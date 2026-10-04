@@ -1,0 +1,3584 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Bake LỚP HÌNH (source.mp4) từ timeline scene — dùng chung cho assemble + export + render_preview.\n\nTách khỏi step assemble để hỗ trợ EDIT kiểu Premiere: timeline hình giờ là dữ liệu non-destructive\n`config.visual_timeline` (user kéo/giãn/dời clip trong Studio). Khi thiếu → sinh mặc định từ\nContentPlan.scenes (đúng như storyboard tính sẵn). Chỉ Export (hoặc bấm "Render preview") mới gọi bake.\n\nclip schema (1 phần tử trong visual_timeline.clips):\n    {seq, start_ms, end_ms, src_in_ms?, src_out_ms?}   # src_* dành cho split/trim clip video (P4)\nBake đặt mỗi clip vào ĐÚNG [start_ms,end_ms] trên timeline; khoảng trống chèn nền đen; chồng lấn bị\nkẹp (clip sau bắt đầu từ điểm kết clip trước) — frontend cũng chặn chồng lấn khi kéo.\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 12           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 14          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (asyncio)
+             24 STORE_NAME               3 (asyncio)
+
+ 15          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               3 (None)
+             30 IMPORT_NAME              4 (json)
+             32 STORE_NAME               4 (json)
+
+ 16          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               3 (None)
+             38 IMPORT_NAME              5 (shutil)
+             40 STORE_NAME               5 (shutil)
+
+ 17          42 LOAD_CONST               1 (0)
+             44 LOAD_CONST               3 (None)
+             46 IMPORT_NAME              6 (tempfile)
+             48 STORE_NAME               6 (tempfile)
+
+ 18          50 LOAD_CONST               1 (0)
+             52 LOAD_CONST               4 (('Path',))
+             54 IMPORT_NAME              7 (pathlib)
+             56 IMPORT_FROM              8 (Path)
+             58 STORE_NAME               8 (Path)
+             60 POP_TOP
+
+ 19          62 LOAD_CONST               1 (0)
+             64 LOAD_CONST               5 (('Callable',))
+             66 IMPORT_NAME              9 (typing)
+             68 IMPORT_FROM             10 (Callable)
+             70 STORE_NAME              10 (Callable)
+             72 POP_TOP
+
+ 21          74 LOAD_CONST               1 (0)
+             76 LOAD_CONST               6 (('is_placeholder',))
+             78 IMPORT_NAME             11 (app.core.asset_names)
+             80 IMPORT_FROM             12 (is_placeholder)
+             82 STORE_NAME              12 (is_placeholder)
+             84 POP_TOP
+
+ 22          86 LOAD_CONST               1 (0)
+             88 LOAD_CONST               7 (('make_error', 'E', 'StudioError'))
+             90 IMPORT_NAME             13 (app.core.errors)
+             92 IMPORT_FROM             14 (make_error)
+             94 STORE_NAME              14 (make_error)
+             96 IMPORT_FROM             15 (E)
+             98 STORE_NAME              15 (E)
+            100 IMPORT_FROM             16 (StudioError)
+            102 STORE_NAME              16 (StudioError)
+            104 POP_TOP
+
+ 23         106 LOAD_CONST               1 (0)
+            108 LOAD_CONST               8 (('ProjectFS',))
+            110 IMPORT_NAME             17 (app.core.fs)
+            112 IMPORT_FROM             18 (ProjectFS)
+            114 STORE_NAME              18 (ProjectFS)
+            116 POP_TOP
+
+ 24         118 LOAD_CONST               1 (0)
+            120 LOAD_CONST               9 (('no_window_kwargs',))
+            122 IMPORT_NAME             19 (app.core.proc)
+            124 IMPORT_FROM             20 (no_window_kwargs)
+            126 STORE_NAME              20 (no_window_kwargs)
+            128 POP_TOP
+
+ 25         130 LOAD_CONST               1 (0)
+            132 LOAD_CONST              10 (('get_ffmpeg_path',))
+            134 IMPORT_NAME             21 (app.adapters.ffmpeg)
+            136 IMPORT_FROM             22 (get_ffmpeg_path)
+            138 STORE_NAME              22 (get_ffmpeg_path)
+            140 POP_TOP
+
+ 26         142 LOAD_CONST               1 (0)
+            144 LOAD_CONST              11 (('SessionLocal',))
+            146 IMPORT_NAME             23 (app.db.session)
+            148 IMPORT_FROM             24 (SessionLocal)
+            150 STORE_NAME              24 (SessionLocal)
+            152 POP_TOP
+
+ 27         154 LOAD_CONST               1 (0)
+            156 LOAD_CONST              12 (('ContentPlan',))
+            158 IMPORT_NAME             25 (app.db.models)
+            160 IMPORT_FROM             26 (ContentPlan)
+            162 STORE_NAME              26 (ContentPlan)
+            164 POP_TOP
+
+ 28         166 LOAD_CONST               1 (0)
+            168 LOAD_CONST              13 (('filtergraph',))
+            170 IMPORT_NAME             27 (app.render)
+            172 IMPORT_FROM             28 (filtergraph)
+            174 STORE_NAME              28 (filtergraph)
+            176 POP_TOP
+
+ 29         178 LOAD_CONST               1 (0)
+            180 LOAD_CONST              14 (('channel_engines',))
+            182 IMPORT_NAME             29 (app.services)
+            184 IMPORT_FROM             30 (channel_engines)
+            186 STORE_NAME              30 (channel_engines)
+            188 POP_TOP
+
+ 31         190 LOAD_CONST              15 (30)
+            192 STORE_NAME              31 (_FPS)
+
+ 32         194 LOAD_CONST              16 (600)
+            196 STORE_NAME              32 (_MIN_SCENE_MS)
+
+ 33         198 LOAD_CONST              17 (8000)
+            200 STORE_NAME              33 (_VIDEO_TARGET_MS)
+
+ 37         202 BUILD_SET                0
+            204 LOAD_CONST              18 (frozenset({'hrslice', 'vertclose', 'circlecrop', 'dissolve', 'diagtl', 'vuslice', 'circleopen', 'wipeup', 'wipedown', 'slideright', 'radial', 'fadewhite', 'diagbl', 'vdslice', 'horzopen', 'distance', 'diagbr', 'horzclose', 'wipeleft', 'rectcrop', 'smoothdown', 'circleclose', 'slidedown', 'hblur', 'vertopen', 'smoothleft', 'wiperight', 'slideleft', 'diagtr', 'smoothup', 'hlslice', 'fade', 'slideup', 'fadeblack', 'smoothright', 'pixelize'}))
+            206 SET_UPDATE               1
+            208 STORE_NAME              34 (XFADE_TRANSITIONS)
+
+ 48         210 LOAD_CONST              19 (150)
+            212 STORE_NAME              35 (_TRANS_MIN_MS)
+
+ 49         214 LOAD_CONST              20 (2000)
+            216 STORE_NAME              36 (_TRANS_MAX_MS)
+
+ 50         218 LOAD_CONST              21 (500)
+            220 STORE_NAME              37 (_TRANS_DEFAULT_MS)
+
+ 53         222 LOAD_CONST              46 (('return', 'dict | None'))
+            224 LOAD_CONST              22 (<code object normalize_transition at 0x7f6c930c4ce0, file "app\render\visual_bake.py", line 53>)
+            226 MAKE_FUNCTION            4 (annotations)
+            228 STORE_NAME              38 (normalize_transition)
+
+ 67         230 LOAD_CONST              47 (('w', 'int', 'h', 'int', 'zoom_in', 'bool', 'total_frames', 'int', 'return', 'str'))
+            232 LOAD_CONST              23 (<code object _ken_burns_vf at 0x7f6c819906b0, file "app\render\visual_bake.py", line 67>)
+            234 MAKE_FUNCTION            4 (annotations)
+            236 STORE_NAME              39 (_ken_burns_vf)
+
+ 96         238 LOAD_CONST              48 (('w', 'int', 'h', 'int', 'return', 'str'))
+            240 LOAD_CONST              24 (<code object _fit_vf at 0x7f6c93096c40, file "app\render\visual_bake.py", line 96>)
+            242 MAKE_FUNCTION            4 (annotations)
+            244 STORE_NAME              40 (_fit_vf)
+
+108         246 LOAD_CONST              25 (('.mp4', '.webm', '.mov', '.mkv', '.m4v'))
+            248 STORE_NAME              41 (_VIDEO_SUFFIXES)
+
+109         250 LOAD_CONST              26 (('.png', '.jpg', '.jpeg', '.webp', '.bmp'))
+            252 STORE_NAME              42 (_IMAGE_SUFFIXES)
+
+112         254 LOAD_CONST              49 (('return', 'Path | None'))
+            256 LOAD_CONST              27 (<code object real_file at 0x7f6c92c3e4f0, file "app\render\visual_bake.py", line 112>)
+            258 MAKE_FUNCTION            4 (annotations)
+            260 STORE_NAME              43 (real_file)
+
+127         262 LOAD_CONST              50 ((None,))
+            264 LOAD_CONST              51 (('p', 'Path', 'return', 'str'))
+            266 LOAD_CONST              28 (<code object _media_kind at 0x7f6c92bcdf10, file "app\render\visual_bake.py", line 127>)
+            268 MAKE_FUNCTION            5 (defaults, annotations)
+            270 STORE_NAME              44 (_media_kind)
+
+141         272 LOAD_CONST              52 (('scene', 'dict', 'return', 'tuple[Path, str] | None'))
+            274 LOAD_CONST              29 (<code object buildable_asset at 0x7f6c81990b90, file "app\render\visual_bake.py", line 141>)
+            276 MAKE_FUNCTION            4 (annotations)
+            278 STORE_NAME              45 (buildable_asset)
+
+160         280 LOAD_CONST              53 (('config', 'dict', 'return', 'tuple[int, int]'))
+            282 LOAD_CONST              30 (<code object dims_for at 0x7f6c92bdef70, file "app\render\visual_bake.py", line 160>)
+            284 MAKE_FUNCTION            4 (annotations)
+            286 STORE_NAME              46 (dims_for)
+
+171         288 LOAD_CONST              54 (('video_id', 'str', 'return', 'list[dict]'))
+            290 LOAD_CONST              31 (<code object _load_scenes at 0x28bb2a80, file "app\render\visual_bake.py", line 171>)
+            292 MAKE_FUNCTION            4 (annotations)
+            294 STORE_NAME              47 (_load_scenes)
+
+182         296 LOAD_CONST              55 (('scenes', 'list[dict]', 'return', 'list[dict]'))
+            298 LOAD_CONST              32 (<code object default_clips at 0x28bc9010, file "app\render\visual_bake.py", line 182>)
+            300 MAKE_FUNCTION            4 (annotations)
+            302 STORE_NAME              48 (default_clips)
+
+201         304 LOAD_CONST              56 (('scenes', 'list[dict]', 'config', 'dict', 'return', 'list[dict]'))
+            306 LOAD_CONST              33 (<code object resolve_clips at 0x28bb8100, file "app\render\visual_bake.py", line 201>)
+            308 MAKE_FUNCTION            4 (annotations)
+            310 STORE_NAME              49 (resolve_clips)
+
+249         312 LOAD_CONST              50 ((None,))
+            314 LOAD_CONST              57 (('ffmpeg', 'str', 'args', 'list[str]', 'cancel_check', 'Callable[[], bool] | None', 'return', 'None'))
+            316 LOAD_CONST              34 (<code object _run at 0x26a2b2f0, file "app\render\visual_bake.py", line 249>)
+            318 MAKE_FUNCTION            5 (defaults, annotations)
+            320 STORE_NAME              50 (_run)
+
+264         322 NOP
+
+262         324 LOAD_CONST              50 ((None,))
+
+263         326 NOP
+
+262         328 NOP
+
+263         330 NOP
+
+262         332 NOP
+
+264         334 NOP
+
+262         336 NOP
+
+264         338 NOP
+
+262         340 LOAD_CONST              58 (('asset', 'Path', 'clip', 'Path', 'dur', 'float', 'w', 'int', 'h', 'int', 'zoom_in', 'bool', 'codec_args', 'list[str]', 'cancel_check', 'Callable[[], bool] | None', 'return', 'None'))
+            342 LOAD_CONST              35 (<code object _render_image_clip at 0x7f6c930c5420, file "app\render\visual_bake.py", line 262>)
+            344 MAKE_FUNCTION            5 (defaults, annotations)
+            346 STORE_NAME              51 (_render_image_clip)
+
+275         348 NOP
+
+273         350 LOAD_CONST              50 ((None,))
+
+274         352 NOP
+
+273         354 NOP
+
+274         356 NOP
+
+273         358 NOP
+
+275         360 NOP
+
+273         362 NOP
+
+275         364 NOP
+
+273         366 LOAD_CONST              59 (('asset', 'Path', 'clip', 'Path', 'dur', 'float', 'w', 'int', 'h', 'int', 'src_in_ms', 'int | None', 'codec_args', 'list[str]', 'cancel_check', 'Callable[[], bool] | None', 'return', 'None'))
+            368 LOAD_CONST              36 (<code object _render_video_clip at 0x7f6c81b0b4b0, file "app\render\visual_bake.py", line 273>)
+            370 MAKE_FUNCTION            5 (defaults, annotations)
+            372 STORE_NAME              52 (_render_video_clip)
+
+286         374 NOP
+
+284         376 LOAD_CONST              50 ((None,))
+
+285         378 NOP
+
+284         380 NOP
+
+286         382 NOP
+
+284         384 NOP
+
+286         386 NOP
+
+284         388 LOAD_CONST              60 (('clip', 'Path', 'dur', 'float', 'w', 'int', 'h', 'int', 'codec_args', 'list[str]', 'cancel_check', 'Callable[[], bool] | None', 'return', 'None'))
+            390 LOAD_CONST              37 (<code object _render_black_clip at 0x7f6c92888c90, file "app\render\visual_bake.py", line 284>)
+            392 MAKE_FUNCTION            5 (defaults, annotations)
+            394 STORE_NAME              53 (_render_black_clip)
+
+295         396 NOP
+
+294         398 LOAD_CONST              50 ((None,))
+
+296         400 LOAD_CONST              38 (True)
+
+294         402 LOAD_CONST              39 (('try_copy',))
+            404 BUILD_CONST_KEY_MAP      1
+
+295         406 NOP
+
+294         408 NOP
+
+296         410 NOP
+
+294         412 NOP
+
+296         414 NOP
+
+294         416 LOAD_CONST              61 (('clips', 'list[Path]', 'out', 'Path', 'codec_args', 'list[str]', 'cancel_check', 'Callable[[], bool] | None', 'try_copy', 'bool', 'return', 'None'))
+            418 LOAD_CONST              40 (<code object _concat at 0x2907dad0, file "app\render\visual_bake.py", line 294>)
+            420 MAKE_FUNCTION            7 (defaults, kwdefaults, annotations)
+            422 STORE_NAME              54 (_concat)
+
+328         424 LOAD_CONST              62 (('durs', 'list[float]', 'trans', 'list[dict | None]', 'return', 'tuple[str, str, float]'))
+            426 LOAD_CONST              41 (<code object build_xfade_graph at 0x28bc1520, file "app\render\visual_bake.py", line 328>)
+            428 MAKE_FUNCTION            4 (annotations)
+            430 STORE_NAME              55 (build_xfade_graph)
+
+357         432 NOP
+
+355         434 LOAD_CONST              50 ((None,))
+
+356         436 NOP
+
+355         438 NOP
+
+356         440 NOP
+
+355         442 NOP
+
+356         444 NOP
+
+355         446 NOP
+
+357         448 NOP
+
+355         450 NOP
+
+357         452 NOP
+
+355         454 LOAD_CONST              63 (('parts', 'list[Path]', 'durs', 'list[float]', 'trans', 'list[dict | None]', 'out', 'Path', 'codec_args', 'list[str]', 'cancel_check', 'Callable[[], bool] | None', 'return', 'None'))
+            456 LOAD_CONST              42 (<code object _render_transitions at 0x269d7310, file "app\render\visual_bake.py", line 355>)
+            458 MAKE_FUNCTION            5 (defaults, annotations)
+            460 STORE_NAME              56 (_render_transitions)
+
+377         462 LOAD_CONST               3 (None)
+            464 LOAD_CONST               3 (None)
+            466 LOAD_CONST               3 (None)
+
+376         468 LOAD_CONST              43 (('cancel_check', 'on_progress', 'emit_log'))
+            470 BUILD_CONST_KEY_MAP      3
+
+377         472 NOP
+
+376         474 LOAD_CONST              64 (('video_id', 'str', 'config', 'dict', 'return', 'Path'))
+            476 LOAD_CONST              44 (<code object bake_source at 0x28bccbc0, file "app\render\visual_bake.py", line 376>)
+            478 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            480 STORE_NAME              57 (bake_source)
+
+541         482 LOAD_CONST               3 (None)
+            484 LOAD_CONST               3 (None)
+            486 LOAD_CONST               3 (None)
+
+540         488 LOAD_CONST              43 (('cancel_check', 'on_progress', 'emit_log'))
+            490 BUILD_CONST_KEY_MAP      3
+
+541         492 NOP
+
+540         494 LOAD_CONST              65 (('video_id', 'str', 'config', 'dict', 'return', 'bool'))
+            496 LOAD_CONST              45 (<code object ensure_source at 0x26a2d130, file "app\render\visual_bake.py", line 540>)
+            498 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            500 STORE_NAME              58 (ensure_source)
+            502 RETURN_CONST             3 (None)
+
+Disassembly of <code object normalize_transition at 0x7f6c930c4ce0, file "app\render\visual_bake.py", line 53>:
+ 53           0 RESUME                   0
+
+ 55           2 LOAD_GLOBAL              1 (NULL + isinstance)
+             12 LOAD_FAST                0 (raw)
+             14 LOAD_GLOBAL              2 (dict)
+             24 CALL                     2
+             32 POP_JUMP_IF_TRUE         1 (to 36)
+
+ 56          34 RETURN_CONST             1 (None)
+
+ 57     >>   36 LOAD_FAST                0 (raw)
+             38 LOAD_ATTR                5 (NULL|self + get)
+             58 LOAD_CONST               2 ('type')
+             60 CALL                     1
+             68 STORE_FAST               1 (typ)
+
+ 58          70 LOAD_FAST                1 (typ)
+             72 LOAD_GLOBAL              6 (XFADE_TRANSITIONS)
+             82 CONTAINS_OP              1
+             84 POP_JUMP_IF_FALSE        1 (to 88)
+
+ 59          86 RETURN_CONST             1 (None)
+
+ 60     >>   88 NOP
+
+ 61          90 LOAD_GLOBAL              9 (NULL + int)
+            100 LOAD_FAST                0 (raw)
+            102 LOAD_ATTR                5 (NULL|self + get)
+            122 LOAD_CONST               3 ('duration_ms')
+            124 LOAD_GLOBAL             10 (_TRANS_DEFAULT_MS)
+            134 CALL                     2
+            142 CALL                     1
+            150 STORE_FAST               2 (d)
+
+ 64     >>  152 LOAD_FAST                1 (typ)
+            154 LOAD_GLOBAL             17 (NULL + max)
+            164 LOAD_GLOBAL             18 (_TRANS_MIN_MS)
+            174 LOAD_GLOBAL             21 (NULL + min)
+            184 LOAD_GLOBAL             22 (_TRANS_MAX_MS)
+            194 LOAD_FAST                2 (d)
+            196 CALL                     2
+            204 CALL                     2
+            212 LOAD_CONST               4 (('type', 'duration_ms'))
+            214 BUILD_CONST_KEY_MAP      2
+            216 RETURN_VALUE
+        >>  218 PUSH_EXC_INFO
+
+ 62         220 LOAD_GLOBAL             12 (TypeError)
+            230 LOAD_GLOBAL             14 (ValueError)
+            240 BUILD_TUPLE              2
+            242 CHECK_EXC_MATCH
+            244 POP_JUMP_IF_FALSE        9 (to 264)
+            246 POP_TOP
+
+ 63         248 LOAD_GLOBAL             10 (_TRANS_DEFAULT_MS)
+            258 STORE_FAST               2 (d)
+            260 POP_EXCEPT
+            262 JUMP_BACKWARD           56 (to 152)
+
+ 62     >>  264 RERAISE                  0
+        >>  266 COPY                     3
+            268 POP_EXCEPT
+            270 RERAISE                  1
+ExceptionTable:
+  90 to 150 -> 218 [0]
+  218 to 258 -> 266 [1] lasti
+  264 to 264 -> 266 [1] lasti
+
+Disassembly of <code object _ken_burns_vf at 0x7f6c819906b0, file "app\render\visual_bake.py", line 67>:
+ 67           0 RESUME                   0
+
+ 81           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('safe_zoom_factor',))
+              6 IMPORT_NAME              0 (app.media.logo_zoom)
+              8 IMPORT_FROM              1 (safe_zoom_factor)
+             10 STORE_FAST               4 (safe_zoom_factor)
+             12 POP_TOP
+
+ 83          14 LOAD_GLOBAL              5 (NULL + max)
+             24 LOAD_CONST               3 (1)
+             26 LOAD_GLOBAL              7 (NULL + int)
+             36 LOAD_FAST                3 (total_frames)
+             38 CALL                     1
+             46 CALL                     2
+             54 STORE_FAST               5 (n)
+
+ 84          56 LOAD_GLOBAL              5 (NULL + max)
+             66 LOAD_CONST               4 (1.0)
+             68 PUSH_NULL
+             70 LOAD_FAST                4 (safe_zoom_factor)
+             72 CALL                     0
+             80 CALL                     2
+             88 STORE_FAST               6 (floor)
+
+ 86          90 LOAD_FAST                2 (zoom_in)
+             92 POP_JUMP_IF_FALSE        8 (to 110)
+             94 LOAD_FAST                6 (floor)
+             96 LOAD_CONST               5 ('.4f')
+             98 FORMAT_VALUE             4 (with format)
+            100 LOAD_CONST               6 ('+0.12*on/')
+            102 LOAD_FAST                5 (n)
+            104 FORMAT_VALUE             0
+            106 BUILD_STRING             3
+            108 JUMP_FORWARD            10 (to 130)
+        >>  110 LOAD_FAST                6 (floor)
+            112 LOAD_CONST               7 (0.12)
+            114 BINARY_OP                0 (+)
+            118 LOAD_CONST               5 ('.4f')
+            120 FORMAT_VALUE             4 (with format)
+            122 LOAD_CONST               8 ('-0.12*on/')
+            124 LOAD_FAST                5 (n)
+            126 FORMAT_VALUE             0
+            128 BUILD_STRING             3
+        >>  130 STORE_FAST               7 (z)
+
+ 87         132 LOAD_FAST                0 (w)
+            134 LOAD_CONST               9 (4)
+            136 BINARY_OP                5 (*)
+            140 LOAD_FAST                1 (h)
+            142 LOAD_CONST               9 (4)
+            144 BINARY_OP                5 (*)
+            148 STORE_FAST               9 (ss_h)
+            150 STORE_FAST               8 (ss_w)
+
+ 89         152 LOAD_CONST              10 ('scale=')
+            154 LOAD_FAST                8 (ss_w)
+            156 FORMAT_VALUE             0
+            158 LOAD_CONST              11 (':')
+            160 LOAD_FAST                9 (ss_h)
+            162 FORMAT_VALUE             0
+            164 LOAD_CONST              12 (':force_original_aspect_ratio=increase:flags=lanczos,crop=')
+
+ 90         166 LOAD_FAST                8 (ss_w)
+            168 FORMAT_VALUE             0
+            170 LOAD_CONST              11 (':')
+            172 LOAD_FAST                9 (ss_h)
+            174 FORMAT_VALUE             0
+            176 LOAD_CONST              13 (",zoompan=z='")
+
+ 91         178 LOAD_FAST                7 (z)
+            180 FORMAT_VALUE             0
+            182 LOAD_CONST              14 ("':d=")
+            184 LOAD_FAST                5 (n)
+            186 FORMAT_VALUE             0
+            188 LOAD_CONST              15 (":x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=")
+
+ 92         190 LOAD_FAST                0 (w)
+            192 FORMAT_VALUE             0
+            194 LOAD_CONST              16 ('x')
+            196 LOAD_FAST                1 (h)
+            198 FORMAT_VALUE             0
+            200 LOAD_CONST              17 (':fps=')
+            202 LOAD_GLOBAL              8 (_FPS)
+            212 FORMAT_VALUE             0
+            214 LOAD_CONST              18 (',format=yuv420p,setsar=1')
+
+ 89         216 BUILD_STRING            19
+
+ 88         218 RETURN_VALUE
+
+Disassembly of <code object _fit_vf at 0x7f6c93096c40, file "app\render\visual_bake.py", line 96>:
+ 96           0 RESUME                   0
+
+101           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('cover_zoom_vf',))
+              6 IMPORT_NAME              0 (app.media.logo_zoom)
+              8 IMPORT_FROM              1 (cover_zoom_vf)
+             10 STORE_FAST               2 (cover_zoom_vf)
+             12 POP_TOP
+
+103          14 PUSH_NULL
+             16 LOAD_FAST                2 (cover_zoom_vf)
+             18 LOAD_FAST                0 (w)
+             20 LOAD_FAST                1 (h)
+             22 LOAD_GLOBAL              4 (_FPS)
+             32 CALL                     3
+             40 RETURN_VALUE
+
+Disassembly of <code object real_file at 0x7f6c92c3e4f0, file "app\render\visual_bake.py", line 112>:
+112           0 RESUME                   0
+
+118           2 LOAD_FAST                0 (path)
+              4 POP_JUMP_IF_TRUE         1 (to 8)
+
+119           6 RETURN_CONST             1 (None)
+
+120     >>    8 NOP
+
+121          10 LOAD_GLOBAL              1 (NULL + Path)
+             20 LOAD_GLOBAL              3 (NULL + str)
+             30 LOAD_FAST                0 (path)
+             32 CALL                     1
+             40 CALL                     1
+             48 STORE_FAST               1 (p)
+
+122          50 LOAD_FAST                1 (p)
+             52 LOAD_ATTR                5 (NULL|self + is_file)
+             72 CALL                     0
+             80 POP_JUMP_IF_FALSE       13 (to 108)
+             82 LOAD_GLOBAL              7 (NULL + is_placeholder)
+             92 LOAD_FAST                1 (p)
+             94 CALL                     1
+            102 POP_JUMP_IF_TRUE         2 (to 108)
+            104 LOAD_FAST                1 (p)
+            106 RETURN_VALUE
+        >>  108 LOAD_CONST               1 (None)
+            110 RETURN_VALUE
+        >>  112 PUSH_EXC_INFO
+
+123         114 LOAD_GLOBAL              8 (OSError)
+            124 CHECK_EXC_MATCH
+            126 POP_JUMP_IF_FALSE        3 (to 134)
+            128 POP_TOP
+
+124         130 POP_EXCEPT
+            132 RETURN_CONST             1 (None)
+
+123     >>  134 RERAISE                  0
+        >>  136 COPY                     3
+            138 POP_EXCEPT
+            140 RERAISE                  1
+ExceptionTable:
+  10 to 104 -> 112 [0]
+  108 to 108 -> 112 [0]
+  112 to 128 -> 136 [1] lasti
+  134 to 134 -> 136 [1] lasti
+
+Disassembly of <code object _media_kind at 0x7f6c92bcdf10, file "app\render\visual_bake.py", line 127>:
+127           0 RESUME                   0
+
+133           2 LOAD_FAST                0 (p)
+              4 LOAD_ATTR                0 (suffix)
+             24 LOAD_ATTR                3 (NULL|self + lower)
+             44 CALL                     0
+             52 STORE_FAST               2 (suf)
+
+134          54 LOAD_FAST                2 (suf)
+             56 LOAD_GLOBAL              4 (_VIDEO_SUFFIXES)
+             66 CONTAINS_OP              0
+             68 POP_JUMP_IF_FALSE        1 (to 72)
+
+135          70 RETURN_CONST             1 ('video')
+
+136     >>   72 LOAD_FAST                2 (suf)
+             74 LOAD_GLOBAL              6 (_IMAGE_SUFFIXES)
+             84 CONTAINS_OP              0
+             86 POP_JUMP_IF_FALSE        1 (to 90)
+
+137          88 RETURN_CONST             2 ('image')
+
+138     >>   90 LOAD_FAST                1 (declared)
+             92 LOAD_CONST               3 (('video', 'image'))
+             94 CONTAINS_OP              0
+             96 POP_JUMP_IF_FALSE        2 (to 102)
+             98 LOAD_FAST                1 (declared)
+            100 RETURN_VALUE
+        >>  102 LOAD_CONST               2 ('image')
+            104 RETURN_VALUE
+
+Disassembly of <code object buildable_asset at 0x7f6c81990b90, file "app\render\visual_bake.py", line 141>:
+141           0 RESUME                   0
+
+149           2 LOAD_GLOBAL              1 (NULL + isinstance)
+             12 LOAD_FAST                0 (scene)
+             14 LOAD_GLOBAL              2 (dict)
+             24 CALL                     2
+             32 POP_JUMP_IF_TRUE         1 (to 36)
+
+150          34 RETURN_CONST             1 (None)
+
+151     >>   36 LOAD_GLOBAL              5 (NULL + real_file)
+             46 LOAD_FAST                0 (scene)
+             48 LOAD_ATTR                7 (NULL|self + get)
+             68 LOAD_CONST               2 ('asset_path')
+             70 CALL                     1
+             78 CALL                     1
+             86 STORE_FAST               1 (p)
+
+152          88 LOAD_FAST                1 (p)
+             90 POP_JUMP_IF_NONE        29 (to 150)
+
+153          92 LOAD_FAST                1 (p)
+             94 LOAD_GLOBAL              9 (NULL + _media_kind)
+            104 LOAD_FAST                1 (p)
+            106 LOAD_FAST                0 (scene)
+            108 LOAD_ATTR                7 (NULL|self + get)
+            128 LOAD_CONST               3 ('asset_kind')
+            130 CALL                     1
+            138 CALL                     2
+            146 BUILD_TUPLE              2
+            148 RETURN_VALUE
+
+154     >>  150 LOAD_GLOBAL              5 (NULL + real_file)
+            160 LOAD_FAST                0 (scene)
+            162 LOAD_ATTR                7 (NULL|self + get)
+            182 LOAD_CONST               4 ('image_path')
+            184 CALL                     1
+            192 CALL                     1
+            200 STORE_FAST               1 (p)
+
+155         202 LOAD_FAST                1 (p)
+            204 POP_JUMP_IF_NONE         4 (to 214)
+
+156         206 LOAD_FAST                1 (p)
+            208 LOAD_CONST               5 ('image')
+            210 BUILD_TUPLE              2
+            212 RETURN_VALUE
+
+157     >>  214 RETURN_CONST             1 (None)
+
+Disassembly of <code object dims_for at 0x7f6c92bdef70, file "app\render\visual_bake.py", line 160>:
+160           0 RESUME                   0
+
+162           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('aspect_to_dims',))
+              6 IMPORT_NAME              0 (app.pipeline.steps.flow_generate)
+              8 IMPORT_FROM              1 (aspect_to_dims)
+             10 STORE_FAST               1 (aspect_to_dims)
+             12 POP_TOP
+
+163          14 LOAD_FAST                0 (config)
+             16 LOAD_ATTR                5 (NULL|self + get)
+             36 LOAD_CONST               3 ('engine_id')
+             38 CALL                     1
+             46 STORE_FAST               2 (engine_id)
+
+164          48 LOAD_FAST                2 (engine_id)
+             50 POP_JUMP_IF_FALSE       21 (to 94)
+             52 LOAD_GLOBAL              7 (NULL + channel_engines)
+             62 LOAD_ATTR                8 (get_engine)
+             82 LOAD_FAST                2 (engine_id)
+             84 CALL                     1
+             92 JUMP_FORWARD             1 (to 96)
+        >>   94 LOAD_CONST               4 (None)
+        >>   96 STORE_FAST               3 (engine)
+
+165          98 LOAD_FAST                0 (config)
+            100 LOAD_ATTR                5 (NULL|self + get)
+            120 LOAD_CONST               5 ('aspect')
+            122 CALL                     1
+            130 STORE_FAST               4 (aspect)
+
+166         132 LOAD_FAST                4 (aspect)
+            134 LOAD_CONST               6 (('16:9', '9:16'))
+            136 CONTAINS_OP              1
+            138 POP_JUMP_IF_FALSE       35 (to 210)
+
+167         140 LOAD_FAST                3 (engine)
+            142 POP_JUMP_IF_FALSE       27 (to 198)
+            144 LOAD_FAST                3 (engine)
+            146 LOAD_ATTR               10 (meta)
+            166 LOAD_ATTR                5 (NULL|self + get)
+            186 LOAD_CONST               7 ('aspect_ratio')
+            188 CALL                     1
+            196 JUMP_FORWARD             1 (to 200)
+        >>  198 LOAD_CONST               4 (None)
+        >>  200 COPY                     1
+            202 POP_JUMP_IF_TRUE         2 (to 208)
+            204 POP_TOP
+            206 LOAD_CONST               8 ('16:9')
+        >>  208 STORE_FAST               4 (aspect)
+
+168     >>  210 PUSH_NULL
+            212 LOAD_FAST                1 (aspect_to_dims)
+            214 LOAD_FAST                4 (aspect)
+            216 CALL                     1
+            224 RETURN_VALUE
+
+Disassembly of <code object _load_scenes at 0x28bb2a80, file "app\render\visual_bake.py", line 171>:
+171           0 RESUME                   0
+
+172           2 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             12 CALL                     0
+             20 BEFORE_WITH
+             22 STORE_FAST               1 (db)
+
+173          24 LOAD_FAST                1 (db)
+             26 LOAD_ATTR                3 (NULL|self + query)
+             46 LOAD_GLOBAL              4 (ContentPlan)
+             56 CALL                     1
+             64 LOAD_ATTR                7 (NULL|self + filter)
+             84 LOAD_GLOBAL              4 (ContentPlan)
+             94 LOAD_ATTR                8 (video_id)
+            114 LOAD_FAST                0 (video_id)
+            116 COMPARE_OP              40 (==)
+            120 CALL                     1
+            128 LOAD_ATTR               11 (NULL|self + first)
+            148 CALL                     0
+            156 STORE_FAST               2 (plan)
+
+174         158 LOAD_FAST                2 (plan)
+            160 POP_JUMP_IF_FALSE       53 (to 268)
+            162 LOAD_FAST                2 (plan)
+            164 LOAD_ATTR               12 (scenes_json)
+            184 POP_JUMP_IF_FALSE       41 (to 268)
+
+175         186 NOP
+
+176         188 LOAD_GLOBAL             15 (NULL + json)
+            198 LOAD_ATTR               16 (loads)
+            218 LOAD_FAST                2 (plan)
+            220 LOAD_ATTR               12 (scenes_json)
+            240 CALL                     1
+
+172         248 SWAP                     2
+            250 LOAD_CONST               0 (None)
+            252 LOAD_CONST               0 (None)
+            254 LOAD_CONST               0 (None)
+            256 CALL                     2
+            264 POP_TOP
+            266 RETURN_VALUE
+        >>  268 LOAD_CONST               0 (None)
+            270 LOAD_CONST               0 (None)
+            272 LOAD_CONST               0 (None)
+            274 CALL                     2
+            282 POP_TOP
+
+179         284 BUILD_LIST               0
+            286 RETURN_VALUE
+        >>  288 PUSH_EXC_INFO
+
+177         290 LOAD_GLOBAL             14 (json)
+            300 LOAD_ATTR               18 (JSONDecodeError)
+            320 CHECK_EXC_MATCH
+            322 POP_JUMP_IF_FALSE       14 (to 352)
+            324 POP_TOP
+
+178         326 BUILD_LIST               0
+            328 SWAP                     2
+            330 POP_EXCEPT
+
+172         332 SWAP                     2
+            334 LOAD_CONST               0 (None)
+            336 LOAD_CONST               0 (None)
+            338 LOAD_CONST               0 (None)
+            340 CALL                     2
+            348 POP_TOP
+            350 RETURN_VALUE
+
+177     >>  352 RERAISE                  0
+        >>  354 COPY                     3
+            356 POP_EXCEPT
+            358 RERAISE                  1
+
+172     >>  360 PUSH_EXC_INFO
+            362 WITH_EXCEPT_START
+            364 POP_JUMP_IF_TRUE         1 (to 368)
+            366 RERAISE                  2
+        >>  368 POP_TOP
+            370 POP_EXCEPT
+            372 POP_TOP
+            374 POP_TOP
+
+179         376 BUILD_LIST               0
+            378 RETURN_VALUE
+        >>  380 COPY                     3
+            382 POP_EXCEPT
+            384 RERAISE                  1
+ExceptionTable:
+  22 to 184 -> 360 [1] lasti
+  188 to 246 -> 288 [1]
+  288 to 328 -> 354 [2] lasti
+  330 to 330 -> 360 [1] lasti
+  352 to 352 -> 354 [2] lasti
+  354 to 358 -> 360 [1] lasti
+  360 to 368 -> 380 [3] lasti
+
+Disassembly of <code object default_clips at 0x28bc9010, file "app\render\visual_bake.py", line 182>:
+182           0 RESUME                   0
+
+185           2 BUILD_LIST               0
+              4 STORE_FAST               1 (clips)
+
+186           6 LOAD_FAST                0 (scenes)
+              8 GET_ITER
+        >>   10 FOR_ITER               184 (to 382)
+             14 STORE_FAST               2 (s)
+
+187          16 LOAD_FAST                2 (s)
+             18 LOAD_ATTR                1 (NULL|self + get)
+             38 LOAD_CONST               1 ('render_skip')
+             40 CALL                     1
+             48 POP_JUMP_IF_FALSE        1 (to 52)
+
+188          50 JUMP_BACKWARD           21 (to 10)
+
+189     >>   52 LOAD_FAST                2 (s)
+             54 LOAD_ATTR                1 (NULL|self + get)
+             74 LOAD_CONST               2 ('seq')
+             76 CALL                     1
+             84 STORE_FAST               3 (seq)
+
+190          86 LOAD_FAST                3 (seq)
+             88 POP_JUMP_IF_NOT_NONE     1 (to 92)
+
+191          90 JUMP_BACKWARD           41 (to 10)
+
+192     >>   92 LOAD_GLOBAL              3 (NULL + int)
+            102 LOAD_FAST                2 (s)
+            104 LOAD_ATTR                1 (NULL|self + get)
+            124 LOAD_CONST               3 ('render_start_ms')
+            126 LOAD_FAST                2 (s)
+            128 LOAD_ATTR                1 (NULL|self + get)
+            148 LOAD_CONST               4 ('start_ms')
+            150 LOAD_CONST               5 (0)
+            152 CALL                     2
+            160 CALL                     2
+            168 COPY                     1
+            170 POP_JUMP_IF_TRUE         2 (to 176)
+            172 POP_TOP
+            174 LOAD_CONST               5 (0)
+        >>  176 CALL                     1
+            184 STORE_FAST               4 (start)
+
+193         186 LOAD_GLOBAL              3 (NULL + int)
+            196 LOAD_FAST                2 (s)
+            198 LOAD_ATTR                1 (NULL|self + get)
+            218 LOAD_CONST               6 ('render_end_ms')
+            220 LOAD_FAST                2 (s)
+            222 LOAD_ATTR                1 (NULL|self + get)
+            242 LOAD_CONST               7 ('end_ms')
+            244 LOAD_FAST                4 (start)
+            246 LOAD_CONST               8 (4000)
+            248 BINARY_OP                0 (+)
+            252 CALL                     2
+            260 CALL                     2
+            268 COPY                     1
+            270 POP_JUMP_IF_TRUE         5 (to 282)
+            272 POP_TOP
+            274 LOAD_FAST                4 (start)
+            276 LOAD_CONST               8 (4000)
+            278 BINARY_OP                0 (+)
+        >>  282 CALL                     1
+            290 STORE_FAST               5 (end)
+
+194         292 LOAD_FAST                5 (end)
+            294 LOAD_FAST                4 (start)
+            296 COMPARE_OP              26 (<=)
+            300 POP_JUMP_IF_FALSE        9 (to 320)
+
+195         302 LOAD_FAST                4 (start)
+            304 LOAD_GLOBAL              4 (_MIN_SCENE_MS)
+            314 BINARY_OP                0 (+)
+            318 STORE_FAST               5 (end)
+
+196     >>  320 LOAD_FAST                1 (clips)
+            322 LOAD_ATTR                7 (NULL|self + append)
+            342 LOAD_GLOBAL              3 (NULL + int)
+            352 LOAD_FAST                3 (seq)
+            354 CALL                     1
+            362 LOAD_FAST                4 (start)
+            364 LOAD_FAST                5 (end)
+            366 LOAD_CONST               9 (('seq', 'start_ms', 'end_ms'))
+            368 BUILD_CONST_KEY_MAP      3
+            370 CALL                     1
+            378 POP_TOP
+            380 JUMP_BACKWARD          186 (to 10)
+
+186     >>  382 END_FOR
+
+197         384 LOAD_FAST                1 (clips)
+            386 LOAD_ATTR                9 (NULL|self + sort)
+            406 LOAD_CONST              10 (<code object <lambda> at 0x7f6c814864c0, file "app\render\visual_bake.py", line 197>)
+            408 MAKE_FUNCTION            0
+            410 KW_NAMES                11 (('key',))
+            412 CALL                     1
+            420 POP_TOP
+
+198         422 LOAD_FAST                1 (clips)
+            424 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c814864c0, file "app\render\visual_bake.py", line 197>:
+197           0 RESUME                   0
+              2 LOAD_FAST                0 (c)
+              4 LOAD_CONST               1 ('start_ms')
+              6 BINARY_SUBSCR
+             10 RETURN_VALUE
+
+Disassembly of <code object resolve_clips at 0x28bb8100, file "app\render\visual_bake.py", line 201>:
+201           0 RESUME                   0
+
+208           2 LOAD_FAST                0 (scenes)
+              4 GET_ITER
+              6 LOAD_FAST_AND_CLEAR      2 (s)
+              8 SWAP                     2
+             10 BUILD_MAP                0
+             12 SWAP                     2
+        >>   14 FOR_ITER                35 (to 88)
+             18 STORE_FAST               2 (s)
+             20 LOAD_FAST                2 (s)
+             22 LOAD_ATTR                1 (NULL|self + get)
+             42 LOAD_CONST               1 ('seq')
+             44 CALL                     1
+             52 POP_JUMP_IF_NOT_NONE     1 (to 56)
+             54 JUMP_BACKWARD           21 (to 14)
+        >>   56 LOAD_GLOBAL              3 (NULL + int)
+             66 LOAD_FAST                2 (s)
+             68 LOAD_CONST               1 ('seq')
+             70 BINARY_SUBSCR
+             74 CALL                     1
+             82 LOAD_FAST                2 (s)
+             84 MAP_ADD                  2
+             86 JUMP_BACKWARD           37 (to 14)
+        >>   88 END_FOR
+             90 STORE_FAST               3 (by_seq)
+             92 STORE_FAST               2 (s)
+
+209          94 LOAD_FAST                1 (config)
+             96 COPY                     1
+             98 POP_JUMP_IF_TRUE         2 (to 104)
+            100 POP_TOP
+            102 BUILD_MAP                0
+        >>  104 LOAD_ATTR                1 (NULL|self + get)
+            124 LOAD_CONST               3 ('visual_timeline')
+            126 CALL                     1
+            134 COPY                     1
+            136 POP_JUMP_IF_TRUE         2 (to 142)
+            138 POP_TOP
+            140 BUILD_MAP                0
+        >>  142 STORE_FAST               4 (vt)
+
+210         144 LOAD_GLOBAL              5 (NULL + isinstance)
+            154 LOAD_FAST                4 (vt)
+            156 LOAD_GLOBAL              6 (dict)
+            166 CALL                     2
+            174 POP_JUMP_IF_FALSE       17 (to 210)
+            176 LOAD_FAST                4 (vt)
+            178 LOAD_ATTR                1 (NULL|self + get)
+            198 LOAD_CONST               4 ('clips')
+            200 CALL                     1
+            208 JUMP_FORWARD             1 (to 212)
+        >>  210 LOAD_CONST               2 (None)
+        >>  212 STORE_FAST               5 (raw)
+
+212         214 LOAD_GLOBAL              5 (NULL + isinstance)
+            224 LOAD_FAST                5 (raw)
+            226 LOAD_GLOBAL              8 (list)
+            236 CALL                     2
+            244 POP_JUMP_IF_FALSE      253 (to 752)
+            246 LOAD_FAST                5 (raw)
+            248 POP_JUMP_IF_FALSE      251 (to 752)
+
+213         250 BUILD_LIST               0
+            252 STORE_FAST               6 (clips)
+
+214         254 LOAD_FAST                5 (raw)
+            256 GET_ITER
+        >>  258 FOR_ITER               224 (to 710)
+            262 STORE_FAST               7 (c)
+
+215         264 LOAD_GLOBAL              5 (NULL + isinstance)
+            274 LOAD_FAST                7 (c)
+            276 LOAD_GLOBAL              6 (dict)
+            286 CALL                     2
+            294 POP_JUMP_IF_TRUE         1 (to 298)
+
+216         296 JUMP_BACKWARD           20 (to 258)
+
+217     >>  298 NOP
+
+218         300 LOAD_GLOBAL              3 (NULL + int)
+            310 LOAD_FAST                7 (c)
+            312 LOAD_CONST               1 ('seq')
+            314 BINARY_SUBSCR
+            318 CALL                     1
+            326 STORE_FAST               8 (seq)
+
+219         328 LOAD_GLOBAL              3 (NULL + int)
+            338 LOAD_FAST                7 (c)
+            340 LOAD_CONST               5 ('start_ms')
+            342 BINARY_SUBSCR
+            346 CALL                     1
+            354 STORE_FAST               9 (start)
+
+220         356 LOAD_GLOBAL              3 (NULL + int)
+            366 LOAD_FAST                7 (c)
+            368 LOAD_CONST               6 ('end_ms')
+            370 BINARY_SUBSCR
+            374 CALL                     1
+            382 STORE_FAST              10 (end)
+
+223         384 LOAD_FAST               10 (end)
+            386 LOAD_FAST                9 (start)
+            388 COMPARE_OP              68 (>)
+            392 POP_JUMP_IF_TRUE         1 (to 396)
+            394 JUMP_BACKWARD           69 (to 258)
+        >>  396 LOAD_FAST                8 (seq)
+            398 LOAD_FAST                3 (by_seq)
+            400 CONTAINS_OP              0
+            402 POP_JUMP_IF_TRUE         1 (to 406)
+            404 JUMP_BACKWARD           74 (to 258)
+
+224     >>  406 LOAD_FAST                8 (seq)
+            408 LOAD_FAST                9 (start)
+            410 LOAD_FAST               10 (end)
+            412 LOAD_CONST               7 (('seq', 'start_ms', 'end_ms'))
+            414 BUILD_CONST_KEY_MAP      3
+            416 STORE_FAST              11 (clip)
+
+225         418 LOAD_FAST                7 (c)
+            420 LOAD_ATTR                1 (NULL|self + get)
+            440 LOAD_CONST               8 ('src_in_ms')
+            442 CALL                     1
+            450 POP_JUMP_IF_NONE        78 (to 608)
+            452 LOAD_FAST                7 (c)
+            454 LOAD_ATTR                1 (NULL|self + get)
+            474 LOAD_CONST               9 ('src_out_ms')
+            476 CALL                     1
+            484 POP_JUMP_IF_NONE        61 (to 608)
+
+226         486 NOP
+
+227         488 LOAD_GLOBAL             17 (NULL + max)
+            498 LOAD_CONST              10 (0)
+            500 LOAD_GLOBAL              3 (NULL + int)
+            510 LOAD_FAST                7 (c)
+            512 LOAD_CONST               8 ('src_in_ms')
+            514 BINARY_SUBSCR
+            518 CALL                     1
+            526 CALL                     2
+            534 LOAD_FAST               11 (clip)
+            536 LOAD_CONST               8 ('src_in_ms')
+            538 STORE_SUBSCR
+
+228         542 LOAD_GLOBAL             17 (NULL + max)
+            552 LOAD_FAST               11 (clip)
+            554 LOAD_CONST               8 ('src_in_ms')
+            556 BINARY_SUBSCR
+            560 LOAD_CONST              11 (1)
+            562 BINARY_OP                0 (+)
+            566 LOAD_GLOBAL              3 (NULL + int)
+            576 LOAD_FAST                7 (c)
+            578 LOAD_CONST               9 ('src_out_ms')
+            580 BINARY_SUBSCR
+            584 CALL                     1
+            592 CALL                     2
+            600 LOAD_FAST               11 (clip)
+            602 LOAD_CONST               9 ('src_out_ms')
+            604 STORE_SUBSCR
+
+231     >>  608 LOAD_GLOBAL             19 (NULL + normalize_transition)
+            618 LOAD_FAST                7 (c)
+            620 LOAD_ATTR                1 (NULL|self + get)
+            640 LOAD_CONST              12 ('transition_out')
+            642 CALL                     1
+            650 CALL                     1
+            658 STORE_FAST              12 (trans)
+
+232         660 LOAD_FAST               12 (trans)
+            662 POP_JUMP_IF_FALSE        5 (to 674)
+
+233         664 LOAD_FAST               12 (trans)
+            666 LOAD_FAST               11 (clip)
+            668 LOAD_CONST              12 ('transition_out')
+            670 STORE_SUBSCR
+
+234     >>  674 LOAD_FAST                6 (clips)
+            676 LOAD_ATTR               21 (NULL|self + append)
+            696 LOAD_FAST               11 (clip)
+            698 CALL                     1
+            706 POP_TOP
+            708 JUMP_BACKWARD          226 (to 258)
+
+214     >>  710 END_FOR
+
+235         712 LOAD_FAST                6 (clips)
+            714 LOAD_ATTR               23 (NULL|self + sort)
+            734 LOAD_CONST              13 (<code object <lambda> at 0x7f6c81485210, file "app\render\visual_bake.py", line 235>)
+            736 MAKE_FUNCTION            0
+            738 KW_NAMES                14 (('key',))
+            740 CALL                     1
+            748 POP_TOP
+            750 JUMP_FORWARD            11 (to 774)
+
+237     >>  752 LOAD_GLOBAL             25 (NULL + default_clips)
+            762 LOAD_FAST                0 (scenes)
+            764 CALL                     1
+            772 STORE_FAST               6 (clips)
+
+239     >>  774 BUILD_LIST               0
+            776 STORE_FAST              13 (out)
+
+240         778 LOAD_FAST                6 (clips)
+            780 GET_ITER
+        >>  782 FOR_ITER                62 (to 910)
+            786 STORE_FAST               7 (c)
+
+241         788 LOAD_GLOBAL             27 (NULL + buildable_asset)
+            798 LOAD_FAST                3 (by_seq)
+            800 LOAD_ATTR                1 (NULL|self + get)
+            820 LOAD_FAST                7 (c)
+            822 LOAD_CONST               1 ('seq')
+            824 BINARY_SUBSCR
+            828 CALL                     1
+            836 CALL                     1
+            844 STORE_FAST              14 (got)
+
+242         846 LOAD_FAST               14 (got)
+            848 POP_JUMP_IF_NOT_NONE     1 (to 852)
+
+243         850 JUMP_BACKWARD           35 (to 782)
+
+244     >>  852 LOAD_FAST               14 (got)
+            854 UNPACK_SEQUENCE          2
+            858 LOAD_FAST                7 (c)
+            860 LOAD_CONST              15 ('asset')
+            862 STORE_SUBSCR
+            866 LOAD_FAST                7 (c)
+            868 LOAD_CONST              16 ('media')
+            870 STORE_SUBSCR
+
+245         874 LOAD_FAST               13 (out)
+            876 LOAD_ATTR               21 (NULL|self + append)
+            896 LOAD_FAST                7 (c)
+            898 CALL                     1
+            906 POP_TOP
+            908 JUMP_BACKWARD           64 (to 782)
+
+240     >>  910 END_FOR
+
+246         912 LOAD_FAST               13 (out)
+            914 RETURN_VALUE
+        >>  916 SWAP                     2
+            918 POP_TOP
+
+208         920 SWAP                     2
+            922 STORE_FAST               2 (s)
+            924 RERAISE                  0
+        >>  926 PUSH_EXC_INFO
+
+221         928 LOAD_GLOBAL             10 (KeyError)
+            938 LOAD_GLOBAL             12 (TypeError)
+            948 LOAD_GLOBAL             14 (ValueError)
+            958 BUILD_TUPLE              3
+            960 CHECK_EXC_MATCH
+            962 POP_JUMP_IF_FALSE        4 (to 972)
+            964 POP_TOP
+
+222         966 POP_EXCEPT
+            968 EXTENDED_ARG             1
+            970 JUMP_BACKWARD          357 (to 258)
+
+221     >>  972 RERAISE                  0
+        >>  974 COPY                     3
+            976 POP_EXCEPT
+            978 RERAISE                  1
+        >>  980 PUSH_EXC_INFO
+
+229         982 LOAD_GLOBAL             12 (TypeError)
+            992 LOAD_GLOBAL             14 (ValueError)
+           1002 BUILD_TUPLE              2
+           1004 CHECK_EXC_MATCH
+           1006 POP_JUMP_IF_FALSE        3 (to 1014)
+           1008 POP_TOP
+
+230        1010 POP_EXCEPT
+           1012 JUMP_BACKWARD          203 (to 608)
+
+229     >> 1014 RERAISE                  0
+        >> 1016 COPY                     3
+           1018 POP_EXCEPT
+           1020 RERAISE                  1
+ExceptionTable:
+  10 to 52 -> 916 [2]
+  56 to 88 -> 916 [2]
+  300 to 382 -> 926 [1]
+  488 to 606 -> 980 [1]
+  926 to 964 -> 974 [2] lasti
+  972 to 972 -> 974 [2] lasti
+  980 to 1008 -> 1016 [2] lasti
+  1014 to 1014 -> 1016 [2] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c81485210, file "app\render\visual_bake.py", line 235>:
+235           0 RESUME                   0
+              2 LOAD_FAST                0 (c)
+              4 LOAD_CONST               1 ('start_ms')
+              6 BINARY_SUBSCR
+             10 RETURN_VALUE
+
+Disassembly of <code object _run at 0x26a2b2f0, file "app\render\visual_bake.py", line 249>:
+249           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+250           6 LOAD_GLOBAL              1 (NULL + asyncio)
+             16 LOAD_ATTR                2 (create_subprocess_exec)
+
+251          36 LOAD_FAST                0 (ffmpeg)
+             38 LOAD_CONST               1 ('-y')
+             40 LOAD_CONST               2 ('-hide_banner')
+
+250          42 BUILD_LIST               3
+
+251          44 LOAD_FAST                1 (args)
+
+250          46 LIST_EXTEND              1
+             48 CALL_INTRINSIC_1         6 (INTRINSIC_LIST_TO_TUPLE)
+
+252          50 LOAD_GLOBAL              0 (asyncio)
+             60 LOAD_ATTR                4 (subprocess)
+             80 LOAD_ATTR                6 (DEVNULL)
+            100 LOAD_GLOBAL              0 (asyncio)
+            110 LOAD_ATTR                4 (subprocess)
+            130 LOAD_ATTR                8 (PIPE)
+
+250         150 LOAD_CONST               3 (('stdout', 'stderr'))
+            152 BUILD_CONST_KEY_MAP      2
+
+253         154 LOAD_GLOBAL             11 (NULL + no_window_kwargs)
+            164 CALL                     0
+
+250         172 DICT_MERGE               1
+            174 CALL_FUNCTION_EX         1
+            176 GET_AWAITABLE            0
+            178 LOAD_CONST               0 (None)
+        >>  180 SEND                     3 (to 190)
+            184 YIELD_VALUE              2
+            186 RESUME                   3
+            188 JUMP_BACKWARD_NO_INTERRUPT     5 (to 180)
+        >>  190 END_SEND
+            192 STORE_FAST               3 (proc)
+
+255         194 LOAD_CONST               4 (0)
+            196 LOAD_CONST               5 (('safe_communicate_proc',))
+            198 IMPORT_NAME              6 (app.core.proc)
+            200 IMPORT_FROM              7 (safe_communicate_proc)
+            202 STORE_FAST               4 (safe_communicate_proc)
+            204 POP_TOP
+
+256         206 PUSH_NULL
+            208 LOAD_FAST                4 (safe_communicate_proc)
+            210 LOAD_FAST                3 (proc)
+            212 LOAD_FAST                2 (cancel_check)
+            214 KW_NAMES                 6 (('cancel_check',))
+            216 CALL                     2
+            224 GET_AWAITABLE            0
+            226 LOAD_CONST               0 (None)
+        >>  228 SEND                     3 (to 238)
+            232 YIELD_VALUE              2
+            234 RESUME                   3
+            236 JUMP_BACKWARD_NO_INTERRUPT     5 (to 228)
+        >>  238 END_SEND
+            240 UNPACK_SEQUENCE          2
+            244 STORE_FAST               5 (_)
+            246 STORE_FAST               6 (err)
+
+257         248 LOAD_FAST                3 (proc)
+            250 LOAD_ATTR               16 (returncode)
+            270 LOAD_CONST               4 (0)
+            272 COMPARE_OP              55 (!=)
+            276 POP_JUMP_IF_FALSE       48 (to 374)
+
+258         278 LOAD_GLOBAL             19 (NULL + make_error)
+            288 LOAD_GLOBAL             20 (E)
+            298 LOAD_ATTR               22 (RENDER_FAILED)
+
+259         318 LOAD_CONST               7 ('ffmpeg dựng cảnh lỗi: ')
+            320 LOAD_FAST                6 (err)
+            322 LOAD_ATTR               25 (NULL|self + decode)
+            342 LOAD_CONST               8 ('utf-8')
+            344 LOAD_CONST               9 ('ignore')
+            346 CALL                     2
+            354 LOAD_CONST              10 (-300)
+            356 LOAD_CONST               0 (None)
+            358 BINARY_SLICE
+            360 FORMAT_VALUE             0
+            362 BUILD_STRING             2
+
+258         364 CALL                     2
+            372 RAISE_VARARGS            1
+
+257     >>  374 RETURN_CONST             0 (None)
+
+250     >>  376 CLEANUP_THROW
+            378 JUMP_BACKWARD           95 (to 190)
+
+256     >>  380 CLEANUP_THROW
+            382 JUMP_BACKWARD           73 (to 238)
+        >>  384 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            386 RERAISE                  1
+ExceptionTable:
+  4 to 182 -> 384 [0] lasti
+  184 to 184 -> 376 [2]
+  186 to 230 -> 384 [0] lasti
+  232 to 232 -> 380 [2]
+  234 to 376 -> 384 [0] lasti
+  380 to 380 -> 384 [0] lasti
+
+Disassembly of <code object _render_image_clip at 0x7f6c930c5420, file "app\render\visual_bake.py", line 262>:
+262           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+265           6 LOAD_GLOBAL              1 (NULL + max)
+             16 LOAD_CONST               1 (1)
+             18 LOAD_GLOBAL              3 (NULL + round)
+             28 LOAD_FAST                3 (dur)
+             30 LOAD_GLOBAL              4 (_FPS)
+             40 BINARY_OP                5 (*)
+             44 CALL                     1
+             52 CALL                     2
+             60 STORE_FAST               9 (total_frames)
+
+266          62 LOAD_GLOBAL              7 (NULL + _run)
+             72 LOAD_FAST                0 (ffmpeg)
+
+267          74 LOAD_CONST               2 ('-loop')
+             76 LOAD_CONST               3 ('1')
+             78 LOAD_CONST               4 ('-i')
+             80 LOAD_GLOBAL              9 (NULL + str)
+             90 LOAD_FAST                1 (asset)
+             92 LOAD_ATTR               11 (NULL|self + resolve)
+            112 CALL                     0
+            120 CALL                     1
+            128 LOAD_CONST               5 ('-t')
+            130 LOAD_FAST                3 (dur)
+            132 LOAD_CONST               6 ('.3f')
+            134 FORMAT_VALUE             4 (with format)
+
+268         136 LOAD_CONST               7 ('-vf')
+            138 LOAD_GLOBAL             13 (NULL + _ken_burns_vf)
+            148 LOAD_FAST                4 (w)
+            150 LOAD_FAST                5 (h)
+            152 LOAD_FAST                6 (zoom_in)
+            154 LOAD_FAST                9 (total_frames)
+            156 CALL                     4
+
+266         164 BUILD_LIST               8
+
+269         166 LOAD_FAST                7 (codec_args)
+
+266         168 LIST_EXTEND              1
+
+269         170 LOAD_CONST               8 ('-an')
+
+266         172 LIST_APPEND              1
+
+269         174 LOAD_GLOBAL              9 (NULL + str)
+            184 LOAD_FAST                2 (clip)
+            186 LOAD_ATTR               11 (NULL|self + resolve)
+            206 CALL                     0
+            214 CALL                     1
+
+266         222 LIST_APPEND              1
+
+270         224 LOAD_FAST                8 (cancel_check)
+
+266         226 KW_NAMES                 9 (('cancel_check',))
+            228 CALL                     3
+            236 GET_AWAITABLE            0
+            238 LOAD_CONST               0 (None)
+        >>  240 SEND                     3 (to 250)
+            244 YIELD_VALUE              2
+            246 RESUME                   3
+            248 JUMP_BACKWARD_NO_INTERRUPT     5 (to 240)
+        >>  250 END_SEND
+            252 POP_TOP
+            254 RETURN_CONST             0 (None)
+        >>  256 CLEANUP_THROW
+            258 JUMP_BACKWARD            5 (to 250)
+        >>  260 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            262 RERAISE                  1
+ExceptionTable:
+  4 to 242 -> 260 [0] lasti
+  244 to 244 -> 256 [2]
+  246 to 256 -> 260 [0] lasti
+
+Disassembly of <code object _render_video_clip at 0x7f6c81b0b4b0, file "app\render\visual_bake.py", line 273>:
+273           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+277           6 LOAD_FAST                6 (src_in_ms)
+              8 POP_JUMP_IF_FALSE        9 (to 28)
+             10 LOAD_CONST               1 ('-ss')
+             12 LOAD_FAST                6 (src_in_ms)
+             14 LOAD_CONST               2 (1000.0)
+             16 BINARY_OP               11 (/)
+             20 LOAD_CONST               3 ('.3f')
+             22 FORMAT_VALUE             4 (with format)
+             24 BUILD_LIST               2
+             26 JUMP_FORWARD             1 (to 30)
+        >>   28 BUILD_LIST               0
+        >>   30 STORE_FAST               9 (pre)
+
+278          32 LOAD_GLOBAL              1 (NULL + _run)
+             42 LOAD_FAST                0 (ffmpeg)
+
+279          44 LOAD_CONST               4 ('-stream_loop')
+             46 LOAD_CONST               5 ('-1')
+
+278          48 BUILD_LIST               2
+
+279          50 LOAD_FAST                9 (pre)
+
+278          52 LIST_EXTEND              1
+
+279          54 LOAD_CONST               6 ('-i')
+
+278          56 LIST_APPEND              1
+
+279          58 LOAD_GLOBAL              3 (NULL + str)
+             68 LOAD_FAST                1 (asset)
+             70 LOAD_ATTR                5 (NULL|self + resolve)
+             90 CALL                     0
+             98 CALL                     1
+
+278         106 LIST_APPEND              1
+
+279         108 LOAD_CONST               7 ('-t')
+
+278         110 LIST_APPEND              1
+
+279         112 LOAD_FAST                3 (dur)
+            114 LOAD_CONST               3 ('.3f')
+            116 FORMAT_VALUE             4 (with format)
+
+278         118 LIST_APPEND              1
+
+280         120 LOAD_CONST               8 ('-vf')
+
+278         122 LIST_APPEND              1
+
+280         124 LOAD_GLOBAL              7 (NULL + _fit_vf)
+            134 LOAD_FAST                4 (w)
+            136 LOAD_FAST                5 (h)
+            138 CALL                     2
+
+278         146 LIST_APPEND              1
+
+280         148 LOAD_FAST                7 (codec_args)
+
+278         150 LIST_EXTEND              1
+
+280         152 LOAD_CONST               9 ('-an')
+
+278         154 LIST_APPEND              1
+
+280         156 LOAD_GLOBAL              3 (NULL + str)
+            166 LOAD_FAST                2 (clip)
+            168 LOAD_ATTR                5 (NULL|self + resolve)
+            188 CALL                     0
+            196 CALL                     1
+
+278         204 LIST_APPEND              1
+
+281         206 LOAD_FAST                8 (cancel_check)
+
+278         208 KW_NAMES                10 (('cancel_check',))
+            210 CALL                     3
+            218 GET_AWAITABLE            0
+            220 LOAD_CONST               0 (None)
+        >>  222 SEND                     3 (to 232)
+            226 YIELD_VALUE              2
+            228 RESUME                   3
+            230 JUMP_BACKWARD_NO_INTERRUPT     5 (to 222)
+        >>  232 END_SEND
+            234 POP_TOP
+            236 RETURN_CONST             0 (None)
+        >>  238 CLEANUP_THROW
+            240 JUMP_BACKWARD            5 (to 232)
+        >>  242 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            244 RERAISE                  1
+ExceptionTable:
+  4 to 224 -> 242 [0] lasti
+  226 to 226 -> 238 [2]
+  228 to 238 -> 242 [0] lasti
+
+Disassembly of <code object _render_black_clip at 0x7f6c92888c90, file "app\render\visual_bake.py", line 284>:
+284           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+288           6 LOAD_GLOBAL              1 (NULL + _run)
+             16 LOAD_FAST                0 (ffmpeg)
+
+289          18 LOAD_CONST               1 ('-f')
+             20 LOAD_CONST               2 ('lavfi')
+             22 LOAD_CONST               3 ('-i')
+             24 LOAD_CONST               4 ('color=c=black:s=')
+             26 LOAD_FAST                3 (w)
+             28 FORMAT_VALUE             0
+             30 LOAD_CONST               5 ('x')
+             32 LOAD_FAST                4 (h)
+             34 FORMAT_VALUE             0
+             36 LOAD_CONST               6 (':r=')
+             38 LOAD_GLOBAL              2 (_FPS)
+             48 FORMAT_VALUE             0
+             50 BUILD_STRING             6
+             52 LOAD_CONST               7 ('-t')
+             54 LOAD_FAST                2 (dur)
+             56 LOAD_CONST               8 ('.3f')
+             58 FORMAT_VALUE             4 (with format)
+
+288          60 BUILD_LIST               6
+
+290          62 LOAD_FAST                5 (codec_args)
+
+288          64 LIST_EXTEND              1
+
+290          66 LOAD_CONST               9 ('-an')
+
+288          68 LIST_APPEND              1
+
+290          70 LOAD_GLOBAL              5 (NULL + str)
+             80 LOAD_FAST                1 (clip)
+             82 LOAD_ATTR                7 (NULL|self + resolve)
+            102 CALL                     0
+            110 CALL                     1
+
+288         118 LIST_APPEND              1
+
+291         120 LOAD_FAST                6 (cancel_check)
+
+288         122 KW_NAMES                10 (('cancel_check',))
+            124 CALL                     3
+            132 GET_AWAITABLE            0
+            134 LOAD_CONST              11 (None)
+        >>  136 SEND                     3 (to 146)
+            140 YIELD_VALUE              2
+            142 RESUME                   3
+            144 JUMP_BACKWARD_NO_INTERRUPT     5 (to 136)
+        >>  146 END_SEND
+            148 POP_TOP
+            150 RETURN_CONST            11 (None)
+        >>  152 CLEANUP_THROW
+            154 JUMP_BACKWARD            5 (to 146)
+        >>  156 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            158 RERAISE                  1
+ExceptionTable:
+  4 to 138 -> 156 [0] lasti
+  140 to 140 -> 152 [2]
+  142 to 152 -> 156 [0] lasti
+
+Disassembly of <code object _concat at 0x2907dad0, file "app\render\visual_bake.py", line 294>:
+294           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+308           6 LOAD_FAST                2 (out)
+              8 LOAD_ATTR                1 (NULL|self + with_suffix)
+             28 LOAD_CONST               1 ('.concat.txt')
+             30 CALL                     1
+             38 STORE_FAST               6 (list_path)
+
+309          40 LOAD_FAST                6 (list_path)
+             42 LOAD_ATTR                3 (NULL|self + write_text)
+             62 LOAD_CONST               2 ('\n')
+             64 LOAD_ATTR                5 (NULL|self + join)
+             84 LOAD_CONST               3 (<code object <genexpr> at 0x7f6c81ad2e50, file "app\render\visual_bake.py", line 309>)
+             86 MAKE_FUNCTION            0
+             88 LOAD_FAST                1 (clips)
+             90 GET_ITER
+             92 CALL                     0
+            100 CALL                     1
+
+310         108 LOAD_CONST               4 ('utf-8')
+
+309         110 KW_NAMES                 5 (('encoding',))
+            112 CALL                     2
+            120 POP_TOP
+
+311         122 LOAD_CONST               6 ('-f')
+            124 LOAD_CONST               7 ('concat')
+            126 LOAD_CONST               8 ('-safe')
+            128 LOAD_CONST               9 ('0')
+            130 LOAD_CONST              10 ('-i')
+            132 LOAD_GLOBAL              7 (NULL + str)
+            142 LOAD_FAST                6 (list_path)
+            144 CALL                     1
+            152 BUILD_LIST               6
+            154 STORE_FAST               7 (base)
+
+312         156 NOP
+
+313         158 LOAD_FAST                5 (try_copy)
+            160 POP_JUMP_IF_FALSE       78 (to 318)
+
+314         162 NOP
+
+315         164 LOAD_GLOBAL              9 (NULL + _run)
+            174 LOAD_FAST                0 (ffmpeg)
+            176 BUILD_LIST               0
+            178 LOAD_FAST                7 (base)
+            180 LIST_EXTEND              1
+            182 LOAD_CONST              11 ('-c')
+            184 LIST_APPEND              1
+            186 LOAD_CONST              12 ('copy')
+            188 LIST_APPEND              1
+            190 LOAD_CONST              13 ('-movflags')
+            192 LIST_APPEND              1
+            194 LOAD_CONST              14 ('+faststart')
+            196 LIST_APPEND              1
+
+316         198 LOAD_GLOBAL              7 (NULL + str)
+            208 LOAD_FAST                2 (out)
+            210 LOAD_ATTR               11 (NULL|self + resolve)
+            230 CALL                     0
+            238 CALL                     1
+
+315         246 LIST_APPEND              1
+
+316         248 LOAD_FAST                4 (cancel_check)
+
+315         250 KW_NAMES                15 (('cancel_check',))
+            252 CALL                     3
+            260 GET_AWAITABLE            0
+            262 LOAD_CONST              16 (None)
+        >>  264 SEND                     3 (to 274)
+            268 YIELD_VALUE              4
+            270 RESUME                   3
+            272 JUMP_BACKWARD_NO_INTERRUPT     5 (to 264)
+        >>  274 END_SEND
+            276 POP_TOP
+
+317         278 NOP
+
+325         280 LOAD_FAST                6 (list_path)
+            282 LOAD_ATTR               13 (NULL|self + unlink)
+            302 LOAD_CONST              17 (True)
+            304 KW_NAMES                18 (('missing_ok',))
+            306 CALL                     1
+            314 POP_TOP
+            316 RETURN_CONST            16 (None)
+
+322     >>  318 LOAD_GLOBAL              9 (NULL + _run)
+            328 LOAD_FAST                0 (ffmpeg)
+            330 BUILD_LIST               0
+            332 LOAD_FAST                7 (base)
+            334 LIST_EXTEND              1
+            336 LOAD_FAST                3 (codec_args)
+            338 LIST_EXTEND              1
+            340 LOAD_CONST              13 ('-movflags')
+            342 LIST_APPEND              1
+            344 LOAD_CONST              14 ('+faststart')
+            346 LIST_APPEND              1
+            348 LOAD_GLOBAL              7 (NULL + str)
+            358 LOAD_FAST                2 (out)
+            360 LOAD_ATTR               11 (NULL|self + resolve)
+            380 CALL                     0
+            388 CALL                     1
+            396 LIST_APPEND              1
+
+323         398 LOAD_FAST                4 (cancel_check)
+
+322         400 KW_NAMES                15 (('cancel_check',))
+            402 CALL                     3
+            410 GET_AWAITABLE            0
+            412 LOAD_CONST              16 (None)
+        >>  414 SEND                     3 (to 424)
+            418 YIELD_VALUE              3
+            420 RESUME                   3
+            422 JUMP_BACKWARD_NO_INTERRUPT     5 (to 414)
+        >>  424 END_SEND
+            426 POP_TOP
+
+325         428 LOAD_FAST                6 (list_path)
+            430 LOAD_ATTR               13 (NULL|self + unlink)
+            450 LOAD_CONST              17 (True)
+            452 KW_NAMES                18 (('missing_ok',))
+            454 CALL                     1
+            462 POP_TOP
+            464 RETURN_CONST            16 (None)
+
+315     >>  466 CLEANUP_THROW
+            468 JUMP_BACKWARD           98 (to 274)
+        >>  470 PUSH_EXC_INFO
+
+318         472 LOAD_GLOBAL             14 (StudioError)
+            482 CHECK_EXC_MATCH
+            484 POP_JUMP_IF_FALSE       49 (to 584)
+            486 STORE_FAST               8 (e)
+
+319         488 LOAD_FAST                8 (e)
+            490 LOAD_ATTR               16 (code)
+            510 LOAD_GLOBAL             18 (E)
+            520 LOAD_ATTR               20 (CANCELLED)
+            540 COMPARE_OP              40 (==)
+            544 POP_JUMP_IF_TRUE         9 (to 564)
+            546 LOAD_FAST                4 (cancel_check)
+            548 POP_JUMP_IF_FALSE        8 (to 566)
+            550 PUSH_NULL
+            552 LOAD_FAST                4 (cancel_check)
+            554 CALL                     0
+            562 POP_JUMP_IF_FALSE        1 (to 566)
+
+320     >>  564 RAISE_VARARGS            0
+        >>  566 POP_EXCEPT
+            568 LOAD_CONST              16 (None)
+            570 STORE_FAST               8 (e)
+            572 DELETE_FAST              8 (e)
+            574 JUMP_BACKWARD          129 (to 318)
+        >>  576 LOAD_CONST              16 (None)
+            578 STORE_FAST               8 (e)
+            580 DELETE_FAST              8 (e)
+            582 RERAISE                  1
+
+318     >>  584 RERAISE                  0
+        >>  586 COPY                     3
+            588 POP_EXCEPT
+            590 RERAISE                  1
+
+322     >>  592 CLEANUP_THROW
+            594 JUMP_BACKWARD           86 (to 424)
+        >>  596 PUSH_EXC_INFO
+
+325         598 LOAD_FAST                6 (list_path)
+            600 LOAD_ATTR               13 (NULL|self + unlink)
+            620 LOAD_CONST              17 (True)
+            622 KW_NAMES                18 (('missing_ok',))
+            624 CALL                     1
+            632 POP_TOP
+            634 RERAISE                  0
+        >>  636 COPY                     3
+            638 POP_EXCEPT
+            640 RERAISE                  1
+        >>  642 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            644 RERAISE                  1
+ExceptionTable:
+  4 to 154 -> 642 [0] lasti
+  158 to 160 -> 596 [0]
+  164 to 266 -> 470 [0]
+  268 to 268 -> 466 [2]
+  270 to 276 -> 470 [0]
+  280 to 316 -> 642 [0] lasti
+  318 to 416 -> 596 [0]
+  418 to 418 -> 592 [2]
+  420 to 426 -> 596 [0]
+  428 to 464 -> 642 [0] lasti
+  466 to 466 -> 470 [0]
+  470 to 486 -> 586 [1] lasti
+  488 to 564 -> 576 [1] lasti
+  566 to 574 -> 596 [0]
+  576 to 584 -> 586 [1] lasti
+  586 to 592 -> 596 [0]
+  596 to 634 -> 636 [1] lasti
+  636 to 640 -> 642 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c81ad2e50, file "app\render\visual_bake.py", line 309>:
+309           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                38 (to 88)
+             12 STORE_FAST               1 (c)
+             14 LOAD_CONST               0 ("file '")
+             16 LOAD_FAST                1 (c)
+             18 LOAD_ATTR                1 (NULL|self + resolve)
+             38 CALL                     0
+             46 LOAD_ATTR                3 (NULL|self + as_posix)
+             66 CALL                     0
+             74 FORMAT_VALUE             0
+             76 LOAD_CONST               1 ("'")
+             78 BUILD_STRING             3
+             80 YIELD_VALUE              1
+             82 RESUME                   1
+             84 POP_TOP
+             86 JUMP_BACKWARD           40 (to 8)
+        >>   88 END_FOR
+             90 RETURN_CONST             2 (None)
+        >>   92 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             94 RERAISE                  1
+ExceptionTable:
+  4 to 90 -> 92 [0] lasti
+
+Disassembly of <code object build_xfade_graph at 0x28bc1520, file "app\render\visual_bake.py", line 328>:
+328           0 RESUME                   0
+
+336           2 BUILD_LIST               0
+              4 STORE_FAST               2 (chains)
+
+337           6 LOAD_CONST               1 ('0:v')
+              8 STORE_FAST               3 (prev)
+
+338          10 LOAD_FAST                0 (durs)
+             12 LOAD_CONST               2 (0)
+             14 BINARY_SUBSCR
+             18 STORE_FAST               4 (running)
+
+339          20 LOAD_GLOBAL              1 (NULL + range)
+             30 LOAD_CONST               3 (1)
+             32 LOAD_GLOBAL              3 (NULL + len)
+             42 LOAD_FAST                0 (durs)
+             44 CALL                     1
+             52 CALL                     2
+             60 GET_ITER
+        >>   62 FOR_ITER               136 (to 338)
+             66 STORE_FAST               5 (k)
+
+340          68 LOAD_FAST                1 (trans)
+             70 LOAD_FAST                5 (k)
+             72 LOAD_CONST               3 (1)
+             74 BINARY_OP               10 (-)
+             78 BINARY_SUBSCR
+             82 STORE_FAST               6 (tr)
+
+341          84 LOAD_CONST               4 ('vt')
+             86 LOAD_FAST                5 (k)
+             88 FORMAT_VALUE             0
+             90 BUILD_STRING             2
+             92 STORE_FAST               7 (lbl)
+
+342          94 LOAD_FAST                6 (tr)
+             96 POP_JUMP_IF_FALSE       82 (to 262)
+
+343          98 LOAD_GLOBAL              5 (NULL + float)
+            108 LOAD_FAST                6 (tr)
+            110 LOAD_CONST               5 ('dur')
+            112 BINARY_SUBSCR
+            116 CALL                     1
+            124 STORE_FAST               8 (tdur)
+
+344         126 LOAD_GLOBAL              7 (NULL + max)
+            136 LOAD_CONST               6 (0.0)
+            138 LOAD_FAST                4 (running)
+            140 LOAD_FAST                8 (tdur)
+            142 BINARY_OP               10 (-)
+            146 CALL                     2
+            154 STORE_FAST               9 (off)
+
+345         156 LOAD_FAST                2 (chains)
+            158 LOAD_ATTR                9 (NULL|self + append)
+
+346         178 LOAD_CONST               7 ('[')
+            180 LOAD_FAST                3 (prev)
+            182 FORMAT_VALUE             0
+            184 LOAD_CONST               8 ('][')
+            186 LOAD_FAST                5 (k)
+            188 FORMAT_VALUE             0
+            190 LOAD_CONST               9 (':v]xfade=transition=')
+            192 LOAD_FAST                6 (tr)
+            194 LOAD_CONST              10 ('type')
+            196 BINARY_SUBSCR
+            200 FORMAT_VALUE             0
+            202 LOAD_CONST              11 (':duration=')
+            204 LOAD_FAST                8 (tdur)
+            206 LOAD_CONST              12 ('.3f')
+            208 FORMAT_VALUE             4 (with format)
+            210 LOAD_CONST              13 (':offset=')
+            212 LOAD_FAST                9 (off)
+            214 LOAD_CONST              12 ('.3f')
+            216 FORMAT_VALUE             4 (with format)
+            218 LOAD_CONST               7 ('[')
+            220 LOAD_FAST                7 (lbl)
+            222 FORMAT_VALUE             0
+            224 LOAD_CONST              14 (']')
+            226 BUILD_STRING            13
+
+345         228 CALL                     1
+            236 POP_TOP
+
+347         238 LOAD_FAST                4 (running)
+            240 LOAD_FAST                0 (durs)
+            242 LOAD_FAST                5 (k)
+            244 BINARY_SUBSCR
+            248 BINARY_OP                0 (+)
+            252 LOAD_FAST                8 (tdur)
+            254 BINARY_OP               10 (-)
+            258 STORE_FAST               4 (running)
+            260 JUMP_FORWARD            35 (to 332)
+
+349     >>  262 LOAD_FAST                2 (chains)
+            264 LOAD_ATTR                9 (NULL|self + append)
+            284 LOAD_CONST               7 ('[')
+            286 LOAD_FAST                3 (prev)
+            288 FORMAT_VALUE             0
+            290 LOAD_CONST               8 ('][')
+            292 LOAD_FAST                5 (k)
+            294 FORMAT_VALUE             0
+            296 LOAD_CONST              15 (':v]concat=n=2:v=1:a=0[')
+            298 LOAD_FAST                7 (lbl)
+            300 FORMAT_VALUE             0
+            302 LOAD_CONST              14 (']')
+            304 BUILD_STRING             7
+            306 CALL                     1
+            314 POP_TOP
+
+350         316 LOAD_FAST                4 (running)
+            318 LOAD_FAST                0 (durs)
+            320 LOAD_FAST                5 (k)
+            322 BINARY_SUBSCR
+            326 BINARY_OP                0 (+)
+            330 STORE_FAST               4 (running)
+
+351     >>  332 LOAD_FAST                7 (lbl)
+            334 STORE_FAST               3 (prev)
+            336 JUMP_BACKWARD          138 (to 62)
+
+339     >>  338 END_FOR
+
+352         340 LOAD_CONST              16 (';')
+            342 LOAD_ATTR               11 (NULL|self + join)
+            362 LOAD_FAST                2 (chains)
+            364 CALL                     1
+            372 LOAD_FAST                3 (prev)
+            374 LOAD_FAST                4 (running)
+            376 BUILD_TUPLE              3
+            378 RETURN_VALUE
+
+Disassembly of <code object _render_transitions at 0x269d7310, file "app\render\visual_bake.py", line 355>:
+355           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+359           6 BUILD_LIST               0
+              8 STORE_FAST               7 (inputs)
+
+360          10 LOAD_FAST                1 (parts)
+             12 GET_ITER
+        >>   14 FOR_ITER                32 (to 82)
+             18 STORE_FAST               8 (p)
+
+361          20 LOAD_FAST                7 (inputs)
+             22 LOAD_CONST               1 ('-i')
+             24 LOAD_GLOBAL              1 (NULL + str)
+             34 LOAD_FAST                8 (p)
+             36 LOAD_ATTR                3 (NULL|self + resolve)
+             56 CALL                     0
+             64 CALL                     1
+             72 BUILD_LIST               2
+             74 BINARY_OP               13 (+=)
+             78 STORE_FAST               7 (inputs)
+             80 JUMP_BACKWARD           34 (to 14)
+
+360     >>   82 END_FOR
+
+362          84 LOAD_GLOBAL              5 (NULL + build_xfade_graph)
+             94 LOAD_FAST                2 (durs)
+             96 LOAD_FAST                3 (trans)
+             98 CALL                     2
+            106 UNPACK_SEQUENCE          3
+            110 STORE_FAST               9 (fc)
+            112 STORE_FAST              10 (final_label)
+            114 STORE_FAST              11 (_)
+
+365         116 LOAD_FAST                4 (out)
+            118 LOAD_ATTR                6 (parent)
+            138 LOAD_CONST               2 ('_xfade_filter_complex.txt')
+            140 BINARY_OP               11 (/)
+            144 STORE_FAST              12 (fc_path)
+
+366         146 LOAD_FAST               12 (fc_path)
+            148 LOAD_ATTR                9 (NULL|self + write_text)
+            168 LOAD_FAST                9 (fc)
+            170 LOAD_CONST               3 ('utf-8')
+            172 KW_NAMES                 4 (('encoding',))
+            174 CALL                     2
+            182 POP_TOP
+
+367         184 NOP
+
+368         186 LOAD_GLOBAL             11 (NULL + _run)
+            196 LOAD_FAST                0 (ffmpeg)
+            198 BUILD_LIST               0
+
+369         200 LOAD_FAST                7 (inputs)
+
+368         202 LIST_EXTEND              1
+
+369         204 LOAD_CONST               5 ('-filter_complex_script')
+
+368         206 LIST_APPEND              1
+
+369         208 LOAD_GLOBAL              1 (NULL + str)
+            218 LOAD_FAST               12 (fc_path)
+            220 CALL                     1
+
+368         228 LIST_APPEND              1
+
+369         230 LOAD_CONST               6 ('-map')
+
+368         232 LIST_APPEND              1
+
+369         234 LOAD_CONST               7 ('[')
+            236 LOAD_FAST               10 (final_label)
+            238 FORMAT_VALUE             0
+            240 LOAD_CONST               8 (']')
+            242 BUILD_STRING             3
+
+368         244 LIST_APPEND              1
+
+370         246 LOAD_FAST                5 (codec_args)
+
+368         248 LIST_EXTEND              1
+
+370         250 LOAD_CONST               9 ('-movflags')
+
+368         252 LIST_APPEND              1
+
+370         254 LOAD_CONST              10 ('+faststart')
+
+368         256 LIST_APPEND              1
+
+370         258 LOAD_GLOBAL              1 (NULL + str)
+            268 LOAD_FAST                4 (out)
+            270 LOAD_ATTR                3 (NULL|self + resolve)
+            290 CALL                     0
+            298 CALL                     1
+
+368         306 LIST_APPEND              1
+
+371         308 LOAD_FAST                6 (cancel_check)
+
+368         310 KW_NAMES                11 (('cancel_check',))
+            312 CALL                     3
+            320 GET_AWAITABLE            0
+            322 LOAD_CONST              12 (None)
+        >>  324 SEND                     3 (to 334)
+            328 YIELD_VALUE              3
+            330 RESUME                   3
+            332 JUMP_BACKWARD_NO_INTERRUPT     5 (to 324)
+        >>  334 END_SEND
+            336 POP_TOP
+
+373         338 LOAD_FAST               12 (fc_path)
+            340 LOAD_ATTR               13 (NULL|self + unlink)
+            360 LOAD_CONST              13 (True)
+            362 KW_NAMES                14 (('missing_ok',))
+            364 CALL                     1
+            372 POP_TOP
+            374 RETURN_CONST            12 (None)
+
+368     >>  376 CLEANUP_THROW
+            378 JUMP_BACKWARD           23 (to 334)
+        >>  380 PUSH_EXC_INFO
+
+373         382 LOAD_FAST               12 (fc_path)
+            384 LOAD_ATTR               13 (NULL|self + unlink)
+            404 LOAD_CONST              13 (True)
+            406 KW_NAMES                14 (('missing_ok',))
+            408 CALL                     1
+            416 POP_TOP
+            418 RERAISE                  0
+        >>  420 COPY                     3
+            422 POP_EXCEPT
+            424 RERAISE                  1
+        >>  426 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            428 RERAISE                  1
+ExceptionTable:
+  4 to 182 -> 426 [0] lasti
+  186 to 326 -> 380 [0]
+  328 to 328 -> 376 [2]
+  330 to 336 -> 380 [0]
+  338 to 374 -> 426 [0] lasti
+  376 to 376 -> 380 [0]
+  380 to 418 -> 420 [1] lasti
+  420 to 424 -> 426 [0] lasti
+
+Disassembly of <code object bake_source at 0x28bccbc0, file "app\render\visual_bake.py", line 376>:
+              0 MAKE_CELL                2 (config)
+              2 MAKE_CELL                3 (cancel_check)
+              4 MAKE_CELL                5 (emit_log)
+              6 MAKE_CELL               34 (codec_args)
+              8 MAKE_CELL               35 (durs)
+             10 MAKE_CELL               36 (enc_name)
+             12 MAKE_CELL               37 (ffmpeg)
+             14 MAKE_CELL               38 (h)
+             16 MAKE_CELL               39 (out_source)
+             18 MAKE_CELL               40 (parts)
+             20 MAKE_CELL               41 (parts_mixed)
+             22 MAKE_CELL               42 (trans)
+             24 MAKE_CELL               43 (w)
+
+376          26 RETURN_GENERATOR
+             28 POP_TOP
+             30 RESUME                   0
+
+380          32 LOAD_GLOBAL              1 (NULL + ProjectFS)
+             42 LOAD_FAST                1 (workdir)
+             44 CALL                     1
+             52 STORE_FAST               6 (fs)
+
+381          54 LOAD_FAST                6 (fs)
+             56 LOAD_ATTR                3 (NULL|self + source_mp4)
+             76 LOAD_FAST                0 (video_id)
+             78 CALL                     1
+             86 STORE_DEREF             39 (out_source)
+
+382          88 LOAD_GLOBAL              5 (NULL + dims_for)
+             98 LOAD_DEREF               2 (config)
+            100 CALL                     1
+            108 UNPACK_SEQUENCE          2
+            112 STORE_DEREF             43 (w)
+            114 STORE_DEREF             38 (h)
+
+384         116 LOAD_GLOBAL              7 (NULL + _load_scenes)
+            126 LOAD_FAST                0 (video_id)
+            128 CALL                     1
+            136 STORE_FAST               7 (scenes)
+
+385         138 LOAD_FAST                7 (scenes)
+            140 GET_ITER
+            142 LOAD_FAST_AND_CLEAR      8 (s)
+            144 SWAP                     2
+            146 BUILD_MAP                0
+            148 SWAP                     2
+        >>  150 FOR_ITER                35 (to 224)
+            154 STORE_FAST               8 (s)
+            156 LOAD_FAST                8 (s)
+            158 LOAD_ATTR                9 (NULL|self + get)
+            178 LOAD_CONST               1 ('seq')
+            180 CALL                     1
+            188 POP_JUMP_IF_NOT_NONE     1 (to 192)
+            190 JUMP_BACKWARD           21 (to 150)
+        >>  192 LOAD_GLOBAL             11 (NULL + int)
+            202 LOAD_FAST                8 (s)
+            204 LOAD_CONST               1 ('seq')
+            206 BINARY_SUBSCR
+            210 CALL                     1
+            218 LOAD_FAST                8 (s)
+            220 MAP_ADD                  2
+            222 JUMP_BACKWARD           37 (to 150)
+        >>  224 END_FOR
+            226 STORE_FAST               9 (by_seq)
+            228 STORE_FAST               8 (s)
+
+386         230 LOAD_GLOBAL             13 (NULL + resolve_clips)
+            240 LOAD_FAST                7 (scenes)
+            242 LOAD_DEREF               2 (config)
+            244 CALL                     2
+            252 STORE_FAST              10 (clips)
+
+387         254 LOAD_FAST               10 (clips)
+            256 POP_JUMP_IF_TRUE        26 (to 310)
+
+388         258 LOAD_GLOBAL             15 (NULL + make_error)
+            268 LOAD_GLOBAL             16 (E)
+            278 LOAD_ATTR               18 (PRECONDITION_MISSING)
+
+389         298 LOAD_CONST               3 ('Chưa có asset cảnh để dựng. Hãy chạy bước tạo ảnh/clip (flow_generate) trước.')
+
+388         300 CALL                     2
+            308 RAISE_VARARGS            1
+
+391     >>  310 LOAD_GLOBAL             21 (NULL + get_ffmpeg_path)
+            320 CALL                     0
+            328 STORE_DEREF             37 (ffmpeg)
+
+395         330 LOAD_GLOBAL             23 (NULL + filtergraph)
+            340 LOAD_ATTR               24 (resolve_video_codec_args)
+            360 LOAD_CONST               4 ('intermediate')
+            362 LOAD_DEREF               2 (config)
+            364 CALL                     2
+            372 GET_AWAITABLE            0
+            374 LOAD_CONST               2 (None)
+        >>  376 SEND                     3 (to 386)
+            380 YIELD_VALUE              2
+            382 RESUME                   3
+            384 JUMP_BACKWARD_NO_INTERRUPT     5 (to 376)
+        >>  386 END_SEND
+            388 UNPACK_SEQUENCE          2
+            392 STORE_DEREF             34 (codec_args)
+            394 STORE_DEREF             36 (enc_name)
+
+398         396 LOAD_CONST               5 (False)
+            398 STORE_DEREF             41 (parts_mixed)
+
+400         400 LOAD_CONST              75 (('make_coro', 'Callable[[list[str]], object]', 'return', 'None'))
+            402 LOAD_CLOSURE             3 (cancel_check)
+            404 LOAD_CLOSURE            34 (codec_args)
+            406 LOAD_CLOSURE             2 (config)
+            408 LOAD_CLOSURE             5 (emit_log)
+            410 LOAD_CLOSURE            36 (enc_name)
+            412 LOAD_CLOSURE            41 (parts_mixed)
+            414 BUILD_TUPLE              6
+            416 LOAD_CONST               6 (<code object _encode at 0x7f6c92bdf2d0, file "app\render\visual_bake.py", line 400>)
+            418 MAKE_FUNCTION           12 (annotations, closure)
+            420 STORE_FAST              11 (_encode)
+
+417         422 LOAD_GLOBAL             27 (NULL + Path)
+            432 LOAD_GLOBAL             29 (NULL + tempfile)
+            442 LOAD_ATTR               30 (mkdtemp)
+            462 LOAD_CONST               7 ('bake_')
+            464 KW_NAMES                 8 (('prefix',))
+            466 CALL                     1
+            474 CALL                     1
+            482 STORE_FAST              12 (temp_dir)
+
+418         484 BUILD_LIST               0
+            486 STORE_DEREF             40 (parts)
+
+419         488 NOP
+
+422         490 BUILD_LIST               0
+            492 STORE_FAST              13 (segs)
+
+423         494 LOAD_CONST               9 (0)
+            496 STORE_FAST              14 (cursor)
+
+424         498 LOAD_CONST               9 (0)
+            500 STORE_FAST              15 (img_idx)
+
+425         502 LOAD_FAST               10 (clips)
+            504 GET_ITER
+        >>  506 FOR_ITER               251 (to 1012)
+            510 STORE_FAST              16 (c)
+
+426         512 LOAD_GLOBAL             33 (NULL + max)
+            522 LOAD_GLOBAL             11 (NULL + int)
+            532 LOAD_FAST               16 (c)
+            534 LOAD_CONST              10 ('start_ms')
+            536 BINARY_SUBSCR
+            540 CALL                     1
+            548 LOAD_FAST               14 (cursor)
+            550 CALL                     2
+            558 STORE_FAST              17 (start)
+
+427         560 LOAD_GLOBAL             11 (NULL + int)
+            570 LOAD_FAST               16 (c)
+            572 LOAD_CONST              11 ('end_ms')
+            574 BINARY_SUBSCR
+            578 CALL                     1
+            586 STORE_FAST              18 (end)
+
+428         588 LOAD_FAST               18 (end)
+            590 LOAD_FAST               17 (start)
+            592 BINARY_OP               10 (-)
+            596 LOAD_GLOBAL             34 (_MIN_SCENE_MS)
+            606 COMPARE_OP               2 (<)
+            610 POP_JUMP_IF_FALSE        1 (to 614)
+
+429         612 JUMP_BACKWARD           54 (to 506)
+
+430     >>  614 LOAD_FAST               17 (start)
+            616 LOAD_FAST               14 (cursor)
+            618 LOAD_CONST              12 (40)
+            620 BINARY_OP                0 (+)
+            624 COMPARE_OP              68 (>)
+            628 POP_JUMP_IF_FALSE       26 (to 682)
+
+431         630 LOAD_FAST               13 (segs)
+            632 LOAD_ATTR               37 (NULL|self + append)
+            652 LOAD_CONST              13 ('gap')
+            654 LOAD_FAST               17 (start)
+            656 LOAD_FAST               14 (cursor)
+            658 BINARY_OP               10 (-)
+            662 LOAD_CONST              14 (1000.0)
+            664 BINARY_OP               11 (/)
+            668 LOAD_CONST              15 (('kind', 'dur'))
+            670 BUILD_CONST_KEY_MAP      2
+            672 CALL                     1
+            680 POP_TOP
+
+432     >>  682 LOAD_FAST                9 (by_seq)
+            684 LOAD_ATTR                9 (NULL|self + get)
+            704 LOAD_FAST               16 (c)
+            706 LOAD_CONST               1 ('seq')
+            708 BINARY_SUBSCR
+            712 CALL                     1
+            720 COPY                     1
+            722 POP_JUMP_IF_TRUE         2 (to 728)
+            724 POP_TOP
+            726 BUILD_MAP                0
+        >>  728 STORE_FAST              19 (scene)
+
+433         730 LOAD_FAST               16 (c)
+            732 LOAD_CONST              16 ('asset')
+            734 BINARY_SUBSCR
+            738 LOAD_FAST               16 (c)
+            740 LOAD_CONST              17 ('media')
+            742 BINARY_SUBSCR
+            746 STORE_FAST              21 (kind)
+            748 STORE_FAST              20 (asset)
+
+434         750 LOAD_CONST              18 ('clip')
+            752 LOAD_FAST               20 (asset)
+            754 LOAD_FAST               21 (kind)
+            756 LOAD_FAST               18 (end)
+            758 LOAD_FAST               17 (start)
+            760 BINARY_OP               10 (-)
+            764 LOAD_CONST              14 (1000.0)
+            766 BINARY_OP               11 (/)
+
+435         770 LOAD_FAST               16 (c)
+            772 LOAD_ATTR                9 (NULL|self + get)
+            792 LOAD_CONST              19 ('src_in_ms')
+            794 CALL                     1
+            802 LOAD_FAST               16 (c)
+            804 LOAD_ATTR                9 (NULL|self + get)
+            824 LOAD_CONST              20 ('transition_out')
+            826 CALL                     1
+
+436         834 LOAD_FAST               16 (c)
+            836 LOAD_CONST               1 ('seq')
+            838 BINARY_SUBSCR
+
+434         842 LOAD_CONST              21 (('kind', 'asset', 'media', 'dur', 'src_in_ms', 'transition_out', 'seq'))
+            844 BUILD_CONST_KEY_MAP      7
+            846 STORE_FAST              22 (seg)
+
+437         848 LOAD_FAST               21 (kind)
+            850 LOAD_CONST              22 ('video')
+            852 COMPARE_OP              40 (==)
+            856 POP_JUMP_IF_FALSE       41 (to 940)
+
+440         858 LOAD_GLOBAL             39 (NULL + real_file)
+            868 LOAD_FAST               19 (scene)
+            870 LOAD_ATTR                9 (NULL|self + get)
+            890 LOAD_CONST              23 ('image_path')
+            892 CALL                     1
+            900 CALL                     1
+            908 LOAD_FAST               22 (seg)
+            910 LOAD_CONST              24 ('still')
+            912 STORE_SUBSCR
+
+441         916 LOAD_FAST               15 (img_idx)
+            918 LOAD_CONST              25 (2)
+            920 BINARY_OP                6 (%)
+            924 LOAD_CONST               9 (0)
+            926 COMPARE_OP              40 (==)
+            930 LOAD_FAST               22 (seg)
+            932 LOAD_CONST              26 ('zoom_in')
+            934 STORE_SUBSCR
+            938 JUMP_FORWARD            16 (to 972)
+
+443     >>  940 LOAD_FAST               15 (img_idx)
+            942 LOAD_CONST              25 (2)
+            944 BINARY_OP                6 (%)
+            948 LOAD_CONST               9 (0)
+            950 COMPARE_OP              40 (==)
+            954 LOAD_FAST               22 (seg)
+            956 LOAD_CONST              26 ('zoom_in')
+            958 STORE_SUBSCR
+
+444         962 LOAD_FAST               15 (img_idx)
+            964 LOAD_CONST              27 (1)
+            966 BINARY_OP               13 (+=)
+            970 STORE_FAST              15 (img_idx)
+
+445     >>  972 LOAD_FAST               13 (segs)
+            974 LOAD_ATTR               37 (NULL|self + append)
+            994 LOAD_FAST               22 (seg)
+            996 CALL                     1
+           1004 POP_TOP
+
+446        1006 LOAD_FAST               18 (end)
+           1008 STORE_FAST              14 (cursor)
+           1010 JUMP_BACKWARD          253 (to 506)
+
+425     >> 1012 END_FOR
+
+448        1014 LOAD_FAST               13 (segs)
+           1016 POP_JUMP_IF_TRUE        26 (to 1070)
+
+449        1018 LOAD_GLOBAL             15 (NULL + make_error)
+           1028 LOAD_GLOBAL             16 (E)
+           1038 LOAD_ATTR               40 (RENDER_FAILED)
+           1058 LOAD_CONST              28 ('Không dựng được clip cảnh nào.')
+           1060 CALL                     2
+           1068 RAISE_VARARGS            1
+
+452     >> 1070 LOAD_FAST               13 (segs)
+           1072 GET_ITER
+           1074 LOAD_FAST_AND_CLEAR      8 (s)
+           1076 SWAP                     2
+           1078 BUILD_LIST               0
+           1080 SWAP                     2
+        >> 1082 FOR_ITER                65 (to 1216)
+           1086 STORE_FAST               8 (s)
+
+453        1088 LOAD_FAST                8 (s)
+           1090 LOAD_CONST              29 ('kind')
+           1092 BINARY_SUBSCR
+           1096 LOAD_CONST              18 ('clip')
+           1098 COMPARE_OP              40 (==)
+           1102 POP_JUMP_IF_FALSE       55 (to 1214)
+           1104 LOAD_FAST                8 (s)
+           1106 LOAD_CONST              17 ('media')
+           1108 BINARY_SUBSCR
+           1112 LOAD_CONST              30 ('image')
+           1114 COMPARE_OP              40 (==)
+           1118 POP_JUMP_IF_FALSE       47 (to 1214)
+
+454        1120 LOAD_FAST                9 (by_seq)
+           1122 LOAD_ATTR                9 (NULL|self + get)
+           1142 LOAD_FAST                8 (s)
+           1144 LOAD_CONST               1 ('seq')
+           1146 BINARY_SUBSCR
+           1150 CALL                     1
+           1158 COPY                     1
+           1160 POP_JUMP_IF_TRUE         2 (to 1166)
+           1162 POP_TOP
+           1164 BUILD_MAP                0
+        >> 1166 LOAD_ATTR                9 (NULL|self + get)
+           1186 LOAD_CONST              31 ('media_type')
+           1188 CALL                     1
+           1196 LOAD_CONST              22 ('video')
+           1198 COMPARE_OP              40 (==)
+           1202 POP_JUMP_IF_FALSE        5 (to 1214)
+
+452        1204 LOAD_FAST                8 (s)
+           1206 LOAD_CONST               1 ('seq')
+           1208 BINARY_SUBSCR
+           1212 LIST_APPEND              2
+        >> 1214 JUMP_BACKWARD           67 (to 1082)
+        >> 1216 END_FOR
+           1218 STORE_FAST              23 (stills)
+           1220 STORE_FAST               8 (s)
+
+455        1222 LOAD_FAST               23 (stills)
+           1224 POP_JUMP_IF_FALSE       72 (to 1370)
+           1226 LOAD_DEREF               5 (emit_log)
+           1228 POP_JUMP_IF_FALSE       70 (to 1370)
+
+456        1230 LOAD_CONST              32 (', ')
+           1232 LOAD_ATTR               43 (NULL|self + join)
+           1252 LOAD_CONST              33 (<code object <genexpr> at 0x7f6c92fd5430, file "app\render\visual_bake.py", line 456>)
+           1254 MAKE_FUNCTION            0
+           1256 LOAD_FAST               23 (stills)
+           1258 LOAD_CONST               2 (None)
+           1260 LOAD_CONST              34 (8)
+           1262 BINARY_SLICE
+           1264 GET_ITER
+           1266 CALL                     0
+           1274 CALL                     1
+           1282 LOAD_GLOBAL             45 (NULL + len)
+           1292 LOAD_FAST               23 (stills)
+           1294 CALL                     1
+           1302 LOAD_CONST              34 (8)
+           1304 COMPARE_OP              68 (>)
+           1308 POP_JUMP_IF_FALSE        2 (to 1314)
+           1310 LOAD_CONST              35 ('…')
+           1312 JUMP_FORWARD             1 (to 1316)
+        >> 1314 LOAD_CONST              36 ('')
+        >> 1316 BINARY_OP                0 (+)
+           1320 STORE_FAST              24 (preview)
+
+457        1322 PUSH_NULL
+           1324 LOAD_DEREF               5 (emit_log)
+           1326 LOAD_GLOBAL             45 (NULL + len)
+           1336 LOAD_FAST               23 (stills)
+           1338 CALL                     1
+           1346 FORMAT_VALUE             0
+           1348 LOAD_CONST              37 (' cảnh thiếu clip → dựng bằng ẢNH tĩnh (cảnh ')
+           1350 LOAD_FAST               24 (preview)
+           1352 FORMAT_VALUE             0
+           1354 LOAD_CONST              38 (').')
+           1356 BUILD_STRING             4
+           1358 LOAD_CONST              39 ('warn')
+           1360 CALL                     2
+           1368 POP_TOP
+
+461     >> 1370 LOAD_GLOBAL             47 (NULL + enumerate)
+           1380 LOAD_FAST               13 (segs)
+           1382 CALL                     1
+           1390 GET_ITER
+        >> 1392 FOR_ITER               129 (to 1654)
+           1396 UNPACK_SEQUENCE          2
+           1400 STORE_FAST              25 (i)
+           1402 STORE_FAST              22 (seg)
+
+462        1404 LOAD_FAST               22 (seg)
+           1406 LOAD_CONST              29 ('kind')
+           1408 BINARY_SUBSCR
+           1412 LOAD_CONST              18 ('clip')
+           1414 COMPARE_OP              40 (==)
+           1418 POP_JUMP_IF_FALSE       17 (to 1454)
+           1420 LOAD_FAST               22 (seg)
+           1422 LOAD_ATTR                9 (NULL|self + get)
+           1442 LOAD_CONST              20 ('transition_out')
+           1444 CALL                     1
+           1452 JUMP_FORWARD             1 (to 1456)
+        >> 1454 LOAD_CONST               2 (None)
+        >> 1456 STORE_FAST              26 (to)
+
+463        1458 LOAD_FAST               25 (i)
+           1460 LOAD_CONST              27 (1)
+           1462 BINARY_OP                0 (+)
+           1466 LOAD_GLOBAL             45 (NULL + len)
+           1476 LOAD_FAST               13 (segs)
+           1478 CALL                     1
+           1486 COMPARE_OP               2 (<)
+           1490 POP_JUMP_IF_FALSE        8 (to 1508)
+           1492 LOAD_FAST               13 (segs)
+           1494 LOAD_FAST               25 (i)
+           1496 LOAD_CONST              27 (1)
+           1498 BINARY_OP                0 (+)
+           1502 BINARY_SUBSCR
+           1506 JUMP_FORWARD             1 (to 1510)
+        >> 1508 LOAD_CONST               2 (None)
+        >> 1510 STORE_FAST              27 (nxt)
+
+464        1512 LOAD_FAST               26 (to)
+           1514 POP_JUMP_IF_TRUE         1 (to 1518)
+           1516 JUMP_BACKWARD           63 (to 1392)
+        >> 1518 LOAD_FAST               27 (nxt)
+           1520 POP_JUMP_IF_TRUE         1 (to 1524)
+           1522 JUMP_BACKWARD           66 (to 1392)
+        >> 1524 LOAD_FAST               27 (nxt)
+           1526 LOAD_CONST              29 ('kind')
+           1528 BINARY_SUBSCR
+           1532 LOAD_CONST              18 ('clip')
+           1534 COMPARE_OP              40 (==)
+           1538 POP_JUMP_IF_TRUE         1 (to 1542)
+           1540 JUMP_BACKWARD           75 (to 1392)
+
+465     >> 1542 LOAD_GLOBAL             49 (NULL + min)
+           1552 LOAD_FAST               26 (to)
+           1554 LOAD_CONST              40 ('duration_ms')
+           1556 BINARY_SUBSCR
+           1560 LOAD_CONST              14 (1000.0)
+           1562 BINARY_OP               11 (/)
+           1566 LOAD_FAST               22 (seg)
+           1568 LOAD_CONST              41 ('dur')
+           1570 BINARY_SUBSCR
+           1574 LOAD_CONST              42 (0.9)
+           1576 BINARY_OP                5 (*)
+           1580 LOAD_FAST               27 (nxt)
+           1582 LOAD_CONST              41 ('dur')
+           1584 BINARY_SUBSCR
+           1588 LOAD_CONST              42 (0.9)
+           1590 BINARY_OP                5 (*)
+           1594 CALL                     3
+           1602 STORE_FAST              28 (tdur)
+
+466        1604 LOAD_FAST               28 (tdur)
+           1606 LOAD_GLOBAL             50 (_TRANS_MIN_MS)
+           1616 LOAD_CONST              14 (1000.0)
+           1618 BINARY_OP               11 (/)
+           1622 COMPARE_OP              92 (>=)
+           1626 POP_JUMP_IF_TRUE         1 (to 1630)
+           1628 JUMP_BACKWARD          119 (to 1392)
+
+467     >> 1630 LOAD_FAST               26 (to)
+           1632 LOAD_CONST              43 ('type')
+           1634 BINARY_SUBSCR
+           1638 LOAD_FAST               28 (tdur)
+           1640 LOAD_CONST              44 (('type', 'dur'))
+           1642 BUILD_CONST_KEY_MAP      2
+           1644 LOAD_FAST               22 (seg)
+           1646 LOAD_CONST              45 ('trans')
+           1648 STORE_SUBSCR
+           1652 JUMP_BACKWARD          131 (to 1392)
+
+461     >> 1654 END_FOR
+
+470        1656 BUILD_LIST               0
+           1658 STORE_DEREF             35 (durs)
+
+471        1660 BUILD_LIST               0
+           1662 STORE_DEREF             42 (trans)
+
+472        1664 LOAD_GLOBAL             45 (NULL + len)
+           1674 LOAD_FAST               13 (segs)
+           1676 CALL                     1
+           1684 STORE_FAST              29 (n)
+
+473        1686 LOAD_GLOBAL             47 (NULL + enumerate)
+           1696 LOAD_FAST               13 (segs)
+           1698 CALL                     1
+           1706 GET_ITER
+        >> 1708 EXTENDED_ARG             1
+           1710 FOR_ITER               296 (to 2306)
+           1714 UNPACK_SEQUENCE          2
+           1718 STORE_FAST              25 (i)
+           1720 STORE_FAST              22 (seg)
+
+474        1722 LOAD_DEREF               3 (cancel_check)
+           1724 POP_JUMP_IF_FALSE       33 (to 1792)
+           1726 PUSH_NULL
+           1728 LOAD_DEREF               3 (cancel_check)
+           1730 CALL                     0
+           1738 POP_JUMP_IF_FALSE       26 (to 1792)
+
+475        1740 LOAD_GLOBAL             15 (NULL + make_error)
+           1750 LOAD_GLOBAL             16 (E)
+           1760 LOAD_ATTR               52 (CANCELLED)
+           1780 LOAD_CONST              46 ('Đã huỷ khi dựng video.')
+           1782 CALL                     2
+           1790 RAISE_VARARGS            1
+
+476     >> 1792 LOAD_FAST               22 (seg)
+           1794 LOAD_ATTR                9 (NULL|self + get)
+           1814 LOAD_CONST              45 ('trans')
+           1816 CALL                     1
+           1824 STORE_FAST              30 (tr)
+
+477        1826 LOAD_FAST               22 (seg)
+           1828 LOAD_CONST              41 ('dur')
+           1830 BINARY_SUBSCR
+           1834 LOAD_FAST               30 (tr)
+           1836 POP_JUMP_IF_FALSE        5 (to 1848)
+           1838 LOAD_FAST               30 (tr)
+           1840 LOAD_CONST              41 ('dur')
+           1842 BINARY_SUBSCR
+           1846 JUMP_FORWARD             1 (to 1850)
+        >> 1848 LOAD_CONST              47 (0.0)
+        >> 1850 BINARY_OP                0 (+)
+           1854 STORE_FAST              31 (rdur)
+
+478        1856 LOAD_FAST               12 (temp_dir)
+           1858 LOAD_CONST              48 ('seg_')
+           1860 LOAD_FAST               25 (i)
+           1862 LOAD_CONST              49 ('04d')
+           1864 FORMAT_VALUE             4 (with format)
+           1866 LOAD_CONST              50 ('.mp4')
+           1868 BUILD_STRING             3
+           1870 BINARY_OP               11 (/)
+           1874 STORE_FAST              32 (part)
+
+479        1876 LOAD_FAST               22 (seg)
+           1878 LOAD_CONST              29 ('kind')
+           1880 BINARY_SUBSCR
+           1884 LOAD_CONST              13 ('gap')
+           1886 COMPARE_OP              40 (==)
+           1890 POP_JUMP_IF_FALSE       26 (to 1944)
+
+480        1892 PUSH_NULL
+           1894 LOAD_FAST               11 (_encode)
+           1896 LOAD_FAST               32 (part)
+           1898 LOAD_FAST               31 (rdur)
+           1900 BUILD_TUPLE              2
+           1902 LOAD_CLOSURE             3 (cancel_check)
+           1904 LOAD_CLOSURE            37 (ffmpeg)
+           1906 LOAD_CLOSURE            38 (h)
+           1908 LOAD_CLOSURE            43 (w)
+           1910 BUILD_TUPLE              4
+           1912 LOAD_CONST              51 (<code object <lambda> at 0x7f6c930952f0, file "app\render\visual_bake.py", line 480>)
+           1914 MAKE_FUNCTION            9 (defaults, closure)
+           1916 CALL                     1
+           1924 GET_AWAITABLE            0
+           1926 LOAD_CONST               2 (None)
+        >> 1928 SEND                     3 (to 1938)
+           1932 YIELD_VALUE              3
+           1934 RESUME                   3
+           1936 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1928)
+        >> 1938 END_SEND
+           1940 POP_TOP
+           1942 JUMP_FORWARD            62 (to 2068)
+
+482     >> 1944 LOAD_FAST               22 (seg)
+           1946 LOAD_CONST              17 ('media')
+           1948 BINARY_SUBSCR
+           1952 LOAD_CONST              22 ('video')
+           1954 COMPARE_OP              40 (==)
+           1958 POP_JUMP_IF_FALSE       28 (to 2016)
+
+483        1960 NOP
+
+484        1962 PUSH_NULL
+           1964 LOAD_FAST               11 (_encode)
+           1966 LOAD_FAST               32 (part)
+           1968 LOAD_FAST               31 (rdur)
+           1970 LOAD_FAST               22 (seg)
+           1972 BUILD_TUPLE              3
+           1974 LOAD_CLOSURE             3 (cancel_check)
+           1976 LOAD_CLOSURE            37 (ffmpeg)
+           1978 LOAD_CLOSURE            38 (h)
+           1980 LOAD_CLOSURE            43 (w)
+           1982 BUILD_TUPLE              4
+           1984 LOAD_CONST              52 (<code object <lambda> at 0x7f6c930bacd0, file "app\render\visual_bake.py", line 484>)
+           1986 MAKE_FUNCTION            9 (defaults, closure)
+           1988 CALL                     1
+           1996 GET_AWAITABLE            0
+           1998 LOAD_CONST               2 (None)
+        >> 2000 SEND                     3 (to 2010)
+           2004 YIELD_VALUE              4
+           2006 RESUME                   3
+           2008 JUMP_BACKWARD_NO_INTERRUPT     5 (to 2000)
+        >> 2010 END_SEND
+           2012 POP_TOP
+           2014 JUMP_FORWARD            26 (to 2068)
+
+501     >> 2016 PUSH_NULL
+           2018 LOAD_FAST               11 (_encode)
+           2020 LOAD_FAST               32 (part)
+           2022 LOAD_FAST               31 (rdur)
+           2024 LOAD_FAST               22 (seg)
+           2026 BUILD_TUPLE              3
+           2028 LOAD_CLOSURE             3 (cancel_check)
+           2030 LOAD_CLOSURE            37 (ffmpeg)
+           2032 LOAD_CLOSURE            38 (h)
+           2034 LOAD_CLOSURE            43 (w)
+           2036 BUILD_TUPLE              4
+           2038 LOAD_CONST              60 (<code object <lambda> at 0x7f6c92fd7930, file "app\render\visual_bake.py", line 501>)
+           2040 MAKE_FUNCTION            9 (defaults, closure)
+           2042 CALL                     1
+           2050 GET_AWAITABLE            0
+           2052 LOAD_CONST               2 (None)
+        >> 2054 SEND                     3 (to 2064)
+           2058 YIELD_VALUE              3
+           2060 RESUME                   3
+           2062 JUMP_BACKWARD_NO_INTERRUPT     5 (to 2054)
+        >> 2064 END_SEND
+           2066 POP_TOP
+
+504     >> 2068 LOAD_FAST               32 (part)
+           2070 LOAD_ATTR               65 (NULL|self + exists)
+           2090 CALL                     0
+           2098 POP_JUMP_IF_TRUE        26 (to 2152)
+
+505        2100 LOAD_GLOBAL             15 (NULL + make_error)
+           2110 LOAD_GLOBAL             16 (E)
+           2120 LOAD_ATTR               40 (RENDER_FAILED)
+           2140 LOAD_CONST              28 ('Không dựng được clip cảnh nào.')
+           2142 CALL                     2
+           2150 RAISE_VARARGS            1
+
+506     >> 2152 LOAD_DEREF              40 (parts)
+           2154 LOAD_ATTR               37 (NULL|self + append)
+           2174 LOAD_FAST               32 (part)
+           2176 CALL                     1
+           2184 POP_TOP
+
+507        2186 LOAD_DEREF              35 (durs)
+           2188 LOAD_ATTR               37 (NULL|self + append)
+           2208 LOAD_FAST               31 (rdur)
+           2210 CALL                     1
+           2218 POP_TOP
+
+508        2220 LOAD_DEREF              42 (trans)
+           2222 LOAD_ATTR               37 (NULL|self + append)
+           2242 LOAD_FAST               30 (tr)
+           2244 CALL                     1
+           2252 POP_TOP
+
+509        2254 LOAD_FAST                4 (on_progress)
+           2256 POP_JUMP_IF_TRUE         2 (to 2262)
+           2258 EXTENDED_ARG             1
+           2260 JUMP_BACKWARD          277 (to 1708)
+
+510     >> 2262 PUSH_NULL
+           2264 LOAD_FAST                4 (on_progress)
+           2266 LOAD_CONST              61 (0.05)
+           2268 LOAD_CONST              62 (0.85)
+           2270 LOAD_FAST               25 (i)
+           2272 LOAD_CONST              27 (1)
+           2274 BINARY_OP                0 (+)
+           2278 BINARY_OP                5 (*)
+           2282 LOAD_FAST               29 (n)
+           2284 BINARY_OP               11 (/)
+           2288 BINARY_OP                0 (+)
+           2292 CALL                     1
+           2300 POP_TOP
+           2302 EXTENDED_ARG             1
+           2304 JUMP_BACKWARD          299 (to 1708)
+
+473     >> 2306 END_FOR
+
+513        2308 LOAD_DEREF              39 (out_source)
+           2310 LOAD_ATTR               66 (parent)
+           2330 LOAD_ATTR               69 (NULL|self + mkdir)
+           2350 LOAD_CONST              53 (True)
+           2352 LOAD_CONST              53 (True)
+           2354 KW_NAMES                63 (('parents', 'exist_ok'))
+           2356 CALL                     2
+           2364 POP_TOP
+
+514        2366 LOAD_GLOBAL             71 (NULL + any)
+           2376 LOAD_CONST              64 (<code object <genexpr> at 0x7f6c92be2cd0, file "app\render\visual_bake.py", line 514>)
+           2378 MAKE_FUNCTION            0
+           2380 LOAD_DEREF              42 (trans)
+           2382 GET_ITER
+           2384 CALL                     0
+           2392 CALL                     1
+           2400 POP_JUMP_IF_FALSE       40 (to 2482)
+           2402 LOAD_GLOBAL             45 (NULL + len)
+           2412 LOAD_DEREF              40 (parts)
+           2414 CALL                     1
+           2422 LOAD_CONST              25 (2)
+           2424 COMPARE_OP              92 (>=)
+           2428 POP_JUMP_IF_FALSE       26 (to 2482)
+
+515        2430 NOP
+
+516        2432 PUSH_NULL
+           2434 LOAD_FAST               11 (_encode)
+           2436 LOAD_CLOSURE             3 (cancel_check)
+           2438 LOAD_CLOSURE            35 (durs)
+           2440 LOAD_CLOSURE            37 (ffmpeg)
+           2442 LOAD_CLOSURE            39 (out_source)
+           2444 LOAD_CLOSURE            40 (parts)
+           2446 LOAD_CLOSURE            42 (trans)
+           2448 BUILD_TUPLE              6
+           2450 LOAD_CONST              65 (<code object <lambda> at 0x7f6c93096e20, file "app\render\visual_bake.py", line 516>)
+           2452 MAKE_FUNCTION            8 (closure)
+           2454 CALL                     1
+           2462 GET_AWAITABLE            0
+           2464 LOAD_CONST               2 (None)
+        >> 2466 SEND                     3 (to 2476)
+           2470 YIELD_VALUE              4
+           2472 RESUME                   3
+           2474 JUMP_BACKWARD_NO_INTERRUPT     5 (to 2466)
+        >> 2476 END_SEND
+           2478 POP_TOP
+           2480 JUMP_FORWARD            23 (to 2528)
+
+527     >> 2482 PUSH_NULL
+           2484 LOAD_FAST               11 (_encode)
+           2486 LOAD_CLOSURE             3 (cancel_check)
+           2488 LOAD_CLOSURE            37 (ffmpeg)
+           2490 LOAD_CLOSURE            39 (out_source)
+           2492 LOAD_CLOSURE            40 (parts)
+           2494 LOAD_CLOSURE            41 (parts_mixed)
+           2496 BUILD_TUPLE              5
+           2498 LOAD_CONST              68 (<code object <lambda> at 0x7f6c930970f0, file "app\render\visual_bake.py", line 527>)
+           2500 MAKE_FUNCTION            8 (closure)
+           2502 CALL                     1
+           2510 GET_AWAITABLE            0
+           2512 LOAD_CONST               2 (None)
+        >> 2514 SEND                     3 (to 2524)
+           2518 YIELD_VALUE              3
+           2520 RESUME                   3
+           2522 JUMP_BACKWARD_NO_INTERRUPT     5 (to 2514)
+        >> 2524 END_SEND
+           2526 POP_TOP
+
+531     >> 2528 LOAD_GLOBAL             73 (NULL + shutil)
+           2538 LOAD_ATTR               74 (rmtree)
+           2558 LOAD_FAST               12 (temp_dir)
+           2560 LOAD_CONST              53 (True)
+           2562 KW_NAMES                69 (('ignore_errors',))
+           2564 CALL                     2
+           2572 POP_TOP
+
+533        2574 LOAD_DEREF              39 (out_source)
+           2576 LOAD_ATTR               65 (NULL|self + exists)
+           2596 CALL                     0
+           2604 POP_JUMP_IF_TRUE        26 (to 2658)
+
+534        2606 LOAD_GLOBAL             15 (NULL + make_error)
+           2616 LOAD_GLOBAL             16 (E)
+           2626 LOAD_ATTR               40 (RENDER_FAILED)
+           2646 LOAD_CONST              70 ('Dựng source.mp4 thất bại.')
+           2648 CALL                     2
+           2656 RAISE_VARARGS            1
+
+535     >> 2658 LOAD_DEREF               5 (emit_log)
+           2660 POP_JUMP_IF_FALSE       40 (to 2742)
+
+536        2662 PUSH_NULL
+           2664 LOAD_DEREF               5 (emit_log)
+           2666 LOAD_CONST              71 ('Đã dựng video nền: ')
+           2668 LOAD_DEREF              39 (out_source)
+           2670 LOAD_ATTR               76 (name)
+           2690 FORMAT_VALUE             0
+           2692 LOAD_CONST              72 (' (')
+           2694 LOAD_DEREF              43 (w)
+           2696 FORMAT_VALUE             0
+           2698 LOAD_CONST              73 ('x')
+           2700 LOAD_DEREF              38 (h)
+           2702 FORMAT_VALUE             0
+           2704 LOAD_CONST              32 (', ')
+           2706 LOAD_GLOBAL             45 (NULL + len)
+           2716 LOAD_DEREF              40 (parts)
+           2718 CALL                     1
+           2726 FORMAT_VALUE             0
+           2728 LOAD_CONST              74 (' đoạn).')
+           2730 BUILD_STRING             9
+           2732 CALL                     1
+           2740 POP_TOP
+
+537     >> 2742 LOAD_DEREF              39 (out_source)
+           2744 RETURN_VALUE
+        >> 2746 SWAP                     2
+           2748 POP_TOP
+
+385        2750 SWAP                     2
+           2752 STORE_FAST               8 (s)
+           2754 RERAISE                  0
+
+395     >> 2756 CLEANUP_THROW
+           2758 EXTENDED_ARG             4
+           2760 JUMP_BACKWARD         1188 (to 386)
+        >> 2762 SWAP                     2
+           2764 POP_TOP
+
+452        2766 SWAP                     2
+           2768 STORE_FAST               8 (s)
+           2770 RERAISE                  0
+
+480     >> 2772 CLEANUP_THROW
+           2774 EXTENDED_ARG             1
+           2776 JUMP_BACKWARD          420 (to 1938)
+
+484     >> 2778 CLEANUP_THROW
+           2780 EXTENDED_ARG             1
+           2782 JUMP_BACKWARD          387 (to 2010)
+        >> 2784 PUSH_EXC_INFO
+
+487        2786 LOAD_GLOBAL             54 (StudioError)
+           2796 CHECK_EXC_MATCH
+           2798 POP_JUMP_IF_FALSE      176 (to 3152)
+           2800 STORE_FAST              33 (e)
+
+491        2802 LOAD_FAST               33 (e)
+           2804 LOAD_ATTR               56 (code)
+           2824 LOAD_GLOBAL             16 (E)
+           2834 LOAD_ATTR               52 (CANCELLED)
+           2854 COMPARE_OP              40 (==)
+           2858 POP_JUMP_IF_TRUE        26 (to 2912)
+           2860 LOAD_DEREF               3 (cancel_check)
+           2862 POP_JUMP_IF_FALSE        7 (to 2878)
+           2864 PUSH_NULL
+           2866 LOAD_DEREF               3 (cancel_check)
+           2868 CALL                     0
+           2876 POP_JUMP_IF_TRUE        17 (to 2912)
+        >> 2878 LOAD_FAST               22 (seg)
+           2880 LOAD_ATTR                9 (NULL|self + get)
+           2900 LOAD_CONST              24 ('still')
+           2902 CALL                     1
+           2910 POP_JUMP_IF_TRUE         1 (to 2914)
+
+492     >> 2912 RAISE_VARARGS            0
+
+493     >> 2914 LOAD_FAST               32 (part)
+           2916 LOAD_ATTR               59 (NULL|self + unlink)
+           2936 LOAD_CONST              53 (True)
+           2938 KW_NAMES                54 (('missing_ok',))
+           2940 CALL                     1
+           2948 POP_TOP
+
+494        2950 LOAD_DEREF               5 (emit_log)
+           2952 POP_JUMP_IF_FALSE       62 (to 3078)
+
+495        2954 PUSH_NULL
+           2956 LOAD_DEREF               5 (emit_log)
+           2958 LOAD_CONST              55 ('Cảnh ')
+           2960 LOAD_FAST               22 (seg)
+           2962 LOAD_ATTR                9 (NULL|self + get)
+           2982 LOAD_CONST               1 ('seq')
+           2984 CALL                     1
+           2992 FORMAT_VALUE             0
+           2994 LOAD_CONST              56 (': clip hỏng, không dựng được (')
+
+496        2996 LOAD_FAST               33 (e)
+           2998 LOAD_ATTR               60 (message)
+           3018 COPY                     1
+           3020 POP_JUMP_IF_TRUE         2 (to 3026)
+           3022 POP_TOP
+           3024 LOAD_CONST              36 ('')
+        >> 3026 LOAD_ATTR               63 (NULL|self + strip)
+           3046 CALL                     0
+           3054 LOAD_CONST               2 (None)
+           3056 LOAD_CONST              57 (120)
+           3058 BINARY_SLICE
+           3060 FORMAT_VALUE             0
+           3062 LOAD_CONST              58 (') → thay bằng ảnh của cảnh.')
+
+495        3064 BUILD_STRING             5
+
+496        3066 LOAD_CONST              39 ('warn')
+
+495        3068 CALL                     2
+           3076 POP_TOP
+
+497     >> 3078 PUSH_NULL
+           3080 LOAD_FAST               11 (_encode)
+           3082 LOAD_FAST               32 (part)
+           3084 LOAD_FAST               31 (rdur)
+           3086 LOAD_FAST               22 (seg)
+           3088 BUILD_TUPLE              3
+           3090 LOAD_CLOSURE             3 (cancel_check)
+           3092 LOAD_CLOSURE            37 (ffmpeg)
+           3094 LOAD_CLOSURE            38 (h)
+           3096 LOAD_CLOSURE            43 (w)
+           3098 BUILD_TUPLE              4
+           3100 LOAD_CONST              59 (<code object <lambda> at 0x7f6c92fd6630, file "app\render\visual_bake.py", line 497>)
+           3102 MAKE_FUNCTION            9 (defaults, closure)
+           3104 CALL                     1
+           3112 GET_AWAITABLE            0
+           3114 LOAD_CONST               2 (None)
+        >> 3116 SEND                     4 (to 3128)
+           3120 YIELD_VALUE              5
+           3122 RESUME                   3
+           3124 JUMP_BACKWARD_NO_INTERRUPT     5 (to 3116)
+        >> 3126 CLEANUP_THROW
+        >> 3128 END_SEND
+           3130 POP_TOP
+           3132 POP_EXCEPT
+           3134 LOAD_CONST               2 (None)
+           3136 STORE_FAST              33 (e)
+           3138 DELETE_FAST             33 (e)
+           3140 EXTENDED_ARG             2
+           3142 JUMP_BACKWARD          538 (to 2068)
+        >> 3144 LOAD_CONST               2 (None)
+           3146 STORE_FAST              33 (e)
+           3148 DELETE_FAST             33 (e)
+           3150 RERAISE                  1
+
+487     >> 3152 RERAISE                  0
+        >> 3154 COPY                     3
+           3156 POP_EXCEPT
+           3158 RERAISE                  1
+
+501     >> 3160 CLEANUP_THROW
+           3162 EXTENDED_ARG             2
+           3164 JUMP_BACKWARD          551 (to 2064)
+
+516     >> 3166 CLEANUP_THROW
+           3168 EXTENDED_ARG             1
+           3170 JUMP_BACKWARD          348 (to 2476)
+        >> 3172 PUSH_EXC_INFO
+
+518        3174 LOAD_GLOBAL             54 (StudioError)
+           3184 CHECK_EXC_MATCH
+           3186 POP_JUMP_IF_FALSE       49 (to 3286)
+           3188 POP_TOP
+
+519        3190 LOAD_DEREF               3 (cancel_check)
+           3192 POP_JUMP_IF_FALSE        8 (to 3210)
+           3194 PUSH_NULL
+           3196 LOAD_DEREF               3 (cancel_check)
+           3198 CALL                     0
+           3206 POP_JUMP_IF_FALSE        1 (to 3210)
+
+520        3208 RAISE_VARARGS            0
+
+521     >> 3210 LOAD_DEREF               5 (emit_log)
+           3212 POP_JUMP_IF_FALSE        9 (to 3232)
+
+522        3214 PUSH_NULL
+           3216 LOAD_DEREF               5 (emit_log)
+           3218 LOAD_CONST              66 ('Ghép chuyển cảnh (xfade) lỗi → nối thẳng không hiệu ứng.')
+           3220 LOAD_CONST              39 ('warn')
+           3222 CALL                     2
+           3230 POP_TOP
+
+523     >> 3232 PUSH_NULL
+           3234 LOAD_FAST               11 (_encode)
+           3236 LOAD_CLOSURE             3 (cancel_check)
+           3238 LOAD_CLOSURE            37 (ffmpeg)
+           3240 LOAD_CLOSURE            39 (out_source)
+           3242 LOAD_CLOSURE            40 (parts)
+           3244 LOAD_CLOSURE            41 (parts_mixed)
+           3246 BUILD_TUPLE              5
+           3248 LOAD_CONST              67 (<code object <lambda> at 0x7f6c93097000, file "app\render\visual_bake.py", line 523>)
+           3250 MAKE_FUNCTION            8 (closure)
+           3252 CALL                     1
+           3260 GET_AWAITABLE            0
+           3262 LOAD_CONST               2 (None)
+        >> 3264 SEND                     4 (to 3276)
+           3268 YIELD_VALUE              4
+           3270 RESUME                   3
+           3272 JUMP_BACKWARD_NO_INTERRUPT     5 (to 3264)
+        >> 3274 CLEANUP_THROW
+        >> 3276 END_SEND
+           3278 POP_TOP
+           3280 POP_EXCEPT
+           3282 EXTENDED_ARG             1
+           3284 JUMP_BACKWARD          379 (to 2528)
+
+518     >> 3286 RERAISE                  0
+        >> 3288 COPY                     3
+           3290 POP_EXCEPT
+           3292 RERAISE                  1
+
+527     >> 3294 CLEANUP_THROW
+           3296 EXTENDED_ARG             1
+           3298 JUMP_BACKWARD          388 (to 2524)
+        >> 3300 PUSH_EXC_INFO
+
+531        3302 LOAD_GLOBAL             73 (NULL + shutil)
+           3312 LOAD_ATTR               74 (rmtree)
+           3332 LOAD_FAST               12 (temp_dir)
+           3334 LOAD_CONST              53 (True)
+           3336 KW_NAMES                69 (('ignore_errors',))
+           3338 CALL                     2
+           3346 POP_TOP
+           3348 RERAISE                  0
+        >> 3350 COPY                     3
+           3352 POP_EXCEPT
+           3354 RERAISE                  1
+        >> 3356 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           3358 RERAISE                  1
+ExceptionTable:
+  30 to 144 -> 3356 [0] lasti
+  146 to 188 -> 2746 [2]
+  192 to 224 -> 2746 [2]
+  226 to 378 -> 3356 [0] lasti
+  380 to 380 -> 2756 [2]
+  382 to 486 -> 3356 [0] lasti
+  490 to 1076 -> 3300 [0]
+  1078 to 1216 -> 2762 [2]
+  1218 to 1514 -> 3300 [0]
+  1518 to 1520 -> 3300 [0]
+  1524 to 1538 -> 3300 [0]
+  1542 to 1626 -> 3300 [0]
+  1630 to 1930 -> 3300 [0]
+  1932 to 1932 -> 2772 [3]
+  1934 to 1958 -> 3300 [0]
+  1962 to 2002 -> 2784 [1]
+  2004 to 2004 -> 2778 [3]
+  2006 to 2012 -> 2784 [1]
+  2014 to 2056 -> 3300 [0]
+  2058 to 2058 -> 3160 [3]
+  2060 to 2256 -> 3300 [0]
+  2262 to 2428 -> 3300 [0]
+  2432 to 2468 -> 3172 [0]
+  2470 to 2470 -> 3166 [2]
+  2472 to 2478 -> 3172 [0]
+  2480 to 2516 -> 3300 [0]
+  2518 to 2518 -> 3294 [2]
+  2520 to 2526 -> 3300 [0]
+  2528 to 2756 -> 3356 [0] lasti
+  2762 to 2772 -> 3300 [0]
+  2778 to 2778 -> 2784 [1]
+  2784 to 2800 -> 3154 [2] lasti
+  2802 to 3118 -> 3144 [2] lasti
+  3120 to 3120 -> 3126 [4]
+  3122 to 3130 -> 3144 [2] lasti
+  3132 to 3142 -> 3300 [0]
+  3144 to 3152 -> 3154 [2] lasti
+  3154 to 3160 -> 3300 [0]
+  3166 to 3166 -> 3172 [0]
+  3172 to 3266 -> 3288 [1] lasti
+  3268 to 3268 -> 3274 [3]
+  3270 to 3278 -> 3288 [1] lasti
+  3280 to 3284 -> 3300 [0]
+  3286 to 3286 -> 3288 [1] lasti
+  3288 to 3294 -> 3300 [0]
+  3300 to 3348 -> 3350 [1] lasti
+  3350 to 3354 -> 3356 [0] lasti
+
+Disassembly of <code object _encode at 0x7f6c92bdf2d0, file "app\render\visual_bake.py", line 400>:
+              0 COPY_FREE_VARS           6
+
+400           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+403           8 NOP
+
+404          10 PUSH_NULL
+             12 LOAD_FAST                0 (make_coro)
+             14 LOAD_DEREF               2 (codec_args)
+             16 CALL                     1
+             24 GET_AWAITABLE            0
+             26 LOAD_CONST               1 (None)
+        >>   28 SEND                     3 (to 38)
+             32 YIELD_VALUE              3
+             34 RESUME                   3
+             36 JUMP_BACKWARD_NO_INTERRUPT     5 (to 28)
+        >>   38 END_SEND
+             40 POP_TOP
+
+405          42 RETURN_CONST             1 (None)
+
+404     >>   44 CLEANUP_THROW
+             46 JUMP_BACKWARD            5 (to 38)
+        >>   48 PUSH_EXC_INFO
+
+406          50 LOAD_GLOBAL              0 (StudioError)
+             60 CHECK_EXC_MATCH
+             62 POP_JUMP_IF_FALSE       18 (to 100)
+             64 POP_TOP
+
+407          66 LOAD_DEREF               5 (enc_name)
+             68 LOAD_CONST               2 ('libx264')
+             70 COMPARE_OP              40 (==)
+             74 POP_JUMP_IF_TRUE         9 (to 94)
+             76 LOAD_DEREF               1 (cancel_check)
+             78 POP_JUMP_IF_FALSE        8 (to 96)
+             80 PUSH_NULL
+             82 LOAD_DEREF               1 (cancel_check)
+             84 CALL                     0
+             92 POP_JUMP_IF_FALSE        1 (to 96)
+
+408     >>   94 RAISE_VARARGS            0
+        >>   96 POP_EXCEPT
+             98 JUMP_FORWARD             4 (to 108)
+
+406     >>  100 RERAISE                  0
+        >>  102 COPY                     3
+            104 POP_EXCEPT
+            106 RERAISE                  1
+
+409     >>  108 LOAD_DEREF               4 (emit_log)
+            110 POP_JUMP_IF_FALSE       13 (to 138)
+
+410         112 PUSH_NULL
+            114 LOAD_DEREF               4 (emit_log)
+            116 LOAD_CONST               3 ('Encoder ')
+            118 LOAD_DEREF               5 (enc_name)
+            120 FORMAT_VALUE             0
+            122 LOAD_CONST               4 (' lỗi khi dựng clip nền → chuyển sang libx264 (CPU).')
+            124 BUILD_STRING             3
+
+411         126 LOAD_CONST               5 ('warn')
+
+410         128 CALL                     2
+            136 POP_TOP
+
+412     >>  138 LOAD_CONST               2 ('libx264')
+            140 STORE_DEREF              5 (enc_name)
+
+413         142 LOAD_GLOBAL              3 (NULL + filtergraph)
+            152 LOAD_ATTR                4 (video_codec_args)
+            172 LOAD_CONST               6 ('intermediate')
+            174 LOAD_DEREF               3 (config)
+            176 CALL                     2
+            184 STORE_DEREF              2 (codec_args)
+
+414         186 LOAD_CONST               7 (True)
+            188 STORE_DEREF              6 (parts_mixed)
+
+415         190 PUSH_NULL
+            192 LOAD_FAST                0 (make_coro)
+            194 LOAD_DEREF               2 (codec_args)
+            196 CALL                     1
+            204 GET_AWAITABLE            0
+            206 LOAD_CONST               1 (None)
+        >>  208 SEND                     4 (to 220)
+            212 YIELD_VALUE              2
+            214 RESUME                   3
+            216 JUMP_BACKWARD_NO_INTERRUPT     5 (to 208)
+        >>  218 CLEANUP_THROW
+        >>  220 END_SEND
+            222 POP_TOP
+            224 RETURN_CONST             1 (None)
+        >>  226 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            228 RERAISE                  1
+ExceptionTable:
+  6 to 6 -> 226 [0] lasti
+  10 to 30 -> 48 [0]
+  32 to 32 -> 44 [2]
+  34 to 40 -> 48 [0]
+  42 to 42 -> 226 [0] lasti
+  44 to 44 -> 48 [0]
+  48 to 94 -> 102 [1] lasti
+  96 to 98 -> 226 [0] lasti
+  100 to 100 -> 102 [1] lasti
+  102 to 210 -> 226 [0] lasti
+  212 to 212 -> 218 [2]
+  214 to 224 -> 226 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c92fd5430, file "app\render\visual_bake.py", line 456>:
+456           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                15 (to 42)
+             12 STORE_FAST               1 (x)
+             14 LOAD_GLOBAL              1 (NULL + str)
+             24 LOAD_FAST                1 (x)
+             26 CALL                     1
+             34 YIELD_VALUE              1
+             36 RESUME                   1
+             38 POP_TOP
+             40 JUMP_BACKWARD           17 (to 8)
+        >>   42 END_FOR
+             44 RETURN_CONST             0 (None)
+        >>   46 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             48 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 46 [0] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c930952f0, file "app\render\visual_bake.py", line 480>:
+              0 COPY_FREE_VARS           4
+
+480           2 RESUME                   0
+
+481           4 LOAD_GLOBAL              1 (NULL + _render_black_clip)
+             14 LOAD_DEREF               4 (ffmpeg)
+             16 LOAD_FAST                1 (p)
+             18 LOAD_FAST                2 (d)
+             20 LOAD_DEREF               6 (w)
+             22 LOAD_DEREF               5 (h)
+             24 LOAD_FAST                0 (ca)
+             26 LOAD_DEREF               3 (cancel_check)
+             28 KW_NAMES                 1 (('cancel_check',))
+             30 CALL                     7
+             38 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c930bacd0, file "app\render\visual_bake.py", line 484>:
+              0 COPY_FREE_VARS           4
+
+484           2 RESUME                   0
+
+485           4 LOAD_GLOBAL              1 (NULL + _render_video_clip)
+             14 LOAD_DEREF               5 (ffmpeg)
+             16 LOAD_FAST                3 (s)
+             18 LOAD_CONST               1 ('asset')
+             20 BINARY_SUBSCR
+             24 LOAD_FAST                1 (p)
+             26 LOAD_FAST                2 (d)
+             28 LOAD_DEREF               7 (w)
+             30 LOAD_DEREF               6 (h)
+             32 LOAD_FAST                3 (s)
+             34 LOAD_ATTR                3 (NULL|self + get)
+             54 LOAD_CONST               2 ('src_in_ms')
+             56 CALL                     1
+             64 LOAD_FAST                0 (ca)
+
+486          66 LOAD_DEREF               4 (cancel_check)
+
+485          68 KW_NAMES                 3 (('cancel_check',))
+             70 CALL                     9
+             78 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c92fd6630, file "app\render\visual_bake.py", line 497>:
+              0 COPY_FREE_VARS           4
+
+497           2 RESUME                   0
+
+498           4 LOAD_GLOBAL              1 (NULL + _render_image_clip)
+             14 LOAD_DEREF               5 (ffmpeg)
+             16 LOAD_FAST                3 (s)
+             18 LOAD_CONST               1 ('still')
+             20 BINARY_SUBSCR
+             24 LOAD_FAST                1 (p)
+             26 LOAD_FAST                2 (d)
+             28 LOAD_DEREF               7 (w)
+             30 LOAD_DEREF               6 (h)
+             32 LOAD_FAST                3 (s)
+             34 LOAD_CONST               2 ('zoom_in')
+             36 BINARY_SUBSCR
+             40 LOAD_FAST                0 (ca)
+
+499          42 LOAD_DEREF               4 (cancel_check)
+
+498          44 KW_NAMES                 3 (('cancel_check',))
+             46 CALL                     9
+             54 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c92fd7930, file "app\render\visual_bake.py", line 501>:
+              0 COPY_FREE_VARS           4
+
+501           2 RESUME                   0
+
+502           4 LOAD_GLOBAL              1 (NULL + _render_image_clip)
+             14 LOAD_DEREF               5 (ffmpeg)
+             16 LOAD_FAST                3 (s)
+             18 LOAD_CONST               1 ('asset')
+             20 BINARY_SUBSCR
+             24 LOAD_FAST                1 (p)
+             26 LOAD_FAST                2 (d)
+             28 LOAD_DEREF               7 (w)
+             30 LOAD_DEREF               6 (h)
+             32 LOAD_FAST                3 (s)
+             34 LOAD_CONST               2 ('zoom_in')
+             36 BINARY_SUBSCR
+             40 LOAD_FAST                0 (ca)
+
+503          42 LOAD_DEREF               4 (cancel_check)
+
+502          44 KW_NAMES                 3 (('cancel_check',))
+             46 CALL                     9
+             54 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c92be2cd0, file "app\render\visual_bake.py", line 514>:
+514           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                 6 (to 24)
+             12 STORE_FAST               1 (t)
+             14 LOAD_FAST                1 (t)
+             16 YIELD_VALUE              1
+             18 RESUME                   1
+             20 POP_TOP
+             22 JUMP_BACKWARD            8 (to 8)
+        >>   24 END_FOR
+             26 RETURN_CONST             0 (None)
+        >>   28 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             30 RERAISE                  1
+ExceptionTable:
+  4 to 26 -> 28 [0] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c93096e20, file "app\render\visual_bake.py", line 516>:
+              0 COPY_FREE_VARS           6
+
+516           2 RESUME                   0
+              4 LOAD_GLOBAL              1 (NULL + _render_transitions)
+
+517          14 LOAD_DEREF               3 (ffmpeg)
+             16 LOAD_DEREF               5 (parts)
+             18 LOAD_DEREF               2 (durs)
+             20 LOAD_DEREF               6 (trans)
+             22 LOAD_DEREF               4 (out_source)
+             24 LOAD_FAST                0 (ca)
+             26 LOAD_DEREF               1 (cancel_check)
+
+516          28 KW_NAMES                 1 (('cancel_check',))
+             30 CALL                     7
+             38 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c93097000, file "app\render\visual_bake.py", line 523>:
+              0 COPY_FREE_VARS           5
+
+523           2 RESUME                   0
+              4 LOAD_GLOBAL              1 (NULL + _concat)
+             14 LOAD_DEREF               2 (ffmpeg)
+             16 LOAD_DEREF               4 (parts)
+             18 LOAD_DEREF               3 (out_source)
+             20 LOAD_FAST                0 (ca)
+
+524          22 LOAD_DEREF               1 (cancel_check)
+
+525          24 LOAD_DEREF               5 (parts_mixed)
+             26 UNARY_NOT
+
+523          28 KW_NAMES                 1 (('cancel_check', 'try_copy'))
+             30 CALL                     6
+             38 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c930970f0, file "app\render\visual_bake.py", line 527>:
+              0 COPY_FREE_VARS           5
+
+527           2 RESUME                   0
+              4 LOAD_GLOBAL              1 (NULL + _concat)
+             14 LOAD_DEREF               2 (ffmpeg)
+             16 LOAD_DEREF               4 (parts)
+             18 LOAD_DEREF               3 (out_source)
+             20 LOAD_FAST                0 (ca)
+
+528          22 LOAD_DEREF               1 (cancel_check)
+
+529          24 LOAD_DEREF               5 (parts_mixed)
+             26 UNARY_NOT
+
+527          28 KW_NAMES                 1 (('cancel_check', 'try_copy'))
+             30 CALL                     6
+             38 RETURN_VALUE
+
+Disassembly of <code object ensure_source at 0x26a2d130, file "app\render\visual_bake.py", line 540>:
+540           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+548           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('timeline_model',))
+             10 IMPORT_NAME              0 (app.render)
+             12 IMPORT_FROM              1 (timeline_model)
+             14 STORE_FAST               6 (timeline_model)
+             16 POP_TOP
+
+549          18 LOAD_FAST                6 (timeline_model)
+             20 LOAD_ATTR                5 (NULL|self + is_v2)
+             40 LOAD_FAST                2 (config)
+             42 CALL                     1
+             50 POP_JUMP_IF_FALSE       37 (to 126)
+
+550          52 LOAD_CONST               1 (0)
+             54 LOAD_CONST               3 (('timeline_compiler',))
+             56 IMPORT_NAME              0 (app.render)
+             58 IMPORT_FROM              3 (timeline_compiler)
+             60 STORE_FAST               7 (timeline_compiler)
+             62 POP_TOP
+
+551          64 LOAD_FAST                7 (timeline_compiler)
+             66 LOAD_ATTR                9 (NULL|self + ensure_timeline)
+
+552          86 LOAD_FAST                0 (video_id)
+             88 LOAD_FAST                1 (workdir)
+             90 LOAD_FAST                2 (config)
+             92 LOAD_FAST                3 (cancel_check)
+
+553          94 LOAD_FAST                4 (on_progress)
+             96 LOAD_FAST                5 (emit_log)
+
+551          98 KW_NAMES                 4 (('cancel_check', 'on_progress', 'emit_log'))
+            100 CALL                     6
+            108 GET_AWAITABLE            0
+            110 LOAD_CONST               5 (None)
+        >>  112 SEND                     3 (to 122)
+            116 YIELD_VALUE              2
+            118 RESUME                   3
+            120 JUMP_BACKWARD_NO_INTERRUPT     5 (to 112)
+        >>  122 END_SEND
+            124 RETURN_VALUE
+
+554     >>  126 LOAD_GLOBAL             11 (NULL + ProjectFS)
+            136 LOAD_FAST                1 (workdir)
+            138 CALL                     1
+            146 STORE_FAST               8 (fs)
+
+555         148 LOAD_GLOBAL             13 (NULL + bool)
+            158 LOAD_FAST                2 (config)
+            160 COPY                     1
+            162 POP_JUMP_IF_TRUE         2 (to 168)
+            164 POP_TOP
+            166 BUILD_MAP                0
+        >>  168 LOAD_ATTR               15 (NULL|self + get)
+            188 LOAD_CONST               6 ('visual_timeline')
+            190 CALL                     1
+            198 CALL                     1
+            206 STORE_FAST               9 (has_edit)
+
+556         208 LOAD_FAST                9 (has_edit)
+            210 POP_JUMP_IF_TRUE        32 (to 276)
+            212 LOAD_FAST                8 (fs)
+            214 LOAD_ATTR               17 (NULL|self + source_mp4)
+            234 LOAD_FAST                0 (video_id)
+            236 CALL                     1
+            244 LOAD_ATTR               19 (NULL|self + exists)
+            264 CALL                     0
+            272 POP_JUMP_IF_FALSE        1 (to 276)
+
+557         274 RETURN_CONST             7 (False)
+
+559     >>  276 LOAD_GLOBAL             21 (NULL + _load_scenes)
+            286 LOAD_FAST                0 (video_id)
+            288 CALL                     1
+            296 POP_JUMP_IF_TRUE         1 (to 300)
+
+560         298 RETURN_CONST             7 (False)
+
+561     >>  300 LOAD_GLOBAL             23 (NULL + bake_source)
+            310 LOAD_FAST                0 (video_id)
+            312 LOAD_FAST                1 (workdir)
+            314 LOAD_FAST                2 (config)
+            316 LOAD_FAST                3 (cancel_check)
+
+562         318 LOAD_FAST                4 (on_progress)
+            320 LOAD_FAST                5 (emit_log)
+
+561         322 KW_NAMES                 4 (('cancel_check', 'on_progress', 'emit_log'))
+            324 CALL                     6
+            332 GET_AWAITABLE            0
+            334 LOAD_CONST               5 (None)
+        >>  336 SEND                     3 (to 346)
+            340 YIELD_VALUE              2
+            342 RESUME                   3
+            344 JUMP_BACKWARD_NO_INTERRUPT     5 (to 336)
+        >>  346 END_SEND
+            348 POP_TOP
+
+563         350 RETURN_CONST             8 (True)
+
+551     >>  352 CLEANUP_THROW
+            354 JUMP_BACKWARD          117 (to 122)
+
+561     >>  356 CLEANUP_THROW
+            358 JUMP_BACKWARD            7 (to 346)
+        >>  360 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            362 RERAISE                  1
+ExceptionTable:
+  4 to 114 -> 360 [0] lasti
+  116 to 116 -> 352 [2]
+  118 to 338 -> 360 [0] lasti
+  340 to 340 -> 356 [2]
+  342 to 352 -> 360 [0] lasti
+  356 to 356 -> 360 [0] lasti

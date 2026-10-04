@@ -1,0 +1,2253 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ("Auto-publish worker Facebook — gắn vào ai_scheduler (tick riêng 60s).\n\nLuồng 1 lượt (publish_due):\n1. SELECT fb_posts status='ready' + schedule_time <= now (limit theo page, ưu tiên sớm).\n2. Claim ATOMIC: UPDATE ... WHERE id=? AND status='ready' → rowcount 1 → chống double-post\n   (2 tick / cron / publish-now cùng lúc chỉ 1 nơi thắng).\n3. pick_token(page) → giải mã → fb_graph_client.post_to_page theo content_type.\n4. Cập nhật: posted (+fb_object_id/fb_post_url) | failed (+error_message, retry).\n5. resolve_stuck: bài 'processing' > 60' (tick trước chết giữa chừng) → về 'ready'.\n\nRetry: tối đa 3 lần cho lỗi retryable (429/network/transcode).\n- rate_limited → bài về 'ready', đợi tick sau (10' throttle tự nhiên).\n- token lỗi → mark_error (≥3 → inactive) + exclude, lượt sau pick token khác.\n- lỗi vĩnh viễn (blocked/restricted/generic) → retry ≤3 rồi 'failed'.\n")
+              4 STORE_NAME               0 (__doc__)
+
+ 16           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 18          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (asyncio)
+             24 STORE_NAME               3 (asyncio)
+
+ 19          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               3 (None)
+             30 IMPORT_NAME              4 (json)
+             32 STORE_NAME               4 (json)
+
+ 20          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               4 (('datetime', 'timedelta'))
+             38 IMPORT_NAME              5 (datetime)
+             40 IMPORT_FROM              5 (datetime)
+             42 STORE_NAME               5 (datetime)
+             44 IMPORT_FROM              6 (timedelta)
+             46 STORE_NAME               6 (timedelta)
+             48 POP_TOP
+
+ 22          50 LOAD_CONST               1 (0)
+             52 LOAD_CONST               5 (('select', 'update'))
+             54 IMPORT_NAME              7 (sqlalchemy)
+             56 IMPORT_FROM              8 (select)
+             58 STORE_NAME               8 (select)
+             60 IMPORT_FROM              9 (update)
+             62 STORE_NAME               9 (update)
+             64 POP_TOP
+
+ 23          66 LOAD_CONST               1 (0)
+             68 LOAD_CONST               6 (('Session',))
+             70 IMPORT_NAME             10 (sqlalchemy.orm)
+             72 IMPORT_FROM             11 (Session)
+             74 STORE_NAME              11 (Session)
+             76 POP_TOP
+
+ 25          78 LOAD_CONST               1 (0)
+             80 LOAD_CONST               7 (('log',))
+             82 IMPORT_NAME             12 (app.core.logging)
+             84 IMPORT_FROM             13 (log)
+             86 STORE_NAME              13 (log)
+             88 POP_TOP
+
+ 26          90 LOAD_CONST               1 (0)
+             92 LOAD_CONST               8 (('SessionLocal',))
+             94 IMPORT_NAME             14 (app.db.session)
+             96 IMPORT_FROM             15 (SessionLocal)
+             98 STORE_NAME              15 (SessionLocal)
+            100 POP_TOP
+
+ 27         102 LOAD_CONST               1 (0)
+            104 LOAD_CONST               9 (('FbPage', 'FbPost'))
+            106 IMPORT_NAME             16 (app.db.models)
+            108 IMPORT_FROM             17 (FbPage)
+            110 STORE_NAME              17 (FbPage)
+            112 IMPORT_FROM             18 (FbPost)
+            114 STORE_NAME              18 (FbPost)
+            116 POP_TOP
+
+ 28         118 LOAD_CONST               1 (0)
+            120 LOAD_CONST              10 (('fb_graph_client', 'fb_token_pool', 'fb_settings'))
+            122 IMPORT_NAME             19 (app.services)
+            124 IMPORT_FROM             20 (fb_graph_client)
+            126 STORE_NAME              20 (fb_graph_client)
+            128 IMPORT_FROM             21 (fb_token_pool)
+            130 STORE_NAME              21 (fb_token_pool)
+            132 IMPORT_FROM             22 (fb_settings)
+            134 STORE_NAME              22 (fb_settings)
+            136 POP_TOP
+
+ 29         138 LOAD_CONST               1 (0)
+            140 LOAD_CONST              11 (('FbError',))
+            142 IMPORT_NAME             23 (app.services.fb_errors)
+            144 IMPORT_FROM             24 (FbError)
+            146 STORE_NAME              24 (FbError)
+            148 POP_TOP
+
+ 31         150 LOAD_CONST              12 (3)
+            152 STORE_NAME              25 (MAX_RETRY)
+
+ 32         154 LOAD_CONST              13 (15)
+            156 STORE_NAME              26 (STUCK_MIN)
+
+ 33         158 LOAD_CONST              14 (10)
+            160 STORE_NAME              27 (POLL_BATCH)
+
+ 36         162 LOAD_CONST              23 (('default', 'int', 'minimum', 'int', 'maximum', 'int', 'return', 'int'))
+            164 LOAD_CONST              15 (<code object _bounded_int at 0x7f6c92693370, file "app\services\fb_publish_service.py", line 36>)
+            166 MAKE_FUNCTION            4 (annotations)
+            168 STORE_NAME              28 (_bounded_int)
+
+ 44         170 PUSH_NULL
+            172 LOAD_BUILD_CLASS
+            174 LOAD_CONST              16 (<code object FbPublishContext at 0x7f6c92405130, file "app\services\fb_publish_service.py", line 44>)
+            176 MAKE_FUNCTION            0
+            178 LOAD_CONST              17 ('FbPublishContext')
+            180 CALL                     2
+            188 STORE_NAME              29 (FbPublishContext)
+
+ 59         190 LOAD_NAME               27 (POLL_BATCH)
+            192 BUILD_TUPLE              1
+            194 LOAD_CONST              24 (('limit', 'int', 'return', 'dict'))
+            196 LOAD_CONST              18 (<code object publish_due at 0x28bfdc10, file "app\services\fb_publish_service.py", line 59>)
+            198 MAKE_FUNCTION            5 (defaults, annotations)
+            200 STORE_NAME              30 (publish_due)
+
+122         202 LOAD_CONST              25 (('ctx', 'FbPublishContext', 'post', 'FbPost', 'return', 'bool'))
+            204 LOAD_CONST              19 (<code object _publish_one at 0x28c291a0, file "app\services\fb_publish_service.py", line 122>)
+            206 MAKE_FUNCTION            4 (annotations)
+            208 STORE_NAME              31 (_publish_one)
+
+285         210 LOAD_CONST              26 (('db', 'Session', 'return', 'int'))
+            212 LOAD_CONST              20 (<code object _resolve_stuck at 0x28c2f3f0, file "app\services\fb_publish_service.py", line 285>)
+            214 MAKE_FUNCTION            4 (annotations)
+            216 STORE_NAME              32 (_resolve_stuck)
+
+305         218 LOAD_CONST              27 (('db', 'Session', 'post_id', 'str', 'return', 'dict'))
+            220 LOAD_CONST              21 (<code object publish_now_in_session at 0x28c2e4d0, file "app\services\fb_publish_service.py", line 305>)
+            222 MAKE_FUNCTION            4 (annotations)
+            224 STORE_NAME              33 (publish_now_in_session)
+
+343         226 LOAD_CONST              28 (('post_id', 'str', 'return', 'dict'))
+            228 LOAD_CONST              22 (<code object publish_now at 0x7f6c92693af0, file "app\services\fb_publish_service.py", line 343>)
+            230 MAKE_FUNCTION            4 (annotations)
+            232 STORE_NAME              34 (publish_now)
+            234 RETURN_CONST             3 (None)
+
+Disassembly of <code object _bounded_int at 0x7f6c92693370, file "app\services\fb_publish_service.py", line 36>:
+ 36           0 RESUME                   0
+
+ 37           2 NOP
+
+ 38           4 LOAD_GLOBAL              1 (NULL + int)
+             14 LOAD_FAST                0 (value)
+             16 CALL                     1
+             24 STORE_FAST               4 (parsed)
+
+ 41     >>   26 LOAD_GLOBAL              7 (NULL + max)
+             36 LOAD_FAST                2 (minimum)
+             38 LOAD_GLOBAL              9 (NULL + min)
+             48 LOAD_FAST                3 (maximum)
+             50 LOAD_FAST                4 (parsed)
+             52 CALL                     2
+             60 CALL                     2
+             68 RETURN_VALUE
+        >>   70 PUSH_EXC_INFO
+
+ 39          72 LOAD_GLOBAL              2 (TypeError)
+             82 LOAD_GLOBAL              4 (ValueError)
+             92 BUILD_TUPLE              2
+             94 CHECK_EXC_MATCH
+             96 POP_JUMP_IF_FALSE        5 (to 108)
+             98 POP_TOP
+
+ 40         100 LOAD_FAST                1 (default)
+            102 STORE_FAST               4 (parsed)
+            104 POP_EXCEPT
+            106 JUMP_BACKWARD           41 (to 26)
+
+ 39     >>  108 RERAISE                  0
+        >>  110 COPY                     3
+            112 POP_EXCEPT
+            114 RERAISE                  1
+ExceptionTable:
+  4 to 24 -> 70 [0]
+  70 to 102 -> 110 [1] lasti
+  108 to 108 -> 110 [1] lasti
+
+Disassembly of <code object FbPublishContext at 0x7f6c92405130, file "app\services\fb_publish_service.py", line 44>:
+ 44           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('FbPublishContext')
+              8 STORE_NAME               2 (__qualname__)
+
+ 45          10 LOAD_CONST               1 ('1 lượt publish — giữ token đã pick để không pick trùng trong cùng lượt.')
+             12 STORE_NAME               3 (__doc__)
+
+ 47          14 LOAD_CONST               2 ('least_used')
+
+ 48          16 LOAD_CONST               3 (2)
+             18 LOAD_CONST               4 (None)
+
+ 49          20 LOAD_CONST               5 (12)
+             22 LOAD_CONST               6 (20)
+
+ 47          24 LOAD_CONST               7 (('strategy', 'block_size', 'proxy_global', 'max_posts_per_day', 'min_gap_minutes'))
+             26 BUILD_CONST_KEY_MAP      5
+
+ 48          28 NOP
+
+ 47          30 NOP
+
+ 48          32 NOP
+
+ 47          34 NOP
+
+ 49          36 NOP
+
+ 47          38 NOP
+
+ 49          40 NOP
+
+ 47          42 LOAD_CONST               9 (('db', 'Session', 'strategy', 'str', 'block_size', 'int', 'proxy_global', 'str | None', 'max_posts_per_day', 'int', 'min_gap_minutes', 'int'))
+             44 LOAD_CONST               8 (<code object __init__ at 0x7f6c926939b0, file "app\services\fb_publish_service.py", line 47>)
+             46 MAKE_FUNCTION            6 (kwdefaults, annotations)
+             48 STORE_NAME               4 (__init__)
+             50 RETURN_CONST             4 (None)
+
+Disassembly of <code object __init__ at 0x7f6c926939b0, file "app\services\fb_publish_service.py", line 47>:
+ 47           0 RESUME                   0
+
+ 50           2 LOAD_FAST                1 (db)
+              4 LOAD_FAST                0 (self)
+              6 STORE_ATTR               0 (db)
+
+ 51          16 LOAD_GLOBAL              3 (NULL + set)
+             26 CALL                     0
+             34 LOAD_FAST                0 (self)
+             36 STORE_ATTR               2 (exclude)
+
+ 52          46 LOAD_FAST                2 (strategy)
+             48 LOAD_FAST                0 (self)
+             50 STORE_ATTR               3 (strategy)
+
+ 53          60 LOAD_FAST                3 (block_size)
+             62 LOAD_FAST                0 (self)
+             64 STORE_ATTR               4 (block_size)
+
+ 54          74 LOAD_FAST                4 (proxy_global)
+             76 LOAD_FAST                0 (self)
+             78 STORE_ATTR               5 (proxy_global)
+
+ 55          88 LOAD_FAST                5 (max_posts_per_day)
+             90 LOAD_FAST                0 (self)
+             92 STORE_ATTR               6 (max_posts_per_day)
+
+ 56         102 LOAD_FAST                6 (min_gap_minutes)
+            104 LOAD_FAST                0 (self)
+            106 STORE_ATTR               7 (min_gap_minutes)
+            116 RETURN_CONST             0 (None)
+
+Disassembly of <code object publish_due at 0x28bfdc10, file "app\services\fb_publish_service.py", line 59>:
+              0 MAKE_CELL               11 (run_one)
+              2 MAKE_CELL               12 (semaphore)
+              4 MAKE_CELL               13 (settings)
+
+ 59           6 RETURN_GENERATOR
+              8 POP_TOP
+             10 RESUME                   0
+
+ 61          12 LOAD_CONST               1 (0)
+             14 LOAD_CONST               1 (0)
+             16 LOAD_CONST               1 (0)
+             18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               1 (0)
+             22 BUILD_LIST               0
+             24 LOAD_CONST               2 (('checked', 'posted', 'failed', 'kept_ready', 'recovered', 'errors'))
+             26 BUILD_CONST_KEY_MAP      6
+             28 STORE_FAST               1 (summary)
+
+ 62          30 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             40 CALL                     0
+             48 BEFORE_WITH
+             50 STORE_FAST               2 (db)
+
+ 64          52 LOAD_GLOBAL              3 (NULL + fb_settings)
+             62 LOAD_ATTR                4 (get_str)
+             82 LOAD_FAST                2 (db)
+             84 LOAD_CONST               3 ('fb_publish_enabled')
+             86 LOAD_CONST               4 ('1')
+             88 CALL                     3
+             96 LOAD_CONST               4 ('1')
+             98 COMPARE_OP              55 (!=)
+            102 POP_JUMP_IF_FALSE       15 (to 134)
+
+ 65         104 LOAD_CONST               5 ('paused')
+            106 LOAD_CONST               6 (True)
+            108 BUILD_MAP                1
+            110 LOAD_FAST                1 (summary)
+            112 DICT_UPDATE              1
+
+ 62         114 SWAP                     2
+            116 LOAD_CONST               7 (None)
+            118 LOAD_CONST               7 (None)
+            120 LOAD_CONST               7 (None)
+            122 CALL                     2
+            130 POP_TOP
+            132 RETURN_VALUE
+
+ 66     >>  134 LOAD_GLOBAL              3 (NULL + fb_settings)
+            144 LOAD_ATTR                6 (get_fb_settings)
+            164 LOAD_FAST                2 (db)
+            166 CALL                     1
+            174 STORE_DEREF             13 (settings)
+
+ 67         176 LOAD_GLOBAL              9 (NULL + _bounded_int)
+            186 LOAD_DEREF              13 (settings)
+            188 LOAD_ATTR               11 (NULL|self + get)
+            208 LOAD_CONST               8 ('fb_worker_threads')
+            210 CALL                     1
+            218 LOAD_CONST               9 (10)
+            220 LOAD_CONST              10 (1)
+            222 LOAD_CONST              11 (20)
+            224 CALL                     4
+            232 STORE_FAST               3 (worker_count)
+
+ 69         234 LOAD_GLOBAL             13 (NULL + max)
+            244 LOAD_FAST                3 (worker_count)
+            246 LOAD_GLOBAL             13 (NULL + max)
+            256 LOAD_CONST              10 (1)
+            258 LOAD_GLOBAL             15 (NULL + int)
+            268 LOAD_FAST                0 (limit)
+            270 CALL                     1
+            278 CALL                     2
+            286 CALL                     2
+            294 STORE_FAST               4 (effective_limit)
+
+ 71         296 LOAD_FAST                2 (db)
+            298 LOAD_ATTR               17 (NULL|self + query)
+            318 LOAD_GLOBAL             18 (FbPost)
+            328 LOAD_ATTR               20 (id)
+            348 CALL                     1
+
+ 72         356 LOAD_ATTR               23 (NULL|self + filter)
+
+ 73         376 LOAD_GLOBAL             18 (FbPost)
+            386 LOAD_ATTR               24 (status)
+            406 LOAD_CONST              12 ('ready')
+            408 COMPARE_OP              40 (==)
+
+ 74         412 LOAD_GLOBAL             18 (FbPost)
+            422 LOAD_ATTR               26 (schedule_time)
+            442 LOAD_ATTR               29 (NULL|self + isnot)
+            462 LOAD_CONST               7 (None)
+            464 CALL                     1
+
+ 75         472 LOAD_GLOBAL             18 (FbPost)
+            482 LOAD_ATTR               26 (schedule_time)
+            502 LOAD_GLOBAL             31 (NULL + datetime)
+            512 LOAD_ATTR               32 (now)
+            532 CALL                     0
+            540 COMPARE_OP              26 (<=)
+
+ 72         544 CALL                     3
+
+ 77         552 LOAD_ATTR               35 (NULL|self + order_by)
+            572 LOAD_GLOBAL             18 (FbPost)
+            582 LOAD_ATTR               26 (schedule_time)
+            602 LOAD_ATTR               37 (NULL|self + asc)
+            622 CALL                     0
+            630 CALL                     1
+
+ 78         638 LOAD_ATTR               39 (NULL|self + limit)
+            658 LOAD_FAST                4 (effective_limit)
+            660 CALL                     1
+
+ 79         668 LOAD_ATTR               41 (NULL|self + all)
+            688 CALL                     0
+
+ 71         696 GET_ITER
+
+ 70         698 LOAD_FAST_AND_CLEAR      5 (row_id)
+            700 SWAP                     2
+            702 BUILD_LIST               0
+            704 SWAP                     2
+
+ 71     >>  706 FOR_ITER                 6 (to 722)
+
+ 70         710 UNPACK_SEQUENCE          1
+            714 STORE_FAST               5 (row_id)
+            716 LOAD_FAST                5 (row_id)
+            718 LIST_APPEND              2
+            720 JUMP_BACKWARD            8 (to 706)
+
+ 71     >>  722 END_FOR
+
+ 70         724 STORE_FAST               6 (row_ids)
+            726 STORE_FAST               5 (row_id)
+
+ 81         728 LOAD_GLOBAL             43 (NULL + len)
+            738 LOAD_FAST                6 (row_ids)
+            740 CALL                     1
+            748 LOAD_FAST                1 (summary)
+            750 LOAD_CONST              13 ('checked')
+            752 STORE_SUBSCR
+
+ 62         756 LOAD_CONST               7 (None)
+            758 LOAD_CONST               7 (None)
+            760 LOAD_CONST               7 (None)
+            762 CALL                     2
+            770 POP_TOP
+
+ 83     >>  772 LOAD_GLOBAL             45 (NULL + asyncio)
+            782 LOAD_ATTR               46 (Semaphore)
+            802 LOAD_FAST_CHECK          3 (worker_count)
+            804 CALL                     1
+            812 STORE_DEREF             12 (semaphore)
+
+ 85         814 LOAD_CONST              22 (('post_id', 'str', 'return', 'tuple[bool, str, str | None]'))
+            816 LOAD_CLOSURE            12 (semaphore)
+            818 LOAD_CLOSURE            13 (settings)
+            820 BUILD_TUPLE              2
+            822 LOAD_CONST              14 (<code object run_one at 0x28aeebc0, file "app\services\fb_publish_service.py", line 85>)
+            824 MAKE_FUNCTION           12 (annotations, closure)
+            826 STORE_DEREF             11 (run_one)
+
+106         828 LOAD_GLOBAL             45 (NULL + asyncio)
+            838 LOAD_ATTR               48 (gather)
+            858 LOAD_CLOSURE            11 (run_one)
+            860 BUILD_TUPLE              1
+            862 LOAD_CONST              15 (<code object <genexpr> at 0x7f6c92696b50, file "app\services\fb_publish_service.py", line 106>)
+            864 MAKE_FUNCTION            8 (closure)
+            866 LOAD_FAST_CHECK          6 (row_ids)
+            868 GET_ITER
+            870 CALL                     0
+            878 CALL_FUNCTION_EX         0
+            880 GET_AWAITABLE            0
+            882 LOAD_CONST               7 (None)
+        >>  884 SEND                     3 (to 894)
+            888 YIELD_VALUE              2
+            890 RESUME                   3
+            892 JUMP_BACKWARD_NO_INTERRUPT     5 (to 884)
+        >>  894 END_SEND
+            896 STORE_FAST               7 (results)
+
+107         898 LOAD_FAST                7 (results)
+            900 GET_ITER
+        >>  902 FOR_ITER                82 (to 1070)
+            906 UNPACK_SEQUENCE          3
+            910 STORE_FAST               8 (ok)
+            912 STORE_FAST               9 (status)
+            914 STORE_FAST              10 (error)
+
+108         916 LOAD_FAST               10 (error)
+            918 POP_JUMP_IF_FALSE       20 (to 960)
+
+109         920 LOAD_FAST                1 (summary)
+            922 LOAD_CONST              16 ('errors')
+            924 BINARY_SUBSCR
+            928 LOAD_ATTR               51 (NULL|self + append)
+            948 LOAD_FAST               10 (error)
+            950 CALL                     1
+            958 POP_TOP
+
+110     >>  960 LOAD_FAST                8 (ok)
+            962 POP_JUMP_IF_FALSE       14 (to 992)
+
+111         964 LOAD_FAST                1 (summary)
+            966 LOAD_CONST              17 ('posted')
+            968 COPY                     2
+            970 COPY                     2
+            972 BINARY_SUBSCR
+            976 LOAD_CONST              10 (1)
+            978 BINARY_OP               13 (+=)
+            982 SWAP                     3
+            984 SWAP                     2
+            986 STORE_SUBSCR
+            990 JUMP_BACKWARD           45 (to 902)
+
+112     >>  992 LOAD_FAST                9 (status)
+            994 LOAD_CONST              12 ('ready')
+            996 COMPARE_OP              40 (==)
+           1000 POP_JUMP_IF_FALSE       14 (to 1030)
+
+113        1002 LOAD_FAST                1 (summary)
+           1004 LOAD_CONST              18 ('kept_ready')
+           1006 COPY                     2
+           1008 COPY                     2
+           1010 BINARY_SUBSCR
+           1014 LOAD_CONST              10 (1)
+           1016 BINARY_OP               13 (+=)
+           1020 SWAP                     3
+           1022 SWAP                     2
+           1024 STORE_SUBSCR
+           1028 JUMP_BACKWARD           64 (to 902)
+
+114     >> 1030 LOAD_FAST                9 (status)
+           1032 LOAD_CONST              19 ('missing')
+           1034 COMPARE_OP              55 (!=)
+           1038 POP_JUMP_IF_TRUE         1 (to 1042)
+           1040 JUMP_BACKWARD           70 (to 902)
+
+115     >> 1042 LOAD_FAST                1 (summary)
+           1044 LOAD_CONST              20 ('failed')
+           1046 COPY                     2
+           1048 COPY                     2
+           1050 BINARY_SUBSCR
+           1054 LOAD_CONST              10 (1)
+           1056 BINARY_OP               13 (+=)
+           1060 SWAP                     3
+           1062 SWAP                     2
+           1064 STORE_SUBSCR
+           1068 JUMP_BACKWARD           84 (to 902)
+
+107     >> 1070 END_FOR
+
+117        1072 LOAD_GLOBAL              1 (NULL + SessionLocal)
+           1082 CALL                     0
+           1090 BEFORE_WITH
+           1092 STORE_FAST               2 (db)
+
+118        1094 LOAD_GLOBAL             53 (NULL + _resolve_stuck)
+           1104 LOAD_FAST                2 (db)
+           1106 CALL                     1
+           1114 LOAD_FAST                1 (summary)
+           1116 LOAD_CONST              21 ('recovered')
+           1118 STORE_SUBSCR
+
+117        1122 LOAD_CONST               7 (None)
+           1124 LOAD_CONST               7 (None)
+           1126 LOAD_CONST               7 (None)
+           1128 CALL                     2
+           1136 POP_TOP
+
+119        1138 LOAD_FAST                1 (summary)
+           1140 RETURN_VALUE
+        >> 1142 SWAP                     2
+           1144 POP_TOP
+
+ 70        1146 SWAP                     2
+           1148 STORE_FAST               5 (row_id)
+           1150 RERAISE                  0
+
+ 62     >> 1152 PUSH_EXC_INFO
+           1154 WITH_EXCEPT_START
+           1156 POP_JUMP_IF_TRUE         1 (to 1160)
+           1158 RERAISE                  2
+        >> 1160 POP_TOP
+           1162 POP_EXCEPT
+           1164 POP_TOP
+           1166 POP_TOP
+           1168 JUMP_BACKWARD          199 (to 772)
+        >> 1170 COPY                     3
+           1172 POP_EXCEPT
+           1174 RERAISE                  1
+
+106     >> 1176 CLEANUP_THROW
+           1178 JUMP_BACKWARD          143 (to 894)
+
+117     >> 1180 PUSH_EXC_INFO
+           1182 WITH_EXCEPT_START
+           1184 POP_JUMP_IF_TRUE         1 (to 1188)
+           1186 RERAISE                  2
+        >> 1188 POP_TOP
+           1190 POP_EXCEPT
+           1192 POP_TOP
+           1194 POP_TOP
+
+119        1196 LOAD_FAST                1 (summary)
+           1198 RETURN_VALUE
+        >> 1200 COPY                     3
+           1202 POP_EXCEPT
+           1204 RERAISE                  1
+        >> 1206 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1208 RERAISE                  1
+ExceptionTable:
+  10 to 48 -> 1206 [0] lasti
+  50 to 112 -> 1152 [1] lasti
+  114 to 132 -> 1206 [0] lasti
+  134 to 700 -> 1152 [1] lasti
+  702 to 722 -> 1142 [3]
+  724 to 754 -> 1152 [1] lasti
+  756 to 886 -> 1206 [0] lasti
+  888 to 888 -> 1176 [2]
+  890 to 1038 -> 1206 [0] lasti
+  1042 to 1090 -> 1206 [0] lasti
+  1092 to 1120 -> 1180 [1] lasti
+  1122 to 1140 -> 1206 [0] lasti
+  1142 to 1150 -> 1152 [1] lasti
+  1152 to 1160 -> 1170 [3] lasti
+  1162 to 1176 -> 1206 [0] lasti
+  1180 to 1188 -> 1200 [3] lasti
+  1190 to 1204 -> 1206 [0] lasti
+
+Disassembly of <code object run_one at 0x28aeebc0, file "app\services\fb_publish_service.py", line 85>:
+              0 COPY_FREE_VARS           2
+
+ 85           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+ 86           8 LOAD_DEREF               6 (semaphore)
+             10 BEFORE_ASYNC_WITH
+             12 GET_AWAITABLE            1
+             14 LOAD_CONST               0 (None)
+        >>   16 SEND                     3 (to 26)
+             20 YIELD_VALUE              2
+             22 RESUME                   3
+             24 JUMP_BACKWARD_NO_INTERRUPT     5 (to 16)
+        >>   26 END_SEND
+             28 POP_TOP
+
+ 87          30 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             40 CALL                     0
+             48 BEFORE_WITH
+             50 STORE_FAST               1 (worker_db)
+
+ 88          52 LOAD_FAST                1 (worker_db)
+             54 LOAD_ATTR                3 (NULL|self + get)
+             74 LOAD_GLOBAL              4 (FbPost)
+             84 LOAD_FAST                0 (post_id)
+             86 CALL                     2
+             94 STORE_FAST               2 (post)
+
+ 89          96 LOAD_FAST                2 (post)
+             98 POP_JUMP_IF_NOT_NONE    26 (to 152)
+
+ 90         100 NOP
+
+ 87         102 LOAD_CONST               0 (None)
+            104 LOAD_CONST               0 (None)
+            106 LOAD_CONST               0 (None)
+            108 CALL                     2
+            116 POP_TOP
+
+ 86         118 LOAD_CONST               0 (None)
+            120 LOAD_CONST               0 (None)
+            122 LOAD_CONST               0 (None)
+            124 CALL                     2
+            132 GET_AWAITABLE            2
+            134 LOAD_CONST               0 (None)
+        >>  136 SEND                     3 (to 146)
+            140 YIELD_VALUE              2
+            142 RESUME                   3
+            144 JUMP_BACKWARD_NO_INTERRUPT     5 (to 136)
+        >>  146 END_SEND
+            148 POP_TOP
+            150 RETURN_CONST             1 ((False, 'missing', None))
+
+ 91     >>  152 LOAD_GLOBAL              7 (NULL + FbPublishContext)
+
+ 92         162 LOAD_FAST                1 (worker_db)
+
+ 93         164 LOAD_DEREF               7 (settings)
+            166 LOAD_ATTR                3 (NULL|self + get)
+            186 LOAD_CONST               2 ('fb_token_strategy')
+            188 LOAD_CONST               3 ('least_used')
+            190 CALL                     2
+
+ 94         198 LOAD_GLOBAL              9 (NULL + _bounded_int)
+            208 LOAD_DEREF               7 (settings)
+            210 LOAD_ATTR                3 (NULL|self + get)
+            230 LOAD_CONST               4 ('fb_token_block_size')
+            232 CALL                     1
+            240 LOAD_CONST               5 (2)
+            242 LOAD_CONST               6 (1)
+            244 LOAD_CONST               7 (100)
+            246 CALL                     4
+
+ 95         254 LOAD_DEREF               7 (settings)
+            256 LOAD_ATTR                3 (NULL|self + get)
+            276 LOAD_CONST               8 ('fb_proxy_global')
+            278 CALL                     1
+            286 COPY                     1
+            288 POP_JUMP_IF_TRUE         2 (to 294)
+            290 POP_TOP
+            292 LOAD_CONST               0 (None)
+
+ 96     >>  294 LOAD_GLOBAL              9 (NULL + _bounded_int)
+            304 LOAD_DEREF               7 (settings)
+            306 LOAD_ATTR                3 (NULL|self + get)
+            326 LOAD_CONST               9 ('fb_max_posts_per_day')
+            328 CALL                     1
+            336 LOAD_CONST              10 (12)
+            338 LOAD_CONST               6 (1)
+            340 LOAD_CONST               7 (100)
+            342 CALL                     4
+
+ 97         350 LOAD_GLOBAL              9 (NULL + _bounded_int)
+            360 LOAD_DEREF               7 (settings)
+            362 LOAD_ATTR                3 (NULL|self + get)
+            382 LOAD_CONST              11 ('fb_min_gap_minutes')
+            384 CALL                     1
+            392 LOAD_CONST              12 (20)
+            394 LOAD_CONST               6 (1)
+            396 LOAD_CONST              13 (1440)
+            398 CALL                     4
+
+ 91         406 KW_NAMES                14 (('strategy', 'block_size', 'proxy_global', 'max_posts_per_day', 'min_gap_minutes'))
+            408 CALL                     6
+            416 STORE_FAST               3 (ctx)
+
+ 99         418 NOP
+
+100         420 LOAD_GLOBAL             11 (NULL + _publish_one)
+            430 LOAD_FAST                3 (ctx)
+            432 LOAD_FAST                2 (post)
+            434 CALL                     2
+            442 GET_AWAITABLE            0
+            444 LOAD_CONST               0 (None)
+        >>  446 SEND                     3 (to 456)
+            450 YIELD_VALUE              5
+            452 RESUME                   3
+            454 JUMP_BACKWARD_NO_INTERRUPT     5 (to 446)
+        >>  456 END_SEND
+            458 STORE_FAST               4 (ok)
+
+101         460 LOAD_FAST                4 (ok)
+            462 LOAD_FAST                2 (post)
+            464 LOAD_ATTR               12 (status)
+            484 LOAD_CONST               0 (None)
+            486 BUILD_TUPLE              3
+
+ 87         488 SWAP                     2
+            490 LOAD_CONST               0 (None)
+            492 LOAD_CONST               0 (None)
+            494 LOAD_CONST               0 (None)
+            496 CALL                     2
+            504 POP_TOP
+
+ 86         506 SWAP                     2
+            508 LOAD_CONST               0 (None)
+            510 LOAD_CONST               0 (None)
+            512 LOAD_CONST               0 (None)
+            514 CALL                     2
+            522 GET_AWAITABLE            2
+            524 LOAD_CONST               0 (None)
+        >>  526 SEND                     3 (to 536)
+            530 YIELD_VALUE              2
+            532 RESUME                   3
+            534 JUMP_BACKWARD_NO_INTERRUPT     5 (to 526)
+        >>  536 END_SEND
+            538 POP_TOP
+            540 RETURN_VALUE
+        >>  542 CLEANUP_THROW
+            544 EXTENDED_ARG             1
+            546 JUMP_BACKWARD          261 (to 26)
+        >>  548 CLEANUP_THROW
+            550 JUMP_BACKWARD          203 (to 146)
+
+100     >>  552 CLEANUP_THROW
+            554 JUMP_BACKWARD           50 (to 456)
+
+ 86     >>  556 CLEANUP_THROW
+            558 JUMP_BACKWARD           12 (to 536)
+        >>  560 PUSH_EXC_INFO
+
+102         562 LOAD_GLOBAL             14 (Exception)
+            572 CHECK_EXC_MATCH
+            574 POP_JUMP_IF_FALSE      101 (to 778)
+            576 STORE_FAST               5 (e)
+
+103         578 LOAD_GLOBAL             17 (NULL + log)
+            588 LOAD_ATTR               18 (warning)
+            608 LOAD_CONST              15 ('[fb_publish] bài ')
+            610 LOAD_FAST                2 (post)
+            612 LOAD_ATTR               20 (id)
+            632 FORMAT_VALUE             0
+            634 LOAD_CONST              16 (' lỗi bất ngờ: ')
+            636 LOAD_FAST                5 (e)
+            638 FORMAT_VALUE             0
+            640 BUILD_STRING             4
+            642 CALL                     1
+            650 POP_TOP
+
+104         652 LOAD_CONST              17 (False)
+            654 LOAD_FAST                2 (post)
+            656 LOAD_ATTR               12 (status)
+            676 LOAD_GLOBAL             23 (NULL + str)
+            686 LOAD_FAST                5 (e)
+            688 CALL                     1
+            696 LOAD_CONST               0 (None)
+            698 LOAD_CONST              18 (200)
+            700 BINARY_SLICE
+            702 BUILD_TUPLE              3
+            704 SWAP                     2
+            706 POP_EXCEPT
+            708 LOAD_CONST               0 (None)
+            710 STORE_FAST               5 (e)
+            712 DELETE_FAST              5 (e)
+
+ 87         714 SWAP                     2
+            716 LOAD_CONST               0 (None)
+            718 LOAD_CONST               0 (None)
+            720 LOAD_CONST               0 (None)
+            722 CALL                     2
+            730 POP_TOP
+
+ 86         732 SWAP                     2
+            734 LOAD_CONST               0 (None)
+            736 LOAD_CONST               0 (None)
+            738 LOAD_CONST               0 (None)
+            740 CALL                     2
+            748 GET_AWAITABLE            2
+            750 LOAD_CONST               0 (None)
+        >>  752 SEND                     4 (to 764)
+            756 YIELD_VALUE              2
+            758 RESUME                   3
+            760 JUMP_BACKWARD_NO_INTERRUPT     5 (to 752)
+        >>  762 CLEANUP_THROW
+        >>  764 END_SEND
+            766 POP_TOP
+            768 RETURN_VALUE
+        >>  770 LOAD_CONST               0 (None)
+            772 STORE_FAST               5 (e)
+            774 DELETE_FAST              5 (e)
+            776 RERAISE                  1
+
+102     >>  778 RERAISE                  0
+        >>  780 COPY                     3
+            782 POP_EXCEPT
+            784 RERAISE                  1
+
+ 87     >>  786 PUSH_EXC_INFO
+            788 WITH_EXCEPT_START
+            790 POP_JUMP_IF_TRUE         1 (to 794)
+            792 RERAISE                  2
+        >>  794 POP_TOP
+            796 POP_EXCEPT
+            798 POP_TOP
+            800 POP_TOP
+            802 JUMP_FORWARD             3 (to 810)
+        >>  804 COPY                     3
+            806 POP_EXCEPT
+            808 RERAISE                  1
+
+ 86     >>  810 LOAD_CONST               0 (None)
+            812 LOAD_CONST               0 (None)
+            814 LOAD_CONST               0 (None)
+            816 CALL                     2
+            824 GET_AWAITABLE            2
+            826 LOAD_CONST               0 (None)
+        >>  828 SEND                     4 (to 840)
+            832 YIELD_VALUE              2
+            834 RESUME                   3
+            836 JUMP_BACKWARD_NO_INTERRUPT     5 (to 828)
+        >>  838 CLEANUP_THROW
+        >>  840 END_SEND
+            842 POP_TOP
+            844 RETURN_CONST             0 (None)
+        >>  846 PUSH_EXC_INFO
+            848 WITH_EXCEPT_START
+            850 GET_AWAITABLE            2
+            852 LOAD_CONST               0 (None)
+        >>  854 SEND                     4 (to 866)
+            858 YIELD_VALUE              3
+            860 RESUME                   3
+            862 JUMP_BACKWARD_NO_INTERRUPT     5 (to 854)
+        >>  864 CLEANUP_THROW
+        >>  866 END_SEND
+            868 POP_JUMP_IF_TRUE         1 (to 872)
+            870 RERAISE                  2
+        >>  872 POP_TOP
+            874 POP_EXCEPT
+            876 POP_TOP
+            878 POP_TOP
+            880 RETURN_CONST             0 (None)
+        >>  882 COPY                     3
+            884 POP_EXCEPT
+            886 RERAISE                  1
+        >>  888 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            890 RERAISE                  1
+ExceptionTable:
+  6 to 18 -> 888 [0] lasti
+  20 to 20 -> 542 [3]
+  22 to 26 -> 888 [0] lasti
+  28 to 48 -> 846 [1] lasti
+  50 to 100 -> 786 [2] lasti
+  102 to 116 -> 846 [1] lasti
+  118 to 138 -> 888 [0] lasti
+  140 to 140 -> 548 [2]
+  142 to 150 -> 888 [0] lasti
+  152 to 416 -> 786 [2] lasti
+  420 to 448 -> 560 [2]
+  450 to 450 -> 552 [4]
+  452 to 486 -> 560 [2]
+  488 to 504 -> 846 [1] lasti
+  506 to 528 -> 888 [0] lasti
+  530 to 530 -> 556 [3]
+  532 to 542 -> 888 [0] lasti
+  548 to 548 -> 888 [0] lasti
+  552 to 552 -> 560 [2]
+  556 to 556 -> 888 [0] lasti
+  560 to 576 -> 780 [3] lasti
+  578 to 702 -> 770 [3] lasti
+  704 to 704 -> 780 [3] lasti
+  706 to 712 -> 786 [2] lasti
+  714 to 730 -> 846 [1] lasti
+  732 to 754 -> 888 [0] lasti
+  756 to 756 -> 762 [3]
+  758 to 768 -> 888 [0] lasti
+  770 to 778 -> 780 [3] lasti
+  780 to 784 -> 786 [2] lasti
+  786 to 794 -> 804 [4] lasti
+  796 to 808 -> 846 [1] lasti
+  810 to 830 -> 888 [0] lasti
+  832 to 832 -> 838 [2]
+  834 to 844 -> 888 [0] lasti
+  846 to 856 -> 882 [3] lasti
+  858 to 858 -> 864 [6]
+  860 to 872 -> 882 [3] lasti
+  874 to 886 -> 888 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c92696b50, file "app\services\fb_publish_service.py", line 106>:
+              0 COPY_FREE_VARS           1
+
+106           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                12 (to 38)
+             14 STORE_FAST               1 (post_id)
+             16 PUSH_NULL
+             18 LOAD_DEREF               2 (run_one)
+             20 LOAD_FAST                1 (post_id)
+             22 CALL                     1
+             30 YIELD_VALUE              1
+             32 RESUME                   1
+             34 POP_TOP
+             36 JUMP_BACKWARD           14 (to 10)
+        >>   38 END_FOR
+             40 RETURN_CONST             0 (None)
+        >>   42 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             44 RERAISE                  1
+ExceptionTable:
+  6 to 40 -> 42 [0] lasti
+
+Disassembly of <code object _publish_one at 0x28c291a0, file "app\services\fb_publish_service.py", line 122>:
+122           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+124           6 LOAD_FAST                0 (ctx)
+              8 LOAD_ATTR                0 (db)
+             28 STORE_FAST               2 (db)
+
+127          30 LOAD_FAST                2 (db)
+             32 LOAD_ATTR                3 (NULL|self + execute)
+
+128          52 LOAD_GLOBAL              5 (NULL + update)
+             62 LOAD_GLOBAL              6 (FbPost)
+             72 CALL                     1
+
+129          80 LOAD_ATTR                9 (NULL|self + where)
+            100 LOAD_GLOBAL              6 (FbPost)
+            110 LOAD_ATTR               10 (id)
+            130 LOAD_FAST                1 (post)
+            132 LOAD_ATTR               10 (id)
+            152 COMPARE_OP              40 (==)
+            156 LOAD_GLOBAL              6 (FbPost)
+            166 LOAD_ATTR               12 (status)
+            186 LOAD_CONST               1 ('ready')
+            188 COMPARE_OP              40 (==)
+            192 CALL                     2
+
+130         200 LOAD_ATTR               15 (NULL|self + values)
+            220 LOAD_CONST               2 ('processing')
+            222 LOAD_GLOBAL             17 (NULL + datetime)
+            232 LOAD_ATTR               18 (now)
+            252 CALL                     0
+            260 KW_NAMES                 3 (('status', 'updated_at'))
+            262 CALL                     2
+
+127         270 CALL                     1
+            278 STORE_FAST               3 (claimed)
+
+132         280 LOAD_FAST                3 (claimed)
+            282 LOAD_ATTR               20 (rowcount)
+            302 LOAD_CONST               4 (1)
+            304 COMPARE_OP              55 (!=)
+            308 POP_JUMP_IF_FALSE       17 (to 344)
+
+133         310 LOAD_FAST                2 (db)
+            312 LOAD_ATTR               23 (NULL|self + rollback)
+            332 CALL                     0
+            340 POP_TOP
+
+134         342 RETURN_CONST             5 (False)
+
+136     >>  344 LOAD_FAST                1 (post)
+            346 LOAD_ATTR               24 (fb_page_id)
+            366 POP_JUMP_IF_FALSE       32 (to 432)
+            368 LOAD_FAST                2 (db)
+            370 LOAD_ATTR               27 (NULL|self + get)
+            390 LOAD_GLOBAL             28 (FbPage)
+            400 LOAD_FAST                1 (post)
+            402 LOAD_ATTR               24 (fb_page_id)
+            422 CALL                     2
+            430 JUMP_FORWARD             1 (to 434)
+        >>  432 LOAD_CONST               6 (None)
+        >>  434 STORE_FAST               4 (page)
+
+137         436 LOAD_FAST                4 (page)
+            438 POP_JUMP_IF_NOT_NONE    31 (to 502)
+
+138         440 LOAD_CONST               7 ('failed')
+            442 LOAD_FAST                1 (post)
+            444 STORE_ATTR               6 (status)
+
+139         454 LOAD_CONST               8 ('Page không tồn tại')
+            456 LOAD_FAST                1 (post)
+            458 STORE_ATTR              15 (error_message)
+
+140         468 LOAD_FAST                2 (db)
+            470 LOAD_ATTR               33 (NULL|self + commit)
+            490 CALL                     0
+            498 POP_TOP
+
+141         500 RETURN_CONST             5 (False)
+
+142     >>  502 LOAD_FAST                4 (page)
+            504 LOAD_ATTR               12 (status)
+            524 LOAD_CONST               9 ('active')
+            526 COMPARE_OP              55 (!=)
+            530 POP_JUMP_IF_TRUE        15 (to 562)
+            532 LOAD_FAST                4 (page)
+            534 LOAD_ATTR               34 (fb_post_mode)
+            554 LOAD_CONST              10 ('off')
+            556 COMPARE_OP              40 (==)
+            560 POP_JUMP_IF_FALSE       62 (to 686)
+
+143     >>  562 LOAD_CONST               1 ('ready')
+            564 LOAD_FAST                1 (post)
+            566 STORE_ATTR               6 (status)
+
+144         576 LOAD_FAST                4 (page)
+            578 LOAD_ATTR               34 (fb_post_mode)
+            598 LOAD_CONST              10 ('off')
+            600 COMPARE_OP              40 (==)
+            604 POP_JUMP_IF_FALSE        2 (to 610)
+            606 LOAD_CONST              11 ('Page đang tắt tự động đăng')
+            608 JUMP_FORWARD            15 (to 640)
+
+145     >>  610 LOAD_CONST              12 ('Page đang ')
+            612 LOAD_FAST                4 (page)
+            614 LOAD_ATTR               12 (status)
+            634 FORMAT_VALUE             0
+            636 LOAD_CONST              13 ('; cần kết nối lại trước khi đăng')
+            638 BUILD_STRING             3
+
+144     >>  640 LOAD_FAST                1 (post)
+            642 STORE_ATTR              15 (error_message)
+
+146         652 LOAD_FAST                2 (db)
+            654 LOAD_ATTR               33 (NULL|self + commit)
+            674 CALL                     0
+            682 POP_TOP
+
+147         684 RETURN_CONST             5 (False)
+
+149     >>  686 BUILD_MAP                0
+            688 STORE_FAST               5 (rule)
+
+150         690 LOAD_FAST                4 (page)
+            692 LOAD_ATTR               36 (schedule_rule_json)
+            712 POP_JUMP_IF_FALSE       32 (to 778)
+
+151         714 NOP
+
+152         716 LOAD_GLOBAL             39 (NULL + json)
+            726 LOAD_ATTR               40 (loads)
+            746 LOAD_FAST                4 (page)
+            748 LOAD_ATTR               36 (schedule_rule_json)
+            768 CALL                     1
+            776 STORE_FAST               5 (rule)
+
+155     >>  778 LOAD_GLOBAL             47 (NULL + _bounded_int)
+            788 LOAD_FAST                5 (rule)
+            790 LOAD_ATTR               27 (NULL|self + get)
+            810 LOAD_CONST              14 ('min_interval_min')
+            812 CALL                     1
+            820 LOAD_FAST                0 (ctx)
+            822 LOAD_ATTR               48 (min_gap_minutes)
+            842 LOAD_CONST               4 (1)
+            844 LOAD_CONST              15 (1440)
+            846 CALL                     4
+            854 STORE_FAST               6 (min_gap)
+
+156         856 LOAD_GLOBAL             47 (NULL + _bounded_int)
+            866 LOAD_FAST                5 (rule)
+            868 LOAD_ATTR               27 (NULL|self + get)
+            888 LOAD_CONST              16 ('max_per_day')
+            890 CALL                     1
+            898 LOAD_FAST                0 (ctx)
+            900 LOAD_ATTR               50 (max_posts_per_day)
+            920 LOAD_CONST               4 (1)
+            922 LOAD_CONST              17 (100)
+            924 CALL                     4
+            932 STORE_FAST               7 (max_per_day)
+
+157         934 LOAD_FAST                1 (post)
+            936 LOAD_ATTR               52 (content_type)
+            956 COPY                     1
+            958 POP_JUMP_IF_TRUE         2 (to 964)
+            960 POP_TOP
+            962 LOAD_CONST              18 ('')
+        >>  964 LOAD_ATTR               55 (NULL|self + lower)
+            984 CALL                     0
+            992 LOAD_CONST              19 (('reel', 'reels'))
+            994 CONTAINS_OP              0
+            996 POP_JUMP_IF_FALSE       12 (to 1022)
+
+159         998 LOAD_GLOBAL             57 (NULL + min)
+           1008 LOAD_FAST                7 (max_per_day)
+           1010 LOAD_CONST              20 (30)
+           1012 CALL                     2
+           1020 STORE_FAST               7 (max_per_day)
+
+160     >> 1022 LOAD_GLOBAL             17 (NULL + datetime)
+           1032 LOAD_ATTR               18 (now)
+           1052 CALL                     0
+           1060 LOAD_GLOBAL             59 (NULL + timedelta)
+           1070 LOAD_CONST              21 (24)
+           1072 KW_NAMES                22 (('hours',))
+           1074 CALL                     1
+           1082 BINARY_OP               10 (-)
+           1086 STORE_FAST               8 (since_24h)
+
+162        1088 LOAD_FAST                2 (db)
+           1090 LOAD_ATTR               61 (NULL|self + query)
+           1110 LOAD_GLOBAL              6 (FbPost)
+           1120 CALL                     1
+
+163        1128 LOAD_ATTR               63 (NULL|self + filter)
+
+164        1148 LOAD_GLOBAL              6 (FbPost)
+           1158 LOAD_ATTR               24 (fb_page_id)
+           1178 LOAD_FAST                4 (page)
+           1180 LOAD_ATTR               10 (id)
+           1200 COMPARE_OP              40 (==)
+
+165        1204 LOAD_GLOBAL              6 (FbPost)
+           1214 LOAD_ATTR               12 (status)
+           1234 LOAD_ATTR               65 (NULL|self + in_)
+           1254 LOAD_CONST              23 (('posted', 'scheduled'))
+           1256 CALL                     1
+
+166        1264 LOAD_GLOBAL              6 (FbPost)
+           1274 LOAD_ATTR               66 (published_at)
+           1294 LOAD_FAST                8 (since_24h)
+           1296 COMPARE_OP              92 (>=)
+
+163        1300 CALL                     3
+
+168        1308 LOAD_ATTR               69 (NULL|self + order_by)
+           1328 LOAD_GLOBAL              6 (FbPost)
+           1338 LOAD_ATTR               66 (published_at)
+           1358 LOAD_ATTR               71 (NULL|self + asc)
+           1378 CALL                     0
+           1386 CALL                     1
+
+169        1394 LOAD_ATTR               73 (NULL|self + all)
+           1414 CALL                     0
+
+161        1422 STORE_FAST               9 (recent_posted)
+
+171        1424 LOAD_FAST                9 (recent_posted)
+           1426 POP_JUMP_IF_FALSE       15 (to 1458)
+           1428 LOAD_FAST                9 (recent_posted)
+           1430 LOAD_CONST              24 (-1)
+           1432 BINARY_SUBSCR
+           1436 LOAD_ATTR               66 (published_at)
+           1456 JUMP_FORWARD             1 (to 1460)
+        >> 1458 LOAD_CONST               6 (None)
+        >> 1460 STORE_FAST              10 (last_published)
+
+172        1462 LOAD_FAST               10 (last_published)
+           1464 POP_JUMP_IF_FALSE       15 (to 1496)
+           1466 LOAD_FAST               10 (last_published)
+           1468 LOAD_GLOBAL             59 (NULL + timedelta)
+           1478 LOAD_FAST                6 (min_gap)
+           1480 KW_NAMES                25 (('minutes',))
+           1482 CALL                     1
+           1490 BINARY_OP                0 (+)
+           1494 JUMP_FORWARD             1 (to 1498)
+        >> 1496 LOAD_CONST               6 (None)
+        >> 1498 STORE_FAST              11 (next_allowed)
+
+173        1500 LOAD_GLOBAL             75 (NULL + len)
+           1510 LOAD_FAST                9 (recent_posted)
+           1512 CALL                     1
+           1520 LOAD_FAST                7 (max_per_day)
+           1522 COMPARE_OP              92 (>=)
+           1526 POP_JUMP_IF_FALSE       85 (to 1698)
+
+174        1528 LOAD_FAST                9 (recent_posted)
+           1530 LOAD_CONST              26 (0)
+           1532 BINARY_SUBSCR
+           1536 LOAD_ATTR               66 (published_at)
+           1556 COPY                     1
+           1558 POP_JUMP_IF_TRUE        20 (to 1600)
+           1560 POP_TOP
+           1562 LOAD_GLOBAL             17 (NULL + datetime)
+           1572 LOAD_ATTR               18 (now)
+           1592 CALL                     0
+        >> 1600 STORE_FAST              12 (oldest)
+
+175        1602 LOAD_GLOBAL             77 (NULL + max)
+           1612 LOAD_FAST               11 (next_allowed)
+           1614 COPY                     1
+           1616 POP_JUMP_IF_TRUE        20 (to 1658)
+           1618 POP_TOP
+           1620 LOAD_GLOBAL             17 (NULL + datetime)
+           1630 LOAD_ATTR               18 (now)
+           1650 CALL                     0
+        >> 1658 LOAD_FAST               12 (oldest)
+           1660 LOAD_GLOBAL             59 (NULL + timedelta)
+           1670 LOAD_CONST              21 (24)
+           1672 LOAD_CONST               4 (1)
+           1674 KW_NAMES                27 (('hours', 'minutes'))
+           1676 CALL                     2
+           1684 BINARY_OP                0 (+)
+           1688 CALL                     2
+           1696 STORE_FAST              11 (next_allowed)
+
+176     >> 1698 LOAD_FAST               11 (next_allowed)
+           1700 POP_JUMP_IF_FALSE       79 (to 1860)
+           1702 LOAD_FAST               11 (next_allowed)
+           1704 LOAD_GLOBAL             17 (NULL + datetime)
+           1714 LOAD_ATTR               18 (now)
+           1734 CALL                     0
+           1742 COMPARE_OP              68 (>)
+           1746 POP_JUMP_IF_FALSE       56 (to 1860)
+
+177        1748 LOAD_CONST               1 ('ready')
+           1750 LOAD_FAST                1 (post)
+           1752 STORE_ATTR               6 (status)
+
+178        1762 LOAD_FAST               11 (next_allowed)
+           1764 LOAD_FAST                1 (post)
+           1766 STORE_ATTR              39 (schedule_time)
+
+180        1776 LOAD_CONST              28 ('Page đang áp dụng khoảng cách/giới hạn đăng; bài đã được giữ trong hàng đợi tới ')
+
+181        1778 LOAD_FAST               11 (next_allowed)
+           1780 LOAD_ATTR               81 (NULL|self + strftime)
+           1800 LOAD_CONST              29 ('%d/%m/%Y %H:%M')
+           1802 CALL                     1
+           1810 FORMAT_VALUE             0
+
+180        1812 BUILD_STRING             2
+
+179        1814 LOAD_FAST                1 (post)
+           1816 STORE_ATTR              15 (error_message)
+
+183        1826 LOAD_FAST                2 (db)
+           1828 LOAD_ATTR               33 (NULL|self + commit)
+           1848 CALL                     0
+           1856 POP_TOP
+
+184        1858 RETURN_CONST             5 (False)
+
+187     >> 1860 LOAD_FAST                2 (db)
+           1862 LOAD_ATTR               61 (NULL|self + query)
+           1882 LOAD_GLOBAL              6 (FbPost)
+           1892 CALL                     1
+
+188        1900 LOAD_ATTR               63 (NULL|self + filter)
+
+189        1920 LOAD_GLOBAL              6 (FbPost)
+           1930 LOAD_ATTR               24 (fb_page_id)
+           1950 LOAD_FAST                4 (page)
+           1952 LOAD_ATTR               10 (id)
+           1972 COMPARE_OP              40 (==)
+
+190        1976 LOAD_GLOBAL              6 (FbPost)
+           1986 LOAD_ATTR               12 (status)
+           2006 LOAD_CONST               2 ('processing')
+           2008 COMPARE_OP              40 (==)
+
+191        2012 LOAD_GLOBAL              6 (FbPost)
+           2022 LOAD_ATTR               10 (id)
+           2042 LOAD_FAST                1 (post)
+           2044 LOAD_ATTR               10 (id)
+           2064 COMPARE_OP              55 (!=)
+
+188        2068 CALL                     3
+
+193        2076 LOAD_ATTR               83 (NULL|self + first)
+           2096 CALL                     0
+
+186        2104 STORE_FAST              13 (another_processing)
+
+195        2106 LOAD_FAST               13 (another_processing)
+           2108 POP_JUMP_IF_NONE        69 (to 2248)
+
+196        2110 LOAD_CONST               1 ('ready')
+           2112 LOAD_FAST                1 (post)
+           2114 STORE_ATTR               6 (status)
+
+197        2124 LOAD_GLOBAL             17 (NULL + datetime)
+           2134 LOAD_ATTR               18 (now)
+           2154 CALL                     0
+           2162 LOAD_GLOBAL             59 (NULL + timedelta)
+           2172 LOAD_FAST                6 (min_gap)
+           2174 KW_NAMES                25 (('minutes',))
+           2176 CALL                     1
+           2184 BINARY_OP                0 (+)
+           2188 LOAD_FAST                1 (post)
+           2190 STORE_ATTR              39 (schedule_time)
+
+198        2200 LOAD_CONST              30 ('Page đang có một bài khác được xử lý; bài này đã được giữ lại trong hàng đợi')
+           2202 LOAD_FAST                1 (post)
+           2204 STORE_ATTR              15 (error_message)
+
+199        2214 LOAD_FAST                2 (db)
+           2216 LOAD_ATTR               33 (NULL|self + commit)
+           2236 CALL                     0
+           2244 POP_TOP
+
+200        2246 RETURN_CONST             5 (False)
+
+202     >> 2248 LOAD_GLOBAL             85 (NULL + fb_token_pool)
+           2258 LOAD_ATTR               86 (pick_token)
+
+203        2278 LOAD_FAST                2 (db)
+           2280 LOAD_FAST                4 (page)
+           2282 LOAD_ATTR               88 (page_id)
+           2302 LOAD_FAST                0 (ctx)
+           2304 LOAD_ATTR               90 (strategy)
+
+204        2324 LOAD_FAST                0 (ctx)
+           2326 LOAD_ATTR               92 (exclude)
+           2346 LOAD_FAST                0 (ctx)
+           2348 LOAD_ATTR               94 (block_size)
+
+202        2368 KW_NAMES                31 (('strategy', 'exclude_token_ids', 'block_size'))
+           2370 CALL                     5
+           2378 STORE_FAST              14 (pick)
+
+206        2380 LOAD_FAST               14 (pick)
+           2382 POP_JUMP_IF_NOT_NONE    82 (to 2548)
+
+207        2384 LOAD_FAST                0 (ctx)
+           2386 LOAD_ATTR               92 (exclude)
+           2406 LOAD_ATTR               97 (NULL|self + clear)
+           2426 CALL                     0
+           2434 POP_TOP
+
+208        2436 LOAD_CONST               1 ('ready')
+           2438 LOAD_FAST                1 (post)
+           2440 STORE_ATTR               6 (status)
+
+209        2450 LOAD_CONST              32 ('Fanpage không còn token hoạt động; hãy kết nối lại token rồi thử lại')
+           2452 LOAD_FAST                1 (post)
+           2454 STORE_ATTR              15 (error_message)
+
+210        2464 LOAD_GLOBAL             17 (NULL + datetime)
+           2474 LOAD_ATTR               18 (now)
+           2494 CALL                     0
+           2502 LOAD_FAST                1 (post)
+           2504 STORE_ATTR              49 (updated_at)
+
+211        2514 LOAD_FAST                2 (db)
+           2516 LOAD_ATTR               33 (NULL|self + commit)
+           2536 CALL                     0
+           2544 POP_TOP
+
+212        2546 RETURN_CONST             5 (False)
+
+214     >> 2548 NOP
+
+215        2550 LOAD_GLOBAL             85 (NULL + fb_token_pool)
+           2560 LOAD_ATTR              100 (decrypt_token)
+           2580 LOAD_FAST                2 (db)
+           2582 LOAD_FAST               14 (pick)
+           2584 LOAD_ATTR              102 (token)
+           2604 LOAD_ATTR               10 (id)
+           2624 CALL                     2
+           2632 STORE_FAST              15 (token_plain)
+
+216        2634 LOAD_GLOBAL            105 (NULL + fb_graph_client)
+           2644 LOAD_ATTR              106 (post_to_page)
+
+217        2664 LOAD_FAST                4 (page)
+           2666 LOAD_ATTR               88 (page_id)
+
+218        2686 LOAD_FAST               15 (token_plain)
+
+219        2688 LOAD_FAST                1 (post)
+           2690 LOAD_ATTR               52 (content_type)
+           2710 COPY                     1
+           2712 POP_JUMP_IF_TRUE         2 (to 2718)
+           2714 POP_TOP
+           2716 LOAD_CONST              33 ('text')
+
+220     >> 2718 LOAD_FAST                1 (post)
+           2720 LOAD_ATTR              108 (caption)
+           2740 COPY                     1
+           2742 POP_JUMP_IF_TRUE         2 (to 2748)
+           2744 POP_TOP
+           2746 LOAD_CONST              18 ('')
+
+221     >> 2748 LOAD_FAST                1 (post)
+           2750 LOAD_ATTR              110 (media_path)
+
+222        2770 LOAD_FAST                4 (page)
+           2772 LOAD_ATTR              112 (proxy)
+           2792 COPY                     1
+           2794 POP_JUMP_IF_TRUE        13 (to 2822)
+           2796 POP_TOP
+           2798 LOAD_GLOBAL            115 (NULL + getattr)
+           2808 LOAD_FAST                0 (ctx)
+           2810 LOAD_CONST              34 ('proxy_global')
+           2812 LOAD_CONST               6 (None)
+           2814 CALL                     3
+
+216     >> 2822 KW_NAMES                35 (('page_id', 'access_token', 'content_type', 'message', 'media_path', 'proxy'))
+           2824 CALL                     6
+           2832 GET_AWAITABLE            0
+           2834 LOAD_CONST               6 (None)
+        >> 2836 SEND                     3 (to 2846)
+           2840 YIELD_VALUE              3
+           2842 RESUME                   3
+           2844 JUMP_BACKWARD_NO_INTERRUPT     5 (to 2836)
+        >> 2846 END_SEND
+           2848 STORE_FAST              16 (result)
+
+224        2850 LOAD_FAST               16 (result)
+           2852 LOAD_ATTR               12 (status)
+           2872 LOAD_CONST              36 ('posted')
+           2874 COMPARE_OP              40 (==)
+           2878 POP_JUMP_IF_FALSE        2 (to 2884)
+           2880 LOAD_CONST              36 ('posted')
+           2882 JUMP_FORWARD             1 (to 2886)
+        >> 2884 LOAD_CONST              37 ('scheduled')
+        >> 2886 LOAD_FAST                1 (post)
+           2888 STORE_ATTR               6 (status)
+
+225        2898 LOAD_FAST               16 (result)
+           2900 LOAD_ATTR              116 (fb_object_id)
+           2920 LOAD_FAST                1 (post)
+           2922 STORE_ATTR              58 (fb_object_id)
+
+226        2932 LOAD_FAST               16 (result)
+           2934 LOAD_ATTR              118 (post_url)
+           2954 LOAD_FAST                1 (post)
+           2956 STORE_ATTR              60 (fb_post_url)
+
+227        2966 LOAD_FAST               14 (pick)
+           2968 LOAD_ATTR              102 (token)
+           2988 LOAD_ATTR               10 (id)
+           3008 LOAD_FAST                1 (post)
+           3010 STORE_ATTR              61 (used_token_id)
+
+228        3020 LOAD_GLOBAL             17 (NULL + datetime)
+           3030 LOAD_ATTR               18 (now)
+           3050 CALL                     0
+           3058 LOAD_FAST                1 (post)
+           3060 STORE_ATTR              33 (published_at)
+
+229        3070 LOAD_CONST               6 (None)
+           3072 LOAD_FAST                1 (post)
+           3074 STORE_ATTR              15 (error_message)
+
+230        3084 LOAD_CONST              26 (0)
+           3086 LOAD_FAST               14 (pick)
+           3088 LOAD_ATTR              102 (token)
+           3108 STORE_ATTR              62 (error_count)
+
+231        3118 LOAD_CONST               6 (None)
+           3120 LOAD_FAST               14 (pick)
+           3122 LOAD_ATTR              102 (token)
+           3142 STORE_ATTR              63 (last_error_message)
+
+232        3152 LOAD_FAST                2 (db)
+           3154 LOAD_ATTR               33 (NULL|self + commit)
+           3174 CALL                     0
+           3182 POP_TOP
+
+233        3184 LOAD_GLOBAL            129 (NULL + log)
+           3194 LOAD_ATTR              130 (info)
+           3214 LOAD_CONST              38 ('[fb_publish] ĐÃ ĐĂNG ')
+           3216 LOAD_FAST                1 (post)
+           3218 LOAD_ATTR               52 (content_type)
+           3238 FORMAT_VALUE             0
+           3240 LOAD_CONST              39 (' bài ')
+           3242 LOAD_FAST                1 (post)
+           3244 LOAD_ATTR               10 (id)
+           3264 FORMAT_VALUE             0
+           3266 LOAD_CONST              40 (' → ')
+           3268 LOAD_FAST                1 (post)
+           3270 LOAD_ATTR              120 (fb_post_url)
+           3290 FORMAT_VALUE             0
+           3292 BUILD_STRING             6
+           3294 CALL                     1
+           3302 POP_TOP
+
+234        3304 RETURN_CONST            41 (True)
+        >> 3306 PUSH_EXC_INFO
+
+153        3308 LOAD_GLOBAL             42 (TypeError)
+           3318 LOAD_GLOBAL             44 (ValueError)
+           3328 BUILD_TUPLE              2
+           3330 CHECK_EXC_MATCH
+           3332 POP_JUMP_IF_FALSE        6 (to 3346)
+           3334 POP_TOP
+
+154        3336 BUILD_MAP                0
+           3338 STORE_FAST               5 (rule)
+           3340 POP_EXCEPT
+           3342 EXTENDED_ARG             5
+           3344 JUMP_BACKWARD         1284 (to 778)
+
+153     >> 3346 RERAISE                  0
+        >> 3348 COPY                     3
+           3350 POP_EXCEPT
+           3352 RERAISE                  1
+
+216     >> 3354 CLEANUP_THROW
+           3356 EXTENDED_ARG             1
+           3358 JUMP_BACKWARD          257 (to 2846)
+        >> 3360 PUSH_EXC_INFO
+
+236        3362 LOAD_GLOBAL            132 (FbError)
+           3372 CHECK_EXC_MATCH
+           3374 EXTENDED_ARG             2
+           3376 POP_JUMP_IF_FALSE      561 (to 4500)
+           3378 STORE_FAST              17 (e)
+
+237        3380 LOAD_FAST               17 (e)
+           3382 LOAD_ATTR              134 (kind)
+           3402 LOAD_CONST              42 (('blocked', 'restricted', 'page_burst'))
+           3404 CONTAINS_OP              0
+           3406 POP_JUMP_IF_FALSE       38 (to 3484)
+
+238        3408 LOAD_CONST              43 ('restricted')
+           3410 LOAD_FAST                4 (page)
+           3412 STORE_ATTR               6 (status)
+
+239        3422 LOAD_GLOBAL            137 (NULL + hasattr)
+           3432 LOAD_FAST                4 (page)
+           3434 LOAD_CONST              44 ('last_error_message')
+           3436 CALL                     2
+           3444 POP_JUMP_IF_FALSE       19 (to 3484)
+
+240        3446 LOAD_GLOBAL            139 (NULL + str)
+           3456 LOAD_FAST               17 (e)
+           3458 CALL                     1
+           3466 LOAD_CONST               6 (None)
+           3468 LOAD_CONST              45 (500)
+           3470 BINARY_SLICE
+           3472 LOAD_FAST                4 (page)
+           3474 STORE_ATTR              63 (last_error_message)
+
+241     >> 3484 LOAD_FAST               17 (e)
+           3486 LOAD_ATTR              134 (kind)
+           3506 LOAD_CONST              46 (('token_expired', 'invalid_token', 'permission_error', 'session_expired'))
+           3508 CONTAINS_OP              0
+           3510 POP_JUMP_IF_FALSE      154 (to 3820)
+
+242        3512 LOAD_GLOBAL             85 (NULL + fb_token_pool)
+           3522 LOAD_ATTR              140 (mark_error)
+           3542 LOAD_FAST                2 (db)
+           3544 LOAD_FAST               14 (pick)
+           3546 LOAD_ATTR              102 (token)
+           3566 LOAD_FAST               17 (e)
+           3568 CALL                     3
+           3576 POP_TOP
+
+243        3578 LOAD_FAST                0 (ctx)
+           3580 LOAD_ATTR               92 (exclude)
+           3600 LOAD_ATTR              143 (NULL|self + add)
+           3620 LOAD_FAST               14 (pick)
+           3622 LOAD_ATTR              102 (token)
+           3642 LOAD_ATTR               10 (id)
+           3662 CALL                     1
+           3670 POP_TOP
+
+244        3672 LOAD_GLOBAL             85 (NULL + fb_token_pool)
+           3682 LOAD_ATTR              144 (peek_token)
+           3702 LOAD_FAST                2 (db)
+           3704 LOAD_FAST                4 (page)
+           3706 LOAD_ATTR               88 (page_id)
+           3726 CALL                     2
+           3734 POP_JUMP_IF_NOT_NONE     7 (to 3750)
+
+245        3736 LOAD_CONST              47 ('disconnected')
+           3738 LOAD_FAST                4 (page)
+           3740 STORE_ATTR               6 (status)
+
+246     >> 3750 LOAD_CONST               1 ('ready')
+           3752 LOAD_FAST                1 (post)
+           3754 STORE_ATTR               6 (status)
+
+247        3764 LOAD_CONST               6 (None)
+           3766 LOAD_FAST                1 (post)
+           3768 STORE_ATTR              15 (error_message)
+
+248        3778 LOAD_FAST                2 (db)
+           3780 LOAD_ATTR               33 (NULL|self + commit)
+           3800 CALL                     0
+           3808 POP_TOP
+
+249        3810 POP_EXCEPT
+           3812 LOAD_CONST               6 (None)
+           3814 STORE_FAST              17 (e)
+           3816 DELETE_FAST             17 (e)
+           3818 RETURN_CONST             5 (False)
+
+250     >> 3820 LOAD_FAST               17 (e)
+           3822 LOAD_ATTR              134 (kind)
+           3842 LOAD_CONST              48 ('rate_limited')
+           3844 COMPARE_OP              40 (==)
+           3848 POP_JUMP_IF_FALSE      167 (to 4184)
+
+251        3850 LOAD_FAST                1 (post)
+           3852 LOAD_ATTR              146 (retry_count)
+           3872 COPY                     1
+           3874 POP_JUMP_IF_TRUE         2 (to 3880)
+           3876 POP_TOP
+           3878 LOAD_CONST              26 (0)
+        >> 3880 LOAD_CONST               4 (1)
+           3882 BINARY_OP                0 (+)
+           3886 LOAD_FAST                1 (post)
+           3888 STORE_ATTR              73 (retry_count)
+
+252        3898 LOAD_GLOBAL             57 (NULL + min)
+           3908 LOAD_CONST              49 (60)
+           3910 LOAD_CONST              50 (5)
+           3912 LOAD_CONST              51 (2)
+           3914 LOAD_GLOBAL             57 (NULL + min)
+           3924 LOAD_FAST                1 (post)
+           3926 LOAD_ATTR              146 (retry_count)
+           3946 LOAD_CONST               4 (1)
+           3948 BINARY_OP               10 (-)
+           3952 LOAD_CONST              52 (3)
+           3954 CALL                     2
+           3962 BINARY_OP                8 (**)
+           3966 BINARY_OP                5 (*)
+           3970 CALL                     2
+           3978 STORE_FAST              18 (backoff_min)
+
+253        3980 LOAD_CONST               1 ('ready')
+           3982 LOAD_FAST                1 (post)
+           3984 STORE_ATTR               6 (status)
+
+254        3994 LOAD_GLOBAL             17 (NULL + datetime)
+           4004 LOAD_ATTR               18 (now)
+           4024 CALL                     0
+           4032 LOAD_GLOBAL             59 (NULL + timedelta)
+           4042 LOAD_FAST               18 (backoff_min)
+           4044 KW_NAMES                25 (('minutes',))
+           4046 CALL                     1
+           4054 BINARY_OP                0 (+)
+           4058 LOAD_FAST                1 (post)
+           4060 STORE_ATTR              39 (schedule_time)
+
+255        4070 LOAD_CONST              53 ('Facebook giới hạn tần suất; sẽ thử lại sau ')
+           4072 LOAD_FAST               18 (backoff_min)
+           4074 FORMAT_VALUE             0
+           4076 LOAD_CONST              54 (' phút')
+           4078 BUILD_STRING             3
+           4080 LOAD_FAST                1 (post)
+           4082 STORE_ATTR              15 (error_message)
+
+256        4092 LOAD_GLOBAL             17 (NULL + datetime)
+           4102 LOAD_ATTR               18 (now)
+           4122 CALL                     0
+           4130 LOAD_FAST                1 (post)
+           4132 STORE_ATTR              49 (updated_at)
+
+257        4142 LOAD_FAST                2 (db)
+           4144 LOAD_ATTR               33 (NULL|self + commit)
+           4164 CALL                     0
+           4172 POP_TOP
+
+258        4174 POP_EXCEPT
+           4176 LOAD_CONST               6 (None)
+           4178 STORE_FAST              17 (e)
+           4180 DELETE_FAST             17 (e)
+           4182 RETURN_CONST             5 (False)
+
+260     >> 4184 LOAD_FAST                1 (post)
+           4186 LOAD_ATTR              146 (retry_count)
+           4206 COPY                     1
+           4208 POP_JUMP_IF_TRUE         2 (to 4214)
+           4210 POP_TOP
+           4212 LOAD_CONST              26 (0)
+        >> 4214 LOAD_CONST               4 (1)
+           4216 BINARY_OP                0 (+)
+           4220 LOAD_FAST                1 (post)
+           4222 STORE_ATTR              73 (retry_count)
+
+261        4232 LOAD_FAST                1 (post)
+           4234 LOAD_ATTR              146 (retry_count)
+           4254 LOAD_GLOBAL            148 (MAX_RETRY)
+           4264 COMPARE_OP              26 (<=)
+           4268 POP_JUMP_IF_FALSE       64 (to 4398)
+           4270 LOAD_FAST               17 (e)
+           4272 LOAD_ATTR              150 (retryable)
+           4292 POP_JUMP_IF_FALSE       52 (to 4398)
+
+262        4294 LOAD_CONST               1 ('ready')
+           4296 LOAD_FAST                1 (post)
+           4298 STORE_ATTR               6 (status)
+
+263        4308 LOAD_GLOBAL             17 (NULL + datetime)
+           4318 LOAD_ATTR               18 (now)
+           4338 CALL                     0
+           4346 LOAD_FAST                1 (post)
+           4348 STORE_ATTR              49 (updated_at)
+
+264        4358 LOAD_GLOBAL            139 (NULL + str)
+           4368 LOAD_FAST               17 (e)
+           4370 CALL                     1
+           4378 LOAD_CONST               6 (None)
+           4380 LOAD_CONST              45 (500)
+           4382 BINARY_SLICE
+           4384 LOAD_FAST                1 (post)
+           4386 STORE_ATTR              15 (error_message)
+           4396 JUMP_FORWARD            26 (to 4450)
+
+266     >> 4398 LOAD_CONST               7 ('failed')
+           4400 LOAD_FAST                1 (post)
+           4402 STORE_ATTR               6 (status)
+
+267        4412 LOAD_GLOBAL            139 (NULL + str)
+           4422 LOAD_FAST               17 (e)
+           4424 CALL                     1
+           4432 LOAD_CONST               6 (None)
+           4434 LOAD_CONST              45 (500)
+           4436 BINARY_SLICE
+           4438 LOAD_FAST                1 (post)
+           4440 STORE_ATTR              15 (error_message)
+
+268     >> 4450 LOAD_FAST                2 (db)
+           4452 LOAD_ATTR               33 (NULL|self + commit)
+           4472 CALL                     0
+           4480 POP_TOP
+
+269        4482 POP_EXCEPT
+           4484 LOAD_CONST               6 (None)
+           4486 STORE_FAST              17 (e)
+           4488 DELETE_FAST             17 (e)
+           4490 RETURN_CONST             5 (False)
+        >> 4492 LOAD_CONST               6 (None)
+           4494 STORE_FAST              17 (e)
+           4496 DELETE_FAST             17 (e)
+           4498 RERAISE                  1
+
+271     >> 4500 LOAD_GLOBAL            152 (Exception)
+           4510 CHECK_EXC_MATCH
+           4512 EXTENDED_ARG             1
+           4514 POP_JUMP_IF_FALSE      256 (to 5028)
+           4516 STORE_FAST              17 (e)
+
+272        4518 LOAD_GLOBAL            129 (NULL + log)
+           4528 LOAD_ATTR              154 (warning)
+           4548 LOAD_CONST              55 ('[fb_publish] bài ')
+           4550 LOAD_FAST                1 (post)
+           4552 LOAD_ATTR               10 (id)
+           4572 FORMAT_VALUE             0
+           4574 LOAD_CONST              56 (' lỗi bất ngờ trong publish: ')
+           4576 LOAD_GLOBAL            157 (NULL + type)
+           4586 LOAD_FAST               17 (e)
+           4588 CALL                     1
+           4596 LOAD_ATTR              158 (__name__)
+           4616 FORMAT_VALUE             0
+           4618 LOAD_CONST              57 (': ')
+           4620 LOAD_FAST               17 (e)
+           4622 FORMAT_VALUE             0
+           4624 BUILD_STRING             6
+           4626 CALL                     1
+           4634 POP_TOP
+
+273        4636 LOAD_FAST                1 (post)
+           4638 LOAD_ATTR              146 (retry_count)
+           4658 COPY                     1
+           4660 POP_JUMP_IF_TRUE         2 (to 4666)
+           4662 POP_TOP
+           4664 LOAD_CONST              26 (0)
+        >> 4666 LOAD_CONST               4 (1)
+           4668 BINARY_OP                0 (+)
+           4672 LOAD_FAST                1 (post)
+           4674 STORE_ATTR              73 (retry_count)
+
+274        4684 LOAD_FAST                1 (post)
+           4686 LOAD_ATTR              146 (retry_count)
+           4706 LOAD_GLOBAL            148 (MAX_RETRY)
+           4716 COMPARE_OP              26 (<=)
+           4720 POP_JUMP_IF_FALSE       77 (to 4876)
+
+275        4722 LOAD_CONST               1 ('ready')
+           4724 LOAD_FAST                1 (post)
+           4726 STORE_ATTR               6 (status)
+
+276        4736 LOAD_GLOBAL             17 (NULL + datetime)
+           4746 LOAD_ATTR               18 (now)
+           4766 CALL                     0
+           4774 LOAD_FAST                1 (post)
+           4776 STORE_ATTR              49 (updated_at)
+
+277        4786 LOAD_FAST               17 (e)
+           4788 LOAD_ATTR              160 (__class__)
+           4808 LOAD_ATTR              158 (__name__)
+           4828 FORMAT_VALUE             0
+           4830 LOAD_CONST              57 (': ')
+           4832 LOAD_GLOBAL            139 (NULL + str)
+           4842 LOAD_FAST               17 (e)
+           4844 CALL                     1
+           4852 LOAD_CONST               6 (None)
+           4854 LOAD_CONST              58 (400)
+           4856 BINARY_SLICE
+           4858 FORMAT_VALUE             0
+           4860 BUILD_STRING             3
+           4862 LOAD_FAST                1 (post)
+           4864 STORE_ATTR              15 (error_message)
+           4874 JUMP_FORWARD            51 (to 4978)
+
+279     >> 4876 LOAD_CONST               7 ('failed')
+           4878 LOAD_FAST                1 (post)
+           4880 STORE_ATTR               6 (status)
+
+280        4890 LOAD_FAST               17 (e)
+           4892 LOAD_ATTR              160 (__class__)
+           4912 LOAD_ATTR              158 (__name__)
+           4932 FORMAT_VALUE             0
+           4934 LOAD_CONST              57 (': ')
+           4936 LOAD_GLOBAL            139 (NULL + str)
+           4946 LOAD_FAST               17 (e)
+           4948 CALL                     1
+           4956 LOAD_CONST               6 (None)
+           4958 LOAD_CONST              58 (400)
+           4960 BINARY_SLICE
+           4962 FORMAT_VALUE             0
+           4964 BUILD_STRING             3
+           4966 LOAD_FAST                1 (post)
+           4968 STORE_ATTR              15 (error_message)
+
+281     >> 4978 LOAD_FAST                2 (db)
+           4980 LOAD_ATTR               33 (NULL|self + commit)
+           5000 CALL                     0
+           5008 POP_TOP
+
+282        5010 POP_EXCEPT
+           5012 LOAD_CONST               6 (None)
+           5014 STORE_FAST              17 (e)
+           5016 DELETE_FAST             17 (e)
+           5018 RETURN_CONST             5 (False)
+        >> 5020 LOAD_CONST               6 (None)
+           5022 STORE_FAST              17 (e)
+           5024 DELETE_FAST             17 (e)
+           5026 RERAISE                  1
+
+271     >> 5028 RERAISE                  0
+        >> 5030 COPY                     3
+           5032 POP_EXCEPT
+           5034 RERAISE                  1
+        >> 5036 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           5038 RERAISE                  1
+ExceptionTable:
+  4 to 712 -> 5036 [0] lasti
+  716 to 776 -> 3306 [0]
+  778 to 2546 -> 5036 [0] lasti
+  2550 to 2838 -> 3360 [0]
+  2840 to 2840 -> 3354 [2]
+  2842 to 3302 -> 3360 [0]
+  3304 to 3304 -> 5036 [0] lasti
+  3306 to 3338 -> 3348 [1] lasti
+  3340 to 3344 -> 5036 [0] lasti
+  3346 to 3346 -> 3348 [1] lasti
+  3348 to 3352 -> 5036 [0] lasti
+  3354 to 3354 -> 3360 [0]
+  3360 to 3378 -> 5030 [1] lasti
+  3380 to 3808 -> 4492 [1] lasti
+  3810 to 3818 -> 5036 [0] lasti
+  3820 to 4172 -> 4492 [1] lasti
+  4174 to 4182 -> 5036 [0] lasti
+  4184 to 4480 -> 4492 [1] lasti
+  4482 to 4490 -> 5036 [0] lasti
+  4492 to 4516 -> 5030 [1] lasti
+  4518 to 5008 -> 5020 [1] lasti
+  5010 to 5018 -> 5036 [0] lasti
+  5020 to 5028 -> 5030 [1] lasti
+  5030 to 5034 -> 5036 [0] lasti
+
+Disassembly of <code object _resolve_stuck at 0x28c2f3f0, file "app\services\fb_publish_service.py", line 285>:
+285           0 RESUME                   0
+
+287           2 LOAD_GLOBAL              1 (NULL + datetime)
+             12 LOAD_ATTR                2 (now)
+             32 CALL                     0
+             40 LOAD_GLOBAL              5 (NULL + timedelta)
+             50 LOAD_GLOBAL              6 (STUCK_MIN)
+             60 KW_NAMES                 1 (('minutes',))
+             62 CALL                     1
+             70 BINARY_OP               10 (-)
+             74 STORE_FAST               1 (threshold)
+
+288          76 LOAD_FAST                0 (db)
+             78 LOAD_ATTR                9 (NULL|self + execute)
+
+289          98 LOAD_GLOBAL             11 (NULL + select)
+            108 LOAD_GLOBAL             12 (FbPost)
+            118 CALL                     1
+            126 LOAD_ATTR               15 (NULL|self + where)
+
+290         146 LOAD_GLOBAL             12 (FbPost)
+            156 LOAD_ATTR               16 (status)
+            176 LOAD_CONST               2 ('processing')
+            178 COMPARE_OP              40 (==)
+
+291         182 LOAD_GLOBAL             12 (FbPost)
+            192 LOAD_ATTR               18 (updated_at)
+            212 LOAD_FAST                1 (threshold)
+            214 COMPARE_OP               2 (<)
+
+289         218 CALL                     2
+
+288         226 CALL                     1
+
+293         234 LOAD_ATTR               21 (NULL|self + scalars)
+            254 CALL                     0
+            262 LOAD_ATTR               23 (NULL|self + all)
+            282 CALL                     0
+
+288         290 STORE_FAST               2 (stuck)
+
+294         292 LOAD_CONST               3 (0)
+            294 STORE_FAST               3 (n)
+
+295         296 LOAD_FAST                2 (stuck)
+            298 GET_ITER
+        >>  300 FOR_ITER                39 (to 382)
+            304 STORE_FAST               4 (p)
+
+296         306 LOAD_CONST               4 ('ready')
+            308 LOAD_FAST                4 (p)
+            310 STORE_ATTR               8 (status)
+
+297         320 LOAD_GLOBAL              1 (NULL + datetime)
+            330 LOAD_ATTR                2 (now)
+            350 CALL                     0
+            358 LOAD_FAST                4 (p)
+            360 STORE_ATTR               9 (updated_at)
+
+298         370 LOAD_FAST                3 (n)
+            372 LOAD_CONST               5 (1)
+            374 BINARY_OP               13 (+=)
+            378 STORE_FAST               3 (n)
+            380 JUMP_BACKWARD           41 (to 300)
+
+295     >>  382 END_FOR
+
+299         384 LOAD_FAST                3 (n)
+            386 POP_JUMP_IF_FALSE       48 (to 484)
+
+300         388 LOAD_FAST                0 (db)
+            390 LOAD_ATTR               25 (NULL|self + commit)
+            410 CALL                     0
+            418 POP_TOP
+
+301         420 LOAD_GLOBAL             27 (NULL + log)
+            430 LOAD_ATTR               28 (info)
+            450 LOAD_CONST               6 ('[fb_publish] khôi phục ')
+            452 LOAD_FAST                3 (n)
+            454 FORMAT_VALUE             0
+            456 LOAD_CONST               7 (' bài stuck (processing > ')
+            458 LOAD_GLOBAL              6 (STUCK_MIN)
+            468 FORMAT_VALUE             0
+            470 LOAD_CONST               8 ("') sang ready")
+            472 BUILD_STRING             5
+            474 CALL                     1
+            482 POP_TOP
+
+302     >>  484 LOAD_FAST                3 (n)
+            486 RETURN_VALUE
+
+Disassembly of <code object publish_now_in_session at 0x28c2e4d0, file "app\services\fb_publish_service.py", line 305>:
+305           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+307           6 LOAD_GLOBAL              1 (NULL + fb_settings)
+             16 LOAD_ATTR                2 (get_str)
+             36 LOAD_FAST                0 (db)
+             38 LOAD_CONST               1 ('fb_publish_enabled')
+             40 LOAD_CONST               2 ('1')
+             42 CALL                     3
+             50 LOAD_CONST               2 ('1')
+             52 COMPARE_OP              55 (!=)
+             56 POP_JUMP_IF_FALSE        6 (to 70)
+
+308          58 LOAD_CONST               3 (False)
+             60 LOAD_CONST               4 (True)
+
+309          62 LOAD_CONST               5 ('Xuất bản Facebook đang tạm dừng bởi công tắc khẩn cấp')
+
+308          64 LOAD_CONST               6 (('ok', 'paused', 'error'))
+             66 BUILD_CONST_KEY_MAP      3
+             68 RETURN_VALUE
+
+310     >>   70 LOAD_FAST                0 (db)
+             72 LOAD_ATTR                5 (NULL|self + get)
+             92 LOAD_GLOBAL              6 (FbPost)
+            102 LOAD_FAST                1 (post_id)
+            104 CALL                     2
+            112 STORE_FAST               2 (post)
+
+311         114 LOAD_FAST                2 (post)
+            116 POP_JUMP_IF_NOT_NONE     5 (to 128)
+
+312         118 LOAD_CONST               3 (False)
+            120 LOAD_CONST               8 ('Bài không tồn tại')
+            122 LOAD_CONST               9 (('ok', 'error'))
+            124 BUILD_CONST_KEY_MAP      2
+            126 RETURN_VALUE
+
+313     >>  128 LOAD_FAST                2 (post)
+            130 LOAD_ATTR                8 (status)
+            150 LOAD_CONST              10 (('draft', 'ready', 'failed'))
+            152 CONTAINS_OP              1
+            154 POP_JUMP_IF_FALSE       20 (to 196)
+
+314         156 LOAD_CONST               3 (False)
+            158 LOAD_CONST              11 ('skipped_already_claimed')
+
+315         160 LOAD_CONST              12 ('Trạng thái ')
+            162 LOAD_FAST                2 (post)
+            164 LOAD_ATTR                8 (status)
+            184 FORMAT_VALUE             0
+            186 LOAD_CONST              13 (' không cho đăng ngay')
+            188 BUILD_STRING             3
+
+314         190 LOAD_CONST              14 (('ok', 'reason', 'error'))
+            192 BUILD_CONST_KEY_MAP      3
+            194 RETURN_VALUE
+
+316     >>  196 LOAD_GLOBAL             11 (NULL + datetime)
+            206 LOAD_ATTR               12 (now)
+            226 CALL                     0
+            234 LOAD_FAST                2 (post)
+            236 STORE_ATTR               7 (schedule_time)
+
+317         246 LOAD_CONST              15 ('ready')
+            248 LOAD_FAST                2 (post)
+            250 STORE_ATTR               4 (status)
+
+318         260 LOAD_FAST                0 (db)
+            262 LOAD_ATTR               17 (NULL|self + commit)
+            282 CALL                     0
+            290 POP_TOP
+
+319         292 LOAD_GLOBAL              1 (NULL + fb_settings)
+            302 LOAD_ATTR               18 (get_fb_settings)
+            322 LOAD_FAST                0 (db)
+            324 CALL                     1
+            332 STORE_FAST               3 (settings)
+
+320         334 LOAD_GLOBAL             21 (NULL + FbPublishContext)
+
+321         344 LOAD_FAST                0 (db)
+
+322         346 LOAD_FAST                3 (settings)
+            348 LOAD_ATTR                5 (NULL|self + get)
+            368 LOAD_CONST              16 ('fb_token_strategy')
+            370 LOAD_CONST              17 ('least_used')
+            372 CALL                     2
+
+323         380 LOAD_GLOBAL             23 (NULL + _bounded_int)
+            390 LOAD_FAST                3 (settings)
+            392 LOAD_ATTR                5 (NULL|self + get)
+            412 LOAD_CONST              18 ('fb_token_block_size')
+            414 CALL                     1
+            422 LOAD_CONST              19 (2)
+            424 LOAD_CONST              20 (1)
+            426 LOAD_CONST              21 (100)
+            428 CALL                     4
+
+324         436 LOAD_FAST                3 (settings)
+            438 LOAD_ATTR                5 (NULL|self + get)
+            458 LOAD_CONST              22 ('fb_proxy_global')
+            460 CALL                     1
+            468 COPY                     1
+            470 POP_JUMP_IF_TRUE         2 (to 476)
+            472 POP_TOP
+            474 LOAD_CONST               7 (None)
+
+325     >>  476 LOAD_GLOBAL             23 (NULL + _bounded_int)
+            486 LOAD_FAST                3 (settings)
+            488 LOAD_ATTR                5 (NULL|self + get)
+            508 LOAD_CONST              23 ('fb_max_posts_per_day')
+            510 CALL                     1
+            518 LOAD_CONST              24 (12)
+            520 LOAD_CONST              20 (1)
+            522 LOAD_CONST              21 (100)
+            524 CALL                     4
+
+326         532 LOAD_GLOBAL             23 (NULL + _bounded_int)
+            542 LOAD_FAST                3 (settings)
+            544 LOAD_ATTR                5 (NULL|self + get)
+            564 LOAD_CONST              25 ('fb_min_gap_minutes')
+            566 CALL                     1
+            574 LOAD_CONST              26 (20)
+            576 LOAD_CONST              20 (1)
+            578 LOAD_CONST              27 (1440)
+            580 CALL                     4
+
+320         588 KW_NAMES                28 (('strategy', 'block_size', 'proxy_global', 'max_posts_per_day', 'min_gap_minutes'))
+            590 CALL                     6
+            598 STORE_FAST               4 (ctx)
+
+328         600 LOAD_GLOBAL             25 (NULL + _publish_one)
+            610 LOAD_FAST                4 (ctx)
+            612 LOAD_FAST                2 (post)
+            614 CALL                     2
+            622 GET_AWAITABLE            0
+            624 LOAD_CONST               7 (None)
+        >>  626 SEND                     3 (to 636)
+            630 YIELD_VALUE              2
+            632 RESUME                   3
+            634 JUMP_BACKWARD_NO_INTERRUPT     5 (to 626)
+        >>  636 END_SEND
+            638 STORE_FAST               5 (ok)
+
+329         640 LOAD_FAST                2 (post)
+            642 LOAD_ATTR               26 (error_message)
+            662 STORE_FAST               6 (error)
+
+330         664 LOAD_FAST                5 (ok)
+            666 POP_JUMP_IF_TRUE        87 (to 842)
+            668 LOAD_FAST                6 (error)
+            670 POP_JUMP_IF_TRUE        85 (to 842)
+
+331         672 LOAD_FAST                2 (post)
+            674 LOAD_ATTR               28 (fb_page_id)
+            694 POP_JUMP_IF_FALSE       32 (to 760)
+            696 LOAD_FAST                0 (db)
+            698 LOAD_ATTR                5 (NULL|self + get)
+            718 LOAD_GLOBAL             30 (FbPage)
+            728 LOAD_FAST                2 (post)
+            730 LOAD_ATTR               28 (fb_page_id)
+            750 CALL                     2
+            758 JUMP_FORWARD             1 (to 762)
+        >>  760 LOAD_CONST               7 (None)
+        >>  762 STORE_FAST               7 (page)
+
+332         764 LOAD_FAST                7 (page)
+            766 POP_JUMP_IF_FALSE       35 (to 838)
+            768 LOAD_GLOBAL             33 (NULL + fb_token_pool)
+            778 LOAD_ATTR               34 (peek_token)
+            798 LOAD_FAST                0 (db)
+            800 LOAD_FAST                7 (page)
+            802 LOAD_ATTR               36 (page_id)
+            822 CALL                     2
+            830 POP_JUMP_IF_NOT_NONE     3 (to 838)
+
+333         832 LOAD_CONST              29 ('Fanpage không còn token hoạt động; hãy kết nối lại token rồi thử lại')
+            834 STORE_FAST               6 (error)
+            836 JUMP_FORWARD             2 (to 842)
+
+335     >>  838 LOAD_CONST              30 ('Bài chưa được đăng; trạng thái hàng đợi đã thay đổi, vui lòng thử lại')
+            840 STORE_FAST               6 (error)
+
+336     >>  842 LOAD_FAST                5 (ok)
+            844 LOAD_FAST                2 (post)
+            846 LOAD_ATTR               38 (id)
+            866 LOAD_FAST                2 (post)
+            868 LOAD_ATTR                8 (status)
+
+337         888 LOAD_FAST                2 (post)
+            890 LOAD_ATTR               40 (fb_post_url)
+            910 LOAD_FAST                6 (error)
+
+336         912 LOAD_CONST              31 (('ok', 'post_id', 'status', 'url', 'error'))
+            914 BUILD_CONST_KEY_MAP      5
+            916 STORE_FAST               8 (result)
+
+338         918 LOAD_FAST                5 (ok)
+            920 POP_JUMP_IF_TRUE        20 (to 962)
+            922 LOAD_FAST                2 (post)
+            924 LOAD_ATTR                8 (status)
+            944 LOAD_CONST              32 ('processing')
+            946 COMPARE_OP              40 (==)
+            950 POP_JUMP_IF_FALSE        5 (to 962)
+
+339         952 LOAD_CONST               3 (False)
+            954 LOAD_CONST              11 ('skipped_already_claimed')
+            956 LOAD_CONST              33 (('ok', 'reason'))
+            958 BUILD_CONST_KEY_MAP      2
+            960 RETURN_VALUE
+
+340     >>  962 LOAD_FAST                8 (result)
+            964 RETURN_VALUE
+
+328     >>  966 CLEANUP_THROW
+            968 JUMP_BACKWARD          167 (to 636)
+        >>  970 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            972 RERAISE                  1
+ExceptionTable:
+  4 to 628 -> 970 [0] lasti
+  630 to 630 -> 966 [2]
+  632 to 966 -> 970 [0] lasti
+
+Disassembly of <code object publish_now at 0x7f6c92693af0, file "app\services\fb_publish_service.py", line 343>:
+343           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+345           6 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             16 CALL                     0
+             24 BEFORE_WITH
+             26 STORE_FAST               1 (db)
+
+346          28 LOAD_GLOBAL              3 (NULL + publish_now_in_session)
+             38 LOAD_FAST                1 (db)
+             40 LOAD_FAST                0 (post_id)
+             42 CALL                     2
+             50 GET_AWAITABLE            0
+             52 LOAD_CONST               1 (None)
+        >>   54 SEND                     3 (to 64)
+             58 YIELD_VALUE              3
+             60 RESUME                   3
+             62 JUMP_BACKWARD_NO_INTERRUPT     5 (to 54)
+        >>   64 END_SEND
+
+345          66 SWAP                     2
+             68 LOAD_CONST               1 (None)
+             70 LOAD_CONST               1 (None)
+             72 LOAD_CONST               1 (None)
+             74 CALL                     2
+             82 POP_TOP
+             84 RETURN_VALUE
+
+346     >>   86 CLEANUP_THROW
+             88 JUMP_BACKWARD           13 (to 64)
+
+345     >>   90 PUSH_EXC_INFO
+             92 WITH_EXCEPT_START
+             94 POP_JUMP_IF_TRUE         1 (to 98)
+             96 RERAISE                  2
+        >>   98 POP_TOP
+            100 POP_EXCEPT
+            102 POP_TOP
+            104 POP_TOP
+            106 RETURN_CONST             1 (None)
+        >>  108 COPY                     3
+            110 POP_EXCEPT
+            112 RERAISE                  1
+        >>  114 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            116 RERAISE                  1
+ExceptionTable:
+  4 to 24 -> 114 [0] lasti
+  26 to 56 -> 90 [1] lasti
+  58 to 58 -> 86 [3]
+  60 to 64 -> 90 [1] lasti
+  66 to 84 -> 114 [0] lasti
+  86 to 86 -> 90 [1] lasti
+  90 to 98 -> 108 [3] lasti
+  100 to 112 -> 114 [0] lasti

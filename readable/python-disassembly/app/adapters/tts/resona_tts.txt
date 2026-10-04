@@ -1,0 +1,2354 @@
+  0           0 RESUME                   0
+
+  1           2 SETUP_ANNOTATIONS
+              4 LOAD_CONST               0 ('Resona TTS provider — REST API v2 (giọng Việt AI tự nhiên · resona.live).\n\nXác thực: Header Authorization đi kèm mọi request:\n    Authorization: Bearer {resona_token}\n\nDanh sách giọng: GET https://resona.live/api/v2/voices (phân trang bằng next_page_token)\n    voice = {voice_id, name, gender, accent, tags, category, preview_url, quality, is_featured, is_owner, usage_count}\n\nTổng hợp bất đồng bộ (Text-to-Speech):\n    POST https://resona.live/api/v2/text-to-speech\n    Body: {"text": text, "voice_id": voice_id, "language": "vi"}\n    → Response: {"request_id": "req_...", "status": "processing", "message": "...", "usage": {...}}\n\nPoll trạng thái & kết quả:\n    GET https://resona.live/api/v2/text-to-speech/{request_id}\n    → Trạng thái: "processing" | "completed" | "failed"\n    → Thành công: {"status": "completed", "audio_urls": ["https://.../audio.wav"]}\n\nGiới hạn: Mỗi đoạn từ 50 đến 2,000 credit (ký tự). Cắt văn bản dài thành các chunk ~1500 ký tự,\nđối với văn bản quá ngắn (<50 ký tự) tự động đệm khoảng trắng/dấu chấm để đạt min 50 ký tự.\n')
+              6 STORE_NAME               0 (__doc__)
+
+ 22           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('annotations',))
+             12 IMPORT_NAME              1 (__future__)
+             14 IMPORT_FROM              2 (annotations)
+             16 STORE_NAME               2 (annotations)
+             18 POP_TOP
+
+ 24          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               3 (None)
+             24 IMPORT_NAME              3 (asyncio)
+             26 STORE_NAME               3 (asyncio)
+
+ 25          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               3 (None)
+             32 IMPORT_NAME              4 (json)
+             34 STORE_NAME               4 (json)
+
+ 26          36 LOAD_CONST               1 (0)
+             38 LOAD_CONST               3 (None)
+             40 IMPORT_NAME              5 (os)
+             42 STORE_NAME               5 (os)
+
+ 27          44 LOAD_CONST               1 (0)
+             46 LOAD_CONST               3 (None)
+             48 IMPORT_NAME              6 (re)
+             50 STORE_NAME               6 (re)
+
+ 28          52 LOAD_CONST               1 (0)
+             54 LOAD_CONST               4 (('Callable',))
+             56 IMPORT_NAME              7 (typing)
+             58 IMPORT_FROM              8 (Callable)
+             60 STORE_NAME               8 (Callable)
+             62 POP_TOP
+
+ 30          64 LOAD_CONST               1 (0)
+             66 LOAD_CONST               3 (None)
+             68 IMPORT_NAME              9 (httpx)
+             70 STORE_NAME               9 (httpx)
+
+ 32          72 LOAD_CONST               1 (0)
+             74 LOAD_CONST               5 (('make_error', 'StudioError', 'E'))
+             76 IMPORT_NAME             10 (app.core.errors)
+             78 IMPORT_FROM             11 (make_error)
+             80 STORE_NAME              11 (make_error)
+             82 IMPORT_FROM             12 (StudioError)
+             84 STORE_NAME              12 (StudioError)
+             86 IMPORT_FROM             13 (E)
+             88 STORE_NAME              13 (E)
+             90 POP_TOP
+
+ 33          92 LOAD_CONST               1 (0)
+             94 LOAD_CONST               6 (('log',))
+             96 IMPORT_NAME             14 (app.core.logging)
+             98 IMPORT_FROM             15 (log)
+            100 STORE_NAME              15 (log)
+            102 POP_TOP
+
+ 34         104 LOAD_CONST               1 (0)
+            106 LOAD_CONST               7 (('TTSProvider', 'get_setting_value', 'LANGUAGE_MAP'))
+            108 IMPORT_NAME             16 (app.adapters.tts.base)
+            110 IMPORT_FROM             17 (TTSProvider)
+            112 STORE_NAME              17 (TTSProvider)
+            114 IMPORT_FROM             18 (get_setting_value)
+            116 STORE_NAME              18 (get_setting_value)
+            118 IMPORT_FROM             19 (LANGUAGE_MAP)
+            120 STORE_NAME              19 (LANGUAGE_MAP)
+            122 POP_TOP
+
+ 36         124 LOAD_CONST               8 ('resona-tts')
+            126 STORE_NAME              20 (PROVIDER_ID)
+
+ 37         128 LOAD_CONST               9 ('https://resona.live')
+            130 STORE_NAME              21 (BASE_URL)
+
+ 38         132 LOAD_CONST              10 ('audio/wav')
+            134 STORE_NAME              22 (PREVIEW_MIME)
+
+ 39         136 LOAD_CONST              11 (120.0)
+            138 STORE_NAME              23 (TIMEOUT)
+
+ 40         140 LOAD_CONST              12 (1.0)
+            142 STORE_NAME              24 (POLL_INTERVAL)
+
+ 41         144 LOAD_CONST              13 (60)
+            146 STORE_NAME              25 (POLL_MAX_ATTEMPTS)
+
+ 44         148 LOAD_CONST              14 (50)
+            150 STORE_NAME              26 (MIN_CHAR_LIMIT)
+
+ 45         152 LOAD_CONST              15 (1500)
+            154 STORE_NAME              27 (CHUNK_CHAR_LIMIT)
+
+ 47         156 LOAD_CONST               3 (None)
+            158 STORE_GLOBAL            28 (_VOICES_CACHE)
+            160 LOAD_CONST              16 ('list[dict] | None')
+            162 LOAD_NAME               29 (__annotations__)
+            164 LOAD_CONST              17 ('_VOICES_CACHE')
+            166 STORE_SUBSCR
+
+ 48         170 PUSH_NULL
+            172 LOAD_NAME                3 (asyncio)
+            174 LOAD_ATTR               60 (Lock)
+            194 CALL                     0
+            202 STORE_NAME              31 (_VOICES_CACHE_LOCK)
+
+ 51         204 LOAD_CONST              34 (('return', 'None'))
+            206 LOAD_CONST              18 (<code object clear_voices_cache at 0x7f6c92951fe0, file "app\adapters\tts\resona_tts.py", line 51>)
+            208 MAKE_FUNCTION            4 (annotations)
+            210 STORE_NAME              32 (clear_voices_cache)
+
+ 57         212 LOAD_CONST              35 (('return', 'str'))
+            214 LOAD_CONST              19 (<code object _get_token at 0x7f6c92d7f370, file "app\adapters\tts\resona_tts.py", line 57>)
+            216 MAKE_FUNCTION            4 (annotations)
+            218 STORE_NAME              33 (_get_token)
+
+ 68         220 LOAD_CONST              36 (('return', 'dict[str, str]'))
+            222 LOAD_CONST              20 (<code object _auth_headers at 0x7f6c932dec40, file "app\adapters\tts\resona_tts.py", line 68>)
+            224 MAKE_FUNCTION            4 (annotations)
+            226 STORE_NAME              34 (_auth_headers)
+
+ 73         228 LOAD_CONST              37 (('return', 'httpx.AsyncClient'))
+            230 LOAD_CONST              21 (<code object _http_client at 0x7f6c9324edb0, file "app\adapters\tts\resona_tts.py", line 73>)
+            232 MAKE_FUNCTION            4 (annotations)
+            234 STORE_NAME              35 (_http_client)
+
+ 78         236 LOAD_CONST              38 (('body', 'str', 'return', 'tuple[str, str]'))
+            238 LOAD_CONST              22 (<code object _resona_error at 0x26a14ee0, file "app\adapters\tts\resona_tts.py", line 78>)
+            240 MAKE_FUNCTION            4 (annotations)
+            242 STORE_NAME              36 (_resona_error)
+
+ 90         244 LOAD_CONST              39 (('',))
+            246 LOAD_CONST              40 (('status', 'int', 'body', 'str', 'return', 'None'))
+            248 LOAD_CONST              23 (<code object _raise_for_status at 0x29089530, file "app\adapters\tts\resona_tts.py", line 90>)
+            250 MAKE_FUNCTION            5 (defaults, annotations)
+            252 STORE_NAME              37 (_raise_for_status)
+
+121         254 LOAD_CONST              41 (('code', 'str | None', 'return', 'str'))
+            256 LOAD_CONST              24 (<code object _norm_lang at 0x7f6c92d7f730, file "app\adapters\tts\resona_tts.py", line 121>)
+            258 MAKE_FUNCTION            4 (annotations)
+            260 STORE_NAME              38 (_norm_lang)
+
+128         262 LOAD_CONST              42 (('v', 'dict', 'return', 'dict | None'))
+            264 LOAD_CONST              25 (<code object _map_voice at 0x269ebc20, file "app\adapters\tts\resona_tts.py", line 128>)
+            266 MAKE_FUNCTION            4 (annotations)
+            268 STORE_NAME              39 (_map_voice)
+
+152         270 LOAD_CONST              43 (('return', 'list[dict]'))
+            272 LOAD_CONST              26 (<code object _fetch_all_voices at 0x269fb220, file "app\adapters\tts\resona_tts.py", line 152>)
+            274 MAKE_FUNCTION            4 (annotations)
+            276 STORE_NAME              40 (_fetch_all_voices)
+
+181         278 LOAD_CONST              43 (('return', 'list[dict]'))
+            280 LOAD_CONST              27 (<code object list_voices at 0x26a0a550, file "app\adapters\tts\resona_tts.py", line 181>)
+            282 MAKE_FUNCTION            4 (annotations)
+            284 STORE_NAME              41 (list_voices)
+
+195         286 LOAD_NAME               27 (CHUNK_CHAR_LIMIT)
+            288 BUILD_TUPLE              1
+            290 LOAD_CONST              44 (('text', 'str', 'limit', 'int', 'return', 'list[str]'))
+            292 LOAD_CONST              28 (<code object _split_chunks at 0x290673a0, file "app\adapters\tts\resona_tts.py", line 195>)
+            294 MAKE_FUNCTION            5 (defaults, annotations)
+            296 STORE_NAME              42 (_split_chunks)
+
+238         298 LOAD_CONST              45 (('vi',))
+            300 LOAD_CONST              46 (('client', 'httpx.AsyncClient', 'text', 'str', 'voice_id', 'str', 'language', 'str', 'return', 'bytes'))
+            302 LOAD_CONST              29 (<code object _synthesize_chunk at 0x269df610, file "app\adapters\tts\resona_tts.py", line 238>)
+            304 MAKE_FUNCTION            5 (defaults, annotations)
+            306 STORE_NAME              43 (_synthesize_chunk)
+
+289         308 LOAD_CONST              47 (('text', 'str', 'voice', 'str', 'return', 'bytes'))
+            310 LOAD_CONST              30 (<code object _synthesize_bytes at 0x269e9360, file "app\adapters\tts\resona_tts.py", line 289>)
+            312 MAKE_FUNCTION            4 (annotations)
+            314 STORE_NAME              44 (_synthesize_bytes)
+
+314         316 LOAD_CONST              48 (('voice', 'str', 'text', 'str', 'return', 'tuple[bytes, str]'))
+            318 LOAD_CONST              31 (<code object preview_voice at 0x29067020, file "app\adapters\tts\resona_tts.py", line 314>)
+            320 MAKE_FUNCTION            4 (annotations)
+            322 STORE_NAME              45 (preview_voice)
+
+332         324 PUSH_NULL
+            326 LOAD_BUILD_CLASS
+            328 LOAD_CONST              32 (<code object ResonaTTSProvider at 0x7f6c92a3aab0, file "app\adapters\tts\resona_tts.py", line 332>)
+            330 MAKE_FUNCTION            0
+            332 LOAD_CONST              33 ('ResonaTTSProvider')
+            334 LOAD_NAME               17 (TTSProvider)
+            336 CALL                     3
+            344 STORE_NAME              46 (ResonaTTSProvider)
+            346 RETURN_CONST             3 (None)
+
+Disassembly of <code object clear_voices_cache at 0x7f6c92951fe0, file "app\adapters\tts\resona_tts.py", line 51>:
+ 51           0 RESUME                   0
+
+ 54           2 LOAD_CONST               1 (None)
+              4 STORE_GLOBAL             0 (_VOICES_CACHE)
+              6 RETURN_CONST             1 (None)
+
+Disassembly of <code object _get_token at 0x7f6c92d7f370, file "app\adapters\tts\resona_tts.py", line 57>:
+ 57           0 RESUME                   0
+
+ 58           2 LOAD_GLOBAL              1 (NULL + get_setting_value)
+             12 LOAD_CONST               1 ('resona_token')
+             14 CALL                     1
+             22 COPY                     1
+             24 POP_JUMP_IF_TRUE         2 (to 30)
+             26 POP_TOP
+             28 LOAD_CONST               2 ('')
+        >>   30 LOAD_ATTR                3 (NULL|self + strip)
+             50 CALL                     0
+             58 STORE_FAST               0 (token)
+
+ 59          60 LOAD_FAST                0 (token)
+             62 POP_JUMP_IF_TRUE        26 (to 116)
+
+ 60          64 LOAD_GLOBAL              5 (NULL + make_error)
+
+ 61          74 LOAD_GLOBAL              6 (E)
+             84 LOAD_ATTR                8 (TTS_AUTH)
+
+ 62         104 LOAD_CONST               3 ('Chưa cấu hình Resona Token. Mở Settings (tab TTS → Resona) để nhập. Tạo API Access Token tại resona.live/settings.')
+
+ 60         106 CALL                     2
+            114 RAISE_VARARGS            1
+
+ 65     >>  116 LOAD_FAST                0 (token)
+            118 RETURN_VALUE
+
+Disassembly of <code object _auth_headers at 0x7f6c932dec40, file "app\adapters\tts\resona_tts.py", line 68>:
+ 68           0 RESUME                   0
+
+ 69           2 LOAD_GLOBAL              1 (NULL + _get_token)
+             12 CALL                     0
+             20 STORE_FAST               0 (token)
+
+ 70          22 LOAD_CONST               1 ('Authorization')
+             24 LOAD_CONST               2 ('Bearer ')
+             26 LOAD_FAST                0 (token)
+             28 FORMAT_VALUE             0
+             30 BUILD_STRING             2
+             32 BUILD_MAP                1
+             34 RETURN_VALUE
+
+Disassembly of <code object _http_client at 0x7f6c9324edb0, file "app\adapters\tts\resona_tts.py", line 73>:
+ 73           0 RESUME                   0
+
+ 74           2 LOAD_GLOBAL              0 (os)
+             12 LOAD_ATTR                2 (environ)
+             32 LOAD_ATTR                5 (NULL|self + get)
+             52 LOAD_CONST               1 ('HTTPS_PROXY')
+             54 CALL                     1
+             62 COPY                     1
+             64 POP_JUMP_IF_TRUE        35 (to 136)
+             66 POP_TOP
+             68 LOAD_GLOBAL              0 (os)
+             78 LOAD_ATTR                2 (environ)
+             98 LOAD_ATTR                5 (NULL|self + get)
+            118 LOAD_CONST               2 ('HTTP_PROXY')
+            120 CALL                     1
+            128 COPY                     1
+            130 POP_JUMP_IF_TRUE         2 (to 136)
+            132 POP_TOP
+            134 LOAD_CONST               0 (None)
+        >>  136 STORE_FAST               0 (proxy)
+
+ 75         138 LOAD_FAST                0 (proxy)
+            140 POP_JUMP_IF_FALSE       27 (to 196)
+            142 LOAD_GLOBAL              7 (NULL + httpx)
+            152 LOAD_ATTR                8 (AsyncClient)
+            172 LOAD_GLOBAL             10 (TIMEOUT)
+            182 LOAD_FAST                0 (proxy)
+            184 KW_NAMES                 3 (('timeout', 'proxy'))
+            186 CALL                     2
+            194 RETURN_VALUE
+        >>  196 LOAD_GLOBAL              7 (NULL + httpx)
+            206 LOAD_ATTR                8 (AsyncClient)
+            226 LOAD_GLOBAL             10 (TIMEOUT)
+            236 KW_NAMES                 4 (('timeout',))
+            238 CALL                     1
+            246 RETURN_VALUE
+
+Disassembly of <code object _resona_error at 0x26a14ee0, file "app\adapters\tts\resona_tts.py", line 78>:
+ 78           0 RESUME                   0
+
+ 80           2 NOP
+
+ 81           4 LOAD_GLOBAL              1 (NULL + json)
+             14 LOAD_ATTR                2 (loads)
+             34 LOAD_FAST                0 (body)
+             36 COPY                     1
+             38 POP_JUMP_IF_TRUE         2 (to 44)
+             40 POP_TOP
+             42 LOAD_CONST               1 ('{}')
+        >>   44 CALL                     1
+             52 STORE_FAST               1 (payload)
+
+ 84          54 LOAD_GLOBAL              9 (NULL + isinstance)
+             64 LOAD_FAST                1 (payload)
+             66 LOAD_GLOBAL             10 (dict)
+             76 CALL                     2
+             84 POP_JUMP_IF_FALSE       17 (to 120)
+             86 LOAD_FAST                1 (payload)
+             88 LOAD_ATTR               13 (NULL|self + get)
+            108 LOAD_CONST               3 ('detail')
+            110 CALL                     1
+            118 JUMP_FORWARD             1 (to 122)
+        >>  120 LOAD_CONST               4 (None)
+        >>  122 STORE_FAST               2 (detail)
+
+ 85         124 LOAD_GLOBAL              9 (NULL + isinstance)
+            134 LOAD_FAST                2 (detail)
+            136 LOAD_GLOBAL             10 (dict)
+            146 CALL                     2
+            154 POP_JUMP_IF_TRUE         1 (to 158)
+
+ 86         156 RETURN_CONST             2 (('', ''))
+
+ 87     >>  158 LOAD_GLOBAL             15 (NULL + str)
+            168 LOAD_FAST                2 (detail)
+            170 LOAD_ATTR               13 (NULL|self + get)
+            190 LOAD_CONST               5 ('status')
+            192 CALL                     1
+            200 COPY                     1
+            202 POP_JUMP_IF_TRUE         2 (to 208)
+            204 POP_TOP
+            206 LOAD_CONST               6 ('')
+        >>  208 CALL                     1
+            216 LOAD_ATTR               17 (NULL|self + strip)
+            236 CALL                     0
+            244 LOAD_GLOBAL             15 (NULL + str)
+            254 LOAD_FAST                2 (detail)
+            256 LOAD_ATTR               13 (NULL|self + get)
+            276 LOAD_CONST               7 ('message')
+            278 CALL                     1
+            286 COPY                     1
+            288 POP_JUMP_IF_TRUE         2 (to 294)
+            290 POP_TOP
+            292 LOAD_CONST               6 ('')
+        >>  294 CALL                     1
+            302 LOAD_ATTR               17 (NULL|self + strip)
+            322 CALL                     0
+            330 BUILD_TUPLE              2
+            332 RETURN_VALUE
+        >>  334 PUSH_EXC_INFO
+
+ 82         336 LOAD_GLOBAL              4 (TypeError)
+            346 LOAD_GLOBAL              6 (ValueError)
+            356 BUILD_TUPLE              2
+            358 CHECK_EXC_MATCH
+            360 POP_JUMP_IF_FALSE        3 (to 368)
+            362 POP_TOP
+
+ 83         364 POP_EXCEPT
+            366 RETURN_CONST             2 (('', ''))
+
+ 82     >>  368 RERAISE                  0
+        >>  370 COPY                     3
+            372 POP_EXCEPT
+            374 RERAISE                  1
+ExceptionTable:
+  4 to 52 -> 334 [0]
+  334 to 362 -> 370 [1] lasti
+  368 to 368 -> 370 [1] lasti
+
+Disassembly of <code object _raise_for_status at 0x29089530, file "app\adapters\tts\resona_tts.py", line 90>:
+ 90           0 RESUME                   0
+
+ 91           2 LOAD_GLOBAL              1 (NULL + _resona_error)
+             12 LOAD_FAST                1 (body)
+             14 CALL                     1
+             22 UNPACK_SEQUENCE          2
+             26 STORE_FAST               2 (error_status)
+             28 STORE_FAST               3 (error_message)
+
+ 92          30 LOAD_FAST                2 (error_status)
+             32 LOAD_CONST               1 ('insufficient_speech_credits')
+             34 COMPARE_OP              40 (==)
+             38 POP_JUMP_IF_FALSE       32 (to 104)
+
+ 93          40 LOAD_GLOBAL              3 (NULL + make_error)
+
+ 94          50 LOAD_GLOBAL              4 (E)
+             60 LOAD_ATTR                6 (TTS_QUOTA)
+
+ 95          80 LOAD_CONST               2 ('Tài khoản Resona không đủ speech credit cho đoạn này. Nạp thêm credit tại Resona hoặc chọn provider TTS khác.')
+
+ 97          82 LOAD_FAST                3 (error_message)
+             84 COPY                     1
+             86 POP_JUMP_IF_TRUE         2 (to 92)
+             88 POP_TOP
+             90 LOAD_CONST               3 ('Mở resona.live để kiểm tra số credit còn lại.')
+
+ 93     >>   92 KW_NAMES                 4 (('hint',))
+             94 CALL                     3
+            102 RAISE_VARARGS            1
+
+ 99     >>  104 LOAD_FAST                2 (error_status)
+            106 LOAD_CONST               5 ('insufficient_scope')
+            108 COMPARE_OP              40 (==)
+            112 POP_JUMP_IF_FALSE       32 (to 178)
+
+100         114 LOAD_GLOBAL              3 (NULL + make_error)
+
+101         124 LOAD_GLOBAL              4 (E)
+            134 LOAD_ATTR                8 (TTS_AUTH)
+
+102         154 LOAD_CONST               6 ('Resona Token không có quyền API v2. Hãy tạo Access Token mới trong Settings của Resona.')
+
+103         156 LOAD_FAST                3 (error_message)
+            158 COPY                     1
+            160 POP_JUMP_IF_TRUE         2 (to 166)
+            162 POP_TOP
+            164 LOAD_CONST               7 ('Token tạo trước API v2 có thể chỉ có quyền v1.')
+
+100     >>  166 KW_NAMES                 4 (('hint',))
+            168 CALL                     3
+            176 RAISE_VARARGS            1
+
+105     >>  178 LOAD_FAST                0 (status)
+            180 LOAD_CONST               8 ((401, 403))
+            182 CONTAINS_OP              0
+            184 POP_JUMP_IF_FALSE       45 (to 276)
+
+106         186 LOAD_GLOBAL              3 (NULL + make_error)
+
+107         196 LOAD_GLOBAL              4 (E)
+            206 LOAD_ATTR                8 (TTS_AUTH)
+
+108         226 LOAD_CONST               9 ('Resona từ chối xác thực. Kiểm tra Token trong Settings → TTS → Resona (HTTP ')
+
+109         228 LOAD_FAST                0 (status)
+            230 FORMAT_VALUE             0
+            232 LOAD_FAST                2 (error_status)
+            234 POP_JUMP_IF_FALSE        5 (to 246)
+            236 LOAD_CONST              10 (', ')
+            238 LOAD_FAST                2 (error_status)
+            240 FORMAT_VALUE             0
+            242 BUILD_STRING             2
+            244 JUMP_FORWARD             1 (to 248)
+        >>  246 LOAD_CONST              11 ('')
+        >>  248 FORMAT_VALUE             0
+            250 LOAD_CONST              12 (').')
+
+108         252 BUILD_STRING             4
+
+110         254 LOAD_FAST                3 (error_message)
+            256 COPY                     1
+            258 POP_JUMP_IF_TRUE         2 (to 264)
+            260 POP_TOP
+            262 LOAD_CONST              13 ('Đảm bảo token v2 chưa bị thu hồi hoặc tạo mới tại resona.live.')
+
+106     >>  264 KW_NAMES                 4 (('hint',))
+            266 CALL                     3
+            274 RAISE_VARARGS            1
+
+112     >>  276 LOAD_FAST                0 (status)
+            278 LOAD_CONST              14 (429)
+            280 COMPARE_OP              40 (==)
+            284 POP_JUMP_IF_FALSE       26 (to 338)
+
+113         286 LOAD_GLOBAL              3 (NULL + make_error)
+            296 LOAD_GLOBAL              4 (E)
+            306 LOAD_ATTR               10 (TTS_RATE_LIMIT)
+            326 LOAD_CONST              15 ('Resona rate limit (429). Thử lại sau ít phút.')
+            328 CALL                     2
+            336 RAISE_VARARGS            1
+
+114     >>  338 LOAD_FAST                0 (status)
+            340 LOAD_CONST              16 ((404, 422))
+            342 CONTAINS_OP              0
+            344 POP_JUMP_IF_FALSE       41 (to 428)
+
+115         346 LOAD_FAST                3 (error_message)
+            348 COPY                     1
+            350 POP_JUMP_IF_TRUE         5 (to 362)
+            352 POP_TOP
+            354 LOAD_FAST                1 (body)
+            356 LOAD_CONST               0 (None)
+            358 LOAD_CONST              17 (200)
+            360 BINARY_SLICE
+        >>  362 STORE_FAST               4 (detail)
+
+116         364 LOAD_GLOBAL              3 (NULL + make_error)
+            374 LOAD_GLOBAL              4 (E)
+            384 LOAD_ATTR               12 (TTS_VOICE_INVALID)
+            404 LOAD_CONST              18 ('Resona từ chối yêu cầu (')
+            406 LOAD_FAST                0 (status)
+            408 FORMAT_VALUE             0
+            410 LOAD_CONST              19 ('): ')
+            412 LOAD_FAST                4 (detail)
+            414 FORMAT_VALUE             0
+            416 BUILD_STRING             4
+            418 CALL                     2
+            426 RAISE_VARARGS            1
+
+117     >>  428 LOAD_FAST                0 (status)
+            430 LOAD_CONST              20 ((200, 201))
+            432 CONTAINS_OP              1
+            434 POP_JUMP_IF_FALSE       35 (to 506)
+
+118         436 LOAD_GLOBAL              3 (NULL + make_error)
+            446 LOAD_GLOBAL              4 (E)
+            456 LOAD_ATTR               14 (TTS_NETWORK)
+            476 LOAD_CONST              21 ('Resona HTTP ')
+            478 LOAD_FAST                0 (status)
+            480 FORMAT_VALUE             0
+            482 LOAD_CONST              22 (': ')
+            484 LOAD_FAST                1 (body)
+            486 LOAD_CONST               0 (None)
+            488 LOAD_CONST              17 (200)
+            490 BINARY_SLICE
+            492 FORMAT_VALUE             0
+            494 BUILD_STRING             4
+            496 CALL                     2
+            504 RAISE_VARARGS            1
+
+117     >>  506 RETURN_CONST             0 (None)
+
+Disassembly of <code object _norm_lang at 0x7f6c92d7f730, file "app\adapters\tts\resona_tts.py", line 121>:
+121           0 RESUME                   0
+
+122           2 LOAD_FAST                0 (code)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 LOAD_CONST               1 ('')
+        >>   12 LOAD_ATTR                1 (NULL|self + strip)
+             32 CALL                     0
+             40 LOAD_ATTR                3 (NULL|self + lower)
+             60 CALL                     0
+             68 STORE_FAST               1 (c)
+
+123          70 LOAD_FAST                1 (c)
+             72 POP_JUMP_IF_TRUE         1 (to 76)
+
+124          74 RETURN_CONST             2 ('vi')
+
+125     >>   76 LOAD_FAST                1 (c)
+             78 LOAD_ATTR                5 (NULL|self + split)
+             98 LOAD_CONST               3 ('-')
+            100 CALL                     1
+            108 LOAD_CONST               4 (0)
+            110 BINARY_SUBSCR
+            114 RETURN_VALUE
+
+Disassembly of <code object _map_voice at 0x269ebc20, file "app\adapters\tts\resona_tts.py", line 128>:
+128           0 RESUME                   0
+
+129           2 LOAD_FAST                0 (v)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_CONST               1 ('voice_id')
+             26 CALL                     1
+             34 STORE_FAST               1 (voice_id)
+
+130          36 LOAD_FAST                1 (voice_id)
+             38 POP_JUMP_IF_TRUE         1 (to 42)
+
+131          40 RETURN_CONST             0 (None)
+
+132     >>   42 LOAD_FAST                0 (v)
+             44 LOAD_ATTR                1 (NULL|self + get)
+             64 LOAD_CONST               2 ('name')
+             66 CALL                     1
+             74 COPY                     1
+             76 POP_JUMP_IF_TRUE         2 (to 82)
+             78 POP_TOP
+             80 LOAD_FAST                1 (voice_id)
+        >>   82 STORE_FAST               2 (name)
+
+133          84 LOAD_FAST                0 (v)
+             86 LOAD_ATTR                1 (NULL|self + get)
+            106 LOAD_CONST               3 ('gender')
+            108 CALL                     1
+            116 COPY                     1
+            118 POP_JUMP_IF_TRUE         2 (to 124)
+            120 POP_TOP
+            122 LOAD_CONST               4 ('')
+        >>  124 LOAD_ATTR                3 (NULL|self + strip)
+            144 CALL                     0
+            152 LOAD_ATTR                5 (NULL|self + lower)
+            172 CALL                     0
+            180 STORE_FAST               3 (gender)
+
+134         182 LOAD_FAST                3 (gender)
+            184 LOAD_ATTR                7 (NULL|self + startswith)
+            204 LOAD_CONST               5 ('f')
+            206 CALL                     1
+            214 POP_JUMP_IF_FALSE        2 (to 220)
+            216 LOAD_CONST               6 ('Nữ')
+            218 JUMP_FORWARD            20 (to 260)
+        >>  220 LOAD_FAST                3 (gender)
+            222 LOAD_ATTR                7 (NULL|self + startswith)
+            242 LOAD_CONST               7 ('m')
+            244 CALL                     1
+            252 POP_JUMP_IF_FALSE        2 (to 258)
+            254 LOAD_CONST               8 ('Nam')
+            256 JUMP_FORWARD             1 (to 260)
+        >>  258 LOAD_CONST               4 ('')
+        >>  260 STORE_FAST               4 (gender_vi)
+
+135         262 LOAD_FAST                4 (gender_vi)
+            264 POP_JUMP_IF_FALSE        8 (to 282)
+            266 LOAD_FAST                2 (name)
+            268 FORMAT_VALUE             0
+            270 LOAD_CONST               9 (' (')
+            272 LOAD_FAST                4 (gender_vi)
+            274 FORMAT_VALUE             0
+            276 LOAD_CONST              10 (')')
+            278 BUILD_STRING             4
+            280 JUMP_FORWARD             1 (to 284)
+        >>  282 LOAD_FAST                2 (name)
+        >>  284 STORE_FAST               5 (friendly)
+
+136         286 LOAD_FAST                0 (v)
+            288 LOAD_ATTR                1 (NULL|self + get)
+            308 LOAD_CONST              11 ('category')
+            310 CALL                     1
+            318 LOAD_CONST              12 ('cloned')
+            320 COMPARE_OP              40 (==)
+            324 POP_JUMP_IF_FALSE        5 (to 336)
+
+137         326 LOAD_FAST                5 (friendly)
+            328 LOAD_CONST              13 (' [Cloned]')
+            330 BINARY_OP               13 (+=)
+            334 STORE_FAST               5 (friendly)
+
+140     >>  336 LOAD_FAST                1 (voice_id)
+
+141         338 LOAD_CONST              14 ('vi')
+
+142         340 LOAD_CONST              14 ('vi')
+
+143         342 LOAD_GLOBAL              9 (NULL + LANGUAGE_MAP)
+            352 LOAD_ATTR                0 (get)
+            372 LOAD_CONST              14 ('vi')
+            374 LOAD_CONST              15 ('Tiếng Việt')
+            376 CALL                     2
+
+144         384 LOAD_FAST                5 (friendly)
+
+145         386 LOAD_FAST                3 (gender)
+
+146         388 LOAD_GLOBAL             10 (PROVIDER_ID)
+
+147         398 LOAD_GLOBAL             13 (NULL + bool)
+            408 LOAD_FAST                0 (v)
+            410 LOAD_ATTR                1 (NULL|self + get)
+            430 LOAD_CONST              16 ('is_featured')
+            432 CALL                     1
+            440 CALL                     1
+
+148         448 LOAD_FAST                0 (v)
+            450 LOAD_ATTR                1 (NULL|self + get)
+            470 LOAD_CONST              17 ('preview_url')
+            472 CALL                     1
+            480 COPY                     1
+            482 POP_JUMP_IF_TRUE         2 (to 488)
+            484 POP_TOP
+            486 LOAD_CONST               4 ('')
+
+139     >>  488 LOAD_CONST              18 (('name', 'locale', 'language_code', 'language_name', 'friendly_name', 'gender', 'provider', 'hot', 'demo'))
+            490 BUILD_CONST_KEY_MAP      9
+            492 RETURN_VALUE
+
+Disassembly of <code object _fetch_all_voices at 0x269fb220, file "app\adapters\tts\resona_tts.py", line 152>:
+152           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+154           6 LOAD_GLOBAL              1 (NULL + _auth_headers)
+             16 CALL                     0
+             24 STORE_FAST               0 (headers)
+
+155          26 BUILD_LIST               0
+             28 STORE_FAST               1 (out)
+
+156          30 LOAD_CONST               1 (None)
+             32 STORE_FAST               2 (next_token)
+
+158          34 LOAD_GLOBAL              3 (NULL + _http_client)
+             44 CALL                     0
+             52 BEFORE_ASYNC_WITH
+             54 GET_AWAITABLE            1
+             56 LOAD_CONST               1 (None)
+        >>   58 SEND                     3 (to 68)
+             62 YIELD_VALUE              2
+             64 RESUME                   3
+             66 JUMP_BACKWARD_NO_INTERRUPT     5 (to 58)
+        >>   68 END_SEND
+             70 STORE_FAST               3 (client)
+
+159          72 LOAD_GLOBAL              5 (NULL + range)
+             82 LOAD_CONST               2 (20)
+             84 CALL                     1
+             92 GET_ITER
+        >>   94 FOR_ITER               197 (to 492)
+             98 STORE_FAST               4 (_)
+
+160         100 LOAD_CONST               3 ('page_size')
+            102 LOAD_CONST               4 ('100')
+            104 BUILD_MAP                1
+            106 STORE_FAST               5 (params)
+
+161         108 LOAD_FAST                2 (next_token)
+            110 POP_JUMP_IF_FALSE        5 (to 122)
+
+162         112 LOAD_FAST                2 (next_token)
+            114 LOAD_FAST                5 (params)
+            116 LOAD_CONST               5 ('next_page_token')
+            118 STORE_SUBSCR
+
+163     >>  122 NOP
+
+164         124 LOAD_FAST                3 (client)
+            126 LOAD_ATTR                7 (NULL|self + get)
+            146 LOAD_GLOBAL              8 (BASE_URL)
+            156 FORMAT_VALUE             0
+            158 LOAD_CONST               6 ('/api/v2/voices')
+            160 BUILD_STRING             2
+            162 LOAD_FAST                0 (headers)
+            164 LOAD_FAST                5 (params)
+            166 KW_NAMES                 7 (('headers', 'params'))
+            168 CALL                     3
+            176 GET_AWAITABLE            0
+            178 LOAD_CONST               1 (None)
+        >>  180 SEND                     3 (to 190)
+            184 YIELD_VALUE              4
+            186 RESUME                   3
+            188 JUMP_BACKWARD_NO_INTERRUPT     5 (to 180)
+        >>  190 END_SEND
+            192 STORE_FAST               6 (resp)
+
+168         194 LOAD_GLOBAL             21 (NULL + _raise_for_status)
+            204 LOAD_FAST                6 (resp)
+            206 LOAD_ATTR               22 (status_code)
+            226 LOAD_FAST                6 (resp)
+            228 LOAD_ATTR               24 (text)
+            248 CALL                     2
+            256 POP_TOP
+
+169         258 LOAD_FAST                6 (resp)
+            260 LOAD_ATTR               27 (NULL|self + json)
+            280 CALL                     0
+            288 COPY                     1
+            290 POP_JUMP_IF_TRUE         2 (to 296)
+            292 POP_TOP
+            294 BUILD_MAP                0
+        >>  296 STORE_FAST               8 (data)
+
+170         298 LOAD_FAST                8 (data)
+            300 LOAD_ATTR                7 (NULL|self + get)
+            320 LOAD_CONST               9 ('voices')
+            322 BUILD_LIST               0
+            324 CALL                     2
+            332 COPY                     1
+            334 POP_JUMP_IF_TRUE         2 (to 340)
+            336 POP_TOP
+            338 BUILD_LIST               0
+        >>  340 GET_ITER
+        >>  342 FOR_ITER                33 (to 412)
+            346 STORE_FAST               9 (raw)
+
+171         348 LOAD_GLOBAL             29 (NULL + _map_voice)
+            358 LOAD_FAST                9 (raw)
+            360 CALL                     1
+            368 STORE_FAST              10 (mapped)
+
+172         370 LOAD_FAST               10 (mapped)
+            372 POP_JUMP_IF_TRUE         1 (to 376)
+            374 JUMP_BACKWARD           17 (to 342)
+
+173     >>  376 LOAD_FAST                1 (out)
+            378 LOAD_ATTR               31 (NULL|self + append)
+            398 LOAD_FAST               10 (mapped)
+            400 CALL                     1
+            408 POP_TOP
+            410 JUMP_BACKWARD           35 (to 342)
+
+170     >>  412 END_FOR
+
+175         414 LOAD_FAST                8 (data)
+            416 LOAD_ATTR                7 (NULL|self + get)
+            436 LOAD_CONST               5 ('next_page_token')
+            438 CALL                     1
+            446 STORE_FAST               2 (next_token)
+
+176         448 LOAD_FAST                8 (data)
+            450 LOAD_ATTR                7 (NULL|self + get)
+            470 LOAD_CONST              10 ('has_more')
+            472 CALL                     1
+            480 POP_JUMP_IF_FALSE        3 (to 488)
+            482 LOAD_FAST                2 (next_token)
+            484 POP_JUMP_IF_FALSE        1 (to 488)
+            486 JUMP_BACKWARD          197 (to 94)
+
+177     >>  488 POP_TOP
+            490 JUMP_FORWARD             1 (to 494)
+
+159     >>  492 END_FOR
+
+158     >>  494 LOAD_CONST               1 (None)
+            496 LOAD_CONST               1 (None)
+            498 LOAD_CONST               1 (None)
+            500 CALL                     2
+            508 GET_AWAITABLE            2
+            510 LOAD_CONST               1 (None)
+        >>  512 SEND                     3 (to 522)
+            516 YIELD_VALUE              2
+            518 RESUME                   3
+            520 JUMP_BACKWARD_NO_INTERRUPT     5 (to 512)
+        >>  522 END_SEND
+            524 POP_TOP
+
+178         526 LOAD_FAST                1 (out)
+            528 RETURN_VALUE
+
+158     >>  530 CLEANUP_THROW
+            532 JUMP_BACKWARD          233 (to 68)
+
+164     >>  534 CLEANUP_THROW
+            536 JUMP_BACKWARD          174 (to 190)
+        >>  538 PUSH_EXC_INFO
+
+165         540 LOAD_GLOBAL             10 (httpx)
+            550 LOAD_ATTR               12 (HTTPError)
+            570 CHECK_EXC_MATCH
+            572 POP_JUMP_IF_FALSE       34 (to 642)
+            574 STORE_FAST               7 (e)
+
+166         576 LOAD_GLOBAL             15 (NULL + make_error)
+            586 LOAD_GLOBAL             16 (E)
+            596 LOAD_ATTR               18 (TTS_NETWORK)
+            616 LOAD_CONST               8 ('Không thể tải danh sách giọng Resona: ')
+            618 LOAD_FAST                7 (e)
+            620 FORMAT_VALUE             0
+            622 BUILD_STRING             2
+            624 CALL                     2
+            632 RAISE_VARARGS            1
+        >>  634 LOAD_CONST               1 (None)
+            636 STORE_FAST               7 (e)
+            638 DELETE_FAST              7 (e)
+            640 RERAISE                  1
+
+165     >>  642 RERAISE                  0
+        >>  644 COPY                     3
+            646 POP_EXCEPT
+            648 RERAISE                  1
+
+158     >>  650 CLEANUP_THROW
+            652 JUMP_BACKWARD           66 (to 522)
+        >>  654 PUSH_EXC_INFO
+            656 WITH_EXCEPT_START
+            658 GET_AWAITABLE            2
+            660 LOAD_CONST               1 (None)
+        >>  662 SEND                     4 (to 674)
+            666 YIELD_VALUE              3
+            668 RESUME                   3
+            670 JUMP_BACKWARD_NO_INTERRUPT     5 (to 662)
+        >>  672 CLEANUP_THROW
+        >>  674 END_SEND
+            676 POP_JUMP_IF_TRUE         1 (to 680)
+            678 RERAISE                  2
+        >>  680 POP_TOP
+            682 POP_EXCEPT
+            684 POP_TOP
+            686 POP_TOP
+
+178         688 LOAD_FAST                1 (out)
+            690 RETURN_VALUE
+        >>  692 COPY                     3
+            694 POP_EXCEPT
+            696 RERAISE                  1
+        >>  698 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            700 RERAISE                  1
+ExceptionTable:
+  4 to 60 -> 698 [0] lasti
+  62 to 62 -> 530 [3]
+  64 to 68 -> 698 [0] lasti
+  70 to 120 -> 654 [1] lasti
+  124 to 182 -> 538 [2]
+  184 to 184 -> 534 [4]
+  186 to 192 -> 538 [2]
+  194 to 372 -> 654 [1] lasti
+  376 to 484 -> 654 [1] lasti
+  488 to 492 -> 654 [1] lasti
+  494 to 514 -> 698 [0] lasti
+  516 to 516 -> 650 [2]
+  518 to 530 -> 698 [0] lasti
+  534 to 534 -> 538 [2]
+  538 to 574 -> 644 [3] lasti
+  576 to 632 -> 634 [3] lasti
+  634 to 642 -> 644 [3] lasti
+  644 to 648 -> 654 [1] lasti
+  650 to 650 -> 698 [0] lasti
+  654 to 664 -> 692 [3] lasti
+  666 to 666 -> 672 [6]
+  668 to 680 -> 692 [3] lasti
+  682 to 696 -> 698 [0] lasti
+
+Disassembly of <code object list_voices at 0x26a0a550, file "app\adapters\tts\resona_tts.py", line 181>:
+181           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+183           6 LOAD_GLOBAL              0 (_VOICES_CACHE)
+             16 POP_JUMP_IF_NONE         6 (to 30)
+
+184          18 LOAD_GLOBAL              0 (_VOICES_CACHE)
+             28 RETURN_VALUE
+
+185     >>   30 LOAD_GLOBAL              2 (_VOICES_CACHE_LOCK)
+             40 BEFORE_ASYNC_WITH
+             42 GET_AWAITABLE            1
+             44 LOAD_CONST               0 (None)
+        >>   46 SEND                     3 (to 56)
+             50 YIELD_VALUE              2
+             52 RESUME                   3
+             54 JUMP_BACKWARD_NO_INTERRUPT     5 (to 46)
+        >>   56 END_SEND
+             58 POP_TOP
+
+186          60 LOAD_GLOBAL              0 (_VOICES_CACHE)
+             70 POP_JUMP_IF_NONE        23 (to 118)
+
+187          72 LOAD_GLOBAL              0 (_VOICES_CACHE)
+
+185          82 SWAP                     2
+             84 LOAD_CONST               0 (None)
+             86 LOAD_CONST               0 (None)
+             88 LOAD_CONST               0 (None)
+             90 CALL                     2
+             98 GET_AWAITABLE            2
+            100 LOAD_CONST               0 (None)
+        >>  102 SEND                     3 (to 112)
+            106 YIELD_VALUE              2
+            108 RESUME                   3
+            110 JUMP_BACKWARD_NO_INTERRUPT     5 (to 102)
+        >>  112 END_SEND
+            114 POP_TOP
+            116 RETURN_VALUE
+
+188     >>  118 LOAD_GLOBAL              5 (NULL + _fetch_all_voices)
+            128 CALL                     0
+            136 GET_AWAITABLE            0
+            138 LOAD_CONST               0 (None)
+        >>  140 SEND                     3 (to 150)
+            144 YIELD_VALUE              3
+            146 RESUME                   3
+            148 JUMP_BACKWARD_NO_INTERRUPT     5 (to 140)
+        >>  150 END_SEND
+            152 STORE_FAST               0 (voices)
+
+189         154 LOAD_FAST                0 (voices)
+            156 LOAD_ATTR                7 (NULL|self + sort)
+            176 LOAD_CONST               1 (<code object <lambda> at 0x7f6c92e4ed30, file "app\adapters\tts\resona_tts.py", line 189>)
+            178 MAKE_FUNCTION            0
+            180 KW_NAMES                 2 (('key',))
+            182 CALL                     1
+            190 POP_TOP
+
+190         192 LOAD_FAST                0 (voices)
+            194 STORE_GLOBAL             0 (_VOICES_CACHE)
+
+191         196 LOAD_GLOBAL              9 (NULL + log)
+            206 LOAD_ATTR               10 (info)
+            226 LOAD_CONST               3 ('Loaded ')
+            228 LOAD_GLOBAL             13 (NULL + len)
+            238 LOAD_FAST                0 (voices)
+            240 CALL                     1
+            248 FORMAT_VALUE             0
+            250 LOAD_CONST               4 (' ')
+            252 LOAD_GLOBAL             14 (PROVIDER_ID)
+            262 FORMAT_VALUE             0
+            264 LOAD_CONST               5 (' voices')
+            266 BUILD_STRING             5
+            268 CALL                     1
+            276 POP_TOP
+
+192         278 LOAD_FAST                0 (voices)
+
+185         280 SWAP                     2
+            282 LOAD_CONST               0 (None)
+            284 LOAD_CONST               0 (None)
+            286 LOAD_CONST               0 (None)
+            288 CALL                     2
+            296 GET_AWAITABLE            2
+            298 LOAD_CONST               0 (None)
+        >>  300 SEND                     3 (to 310)
+            304 YIELD_VALUE              2
+            306 RESUME                   3
+            308 JUMP_BACKWARD_NO_INTERRUPT     5 (to 300)
+        >>  310 END_SEND
+            312 POP_TOP
+            314 RETURN_VALUE
+        >>  316 CLEANUP_THROW
+            318 JUMP_BACKWARD          132 (to 56)
+        >>  320 CLEANUP_THROW
+            322 JUMP_BACKWARD          106 (to 112)
+
+188     >>  324 CLEANUP_THROW
+            326 JUMP_BACKWARD           89 (to 150)
+
+185     >>  328 CLEANUP_THROW
+            330 JUMP_BACKWARD           11 (to 310)
+        >>  332 PUSH_EXC_INFO
+            334 WITH_EXCEPT_START
+            336 GET_AWAITABLE            2
+            338 LOAD_CONST               0 (None)
+        >>  340 SEND                     4 (to 352)
+            344 YIELD_VALUE              3
+            346 RESUME                   3
+            348 JUMP_BACKWARD_NO_INTERRUPT     5 (to 340)
+        >>  350 CLEANUP_THROW
+        >>  352 END_SEND
+            354 POP_JUMP_IF_TRUE         1 (to 358)
+            356 RERAISE                  2
+        >>  358 POP_TOP
+            360 POP_EXCEPT
+            362 POP_TOP
+            364 POP_TOP
+            366 RETURN_CONST             0 (None)
+        >>  368 COPY                     3
+            370 POP_EXCEPT
+            372 RERAISE                  1
+        >>  374 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            376 RERAISE                  1
+ExceptionTable:
+  4 to 48 -> 374 [0] lasti
+  50 to 50 -> 316 [3]
+  52 to 56 -> 374 [0] lasti
+  58 to 80 -> 332 [1] lasti
+  82 to 104 -> 374 [0] lasti
+  106 to 106 -> 320 [3]
+  108 to 116 -> 374 [0] lasti
+  118 to 142 -> 332 [1] lasti
+  144 to 144 -> 324 [3]
+  146 to 278 -> 332 [1] lasti
+  280 to 302 -> 374 [0] lasti
+  304 to 304 -> 328 [3]
+  306 to 316 -> 374 [0] lasti
+  320 to 320 -> 374 [0] lasti
+  324 to 324 -> 332 [1] lasti
+  328 to 328 -> 374 [0] lasti
+  332 to 342 -> 368 [3] lasti
+  344 to 344 -> 350 [6]
+  346 to 358 -> 368 [3] lasti
+  360 to 372 -> 374 [0] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c92e4ed30, file "app\adapters\tts\resona_tts.py", line 189>:
+189           0 RESUME                   0
+              2 LOAD_FAST                0 (x)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_CONST               1 ('hot')
+             26 LOAD_CONST               2 (False)
+             28 CALL                     2
+             36 UNARY_NOT
+             38 LOAD_FAST                0 (x)
+             40 LOAD_CONST               3 ('friendly_name')
+             42 BINARY_SUBSCR
+             46 BUILD_TUPLE              2
+             48 RETURN_VALUE
+
+Disassembly of <code object _split_chunks at 0x290673a0, file "app\adapters\tts\resona_tts.py", line 195>:
+195           0 RESUME                   0
+
+197           2 LOAD_FAST                0 (text)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 LOAD_CONST               1 ('')
+        >>   12 LOAD_ATTR                1 (NULL|self + strip)
+             32 CALL                     0
+             40 STORE_FAST               0 (text)
+
+198          42 LOAD_FAST                0 (text)
+             44 POP_JUMP_IF_TRUE         2 (to 50)
+
+199          46 BUILD_LIST               0
+             48 RETURN_VALUE
+
+201     >>   50 LOAD_GLOBAL              3 (NULL + re)
+             60 LOAD_ATTR                4 (split)
+             80 LOAD_CONST               2 ('(?<=[.!?…\\n])\\s+')
+             82 LOAD_FAST                0 (text)
+             84 CALL                     2
+             92 STORE_FAST               2 (parts)
+
+202          94 BUILD_LIST               0
+             96 STORE_FAST               3 (chunks)
+
+203          98 LOAD_CONST               1 ('')
+            100 STORE_FAST               4 (cur)
+
+204         102 LOAD_FAST                2 (parts)
+            104 GET_ITER
+        >>  106 FOR_ITER               198 (to 506)
+            110 STORE_FAST               5 (p)
+
+205         112 LOAD_FAST                5 (p)
+            114 LOAD_ATTR                1 (NULL|self + strip)
+            134 CALL                     0
+            142 STORE_FAST               5 (p)
+
+206         144 LOAD_FAST                5 (p)
+            146 POP_JUMP_IF_TRUE         1 (to 150)
+
+207         148 JUMP_BACKWARD           22 (to 106)
+
+208     >>  150 LOAD_GLOBAL              7 (NULL + len)
+            160 LOAD_FAST                5 (p)
+            162 CALL                     1
+            170 LOAD_FAST                1 (limit)
+            172 COMPARE_OP              68 (>)
+            176 POP_JUMP_IF_FALSE      102 (to 382)
+
+209     >>  178 LOAD_FAST                5 (p)
+            180 LOAD_CONST               3 (None)
+            182 LOAD_FAST                1 (limit)
+            184 BINARY_SLICE
+            186 STORE_FAST               6 (head)
+
+210         188 LOAD_FAST                6 (head)
+            190 LOAD_ATTR                9 (NULL|self + rfind)
+            210 LOAD_CONST               4 (' ')
+            212 CALL                     1
+            220 STORE_FAST               7 (sp)
+
+211         222 LOAD_FAST                7 (sp)
+            224 LOAD_FAST                1 (limit)
+            226 LOAD_CONST               5 (0.6)
+            228 BINARY_OP                5 (*)
+            232 COMPARE_OP              68 (>)
+            236 POP_JUMP_IF_FALSE        2 (to 242)
+            238 LOAD_FAST                7 (sp)
+            240 JUMP_FORWARD             1 (to 244)
+        >>  242 LOAD_FAST                1 (limit)
+        >>  244 STORE_FAST               8 (cut)
+
+212         246 LOAD_FAST                3 (chunks)
+            248 LOAD_ATTR               11 (NULL|self + append)
+            268 LOAD_FAST                5 (p)
+            270 LOAD_CONST               3 (None)
+            272 LOAD_FAST                8 (cut)
+            274 BINARY_SLICE
+            276 LOAD_ATTR                1 (NULL|self + strip)
+            296 CALL                     0
+            304 CALL                     1
+            312 POP_TOP
+
+213         314 LOAD_FAST                5 (p)
+            316 LOAD_FAST                8 (cut)
+            318 LOAD_CONST               3 (None)
+            320 BINARY_SLICE
+            322 LOAD_ATTR                1 (NULL|self + strip)
+            342 CALL                     0
+            350 STORE_FAST               5 (p)
+
+208         352 LOAD_GLOBAL              7 (NULL + len)
+            362 LOAD_FAST                5 (p)
+            364 CALL                     1
+            372 LOAD_FAST                1 (limit)
+            374 COMPARE_OP              68 (>)
+            378 POP_JUMP_IF_FALSE        1 (to 382)
+            380 JUMP_BACKWARD          102 (to 178)
+
+214     >>  382 LOAD_FAST                4 (cur)
+            384 POP_JUMP_IF_TRUE         3 (to 392)
+
+215         386 LOAD_FAST                5 (p)
+            388 STORE_FAST               4 (cur)
+            390 JUMP_BACKWARD          143 (to 106)
+
+216     >>  392 LOAD_GLOBAL              7 (NULL + len)
+            402 LOAD_FAST                4 (cur)
+            404 CALL                     1
+            412 LOAD_CONST               6 (1)
+            414 BINARY_OP                0 (+)
+            418 LOAD_GLOBAL              7 (NULL + len)
+            428 LOAD_FAST                5 (p)
+            430 CALL                     1
+            438 BINARY_OP                0 (+)
+            442 LOAD_FAST                1 (limit)
+            444 COMPARE_OP              26 (<=)
+            448 POP_JUMP_IF_FALSE        8 (to 466)
+
+217         450 LOAD_FAST                4 (cur)
+            452 FORMAT_VALUE             0
+            454 LOAD_CONST               4 (' ')
+            456 LOAD_FAST                5 (p)
+            458 FORMAT_VALUE             0
+            460 BUILD_STRING             3
+            462 STORE_FAST               4 (cur)
+            464 JUMP_BACKWARD          180 (to 106)
+
+219     >>  466 LOAD_FAST                3 (chunks)
+            468 LOAD_ATTR               11 (NULL|self + append)
+            488 LOAD_FAST                4 (cur)
+            490 CALL                     1
+            498 POP_TOP
+
+220         500 LOAD_FAST                5 (p)
+            502 STORE_FAST               4 (cur)
+            504 JUMP_BACKWARD          200 (to 106)
+
+204     >>  506 END_FOR
+
+221         508 LOAD_FAST                4 (cur)
+            510 POP_JUMP_IF_FALSE       17 (to 546)
+
+222         512 LOAD_FAST                3 (chunks)
+            514 LOAD_ATTR               11 (NULL|self + append)
+            534 LOAD_FAST                4 (cur)
+            536 CALL                     1
+            544 POP_TOP
+
+225     >>  546 BUILD_LIST               0
+            548 STORE_FAST               9 (final_chunks)
+
+226         550 LOAD_CONST               7 (60)
+            552 STORE_FAST              10 (min_len)
+
+227         554 LOAD_FAST                3 (chunks)
+            556 GET_ITER
+        >>  558 FOR_ITER                82 (to 726)
+            562 STORE_FAST              11 (c)
+
+228         564 LOAD_FAST               11 (c)
+            566 LOAD_ATTR                1 (NULL|self + strip)
+            586 CALL                     0
+            594 STORE_FAST              11 (c)
+
+229         596 LOAD_GLOBAL              7 (NULL + len)
+            606 LOAD_FAST               11 (c)
+            608 CALL                     1
+            616 LOAD_FAST               10 (min_len)
+            618 COMPARE_OP               2 (<)
+            622 POP_JUMP_IF_FALSE       33 (to 690)
+
+230         624 LOAD_FAST               10 (min_len)
+            626 LOAD_GLOBAL              7 (NULL + len)
+            636 LOAD_FAST               11 (c)
+            638 CALL                     1
+            646 BINARY_OP               10 (-)
+            650 STORE_FAST              12 (needed)
+
+231         652 LOAD_FAST               11 (c)
+            654 LOAD_CONST               8 ('...')
+            656 LOAD_FAST               12 (needed)
+            658 LOAD_CONST               9 (3)
+            660 BINARY_OP                2 (//)
+            664 LOAD_CONST               9 (3)
+            666 BINARY_OP                0 (+)
+            670 BINARY_OP                5 (*)
+            674 BINARY_OP                0 (+)
+            678 STORE_FAST              11 (c)
+
+232         680 LOAD_FAST               11 (c)
+            682 LOAD_CONST               3 (None)
+            684 LOAD_FAST               10 (min_len)
+            686 BINARY_SLICE
+            688 STORE_FAST              11 (c)
+
+233     >>  690 LOAD_FAST                9 (final_chunks)
+            692 LOAD_ATTR               11 (NULL|self + append)
+            712 LOAD_FAST               11 (c)
+            714 CALL                     1
+            722 POP_TOP
+            724 JUMP_BACKWARD           84 (to 558)
+
+227     >>  726 END_FOR
+
+235         728 LOAD_FAST                9 (final_chunks)
+            730 RETURN_VALUE
+
+Disassembly of <code object _synthesize_chunk at 0x269df610, file "app\adapters\tts\resona_tts.py", line 238>:
+238           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+239           6 BUILD_MAP                0
+              8 LOAD_GLOBAL              1 (NULL + _auth_headers)
+             18 CALL                     0
+             26 DICT_UPDATE              1
+             28 LOAD_CONST               1 ('Content-Type')
+             30 LOAD_CONST               2 ('application/json')
+             32 BUILD_MAP                1
+             34 DICT_UPDATE              1
+             36 STORE_FAST               4 (headers)
+
+241          38 LOAD_FAST                1 (text)
+
+242          40 LOAD_FAST                2 (voice_id)
+
+243          42 LOAD_FAST                3 (language)
+
+240          44 LOAD_CONST               3 (('text', 'voice_id', 'language'))
+             46 BUILD_CONST_KEY_MAP      3
+             48 STORE_FAST               5 (body)
+
+246          50 NOP
+
+247          52 LOAD_FAST                0 (client)
+             54 LOAD_ATTR                3 (NULL|self + post)
+             74 LOAD_GLOBAL              4 (BASE_URL)
+             84 FORMAT_VALUE             0
+             86 LOAD_CONST               4 ('/api/v2/text-to-speech')
+             88 BUILD_STRING             2
+             90 LOAD_FAST                4 (headers)
+             92 LOAD_FAST                5 (body)
+             94 KW_NAMES                 5 (('headers', 'json'))
+             96 CALL                     3
+            104 GET_AWAITABLE            0
+            106 LOAD_CONST               0 (None)
+        >>  108 SEND                     3 (to 118)
+            112 YIELD_VALUE              3
+            114 RESUME                   3
+            116 JUMP_BACKWARD_NO_INTERRUPT     5 (to 108)
+        >>  118 END_SEND
+            120 STORE_FAST               6 (resp)
+
+251         122 LOAD_GLOBAL             17 (NULL + _raise_for_status)
+            132 LOAD_FAST                6 (resp)
+            134 LOAD_ATTR               18 (status_code)
+            154 LOAD_FAST                6 (resp)
+            156 LOAD_ATTR               20 (text)
+            176 CALL                     2
+            184 POP_TOP
+
+252         186 LOAD_FAST                6 (resp)
+            188 LOAD_ATTR               23 (NULL|self + json)
+            208 CALL                     0
+            216 COPY                     1
+            218 POP_JUMP_IF_TRUE         2 (to 224)
+            220 POP_TOP
+            222 BUILD_MAP                0
+        >>  224 STORE_FAST               8 (data)
+
+253         226 LOAD_FAST                8 (data)
+            228 LOAD_ATTR               25 (NULL|self + get)
+            248 LOAD_CONST               7 ('request_id')
+            250 CALL                     1
+            258 STORE_FAST               9 (req_id)
+
+254         260 LOAD_FAST                9 (req_id)
+            262 POP_JUMP_IF_TRUE        42 (to 348)
+
+255         264 LOAD_GLOBAL             11 (NULL + make_error)
+            274 LOAD_GLOBAL             12 (E)
+            284 LOAD_ATTR               26 (TTS_VOICE_INVALID)
+            304 LOAD_CONST               8 ('Resona không trả về request_id: ')
+            306 LOAD_FAST                6 (resp)
+            308 LOAD_ATTR               20 (text)
+            328 LOAD_CONST               0 (None)
+            330 LOAD_CONST               9 (200)
+            332 BINARY_SLICE
+            334 FORMAT_VALUE             0
+            336 BUILD_STRING             2
+            338 CALL                     2
+            346 RAISE_VARARGS            1
+
+258     >>  348 LOAD_GLOBAL             29 (NULL + range)
+            358 LOAD_GLOBAL             30 (POLL_MAX_ATTEMPTS)
+            368 CALL                     1
+            376 GET_ITER
+        >>  378 EXTENDED_ARG             1
+            380 FOR_ITER               329 (to 1042)
+            384 STORE_FAST              10 (_)
+
+259         386 LOAD_GLOBAL             33 (NULL + asyncio)
+            396 LOAD_ATTR               34 (sleep)
+            416 LOAD_GLOBAL             36 (POLL_INTERVAL)
+            426 CALL                     1
+            434 GET_AWAITABLE            0
+            436 LOAD_CONST               0 (None)
+        >>  438 SEND                     3 (to 448)
+            442 YIELD_VALUE              2
+            444 RESUME                   3
+            446 JUMP_BACKWARD_NO_INTERRUPT     5 (to 438)
+        >>  448 END_SEND
+            450 POP_TOP
+
+260         452 NOP
+
+261         454 LOAD_FAST                0 (client)
+            456 LOAD_ATTR               25 (NULL|self + get)
+            476 LOAD_GLOBAL              4 (BASE_URL)
+            486 FORMAT_VALUE             0
+            488 LOAD_CONST              10 ('/api/v2/text-to-speech/')
+            490 LOAD_FAST                9 (req_id)
+            492 FORMAT_VALUE             0
+            494 BUILD_STRING             3
+            496 LOAD_FAST                4 (headers)
+            498 KW_NAMES                11 (('headers',))
+            500 CALL                     2
+            508 GET_AWAITABLE            0
+            510 LOAD_CONST               0 (None)
+        >>  512 SEND                     3 (to 522)
+            516 YIELD_VALUE              3
+            518 RESUME                   3
+            520 JUMP_BACKWARD_NO_INTERRUPT     5 (to 512)
+        >>  522 END_SEND
+            524 STORE_FAST              11 (poll_resp)
+
+265         526 LOAD_GLOBAL             17 (NULL + _raise_for_status)
+            536 LOAD_FAST               11 (poll_resp)
+            538 LOAD_ATTR               18 (status_code)
+            558 LOAD_FAST               11 (poll_resp)
+            560 LOAD_ATTR               20 (text)
+            580 CALL                     2
+            588 POP_TOP
+
+266         590 LOAD_FAST               11 (poll_resp)
+            592 LOAD_ATTR               23 (NULL|self + json)
+            612 CALL                     0
+            620 COPY                     1
+            622 POP_JUMP_IF_TRUE         2 (to 628)
+            624 POP_TOP
+            626 BUILD_MAP                0
+        >>  628 STORE_FAST              12 (poll_data)
+
+267         630 LOAD_FAST               12 (poll_data)
+            632 LOAD_ATTR               25 (NULL|self + get)
+            652 LOAD_CONST              13 ('status')
+            654 CALL                     1
+            662 STORE_FAST              13 (status)
+
+269         664 LOAD_FAST               13 (status)
+            666 LOAD_CONST              14 ('completed')
+            668 COMPARE_OP              40 (==)
+            672 POP_JUMP_IF_FALSE      108 (to 890)
+
+270         674 LOAD_FAST               12 (poll_data)
+            676 LOAD_ATTR               25 (NULL|self + get)
+            696 LOAD_CONST              15 ('audio_urls')
+            698 CALL                     1
+            706 COPY                     1
+            708 POP_JUMP_IF_TRUE         2 (to 714)
+            710 POP_TOP
+            712 BUILD_LIST               0
+        >>  714 STORE_FAST              14 (audio_urls)
+
+271         716 LOAD_FAST               14 (audio_urls)
+            718 POP_JUMP_IF_TRUE        26 (to 772)
+
+272         720 LOAD_GLOBAL             11 (NULL + make_error)
+            730 LOAD_GLOBAL             12 (E)
+            740 LOAD_ATTR               14 (TTS_NETWORK)
+            760 LOAD_CONST              16 ('Resona hoàn thành nhưng không có URL audio.')
+            762 CALL                     2
+            770 RAISE_VARARGS            1
+
+275     >>  772 NOP
+
+276         774 LOAD_FAST                0 (client)
+            776 LOAD_ATTR               25 (NULL|self + get)
+            796 LOAD_FAST               14 (audio_urls)
+            798 LOAD_CONST              17 (0)
+            800 BINARY_SUBSCR
+            804 CALL                     1
+            812 GET_AWAITABLE            0
+            814 LOAD_CONST               0 (None)
+        >>  816 SEND                     3 (to 826)
+            820 YIELD_VALUE              3
+            822 RESUME                   3
+            824 JUMP_BACKWARD_NO_INTERRUPT     5 (to 816)
+        >>  826 END_SEND
+            828 STORE_FAST              15 (audio_resp)
+
+277         830 LOAD_FAST               15 (audio_resp)
+            832 LOAD_ATTR               39 (NULL|self + raise_for_status)
+            852 CALL                     0
+            860 POP_TOP
+
+278         862 LOAD_FAST               15 (audio_resp)
+            864 LOAD_ATTR               40 (content)
+            884 SWAP                     2
+            886 POP_TOP
+            888 RETURN_VALUE
+
+282     >>  890 LOAD_FAST               13 (status)
+            892 LOAD_CONST              19 ('failed')
+            894 COMPARE_OP              40 (==)
+            898 POP_JUMP_IF_TRUE         2 (to 904)
+            900 EXTENDED_ARG             1
+            902 JUMP_BACKWARD          263 (to 378)
+
+283     >>  904 LOAD_FAST               12 (poll_data)
+            906 LOAD_ATTR               25 (NULL|self + get)
+            926 LOAD_CONST              20 ('detail')
+            928 CALL                     1
+            936 COPY                     1
+            938 POP_JUMP_IF_TRUE        21 (to 982)
+            940 POP_TOP
+            942 LOAD_FAST               12 (poll_data)
+            944 LOAD_ATTR               25 (NULL|self + get)
+            964 LOAD_CONST              21 ('error')
+            966 CALL                     1
+            974 COPY                     1
+            976 POP_JUMP_IF_TRUE         2 (to 982)
+            978 POP_TOP
+            980 LOAD_CONST              22 ('Không rõ nguyên nhân')
+        >>  982 STORE_FAST              16 (detail)
+
+284         984 LOAD_GLOBAL             11 (NULL + make_error)
+            994 LOAD_GLOBAL             12 (E)
+           1004 LOAD_ATTR               26 (TTS_VOICE_INVALID)
+           1024 LOAD_CONST              23 ('Resona tổng hợp giọng nói thất bại: ')
+           1026 LOAD_FAST               16 (detail)
+           1028 FORMAT_VALUE             0
+           1030 BUILD_STRING             2
+           1032 CALL                     2
+           1040 RAISE_VARARGS            1
+
+258     >> 1042 END_FOR
+
+286        1044 LOAD_GLOBAL             11 (NULL + make_error)
+           1054 LOAD_GLOBAL             12 (E)
+           1064 LOAD_ATTR               14 (TTS_NETWORK)
+           1084 LOAD_CONST              24 ('Resona tổng hợp quá thời gian chờ (timeout request_id: ')
+           1086 LOAD_FAST                9 (req_id)
+           1088 FORMAT_VALUE             0
+           1090 LOAD_CONST              25 (').')
+           1092 BUILD_STRING             3
+           1094 CALL                     2
+           1102 RAISE_VARARGS            1
+
+247     >> 1104 CLEANUP_THROW
+           1106 EXTENDED_ARG             1
+           1108 JUMP_BACKWARD          496 (to 118)
+        >> 1110 PUSH_EXC_INFO
+
+248        1112 LOAD_GLOBAL              6 (httpx)
+           1122 LOAD_ATTR                8 (HTTPError)
+           1142 CHECK_EXC_MATCH
+           1144 POP_JUMP_IF_FALSE       34 (to 1214)
+           1146 STORE_FAST               7 (e)
+
+249        1148 LOAD_GLOBAL             11 (NULL + make_error)
+           1158 LOAD_GLOBAL             12 (E)
+           1168 LOAD_ATTR               14 (TTS_NETWORK)
+           1188 LOAD_CONST               6 ('Resona lỗi mạng khi gửi yêu cầu: ')
+           1190 LOAD_FAST                7 (e)
+           1192 FORMAT_VALUE             0
+           1194 BUILD_STRING             2
+           1196 CALL                     2
+           1204 RAISE_VARARGS            1
+        >> 1206 LOAD_CONST               0 (None)
+           1208 STORE_FAST               7 (e)
+           1210 DELETE_FAST              7 (e)
+           1212 RERAISE                  1
+
+248     >> 1214 RERAISE                  0
+        >> 1216 COPY                     3
+           1218 POP_EXCEPT
+           1220 RERAISE                  1
+
+259     >> 1222 CLEANUP_THROW
+           1224 EXTENDED_ARG             1
+           1226 JUMP_BACKWARD          390 (to 448)
+
+261     >> 1228 CLEANUP_THROW
+           1230 EXTENDED_ARG             1
+           1232 JUMP_BACKWARD          356 (to 522)
+        >> 1234 PUSH_EXC_INFO
+
+262        1236 LOAD_GLOBAL              6 (httpx)
+           1246 LOAD_ATTR                8 (HTTPError)
+           1266 CHECK_EXC_MATCH
+           1268 POP_JUMP_IF_FALSE       34 (to 1338)
+           1270 STORE_FAST               7 (e)
+
+263        1272 LOAD_GLOBAL             11 (NULL + make_error)
+           1282 LOAD_GLOBAL             12 (E)
+           1292 LOAD_ATTR               14 (TTS_NETWORK)
+           1312 LOAD_CONST              12 ('Resona lỗi mạng khi kiểm tra kết quả: ')
+           1314 LOAD_FAST                7 (e)
+           1316 FORMAT_VALUE             0
+           1318 BUILD_STRING             2
+           1320 CALL                     2
+           1328 RAISE_VARARGS            1
+        >> 1330 LOAD_CONST               0 (None)
+           1332 STORE_FAST               7 (e)
+           1334 DELETE_FAST              7 (e)
+           1336 RERAISE                  1
+
+262     >> 1338 RERAISE                  0
+        >> 1340 COPY                     3
+           1342 POP_EXCEPT
+           1344 RERAISE                  1
+
+276     >> 1346 CLEANUP_THROW
+           1348 EXTENDED_ARG             1
+           1350 JUMP_BACKWARD          263 (to 826)
+        >> 1352 PUSH_EXC_INFO
+
+279        1354 LOAD_GLOBAL              6 (httpx)
+           1364 LOAD_ATTR                8 (HTTPError)
+           1384 CHECK_EXC_MATCH
+           1386 POP_JUMP_IF_FALSE       34 (to 1456)
+           1388 STORE_FAST               7 (e)
+
+280        1390 LOAD_GLOBAL             11 (NULL + make_error)
+           1400 LOAD_GLOBAL             12 (E)
+           1410 LOAD_ATTR               14 (TTS_NETWORK)
+           1430 LOAD_CONST              18 ('Không thể tải file âm thanh từ Resona: ')
+           1432 LOAD_FAST                7 (e)
+           1434 FORMAT_VALUE             0
+           1436 BUILD_STRING             2
+           1438 CALL                     2
+           1446 RAISE_VARARGS            1
+        >> 1448 LOAD_CONST               0 (None)
+           1450 STORE_FAST               7 (e)
+           1452 DELETE_FAST              7 (e)
+           1454 RERAISE                  1
+
+279     >> 1456 RERAISE                  0
+        >> 1458 COPY                     3
+           1460 POP_EXCEPT
+           1462 RERAISE                  1
+        >> 1464 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1466 RERAISE                  1
+ExceptionTable:
+  4 to 48 -> 1464 [0] lasti
+  52 to 110 -> 1110 [0]
+  112 to 112 -> 1104 [2]
+  114 to 120 -> 1110 [0]
+  122 to 440 -> 1464 [0] lasti
+  442 to 442 -> 1222 [3]
+  444 to 450 -> 1464 [0] lasti
+  454 to 514 -> 1234 [1]
+  516 to 516 -> 1228 [3]
+  518 to 524 -> 1234 [1]
+  526 to 770 -> 1464 [0] lasti
+  774 to 818 -> 1352 [1]
+  820 to 820 -> 1346 [3]
+  822 to 882 -> 1352 [1]
+  884 to 898 -> 1464 [0] lasti
+  904 to 1102 -> 1464 [0] lasti
+  1104 to 1104 -> 1110 [0]
+  1110 to 1146 -> 1216 [1] lasti
+  1148 to 1204 -> 1206 [1] lasti
+  1206 to 1214 -> 1216 [1] lasti
+  1216 to 1222 -> 1464 [0] lasti
+  1228 to 1228 -> 1234 [1]
+  1234 to 1270 -> 1340 [2] lasti
+  1272 to 1328 -> 1330 [2] lasti
+  1330 to 1338 -> 1340 [2] lasti
+  1340 to 1344 -> 1464 [0] lasti
+  1346 to 1346 -> 1352 [1]
+  1352 to 1388 -> 1458 [2] lasti
+  1390 to 1446 -> 1448 [2] lasti
+  1448 to 1456 -> 1458 [2] lasti
+  1458 to 1462 -> 1464 [0] lasti
+
+Disassembly of <code object _synthesize_bytes at 0x269e9360, file "app\adapters\tts\resona_tts.py", line 289>:
+289           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+290           6 LOAD_GLOBAL              1 (NULL + _split_chunks)
+             16 LOAD_FAST                0 (text)
+             18 CALL                     1
+             26 STORE_FAST               2 (chunks)
+
+291          28 LOAD_FAST                2 (chunks)
+             30 POP_JUMP_IF_TRUE        26 (to 84)
+
+292          32 LOAD_GLOBAL              3 (NULL + make_error)
+             42 LOAD_GLOBAL              4 (E)
+             52 LOAD_ATTR                6 (TTS_VOICE_INVALID)
+             72 LOAD_CONST               1 ('Resona: Văn bản rỗng.')
+             74 CALL                     2
+             82 RAISE_VARARGS            1
+
+295     >>   84 NOP
+
+296          86 LOAD_GLOBAL              9 (NULL + list_voices)
+             96 CALL                     0
+            104 GET_AWAITABLE            0
+            106 LOAD_CONST               0 (None)
+        >>  108 SEND                     3 (to 118)
+            112 YIELD_VALUE              3
+            114 RESUME                   3
+            116 JUMP_BACKWARD_NO_INTERRUPT     5 (to 108)
+        >>  118 END_SEND
+            120 STORE_FAST               3 (voices)
+
+297         122 LOAD_FAST                3 (voices)
+            124 POP_JUMP_IF_FALSE       60 (to 246)
+
+298         126 LOAD_FAST                3 (voices)
+            128 GET_ITER
+            130 LOAD_FAST_AND_CLEAR      4 (v)
+            132 SWAP                     2
+            134 BUILD_SET                0
+            136 SWAP                     2
+        >>  138 FOR_ITER                 7 (to 156)
+            142 STORE_FAST               4 (v)
+            144 LOAD_FAST                4 (v)
+            146 LOAD_CONST               2 ('name')
+            148 BINARY_SUBSCR
+            152 SET_ADD                  2
+            154 JUMP_BACKWARD            9 (to 138)
+        >>  156 END_FOR
+            158 STORE_FAST               5 (valid_ids)
+            160 STORE_FAST               4 (v)
+
+299         162 LOAD_FAST                1 (voice)
+            164 LOAD_FAST                5 (valid_ids)
+            166 CONTAINS_OP              1
+            168 POP_JUMP_IF_FALSE       38 (to 246)
+
+300         170 LOAD_FAST                3 (voices)
+            172 LOAD_CONST               3 (0)
+            174 BINARY_SUBSCR
+            178 LOAD_CONST               2 ('name')
+            180 BINARY_SUBSCR
+            184 STORE_FAST               6 (fallback_voice)
+
+301         186 LOAD_GLOBAL             11 (NULL + log)
+            196 LOAD_ATTR               12 (info)
+            216 LOAD_CONST               4 ("[resona_tts] Voice ID '")
+            218 LOAD_FAST                1 (voice)
+            220 FORMAT_VALUE             0
+            222 LOAD_CONST               5 ("' không hợp lệ trên Resona, tự động chuyển về '")
+            224 LOAD_FAST                6 (fallback_voice)
+            226 FORMAT_VALUE             0
+            228 LOAD_CONST               6 ("'.")
+            230 BUILD_STRING             5
+            232 CALL                     1
+            240 POP_TOP
+
+302         242 LOAD_FAST                6 (fallback_voice)
+            244 STORE_FAST               1 (voice)
+
+306     >>  246 LOAD_GLOBAL             19 (NULL + _http_client)
+            256 CALL                     0
+            264 BEFORE_ASYNC_WITH
+            266 GET_AWAITABLE            1
+            268 LOAD_CONST               0 (None)
+        >>  270 SEND                     3 (to 280)
+            274 YIELD_VALUE              2
+            276 RESUME                   3
+            278 JUMP_BACKWARD_NO_INTERRUPT     5 (to 270)
+        >>  280 END_SEND
+            282 STORE_FAST               8 (client)
+
+307         284 LOAD_GLOBAL             21 (NULL + len)
+            294 LOAD_FAST                2 (chunks)
+            296 CALL                     1
+            304 LOAD_CONST               8 (1)
+            306 COMPARE_OP              40 (==)
+            310 POP_JUMP_IF_FALSE       41 (to 394)
+
+308         312 LOAD_GLOBAL             23 (NULL + _synthesize_chunk)
+            322 LOAD_FAST                8 (client)
+            324 LOAD_FAST                2 (chunks)
+            326 LOAD_CONST               3 (0)
+            328 BINARY_SUBSCR
+            332 LOAD_FAST                1 (voice)
+            334 CALL                     3
+            342 GET_AWAITABLE            0
+            344 LOAD_CONST               0 (None)
+        >>  346 SEND                     3 (to 356)
+            350 YIELD_VALUE              3
+            352 RESUME                   3
+            354 JUMP_BACKWARD_NO_INTERRUPT     5 (to 346)
+        >>  356 END_SEND
+
+306         358 SWAP                     2
+            360 LOAD_CONST               0 (None)
+            362 LOAD_CONST               0 (None)
+            364 LOAD_CONST               0 (None)
+            366 CALL                     2
+            374 GET_AWAITABLE            2
+            376 LOAD_CONST               0 (None)
+        >>  378 SEND                     3 (to 388)
+            382 YIELD_VALUE              2
+            384 RESUME                   3
+            386 JUMP_BACKWARD_NO_INTERRUPT     5 (to 378)
+        >>  388 END_SEND
+            390 POP_TOP
+            392 RETURN_VALUE
+
+309     >>  394 LOAD_FAST                2 (chunks)
+            396 GET_ITER
+            398 LOAD_FAST_AND_CLEAR      9 (c)
+            400 SWAP                     2
+            402 BUILD_LIST               0
+            404 SWAP                     2
+        >>  406 FOR_ITER                23 (to 456)
+            410 STORE_FAST               9 (c)
+            412 LOAD_GLOBAL             23 (NULL + _synthesize_chunk)
+            422 LOAD_FAST                8 (client)
+            424 LOAD_FAST                9 (c)
+            426 LOAD_FAST                1 (voice)
+            428 CALL                     3
+            436 GET_AWAITABLE            0
+            438 LOAD_CONST               0 (None)
+        >>  440 SEND                     3 (to 450)
+            444 YIELD_VALUE              4
+            446 RESUME                   3
+            448 JUMP_BACKWARD_NO_INTERRUPT     5 (to 440)
+        >>  450 END_SEND
+            452 LIST_APPEND              2
+            454 JUMP_BACKWARD           25 (to 406)
+        >>  456 END_FOR
+            458 STORE_FAST              10 (parts)
+            460 STORE_FAST               9 (c)
+
+306         462 LOAD_CONST               0 (None)
+            464 LOAD_CONST               0 (None)
+            466 LOAD_CONST               0 (None)
+            468 CALL                     2
+            476 GET_AWAITABLE            2
+            478 LOAD_CONST               0 (None)
+        >>  480 SEND                     3 (to 490)
+            484 YIELD_VALUE              2
+            486 RESUME                   3
+            488 JUMP_BACKWARD_NO_INTERRUPT     5 (to 480)
+        >>  490 END_SEND
+            492 POP_TOP
+
+311     >>  494 LOAD_CONST               9 (b'')
+            496 LOAD_ATTR               25 (NULL|self + join)
+            516 LOAD_FAST_CHECK         10 (parts)
+            518 CALL                     1
+            526 RETURN_VALUE
+
+296     >>  528 CLEANUP_THROW
+            530 JUMP_BACKWARD          207 (to 118)
+        >>  532 SWAP                     2
+            534 POP_TOP
+
+298         536 SWAP                     2
+            538 STORE_FAST               4 (v)
+            540 RERAISE                  0
+        >>  542 PUSH_EXC_INFO
+
+303         544 LOAD_GLOBAL             14 (Exception)
+            554 CHECK_EXC_MATCH
+            556 POP_JUMP_IF_FALSE       34 (to 626)
+            558 STORE_FAST               7 (e)
+
+304         560 LOAD_GLOBAL             11 (NULL + log)
+            570 LOAD_ATTR               16 (warning)
+            590 LOAD_CONST               7 ('[resona_tts] Không thể kiểm tra danh sách giọng: ')
+            592 LOAD_FAST                7 (e)
+            594 FORMAT_VALUE             0
+            596 BUILD_STRING             2
+            598 CALL                     1
+            606 POP_TOP
+            608 POP_EXCEPT
+            610 LOAD_CONST               0 (None)
+            612 STORE_FAST               7 (e)
+            614 DELETE_FAST              7 (e)
+            616 JUMP_BACKWARD          186 (to 246)
+        >>  618 LOAD_CONST               0 (None)
+            620 STORE_FAST               7 (e)
+            622 DELETE_FAST              7 (e)
+            624 RERAISE                  1
+
+303     >>  626 RERAISE                  0
+        >>  628 COPY                     3
+            630 POP_EXCEPT
+            632 RERAISE                  1
+
+306     >>  634 CLEANUP_THROW
+            636 JUMP_BACKWARD          179 (to 280)
+
+308     >>  638 CLEANUP_THROW
+            640 JUMP_BACKWARD          143 (to 356)
+
+306     >>  642 CLEANUP_THROW
+            644 JUMP_BACKWARD          129 (to 388)
+
+309     >>  646 CLEANUP_THROW
+            648 JUMP_BACKWARD          100 (to 450)
+        >>  650 SWAP                     2
+            652 POP_TOP
+            654 SWAP                     2
+            656 STORE_FAST               9 (c)
+            658 RERAISE                  0
+
+306     >>  660 CLEANUP_THROW
+            662 JUMP_BACKWARD           87 (to 490)
+        >>  664 PUSH_EXC_INFO
+            666 WITH_EXCEPT_START
+            668 GET_AWAITABLE            2
+            670 LOAD_CONST               0 (None)
+        >>  672 SEND                     4 (to 684)
+            676 YIELD_VALUE              3
+            678 RESUME                   3
+            680 JUMP_BACKWARD_NO_INTERRUPT     5 (to 672)
+        >>  682 CLEANUP_THROW
+        >>  684 END_SEND
+            686 POP_JUMP_IF_TRUE         1 (to 690)
+            688 RERAISE                  2
+        >>  690 POP_TOP
+            692 POP_EXCEPT
+            694 POP_TOP
+            696 POP_TOP
+            698 JUMP_BACKWARD          103 (to 494)
+        >>  700 COPY                     3
+            702 POP_EXCEPT
+            704 RERAISE                  1
+        >>  706 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            708 RERAISE                  1
+ExceptionTable:
+  4 to 82 -> 706 [0] lasti
+  86 to 110 -> 542 [0]
+  112 to 112 -> 528 [2]
+  114 to 132 -> 542 [0]
+  134 to 156 -> 532 [2]
+  158 to 244 -> 542 [0]
+  246 to 272 -> 706 [0] lasti
+  274 to 274 -> 634 [3]
+  276 to 280 -> 706 [0] lasti
+  282 to 348 -> 664 [1] lasti
+  350 to 350 -> 638 [3]
+  352 to 356 -> 664 [1] lasti
+  358 to 380 -> 706 [0] lasti
+  382 to 382 -> 642 [3]
+  384 to 392 -> 706 [0] lasti
+  394 to 400 -> 664 [1] lasti
+  402 to 442 -> 650 [3]
+  444 to 444 -> 646 [6]
+  446 to 456 -> 650 [3]
+  458 to 460 -> 664 [1] lasti
+  462 to 482 -> 706 [0] lasti
+  484 to 484 -> 660 [2]
+  486 to 526 -> 706 [0] lasti
+  528 to 528 -> 542 [0]
+  532 to 540 -> 542 [0]
+  542 to 558 -> 628 [1] lasti
+  560 to 606 -> 618 [1] lasti
+  608 to 616 -> 706 [0] lasti
+  618 to 626 -> 628 [1] lasti
+  628 to 634 -> 706 [0] lasti
+  638 to 638 -> 664 [1] lasti
+  642 to 642 -> 706 [0] lasti
+  646 to 646 -> 650 [3]
+  650 to 658 -> 664 [1] lasti
+  660 to 660 -> 706 [0] lasti
+  664 to 674 -> 700 [3] lasti
+  676 to 676 -> 682 [6]
+  678 to 690 -> 700 [3] lasti
+  692 to 704 -> 706 [0] lasti
+
+Disassembly of <code object preview_voice at 0x29067020, file "app\adapters\tts\resona_tts.py", line 314>:
+              0 MAKE_CELL                0 (voice)
+
+314           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+316           8 LOAD_GLOBAL              1 (NULL + list_voices)
+             18 CALL                     0
+             26 GET_AWAITABLE            0
+             28 LOAD_CONST               0 (None)
+        >>   30 SEND                     3 (to 40)
+             34 YIELD_VALUE              2
+             36 RESUME                   3
+             38 JUMP_BACKWARD_NO_INTERRUPT     5 (to 30)
+        >>   40 END_SEND
+             42 STORE_FAST               2 (voices)
+
+317          44 LOAD_GLOBAL              3 (NULL + next)
+             54 LOAD_CLOSURE             0 (voice)
+             56 BUILD_TUPLE              1
+             58 LOAD_CONST               1 (<code object <genexpr> at 0x7f6c92e4d730, file "app\adapters\tts\resona_tts.py", line 317>)
+             60 MAKE_FUNCTION            8 (closure)
+             62 LOAD_FAST                2 (voices)
+             64 GET_ITER
+             66 CALL                     0
+             74 LOAD_CONST               0 (None)
+             76 CALL                     2
+             84 STORE_FAST               3 (matched)
+
+318          86 LOAD_FAST                3 (matched)
+             88 POP_JUMP_IF_FALSE      116 (to 322)
+             90 LOAD_FAST                3 (matched)
+             92 LOAD_ATTR                5 (NULL|self + get)
+            112 LOAD_CONST               2 ('demo')
+            114 CALL                     1
+            122 POP_JUMP_IF_FALSE       99 (to 322)
+
+319         124 LOAD_GLOBAL              7 (NULL + _http_client)
+            134 CALL                     0
+            142 BEFORE_ASYNC_WITH
+            144 GET_AWAITABLE            1
+            146 LOAD_CONST               0 (None)
+        >>  148 SEND                     3 (to 158)
+            152 YIELD_VALUE              2
+            154 RESUME                   3
+            156 JUMP_BACKWARD_NO_INTERRUPT     5 (to 148)
+        >>  158 END_SEND
+            160 STORE_FAST               4 (client)
+
+320         162 NOP
+
+321         164 LOAD_FAST                4 (client)
+            166 LOAD_ATTR                5 (NULL|self + get)
+            186 LOAD_FAST                3 (matched)
+            188 LOAD_CONST               2 ('demo')
+            190 BINARY_SUBSCR
+            194 CALL                     1
+            202 GET_AWAITABLE            0
+            204 LOAD_CONST               0 (None)
+        >>  206 SEND                     3 (to 216)
+            210 YIELD_VALUE              4
+            212 RESUME                   3
+            214 JUMP_BACKWARD_NO_INTERRUPT     5 (to 206)
+        >>  216 END_SEND
+            218 STORE_FAST               5 (resp)
+
+322         220 LOAD_FAST                5 (resp)
+            222 LOAD_ATTR                9 (NULL|self + raise_for_status)
+            242 CALL                     0
+            250 POP_TOP
+
+323         252 LOAD_FAST                5 (resp)
+            254 LOAD_ATTR               10 (content)
+            274 LOAD_GLOBAL             12 (PREVIEW_MIME)
+            284 BUILD_TUPLE              2
+
+319         286 SWAP                     2
+            288 LOAD_CONST               0 (None)
+            290 LOAD_CONST               0 (None)
+            292 LOAD_CONST               0 (None)
+            294 CALL                     2
+            302 GET_AWAITABLE            2
+            304 LOAD_CONST               0 (None)
+        >>  306 SEND                     3 (to 316)
+            310 YIELD_VALUE              2
+            312 RESUME                   3
+            314 JUMP_BACKWARD_NO_INTERRUPT     5 (to 306)
+        >>  316 END_SEND
+            318 POP_TOP
+            320 RETURN_VALUE
+
+327     >>  322 LOAD_FAST                1 (text)
+            324 COPY                     1
+            326 POP_JUMP_IF_TRUE         2 (to 332)
+            328 POP_TOP
+            330 LOAD_CONST               3 ('')
+        >>  332 LOAD_ATTR               17 (NULL|self + strip)
+            352 CALL                     0
+            360 COPY                     1
+            362 POP_JUMP_IF_TRUE         2 (to 368)
+            364 POP_TOP
+            366 LOAD_CONST               4 ('Xin chào, đây là bản nghe thử giọng đọc Resona.')
+        >>  368 STORE_FAST               6 (snippet)
+
+328         370 LOAD_GLOBAL             19 (NULL + _synthesize_bytes)
+            380 LOAD_FAST                6 (snippet)
+            382 LOAD_DEREF               0 (voice)
+            384 CALL                     2
+            392 GET_AWAITABLE            0
+            394 LOAD_CONST               0 (None)
+        >>  396 SEND                     3 (to 406)
+            400 YIELD_VALUE              2
+            402 RESUME                   3
+            404 JUMP_BACKWARD_NO_INTERRUPT     5 (to 396)
+        >>  406 END_SEND
+            408 STORE_FAST               7 (data)
+
+329         410 LOAD_FAST                7 (data)
+            412 LOAD_GLOBAL             12 (PREVIEW_MIME)
+            422 BUILD_TUPLE              2
+            424 RETURN_VALUE
+
+316     >>  426 CLEANUP_THROW
+            428 JUMP_BACKWARD          195 (to 40)
+
+319     >>  430 CLEANUP_THROW
+            432 JUMP_BACKWARD          138 (to 158)
+
+321     >>  434 CLEANUP_THROW
+            436 JUMP_BACKWARD          111 (to 216)
+
+319     >>  438 CLEANUP_THROW
+            440 JUMP_BACKWARD           63 (to 316)
+        >>  442 PUSH_EXC_INFO
+
+324         444 LOAD_GLOBAL             14 (Exception)
+            454 CHECK_EXC_MATCH
+            456 POP_JUMP_IF_FALSE        3 (to 464)
+            458 POP_TOP
+
+325         460 POP_EXCEPT
+            462 JUMP_FORWARD             4 (to 472)
+
+324     >>  464 RERAISE                  0
+        >>  466 COPY                     3
+            468 POP_EXCEPT
+            470 RERAISE                  1
+
+319     >>  472 LOAD_CONST               0 (None)
+            474 LOAD_CONST               0 (None)
+            476 LOAD_CONST               0 (None)
+            478 CALL                     2
+            486 GET_AWAITABLE            2
+            488 LOAD_CONST               0 (None)
+        >>  490 SEND                     4 (to 502)
+            494 YIELD_VALUE              2
+            496 RESUME                   3
+            498 JUMP_BACKWARD_NO_INTERRUPT     5 (to 490)
+        >>  500 CLEANUP_THROW
+        >>  502 END_SEND
+            504 POP_TOP
+            506 JUMP_BACKWARD           93 (to 322)
+        >>  508 PUSH_EXC_INFO
+            510 WITH_EXCEPT_START
+            512 GET_AWAITABLE            2
+            514 LOAD_CONST               0 (None)
+        >>  516 SEND                     4 (to 528)
+            520 YIELD_VALUE              3
+            522 RESUME                   3
+            524 JUMP_BACKWARD_NO_INTERRUPT     5 (to 516)
+        >>  526 CLEANUP_THROW
+        >>  528 END_SEND
+            530 POP_JUMP_IF_TRUE         1 (to 534)
+            532 RERAISE                  2
+        >>  534 POP_TOP
+            536 POP_EXCEPT
+            538 POP_TOP
+            540 POP_TOP
+            542 JUMP_BACKWARD          111 (to 322)
+        >>  544 COPY                     3
+            546 POP_EXCEPT
+            548 RERAISE                  1
+
+328     >>  550 CLEANUP_THROW
+            552 JUMP_BACKWARD           74 (to 406)
+        >>  554 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            556 RERAISE                  1
+ExceptionTable:
+  6 to 32 -> 554 [0] lasti
+  34 to 34 -> 426 [2]
+  36 to 150 -> 554 [0] lasti
+  152 to 152 -> 430 [3]
+  154 to 158 -> 554 [0] lasti
+  160 to 160 -> 508 [1] lasti
+  164 to 208 -> 442 [1]
+  210 to 210 -> 434 [3]
+  212 to 284 -> 442 [1]
+  286 to 308 -> 554 [0] lasti
+  310 to 310 -> 438 [3]
+  312 to 398 -> 554 [0] lasti
+  400 to 400 -> 550 [2]
+  402 to 426 -> 554 [0] lasti
+  430 to 430 -> 554 [0] lasti
+  434 to 434 -> 442 [1]
+  438 to 438 -> 554 [0] lasti
+  442 to 458 -> 466 [2] lasti
+  460 to 462 -> 508 [1] lasti
+  464 to 464 -> 466 [2] lasti
+  466 to 470 -> 508 [1] lasti
+  472 to 492 -> 554 [0] lasti
+  494 to 494 -> 500 [2]
+  496 to 506 -> 554 [0] lasti
+  508 to 518 -> 544 [3] lasti
+  520 to 520 -> 526 [6]
+  522 to 534 -> 544 [3] lasti
+  536 to 550 -> 554 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c92e4d730, file "app\adapters\tts\resona_tts.py", line 317>:
+              0 COPY_FREE_VARS           1
+
+317           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                15 (to 44)
+             14 STORE_FAST               1 (v)
+             16 LOAD_FAST                1 (v)
+             18 LOAD_CONST               0 ('name')
+             20 BINARY_SUBSCR
+             24 LOAD_DEREF               2 (voice)
+             26 COMPARE_OP              40 (==)
+             30 POP_JUMP_IF_TRUE         1 (to 34)
+             32 JUMP_BACKWARD           12 (to 10)
+        >>   34 LOAD_FAST                1 (v)
+             36 YIELD_VALUE              1
+             38 RESUME                   1
+             40 POP_TOP
+             42 JUMP_BACKWARD           17 (to 10)
+        >>   44 END_FOR
+             46 RETURN_CONST             1 (None)
+        >>   48 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             50 RERAISE                  1
+ExceptionTable:
+  6 to 30 -> 48 [0] lasti
+  34 to 46 -> 48 [0] lasti
+
+Disassembly of <code object ResonaTTSProvider at 0x7f6c92a3aab0, file "app\adapters\tts\resona_tts.py", line 332>:
+332           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('ResonaTTSProvider')
+              8 STORE_NAME               2 (__qualname__)
+
+338          10 NOP
+
+339          12 NOP
+
+340          14 NOP
+
+341          16 NOP
+
+342          18 NOP
+
+343          20 NOP
+
+333          22 LOAD_CONST               3 (('+0%', '+0Hz', None, None, None, None))
+
+335          24 NOP
+
+333          26 NOP
+
+336          28 NOP
+
+333          30 NOP
+
+337          32 NOP
+
+333          34 NOP
+
+338          36 NOP
+
+333          38 NOP
+
+339          40 NOP
+
+333          42 NOP
+
+340          44 NOP
+
+333          46 NOP
+
+341          48 NOP
+
+333          50 NOP
+
+342          52 NOP
+
+333          54 NOP
+
+343          56 NOP
+
+333          58 NOP
+
+344          60 NOP
+
+333          62 LOAD_CONST               4 (('text', 'str', 'voice', 'str', 'output_path', 'str', 'rate', 'str', 'pitch', 'str', 'style', 'dict | None', 'context', 'dict | None', 'on_progress', 'Callable[[float, str], None] | None', 'cancel_check', 'Callable[[], bool] | None', 'return', 'None'))
+             64 LOAD_CONST               2 (<code object synthesize at 0x7f6c9326e3d0, file "app\adapters\tts\resona_tts.py", line 333>)
+             66 MAKE_FUNCTION            5 (defaults, annotations)
+             68 STORE_NAME               3 (synthesize)
+             70 RETURN_CONST             1 (None)
+
+Disassembly of <code object synthesize at 0x7f6c9326e3d0, file "app\adapters\tts\resona_tts.py", line 333>:
+333           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+345           6 LOAD_GLOBAL              1 (NULL + _synthesize_bytes)
+             16 LOAD_FAST                1 (text)
+             18 LOAD_FAST                2 (voice)
+             20 CALL                     2
+             28 GET_AWAITABLE            0
+             30 LOAD_CONST               0 (None)
+        >>   32 SEND                     3 (to 42)
+             36 YIELD_VALUE              2
+             38 RESUME                   3
+             40 JUMP_BACKWARD_NO_INTERRUPT     5 (to 32)
+        >>   42 END_SEND
+             44 STORE_FAST              10 (data)
+
+346          46 LOAD_FAST                9 (cancel_check)
+             48 POP_JUMP_IF_FALSE       33 (to 116)
+             50 PUSH_NULL
+             52 LOAD_FAST                9 (cancel_check)
+             54 CALL                     0
+             62 POP_JUMP_IF_FALSE       26 (to 116)
+
+347          64 LOAD_GLOBAL              3 (NULL + make_error)
+             74 LOAD_GLOBAL              4 (E)
+             84 LOAD_ATTR                6 (CANCELLED)
+            104 LOAD_CONST               1 ('Đã huỷ khi tạo giọng.')
+            106 CALL                     2
+            114 RAISE_VARARGS            1
+
+349     >>  116 LOAD_FAST                3 (output_path)
+            118 LOAD_CONST               2 ('.tmp')
+            120 BINARY_OP                0 (+)
+            124 STORE_FAST              11 (tmp)
+
+350         126 LOAD_GLOBAL              9 (NULL + open)
+            136 LOAD_FAST               11 (tmp)
+            138 LOAD_CONST               3 ('wb')
+            140 CALL                     2
+            148 BEFORE_WITH
+            150 STORE_FAST              12 (f)
+
+351         152 LOAD_FAST               12 (f)
+            154 LOAD_ATTR               11 (NULL|self + write)
+            174 LOAD_FAST               10 (data)
+            176 CALL                     1
+            184 POP_TOP
+
+350         186 LOAD_CONST               0 (None)
+            188 LOAD_CONST               0 (None)
+            190 LOAD_CONST               0 (None)
+            192 CALL                     2
+            200 POP_TOP
+
+352     >>  202 LOAD_GLOBAL             13 (NULL + os)
+            212 LOAD_ATTR               14 (replace)
+            232 LOAD_FAST               11 (tmp)
+            234 LOAD_FAST                3 (output_path)
+            236 CALL                     2
+            244 POP_TOP
+            246 RETURN_CONST             0 (None)
+
+345     >>  248 CLEANUP_THROW
+            250 JUMP_BACKWARD          105 (to 42)
+
+350     >>  252 PUSH_EXC_INFO
+            254 WITH_EXCEPT_START
+            256 POP_JUMP_IF_TRUE         1 (to 260)
+            258 RERAISE                  2
+        >>  260 POP_TOP
+            262 POP_EXCEPT
+            264 POP_TOP
+            266 POP_TOP
+            268 JUMP_BACKWARD           34 (to 202)
+        >>  270 COPY                     3
+            272 POP_EXCEPT
+            274 RERAISE                  1
+        >>  276 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            278 RERAISE                  1
+ExceptionTable:
+  4 to 34 -> 276 [0] lasti
+  36 to 36 -> 248 [2]
+  38 to 148 -> 276 [0] lasti
+  150 to 184 -> 252 [1] lasti
+  186 to 248 -> 276 [0] lasti
+  252 to 260 -> 270 [3] lasti
+  262 to 274 -> 276 [0] lasti

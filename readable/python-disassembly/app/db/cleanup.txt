@@ -1,0 +1,208 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Dọn dữ liệu của tính năng đã gỡ — chạy lúc khởi động (best-effort, idempotent).\n\nKhông dùng migration cho việc này: đây là dọn RÁC theo trạng thái máy user (file trên đĩa + dòng\nDB do seed sinh ra), chạy lại nhiều lần vẫn đúng, và không được phép chặn app khởi động nếu lỗi.\n')
+              4 STORE_NAME               0 (__doc__)
+
+  6           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+  8          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('log',))
+             22 IMPORT_NAME              3 (app.core.logging)
+             24 IMPORT_FROM              4 (log)
+             26 STORE_NAME               4 (log)
+             28 POP_TOP
+
+ 11          30 LOAD_CONST               7 (('return', 'int'))
+             32 LOAD_CONST               4 (<code object purge_openvoice_clones at 0x28b817c0, file "app\db\cleanup.py", line 11>)
+             34 MAKE_FUNCTION            4 (annotations)
+             36 STORE_NAME               5 (purge_openvoice_clones)
+
+ 37          38 LOAD_CONST               8 (('clone_id', 'str', 'return', 'None'))
+             40 LOAD_CONST               5 (<code object _unlink_se at 0x7f6c9331fa00, file "app\db\cleanup.py", line 37>)
+             42 MAKE_FUNCTION            4 (annotations)
+             44 STORE_NAME               6 (_unlink_se)
+             46 RETURN_CONST             6 (None)
+
+Disassembly of <code object purge_openvoice_clones at 0x28b817c0, file "app\db\cleanup.py", line 11>:
+ 11           0 RESUME                   0
+
+ 20           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('ClonedVoice',))
+              6 IMPORT_NAME              0 (app.db.models)
+              8 IMPORT_FROM              1 (ClonedVoice)
+             10 STORE_FAST               0 (ClonedVoice)
+             12 POP_TOP
+
+ 21          14 LOAD_CONST               1 (0)
+             16 LOAD_CONST               3 (('SessionLocal',))
+             18 IMPORT_NAME              2 (app.db.session)
+             20 IMPORT_FROM              3 (SessionLocal)
+             22 STORE_FAST               1 (SessionLocal)
+             24 POP_TOP
+
+ 23          26 LOAD_CONST               1 (0)
+             28 STORE_FAST               2 (removed)
+
+ 24          30 PUSH_NULL
+             32 LOAD_FAST                1 (SessionLocal)
+             34 CALL                     0
+             42 BEFORE_WITH
+             44 STORE_FAST               3 (db)
+
+ 25          46 LOAD_FAST                3 (db)
+             48 LOAD_ATTR                9 (NULL|self + query)
+             68 LOAD_FAST                0 (ClonedVoice)
+             70 CALL                     1
+             78 LOAD_ATTR               11 (NULL|self + filter)
+             98 LOAD_FAST                0 (ClonedVoice)
+            100 LOAD_ATTR               12 (engine)
+            120 LOAD_CONST               4 ('omnivoice')
+            122 COMPARE_OP              55 (!=)
+            126 CALL                     1
+            134 LOAD_ATTR               15 (NULL|self + all)
+            154 CALL                     0
+            162 STORE_FAST               4 (rows)
+
+ 26         164 LOAD_FAST                4 (rows)
+            166 GET_ITER
+        >>  168 FOR_ITER                45 (to 262)
+            172 STORE_FAST               5 (row)
+
+ 27         174 LOAD_GLOBAL             17 (NULL + _unlink_se)
+            184 LOAD_FAST                5 (row)
+            186 LOAD_ATTR               18 (id)
+            206 CALL                     1
+            214 POP_TOP
+
+ 28         216 LOAD_FAST                3 (db)
+            218 LOAD_ATTR               21 (NULL|self + delete)
+            238 LOAD_FAST                5 (row)
+            240 CALL                     1
+            248 POP_TOP
+
+ 29         250 LOAD_FAST                2 (removed)
+            252 LOAD_CONST               5 (1)
+            254 BINARY_OP               13 (+=)
+            258 STORE_FAST               2 (removed)
+            260 JUMP_BACKWARD           47 (to 168)
+
+ 26     >>  262 END_FOR
+
+ 30         264 LOAD_FAST                2 (removed)
+            266 POP_JUMP_IF_FALSE       16 (to 300)
+
+ 31         268 LOAD_FAST                3 (db)
+            270 LOAD_ATTR               23 (NULL|self + commit)
+            290 CALL                     0
+            298 POP_TOP
+
+ 24     >>  300 LOAD_CONST               6 (None)
+            302 LOAD_CONST               6 (None)
+            304 LOAD_CONST               6 (None)
+            306 CALL                     2
+            314 POP_TOP
+
+ 32     >>  316 LOAD_FAST                2 (removed)
+            318 POP_JUMP_IF_FALSE       25 (to 370)
+
+ 33         320 LOAD_GLOBAL             25 (NULL + log)
+            330 LOAD_ATTR               26 (info)
+            350 LOAD_CONST               7 ('Đã dọn ')
+            352 LOAD_FAST                2 (removed)
+            354 FORMAT_VALUE             0
+            356 LOAD_CONST               8 (' giọng RevoVoice cũ (provider openvoice đã gỡ).')
+            358 BUILD_STRING             3
+            360 CALL                     1
+            368 POP_TOP
+
+ 34     >>  370 LOAD_FAST                2 (removed)
+            372 RETURN_VALUE
+
+ 24     >>  374 PUSH_EXC_INFO
+            376 WITH_EXCEPT_START
+            378 POP_JUMP_IF_TRUE         1 (to 382)
+            380 RERAISE                  2
+        >>  382 POP_TOP
+            384 POP_EXCEPT
+            386 POP_TOP
+            388 POP_TOP
+            390 JUMP_BACKWARD           38 (to 316)
+        >>  392 COPY                     3
+            394 POP_EXCEPT
+            396 RERAISE                  1
+ExceptionTable:
+  44 to 298 -> 374 [1] lasti
+  374 to 382 -> 392 [3] lasti
+
+Disassembly of <code object _unlink_se at 0x7f6c9331fa00, file "app\db\cleanup.py", line 37>:
+ 37           0 RESUME                   0
+
+ 38           2 NOP
+
+ 39           4 LOAD_CONST               1 (0)
+              6 LOAD_CONST               2 (('target_se_path',))
+              8 IMPORT_NAME              0 (app.adapters.tts.voice_clone)
+             10 IMPORT_FROM              1 (target_se_path)
+             12 STORE_FAST               1 (target_se_path)
+             14 POP_TOP
+
+ 41          16 PUSH_NULL
+             18 LOAD_FAST                1 (target_se_path)
+             20 LOAD_FAST                0 (clone_id)
+             22 CALL                     1
+             30 STORE_FAST               2 (p)
+
+ 42          32 LOAD_FAST                2 (p)
+             34 LOAD_ATTR                5 (NULL|self + exists)
+             54 CALL                     0
+             62 POP_JUMP_IF_FALSE       17 (to 98)
+
+ 43          64 LOAD_FAST                2 (p)
+             66 LOAD_ATTR                7 (NULL|self + unlink)
+             86 CALL                     0
+             94 POP_TOP
+             96 RETURN_CONST             0 (None)
+
+ 42     >>   98 RETURN_CONST             0 (None)
+        >>  100 PUSH_EXC_INFO
+
+ 44         102 LOAD_GLOBAL              8 (OSError)
+            112 CHECK_EXC_MATCH
+            114 POP_JUMP_IF_FALSE       37 (to 190)
+            116 STORE_FAST               3 (e)
+
+ 45         118 LOAD_GLOBAL             11 (NULL + log)
+            128 LOAD_ATTR               12 (warning)
+            148 LOAD_CONST               3 ('Xoá embedding giọng cũ ')
+            150 LOAD_FAST                0 (clone_id)
+            152 FORMAT_VALUE             0
+            154 LOAD_CONST               4 (' lỗi (bỏ qua): ')
+            156 LOAD_FAST                3 (e)
+            158 FORMAT_VALUE             0
+            160 BUILD_STRING             4
+            162 CALL                     1
+            170 POP_TOP
+            172 POP_EXCEPT
+            174 LOAD_CONST               0 (None)
+            176 STORE_FAST               3 (e)
+            178 DELETE_FAST              3 (e)
+            180 RETURN_CONST             0 (None)
+        >>  182 LOAD_CONST               0 (None)
+            184 STORE_FAST               3 (e)
+            186 DELETE_FAST              3 (e)
+            188 RERAISE                  1
+
+ 44     >>  190 RERAISE                  0
+        >>  192 COPY                     3
+            194 POP_EXCEPT
+            196 RERAISE                  1
+ExceptionTable:
+  4 to 94 -> 100 [0]
+  100 to 116 -> 192 [1] lasti
+  118 to 170 -> 182 [1] lasti
+  182 to 190 -> 192 [1] lasti

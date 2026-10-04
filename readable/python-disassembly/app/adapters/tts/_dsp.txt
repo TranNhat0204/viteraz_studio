@@ -1,0 +1,652 @@
+  0           0 RESUME                   0
+
+  1           2 SETUP_ANNOTATIONS
+              4 LOAD_CONST               0 ('DSP hậu xử lý cảm xúc dùng chung cho giọng tiếng Việt (Edge base / clone).\n\nTốc độ đọc do base TTS lo (Edge `rate`); ở đây chỉ áp **pitch shift + audio filter**\n(EQ/echo…) sau khi đã sinh giọng. Ưu tiên `rubberband` (giữ formant) → fallback `asetrate`.\n')
+              6 STORE_NAME               0 (__doc__)
+
+  6           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('annotations',))
+             12 IMPORT_NAME              1 (__future__)
+             14 IMPORT_FROM              2 (annotations)
+             16 STORE_NAME               2 (annotations)
+             18 POP_TOP
+
+  8          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               3 (None)
+             24 IMPORT_NAME              3 (asyncio)
+             26 STORE_NAME               3 (asyncio)
+
+ 10          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               4 (('no_window_kwargs',))
+             32 IMPORT_NAME              4 (app.core.proc)
+             34 IMPORT_FROM              5 (no_window_kwargs)
+             36 STORE_NAME               5 (no_window_kwargs)
+             38 POP_TOP
+
+ 11          40 LOAD_CONST               1 (0)
+             42 LOAD_CONST               5 (('get_ffmpeg_path',))
+             44 IMPORT_NAME              6 (app.adapters.ffmpeg)
+             46 IMPORT_FROM              7 (get_ffmpeg_path)
+             48 STORE_NAME               7 (get_ffmpeg_path)
+             50 POP_TOP
+
+ 13          52 LOAD_CONST               3 (None)
+             54 STORE_GLOBAL             8 (_FFMPEG_FILTERS)
+             56 LOAD_CONST               6 ('set[str] | None')
+             58 LOAD_NAME                9 (__annotations__)
+             60 LOAD_CONST               7 ('_FFMPEG_FILTERS')
+             62 STORE_SUBSCR
+
+ 16          66 LOAD_CONST              10 (('return', 'set[str]'))
+             68 LOAD_CONST               8 (<code object ffmpeg_filters at 0x267ddab0, file "app\adapters\tts\_dsp.py", line 16>)
+             70 MAKE_FUNCTION            4 (annotations)
+             72 STORE_NAME              10 (ffmpeg_filters)
+
+ 43          74 NOP
+
+ 44          76 NOP
+
+ 45          78 NOP
+
+ 46          80 NOP
+
+ 47          82 NOP
+
+ 48          84 NOP
+
+ 40          86 LOAD_CONST              11 ((1.0, 1.0, '', 24000, None, None))
+
+ 41          88 NOP
+
+ 40          90 NOP
+
+ 42          92 NOP
+
+ 40          94 NOP
+
+ 43          96 NOP
+
+ 40          98 NOP
+
+ 44         100 NOP
+
+ 40         102 NOP
+
+ 45         104 NOP
+
+ 40         106 NOP
+
+ 46         108 NOP
+
+ 40         110 NOP
+
+ 47         112 NOP
+
+ 40         114 NOP
+
+ 48         116 NOP
+
+ 40         118 NOP
+
+ 49         120 NOP
+
+ 40         122 LOAD_CONST              12 (('src_wav', 'str', 'dst_wav', 'str', 'pitch_shift', 'float', 'tempo_shift', 'float', 'dsp_filter', 'str', 'sr', 'int', 'clamp', 'tuple[float, float] | None', 'cancel_check', 'Callable[[], bool] | None', 'return', 'bool'))
+            124 LOAD_CONST               9 (<code object apply_emotion_dsp at 0x269dc4d0, file "app\adapters\tts\_dsp.py", line 40>)
+            126 MAKE_FUNCTION            5 (defaults, annotations)
+            128 STORE_NAME              11 (apply_emotion_dsp)
+            130 RETURN_CONST             3 (None)
+
+Disassembly of <code object ffmpeg_filters at 0x267ddab0, file "app\adapters\tts\_dsp.py", line 16>:
+ 16           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 19           6 LOAD_GLOBAL              0 (_FFMPEG_FILTERS)
+             16 POP_JUMP_IF_NONE         6 (to 30)
+
+ 20          18 LOAD_GLOBAL              0 (_FFMPEG_FILTERS)
+             28 RETURN_VALUE
+
+ 21     >>   30 LOAD_GLOBAL              3 (NULL + set)
+             40 CALL                     0
+             48 STORE_FAST               0 (names)
+
+ 22          50 NOP
+
+ 23          52 LOAD_GLOBAL              5 (NULL + asyncio)
+             62 LOAD_ATTR                6 (create_subprocess_exec)
+
+ 24          82 LOAD_GLOBAL              9 (NULL + get_ffmpeg_path)
+             92 CALL                     0
+            100 LOAD_CONST               2 ('-hide_banner')
+            102 LOAD_CONST               3 ('-filters')
+
+ 23         104 BUILD_TUPLE              3
+
+ 25         106 LOAD_GLOBAL              4 (asyncio)
+            116 LOAD_ATTR               10 (subprocess)
+            136 LOAD_ATTR               12 (PIPE)
+
+ 26         156 LOAD_GLOBAL              4 (asyncio)
+            166 LOAD_ATTR               10 (subprocess)
+            186 LOAD_ATTR               14 (DEVNULL)
+
+ 23         206 LOAD_CONST               4 (('stdout', 'stderr'))
+            208 BUILD_CONST_KEY_MAP      2
+
+ 27         210 LOAD_GLOBAL             17 (NULL + no_window_kwargs)
+            220 CALL                     0
+
+ 23         228 DICT_MERGE               1
+            230 CALL_FUNCTION_EX         1
+            232 GET_AWAITABLE            0
+            234 LOAD_CONST               1 (None)
+        >>  236 SEND                     3 (to 246)
+            240 YIELD_VALUE              3
+            242 RESUME                   3
+            244 JUMP_BACKWARD_NO_INTERRUPT     5 (to 236)
+        >>  246 END_SEND
+            248 STORE_FAST               1 (proc)
+
+ 29         250 LOAD_FAST                1 (proc)
+            252 LOAD_ATTR               19 (NULL|self + communicate)
+            272 CALL                     0
+            280 GET_AWAITABLE            0
+            282 LOAD_CONST               1 (None)
+        >>  284 SEND                     3 (to 294)
+            288 YIELD_VALUE              3
+            290 RESUME                   3
+            292 JUMP_BACKWARD_NO_INTERRUPT     5 (to 284)
+        >>  294 END_SEND
+            296 UNPACK_SEQUENCE          2
+            300 STORE_FAST               2 (data)
+            302 STORE_FAST               3 (_)
+
+ 30         304 LOAD_FAST                2 (data)
+            306 LOAD_ATTR               21 (NULL|self + decode)
+            326 LOAD_CONST               5 ('utf-8')
+            328 LOAD_CONST               6 ('ignore')
+            330 CALL                     2
+            338 LOAD_ATTR               23 (NULL|self + splitlines)
+            358 CALL                     0
+            366 GET_ITER
+        >>  368 FOR_ITER                80 (to 532)
+            372 STORE_FAST               4 (line)
+
+ 31         374 LOAD_FAST                4 (line)
+            376 LOAD_ATTR               25 (NULL|self + split)
+            396 CALL                     0
+            404 STORE_FAST               5 (parts)
+
+ 32         406 LOAD_GLOBAL             27 (NULL + len)
+            416 LOAD_FAST                5 (parts)
+            418 CALL                     1
+            426 LOAD_CONST               7 (2)
+            428 COMPARE_OP              92 (>=)
+            432 POP_JUMP_IF_TRUE         1 (to 436)
+            434 JUMP_BACKWARD           34 (to 368)
+        >>  436 LOAD_FAST                5 (parts)
+            438 LOAD_CONST               8 (0)
+            440 BINARY_SUBSCR
+            444 POP_JUMP_IF_TRUE         1 (to 448)
+            446 JUMP_BACKWARD           40 (to 368)
+        >>  448 LOAD_FAST                5 (parts)
+            450 LOAD_CONST               8 (0)
+            452 BINARY_SUBSCR
+            456 LOAD_ATTR               29 (NULL|self + startswith)
+            476 LOAD_CONST               9 ('=')
+            478 CALL                     1
+            486 POP_JUMP_IF_FALSE        1 (to 490)
+            488 JUMP_BACKWARD           61 (to 368)
+
+ 33     >>  490 LOAD_FAST                0 (names)
+            492 LOAD_ATTR               31 (NULL|self + add)
+            512 LOAD_FAST                5 (parts)
+            514 LOAD_CONST              10 (1)
+            516 BINARY_SUBSCR
+            520 CALL                     1
+            528 POP_TOP
+            530 JUMP_BACKWARD           82 (to 368)
+
+ 30     >>  532 END_FOR
+            534 NOP
+
+ 36         536 LOAD_FAST                0 (names)
+            538 STORE_GLOBAL             0 (_FFMPEG_FILTERS)
+
+ 37         540 LOAD_FAST                0 (names)
+            542 RETURN_VALUE
+
+ 23     >>  544 CLEANUP_THROW
+            546 JUMP_BACKWARD          151 (to 246)
+
+ 29     >>  548 CLEANUP_THROW
+            550 JUMP_BACKWARD          129 (to 294)
+        >>  552 PUSH_EXC_INFO
+
+ 34         554 LOAD_GLOBAL             32 (Exception)
+            564 CHECK_EXC_MATCH
+            566 POP_JUMP_IF_FALSE        6 (to 580)
+            568 POP_TOP
+
+ 35         570 POP_EXCEPT
+
+ 36         572 LOAD_FAST                0 (names)
+            574 STORE_GLOBAL             0 (_FFMPEG_FILTERS)
+
+ 37         576 LOAD_FAST                0 (names)
+            578 RETURN_VALUE
+
+ 34     >>  580 RERAISE                  0
+        >>  582 COPY                     3
+            584 POP_EXCEPT
+            586 RERAISE                  1
+        >>  588 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            590 RERAISE                  1
+ExceptionTable:
+  4 to 48 -> 588 [0] lasti
+  52 to 238 -> 552 [0]
+  240 to 240 -> 544 [2]
+  242 to 286 -> 552 [0]
+  288 to 288 -> 548 [2]
+  290 to 432 -> 552 [0]
+  436 to 444 -> 552 [0]
+  448 to 486 -> 552 [0]
+  490 to 532 -> 552 [0]
+  536 to 542 -> 588 [0] lasti
+  544 to 544 -> 552 [0]
+  548 to 548 -> 552 [0]
+  552 to 568 -> 582 [1] lasti
+  570 to 578 -> 588 [0] lasti
+  580 to 580 -> 582 [1] lasti
+  582 to 586 -> 588 [0] lasti
+
+Disassembly of <code object apply_emotion_dsp at 0x269dc4d0, file "app\adapters\tts\_dsp.py", line 40>:
+ 40           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 55           6 NOP
+
+ 56           8 LOAD_GLOBAL              1 (NULL + float)
+             18 LOAD_FAST                2 (pitch_shift)
+             20 COPY                     1
+             22 POP_JUMP_IF_TRUE         2 (to 28)
+             24 POP_TOP
+             26 LOAD_CONST               1 (1.0)
+        >>   28 CALL                     1
+             36 STORE_FAST               8 (ps)
+
+ 59     >>   38 NOP
+
+ 60          40 LOAD_GLOBAL              1 (NULL + float)
+             50 LOAD_FAST                3 (tempo_shift)
+             52 COPY                     1
+             54 POP_JUMP_IF_TRUE         2 (to 60)
+             56 POP_TOP
+             58 LOAD_CONST               1 (1.0)
+        >>   60 CALL                     1
+             68 STORE_FAST               9 (ts)
+
+ 64     >>   70 LOAD_FAST                6 (clamp)
+             72 POP_JUMP_IF_FALSE       28 (to 130)
+
+ 65          74 LOAD_GLOBAL              7 (NULL + max)
+             84 LOAD_FAST                6 (clamp)
+             86 LOAD_CONST               2 (0)
+             88 BINARY_SUBSCR
+             92 LOAD_GLOBAL              9 (NULL + min)
+            102 LOAD_FAST                8 (ps)
+            104 LOAD_FAST                6 (clamp)
+            106 LOAD_CONST               3 (1)
+            108 BINARY_SUBSCR
+            112 CALL                     2
+            120 CALL                     2
+            128 STORE_FAST               8 (ps)
+
+ 67     >>  130 BUILD_LIST               0
+            132 STORE_FAST              10 (filters)
+
+ 68         134 LOAD_GLOBAL             11 (NULL + abs)
+            144 LOAD_FAST                8 (ps)
+            146 LOAD_CONST               1 (1.0)
+            148 BINARY_OP               10 (-)
+            152 CALL                     1
+            160 LOAD_CONST               4 (0.001)
+            162 COMPARE_OP              68 (>)
+            166 STORE_FAST              11 (has_pitch)
+
+ 69         168 LOAD_GLOBAL             11 (NULL + abs)
+            178 LOAD_FAST                9 (ts)
+            180 LOAD_CONST               1 (1.0)
+            182 BINARY_OP               10 (-)
+            186 CALL                     1
+            194 LOAD_CONST               4 (0.001)
+            196 COMPARE_OP              68 (>)
+            200 STORE_FAST              12 (has_tempo)
+
+ 71         202 LOAD_FAST               11 (has_pitch)
+            204 POP_JUMP_IF_TRUE         2 (to 210)
+            206 LOAD_FAST               12 (has_tempo)
+            208 POP_JUMP_IF_FALSE      250 (to 710)
+
+ 72     >>  210 LOAD_GLOBAL             13 (NULL + ffmpeg_filters)
+            220 CALL                     0
+            228 GET_AWAITABLE            0
+            230 LOAD_CONST               5 (None)
+        >>  232 SEND                     3 (to 242)
+            236 YIELD_VALUE              2
+            238 RESUME                   3
+            240 JUMP_BACKWARD_NO_INTERRUPT     5 (to 232)
+        >>  242 END_SEND
+            244 STORE_FAST              13 (avail)
+
+ 73         246 LOAD_CONST               6 ('rubberband')
+            248 LOAD_FAST               13 (avail)
+            250 CONTAINS_OP              0
+            252 POP_JUMP_IF_FALSE       84 (to 422)
+
+ 74         254 BUILD_LIST               0
+            256 STORE_FAST              14 (rb_opts)
+
+ 75         258 LOAD_FAST               11 (has_pitch)
+            260 POP_JUMP_IF_FALSE       21 (to 304)
+
+ 76         262 LOAD_FAST               14 (rb_opts)
+            264 LOAD_ATTR               15 (NULL|self + append)
+            284 LOAD_CONST               7 ('pitch=')
+            286 LOAD_FAST                8 (ps)
+            288 LOAD_CONST               8 ('.4f')
+            290 FORMAT_VALUE             4 (with format)
+            292 BUILD_STRING             2
+            294 CALL                     1
+            302 POP_TOP
+
+ 77     >>  304 LOAD_FAST               12 (has_tempo)
+            306 POP_JUMP_IF_FALSE       21 (to 350)
+
+ 78         308 LOAD_FAST               14 (rb_opts)
+            310 LOAD_ATTR               15 (NULL|self + append)
+            330 LOAD_CONST               9 ('tempo=')
+            332 LOAD_FAST                9 (ts)
+            334 LOAD_CONST               8 ('.4f')
+            336 FORMAT_VALUE             4 (with format)
+            338 BUILD_STRING             2
+            340 CALL                     1
+            348 POP_TOP
+
+ 79     >>  350 LOAD_FAST               10 (filters)
+            352 LOAD_ATTR               15 (NULL|self + append)
+            372 LOAD_CONST              10 ('rubberband=')
+            374 LOAD_CONST              11 (':')
+            376 LOAD_ATTR               17 (NULL|self + join)
+            396 LOAD_FAST               14 (rb_opts)
+            398 CALL                     1
+            406 FORMAT_VALUE             0
+            408 BUILD_STRING             2
+            410 CALL                     1
+            418 POP_TOP
+            420 JUMP_FORWARD           144 (to 710)
+
+ 81     >>  422 LOAD_FAST               11 (has_pitch)
+            424 POP_JUMP_IF_FALSE       34 (to 494)
+
+ 82         426 LOAD_FAST               10 (filters)
+            428 LOAD_ATTR               15 (NULL|self + append)
+            448 LOAD_CONST              12 ('asetrate=')
+            450 LOAD_FAST                5 (sr)
+            452 FORMAT_VALUE             0
+            454 LOAD_CONST              13 ('*')
+            456 LOAD_FAST                8 (ps)
+            458 LOAD_CONST               8 ('.4f')
+            460 FORMAT_VALUE             4 (with format)
+            462 LOAD_CONST              14 (',aresample=')
+            464 LOAD_FAST                5 (sr)
+            466 FORMAT_VALUE             0
+            468 LOAD_CONST              15 (',atempo=')
+            470 LOAD_CONST               1 (1.0)
+            472 LOAD_FAST                8 (ps)
+            474 BINARY_OP               11 (/)
+            478 LOAD_CONST               8 ('.4f')
+            480 FORMAT_VALUE             4 (with format)
+            482 BUILD_STRING             8
+            484 CALL                     1
+            492 POP_TOP
+
+ 83     >>  494 LOAD_FAST               12 (has_tempo)
+            496 POP_JUMP_IF_FALSE      106 (to 710)
+
+ 84         498 LOAD_FAST                9 (ts)
+            500 STORE_FAST              15 (cur_t)
+
+ 85         502 LOAD_FAST               15 (cur_t)
+            504 LOAD_CONST              16 (2.0)
+            506 COMPARE_OP              68 (>)
+            510 POP_JUMP_IF_FALSE       28 (to 568)
+
+ 86     >>  512 LOAD_FAST               10 (filters)
+            514 LOAD_ATTR               15 (NULL|self + append)
+            534 LOAD_CONST              17 ('atempo=2.0')
+            536 CALL                     1
+            544 POP_TOP
+
+ 87         546 LOAD_FAST               15 (cur_t)
+            548 LOAD_CONST              16 (2.0)
+            550 BINARY_OP               24 (/=)
+            554 STORE_FAST              15 (cur_t)
+
+ 85         556 LOAD_FAST               15 (cur_t)
+            558 LOAD_CONST              16 (2.0)
+            560 COMPARE_OP              68 (>)
+            564 POP_JUMP_IF_FALSE        1 (to 568)
+            566 JUMP_BACKWARD           28 (to 512)
+
+ 88     >>  568 LOAD_FAST               15 (cur_t)
+            570 LOAD_CONST              18 (0.5)
+            572 COMPARE_OP               2 (<)
+            576 POP_JUMP_IF_FALSE       28 (to 634)
+
+ 89     >>  578 LOAD_FAST               10 (filters)
+            580 LOAD_ATTR               15 (NULL|self + append)
+            600 LOAD_CONST              19 ('atempo=0.5')
+            602 CALL                     1
+            610 POP_TOP
+
+ 90         612 LOAD_FAST               15 (cur_t)
+            614 LOAD_CONST              18 (0.5)
+            616 BINARY_OP               24 (/=)
+            620 STORE_FAST              15 (cur_t)
+
+ 88         622 LOAD_FAST               15 (cur_t)
+            624 LOAD_CONST              18 (0.5)
+            626 COMPARE_OP               2 (<)
+            630 POP_JUMP_IF_FALSE        1 (to 634)
+            632 JUMP_BACKWARD           28 (to 578)
+
+ 91     >>  634 LOAD_GLOBAL             11 (NULL + abs)
+            644 LOAD_FAST               15 (cur_t)
+            646 LOAD_CONST               1 (1.0)
+            648 BINARY_OP               10 (-)
+            652 CALL                     1
+            660 LOAD_CONST               4 (0.001)
+            662 COMPARE_OP              68 (>)
+            666 POP_JUMP_IF_FALSE       21 (to 710)
+
+ 92         668 LOAD_FAST               10 (filters)
+            670 LOAD_ATTR               15 (NULL|self + append)
+            690 LOAD_CONST              20 ('atempo=')
+            692 LOAD_FAST               15 (cur_t)
+            694 LOAD_CONST               8 ('.4f')
+            696 FORMAT_VALUE             4 (with format)
+            698 BUILD_STRING             2
+            700 CALL                     1
+            708 POP_TOP
+
+ 94     >>  710 LOAD_FAST                4 (dsp_filter)
+            712 POP_JUMP_IF_FALSE       17 (to 748)
+
+ 95         714 LOAD_FAST               10 (filters)
+            716 LOAD_ATTR               15 (NULL|self + append)
+            736 LOAD_FAST                4 (dsp_filter)
+            738 CALL                     1
+            746 POP_TOP
+
+ 96     >>  748 LOAD_FAST               10 (filters)
+            750 POP_JUMP_IF_TRUE         1 (to 754)
+
+ 97         752 RETURN_CONST            21 (False)
+
+ 99     >>  754 LOAD_GLOBAL             19 (NULL + asyncio)
+            764 LOAD_ATTR               20 (create_subprocess_exec)
+
+100         784 LOAD_GLOBAL             23 (NULL + get_ffmpeg_path)
+            794 CALL                     0
+            802 LOAD_CONST              22 ('-y')
+
+101         804 LOAD_CONST              23 ('-i')
+            806 LOAD_FAST                0 (src_wav)
+
+102         808 LOAD_CONST              24 ('-af')
+            810 LOAD_CONST              25 (',')
+            812 LOAD_ATTR               17 (NULL|self + join)
+            832 LOAD_FAST               10 (filters)
+            834 CALL                     1
+
+103         842 LOAD_CONST              26 ('-acodec')
+            844 LOAD_CONST              27 ('pcm_s16le')
+            846 LOAD_CONST              28 ('-ar')
+            848 LOAD_GLOBAL             25 (NULL + str)
+            858 LOAD_FAST                5 (sr)
+            860 CALL                     1
+            868 LOAD_CONST              29 ('-ac')
+            870 LOAD_CONST              30 ('1')
+
+104         872 LOAD_FAST                1 (dst_wav)
+
+ 99         874 BUILD_TUPLE             13
+
+105         876 LOAD_GLOBAL             18 (asyncio)
+            886 LOAD_ATTR               26 (subprocess)
+            906 LOAD_ATTR               28 (DEVNULL)
+
+106         926 LOAD_GLOBAL             18 (asyncio)
+            936 LOAD_ATTR               26 (subprocess)
+            956 LOAD_ATTR               28 (DEVNULL)
+
+ 99         976 LOAD_CONST              31 (('stdout', 'stderr'))
+            978 BUILD_CONST_KEY_MAP      2
+
+107         980 LOAD_GLOBAL             31 (NULL + no_window_kwargs)
+            990 CALL                     0
+
+ 99         998 DICT_MERGE               1
+           1000 CALL_FUNCTION_EX         1
+           1002 GET_AWAITABLE            0
+           1004 LOAD_CONST               5 (None)
+        >> 1006 SEND                     3 (to 1016)
+           1010 YIELD_VALUE              2
+           1012 RESUME                   3
+           1014 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1006)
+        >> 1016 END_SEND
+           1018 STORE_FAST              16 (proc)
+
+109        1020 LOAD_CONST               2 (0)
+           1022 LOAD_CONST              32 (('safe_wait_proc',))
+           1024 IMPORT_NAME             16 (app.core.proc)
+           1026 IMPORT_FROM             17 (safe_wait_proc)
+           1028 STORE_FAST              17 (safe_wait_proc)
+           1030 POP_TOP
+
+110        1032 PUSH_NULL
+           1034 LOAD_FAST               17 (safe_wait_proc)
+           1036 LOAD_FAST               16 (proc)
+           1038 LOAD_FAST                7 (cancel_check)
+           1040 KW_NAMES                33 (('cancel_check',))
+           1042 CALL                     2
+           1050 GET_AWAITABLE            0
+           1052 LOAD_CONST               5 (None)
+        >> 1054 SEND                     3 (to 1064)
+           1058 YIELD_VALUE              2
+           1060 RESUME                   3
+           1062 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1054)
+        >> 1064 END_SEND
+           1066 POP_TOP
+
+111        1068 LOAD_FAST               16 (proc)
+           1070 LOAD_ATTR               36 (returncode)
+           1090 LOAD_CONST               2 (0)
+           1092 COMPARE_OP              40 (==)
+           1096 RETURN_VALUE
+        >> 1098 PUSH_EXC_INFO
+
+ 57        1100 LOAD_GLOBAL              2 (TypeError)
+           1110 LOAD_GLOBAL              4 (ValueError)
+           1120 BUILD_TUPLE              2
+           1122 CHECK_EXC_MATCH
+           1124 POP_JUMP_IF_FALSE        6 (to 1138)
+           1126 POP_TOP
+
+ 58        1128 LOAD_CONST               1 (1.0)
+           1130 STORE_FAST               8 (ps)
+           1132 POP_EXCEPT
+           1134 EXTENDED_ARG             2
+           1136 JUMP_BACKWARD          550 (to 38)
+
+ 57     >> 1138 RERAISE                  0
+        >> 1140 COPY                     3
+           1142 POP_EXCEPT
+           1144 RERAISE                  1
+        >> 1146 PUSH_EXC_INFO
+
+ 61        1148 LOAD_GLOBAL              2 (TypeError)
+           1158 LOAD_GLOBAL              4 (ValueError)
+           1168 BUILD_TUPLE              2
+           1170 CHECK_EXC_MATCH
+           1172 POP_JUMP_IF_FALSE        6 (to 1186)
+           1174 POP_TOP
+
+ 62        1176 LOAD_CONST               1 (1.0)
+           1178 STORE_FAST               9 (ts)
+           1180 POP_EXCEPT
+           1182 EXTENDED_ARG             2
+           1184 JUMP_BACKWARD          558 (to 70)
+
+ 61     >> 1186 RERAISE                  0
+        >> 1188 COPY                     3
+           1190 POP_EXCEPT
+           1192 RERAISE                  1
+
+ 72     >> 1194 CLEANUP_THROW
+           1196 EXTENDED_ARG             1
+           1198 JUMP_BACKWARD          479 (to 242)
+
+ 99     >> 1200 CLEANUP_THROW
+           1202 JUMP_BACKWARD           94 (to 1016)
+
+110     >> 1204 CLEANUP_THROW
+           1206 JUMP_BACKWARD           72 (to 1064)
+        >> 1208 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1210 RERAISE                  1
+ExceptionTable:
+  4 to 4 -> 1208 [0] lasti
+  8 to 36 -> 1098 [0]
+  40 to 68 -> 1146 [0]
+  70 to 234 -> 1208 [0] lasti
+  236 to 236 -> 1194 [2]
+  238 to 564 -> 1208 [0] lasti
+  568 to 630 -> 1208 [0] lasti
+  634 to 1008 -> 1208 [0] lasti
+  1010 to 1010 -> 1200 [2]
+  1012 to 1056 -> 1208 [0] lasti
+  1058 to 1058 -> 1204 [2]
+  1060 to 1096 -> 1208 [0] lasti
+  1098 to 1130 -> 1140 [1] lasti
+  1132 to 1136 -> 1208 [0] lasti
+  1138 to 1138 -> 1140 [1] lasti
+  1140 to 1144 -> 1208 [0] lasti
+  1146 to 1178 -> 1188 [1] lasti
+  1180 to 1184 -> 1208 [0] lasti
+  1186 to 1186 -> 1188 [1] lasti
+  1188 to 1194 -> 1208 [0] lasti
+  1200 to 1200 -> 1208 [0] lasti
+  1204 to 1204 -> 1208 [0] lasti

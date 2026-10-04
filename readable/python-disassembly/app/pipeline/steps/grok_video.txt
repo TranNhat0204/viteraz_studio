@@ -1,0 +1,1969 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Step grok_video — Grok (grok.com Imagine) ANIMATE ảnh cảnh đã có sẵn thành clip.\n\nDùng khi cấu hình kênh tách "Tạo ảnh" và "Tạo video": ảnh do Google Flow tạo (flow_characters +\nflow_images, giữ nguyên nhân vật/style của Flow), còn clip do Grok tạo thay cho `flow_generate`.\nChọn bằng channel_profile.video_provider = "grok" (xem registry.apply_image_provider).\n\nVì sao tách được: `flow_images` đã tạo ẢNH cho MỌI cảnh — kể cả cảnh video (status "image_ready",\nimage_path = khung đầu). Grok image-to-video lấy đúng ảnh đó làm frame đầu (đo SSIM ~0.99), nên clip\nbám sát storyboard/nhân vật như khi Flow tự animate.\n\nHành vi khi hỏng giống combo ChatGPT + Grok: clip lệch keyframe thì tạo lại, hết lượt / bị giới hạn /\nbị kiểm duyệt thì GIỮ ảnh Flow làm cảnh tĩnh (đánh dấu clip_status=failed) thay vì làm hỏng cả video.\nChỉ chạy grok.com (web) — api.x.ai trên token SuperGrok ra cảnh sai chủ đề (docs/grok-web-imagine-api.md).\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 15           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 17          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (asyncio)
+             24 STORE_NAME               3 (asyncio)
+
+ 18          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               3 (None)
+             30 IMPORT_NAME              4 (json)
+             32 STORE_NAME               4 (json)
+
+ 19          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               3 (None)
+             38 IMPORT_NAME              5 (time)
+             40 STORE_NAME               5 (time)
+
+ 20          42 LOAD_CONST               1 (0)
+             44 LOAD_CONST               4 (('Path',))
+             46 IMPORT_NAME              6 (pathlib)
+             48 IMPORT_FROM              7 (Path)
+             50 STORE_NAME               7 (Path)
+             52 POP_TOP
+
+ 22          54 LOAD_CONST               1 (0)
+             56 LOAD_CONST               5 (('GrokWebClient',))
+             58 IMPORT_NAME              8 (app.adapters.grokweb_session)
+             60 IMPORT_FROM              9 (GrokWebClient)
+             62 STORE_NAME               9 (GrokWebClient)
+             64 POP_TOP
+
+ 23          66 LOAD_CONST               1 (0)
+             68 LOAD_CONST               6 (('is_placeholder',))
+             70 IMPORT_NAME             10 (app.core.asset_names)
+             72 IMPORT_FROM             11 (is_placeholder)
+             74 STORE_NAME              11 (is_placeholder)
+             76 POP_TOP
+
+ 24          78 LOAD_CONST               1 (0)
+             80 LOAD_CONST               7 (('E', 'StudioError', 'make_error'))
+             82 IMPORT_NAME             12 (app.core.errors)
+             84 IMPORT_FROM             13 (E)
+             86 STORE_NAME              13 (E)
+             88 IMPORT_FROM             14 (StudioError)
+             90 STORE_NAME              14 (StudioError)
+             92 IMPORT_FROM             15 (make_error)
+             94 STORE_NAME              15 (make_error)
+             96 POP_TOP
+
+ 25          98 LOAD_CONST               1 (0)
+            100 LOAD_CONST               8 (('ProjectFS',))
+            102 IMPORT_NAME             16 (app.core.fs)
+            104 IMPORT_FROM             17 (ProjectFS)
+            106 STORE_NAME              17 (ProjectFS)
+            108 POP_TOP
+
+ 26         110 LOAD_CONST               1 (0)
+            112 LOAD_CONST               9 (('require_advanced',))
+            114 IMPORT_NAME             18 (app.core.license)
+            116 IMPORT_FROM             19 (require_advanced)
+            118 STORE_NAME              19 (require_advanced)
+            120 POP_TOP
+
+ 27         122 LOAD_CONST               1 (0)
+            124 LOAD_CONST              10 (('ContentPlan',))
+            126 IMPORT_NAME             20 (app.db.models)
+            128 IMPORT_FROM             21 (ContentPlan)
+            130 STORE_NAME              21 (ContentPlan)
+            132 POP_TOP
+
+ 28         134 LOAD_CONST               1 (0)
+            136 LOAD_CONST              11 (('SessionLocal',))
+            138 IMPORT_NAME             22 (app.db.session)
+            140 IMPORT_FROM             23 (SessionLocal)
+            142 STORE_NAME              23 (SessionLocal)
+            144 POP_TOP
+
+ 29         146 LOAD_CONST               1 (0)
+            148 LOAD_CONST              12 (('BaseStep', 'StepContext'))
+            150 IMPORT_NAME             24 (app.pipeline.base)
+            152 IMPORT_FROM             25 (BaseStep)
+            154 STORE_NAME              25 (BaseStep)
+            156 IMPORT_FROM             26 (StepContext)
+            158 STORE_NAME              26 (StepContext)
+            160 POP_TOP
+
+ 30         162 LOAD_CONST               1 (0)
+            164 LOAD_CONST              13 (('_SSIM_MIN', '_keyframe_ssim', 'grok_web_duration'))
+            166 IMPORT_NAME             27 (app.pipeline.steps.chatgpt_grok_generate)
+            168 IMPORT_FROM             28 (_SSIM_MIN)
+            170 STORE_NAME              28 (_SSIM_MIN)
+            172 IMPORT_FROM             29 (_keyframe_ssim)
+            174 STORE_NAME              29 (_keyframe_ssim)
+            176 IMPORT_FROM             30 (grok_web_duration)
+            178 STORE_NAME              30 (grok_web_duration)
+            180 POP_TOP
+
+ 31         182 LOAD_CONST               1 (0)
+            184 LOAD_CONST              14 (('GrokFailover',))
+            186 IMPORT_NAME             31 (app.pipeline.steps.grok_failover)
+            188 IMPORT_FROM             32 (GrokFailover)
+            190 STORE_NAME              32 (GrokFailover)
+            192 POP_TOP
+
+ 33         194 LOAD_CONST              15 (3)
+            196 STORE_NAME              33 (_SCENE_ATTEMPTS)
+
+ 34         198 LOAD_CONST              16 (4.0)
+            200 STORE_NAME              34 (_RETRY_SLEEP_SEC)
+
+ 37         202 LOAD_CONST              23 (('path', 'str | None', 'return', 'bool'))
+            204 LOAD_CONST              17 (<code object _real_file at 0x7f6c92bcc030, file "app\pipeline\steps\grok_video.py", line 37>)
+            206 MAKE_FUNCTION            4 (annotations)
+            208 STORE_NAME              35 (_real_file)
+
+ 41         210 LOAD_CONST              24 (('scene', 'dict', 'return', 'bool'))
+            212 LOAD_CONST              18 (<code object scene_needs_clip at 0x7f6c925a5070, file "app\pipeline\steps\grok_video.py", line 41>)
+            214 MAKE_FUNCTION            4 (annotations)
+            216 STORE_NAME              36 (scene_needs_clip)
+
+ 52         218 LOAD_CONST              25 (('scene', 'dict', 'return', 'str'))
+            220 LOAD_CONST              19 (<code object video_prompt_for at 0x7f6c9333a810, file "app\pipeline\steps\grok_video.py", line 52>)
+            222 MAKE_FUNCTION            4 (annotations)
+            224 STORE_NAME              37 (video_prompt_for)
+
+ 57         226 LOAD_CONST              26 ((None,))
+            228 LOAD_CONST              27 (('scene', 'dict', 'keyframe', 'str', 'source', 'str', 'reason', 'str | None', 'return', 'None'))
+            230 LOAD_CONST              20 (<code object keep_still at 0x7f6c92c3cea0, file "app\pipeline\steps\grok_video.py", line 57>)
+            232 MAKE_FUNCTION            5 (defaults, annotations)
+            234 STORE_NAME              38 (keep_still)
+
+ 68         236 PUSH_NULL
+            238 LOAD_BUILD_CLASS
+            240 LOAD_CONST              21 (<code object GrokVideoStep at 0x7f6c930b8250, file "app\pipeline\steps\grok_video.py", line 68>)
+            242 MAKE_FUNCTION            0
+            244 LOAD_CONST              22 ('GrokVideoStep')
+            246 LOAD_NAME               25 (BaseStep)
+            248 CALL                     3
+            256 STORE_NAME              39 (GrokVideoStep)
+            258 RETURN_CONST             3 (None)
+
+Disassembly of <code object _real_file at 0x7f6c92bcc030, file "app\pipeline\steps\grok_video.py", line 37>:
+ 37           0 RESUME                   0
+
+ 38           2 LOAD_GLOBAL              1 (NULL + bool)
+             12 LOAD_FAST                0 (path)
+             14 CALL                     1
+             22 COPY                     1
+             24 POP_JUMP_IF_FALSE       39 (to 104)
+             26 POP_TOP
+             28 LOAD_GLOBAL              3 (NULL + Path)
+             38 LOAD_FAST                0 (path)
+             40 CALL                     1
+             48 LOAD_ATTR                5 (NULL|self + is_file)
+             68 CALL                     0
+             76 COPY                     1
+             78 POP_JUMP_IF_FALSE       12 (to 104)
+             80 POP_TOP
+             82 LOAD_GLOBAL              7 (NULL + is_placeholder)
+             92 LOAD_FAST                0 (path)
+             94 CALL                     1
+            102 UNARY_NOT
+        >>  104 RETURN_VALUE
+
+Disassembly of <code object scene_needs_clip at 0x7f6c925a5070, file "app\pipeline\steps\grok_video.py", line 41>:
+ 41           0 RESUME                   0
+
+ 46           2 LOAD_FAST                0 (scene)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_CONST               1 ('render_skip')
+             26 CALL                     1
+             34 POP_JUMP_IF_TRUE        20 (to 76)
+             36 LOAD_FAST                0 (scene)
+             38 LOAD_ATTR                1 (NULL|self + get)
+             58 LOAD_CONST               2 ('media_type')
+             60 CALL                     1
+             68 LOAD_CONST               3 ('video')
+             70 COMPARE_OP              55 (!=)
+             74 POP_JUMP_IF_FALSE        1 (to 78)
+
+ 47     >>   76 RETURN_CONST             4 (False)
+
+ 48     >>   78 LOAD_FAST                0 (scene)
+             80 LOAD_ATTR                1 (NULL|self + get)
+            100 LOAD_CONST               5 ('status')
+            102 CALL                     1
+            110 LOAD_CONST               6 ('done')
+            112 COMPARE_OP              40 (==)
+            116 COPY                     1
+            118 POP_JUMP_IF_FALSE       48 (to 216)
+            120 POP_TOP
+            122 LOAD_FAST                0 (scene)
+            124 LOAD_ATTR                1 (NULL|self + get)
+            144 LOAD_CONST               7 ('asset_kind')
+            146 CALL                     1
+            154 LOAD_CONST               3 ('video')
+            156 COMPARE_OP              40 (==)
+            160 COPY                     1
+            162 POP_JUMP_IF_FALSE       26 (to 216)
+            164 POP_TOP
+
+ 49         166 LOAD_GLOBAL              3 (NULL + _real_file)
+            176 LOAD_FAST                0 (scene)
+            178 LOAD_ATTR                1 (NULL|self + get)
+            198 LOAD_CONST               8 ('asset_path')
+            200 CALL                     1
+            208 CALL                     1
+
+ 48     >>  216 UNARY_NOT
+            218 RETURN_VALUE
+
+Disassembly of <code object video_prompt_for at 0x7f6c9333a810, file "app\pipeline\steps\grok_video.py", line 52>:
+ 52           0 RESUME                   0
+
+ 54           2 LOAD_FAST                0 (scene)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_CONST               1 ('video_prompt_en')
+             26 CALL                     1
+             34 COPY                     1
+             36 POP_JUMP_IF_TRUE        40 (to 118)
+             38 POP_TOP
+             40 LOAD_FAST                0 (scene)
+             42 LOAD_ATTR                1 (NULL|self + get)
+             62 LOAD_CONST               2 ('image_prompt_en')
+             64 CALL                     1
+             72 COPY                     1
+             74 POP_JUMP_IF_TRUE        21 (to 118)
+             76 POP_TOP
+             78 LOAD_FAST                0 (scene)
+             80 LOAD_ATTR                1 (NULL|self + get)
+            100 LOAD_CONST               3 ('text')
+            102 CALL                     1
+            110 COPY                     1
+            112 POP_JUMP_IF_TRUE         2 (to 118)
+            114 POP_TOP
+            116 LOAD_CONST               4 ('')
+        >>  118 LOAD_ATTR                3 (NULL|self + strip)
+            138 CALL                     0
+            146 RETURN_VALUE
+
+Disassembly of <code object keep_still at 0x7f6c92c3cea0, file "app\pipeline\steps\grok_video.py", line 57>:
+ 57           0 RESUME                   0
+
+ 59           2 LOAD_GLOBAL              1 (NULL + str)
+             12 LOAD_GLOBAL              3 (NULL + Path)
+             22 LOAD_FAST                1 (keyframe)
+             24 CALL                     1
+             32 LOAD_ATTR                5 (NULL|self + resolve)
+             52 CALL                     0
+             60 CALL                     1
+             68 LOAD_FAST                0 (scene)
+             70 LOAD_CONST               1 ('asset_path')
+             72 STORE_SUBSCR
+
+ 60          76 LOAD_CONST               2 ('image')
+             78 LOAD_FAST                0 (scene)
+             80 LOAD_CONST               3 ('asset_kind')
+             82 STORE_SUBSCR
+
+ 61          86 LOAD_CONST               4 ('done')
+             88 LOAD_FAST                0 (scene)
+             90 LOAD_CONST               5 ('status')
+             92 STORE_SUBSCR
+
+ 62          96 LOAD_FAST                2 (source)
+             98 LOAD_FAST                0 (scene)
+            100 LOAD_CONST               6 ('video_source')
+            102 STORE_SUBSCR
+
+ 63         106 LOAD_FAST                3 (reason)
+            108 POP_JUMP_IF_FALSE       11 (to 132)
+
+ 64         110 LOAD_CONST               7 ('failed')
+            112 LOAD_FAST                0 (scene)
+            114 LOAD_CONST               8 ('clip_status')
+            116 STORE_SUBSCR
+
+ 65         120 LOAD_FAST                3 (reason)
+            122 LOAD_FAST                0 (scene)
+            124 LOAD_CONST               9 ('clip_error')
+            126 STORE_SUBSCR
+            130 RETURN_CONST            10 (None)
+
+ 63     >>  132 RETURN_CONST            10 (None)
+
+Disassembly of <code object GrokVideoStep at 0x7f6c930b8250, file "app\pipeline\steps\grok_video.py", line 68>:
+ 68           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('GrokVideoStep')
+              8 STORE_NAME               2 (__qualname__)
+
+ 69          10 LOAD_CONST               1 ('grok_video')
+             12 STORE_NAME               3 (name)
+
+ 70          14 LOAD_CONST               2 ('NET')
+             16 STORE_NAME               4 (resource)
+
+ 71          18 LOAD_CONST               3 ('scene_assets')
+             20 BUILD_LIST               1
+             22 STORE_NAME               5 (produces)
+
+ 73          24 LOAD_CONST               9 (('ctx', 'StepContext', 'return', 'dict'))
+             26 LOAD_CONST               4 (<code object run at 0x28b24010, file "app\pipeline\steps\grok_video.py", line 73>)
+             28 MAKE_FUNCTION            4 (annotations)
+             30 STORE_NAME               6 (run)
+
+206          32 LOAD_CONST              10 (('ctx', 'StepContext', 'scenes', 'list', 'scenes_dir', 'Path', 'n_clip', 'int', 'n_still', 'int', 'return', 'dict'))
+             34 LOAD_CONST               5 (<code object _finish at 0x26a06b60, file "app\pipeline\steps\grok_video.py", line 206>)
+             36 MAKE_FUNCTION            4 (annotations)
+             38 STORE_NAME               7 (_finish)
+
+222          40 LOAD_NAME                8 (staticmethod)
+
+223          42 LOAD_CONST              11 (('video_id', 'str', 'return', 'list'))
+             44 LOAD_CONST               6 (<code object _load_scenes at 0x290caec0, file "app\pipeline\steps\grok_video.py", line 222>)
+             46 MAKE_FUNCTION            4 (annotations)
+
+222          48 CALL                     0
+
+223          56 STORE_NAME               9 (_load_scenes)
+
+231          58 LOAD_NAME                8 (staticmethod)
+
+232          60 LOAD_CONST              12 (('video_id', 'str', 'scenes', 'list', 'return', 'None'))
+             62 LOAD_CONST               7 (<code object _save_scenes at 0x28b7be20, file "app\pipeline\steps\grok_video.py", line 231>)
+             64 MAKE_FUNCTION            4 (annotations)
+
+231          66 CALL                     0
+
+232          74 STORE_NAME              10 (_save_scenes)
+             76 RETURN_CONST             8 (None)
+
+Disassembly of <code object run at 0x28b24010, file "app\pipeline\steps\grok_video.py", line 73>:
+              0 MAKE_CELL               36 (scenes)
+
+ 73           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+ 74           8 LOAD_GLOBAL              1 (NULL + require_advanced)
+             18 LOAD_CONST               1 ('grok_generate')
+             20 CALL                     1
+             28 POP_TOP
+
+ 75          30 LOAD_GLOBAL              3 (NULL + ProjectFS)
+             40 LOAD_FAST                1 (ctx)
+             42 LOAD_ATTR                4 (workdir)
+             62 CALL                     1
+             70 STORE_FAST               2 (fs)
+
+ 76          72 LOAD_FAST                2 (fs)
+             74 LOAD_ATTR                7 (NULL|self + video_dir)
+             94 LOAD_FAST                1 (ctx)
+             96 LOAD_ATTR                8 (video_id)
+            116 CALL                     1
+            124 LOAD_CONST               2 ('scenes')
+            126 BINARY_OP               11 (/)
+            130 STORE_FAST               3 (scenes_dir)
+
+ 77         132 LOAD_FAST                3 (scenes_dir)
+            134 LOAD_ATTR               11 (NULL|self + mkdir)
+            154 LOAD_CONST               3 (True)
+            156 LOAD_CONST               3 (True)
+            158 KW_NAMES                 4 (('parents', 'exist_ok'))
+            160 CALL                     2
+            168 POP_TOP
+
+ 78         170 LOAD_FAST                1 (ctx)
+            172 LOAD_ATTR               12 (config)
+            192 LOAD_ATTR               15 (NULL|self + get)
+            212 LOAD_CONST               5 ('aspect')
+            214 CALL                     1
+            222 LOAD_CONST               6 (('16:9', '9:16'))
+            224 CONTAINS_OP              0
+            226 POP_JUMP_IF_FALSE       27 (to 282)
+            228 LOAD_FAST                1 (ctx)
+            230 LOAD_ATTR               12 (config)
+            250 LOAD_ATTR               15 (NULL|self + get)
+            270 LOAD_CONST               5 ('aspect')
+            272 CALL                     1
+            280 JUMP_FORWARD             1 (to 284)
+        >>  282 LOAD_CONST               7 ('16:9')
+        >>  284 STORE_FAST               4 (aspect)
+
+ 80         286 LOAD_FAST                0 (self)
+            288 LOAD_ATTR               17 (NULL|self + _load_scenes)
+            308 LOAD_FAST                1 (ctx)
+            310 LOAD_ATTR                8 (video_id)
+            330 CALL                     1
+            338 STORE_DEREF             36 (scenes)
+
+ 81         340 LOAD_DEREF              36 (scenes)
+            342 POP_JUMP_IF_TRUE        26 (to 396)
+
+ 82         344 LOAD_GLOBAL             19 (NULL + make_error)
+            354 LOAD_GLOBAL             20 (E)
+            364 LOAD_ATTR               22 (PRECONDITION_MISSING)
+            384 LOAD_CONST               8 ('Chưa có storyboard (scenes). Hãy chạy step storyboard trước.')
+            386 CALL                     2
+            394 RAISE_VARARGS            1
+
+ 84     >>  396 LOAD_GLOBAL             25 (NULL + enumerate)
+            406 LOAD_DEREF              36 (scenes)
+            408 CALL                     1
+            416 GET_ITER
+            418 LOAD_FAST_AND_CLEAR      5 (i)
+            420 LOAD_FAST_AND_CLEAR      6 (s)
+            422 SWAP                     3
+            424 BUILD_LIST               0
+            426 SWAP                     2
+        >>  428 FOR_ITER                19 (to 470)
+            432 UNPACK_SEQUENCE          2
+            436 STORE_FAST               5 (i)
+            438 STORE_FAST               6 (s)
+            440 LOAD_GLOBAL             27 (NULL + scene_needs_clip)
+            450 LOAD_FAST                6 (s)
+            452 CALL                     1
+            460 POP_JUMP_IF_TRUE         1 (to 464)
+            462 JUMP_BACKWARD           18 (to 428)
+        >>  464 LOAD_FAST                5 (i)
+            466 LIST_APPEND              2
+            468 JUMP_BACKWARD           21 (to 428)
+        >>  470 END_FOR
+            472 STORE_FAST               7 (todo)
+            474 STORE_FAST               5 (i)
+            476 STORE_FAST               6 (s)
+
+ 88         478 LOAD_FAST                7 (todo)
+            480 GET_ITER
+            482 LOAD_FAST_AND_CLEAR      5 (i)
+            484 SWAP                     2
+            486 BUILD_LIST               0
+            488 SWAP                     2
+        >>  490 FOR_ITER                34 (to 562)
+            494 STORE_FAST               5 (i)
+            496 LOAD_GLOBAL             29 (NULL + _real_file)
+            506 LOAD_DEREF              36 (scenes)
+            508 LOAD_FAST                5 (i)
+            510 BINARY_SUBSCR
+            514 LOAD_ATTR               15 (NULL|self + get)
+            534 LOAD_CONST               9 ('image_path')
+            536 CALL                     1
+            544 CALL                     1
+            552 POP_JUMP_IF_FALSE        1 (to 556)
+            554 JUMP_BACKWARD           33 (to 490)
+        >>  556 LOAD_FAST                5 (i)
+            558 LIST_APPEND              2
+            560 JUMP_BACKWARD           36 (to 490)
+        >>  562 END_FOR
+            564 STORE_FAST               8 (no_still)
+            566 STORE_FAST               5 (i)
+
+ 89         568 LOAD_FAST                8 (no_still)
+            570 POP_JUMP_IF_FALSE       91 (to 754)
+
+ 90         572 LOAD_FAST                1 (ctx)
+            574 LOAD_ATTR               31 (NULL|self + emit_log)
+
+ 91         594 LOAD_CONST              10 ('Grok video: ')
+            596 LOAD_GLOBAL             33 (NULL + len)
+            606 LOAD_FAST                8 (no_still)
+            608 CALL                     1
+            616 FORMAT_VALUE             0
+            618 LOAD_CONST              11 (' cảnh video chưa có ảnh khung đầu (')
+
+ 92         620 LOAD_CONST              12 (', ')
+            622 LOAD_ATTR               35 (NULL|self + join)
+            642 LOAD_CLOSURE            36 (scenes)
+            644 BUILD_TUPLE              1
+            646 LOAD_CONST              13 (<code object <genexpr> at 0x7f6c81ad0a50, file "app\pipeline\steps\grok_video.py", line 92>)
+            648 MAKE_FUNCTION            8 (closure)
+            650 LOAD_FAST                8 (no_still)
+            652 LOAD_CONST               0 (None)
+            654 LOAD_CONST              14 (8)
+            656 BINARY_SLICE
+            658 GET_ITER
+            660 CALL                     0
+            668 CALL                     1
+            676 FORMAT_VALUE             0
+            678 LOAD_CONST              15 (') → bỏ qua, chạy lại bước tạo ảnh rồi Tạo lại.')
+
+ 91         680 BUILD_STRING             5
+
+ 93         682 LOAD_CONST              16 ('warn')
+
+ 90         684 KW_NAMES                17 (('level',))
+            686 CALL                     2
+            694 POP_TOP
+
+ 94         696 LOAD_FAST                7 (todo)
+            698 GET_ITER
+            700 LOAD_FAST_AND_CLEAR      5 (i)
+            702 SWAP                     2
+            704 BUILD_LIST               0
+            706 SWAP                     2
+        >>  708 FOR_ITER                18 (to 748)
+            712 STORE_FAST               5 (i)
+            714 LOAD_FAST                5 (i)
+            716 LOAD_GLOBAL             37 (NULL + set)
+            726 LOAD_FAST                8 (no_still)
+            728 CALL                     1
+            736 CONTAINS_OP              1
+            738 POP_JUMP_IF_TRUE         1 (to 742)
+            740 JUMP_BACKWARD           17 (to 708)
+        >>  742 LOAD_FAST                5 (i)
+            744 LIST_APPEND              2
+            746 JUMP_BACKWARD           20 (to 708)
+        >>  748 END_FOR
+            750 STORE_FAST               7 (todo)
+            752 STORE_FAST               5 (i)
+
+ 95     >>  754 LOAD_FAST                7 (todo)
+            756 POP_JUMP_IF_TRUE        24 (to 806)
+            758 LOAD_FAST                8 (no_still)
+            760 POP_JUMP_IF_FALSE       22 (to 806)
+
+ 96         762 LOAD_FAST                0 (self)
+            764 LOAD_ATTR               39 (NULL|self + _finish)
+            784 LOAD_FAST                1 (ctx)
+            786 LOAD_DEREF              36 (scenes)
+            788 LOAD_FAST                3 (scenes_dir)
+            790 LOAD_CONST              18 (0)
+            792 LOAD_CONST              18 (0)
+            794 KW_NAMES                19 (('n_clip', 'n_still'))
+            796 CALL                     5
+            804 RETURN_VALUE
+
+ 97     >>  806 LOAD_FAST                7 (todo)
+            808 POP_JUMP_IF_TRUE        39 (to 888)
+
+ 98         810 LOAD_FAST                1 (ctx)
+            812 LOAD_ATTR               31 (NULL|self + emit_log)
+            832 LOAD_CONST              20 ('Grok video: mọi cảnh video đã có clip — không cần tạo thêm.')
+            834 CALL                     1
+            842 POP_TOP
+
+ 99         844 LOAD_FAST                0 (self)
+            846 LOAD_ATTR               39 (NULL|self + _finish)
+            866 LOAD_FAST                1 (ctx)
+            868 LOAD_DEREF              36 (scenes)
+            870 LOAD_FAST                3 (scenes_dir)
+            872 LOAD_CONST              18 (0)
+            874 LOAD_CONST              18 (0)
+            876 KW_NAMES                19 (('n_clip', 'n_still'))
+            878 CALL                     5
+            886 RETURN_VALUE
+
+104     >>  888 LOAD_GLOBAL             41 (NULL + str)
+            898 LOAD_FAST                1 (ctx)
+            900 LOAD_ATTR               12 (config)
+            920 LOAD_ATTR               15 (NULL|self + get)
+            940 LOAD_CONST              21 ('flow_profile_id')
+            942 CALL                     1
+            950 COPY                     1
+            952 POP_JUMP_IF_TRUE         2 (to 958)
+            954 POP_TOP
+            956 LOAD_CONST              22 ('')
+        >>  958 CALL                     1
+            966 LOAD_ATTR               43 (NULL|self + strip)
+            986 CALL                     0
+            994 COPY                     1
+            996 POP_JUMP_IF_TRUE         2 (to 1002)
+            998 POP_TOP
+           1000 LOAD_CONST               0 (None)
+        >> 1002 STORE_FAST               9 (pref_pid)
+
+105        1004 LOAD_GLOBAL             45 (NULL + GrokFailover)
+           1014 LOAD_FAST                1 (ctx)
+           1016 LOAD_ATTR                8 (video_id)
+           1036 LOAD_FAST                1 (ctx)
+           1038 LOAD_ATTR               46 (job_id)
+
+106        1058 LOAD_FAST                9 (pref_pid)
+           1060 POP_JUMP_IF_FALSE        5 (to 1072)
+           1062 LOAD_CONST              23 ('bp:')
+           1064 LOAD_FAST                9 (pref_pid)
+           1066 FORMAT_VALUE             0
+           1068 BUILD_STRING             2
+           1070 JUMP_FORWARD             1 (to 1074)
+        >> 1072 LOAD_CONST               0 (None)
+
+105     >> 1074 KW_NAMES                24 (('video_id', 'job_id', 'preferred_partition'))
+           1076 CALL                     3
+           1084 STORE_FAST              10 (grok_fail)
+
+107        1086 LOAD_FAST               10 (grok_fail)
+           1088 LOAD_ATTR               48 (account_id)
+           1108 COPY                     1
+           1110 POP_JUMP_IF_TRUE         2 (to 1116)
+           1112 POP_TOP
+           1114 LOAD_CONST              22 ('')
+        >> 1116 LOAD_ATTR               51 (NULL|self + startswith)
+           1136 LOAD_CONST              23 ('bp:')
+           1138 CALL                     1
+           1146 POP_JUMP_IF_FALSE       12 (to 1172)
+           1148 LOAD_FAST               10 (grok_fail)
+           1150 LOAD_ATTR               48 (account_id)
+           1170 JUMP_FORWARD             1 (to 1174)
+        >> 1172 LOAD_CONST               0 (None)
+        >> 1174 STORE_FAST              11 (account)
+
+108        1176 LOAD_FAST               11 (account)
+           1178 POP_JUMP_IF_TRUE         7 (to 1194)
+           1180 LOAD_FAST                9 (pref_pid)
+           1182 POP_JUMP_IF_FALSE        5 (to 1194)
+
+109        1184 LOAD_CONST              23 ('bp:')
+           1186 LOAD_FAST                9 (pref_pid)
+           1188 FORMAT_VALUE             0
+           1190 BUILD_STRING             2
+           1192 STORE_FAST              11 (account)
+
+110     >> 1194 LOAD_GLOBAL             53 (NULL + GrokWebClient)
+           1204 LOAD_FAST               11 (account)
+           1206 KW_NAMES                25 (('account_id',))
+           1208 CALL                     1
+           1216 STORE_FAST              12 (grok)
+
+111        1218 LOAD_FAST               12 (grok)
+           1220 LOAD_ATTR               54 (available)
+           1240 POP_JUMP_IF_TRUE        26 (to 1294)
+
+112        1242 LOAD_GLOBAL             19 (NULL + make_error)
+           1252 LOAD_GLOBAL             20 (E)
+           1262 LOAD_ATTR               56 (GROK_BRIDGE_UNAVAILABLE)
+           1282 LOAD_CONST              26 ('Bridge Grok web chưa sẵn sàng (khởi động lại app).')
+           1284 CALL                     2
+           1292 RAISE_VARARGS            1
+
+113     >> 1294 LOAD_GLOBAL             59 (NULL + bool)
+           1304 LOAD_FAST               12 (grok)
+           1306 LOAD_ATTR               61 (NULL|self + get_status)
+           1326 CALL                     0
+           1334 GET_AWAITABLE            0
+           1336 LOAD_CONST               0 (None)
+        >> 1338 SEND                     3 (to 1348)
+           1342 YIELD_VALUE              2
+           1344 RESUME                   3
+           1346 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1338)
+        >> 1348 END_SEND
+           1350 LOAD_ATTR               15 (NULL|self + get)
+           1370 LOAD_CONST              27 ('connected')
+           1372 CALL                     1
+           1380 CALL                     1
+           1388 STORE_FAST              13 (connected)
+
+114        1390 LOAD_FAST               13 (connected)
+           1392 POP_JUMP_IF_TRUE        77 (to 1548)
+
+115        1394 LOAD_GLOBAL             63 (NULL + asyncio)
+           1404 LOAD_ATTR               64 (sleep)
+           1424 LOAD_CONST              28 (3.0)
+           1426 CALL                     1
+           1434 GET_AWAITABLE            0
+           1436 LOAD_CONST               0 (None)
+        >> 1438 SEND                     3 (to 1448)
+           1442 YIELD_VALUE              2
+           1444 RESUME                   3
+           1446 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1438)
+        >> 1448 END_SEND
+           1450 POP_TOP
+
+116        1452 LOAD_GLOBAL             59 (NULL + bool)
+           1462 LOAD_FAST               12 (grok)
+           1464 LOAD_ATTR               61 (NULL|self + get_status)
+           1484 CALL                     0
+           1492 GET_AWAITABLE            0
+           1494 LOAD_CONST               0 (None)
+        >> 1496 SEND                     3 (to 1506)
+           1500 YIELD_VALUE              2
+           1502 RESUME                   3
+           1504 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1496)
+        >> 1506 END_SEND
+           1508 LOAD_ATTR               15 (NULL|self + get)
+           1528 LOAD_CONST              27 ('connected')
+           1530 CALL                     1
+           1538 CALL                     1
+           1546 STORE_FAST              13 (connected)
+
+117     >> 1548 LOAD_FAST               13 (connected)
+           1550 POP_JUMP_IF_TRUE        26 (to 1604)
+
+118        1552 LOAD_GLOBAL             19 (NULL + make_error)
+
+119        1562 LOAD_GLOBAL             20 (E)
+           1572 LOAD_ATTR               66 (GROK_AUTH)
+
+120        1592 LOAD_CONST              29 ('Chưa đăng nhập grok.com trên profile Chrome dùng cho Grok. Mở Trình duyệt & Profile → Mở profile → đăng nhập grok.com (xác nhận tuổi nếu được hỏi) → Kiểm tra, rồi bấm Tạo lại.')
+
+118        1594 CALL                     2
+           1602 RAISE_VARARGS            1
+
+122     >> 1604 LOAD_FAST                1 (ctx)
+           1606 LOAD_ATTR               31 (NULL|self + emit_log)
+           1626 LOAD_CONST              30 ('Grok video: animate ')
+           1628 LOAD_GLOBAL             33 (NULL + len)
+           1638 LOAD_FAST                7 (todo)
+           1640 CALL                     1
+           1648 FORMAT_VALUE             0
+           1650 LOAD_CONST              31 (' cảnh từ ảnh đã có trên grok.com [')
+
+123        1652 LOAD_FAST               10 (grok_fail)
+           1654 LOAD_ATTR               48 (account_id)
+           1674 POP_JUMP_IF_FALSE       12 (to 1700)
+           1676 LOAD_FAST               10 (grok_fail)
+           1678 LOAD_ATTR               68 (label)
+           1698 JUMP_FORWARD             5 (to 1710)
+        >> 1700 LOAD_FAST               11 (account)
+           1702 COPY                     1
+           1704 POP_JUMP_IF_TRUE         2 (to 1710)
+           1706 POP_TOP
+           1708 LOAD_CONST              32 ('mặc định')
+        >> 1710 FORMAT_VALUE             0
+           1712 LOAD_CONST              33 ('].')
+
+122        1714 BUILD_STRING             5
+           1716 CALL                     1
+           1724 POP_TOP
+
+129        1726 NOP
+
+130        1728 LOAD_CONST              18 (0)
+           1730 LOAD_CONST              34 (('browser_profile_service',))
+           1732 IMPORT_NAME             35 (app.services)
+           1734 IMPORT_FROM             36 (browser_profile_service)
+           1736 STORE_FAST              14 (bps)
+           1738 POP_TOP
+
+131        1740 LOAD_FAST               11 (account)
+           1742 COPY                     1
+           1744 POP_JUMP_IF_TRUE         2 (to 1750)
+           1746 POP_TOP
+           1748 LOAD_CONST              22 ('')
+        >> 1750 LOAD_ATTR               51 (NULL|self + startswith)
+           1770 LOAD_CONST              23 ('bp:')
+           1772 CALL                     1
+           1780 POP_JUMP_IF_FALSE        5 (to 1792)
+           1782 LOAD_FAST               11 (account)
+           1784 LOAD_CONST              35 (3)
+           1786 LOAD_CONST               0 (None)
+           1788 BINARY_SLICE
+           1790 JUMP_FORWARD             1 (to 1794)
+        >> 1792 LOAD_CONST               0 (None)
+        >> 1794 STORE_FAST              15 (keep)
+
+132        1796 LOAD_GLOBAL             75 (NULL + SessionLocal)
+           1806 CALL                     0
+           1814 BEFORE_WITH
+           1816 STORE_FAST              16 (db)
+
+133        1818 LOAD_FAST               14 (bps)
+           1820 LOAD_ATTR               77 (NULL|self + release_other_profiles)
+           1840 LOAD_FAST               16 (db)
+           1842 LOAD_FAST                1 (ctx)
+           1844 LOAD_ATTR                8 (video_id)
+           1864 LOAD_FAST               15 (keep)
+           1866 KW_NAMES                36 (('keep_profile_id',))
+           1868 CALL                     3
+           1876 STORE_FAST              17 (freed)
+
+132        1878 LOAD_CONST               0 (None)
+           1880 LOAD_CONST               0 (None)
+           1882 LOAD_CONST               0 (None)
+           1884 CALL                     2
+           1892 POP_TOP
+
+134     >> 1894 LOAD_FAST_CHECK         17 (freed)
+           1896 POP_JUMP_IF_FALSE       21 (to 1940)
+
+135        1898 LOAD_FAST                1 (ctx)
+           1900 LOAD_ATTR               31 (NULL|self + emit_log)
+           1920 LOAD_CONST              37 ('Đã nhả ')
+           1922 LOAD_FAST               17 (freed)
+           1924 FORMAT_VALUE             0
+           1926 LOAD_CONST              38 (' profile Flow (ảnh đã xong) → video khác dùng được ngay.')
+           1928 BUILD_STRING             3
+           1930 CALL                     1
+           1938 POP_TOP
+
+139     >> 1940 LOAD_GLOBAL             33 (NULL + len)
+           1950 LOAD_FAST                7 (todo)
+           1952 CALL                     1
+           1960 STORE_FAST              19 (total)
+
+140        1962 LOAD_CONST              18 (0)
+           1964 COPY                     1
+           1966 STORE_FAST              20 (n_clip)
+           1968 STORE_FAST              21 (n_still)
+
+141        1970 LOAD_GLOBAL             25 (NULL + enumerate)
+           1980 LOAD_FAST                7 (todo)
+           1982 CALL                     1
+           1990 GET_ITER
+        >> 1992 EXTENDED_ARG             2
+           1994 FOR_ITER               683 (to 3364)
+           1998 UNPACK_SEQUENCE          2
+           2002 STORE_FAST              22 (k)
+           2004 STORE_FAST              23 (idx)
+
+142        2006 LOAD_FAST                1 (ctx)
+           2008 LOAD_ATTR               81 (NULL|self + is_cancelled)
+           2028 CALL                     0
+           2036 POP_JUMP_IF_FALSE       26 (to 2090)
+
+143        2038 LOAD_GLOBAL             19 (NULL + make_error)
+           2048 LOAD_GLOBAL             20 (E)
+           2058 LOAD_ATTR               82 (CANCELLED)
+           2078 LOAD_CONST              41 ('Đã huỷ khi tạo video Grok.')
+           2080 CALL                     2
+           2088 RAISE_VARARGS            1
+
+144     >> 2090 LOAD_DEREF              36 (scenes)
+           2092 LOAD_FAST               23 (idx)
+           2094 BINARY_SUBSCR
+           2098 STORE_FAST              24 (scene)
+
+145        2100 LOAD_GLOBAL             85 (NULL + int)
+           2110 LOAD_FAST               24 (scene)
+           2112 LOAD_ATTR               15 (NULL|self + get)
+           2132 LOAD_CONST              42 ('seq')
+           2134 LOAD_FAST               23 (idx)
+           2136 LOAD_CONST              43 (1)
+           2138 BINARY_OP                0 (+)
+           2142 CALL                     2
+           2150 CALL                     1
+           2158 STORE_FAST              25 (seq)
+
+146        2160 LOAD_GLOBAL             87 (NULL + Path)
+           2170 LOAD_FAST               24 (scene)
+           2172 LOAD_CONST               9 ('image_path')
+           2174 BINARY_SUBSCR
+           2178 CALL                     1
+           2186 STORE_FAST              26 (keyframe)
+
+147        2188 LOAD_FAST                3 (scenes_dir)
+           2190 LOAD_CONST              44 ('scene_')
+           2192 LOAD_FAST               25 (seq)
+           2194 LOAD_CONST              45 ('04d')
+           2196 FORMAT_VALUE             4 (with format)
+           2198 LOAD_CONST              46 ('.mp4')
+           2200 BUILD_STRING             3
+           2202 BINARY_OP               11 (/)
+           2206 STORE_FAST              27 (out)
+
+148        2208 LOAD_GLOBAL             89 (NULL + grok_web_duration)
+           2218 LOAD_FAST               24 (scene)
+           2220 LOAD_ATTR               15 (NULL|self + get)
+           2240 LOAD_CONST              47 ('start_ms')
+           2242 LOAD_CONST              18 (0)
+           2244 CALL                     2
+           2252 LOAD_FAST               24 (scene)
+           2254 LOAD_ATTR               15 (NULL|self + get)
+           2274 LOAD_CONST              48 ('end_ms')
+           2276 LOAD_CONST              18 (0)
+           2278 CALL                     2
+           2286 CALL                     2
+           2294 STORE_FAST              28 (duration)
+
+149        2296 LOAD_GLOBAL             91 (NULL + video_prompt_for)
+           2306 LOAD_FAST               24 (scene)
+           2308 CALL                     1
+           2316 STORE_FAST              29 (prompt)
+
+150        2318 LOAD_CONST              49 (False)
+           2320 STORE_FAST              30 (done)
+
+151        2322 LOAD_CONST              50 ('không tạo được clip sau các lượt thử')
+           2324 STORE_FAST              31 (last_reason)
+
+152        2326 LOAD_GLOBAL             93 (NULL + range)
+           2336 LOAD_CONST              43 (1)
+           2338 LOAD_GLOBAL             94 (_SCENE_ATTEMPTS)
+           2348 LOAD_CONST              43 (1)
+           2350 BINARY_OP                0 (+)
+           2354 CALL                     2
+           2362 GET_ITER
+        >> 2364 EXTENDED_ARG             1
+           2366 FOR_ITER               370 (to 3110)
+           2370 STORE_FAST              32 (attempt)
+
+153        2372 NOP
+
+154        2374 LOAD_FAST                1 (ctx)
+           2376 LOAD_ATTR               31 (NULL|self + emit_log)
+           2396 LOAD_CONST              51 ('Cảnh ')
+           2398 LOAD_FAST               25 (seq)
+           2400 FORMAT_VALUE             0
+           2402 LOAD_CONST              52 (': Grok đang animate ảnh (')
+           2404 LOAD_FAST               28 (duration)
+           2406 FORMAT_VALUE             0
+           2408 LOAD_CONST              53 ('s, thử ')
+           2410 LOAD_FAST               32 (attempt)
+           2412 FORMAT_VALUE             0
+           2414 LOAD_CONST              54 ('/')
+           2416 LOAD_GLOBAL             94 (_SCENE_ATTEMPTS)
+           2426 FORMAT_VALUE             0
+           2428 LOAD_CONST              55 (')…')
+           2430 BUILD_STRING             9
+           2432 CALL                     1
+           2440 POP_TOP
+
+155        2442 LOAD_FAST                1 (ctx)
+           2444 LOAD_ATTR               97 (NULL|self + emit_progress)
+           2464 LOAD_CONST              56 (0.02)
+           2466 LOAD_CONST              57 (0.96)
+           2468 LOAD_FAST               22 (k)
+           2470 LOAD_CONST              58 (0.1)
+           2472 BINARY_OP                0 (+)
+           2476 BINARY_OP                5 (*)
+           2480 LOAD_FAST               19 (total)
+           2482 BINARY_OP               11 (/)
+           2486 BINARY_OP                0 (+)
+           2490 LOAD_CONST              59 ('Grok cảnh ')
+           2492 LOAD_FAST               25 (seq)
+           2494 FORMAT_VALUE             0
+           2496 LOAD_CONST              60 ('…')
+           2498 BUILD_STRING             3
+           2500 CALL                     2
+           2508 POP_TOP
+
+156        2510 LOAD_GLOBAL             99 (NULL + time)
+           2520 LOAD_ATTR              100 (monotonic)
+           2540 CALL                     0
+           2548 STORE_FAST              33 (started)
+
+157        2550 LOAD_FAST               12 (grok)
+           2552 LOAD_ATTR              103 (NULL|self + generate_video)
+           2572 LOAD_FAST               26 (keyframe)
+           2574 LOAD_FAST               27 (out)
+           2576 LOAD_FAST               29 (prompt)
+           2578 LOAD_FAST                4 (aspect)
+           2580 LOAD_FAST               28 (duration)
+           2582 KW_NAMES                61 (('prompt', 'aspect', 'duration_sec'))
+           2584 CALL                     5
+           2592 GET_AWAITABLE            0
+           2594 LOAD_CONST               0 (None)
+        >> 2596 SEND                     3 (to 2606)
+           2600 YIELD_VALUE              3
+           2602 RESUME                   3
+           2604 JUMP_BACKWARD_NO_INTERRUPT     5 (to 2596)
+        >> 2606 END_SEND
+           2608 POP_TOP
+
+158        2610 LOAD_GLOBAL            105 (NULL + _keyframe_ssim)
+           2620 LOAD_FAST               27 (out)
+           2622 LOAD_FAST               26 (keyframe)
+           2624 CALL                     2
+           2632 GET_AWAITABLE            0
+           2634 LOAD_CONST               0 (None)
+        >> 2636 SEND                     3 (to 2646)
+           2640 YIELD_VALUE              3
+           2642 RESUME                   3
+           2644 JUMP_BACKWARD_NO_INTERRUPT     5 (to 2636)
+        >> 2646 END_SEND
+           2648 STORE_FAST              34 (ssim)
+
+159        2650 LOAD_FAST               34 (ssim)
+           2652 POP_JUMP_IF_NONE        94 (to 2842)
+           2654 LOAD_FAST               34 (ssim)
+           2656 LOAD_GLOBAL            106 (_SSIM_MIN)
+           2666 COMPARE_OP               2 (<)
+           2670 POP_JUMP_IF_FALSE       85 (to 2842)
+
+160        2672 LOAD_FAST               27 (out)
+           2674 LOAD_ATTR              109 (NULL|self + unlink)
+           2694 LOAD_CONST               3 (True)
+           2696 KW_NAMES                62 (('missing_ok',))
+           2698 CALL                     1
+           2706 POP_TOP
+
+161        2708 LOAD_CONST              63 ('clip lệch ảnh khung đầu (SSIM=')
+           2710 LOAD_FAST               34 (ssim)
+           2712 LOAD_CONST              64 ('.3f')
+           2714 FORMAT_VALUE             4 (with format)
+           2716 LOAD_CONST              65 (')')
+           2718 BUILD_STRING             3
+           2720 STORE_FAST              31 (last_reason)
+
+162        2722 LOAD_FAST                1 (ctx)
+           2724 LOAD_ATTR               31 (NULL|self + emit_log)
+           2744 LOAD_CONST              51 ('Cảnh ')
+           2746 LOAD_FAST               25 (seq)
+           2748 FORMAT_VALUE             0
+           2750 LOAD_CONST              66 (': ')
+           2752 LOAD_FAST               31 (last_reason)
+           2754 FORMAT_VALUE             0
+           2756 LOAD_CONST              67 (' → tạo lại.')
+           2758 BUILD_STRING             5
+           2760 LOAD_CONST              16 ('warn')
+           2762 KW_NAMES                17 (('level',))
+           2764 CALL                     2
+           2772 POP_TOP
+
+163        2774 LOAD_GLOBAL             63 (NULL + asyncio)
+           2784 LOAD_ATTR               64 (sleep)
+           2804 LOAD_GLOBAL            110 (_RETRY_SLEEP_SEC)
+           2814 CALL                     1
+           2822 GET_AWAITABLE            0
+           2824 LOAD_CONST               0 (None)
+        >> 2826 SEND                     3 (to 2836)
+           2830 YIELD_VALUE              3
+           2832 RESUME                   3
+           2834 JUMP_BACKWARD_NO_INTERRUPT     5 (to 2826)
+        >> 2836 END_SEND
+           2838 POP_TOP
+
+164        2840 JUMP_BACKWARD          239 (to 2364)
+
+165     >> 2842 LOAD_GLOBAL             41 (NULL + str)
+           2852 LOAD_FAST               27 (out)
+           2854 LOAD_ATTR              113 (NULL|self + resolve)
+           2874 CALL                     0
+           2882 CALL                     1
+           2890 LOAD_FAST               24 (scene)
+           2892 LOAD_CONST              68 ('asset_path')
+           2894 STORE_SUBSCR
+
+166        2898 LOAD_CONST              69 ('video')
+           2900 LOAD_FAST               24 (scene)
+           2902 LOAD_CONST              70 ('asset_kind')
+           2904 STORE_SUBSCR
+
+167        2908 LOAD_CONST              71 ('done')
+           2910 LOAD_FAST               24 (scene)
+           2912 LOAD_CONST              72 ('status')
+           2914 STORE_SUBSCR
+
+168        2918 LOAD_CONST              73 ('grok_web')
+           2920 LOAD_FAST               24 (scene)
+           2922 LOAD_CONST              74 ('video_source')
+           2924 STORE_SUBSCR
+
+169        2928 LOAD_FAST               24 (scene)
+           2930 LOAD_ATTR              115 (NULL|self + pop)
+           2950 LOAD_CONST              75 ('clip_status')
+           2952 LOAD_CONST               0 (None)
+           2954 CALL                     2
+           2962 POP_TOP
+
+170        2964 LOAD_FAST               24 (scene)
+           2966 LOAD_ATTR              115 (NULL|self + pop)
+           2986 LOAD_CONST              76 ('clip_error')
+           2988 LOAD_CONST               0 (None)
+           2990 CALL                     2
+           2998 POP_TOP
+
+171        3000 LOAD_FAST               20 (n_clip)
+           3002 LOAD_CONST              43 (1)
+           3004 BINARY_OP               13 (+=)
+           3008 STORE_FAST              20 (n_clip)
+
+172        3010 LOAD_CONST               3 (True)
+           3012 STORE_FAST              30 (done)
+
+173        3014 LOAD_FAST                1 (ctx)
+           3016 LOAD_ATTR               31 (NULL|self + emit_log)
+           3036 LOAD_CONST              51 ('Cảnh ')
+           3038 LOAD_FAST               25 (seq)
+           3040 FORMAT_VALUE             0
+           3042 LOAD_CONST              77 (': Grok xong clip sau ')
+           3044 LOAD_GLOBAL             99 (NULL + time)
+           3054 LOAD_ATTR              100 (monotonic)
+           3074 CALL                     0
+           3082 LOAD_FAST               33 (started)
+           3084 BINARY_OP               10 (-)
+           3088 LOAD_CONST              78 ('.1f')
+           3090 FORMAT_VALUE             4 (with format)
+           3092 LOAD_CONST              79 ('s')
+           3094 BUILD_STRING             5
+           3096 CALL                     1
+           3104 POP_TOP
+
+174        3106 POP_TOP
+           3108 JUMP_FORWARD             1 (to 3112)
+
+152     >> 3110 END_FOR
+
+196     >> 3112 LOAD_FAST               30 (done)
+           3114 POP_JUMP_IF_TRUE        54 (to 3224)
+
+197        3116 LOAD_GLOBAL            131 (NULL + keep_still)
+           3126 LOAD_FAST               24 (scene)
+           3128 LOAD_GLOBAL             41 (NULL + str)
+           3138 LOAD_FAST               26 (keyframe)
+           3140 CALL                     1
+           3148 LOAD_CONST              85 ('grok_failed_keyframe')
+           3150 LOAD_FAST               31 (last_reason)
+           3152 CALL                     4
+           3160 POP_TOP
+
+198        3162 LOAD_FAST               21 (n_still)
+           3164 LOAD_CONST              43 (1)
+           3166 BINARY_OP               13 (+=)
+           3170 STORE_FAST              21 (n_still)
+
+199        3172 LOAD_FAST                1 (ctx)
+           3174 LOAD_ATTR               31 (NULL|self + emit_log)
+           3194 LOAD_CONST              51 ('Cảnh ')
+           3196 LOAD_FAST               25 (seq)
+           3198 FORMAT_VALUE             0
+           3200 LOAD_CONST              86 (': không có clip Grok → giữ ảnh Flow làm cảnh tĩnh (')
+           3202 LOAD_FAST               31 (last_reason)
+           3204 FORMAT_VALUE             0
+           3206 LOAD_CONST              87 (').')
+           3208 BUILD_STRING             5
+
+200        3210 LOAD_CONST              16 ('warn')
+
+199        3212 KW_NAMES                17 (('level',))
+           3214 CALL                     2
+           3222 POP_TOP
+
+201     >> 3224 LOAD_FAST                0 (self)
+           3226 LOAD_ATTR              133 (NULL|self + _save_scenes)
+           3246 LOAD_FAST                1 (ctx)
+           3248 LOAD_ATTR                8 (video_id)
+           3268 LOAD_DEREF              36 (scenes)
+           3270 CALL                     2
+           3278 POP_TOP
+
+202        3280 LOAD_FAST                1 (ctx)
+           3282 LOAD_ATTR               97 (NULL|self + emit_progress)
+           3302 LOAD_CONST              56 (0.02)
+           3304 LOAD_CONST              57 (0.96)
+           3306 LOAD_FAST               22 (k)
+           3308 LOAD_CONST              43 (1)
+           3310 BINARY_OP                0 (+)
+           3314 BINARY_OP                5 (*)
+           3318 LOAD_FAST               19 (total)
+           3320 BINARY_OP               11 (/)
+           3324 BINARY_OP                0 (+)
+           3328 LOAD_CONST              88 ('Xong ')
+           3330 LOAD_FAST               22 (k)
+           3332 LOAD_CONST              43 (1)
+           3334 BINARY_OP                0 (+)
+           3338 FORMAT_VALUE             0
+           3340 LOAD_CONST              54 ('/')
+           3342 LOAD_FAST               19 (total)
+           3344 FORMAT_VALUE             0
+           3346 LOAD_CONST              89 (' cảnh video')
+           3348 BUILD_STRING             5
+           3350 CALL                     2
+           3358 POP_TOP
+           3360 EXTENDED_ARG             2
+           3362 JUMP_BACKWARD          686 (to 1992)
+
+141     >> 3364 END_FOR
+
+204        3366 LOAD_FAST                0 (self)
+           3368 LOAD_ATTR               39 (NULL|self + _finish)
+           3388 LOAD_FAST                1 (ctx)
+           3390 LOAD_DEREF              36 (scenes)
+           3392 LOAD_FAST                3 (scenes_dir)
+           3394 LOAD_FAST               20 (n_clip)
+           3396 LOAD_FAST               21 (n_still)
+           3398 KW_NAMES                19 (('n_clip', 'n_still'))
+           3400 CALL                     5
+           3408 RETURN_VALUE
+        >> 3410 SWAP                     2
+           3412 POP_TOP
+
+ 84        3414 SWAP                     3
+           3416 STORE_FAST               6 (s)
+           3418 STORE_FAST               5 (i)
+           3420 RERAISE                  0
+        >> 3422 SWAP                     2
+           3424 POP_TOP
+
+ 88        3426 SWAP                     2
+           3428 STORE_FAST               5 (i)
+           3430 RERAISE                  0
+        >> 3432 SWAP                     2
+           3434 POP_TOP
+
+ 94        3436 SWAP                     2
+           3438 STORE_FAST               5 (i)
+           3440 RERAISE                  0
+
+113     >> 3442 CLEANUP_THROW
+           3444 EXTENDED_ARG             4
+           3446 JUMP_BACKWARD         1050 (to 1348)
+
+115     >> 3448 CLEANUP_THROW
+           3450 EXTENDED_ARG             3
+           3452 JUMP_BACKWARD         1003 (to 1448)
+
+116     >> 3454 CLEANUP_THROW
+           3456 EXTENDED_ARG             3
+           3458 JUMP_BACKWARD          977 (to 1506)
+
+132     >> 3460 PUSH_EXC_INFO
+           3462 WITH_EXCEPT_START
+           3464 POP_JUMP_IF_TRUE         1 (to 3468)
+           3466 RERAISE                  2
+        >> 3468 POP_TOP
+           3470 POP_EXCEPT
+           3472 POP_TOP
+           3474 POP_TOP
+           3476 EXTENDED_ARG             3
+           3478 JUMP_BACKWARD          793 (to 1894)
+        >> 3480 COPY                     3
+           3482 POP_EXCEPT
+           3484 RERAISE                  1
+        >> 3486 PUSH_EXC_INFO
+
+136        3488 LOAD_GLOBAL             78 (Exception)
+           3498 CHECK_EXC_MATCH
+           3500 POP_JUMP_IF_FALSE       34 (to 3570)
+           3502 STORE_FAST              18 (exc)
+
+137        3504 LOAD_FAST                1 (ctx)
+           3506 LOAD_ATTR               31 (NULL|self + emit_log)
+           3526 LOAD_CONST              39 ('Không nhả được lease Flow (')
+           3528 LOAD_FAST               18 (exc)
+           3530 FORMAT_VALUE             0
+           3532 LOAD_CONST              40 (') — vẫn tạo clip bình thường.')
+           3534 BUILD_STRING             3
+           3536 LOAD_CONST              16 ('warn')
+           3538 KW_NAMES                17 (('level',))
+           3540 CALL                     2
+           3548 POP_TOP
+           3550 POP_EXCEPT
+           3552 LOAD_CONST               0 (None)
+           3554 STORE_FAST              18 (exc)
+           3556 DELETE_FAST             18 (exc)
+           3558 EXTENDED_ARG             3
+           3560 JUMP_BACKWARD          811 (to 1940)
+        >> 3562 LOAD_CONST               0 (None)
+           3564 STORE_FAST              18 (exc)
+           3566 DELETE_FAST             18 (exc)
+           3568 RERAISE                  1
+
+136     >> 3570 RERAISE                  0
+        >> 3572 COPY                     3
+           3574 POP_EXCEPT
+           3576 RERAISE                  1
+
+157     >> 3578 CLEANUP_THROW
+           3580 EXTENDED_ARG             1
+           3582 JUMP_BACKWARD          489 (to 2606)
+
+158     >> 3584 CLEANUP_THROW
+           3586 EXTENDED_ARG             1
+           3588 JUMP_BACKWARD          472 (to 2646)
+
+163     >> 3590 CLEANUP_THROW
+           3592 EXTENDED_ARG             1
+           3594 JUMP_BACKWARD          380 (to 2836)
+        >> 3596 PUSH_EXC_INFO
+
+175        3598 LOAD_GLOBAL            116 (StudioError)
+           3608 CHECK_EXC_MATCH
+           3610 EXTENDED_ARG             1
+           3612 POP_JUMP_IF_FALSE      452 (to 4518)
+           3614 STORE_FAST              18 (exc)
+
+176        3616 LOAD_FAST               18 (exc)
+           3618 LOAD_ATTR              118 (code)
+           3638 LOAD_GLOBAL             20 (E)
+           3648 LOAD_ATTR               82 (CANCELLED)
+           3668 COMPARE_OP              40 (==)
+           3672 POP_JUMP_IF_FALSE        1 (to 3676)
+
+177        3674 RAISE_VARARGS            0
+
+178     >> 3676 LOAD_FAST               18 (exc)
+           3678 LOAD_ATTR              118 (code)
+           3698 FORMAT_VALUE             0
+           3700 LOAD_CONST              66 (': ')
+           3702 LOAD_FAST               18 (exc)
+           3704 LOAD_ATTR              120 (message)
+           3724 FORMAT_VALUE             0
+           3726 BUILD_STRING             3
+           3728 STORE_FAST              31 (last_reason)
+
+179        3730 LOAD_FAST               18 (exc)
+           3732 LOAD_ATTR              118 (code)
+           3752 LOAD_GLOBAL             20 (E)
+           3762 LOAD_ATTR              122 (GROK_MODERATED)
+           3782 LOAD_GLOBAL             20 (E)
+           3792 LOAD_ATTR               56 (GROK_BRIDGE_UNAVAILABLE)
+           3812 BUILD_TUPLE              2
+           3814 CONTAINS_OP              0
+           3816 POP_JUMP_IF_FALSE       32 (to 3882)
+
+180        3818 LOAD_FAST                1 (ctx)
+           3820 LOAD_ATTR               31 (NULL|self + emit_log)
+           3840 LOAD_CONST              51 ('Cảnh ')
+           3842 LOAD_FAST               25 (seq)
+           3844 FORMAT_VALUE             0
+           3846 LOAD_CONST              80 (': Grok ')
+           3848 LOAD_FAST               31 (last_reason)
+           3850 FORMAT_VALUE             0
+           3852 BUILD_STRING             4
+           3854 LOAD_CONST              16 ('warn')
+           3856 KW_NAMES                17 (('level',))
+           3858 CALL                     2
+           3866 POP_TOP
+
+181        3868 POP_EXCEPT
+           3870 LOAD_CONST               0 (None)
+           3872 STORE_FAST              18 (exc)
+           3874 DELETE_FAST             18 (exc)
+           3876 POP_TOP
+           3878 EXTENDED_ARG             1
+           3880 JUMP_BACKWARD          385 (to 3112)
+
+182     >> 3882 LOAD_FAST               18 (exc)
+           3884 LOAD_ATTR              118 (code)
+           3904 LOAD_GLOBAL             20 (E)
+           3914 LOAD_ATTR              124 (GROK_RATE_LIMIT)
+           3934 LOAD_GLOBAL             20 (E)
+           3944 LOAD_ATTR               66 (GROK_AUTH)
+           3964 BUILD_TUPLE              2
+           3966 CONTAINS_OP              0
+           3968 POP_JUMP_IF_FALSE      204 (to 4378)
+
+183        3970 LOAD_FAST               18 (exc)
+           3972 LOAD_ATTR              118 (code)
+           3992 LOAD_GLOBAL             20 (E)
+           4002 LOAD_ATTR              124 (GROK_RATE_LIMIT)
+           4022 COMPARE_OP              40 (==)
+           4026 POP_JUMP_IF_FALSE       16 (to 4060)
+           4028 LOAD_FAST               10 (grok_fail)
+           4030 LOAD_ATTR              127 (NULL|self + on_quota)
+           4050 CALL                     0
+           4058 JUMP_FORWARD            15 (to 4090)
+        >> 4060 LOAD_FAST               10 (grok_fail)
+           4062 LOAD_ATTR              129 (NULL|self + on_auth)
+           4082 CALL                     0
+        >> 4090 STORE_FAST              35 (rotated)
+
+184        4092 LOAD_FAST               35 (rotated)
+           4094 POP_JUMP_IF_FALSE      108 (to 4312)
+           4096 LOAD_FAST               10 (grok_fail)
+           4098 LOAD_ATTR               48 (account_id)
+           4118 COPY                     1
+           4120 POP_JUMP_IF_TRUE         2 (to 4126)
+           4122 POP_TOP
+           4124 LOAD_CONST              22 ('')
+        >> 4126 LOAD_ATTR               51 (NULL|self + startswith)
+           4146 LOAD_CONST              23 ('bp:')
+           4148 CALL                     1
+           4156 POP_JUMP_IF_FALSE       77 (to 4312)
+
+185        4158 LOAD_GLOBAL             53 (NULL + GrokWebClient)
+           4168 LOAD_FAST               10 (grok_fail)
+           4170 LOAD_ATTR               48 (account_id)
+           4190 KW_NAMES                25 (('account_id',))
+           4192 CALL                     1
+           4200 STORE_FAST              12 (grok)
+
+186        4202 LOAD_FAST                1 (ctx)
+           4204 LOAD_ATTR               31 (NULL|self + emit_log)
+           4224 LOAD_CONST              51 ('Cảnh ')
+           4226 LOAD_FAST               25 (seq)
+           4228 FORMAT_VALUE             0
+           4230 LOAD_CONST              80 (': Grok ')
+           4232 LOAD_FAST               18 (exc)
+           4234 LOAD_ATTR              118 (code)
+           4254 FORMAT_VALUE             0
+           4256 LOAD_CONST              81 (' → xoay sang [')
+           4258 LOAD_FAST               10 (grok_fail)
+           4260 LOAD_ATTR               68 (label)
+           4280 FORMAT_VALUE             0
+           4282 LOAD_CONST              33 ('].')
+           4284 BUILD_STRING             7
+           4286 LOAD_CONST              16 ('warn')
+           4288 KW_NAMES                17 (('level',))
+           4290 CALL                     2
+           4298 POP_TOP
+
+187        4300 POP_EXCEPT
+           4302 LOAD_CONST               0 (None)
+           4304 STORE_FAST              18 (exc)
+           4306 DELETE_FAST             18 (exc)
+           4308 EXTENDED_ARG             3
+           4310 JUMP_BACKWARD          974 (to 2364)
+
+188     >> 4312 LOAD_FAST                1 (ctx)
+           4314 LOAD_ATTR               31 (NULL|self + emit_log)
+           4334 LOAD_CONST              51 ('Cảnh ')
+           4336 LOAD_FAST               25 (seq)
+           4338 FORMAT_VALUE             0
+           4340 LOAD_CONST              80 (': Grok ')
+           4342 LOAD_FAST               31 (last_reason)
+           4344 FORMAT_VALUE             0
+           4346 LOAD_CONST              82 (' → hết tài khoản Grok để xoay.')
+           4348 BUILD_STRING             5
+           4350 LOAD_CONST              16 ('warn')
+           4352 KW_NAMES                17 (('level',))
+           4354 CALL                     2
+           4362 POP_TOP
+
+189        4364 POP_EXCEPT
+           4366 LOAD_CONST               0 (None)
+           4368 STORE_FAST              18 (exc)
+           4370 DELETE_FAST             18 (exc)
+           4372 POP_TOP
+           4374 EXTENDED_ARG             2
+           4376 JUMP_BACKWARD          633 (to 3112)
+
+190     >> 4378 LOAD_FAST                1 (ctx)
+           4380 LOAD_ATTR               31 (NULL|self + emit_log)
+           4400 LOAD_CONST              51 ('Cảnh ')
+           4402 LOAD_FAST               25 (seq)
+           4404 FORMAT_VALUE             0
+           4406 LOAD_CONST              83 (': Grok lỗi ')
+           4408 LOAD_FAST               31 (last_reason)
+           4410 FORMAT_VALUE             0
+           4412 LOAD_CONST              84 (' → thử lại.')
+           4414 BUILD_STRING             5
+           4416 LOAD_CONST              16 ('warn')
+           4418 KW_NAMES                17 (('level',))
+           4420 CALL                     2
+           4428 POP_TOP
+
+191        4430 LOAD_GLOBAL             63 (NULL + asyncio)
+           4440 LOAD_ATTR               64 (sleep)
+           4460 LOAD_GLOBAL            110 (_RETRY_SLEEP_SEC)
+           4470 CALL                     1
+           4478 GET_AWAITABLE            0
+           4480 LOAD_CONST               0 (None)
+        >> 4482 SEND                     4 (to 4494)
+           4486 YIELD_VALUE              4
+           4488 RESUME                   3
+           4490 JUMP_BACKWARD_NO_INTERRUPT     5 (to 4482)
+        >> 4492 CLEANUP_THROW
+        >> 4494 END_SEND
+           4496 POP_TOP
+           4498 POP_EXCEPT
+           4500 LOAD_CONST               0 (None)
+           4502 STORE_FAST              18 (exc)
+           4504 DELETE_FAST             18 (exc)
+           4506 EXTENDED_ARG             4
+           4508 JUMP_BACKWARD         1073 (to 2364)
+        >> 4510 LOAD_CONST               0 (None)
+           4512 STORE_FAST              18 (exc)
+           4514 DELETE_FAST             18 (exc)
+           4516 RERAISE                  1
+
+192     >> 4518 LOAD_GLOBAL             78 (Exception)
+           4528 CHECK_EXC_MATCH
+           4530 POP_JUMP_IF_FALSE       82 (to 4696)
+           4532 STORE_FAST              18 (exc)
+
+193        4534 LOAD_GLOBAL             41 (NULL + str)
+           4544 LOAD_FAST               18 (exc)
+           4546 CALL                     1
+           4554 STORE_FAST              31 (last_reason)
+
+194        4556 LOAD_FAST                1 (ctx)
+           4558 LOAD_ATTR               31 (NULL|self + emit_log)
+           4578 LOAD_CONST              51 ('Cảnh ')
+           4580 LOAD_FAST               25 (seq)
+           4582 FORMAT_VALUE             0
+           4584 LOAD_CONST              83 (': Grok lỗi ')
+           4586 LOAD_FAST               18 (exc)
+           4588 FORMAT_VALUE             0
+           4590 LOAD_CONST              84 (' → thử lại.')
+           4592 BUILD_STRING             5
+           4594 LOAD_CONST              16 ('warn')
+           4596 KW_NAMES                17 (('level',))
+           4598 CALL                     2
+           4606 POP_TOP
+
+195        4608 LOAD_GLOBAL             63 (NULL + asyncio)
+           4618 LOAD_ATTR               64 (sleep)
+           4638 LOAD_GLOBAL            110 (_RETRY_SLEEP_SEC)
+           4648 CALL                     1
+           4656 GET_AWAITABLE            0
+           4658 LOAD_CONST               0 (None)
+        >> 4660 SEND                     4 (to 4672)
+           4664 YIELD_VALUE              4
+           4666 RESUME                   3
+           4668 JUMP_BACKWARD_NO_INTERRUPT     5 (to 4660)
+        >> 4670 CLEANUP_THROW
+        >> 4672 END_SEND
+           4674 POP_TOP
+           4676 POP_EXCEPT
+           4678 LOAD_CONST               0 (None)
+           4680 STORE_FAST              18 (exc)
+           4682 DELETE_FAST             18 (exc)
+           4684 EXTENDED_ARG             4
+           4686 JUMP_BACKWARD         1162 (to 2364)
+        >> 4688 LOAD_CONST               0 (None)
+           4690 STORE_FAST              18 (exc)
+           4692 DELETE_FAST             18 (exc)
+           4694 RERAISE                  1
+
+192     >> 4696 RERAISE                  0
+        >> 4698 COPY                     3
+           4700 POP_EXCEPT
+           4702 RERAISE                  1
+        >> 4704 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           4706 RERAISE                  1
+ExceptionTable:
+  6 to 422 -> 4704 [0] lasti
+  424 to 460 -> 3410 [3]
+  464 to 470 -> 3410 [3]
+  472 to 484 -> 4704 [0] lasti
+  486 to 552 -> 3422 [2]
+  556 to 562 -> 3422 [2]
+  564 to 702 -> 4704 [0] lasti
+  704 to 738 -> 3432 [2]
+  742 to 748 -> 3432 [2]
+  750 to 1340 -> 4704 [0] lasti
+  1342 to 1342 -> 3442 [4]
+  1344 to 1440 -> 4704 [0] lasti
+  1442 to 1442 -> 3448 [2]
+  1444 to 1498 -> 4704 [0] lasti
+  1500 to 1500 -> 3454 [4]
+  1502 to 1724 -> 4704 [0] lasti
+  1728 to 1814 -> 3486 [0]
+  1816 to 1876 -> 3460 [1] lasti
+  1878 to 1938 -> 3486 [0]
+  1940 to 2370 -> 4704 [0] lasti
+  2374 to 2598 -> 3596 [2]
+  2600 to 2600 -> 3578 [4]
+  2602 to 2638 -> 3596 [2]
+  2640 to 2640 -> 3584 [4]
+  2642 to 2828 -> 3596 [2]
+  2830 to 2830 -> 3590 [4]
+  2832 to 2838 -> 3596 [2]
+  2840 to 2840 -> 4704 [0] lasti
+  2842 to 3104 -> 3596 [2]
+  3106 to 3442 -> 4704 [0] lasti
+  3448 to 3448 -> 4704 [0] lasti
+  3454 to 3454 -> 4704 [0] lasti
+  3460 to 3468 -> 3480 [3] lasti
+  3470 to 3484 -> 3486 [0]
+  3486 to 3502 -> 3572 [1] lasti
+  3504 to 3548 -> 3562 [1] lasti
+  3550 to 3560 -> 4704 [0] lasti
+  3562 to 3570 -> 3572 [1] lasti
+  3572 to 3576 -> 4704 [0] lasti
+  3578 to 3578 -> 3596 [2]
+  3584 to 3584 -> 3596 [2]
+  3590 to 3590 -> 3596 [2]
+  3596 to 3614 -> 4698 [3] lasti
+  3616 to 3866 -> 4510 [3] lasti
+  3868 to 3880 -> 4704 [0] lasti
+  3882 to 4298 -> 4510 [3] lasti
+  4300 to 4310 -> 4704 [0] lasti
+  4312 to 4362 -> 4510 [3] lasti
+  4364 to 4376 -> 4704 [0] lasti
+  4378 to 4484 -> 4510 [3] lasti
+  4486 to 4486 -> 4492 [5]
+  4488 to 4496 -> 4510 [3] lasti
+  4498 to 4508 -> 4704 [0] lasti
+  4510 to 4532 -> 4698 [3] lasti
+  4534 to 4662 -> 4688 [3] lasti
+  4664 to 4664 -> 4670 [5]
+  4666 to 4674 -> 4688 [3] lasti
+  4676 to 4686 -> 4704 [0] lasti
+  4688 to 4696 -> 4698 [3] lasti
+  4698 to 4702 -> 4704 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c81ad0a50, file "app\pipeline\steps\grok_video.py", line 92>:
+              0 COPY_FREE_VARS           1
+
+ 92           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                37 (to 88)
+             14 STORE_FAST               1 (i)
+             16 LOAD_GLOBAL              1 (NULL + str)
+             26 LOAD_DEREF               2 (scenes)
+             28 LOAD_FAST                1 (i)
+             30 BINARY_SUBSCR
+             34 LOAD_ATTR                3 (NULL|self + get)
+             54 LOAD_CONST               0 ('seq')
+             56 LOAD_FAST                1 (i)
+             58 LOAD_CONST               1 (1)
+             60 BINARY_OP                0 (+)
+             64 CALL                     2
+             72 CALL                     1
+             80 YIELD_VALUE              1
+             82 RESUME                   1
+             84 POP_TOP
+             86 JUMP_BACKWARD           39 (to 10)
+        >>   88 END_FOR
+             90 RETURN_CONST             2 (None)
+        >>   92 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             94 RERAISE                  1
+ExceptionTable:
+  6 to 90 -> 92 [0] lasti
+
+Disassembly of <code object _finish at 0x26a06b60, file "app\pipeline\steps\grok_video.py", line 206>:
+206           0 RESUME                   0
+
+207           2 LOAD_GLOBAL              1 (NULL + enumerate)
+             12 LOAD_FAST                2 (scenes)
+             14 CALL                     1
+             22 GET_ITER
+             24 LOAD_FAST_AND_CLEAR      6 (i)
+             26 LOAD_FAST_AND_CLEAR      7 (s)
+             28 SWAP                     3
+             30 BUILD_LIST               0
+             32 SWAP                     2
+        >>   34 FOR_ITER                72 (to 182)
+             38 UNPACK_SEQUENCE          2
+             42 STORE_FAST               6 (i)
+             44 STORE_FAST               7 (s)
+
+208          46 LOAD_FAST                7 (s)
+             48 LOAD_ATTR                3 (NULL|self + get)
+             68 LOAD_CONST               1 ('render_skip')
+             70 CALL                     1
+             78 POP_JUMP_IF_TRUE        50 (to 180)
+             80 LOAD_FAST                7 (s)
+             82 LOAD_ATTR                3 (NULL|self + get)
+            102 LOAD_CONST               2 ('status')
+            104 CALL                     1
+            112 LOAD_CONST               3 ('done')
+            114 COMPARE_OP              55 (!=)
+            118 POP_JUMP_IF_FALSE       30 (to 180)
+
+207         120 LOAD_GLOBAL              5 (NULL + int)
+            130 LOAD_FAST                7 (s)
+            132 LOAD_ATTR                3 (NULL|self + get)
+            152 LOAD_CONST               4 ('seq')
+            154 LOAD_FAST                6 (i)
+            156 LOAD_CONST               5 (1)
+            158 BINARY_OP                0 (+)
+            162 CALL                     2
+            170 CALL                     1
+            178 LIST_APPEND              2
+        >>  180 JUMP_BACKWARD           74 (to 34)
+        >>  182 END_FOR
+            184 STORE_FAST               8 (missing)
+            186 STORE_FAST               6 (i)
+            188 STORE_FAST               7 (s)
+
+209         190 LOAD_FAST                8 (missing)
+            192 POP_JUMP_IF_FALSE       74 (to 342)
+
+210         194 LOAD_GLOBAL              7 (NULL + make_error)
+            204 LOAD_GLOBAL              8 (E)
+            214 LOAD_ATTR               10 (GROK_BAD_RESPONSE)
+
+211         234 LOAD_CONST               6 ('Còn ')
+            236 LOAD_GLOBAL             13 (NULL + len)
+            246 LOAD_FAST                8 (missing)
+            248 CALL                     1
+            256 FORMAT_VALUE             0
+            258 LOAD_CONST               7 (' cảnh chưa có ảnh/clip (')
+            260 LOAD_CONST               8 (', ')
+            262 LOAD_ATTR               15 (NULL|self + join)
+            282 LOAD_GLOBAL             17 (NULL + map)
+            292 LOAD_GLOBAL             18 (str)
+            302 LOAD_FAST                8 (missing)
+            304 LOAD_CONST               0 (None)
+            306 LOAD_CONST               9 (8)
+            308 BINARY_SLICE
+            310 CALL                     2
+            318 CALL                     1
+            326 FORMAT_VALUE             0
+            328 LOAD_CONST              10 ('). Hãy chạy lại bước tạo ảnh.')
+            330 BUILD_STRING             5
+
+210         332 CALL                     2
+            340 RAISE_VARARGS            1
+
+213     >>  342 LOAD_FAST                3 (scenes_dir)
+            344 LOAD_CONST              11 ('assets.json')
+            346 BINARY_OP               11 (/)
+            350 STORE_FAST               9 (manifest)
+
+214         352 LOAD_FAST                9 (manifest)
+            354 LOAD_ATTR               21 (NULL|self + write_text)
+            374 LOAD_GLOBAL             23 (NULL + json)
+            384 LOAD_ATTR               24 (dumps)
+            404 LOAD_CONST              12 ('scenes')
+
+217         406 LOAD_FAST                2 (scenes)
+            408 GET_ITER
+
+214         410 LOAD_FAST_AND_CLEAR      7 (s)
+            412 SWAP                     2
+            414 BUILD_LIST               0
+            416 SWAP                     2
+
+217     >>  418 FOR_ITER               101 (to 624)
+            422 STORE_FAST               7 (s)
+
+215         424 LOAD_FAST                7 (s)
+            426 LOAD_ATTR                3 (NULL|self + get)
+            446 LOAD_CONST               4 ('seq')
+            448 CALL                     1
+            456 LOAD_FAST                7 (s)
+            458 LOAD_ATTR                3 (NULL|self + get)
+            478 LOAD_CONST              13 ('asset_path')
+            480 CALL                     1
+            488 LOAD_FAST                7 (s)
+            490 LOAD_ATTR                3 (NULL|self + get)
+            510 LOAD_CONST              14 ('image_path')
+            512 CALL                     1
+
+216         520 LOAD_FAST                7 (s)
+            522 LOAD_ATTR                3 (NULL|self + get)
+            542 LOAD_CONST              15 ('asset_kind')
+            544 CALL                     1
+            552 LOAD_FAST                7 (s)
+            554 LOAD_ATTR                3 (NULL|self + get)
+            574 LOAD_CONST               2 ('status')
+            576 CALL                     1
+            584 LOAD_FAST                7 (s)
+            586 LOAD_ATTR                3 (NULL|self + get)
+            606 LOAD_CONST              16 ('clip_status')
+            608 CALL                     1
+
+215         616 LOAD_CONST              17 (('seq', 'asset_path', 'image_path', 'asset_kind', 'status', 'clip_status'))
+            618 BUILD_CONST_KEY_MAP      6
+            620 LIST_APPEND              2
+            622 JUMP_BACKWARD          103 (to 418)
+
+217     >>  624 END_FOR
+
+214         626 SWAP                     2
+            628 STORE_FAST               7 (s)
+            630 BUILD_MAP                1
+
+217         632 LOAD_CONST              18 (False)
+            634 LOAD_CONST              19 (2)
+
+214         636 KW_NAMES                20 (('ensure_ascii', 'indent'))
+            638 CALL                     3
+
+217         646 LOAD_CONST              21 ('utf-8')
+
+214         648 KW_NAMES                22 (('encoding',))
+            650 CALL                     2
+            658 POP_TOP
+
+218         660 LOAD_FAST                1 (ctx)
+            662 LOAD_ATTR               27 (NULL|self + emit_progress)
+            682 LOAD_CONST              23 (1.0)
+            684 LOAD_CONST              24 ('Xong video Grok: ')
+            686 LOAD_FAST                4 (n_clip)
+            688 FORMAT_VALUE             0
+            690 LOAD_CONST              25 (' clip, ')
+            692 LOAD_FAST                5 (n_still)
+            694 FORMAT_VALUE             0
+            696 LOAD_CONST              26 (' cảnh giữ ảnh tĩnh.')
+            698 BUILD_STRING             5
+            700 CALL                     2
+            708 POP_TOP
+
+219         710 LOAD_GLOBAL             19 (NULL + str)
+            720 LOAD_FAST                9 (manifest)
+            722 LOAD_ATTR               29 (NULL|self + resolve)
+            742 CALL                     0
+            750 CALL                     1
+
+220         758 LOAD_GLOBAL             13 (NULL + len)
+            768 LOAD_FAST                2 (scenes)
+            770 CALL                     1
+            778 LOAD_FAST                4 (n_clip)
+            780 LOAD_FAST                5 (n_still)
+            782 LOAD_CONST              27 ('flow_grok')
+            784 LOAD_CONST              28 (('scenes', 'clips', 'stills_kept', 'source'))
+            786 BUILD_CONST_KEY_MAP      4
+
+219         788 LOAD_CONST              29 (('scene_assets', 'meta'))
+            790 BUILD_CONST_KEY_MAP      2
+            792 RETURN_VALUE
+        >>  794 SWAP                     2
+            796 POP_TOP
+
+207         798 SWAP                     3
+            800 STORE_FAST               7 (s)
+            802 STORE_FAST               6 (i)
+            804 RERAISE                  0
+        >>  806 SWAP                     2
+            808 POP_TOP
+
+214         810 SWAP                     2
+            812 STORE_FAST               7 (s)
+            814 RERAISE                  0
+ExceptionTable:
+  30 to 182 -> 794 [3]
+  414 to 624 -> 806 [7]
+
+Disassembly of <code object _load_scenes at 0x290caec0, file "app\pipeline\steps\grok_video.py", line 222>:
+222           0 RESUME                   0
+
+224           2 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             12 CALL                     0
+             20 BEFORE_WITH
+             22 STORE_FAST               1 (db)
+
+225          24 LOAD_FAST                1 (db)
+             26 LOAD_ATTR                3 (NULL|self + query)
+             46 LOAD_GLOBAL              4 (ContentPlan)
+             56 CALL                     1
+             64 LOAD_ATTR                7 (NULL|self + filter)
+             84 LOAD_GLOBAL              4 (ContentPlan)
+             94 LOAD_ATTR                8 (video_id)
+            114 LOAD_FAST                0 (video_id)
+            116 COMPARE_OP              40 (==)
+            120 CALL                     1
+            128 LOAD_ATTR               11 (NULL|self + first)
+            148 CALL                     0
+            156 STORE_FAST               2 (plan)
+
+226         158 NOP
+
+227         160 LOAD_FAST                2 (plan)
+            162 POP_JUMP_IF_FALSE       43 (to 250)
+            164 LOAD_FAST                2 (plan)
+            166 LOAD_ATTR               12 (scenes_json)
+            186 POP_JUMP_IF_FALSE       31 (to 250)
+            188 LOAD_GLOBAL             15 (NULL + json)
+            198 LOAD_ATTR               16 (loads)
+            218 LOAD_FAST                2 (plan)
+            220 LOAD_ATTR               12 (scenes_json)
+            240 CALL                     1
+            248 JUMP_FORWARD             1 (to 252)
+        >>  250 BUILD_LIST               0
+        >>  252 NOP
+
+224         254 SWAP                     2
+            256 LOAD_CONST               0 (None)
+            258 LOAD_CONST               0 (None)
+            260 LOAD_CONST               0 (None)
+            262 CALL                     2
+            270 POP_TOP
+            272 RETURN_VALUE
+        >>  274 PUSH_EXC_INFO
+
+228         276 LOAD_GLOBAL             14 (json)
+            286 LOAD_ATTR               18 (JSONDecodeError)
+            306 CHECK_EXC_MATCH
+            308 POP_JUMP_IF_FALSE       14 (to 338)
+            310 POP_TOP
+
+229         312 BUILD_LIST               0
+            314 SWAP                     2
+            316 POP_EXCEPT
+
+224         318 SWAP                     2
+            320 LOAD_CONST               0 (None)
+            322 LOAD_CONST               0 (None)
+            324 LOAD_CONST               0 (None)
+            326 CALL                     2
+            334 POP_TOP
+            336 RETURN_VALUE
+
+228     >>  338 RERAISE                  0
+        >>  340 COPY                     3
+            342 POP_EXCEPT
+            344 RERAISE                  1
+
+224     >>  346 PUSH_EXC_INFO
+            348 WITH_EXCEPT_START
+            350 POP_JUMP_IF_TRUE         1 (to 354)
+            352 RERAISE                  2
+        >>  354 POP_TOP
+            356 POP_EXCEPT
+            358 POP_TOP
+            360 POP_TOP
+            362 RETURN_CONST             0 (None)
+        >>  364 COPY                     3
+            366 POP_EXCEPT
+            368 RERAISE                  1
+ExceptionTable:
+  22 to 156 -> 346 [1] lasti
+  160 to 250 -> 274 [1]
+  274 to 314 -> 340 [2] lasti
+  316 to 316 -> 346 [1] lasti
+  338 to 338 -> 340 [2] lasti
+  340 to 344 -> 346 [1] lasti
+  346 to 354 -> 364 [3] lasti
+
+Disassembly of <code object _save_scenes at 0x28b7be20, file "app\pipeline\steps\grok_video.py", line 231>:
+231           0 RESUME                   0
+
+233           2 NOP
+
+234           4 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             14 CALL                     0
+             22 BEFORE_WITH
+             24 STORE_FAST               2 (db)
+
+235          26 LOAD_FAST                2 (db)
+             28 LOAD_ATTR                3 (NULL|self + query)
+             48 LOAD_GLOBAL              4 (ContentPlan)
+             58 CALL                     1
+             66 LOAD_ATTR                7 (NULL|self + filter)
+             86 LOAD_GLOBAL              4 (ContentPlan)
+             96 LOAD_ATTR                8 (video_id)
+            116 LOAD_FAST                0 (video_id)
+            118 COMPARE_OP              40 (==)
+            122 CALL                     1
+            130 LOAD_ATTR               11 (NULL|self + first)
+            150 CALL                     0
+            158 STORE_FAST               3 (plan)
+
+236         160 LOAD_FAST                3 (plan)
+            162 POP_JUMP_IF_NONE        44 (to 252)
+
+237         164 LOAD_GLOBAL             13 (NULL + json)
+            174 LOAD_ATTR               14 (dumps)
+            194 LOAD_FAST                1 (scenes)
+            196 LOAD_CONST               1 (False)
+            198 KW_NAMES                 2 (('ensure_ascii',))
+            200 CALL                     2
+            208 LOAD_FAST                3 (plan)
+            210 STORE_ATTR               8 (scenes_json)
+
+238         220 LOAD_FAST                2 (db)
+            222 LOAD_ATTR               19 (NULL|self + commit)
+            242 CALL                     0
+            250 POP_TOP
+
+234     >>  252 LOAD_CONST               0 (None)
+            254 LOAD_CONST               0 (None)
+            256 LOAD_CONST               0 (None)
+            258 CALL                     2
+            266 POP_TOP
+            268 RETURN_CONST             0 (None)
+        >>  270 PUSH_EXC_INFO
+            272 WITH_EXCEPT_START
+            274 POP_JUMP_IF_TRUE         1 (to 278)
+            276 RERAISE                  2
+        >>  278 POP_TOP
+            280 POP_EXCEPT
+            282 POP_TOP
+            284 POP_TOP
+            286 RETURN_CONST             0 (None)
+        >>  288 COPY                     3
+            290 POP_EXCEPT
+            292 RERAISE                  1
+        >>  294 PUSH_EXC_INFO
+
+239         296 LOAD_GLOBAL             20 (Exception)
+            306 CHECK_EXC_MATCH
+            308 POP_JUMP_IF_FALSE        3 (to 316)
+            310 POP_TOP
+
+240         312 POP_EXCEPT
+            314 RETURN_CONST             0 (None)
+
+239     >>  316 RERAISE                  0
+        >>  318 COPY                     3
+            320 POP_EXCEPT
+            322 RERAISE                  1
+ExceptionTable:
+  4 to 22 -> 294 [0]
+  24 to 250 -> 270 [1] lasti
+  252 to 266 -> 294 [0]
+  270 to 278 -> 288 [3] lasti
+  280 to 284 -> 294 [0]
+  288 to 292 -> 294 [0]
+  294 to 310 -> 318 [1] lasti
+  316 to 316 -> 318 [1] lasti

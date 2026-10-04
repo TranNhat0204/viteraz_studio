@@ -1,0 +1,1645 @@
+  0           0 RESUME                   0
+
+  1           2 SETUP_ANNOTATIONS
+              4 LOAD_CONST               0 ('Kho model Revo Voice — manifest + tải giọng theo yêu cầu (Cloudflare R2).\n\nModel `.onnx` mỗi giọng ~63MB (trọng số float32, nén gần như vô ích: zip/xz chỉ giảm ~12%) nên\nKHÔNG nhét vào file cài đặt. Thay vào đó:\n\n  - `presets/revo_voices.json` (manifest ~5KB, ship trong app) mô tả TẤT CẢ giọng: id, tên file,\n    kích thước, sha256. Nhờ nó UI liệt kê đủ giọng ngay cả khi máy chưa tải file nào.\n  - File model tải từ `base_url` về `{data_dir}/resources/revo_voice/models/` khi user bấm tải\n    (hoặc tự tải khi pipeline cần một giọng chưa có).\n\nTải có RESUME (HTTP Range): rớt mạng giữa chừng thì lần sau tải tiếp phần còn thiếu, không tải lại\n63MB từ đầu. Ghi ra `<file>.part` rồi verify sha256 → rename nguyên tử, nên không bao giờ để lại\nfile model hỏng/nửa vời cho engine đọc.\n\nĐổi URL gốc (mirror/staging) bằng env `REVO_VOICE_BASE_URL` hoặc Setting `revo_voice_base_url`.\n')
+              6 STORE_NAME               0 (__doc__)
+
+ 17           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('annotations',))
+             12 IMPORT_NAME              1 (__future__)
+             14 IMPORT_FROM              2 (annotations)
+             16 STORE_NAME               2 (annotations)
+             18 POP_TOP
+
+ 19          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               3 (None)
+             24 IMPORT_NAME              3 (hashlib)
+             26 STORE_NAME               3 (hashlib)
+
+ 20          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               3 (None)
+             32 IMPORT_NAME              4 (json)
+             34 STORE_NAME               4 (json)
+
+ 21          36 LOAD_CONST               1 (0)
+             38 LOAD_CONST               3 (None)
+             40 IMPORT_NAME              5 (os)
+             42 STORE_NAME               5 (os)
+
+ 22          44 LOAD_CONST               1 (0)
+             46 LOAD_CONST               3 (None)
+             48 IMPORT_NAME              6 (threading)
+             50 STORE_NAME               6 (threading)
+
+ 23          52 LOAD_CONST               1 (0)
+             54 LOAD_CONST               4 (('Path',))
+             56 IMPORT_NAME              7 (pathlib)
+             58 IMPORT_FROM              8 (Path)
+             60 STORE_NAME               8 (Path)
+             62 POP_TOP
+
+ 24          64 LOAD_CONST               1 (0)
+             66 LOAD_CONST               5 (('Callable',))
+             68 IMPORT_NAME              9 (typing)
+             70 IMPORT_FROM             10 (Callable)
+             72 STORE_NAME              10 (Callable)
+             74 POP_TOP
+
+ 26          76 LOAD_CONST               1 (0)
+             78 LOAD_CONST               3 (None)
+             80 IMPORT_NAME             11 (httpx)
+             82 STORE_NAME              11 (httpx)
+
+ 28          84 LOAD_CONST               1 (0)
+             86 LOAD_CONST               6 (('make_error', 'E'))
+             88 IMPORT_NAME             12 (app.core.errors)
+             90 IMPORT_FROM             13 (make_error)
+             92 STORE_NAME              13 (make_error)
+             94 IMPORT_FROM             14 (E)
+             96 STORE_NAME              14 (E)
+             98 POP_TOP
+
+ 29         100 LOAD_CONST               1 (0)
+            102 LOAD_CONST               7 (('log',))
+            104 IMPORT_NAME             15 (app.core.logging)
+            106 IMPORT_FROM             16 (log)
+            108 STORE_NAME              16 (log)
+            110 POP_TOP
+
+ 31         112 LOAD_CONST               8 (262144)
+            114 STORE_NAME              17 (CHUNK)
+
+ 32         116 PUSH_NULL
+            118 LOAD_NAME               11 (httpx)
+            120 LOAD_ATTR               36 (Timeout)
+            140 LOAD_CONST               9 (30.0)
+            142 LOAD_CONST              10 (120.0)
+            144 KW_NAMES                11 (('read',))
+            146 CALL                     2
+            154 STORE_NAME              19 (TIMEOUT)
+
+ 33         156 LOAD_CONST              12 (3)
+            158 STORE_NAME              20 (_ATTEMPTS)
+
+ 35         160 LOAD_CONST               3 (None)
+            162 STORE_GLOBAL            21 (_MANIFEST)
+            164 LOAD_CONST              13 ('dict | None')
+            166 LOAD_NAME               22 (__annotations__)
+            168 LOAD_CONST              14 ('_MANIFEST')
+            170 STORE_SUBSCR
+
+ 36         174 PUSH_NULL
+            176 LOAD_NAME                6 (threading)
+            178 LOAD_ATTR               46 (Lock)
+            198 CALL                     0
+            206 STORE_NAME              24 (_LOCK)
+
+ 40         208 LOAD_CONST              29 (('return', 'Path'))
+            210 LOAD_CONST              15 (<code object manifest_path at 0x7f6c9331dac0, file "app\adapters\tts\revo_voice_store.py", line 40>)
+            212 MAKE_FUNCTION            4 (annotations)
+            214 STORE_NAME              25 (manifest_path)
+
+ 52         216 LOAD_CONST              30 (('return', 'dict'))
+            218 LOAD_CONST              16 (<code object load_manifest at 0x269e46b0, file "app\adapters\tts\revo_voice_store.py", line 52>)
+            220 MAKE_FUNCTION            4 (annotations)
+            222 STORE_NAME              26 (load_manifest)
+
+ 76         224 LOAD_CONST              31 (('return', 'None'))
+            226 LOAD_CONST              17 (<code object reset_cache at 0x7f6c929e53b0, file "app\adapters\tts\revo_voice_store.py", line 76>)
+            228 MAKE_FUNCTION            4 (annotations)
+            230 STORE_NAME              27 (reset_cache)
+
+ 81         232 LOAD_CONST              32 (('return', 'dict[str, dict]'))
+            234 LOAD_CONST              18 (<code object manifest_voices at 0x7f6c92d61bc0, file "app\adapters\tts\revo_voice_store.py", line 81>)
+            236 MAKE_FUNCTION            4 (annotations)
+            238 STORE_NAME              28 (manifest_voices)
+
+ 86         240 LOAD_CONST              33 (('return', 'str'))
+            242 LOAD_CONST              19 (<code object base_url at 0x269fea00, file "app\adapters\tts\revo_voice_store.py", line 86>)
+            244 MAKE_FUNCTION            4 (annotations)
+            246 STORE_NAME              29 (base_url)
+
+102         248 LOAD_CONST              34 (('return', 'list[str]'))
+            250 LOAD_CONST              20 (<code object default_voice_ids at 0x7f6c92d62100, file "app\adapters\tts\revo_voice_store.py", line 102>)
+            252 MAKE_FUNCTION            4 (annotations)
+            254 STORE_NAME              30 (default_voice_ids)
+
+108         256 LOAD_CONST              29 (('return', 'Path'))
+            258 LOAD_CONST              21 (<code object download_dir at 0x7f6c9324ba60, file "app\adapters\tts\revo_voice_store.py", line 108>)
+            260 MAKE_FUNCTION            4 (annotations)
+            262 STORE_NAME              31 (download_dir)
+
+117         264 LOAD_CONST              35 (('filename', 'str', 'return', 'Path | None'))
+            266 LOAD_CONST              22 (<code object _installed_path at 0x7f6c81b7c5d0, file "app\adapters\tts\revo_voice_store.py", line 117>)
+            268 MAKE_FUNCTION            4 (annotations)
+            270 STORE_NAME              32 (_installed_path)
+
+128         272 LOAD_CONST              36 (('entry', 'dict', 'return', 'bool'))
+            274 LOAD_CONST              23 (<code object is_installed at 0x7f6c9324f670, file "app\adapters\tts\revo_voice_store.py", line 128>)
+            276 MAKE_FUNCTION            4 (annotations)
+            278 STORE_NAME              33 (is_installed)
+
+138         280 LOAD_CONST              37 (('return', 'set[str]'))
+            282 LOAD_CONST              24 (<code object installed_ids at 0x7f6c92d7f9b0, file "app\adapters\tts\revo_voice_store.py", line 138>)
+            284 MAKE_FUNCTION            4 (annotations)
+            286 STORE_NAME              34 (installed_ids)
+
+143         288 LOAD_CONST              38 ((None,))
+            290 LOAD_CONST              39 (('p', 'Path', 'cancel_check', 'Callable[[], bool] | None', 'return', 'str'))
+            292 LOAD_CONST              25 (<code object _sha256 at 0x290ecf50, file "app\adapters\tts\revo_voice_store.py", line 143>)
+            294 MAKE_FUNCTION            5 (defaults, annotations)
+            296 STORE_NAME              35 (_sha256)
+
+154         298 NOP
+
+155         300 NOP
+
+153         302 LOAD_CONST              40 ((None, None))
+
+154         304 NOP
+
+153         306 NOP
+
+155         308 NOP
+
+153         310 NOP
+
+155         312 NOP
+
+153         314 LOAD_CONST              41 (('url', 'str', 'dest', 'Path', 'expect_size', 'int', 'expect_sha', 'str', 'on_progress', 'Callable[[float], None] | None', 'cancel_check', 'Callable[[], bool] | None', 'return', 'None'))
+            316 LOAD_CONST              26 (<code object _download_file at 0x28e33500, file "app\adapters\tts\revo_voice_store.py", line 153>)
+            318 MAKE_FUNCTION            5 (defaults, annotations)
+            320 STORE_NAME              36 (_download_file)
+
+214         322 NOP
+
+215         324 NOP
+
+213         326 LOAD_CONST              40 ((None, None))
+
+214         328 NOP
+
+213         330 NOP
+
+215         332 NOP
+
+213         334 NOP
+
+215         336 NOP
+
+213         338 LOAD_CONST              42 (('voice_id', 'str', 'on_progress', 'Callable[[float, str], None] | None', 'cancel_check', 'Callable[[], bool] | None', 'return', 'Path'))
+            340 LOAD_CONST              27 (<code object download_voice at 0x269fd690, file "app\adapters\tts\revo_voice_store.py", line 213>)
+            342 MAKE_FUNCTION            5 (defaults, annotations)
+            344 STORE_NAME              37 (download_voice)
+
+259         346 LOAD_CONST              43 (('voice_id', 'str', 'return', 'bool'))
+            348 LOAD_CONST              28 (<code object delete_voice at 0x269df3b0, file "app\adapters\tts\revo_voice_store.py", line 259>)
+            350 MAKE_FUNCTION            4 (annotations)
+            352 STORE_NAME              38 (delete_voice)
+            354 RETURN_CONST             3 (None)
+
+Disassembly of <code object manifest_path at 0x7f6c9331dac0, file "app\adapters\tts\revo_voice_store.py", line 40>:
+ 40           0 RESUME                   0
+
+ 42           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (None)
+              6 IMPORT_NAME              0 (sys)
+              8 STORE_FAST               0 (sys)
+
+ 44          10 LOAD_GLOBAL              3 (NULL + getattr)
+             20 LOAD_FAST                0 (sys)
+             22 LOAD_CONST               3 ('_MEIPASS')
+             24 LOAD_CONST               2 (None)
+             26 CALL                     3
+             34 STORE_FAST               1 (meipass)
+
+ 45          36 LOAD_FAST                1 (meipass)
+             38 POP_JUMP_IF_FALSE       38 (to 116)
+
+ 46          40 LOAD_GLOBAL              5 (NULL + Path)
+             50 LOAD_FAST                1 (meipass)
+             52 CALL                     1
+             60 LOAD_CONST               4 ('app')
+             62 BINARY_OP               11 (/)
+             66 LOAD_CONST               5 ('resources')
+             68 BINARY_OP               11 (/)
+             72 LOAD_CONST               6 ('revo_voices.json')
+             74 BINARY_OP               11 (/)
+             78 STORE_FAST               2 (p)
+
+ 47          80 LOAD_FAST                2 (p)
+             82 LOAD_ATTR                7 (NULL|self + is_file)
+            102 CALL                     0
+            110 POP_JUMP_IF_FALSE        2 (to 116)
+
+ 48         112 LOAD_FAST                2 (p)
+            114 RETURN_VALUE
+
+ 49     >>  116 LOAD_GLOBAL              5 (NULL + Path)
+            126 LOAD_GLOBAL              8 (__file__)
+            136 CALL                     1
+            144 LOAD_ATTR               11 (NULL|self + resolve)
+            164 CALL                     0
+            172 LOAD_ATTR               12 (parent)
+            192 LOAD_CONST               7 ('presets')
+            194 BINARY_OP               11 (/)
+            198 LOAD_CONST               6 ('revo_voices.json')
+            200 BINARY_OP               11 (/)
+            204 RETURN_VALUE
+
+Disassembly of <code object load_manifest at 0x269e46b0, file "app\adapters\tts\revo_voice_store.py", line 52>:
+ 52           0 RESUME                   0
+
+ 55           2 LOAD_GLOBAL              0 (_MANIFEST)
+             12 POP_JUMP_IF_NONE         6 (to 26)
+
+ 56          14 LOAD_GLOBAL              0 (_MANIFEST)
+             24 RETURN_VALUE
+
+ 57     >>   26 LOAD_CONST               2 (0)
+             28 LOAD_CONST               3 ('')
+             30 BUILD_LIST               0
+             32 LOAD_CONST               4 (('version', 'base_url', 'voices'))
+             34 BUILD_CONST_KEY_MAP      3
+             36 STORE_FAST               0 (empty)
+
+ 58          38 LOAD_GLOBAL              3 (NULL + manifest_path)
+             48 CALL                     0
+             56 STORE_FAST               1 (p)
+
+ 59          58 LOAD_FAST                1 (p)
+             60 LOAD_ATTR                5 (NULL|self + is_file)
+             80 CALL                     0
+             88 POP_JUMP_IF_TRUE        33 (to 156)
+
+ 60          90 LOAD_GLOBAL              7 (NULL + log)
+            100 LOAD_ATTR                8 (warning)
+            120 LOAD_CONST               5 ('[revo-voice] Không thấy manifest ')
+            122 LOAD_FAST                1 (p)
+            124 FORMAT_VALUE             0
+            126 LOAD_CONST               6 (' — sẽ chỉ dùng model có sẵn trên máy.')
+            128 BUILD_STRING             3
+            130 CALL                     1
+            138 POP_TOP
+
+ 61         140 LOAD_FAST                0 (empty)
+            142 STORE_GLOBAL             0 (_MANIFEST)
+
+ 62         144 LOAD_GLOBAL              0 (_MANIFEST)
+            154 RETURN_VALUE
+
+ 63     >>  156 NOP
+
+ 64         158 LOAD_GLOBAL             11 (NULL + json)
+            168 LOAD_ATTR               12 (loads)
+            188 LOAD_FAST                1 (p)
+            190 LOAD_ATTR               15 (NULL|self + read_text)
+            210 LOAD_CONST               7 ('utf-8')
+            212 KW_NAMES                 8 (('encoding',))
+            214 CALL                     1
+            222 CALL                     1
+            230 STORE_FAST               2 (data)
+
+ 69         232 LOAD_GLOBAL             21 (NULL + isinstance)
+            242 LOAD_FAST                2 (data)
+            244 LOAD_GLOBAL             22 (dict)
+            254 CALL                     2
+            262 POP_JUMP_IF_FALSE       31 (to 326)
+            264 LOAD_GLOBAL             21 (NULL + isinstance)
+            274 LOAD_FAST                2 (data)
+            276 LOAD_ATTR               25 (NULL|self + get)
+            296 LOAD_CONST              11 ('voices')
+            298 CALL                     1
+            306 LOAD_GLOBAL             26 (list)
+            316 CALL                     2
+            324 POP_JUMP_IF_TRUE         8 (to 342)
+
+ 70     >>  326 LOAD_FAST                0 (empty)
+            328 STORE_GLOBAL             0 (_MANIFEST)
+
+ 71         330 LOAD_GLOBAL              0 (_MANIFEST)
+            340 RETURN_VALUE
+
+ 72     >>  342 LOAD_FAST                2 (data)
+            344 STORE_GLOBAL             0 (_MANIFEST)
+
+ 73         346 LOAD_GLOBAL              0 (_MANIFEST)
+            356 RETURN_VALUE
+        >>  358 PUSH_EXC_INFO
+
+ 65         360 LOAD_GLOBAL             16 (OSError)
+            370 LOAD_GLOBAL             10 (json)
+            380 LOAD_ATTR               18 (JSONDecodeError)
+            400 BUILD_TUPLE              2
+            402 CHECK_EXC_MATCH
+            404 POP_JUMP_IF_FALSE       45 (to 496)
+            406 STORE_FAST               3 (e)
+
+ 66         408 LOAD_GLOBAL              7 (NULL + log)
+            418 LOAD_ATTR                8 (warning)
+            438 LOAD_CONST               9 ('[revo-voice] Manifest ')
+            440 LOAD_FAST                1 (p)
+            442 FORMAT_VALUE             0
+            444 LOAD_CONST              10 (' lỗi: ')
+            446 LOAD_FAST                3 (e)
+            448 FORMAT_VALUE             0
+            450 BUILD_STRING             4
+            452 CALL                     1
+            460 POP_TOP
+
+ 67         462 LOAD_FAST                0 (empty)
+            464 STORE_GLOBAL             0 (_MANIFEST)
+
+ 68         466 LOAD_GLOBAL              0 (_MANIFEST)
+            476 SWAP                     2
+            478 POP_EXCEPT
+            480 LOAD_CONST               1 (None)
+            482 STORE_FAST               3 (e)
+            484 DELETE_FAST              3 (e)
+            486 RETURN_VALUE
+        >>  488 LOAD_CONST               1 (None)
+            490 STORE_FAST               3 (e)
+            492 DELETE_FAST              3 (e)
+            494 RERAISE                  1
+
+ 65     >>  496 RERAISE                  0
+        >>  498 COPY                     3
+            500 POP_EXCEPT
+            502 RERAISE                  1
+ExceptionTable:
+  158 to 230 -> 358 [0]
+  358 to 406 -> 498 [1] lasti
+  408 to 474 -> 488 [1] lasti
+  476 to 476 -> 498 [1] lasti
+  488 to 496 -> 498 [1] lasti
+
+Disassembly of <code object reset_cache at 0x7f6c929e53b0, file "app\adapters\tts\revo_voice_store.py", line 76>:
+ 76           0 RESUME                   0
+
+ 78           2 LOAD_CONST               0 (None)
+              4 STORE_GLOBAL             0 (_MANIFEST)
+              6 RETURN_CONST             0 (None)
+
+Disassembly of <code object manifest_voices at 0x7f6c92d61bc0, file "app\adapters\tts\revo_voice_store.py", line 81>:
+ 81           0 RESUME                   0
+
+ 83           2 LOAD_GLOBAL              1 (NULL + load_manifest)
+             12 CALL                     0
+             20 LOAD_ATTR                3 (NULL|self + get)
+             40 LOAD_CONST               1 ('voices')
+             42 BUILD_LIST               0
+             44 CALL                     2
+             52 GET_ITER
+             54 LOAD_FAST_AND_CLEAR      0 (v)
+             56 SWAP                     2
+             58 BUILD_MAP                0
+             60 SWAP                     2
+        >>   62 FOR_ITER                26 (to 118)
+             66 STORE_FAST               0 (v)
+             68 LOAD_FAST                0 (v)
+             70 LOAD_ATTR                3 (NULL|self + get)
+             90 LOAD_CONST               2 ('id')
+             92 CALL                     1
+            100 POP_JUMP_IF_TRUE         1 (to 104)
+            102 JUMP_BACKWARD           21 (to 62)
+        >>  104 LOAD_FAST                0 (v)
+            106 LOAD_CONST               2 ('id')
+            108 BINARY_SUBSCR
+            112 LOAD_FAST                0 (v)
+            114 MAP_ADD                  2
+            116 JUMP_BACKWARD           28 (to 62)
+        >>  118 END_FOR
+            120 SWAP                     2
+            122 STORE_FAST               0 (v)
+            124 RETURN_VALUE
+        >>  126 SWAP                     2
+            128 POP_TOP
+            130 SWAP                     2
+            132 STORE_FAST               0 (v)
+            134 RERAISE                  0
+ExceptionTable:
+  58 to 100 -> 126 [2]
+  104 to 118 -> 126 [2]
+
+Disassembly of <code object base_url at 0x269fea00, file "app\adapters\tts\revo_voice_store.py", line 86>:
+ 86           0 RESUME                   0
+
+ 88           2 LOAD_GLOBAL              0 (os)
+             12 LOAD_ATTR                2 (environ)
+             32 LOAD_ATTR                5 (NULL|self + get)
+             52 LOAD_CONST               1 ('REVO_VOICE_BASE_URL')
+             54 CALL                     1
+             62 COPY                     1
+             64 POP_JUMP_IF_TRUE         2 (to 70)
+             66 POP_TOP
+             68 LOAD_CONST               2 ('')
+        >>   70 LOAD_ATTR                7 (NULL|self + strip)
+             90 CALL                     0
+             98 STORE_FAST               0 (env)
+
+ 89         100 LOAD_FAST                0 (env)
+            102 POP_JUMP_IF_FALSE       17 (to 138)
+
+ 90         104 LOAD_FAST                0 (env)
+            106 LOAD_ATTR                9 (NULL|self + rstrip)
+            126 LOAD_CONST               3 ('/')
+            128 CALL                     1
+            136 RETURN_VALUE
+
+ 91     >>  138 NOP
+
+ 92         140 LOAD_CONST               4 (0)
+            142 LOAD_CONST               5 (('get_setting_value',))
+            144 IMPORT_NAME              5 (app.adapters.tts.base)
+            146 IMPORT_FROM              6 (get_setting_value)
+            148 STORE_FAST               1 (get_setting_value)
+            150 POP_TOP
+
+ 94         152 PUSH_NULL
+            154 LOAD_FAST                1 (get_setting_value)
+            156 LOAD_CONST               6 ('revo_voice_base_url')
+            158 CALL                     1
+            166 COPY                     1
+            168 POP_JUMP_IF_TRUE         2 (to 174)
+            170 POP_TOP
+            172 LOAD_CONST               2 ('')
+        >>  174 LOAD_ATTR                7 (NULL|self + strip)
+            194 CALL                     0
+            202 STORE_FAST               2 (saved)
+
+ 95         204 LOAD_FAST                2 (saved)
+            206 POP_JUMP_IF_FALSE       17 (to 242)
+
+ 96         208 LOAD_FAST                2 (saved)
+            210 LOAD_ATTR                9 (NULL|self + rstrip)
+            230 LOAD_CONST               3 ('/')
+            232 CALL                     1
+            240 RETURN_VALUE
+
+ 95     >>  242 NOP
+
+ 99     >>  244 LOAD_GLOBAL             17 (NULL + str)
+            254 LOAD_GLOBAL             19 (NULL + load_manifest)
+            264 CALL                     0
+            272 LOAD_ATTR                5 (NULL|self + get)
+            292 LOAD_CONST               7 ('base_url')
+            294 CALL                     1
+            302 COPY                     1
+            304 POP_JUMP_IF_TRUE         2 (to 310)
+            306 POP_TOP
+            308 LOAD_CONST               2 ('')
+        >>  310 CALL                     1
+            318 LOAD_ATTR                9 (NULL|self + rstrip)
+            338 LOAD_CONST               3 ('/')
+            340 CALL                     1
+            348 RETURN_VALUE
+        >>  350 PUSH_EXC_INFO
+
+ 97         352 LOAD_GLOBAL             14 (Exception)
+            362 CHECK_EXC_MATCH
+            364 POP_JUMP_IF_FALSE        3 (to 372)
+            366 POP_TOP
+
+ 98         368 POP_EXCEPT
+            370 JUMP_BACKWARD           64 (to 244)
+
+ 97     >>  372 RERAISE                  0
+        >>  374 COPY                     3
+            376 POP_EXCEPT
+            378 RERAISE                  1
+ExceptionTable:
+  140 to 238 -> 350 [0]
+  350 to 366 -> 374 [1] lasti
+  372 to 372 -> 374 [1] lasti
+
+Disassembly of <code object default_voice_ids at 0x7f6c92d62100, file "app\adapters\tts\revo_voice_store.py", line 102>:
+102           0 RESUME                   0
+
+104           2 LOAD_GLOBAL              1 (NULL + load_manifest)
+             12 CALL                     0
+             20 LOAD_ATTR                3 (NULL|self + get)
+             40 LOAD_CONST               1 ('voices')
+             42 BUILD_LIST               0
+             44 CALL                     2
+             52 GET_ITER
+             54 LOAD_FAST_AND_CLEAR      0 (v)
+             56 SWAP                     2
+             58 BUILD_LIST               0
+             60 SWAP                     2
+        >>   62 FOR_ITER                25 (to 116)
+             66 STORE_FAST               0 (v)
+             68 LOAD_FAST                0 (v)
+             70 LOAD_ATTR                3 (NULL|self + get)
+             90 LOAD_CONST               2 ('default')
+             92 CALL                     1
+            100 POP_JUMP_IF_TRUE         1 (to 104)
+            102 JUMP_BACKWARD           21 (to 62)
+        >>  104 LOAD_FAST                0 (v)
+            106 LOAD_CONST               3 ('id')
+            108 BINARY_SUBSCR
+            112 LIST_APPEND              2
+            114 JUMP_BACKWARD           27 (to 62)
+        >>  116 END_FOR
+            118 SWAP                     2
+            120 STORE_FAST               0 (v)
+            122 RETURN_VALUE
+        >>  124 SWAP                     2
+            126 POP_TOP
+            128 SWAP                     2
+            130 STORE_FAST               0 (v)
+            132 RERAISE                  0
+ExceptionTable:
+  58 to 100 -> 124 [2]
+  104 to 116 -> 124 [2]
+
+Disassembly of <code object download_dir at 0x7f6c9324ba60, file "app\adapters\tts\revo_voice_store.py", line 108>:
+108           0 RESUME                   0
+
+110           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('get_settings',))
+              6 IMPORT_NAME              0 (app.config)
+              8 IMPORT_FROM              1 (get_settings)
+             10 STORE_FAST               0 (get_settings)
+             12 POP_TOP
+
+112          14 PUSH_NULL
+             16 LOAD_FAST                0 (get_settings)
+             18 CALL                     0
+             26 LOAD_ATTR                4 (data_dir)
+             46 LOAD_CONST               3 ('resources')
+             48 BINARY_OP               11 (/)
+             52 LOAD_CONST               4 ('revo_voice')
+             54 BINARY_OP               11 (/)
+             58 LOAD_CONST               5 ('models')
+             60 BINARY_OP               11 (/)
+             64 STORE_FAST               1 (d)
+
+113          66 LOAD_FAST                1 (d)
+             68 LOAD_ATTR                7 (NULL|self + mkdir)
+             88 LOAD_CONST               6 (True)
+             90 LOAD_CONST               6 (True)
+             92 KW_NAMES                 7 (('parents', 'exist_ok'))
+             94 CALL                     2
+            102 POP_TOP
+
+114         104 LOAD_FAST                1 (d)
+            106 RETURN_VALUE
+
+Disassembly of <code object _installed_path at 0x7f6c81b7c5d0, file "app\adapters\tts\revo_voice_store.py", line 117>:
+117           0 RESUME                   0
+
+119           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('models_dirs',))
+              6 IMPORT_NAME              0 (app.adapters.tts.revo_voice)
+              8 IMPORT_FROM              1 (models_dirs)
+             10 STORE_FAST               1 (models_dirs)
+             12 POP_TOP
+
+121          14 PUSH_NULL
+             16 LOAD_FAST                1 (models_dirs)
+             18 CALL                     0
+             26 GET_ITER
+        >>   28 FOR_ITER                27 (to 86)
+             32 STORE_FAST               2 (d)
+
+122          34 LOAD_FAST                2 (d)
+             36 LOAD_FAST                0 (filename)
+             38 BINARY_OP               11 (/)
+             42 STORE_FAST               3 (p)
+
+123          44 LOAD_FAST                3 (p)
+             46 LOAD_ATTR                5 (NULL|self + is_file)
+             66 CALL                     0
+             74 POP_JUMP_IF_TRUE         1 (to 78)
+             76 JUMP_BACKWARD           25 (to 28)
+
+124     >>   78 LOAD_FAST                3 (p)
+             80 SWAP                     2
+             82 POP_TOP
+             84 RETURN_VALUE
+
+121     >>   86 END_FOR
+
+125          88 RETURN_CONST             3 (None)
+
+Disassembly of <code object is_installed at 0x7f6c9324f670, file "app\adapters\tts\revo_voice_store.py", line 128>:
+128           0 RESUME                   0
+
+130           2 LOAD_GLOBAL              1 (NULL + _installed_path)
+             12 LOAD_FAST                0 (entry)
+             14 LOAD_ATTR                3 (NULL|self + get)
+             34 LOAD_CONST               1 ('model')
+             36 LOAD_CONST               2 ('')
+             38 CALL                     2
+             46 CALL                     1
+             54 STORE_FAST               1 (model)
+
+131          56 LOAD_GLOBAL              1 (NULL + _installed_path)
+             66 LOAD_FAST                0 (entry)
+             68 LOAD_ATTR                3 (NULL|self + get)
+             88 LOAD_CONST               3 ('config')
+             90 LOAD_CONST               2 ('')
+             92 CALL                     2
+            100 CALL                     1
+            108 STORE_FAST               2 (config)
+
+132         110 LOAD_FAST                1 (model)
+            112 POP_JUMP_IF_NONE         2 (to 118)
+            114 LOAD_FAST                2 (config)
+            116 POP_JUMP_IF_NOT_NONE     1 (to 120)
+
+133     >>  118 RETURN_CONST             4 (False)
+
+134     >>  120 LOAD_GLOBAL              5 (NULL + int)
+            130 LOAD_FAST                0 (entry)
+            132 LOAD_ATTR                3 (NULL|self + get)
+            152 LOAD_CONST               5 ('size')
+            154 CALL                     1
+            162 COPY                     1
+            164 POP_JUMP_IF_TRUE         2 (to 170)
+            166 POP_TOP
+            168 LOAD_CONST               6 (0)
+        >>  170 CALL                     1
+            178 STORE_FAST               3 (size)
+
+135         180 LOAD_FAST                3 (size)
+            182 UNARY_NOT
+            184 COPY                     1
+            186 POP_JUMP_IF_TRUE        29 (to 246)
+            188 POP_TOP
+            190 LOAD_FAST                1 (model)
+            192 LOAD_ATTR                7 (NULL|self + stat)
+            212 CALL                     0
+            220 LOAD_ATTR                8 (st_size)
+            240 LOAD_FAST                3 (size)
+            242 COMPARE_OP              40 (==)
+        >>  246 RETURN_VALUE
+
+Disassembly of <code object installed_ids at 0x7f6c92d7f9b0, file "app\adapters\tts\revo_voice_store.py", line 138>:
+138           0 RESUME                   0
+
+139           2 LOAD_GLOBAL              1 (NULL + manifest_voices)
+             12 CALL                     0
+             20 LOAD_ATTR                3 (NULL|self + items)
+             40 CALL                     0
+             48 GET_ITER
+             50 LOAD_FAST_AND_CLEAR      0 (vid)
+             52 LOAD_FAST_AND_CLEAR      1 (e)
+             54 SWAP                     3
+             56 BUILD_SET                0
+             58 SWAP                     2
+        >>   60 FOR_ITER                19 (to 102)
+             64 UNPACK_SEQUENCE          2
+             68 STORE_FAST               0 (vid)
+             70 STORE_FAST               1 (e)
+             72 LOAD_GLOBAL              5 (NULL + is_installed)
+             82 LOAD_FAST                1 (e)
+             84 CALL                     1
+             92 POP_JUMP_IF_TRUE         1 (to 96)
+             94 JUMP_BACKWARD           18 (to 60)
+        >>   96 LOAD_FAST                0 (vid)
+             98 SET_ADD                  2
+            100 JUMP_BACKWARD           21 (to 60)
+        >>  102 END_FOR
+            104 SWAP                     3
+            106 STORE_FAST               1 (e)
+            108 STORE_FAST               0 (vid)
+            110 RETURN_VALUE
+        >>  112 SWAP                     2
+            114 POP_TOP
+            116 SWAP                     3
+            118 STORE_FAST               1 (e)
+            120 STORE_FAST               0 (vid)
+            122 RERAISE                  0
+ExceptionTable:
+  56 to 92 -> 112 [3]
+  96 to 102 -> 112 [3]
+
+Disassembly of <code object _sha256 at 0x290ecf50, file "app\adapters\tts\revo_voice_store.py", line 143>:
+143           0 RESUME                   0
+
+144           2 LOAD_GLOBAL              1 (NULL + hashlib)
+             12 LOAD_ATTR                2 (sha256)
+             32 CALL                     0
+             40 STORE_FAST               2 (h)
+
+145          42 LOAD_FAST                0 (p)
+             44 LOAD_ATTR                5 (NULL|self + open)
+             64 LOAD_CONST               1 ('rb')
+             66 CALL                     1
+             74 BEFORE_WITH
+             76 STORE_FAST               3 (f)
+
+146          78 LOAD_FAST                3 (f)
+             80 LOAD_ATTR                7 (NULL|self + read)
+            100 LOAD_CONST               2 (1048576)
+            102 CALL                     1
+            110 COPY                     1
+            112 STORE_FAST               4 (chunk)
+            114 POP_JUMP_IF_FALSE       72 (to 260)
+
+147     >>  116 LOAD_FAST                1 (cancel_check)
+            118 POP_JUMP_IF_FALSE       33 (to 186)
+            120 PUSH_NULL
+            122 LOAD_FAST                1 (cancel_check)
+            124 CALL                     0
+            132 POP_JUMP_IF_FALSE       26 (to 186)
+
+148         134 LOAD_GLOBAL              9 (NULL + make_error)
+            144 LOAD_GLOBAL             10 (E)
+            154 LOAD_ATTR               12 (CANCELLED)
+            174 LOAD_CONST               3 ('Đã huỷ khi tải giọng.')
+            176 CALL                     2
+            184 RAISE_VARARGS            1
+
+149     >>  186 LOAD_FAST                2 (h)
+            188 LOAD_ATTR               15 (NULL|self + update)
+            208 LOAD_FAST                4 (chunk)
+            210 CALL                     1
+            218 POP_TOP
+
+146         220 LOAD_FAST                3 (f)
+            222 LOAD_ATTR                7 (NULL|self + read)
+            242 LOAD_CONST               2 (1048576)
+            244 CALL                     1
+            252 COPY                     1
+            254 STORE_FAST               4 (chunk)
+            256 POP_JUMP_IF_FALSE        1 (to 260)
+            258 JUMP_BACKWARD           72 (to 116)
+
+145     >>  260 LOAD_CONST               0 (None)
+            262 LOAD_CONST               0 (None)
+            264 LOAD_CONST               0 (None)
+            266 CALL                     2
+            274 POP_TOP
+
+150         276 LOAD_FAST                2 (h)
+            278 LOAD_ATTR               17 (NULL|self + hexdigest)
+            298 CALL                     0
+            306 RETURN_VALUE
+
+145     >>  308 PUSH_EXC_INFO
+            310 WITH_EXCEPT_START
+            312 POP_JUMP_IF_TRUE         1 (to 316)
+            314 RERAISE                  2
+        >>  316 POP_TOP
+            318 POP_EXCEPT
+            320 POP_TOP
+            322 POP_TOP
+
+150         324 LOAD_FAST                2 (h)
+            326 LOAD_ATTR               17 (NULL|self + hexdigest)
+            346 CALL                     0
+            354 RETURN_VALUE
+        >>  356 COPY                     3
+            358 POP_EXCEPT
+            360 RERAISE                  1
+ExceptionTable:
+  76 to 256 -> 308 [1] lasti
+  308 to 316 -> 356 [3] lasti
+
+Disassembly of <code object _download_file at 0x28e33500, file "app\adapters\tts\revo_voice_store.py", line 153>:
+153           0 RESUME                   0
+
+157           2 LOAD_FAST                1 (dest)
+              4 LOAD_ATTR                1 (NULL|self + is_file)
+             24 CALL                     0
+             32 POP_JUMP_IF_FALSE       42 (to 118)
+             34 LOAD_FAST                2 (expect_size)
+             36 POP_JUMP_IF_FALSE       29 (to 96)
+             38 LOAD_FAST                1 (dest)
+             40 LOAD_ATTR                3 (NULL|self + stat)
+             60 CALL                     0
+             68 LOAD_ATTR                4 (st_size)
+             88 LOAD_FAST                2 (expect_size)
+             90 COMPARE_OP              40 (==)
+             94 POP_JUMP_IF_FALSE       11 (to 118)
+
+158     >>   96 LOAD_FAST                4 (on_progress)
+             98 POP_JUMP_IF_FALSE        8 (to 116)
+
+159         100 PUSH_NULL
+            102 LOAD_FAST                4 (on_progress)
+            104 LOAD_CONST               1 (100.0)
+            106 CALL                     1
+            114 POP_TOP
+
+160     >>  116 RETURN_CONST             2 (None)
+
+162     >>  118 LOAD_FAST                1 (dest)
+            120 LOAD_ATTR                7 (NULL|self + with_suffix)
+            140 LOAD_FAST                1 (dest)
+            142 LOAD_ATTR                8 (suffix)
+            162 LOAD_CONST               3 ('.part')
+            164 BINARY_OP                0 (+)
+            168 CALL                     1
+            176 STORE_FAST               6 (part)
+
+163         178 LOAD_CONST               2 (None)
+            180 STORE_FAST               7 (last_err)
+
+164         182 LOAD_GLOBAL             11 (NULL + range)
+            192 LOAD_CONST               4 (1)
+            194 LOAD_GLOBAL             12 (_ATTEMPTS)
+            204 LOAD_CONST               4 (1)
+            206 BINARY_OP                0 (+)
+            210 CALL                     2
+            218 GET_ITER
+        >>  220 EXTENDED_ARG             2
+            222 FOR_ITER               540 (to 1306)
+            226 STORE_FAST               8 (attempt)
+
+165         228 NOP
+
+166         230 LOAD_FAST                6 (part)
+            232 LOAD_ATTR                1 (NULL|self + is_file)
+            252 CALL                     0
+            260 POP_JUMP_IF_FALSE       26 (to 314)
+            262 LOAD_FAST                6 (part)
+            264 LOAD_ATTR                3 (NULL|self + stat)
+            284 CALL                     0
+            292 LOAD_ATTR                4 (st_size)
+            312 JUMP_FORWARD             1 (to 316)
+        >>  314 LOAD_CONST               5 (0)
+        >>  316 STORE_FAST               9 (done)
+
+167         318 LOAD_FAST                2 (expect_size)
+            320 POP_JUMP_IF_FALSE       23 (to 368)
+            322 LOAD_FAST                9 (done)
+            324 LOAD_FAST                2 (expect_size)
+            326 COMPARE_OP              68 (>)
+            330 POP_JUMP_IF_FALSE       18 (to 368)
+
+168         332 LOAD_FAST                6 (part)
+            334 LOAD_ATTR               15 (NULL|self + unlink)
+            354 CALL                     0
+            362 POP_TOP
+
+169         364 LOAD_CONST               5 (0)
+            366 STORE_FAST               9 (done)
+
+170     >>  368 LOAD_FAST                9 (done)
+            370 POP_JUMP_IF_FALSE        8 (to 388)
+            372 LOAD_CONST               6 ('Range')
+            374 LOAD_CONST               7 ('bytes=')
+            376 LOAD_FAST                9 (done)
+            378 FORMAT_VALUE             0
+            380 LOAD_CONST               8 ('-')
+            382 BUILD_STRING             3
+            384 BUILD_MAP                1
+            386 JUMP_FORWARD             1 (to 390)
+        >>  388 BUILD_MAP                0
+        >>  390 STORE_FAST              10 (headers)
+
+171         392 LOAD_GLOBAL             17 (NULL + httpx)
+            402 LOAD_ATTR               18 (Client)
+            422 LOAD_GLOBAL             20 (TIMEOUT)
+            432 LOAD_CONST               9 (True)
+            434 KW_NAMES                10 (('timeout', 'follow_redirects'))
+            436 CALL                     2
+            444 BEFORE_WITH
+            446 STORE_FAST              11 (client)
+
+172         448 LOAD_FAST               11 (client)
+            450 LOAD_ATTR               23 (NULL|self + stream)
+            470 LOAD_CONST              11 ('GET')
+            472 LOAD_FAST                0 (url)
+            474 LOAD_FAST               10 (headers)
+            476 KW_NAMES                12 (('headers',))
+            478 CALL                     3
+            486 BEFORE_WITH
+            488 STORE_FAST              12 (resp)
+
+173         490 LOAD_FAST                9 (done)
+            492 POP_JUMP_IF_FALSE       18 (to 530)
+            494 LOAD_FAST               12 (resp)
+            496 LOAD_ATTR               24 (status_code)
+            516 LOAD_CONST              13 (200)
+            518 COMPARE_OP              40 (==)
+            522 POP_JUMP_IF_FALSE        3 (to 530)
+
+174         524 LOAD_CONST               5 (0)
+            526 STORE_FAST               9 (done)
+            528 JUMP_FORWARD            59 (to 648)
+
+175     >>  530 LOAD_FAST               12 (resp)
+            532 LOAD_ATTR               24 (status_code)
+            552 LOAD_CONST              14 ((200, 206))
+            554 CONTAINS_OP              1
+            556 POP_JUMP_IF_FALSE       45 (to 648)
+
+176         558 LOAD_GLOBAL             27 (NULL + make_error)
+
+177         568 LOAD_GLOBAL             28 (E)
+            578 LOAD_ATTR               30 (TTS_NETWORK)
+
+178         598 LOAD_CONST              15 ('Tải giọng lỗi HTTP ')
+            600 LOAD_FAST               12 (resp)
+            602 LOAD_ATTR               24 (status_code)
+            622 FORMAT_VALUE             0
+            624 LOAD_CONST              16 (' (')
+            626 LOAD_FAST                0 (url)
+            628 FORMAT_VALUE             0
+            630 LOAD_CONST              17 (').')
+            632 BUILD_STRING             5
+
+179         634 LOAD_CONST              18 ('Kiểm tra kết nối mạng hoặc URL kho giọng trong Settings.')
+
+176         636 KW_NAMES                19 (('hint',))
+            638 CALL                     3
+            646 RAISE_VARARGS            1
+
+181     >>  648 LOAD_FAST                2 (expect_size)
+            650 COPY                     1
+            652 POP_JUMP_IF_TRUE        43 (to 740)
+            654 POP_TOP
+            656 LOAD_GLOBAL             33 (NULL + int)
+            666 LOAD_FAST               12 (resp)
+            668 LOAD_ATTR               34 (headers)
+            688 LOAD_ATTR               37 (NULL|self + get)
+            708 LOAD_CONST              20 ('content-length')
+            710 CALL                     1
+            718 COPY                     1
+            720 POP_JUMP_IF_TRUE         2 (to 726)
+            722 POP_TOP
+            724 LOAD_CONST               5 (0)
+        >>  726 CALL                     1
+            734 LOAD_FAST                9 (done)
+            736 BINARY_OP                0 (+)
+        >>  740 STORE_FAST              13 (total)
+
+182         742 LOAD_FAST                9 (done)
+            744 POP_JUMP_IF_FALSE        2 (to 750)
+            746 LOAD_CONST              21 ('ab')
+            748 JUMP_FORWARD             1 (to 752)
+        >>  750 LOAD_CONST              22 ('wb')
+        >>  752 STORE_FAST              14 (mode)
+
+183         754 LOAD_FAST                6 (part)
+            756 LOAD_ATTR               39 (NULL|self + open)
+            776 LOAD_FAST               14 (mode)
+            778 CALL                     1
+            786 BEFORE_WITH
+            788 STORE_FAST              15 (f)
+
+184         790 LOAD_FAST               12 (resp)
+            792 LOAD_ATTR               41 (NULL|self + iter_bytes)
+            812 LOAD_GLOBAL             42 (CHUNK)
+            822 CALL                     1
+            830 GET_ITER
+        >>  832 FOR_ITER                98 (to 1032)
+            836 STORE_FAST              16 (chunk)
+
+185         838 LOAD_FAST                5 (cancel_check)
+            840 POP_JUMP_IF_FALSE       33 (to 908)
+            842 PUSH_NULL
+            844 LOAD_FAST                5 (cancel_check)
+            846 CALL                     0
+            854 POP_JUMP_IF_FALSE       26 (to 908)
+
+186         856 LOAD_GLOBAL             27 (NULL + make_error)
+            866 LOAD_GLOBAL             28 (E)
+            876 LOAD_ATTR               44 (CANCELLED)
+            896 LOAD_CONST              23 ('Đã huỷ khi tải giọng.')
+            898 CALL                     2
+            906 RAISE_VARARGS            1
+
+187     >>  908 LOAD_FAST               15 (f)
+            910 LOAD_ATTR               47 (NULL|self + write)
+            930 LOAD_FAST               16 (chunk)
+            932 CALL                     1
+            940 POP_TOP
+
+188         942 LOAD_FAST                9 (done)
+            944 LOAD_GLOBAL             49 (NULL + len)
+            954 LOAD_FAST               16 (chunk)
+            956 CALL                     1
+            964 BINARY_OP               13 (+=)
+            968 STORE_FAST               9 (done)
+
+189         970 LOAD_FAST                4 (on_progress)
+            972 POP_JUMP_IF_TRUE         1 (to 976)
+            974 JUMP_BACKWARD           72 (to 832)
+        >>  976 LOAD_FAST               13 (total)
+            978 POP_JUMP_IF_TRUE         1 (to 982)
+            980 JUMP_BACKWARD           75 (to 832)
+
+190     >>  982 PUSH_NULL
+            984 LOAD_FAST                4 (on_progress)
+            986 LOAD_GLOBAL             51 (NULL + min)
+            996 LOAD_CONST              24 (99.0)
+            998 LOAD_FAST                9 (done)
+           1000 LOAD_CONST               1 (100.0)
+           1002 BINARY_OP                5 (*)
+           1006 LOAD_FAST               13 (total)
+           1008 BINARY_OP               11 (/)
+           1012 CALL                     2
+           1020 CALL                     1
+           1028 POP_TOP
+           1030 JUMP_BACKWARD          100 (to 832)
+
+184     >> 1032 END_FOR
+           1034 NOP
+
+183        1036 LOAD_CONST               2 (None)
+           1038 LOAD_CONST               2 (None)
+           1040 LOAD_CONST               2 (None)
+           1042 CALL                     2
+           1050 POP_TOP
+
+172     >> 1052 LOAD_CONST               2 (None)
+           1054 LOAD_CONST               2 (None)
+           1056 LOAD_CONST               2 (None)
+           1058 CALL                     2
+           1066 POP_TOP
+
+171     >> 1068 LOAD_CONST               2 (None)
+           1070 LOAD_CONST               2 (None)
+           1072 LOAD_CONST               2 (None)
+           1074 CALL                     2
+           1082 POP_TOP
+
+191     >> 1084 LOAD_FAST                3 (expect_sha)
+           1086 POP_JUMP_IF_FALSE       75 (to 1238)
+
+192        1088 LOAD_GLOBAL             53 (NULL + _sha256)
+           1098 LOAD_FAST                6 (part)
+           1100 LOAD_FAST                5 (cancel_check)
+           1102 CALL                     2
+           1110 STORE_FAST              17 (got)
+
+193        1112 LOAD_FAST               17 (got)
+           1114 LOAD_FAST                3 (expect_sha)
+           1116 COMPARE_OP              55 (!=)
+           1120 POP_JUMP_IF_FALSE       58 (to 1238)
+
+194        1122 LOAD_FAST                6 (part)
+           1124 LOAD_ATTR               15 (NULL|self + unlink)
+           1144 LOAD_CONST               9 (True)
+           1146 KW_NAMES                25 (('missing_ok',))
+           1148 CALL                     1
+           1156 POP_TOP
+
+195        1158 LOAD_GLOBAL             27 (NULL + make_error)
+
+196        1168 LOAD_GLOBAL             28 (E)
+           1178 LOAD_ATTR               30 (TTS_NETWORK)
+
+197        1198 LOAD_CONST              26 ('File tải về sai checksum (')
+           1200 LOAD_FAST                1 (dest)
+           1202 LOAD_ATTR               54 (name)
+           1222 FORMAT_VALUE             0
+           1224 LOAD_CONST              27 ('). Đang thử lại…')
+           1226 BUILD_STRING             3
+
+195        1228 CALL                     2
+           1236 RAISE_VARARGS            1
+
+199     >> 1238 LOAD_GLOBAL             57 (NULL + os)
+           1248 LOAD_ATTR               58 (replace)
+           1268 LOAD_FAST                6 (part)
+           1270 LOAD_FAST                1 (dest)
+           1272 CALL                     2
+           1280 POP_TOP
+
+200        1282 LOAD_FAST                4 (on_progress)
+           1284 POP_JUMP_IF_FALSE        8 (to 1302)
+
+201        1286 PUSH_NULL
+           1288 LOAD_FAST                4 (on_progress)
+           1290 LOAD_CONST               1 (100.0)
+           1292 CALL                     1
+           1300 POP_TOP
+
+202     >> 1302 POP_TOP
+           1304 RETURN_CONST             2 (None)
+
+164     >> 1306 END_FOR
+
+210        1308 LOAD_GLOBAL             27 (NULL + make_error)
+           1318 LOAD_GLOBAL             28 (E)
+           1328 LOAD_ATTR               30 (TTS_NETWORK)
+           1348 LOAD_CONST              33 ('Không tải được ')
+           1350 LOAD_FAST                1 (dest)
+           1352 LOAD_ATTR               54 (name)
+           1372 FORMAT_VALUE             0
+           1374 LOAD_CONST              32 (': ')
+           1376 LOAD_FAST                7 (last_err)
+           1378 FORMAT_VALUE             0
+           1380 BUILD_STRING             4
+           1382 CALL                     2
+           1390 RAISE_VARARGS            1
+
+183     >> 1392 PUSH_EXC_INFO
+           1394 WITH_EXCEPT_START
+           1396 POP_JUMP_IF_TRUE         1 (to 1400)
+           1398 RERAISE                  2
+        >> 1400 POP_TOP
+           1402 POP_EXCEPT
+           1404 POP_TOP
+           1406 POP_TOP
+           1408 JUMP_BACKWARD          179 (to 1052)
+        >> 1410 COPY                     3
+           1412 POP_EXCEPT
+           1414 RERAISE                  1
+
+172     >> 1416 PUSH_EXC_INFO
+           1418 WITH_EXCEPT_START
+           1420 POP_JUMP_IF_TRUE         1 (to 1424)
+           1422 RERAISE                  2
+        >> 1424 POP_TOP
+           1426 POP_EXCEPT
+           1428 POP_TOP
+           1430 POP_TOP
+           1432 JUMP_BACKWARD          183 (to 1068)
+        >> 1434 COPY                     3
+           1436 POP_EXCEPT
+           1438 RERAISE                  1
+
+171     >> 1440 PUSH_EXC_INFO
+           1442 WITH_EXCEPT_START
+           1444 POP_JUMP_IF_TRUE         1 (to 1448)
+           1446 RERAISE                  2
+        >> 1448 POP_TOP
+           1450 POP_EXCEPT
+           1452 POP_TOP
+           1454 POP_TOP
+           1456 JUMP_BACKWARD          187 (to 1084)
+        >> 1458 COPY                     3
+           1460 POP_EXCEPT
+           1462 RERAISE                  1
+        >> 1464 PUSH_EXC_INFO
+
+203        1466 LOAD_GLOBAL             60 (Exception)
+           1476 CHECK_EXC_MATCH
+           1478 POP_JUMP_IF_FALSE      108 (to 1696)
+           1480 STORE_FAST              18 (e)
+
+204        1482 LOAD_CONST               5 (0)
+           1484 LOAD_CONST              28 (('StudioError',))
+           1486 IMPORT_NAME             31 (app.core.errors)
+           1488 IMPORT_FROM             32 (StudioError)
+           1490 STORE_FAST              19 (StudioError)
+           1492 POP_TOP
+
+206        1494 LOAD_GLOBAL             67 (NULL + isinstance)
+           1504 LOAD_FAST               18 (e)
+           1506 LOAD_FAST               19 (StudioError)
+           1508 CALL                     2
+           1516 POP_JUMP_IF_FALSE       30 (to 1578)
+           1518 LOAD_FAST               18 (e)
+           1520 LOAD_ATTR               68 (code)
+           1540 LOAD_GLOBAL             28 (E)
+           1550 LOAD_ATTR               44 (CANCELLED)
+           1570 COMPARE_OP              40 (==)
+           1574 POP_JUMP_IF_FALSE        1 (to 1578)
+
+207        1576 RAISE_VARARGS            0
+
+208     >> 1578 LOAD_FAST               18 (e)
+           1580 STORE_FAST               7 (last_err)
+
+209        1582 LOAD_GLOBAL             71 (NULL + log)
+           1592 LOAD_ATTR               72 (warning)
+           1612 LOAD_CONST              29 ('[revo-voice] Tải ')
+           1614 LOAD_FAST                1 (dest)
+           1616 LOAD_ATTR               54 (name)
+           1636 FORMAT_VALUE             0
+           1638 LOAD_CONST              30 (' lỗi lần ')
+           1640 LOAD_FAST                8 (attempt)
+           1642 FORMAT_VALUE             0
+           1644 LOAD_CONST              31 ('/')
+           1646 LOAD_GLOBAL             12 (_ATTEMPTS)
+           1656 FORMAT_VALUE             0
+           1658 LOAD_CONST              32 (': ')
+           1660 LOAD_FAST               18 (e)
+           1662 FORMAT_VALUE             0
+           1664 BUILD_STRING             8
+           1666 CALL                     1
+           1674 POP_TOP
+           1676 POP_EXCEPT
+           1678 LOAD_CONST               2 (None)
+           1680 STORE_FAST              18 (e)
+           1682 DELETE_FAST             18 (e)
+           1684 EXTENDED_ARG             2
+           1686 JUMP_BACKWARD          734 (to 220)
+        >> 1688 LOAD_CONST               2 (None)
+           1690 STORE_FAST              18 (e)
+           1692 DELETE_FAST             18 (e)
+           1694 RERAISE                  1
+
+203     >> 1696 RERAISE                  0
+        >> 1698 COPY                     3
+           1700 POP_EXCEPT
+           1702 RERAISE                  1
+ExceptionTable:
+  230 to 444 -> 1464 [1]
+  446 to 486 -> 1440 [2] lasti
+  488 to 786 -> 1416 [3] lasti
+  788 to 972 -> 1392 [4] lasti
+  976 to 978 -> 1392 [4] lasti
+  982 to 1032 -> 1392 [4] lasti
+  1036 to 1050 -> 1416 [3] lasti
+  1052 to 1066 -> 1440 [2] lasti
+  1068 to 1300 -> 1464 [1]
+  1392 to 1400 -> 1410 [6] lasti
+  1402 to 1414 -> 1416 [3] lasti
+  1416 to 1424 -> 1434 [5] lasti
+  1426 to 1438 -> 1440 [2] lasti
+  1440 to 1448 -> 1458 [4] lasti
+  1450 to 1462 -> 1464 [1]
+  1464 to 1480 -> 1698 [2] lasti
+  1482 to 1674 -> 1688 [2] lasti
+  1688 to 1696 -> 1698 [2] lasti
+
+Disassembly of <code object download_voice at 0x269fd690, file "app\adapters\tts\revo_voice_store.py", line 213>:
+              0 MAKE_CELL                1 (on_progress)
+              2 MAKE_CELL                7 (mb)
+              4 MAKE_CELL                8 (name)
+
+213           6 RESUME                   0
+
+220           8 LOAD_GLOBAL              1 (NULL + manifest_voices)
+             18 CALL                     0
+             26 LOAD_ATTR                3 (NULL|self + get)
+             46 LOAD_FAST                0 (voice_id)
+             48 CALL                     1
+             56 STORE_FAST               3 (entry)
+
+221          58 LOAD_FAST                3 (entry)
+             60 POP_JUMP_IF_NOT_NONE    30 (to 122)
+
+222          62 LOAD_GLOBAL              5 (NULL + make_error)
+             72 LOAD_GLOBAL              6 (E)
+             82 LOAD_ATTR                8 (TTS_VOICE_INVALID)
+
+223         102 LOAD_CONST               2 ("Giọng '")
+            104 LOAD_FAST                0 (voice_id)
+            106 FORMAT_VALUE             0
+            108 LOAD_CONST               3 ("' không có trong danh mục Revo Voice.")
+            110 BUILD_STRING             3
+
+222         112 CALL                     2
+            120 RAISE_VARARGS            1
+
+224     >>  122 LOAD_GLOBAL             11 (NULL + base_url)
+            132 CALL                     0
+            140 STORE_FAST               4 (root)
+
+225         142 LOAD_FAST                4 (root)
+            144 POP_JUMP_IF_TRUE        28 (to 202)
+
+226         146 LOAD_GLOBAL              5 (NULL + make_error)
+
+227         156 LOAD_GLOBAL              6 (E)
+            166 LOAD_ATTR               12 (TTS_NETWORK)
+
+228         186 LOAD_CONST               4 ('Chưa cấu hình kho giọng Revo Voice (base_url rỗng).')
+
+229         188 LOAD_CONST               5 ("Đặt Setting 'revo_voice_base_url' hoặc build lại manifest với --base-url.")
+
+226         190 KW_NAMES                 6 (('hint',))
+            192 CALL                     3
+            200 RAISE_VARARGS            1
+
+231     >>  202 LOAD_GLOBAL             15 (NULL + download_dir)
+            212 CALL                     0
+            220 STORE_FAST               5 (dest_dir)
+
+232         222 LOAD_FAST                3 (entry)
+            224 LOAD_ATTR                3 (NULL|self + get)
+            244 LOAD_CONST               7 ('name')
+            246 CALL                     1
+            254 COPY                     1
+            256 POP_JUMP_IF_TRUE         2 (to 262)
+            258 POP_TOP
+            260 LOAD_FAST                0 (voice_id)
+        >>  262 STORE_DEREF              8 (name)
+
+234         264 LOAD_GLOBAL             16 (_LOCK)
+            274 BEFORE_WITH
+            276 POP_TOP
+
+236         278 LOAD_DEREF               1 (on_progress)
+            280 POP_JUMP_IF_FALSE       13 (to 308)
+
+237         282 PUSH_NULL
+            284 LOAD_DEREF               1 (on_progress)
+            286 LOAD_CONST               8 (1.0)
+            288 LOAD_CONST               9 ('Đang tải cấu hình giọng ')
+            290 LOAD_DEREF               8 (name)
+            292 FORMAT_VALUE             0
+            294 LOAD_CONST              10 ('…')
+            296 BUILD_STRING             3
+            298 CALL                     2
+            306 POP_TOP
+
+238     >>  308 LOAD_GLOBAL             19 (NULL + _download_file)
+            318 LOAD_FAST                4 (root)
+            320 FORMAT_VALUE             0
+            322 LOAD_CONST              11 ('/')
+            324 LOAD_FAST                3 (entry)
+            326 LOAD_CONST              12 ('config')
+            328 BINARY_SUBSCR
+            332 FORMAT_VALUE             0
+            334 BUILD_STRING             3
+            336 LOAD_FAST                5 (dest_dir)
+            338 LOAD_FAST                3 (entry)
+            340 LOAD_CONST              12 ('config')
+            342 BINARY_SUBSCR
+            346 BINARY_OP               11 (/)
+
+239         350 LOAD_GLOBAL             21 (NULL + int)
+            360 LOAD_FAST                3 (entry)
+            362 LOAD_ATTR                3 (NULL|self + get)
+            382 LOAD_CONST              13 ('config_size')
+            384 CALL                     1
+            392 COPY                     1
+            394 POP_JUMP_IF_TRUE         2 (to 400)
+            396 POP_TOP
+            398 LOAD_CONST              14 (0)
+        >>  400 CALL                     1
+            408 LOAD_GLOBAL             23 (NULL + str)
+            418 LOAD_FAST                3 (entry)
+            420 LOAD_ATTR                3 (NULL|self + get)
+            440 LOAD_CONST              15 ('config_sha256')
+            442 CALL                     1
+            450 COPY                     1
+            452 POP_JUMP_IF_TRUE         2 (to 458)
+            454 POP_TOP
+            456 LOAD_CONST              16 ('')
+        >>  458 CALL                     1
+
+240         466 LOAD_FAST                2 (cancel_check)
+
+238         468 KW_NAMES                17 (('cancel_check',))
+            470 CALL                     5
+            478 POP_TOP
+
+242         480 LOAD_GLOBAL             21 (NULL + int)
+            490 LOAD_FAST                3 (entry)
+            492 LOAD_ATTR                3 (NULL|self + get)
+            512 LOAD_CONST              18 ('size')
+            514 CALL                     1
+            522 COPY                     1
+            524 POP_JUMP_IF_TRUE         2 (to 530)
+            526 POP_TOP
+            528 LOAD_CONST              14 (0)
+        >>  530 CALL                     1
+            538 LOAD_CONST              19 (1000000.0)
+            540 BINARY_OP               11 (/)
+            544 STORE_DEREF              7 (mb)
+
+243         546 LOAD_GLOBAL             19 (NULL + _download_file)
+
+244         556 LOAD_FAST                4 (root)
+            558 FORMAT_VALUE             0
+            560 LOAD_CONST              11 ('/')
+            562 LOAD_FAST                3 (entry)
+            564 LOAD_CONST              20 ('model')
+            566 BINARY_SUBSCR
+            570 FORMAT_VALUE             0
+            572 BUILD_STRING             3
+            574 LOAD_FAST                5 (dest_dir)
+            576 LOAD_FAST                3 (entry)
+            578 LOAD_CONST              20 ('model')
+            580 BINARY_SUBSCR
+            584 BINARY_OP               11 (/)
+
+245         588 LOAD_GLOBAL             21 (NULL + int)
+            598 LOAD_FAST                3 (entry)
+            600 LOAD_ATTR                3 (NULL|self + get)
+            620 LOAD_CONST              18 ('size')
+            622 CALL                     1
+            630 COPY                     1
+            632 POP_JUMP_IF_TRUE         2 (to 638)
+            634 POP_TOP
+            636 LOAD_CONST              14 (0)
+        >>  638 CALL                     1
+            646 LOAD_GLOBAL             23 (NULL + str)
+            656 LOAD_FAST                3 (entry)
+            658 LOAD_ATTR                3 (NULL|self + get)
+            678 LOAD_CONST              21 ('sha256')
+            680 CALL                     1
+            688 COPY                     1
+            690 POP_JUMP_IF_TRUE         2 (to 696)
+            692 POP_TOP
+            694 LOAD_CONST              16 ('')
+        >>  696 CALL                     1
+
+248         704 LOAD_DEREF               1 (on_progress)
+            706 POP_JUMP_IF_FALSE        7 (to 722)
+
+246         708 LOAD_CLOSURE             7 (mb)
+            710 LOAD_CLOSURE             8 (name)
+            712 LOAD_CLOSURE             1 (on_progress)
+            714 BUILD_TUPLE              3
+            716 LOAD_CONST              22 (<code object <lambda> at 0x7f6c93323a30, file "app\adapters\tts\revo_voice_store.py", line 246>)
+            718 MAKE_FUNCTION            8 (closure)
+            720 JUMP_FORWARD             1 (to 724)
+
+248     >>  722 LOAD_CONST               1 (None)
+
+249     >>  724 LOAD_FAST                2 (cancel_check)
+
+243         726 KW_NAMES                23 (('on_progress', 'cancel_check'))
+            728 CALL                     6
+            736 POP_TOP
+
+234         738 LOAD_CONST               1 (None)
+            740 LOAD_CONST               1 (None)
+            742 LOAD_CONST               1 (None)
+            744 CALL                     2
+            752 POP_TOP
+
+252     >>  754 LOAD_CONST              14 (0)
+            756 LOAD_CONST              24 (('revo_voice',))
+            758 IMPORT_NAME             12 (app.adapters.tts)
+            760 IMPORT_FROM             13 (revo_voice)
+            762 STORE_FAST               6 (revo_voice)
+            764 POP_TOP
+
+254         766 LOAD_FAST                6 (revo_voice)
+            768 LOAD_ATTR               29 (NULL|self + reset_cache)
+            788 CALL                     0
+            796 POP_TOP
+
+255         798 LOAD_GLOBAL             31 (NULL + log)
+            808 LOAD_ATTR               32 (info)
+            828 LOAD_CONST              25 ('[revo-voice] Đã tải giọng ')
+            830 LOAD_DEREF               8 (name)
+            832 FORMAT_VALUE             0
+            834 LOAD_CONST              26 (' (')
+            836 LOAD_FAST                0 (voice_id)
+            838 FORMAT_VALUE             0
+            840 LOAD_CONST              27 (').')
+            842 BUILD_STRING             5
+            844 CALL                     1
+            852 POP_TOP
+
+256         854 LOAD_FAST                5 (dest_dir)
+            856 LOAD_FAST                3 (entry)
+            858 LOAD_CONST              20 ('model')
+            860 BINARY_SUBSCR
+            864 BINARY_OP               11 (/)
+            868 RETURN_VALUE
+
+234     >>  870 PUSH_EXC_INFO
+            872 WITH_EXCEPT_START
+            874 POP_JUMP_IF_TRUE         1 (to 878)
+            876 RERAISE                  2
+        >>  878 POP_TOP
+            880 POP_EXCEPT
+            882 POP_TOP
+            884 POP_TOP
+            886 JUMP_BACKWARD           67 (to 754)
+        >>  888 COPY                     3
+            890 POP_EXCEPT
+            892 RERAISE                  1
+ExceptionTable:
+  276 to 736 -> 870 [1] lasti
+  870 to 878 -> 888 [3] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c93323a30, file "app\adapters\tts\revo_voice_store.py", line 246>:
+              0 COPY_FREE_VARS           3
+
+246           2 RESUME                   0
+              4 PUSH_NULL
+              6 LOAD_DEREF               3 (on_progress)
+              8 LOAD_CONST               1 (2.0)
+             10 LOAD_FAST                0 (p)
+             12 LOAD_CONST               2 (0.98)
+             14 BINARY_OP                5 (*)
+             18 BINARY_OP                0 (+)
+
+247          22 LOAD_CONST               3 ('Đang tải giọng ')
+             24 LOAD_DEREF               2 (name)
+             26 FORMAT_VALUE             0
+             28 LOAD_CONST               4 (' (')
+             30 LOAD_DEREF               1 (mb)
+             32 LOAD_CONST               5 ('.0f')
+             34 FORMAT_VALUE             4 (with format)
+             36 LOAD_CONST               6 ('MB)… ')
+             38 LOAD_FAST                0 (p)
+             40 LOAD_CONST               5 ('.0f')
+             42 FORMAT_VALUE             4 (with format)
+             44 LOAD_CONST               7 ('%')
+             46 BUILD_STRING             7
+
+246          48 CALL                     2
+             56 RETURN_VALUE
+
+Disassembly of <code object delete_voice at 0x269df3b0, file "app\adapters\tts\revo_voice_store.py", line 259>:
+259           0 RESUME                   0
+
+261           2 LOAD_GLOBAL              1 (NULL + manifest_voices)
+             12 CALL                     0
+             20 LOAD_ATTR                3 (NULL|self + get)
+             40 LOAD_FAST                0 (voice_id)
+             42 CALL                     1
+             50 STORE_FAST               1 (entry)
+
+262          52 LOAD_FAST                1 (entry)
+             54 POP_JUMP_IF_NOT_NONE     1 (to 58)
+
+263          56 RETURN_CONST             2 (False)
+
+264     >>   58 LOAD_GLOBAL              5 (NULL + download_dir)
+             68 CALL                     0
+             76 STORE_FAST               2 (d)
+
+265          78 LOAD_CONST               2 (False)
+             80 STORE_FAST               3 (removed)
+
+266          82 LOAD_CONST               3 (('model', 'config'))
+             84 GET_ITER
+        >>   86 FOR_ITER                70 (to 230)
+             90 STORE_FAST               4 (key)
+
+267          92 LOAD_FAST                2 (d)
+             94 LOAD_GLOBAL              7 (NULL + str)
+            104 LOAD_FAST                1 (entry)
+            106 LOAD_ATTR                3 (NULL|self + get)
+            126 LOAD_FAST                4 (key)
+            128 CALL                     1
+            136 COPY                     1
+            138 POP_JUMP_IF_TRUE         2 (to 144)
+            140 POP_TOP
+            142 LOAD_CONST               4 ('')
+        >>  144 CALL                     1
+            152 BINARY_OP               11 (/)
+            156 STORE_FAST               5 (p)
+
+268         158 NOP
+
+269         160 LOAD_FAST                5 (p)
+            162 LOAD_ATTR                9 (NULL|self + is_file)
+            182 CALL                     0
+            190 POP_JUMP_IF_FALSE       18 (to 228)
+
+270         192 LOAD_FAST                5 (p)
+            194 LOAD_ATTR               11 (NULL|self + unlink)
+            214 CALL                     0
+            222 POP_TOP
+
+271         224 LOAD_CONST               5 (True)
+            226 STORE_FAST               3 (removed)
+        >>  228 JUMP_BACKWARD           72 (to 86)
+
+266     >>  230 END_FOR
+
+274         232 LOAD_FAST                3 (removed)
+            234 POP_JUMP_IF_FALSE       22 (to 280)
+
+275         236 LOAD_CONST               8 (0)
+            238 LOAD_CONST               9 (('revo_voice',))
+            240 IMPORT_NAME             10 (app.adapters.tts)
+            242 IMPORT_FROM             11 (revo_voice)
+            244 STORE_FAST               7 (revo_voice)
+            246 POP_TOP
+
+277         248 LOAD_FAST                7 (revo_voice)
+            250 LOAD_ATTR               25 (NULL|self + reset_cache)
+            270 CALL                     0
+            278 POP_TOP
+
+278     >>  280 LOAD_FAST                3 (removed)
+            282 RETURN_VALUE
+        >>  284 PUSH_EXC_INFO
+
+272         286 LOAD_GLOBAL             12 (OSError)
+            296 CHECK_EXC_MATCH
+            298 POP_JUMP_IF_FALSE       47 (to 394)
+            300 STORE_FAST               6 (e)
+
+273         302 LOAD_GLOBAL             15 (NULL + log)
+            312 LOAD_ATTR               16 (warning)
+            332 LOAD_CONST               6 ('[revo-voice] Xoá ')
+            334 LOAD_FAST                5 (p)
+            336 LOAD_ATTR               18 (name)
+            356 FORMAT_VALUE             0
+            358 LOAD_CONST               7 (' lỗi: ')
+            360 LOAD_FAST                6 (e)
+            362 FORMAT_VALUE             0
+            364 BUILD_STRING             4
+            366 CALL                     1
+            374 POP_TOP
+            376 POP_EXCEPT
+            378 LOAD_CONST               1 (None)
+            380 STORE_FAST               6 (e)
+            382 DELETE_FAST              6 (e)
+            384 JUMP_BACKWARD          150 (to 86)
+        >>  386 LOAD_CONST               1 (None)
+            388 STORE_FAST               6 (e)
+            390 DELETE_FAST              6 (e)
+            392 RERAISE                  1
+
+272     >>  394 RERAISE                  0
+        >>  396 COPY                     3
+            398 POP_EXCEPT
+            400 RERAISE                  1
+ExceptionTable:
+  160 to 226 -> 284 [1]
+  284 to 300 -> 396 [2] lasti
+  302 to 374 -> 386 [2] lasti
+  386 to 394 -> 396 [2] lasti

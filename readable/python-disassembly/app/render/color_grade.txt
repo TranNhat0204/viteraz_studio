@@ -1,0 +1,767 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Bake chỉnh màu (color grade) + hiệu ứng (FX) do user chỉnh trong Studio → chuỗi ffmpeg filter.\n\nKhớp với preview CSS ở desktop (colorGrade.ts §MAPFF). Thứ tự áp trong filtergraph._video_chains:\n  scale → originality(flip/zoom) → [color grade + FX pre-sub] → ass → originality(eq) → [fade] → setpts\nColor grade + FX pre-sub đặt TRƯỚC ass (chỉ tác động video, phụ đề burn lên trên giữ nguyên — khớp\npreview: overlay nằm DƯỚI phụ đề). Fade đặt SAU ass (phủ cả phụ đề — khớp preview: lớp fade trên cùng).\n')
+              4 STORE_NAME               0 (__doc__)
+
+  8           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 10          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('Path',))
+             22 IMPORT_NAME              3 (pathlib)
+             24 IMPORT_FROM              4 (Path)
+             26 STORE_NAME               4 (Path)
+             28 POP_TOP
+
+ 13          30 LOAD_CONST              11 ((0.0,))
+             32 LOAD_CONST              12 (('default', 'float', 'return', 'float'))
+             34 LOAD_CONST               4 (<code object _num at 0x7f6c930b8250, file "app\render\color_grade.py", line 13>)
+             36 MAKE_FUNCTION            5 (defaults, annotations)
+             38 STORE_NAME               5 (_num)
+
+ 20          40 LOAD_CONST              13 (('p', 'str', 'return', 'str'))
+             42 LOAD_CONST               5 (<code object _lut_value at 0x7f6c9333b9f0, file "app\render\color_grade.py", line 20>)
+             44 MAKE_FUNCTION            4 (annotations)
+             46 STORE_NAME               6 (_lut_value)
+
+ 26          48 LOAD_CONST              14 (('grade', 'dict | None', 'return', 'list[str]'))
+             50 LOAD_CONST               6 (<code object video_color_filters at 0x28b1ef30, file "app\render\color_grade.py", line 26>)
+             52 MAKE_FUNCTION            4 (annotations)
+             54 STORE_NAME               7 (video_color_filters)
+
+ 73          56 LOAD_CONST              15 (('letterbox', 'str', 'aspect', 'float', 'return', 'float'))
+             58 LOAD_CONST               7 (<code object _letterbox_frac at 0x7f6c92c3de60, file "app\render\color_grade.py", line 73>)
+             60 MAKE_FUNCTION            4 (annotations)
+             62 STORE_NAME               8 (_letterbox_frac)
+
+ 80          64 LOAD_CONST              16 (('effects', 'dict | None', 'frame_w', 'int', 'frame_h', 'int', 'return', 'list[str]'))
+             66 LOAD_CONST               8 (<code object video_fx_pre_sub at 0x26a06b60, file "app\render\color_grade.py", line 80>)
+             68 MAKE_FUNCTION            4 (annotations)
+             70 STORE_NAME               9 (video_fx_pre_sub)
+
+106          72 LOAD_CONST              17 (('effects', 'dict | None', 'duration_sec', 'float', 'return', 'list[str]'))
+             74 LOAD_CONST               9 (<code object video_fx_post_sub at 0x7f6c819a4410, file "app\render\color_grade.py", line 106>)
+             76 MAKE_FUNCTION            4 (annotations)
+             78 STORE_NAME              10 (video_fx_post_sub)
+             80 RETURN_CONST            10 (None)
+
+Disassembly of <code object _num at 0x7f6c930b8250, file "app\render\color_grade.py", line 13>:
+ 13           0 RESUME                   0
+
+ 14           2 NOP
+
+ 15           4 LOAD_GLOBAL              1 (NULL + float)
+             14 LOAD_FAST                0 (v)
+             16 CALL                     1
+             24 RETURN_VALUE
+        >>   26 PUSH_EXC_INFO
+
+ 16          28 LOAD_GLOBAL              2 (TypeError)
+             38 LOAD_GLOBAL              4 (ValueError)
+             48 BUILD_TUPLE              2
+             50 CHECK_EXC_MATCH
+             52 POP_JUMP_IF_FALSE        5 (to 64)
+             54 POP_TOP
+
+ 17          56 LOAD_FAST                1 (default)
+             58 SWAP                     2
+             60 POP_EXCEPT
+             62 RETURN_VALUE
+
+ 16     >>   64 RERAISE                  0
+        >>   66 COPY                     3
+             68 POP_EXCEPT
+             70 RERAISE                  1
+ExceptionTable:
+  4 to 22 -> 26 [0]
+  26 to 58 -> 66 [1] lasti
+  64 to 64 -> 66 [1] lasti
+
+Disassembly of <code object _lut_value at 0x7f6c9333b9f0, file "app\render\color_grade.py", line 20>:
+ 20           0 RESUME                   0
+
+ 22           2 LOAD_GLOBAL              1 (NULL + str)
+             12 LOAD_GLOBAL              3 (NULL + Path)
+             22 LOAD_FAST                0 (p)
+             24 CALL                     1
+             32 LOAD_ATTR                5 (NULL|self + resolve)
+             52 CALL                     0
+             60 CALL                     1
+             68 LOAD_ATTR                7 (NULL|self + replace)
+             88 LOAD_CONST               1 ('\\')
+             90 LOAD_CONST               2 ('/')
+             92 CALL                     2
+            100 LOAD_ATTR                7 (NULL|self + replace)
+            120 LOAD_CONST               3 ("'")
+            122 LOAD_CONST               4 ("\\'")
+            124 CALL                     2
+            132 STORE_FAST               1 (s)
+
+ 23         134 LOAD_CONST               3 ("'")
+            136 LOAD_FAST                1 (s)
+            138 FORMAT_VALUE             0
+            140 LOAD_CONST               3 ("'")
+            142 BUILD_STRING             3
+            144 RETURN_VALUE
+
+Disassembly of <code object video_color_filters at 0x28b1ef30, file "app\render\color_grade.py", line 26>:
+ 26           0 RESUME                   0
+
+ 30           2 LOAD_GLOBAL              1 (NULL + isinstance)
+             12 LOAD_FAST                0 (grade)
+             14 LOAD_GLOBAL              2 (dict)
+             24 CALL                     2
+             32 POP_JUMP_IF_FALSE       17 (to 68)
+             34 LOAD_FAST                0 (grade)
+             36 LOAD_ATTR                5 (NULL|self + get)
+             56 LOAD_CONST               1 ('enabled')
+             58 CALL                     1
+             66 POP_JUMP_IF_TRUE         2 (to 72)
+
+ 31     >>   68 BUILD_LIST               0
+             70 RETURN_VALUE
+
+ 32     >>   72 BUILD_LIST               0
+             74 STORE_FAST               1 (f)
+
+ 34          76 LOAD_GLOBAL              7 (NULL + _num)
+             86 LOAD_FAST                0 (grade)
+             88 LOAD_ATTR                5 (NULL|self + get)
+            108 LOAD_CONST               2 ('brightness')
+            110 CALL                     1
+            118 CALL                     1
+            126 STORE_FAST               2 (b)
+            128 LOAD_GLOBAL              7 (NULL + _num)
+            138 LOAD_FAST                0 (grade)
+            140 LOAD_ATTR                5 (NULL|self + get)
+            160 LOAD_CONST               3 ('contrast')
+            162 CALL                     1
+            170 CALL                     1
+            178 STORE_FAST               3 (c)
+
+ 35         180 LOAD_GLOBAL              7 (NULL + _num)
+            190 LOAD_FAST                0 (grade)
+            192 LOAD_ATTR                5 (NULL|self + get)
+            212 LOAD_CONST               4 ('saturation')
+            214 CALL                     1
+            222 CALL                     1
+            230 STORE_FAST               4 (s)
+            232 LOAD_GLOBAL              7 (NULL + _num)
+            242 LOAD_FAST                0 (grade)
+            244 LOAD_ATTR                5 (NULL|self + get)
+            264 LOAD_CONST               5 ('gamma')
+            266 CALL                     1
+            274 CALL                     1
+            282 STORE_FAST               5 (g)
+
+ 36         284 BUILD_LIST               0
+            286 STORE_FAST               6 (eq)
+
+ 37         288 LOAD_FAST                2 (b)
+            290 POP_JUMP_IF_FALSE       27 (to 346)
+
+ 38         292 LOAD_FAST                6 (eq)
+            294 LOAD_ATTR                9 (NULL|self + append)
+            314 LOAD_CONST               6 ('brightness=')
+            316 LOAD_FAST                2 (b)
+            318 LOAD_CONST               7 (100)
+            320 BINARY_OP               11 (/)
+            324 LOAD_CONST               8 (0.5)
+            326 BINARY_OP                5 (*)
+            330 LOAD_CONST               9 ('.4f')
+            332 FORMAT_VALUE             4 (with format)
+            334 BUILD_STRING             2
+            336 CALL                     1
+            344 POP_TOP
+
+ 39     >>  346 LOAD_FAST                3 (c)
+            348 POP_JUMP_IF_FALSE       30 (to 410)
+
+ 40         350 LOAD_FAST                6 (eq)
+            352 LOAD_ATTR                9 (NULL|self + append)
+            372 LOAD_CONST              10 ('contrast=')
+            374 LOAD_CONST              11 (1)
+            376 LOAD_FAST                3 (c)
+            378 LOAD_CONST               7 (100)
+            380 BINARY_OP               11 (/)
+            384 LOAD_CONST               8 (0.5)
+            386 BINARY_OP                5 (*)
+            390 BINARY_OP                0 (+)
+            394 LOAD_CONST               9 ('.4f')
+            396 FORMAT_VALUE             4 (with format)
+            398 BUILD_STRING             2
+            400 CALL                     1
+            408 POP_TOP
+
+ 41     >>  410 LOAD_FAST                4 (s)
+            412 POP_JUMP_IF_FALSE       37 (to 488)
+
+ 42         414 LOAD_FAST                6 (eq)
+            416 LOAD_ATTR                9 (NULL|self + append)
+            436 LOAD_CONST              12 ('saturation=')
+            438 LOAD_GLOBAL             11 (NULL + max)
+            448 LOAD_CONST              13 (0.0)
+            450 LOAD_CONST              11 (1)
+            452 LOAD_FAST                4 (s)
+            454 LOAD_CONST               7 (100)
+            456 BINARY_OP               11 (/)
+            460 BINARY_OP                0 (+)
+            464 CALL                     2
+            472 LOAD_CONST               9 ('.4f')
+            474 FORMAT_VALUE             4 (with format)
+            476 BUILD_STRING             2
+            478 CALL                     1
+            486 POP_TOP
+
+ 43     >>  488 LOAD_FAST                5 (g)
+            490 POP_JUMP_IF_FALSE       50 (to 592)
+
+ 44         492 LOAD_FAST                6 (eq)
+            494 LOAD_ATTR                9 (NULL|self + append)
+            514 LOAD_CONST              14 ('gamma=')
+            516 LOAD_GLOBAL             13 (NULL + min)
+            526 LOAD_CONST              15 (10.0)
+            528 LOAD_GLOBAL             11 (NULL + max)
+            538 LOAD_CONST              16 (0.1)
+            540 LOAD_CONST              11 (1)
+            542 LOAD_FAST                5 (g)
+            544 LOAD_CONST               7 (100)
+            546 BINARY_OP               11 (/)
+            550 LOAD_CONST              17 (0.6)
+            552 BINARY_OP                5 (*)
+            556 BINARY_OP                0 (+)
+            560 CALL                     2
+            568 CALL                     2
+            576 LOAD_CONST               9 ('.4f')
+            578 FORMAT_VALUE             4 (with format)
+            580 BUILD_STRING             2
+            582 CALL                     1
+            590 POP_TOP
+
+ 45     >>  592 LOAD_FAST                6 (eq)
+            594 POP_JUMP_IF_FALSE       35 (to 666)
+
+ 46         596 LOAD_FAST                1 (f)
+            598 LOAD_ATTR                9 (NULL|self + append)
+            618 LOAD_CONST              18 ('eq=')
+            620 LOAD_CONST              19 (':')
+            622 LOAD_ATTR               15 (NULL|self + join)
+            642 LOAD_FAST                6 (eq)
+            644 CALL                     1
+            652 BINARY_OP                0 (+)
+            656 CALL                     1
+            664 POP_TOP
+
+ 49     >>  666 LOAD_GLOBAL              7 (NULL + _num)
+            676 LOAD_FAST                0 (grade)
+            678 LOAD_ATTR                5 (NULL|self + get)
+            698 LOAD_CONST              20 ('temperature')
+            700 CALL                     1
+            708 CALL                     1
+            716 STORE_FAST               7 (t)
+            718 LOAD_GLOBAL              7 (NULL + _num)
+            728 LOAD_FAST                0 (grade)
+            730 LOAD_ATTR                5 (NULL|self + get)
+            750 LOAD_CONST              21 ('tint')
+            752 CALL                     1
+            760 CALL                     1
+            768 STORE_FAST               8 (ti)
+
+ 50         770 BUILD_LIST               0
+            772 STORE_FAST               9 (cb)
+
+ 51         774 LOAD_FAST                7 (t)
+            776 POP_JUMP_IF_FALSE       51 (to 880)
+
+ 52         778 LOAD_FAST                7 (t)
+            780 LOAD_CONST               7 (100)
+            782 BINARY_OP               11 (/)
+            786 LOAD_CONST              22 (0.3)
+            788 BINARY_OP                5 (*)
+            792 STORE_FAST              10 (tf)
+
+ 53         794 LOAD_FAST                9 (cb)
+            796 LOAD_ATTR                9 (NULL|self + append)
+            816 LOAD_CONST              23 ('rm=')
+            818 LOAD_FAST               10 (tf)
+            820 LOAD_CONST               9 ('.4f')
+            822 FORMAT_VALUE             4 (with format)
+            824 BUILD_STRING             2
+            826 CALL                     1
+            834 POP_TOP
+            836 LOAD_FAST                9 (cb)
+            838 LOAD_ATTR                9 (NULL|self + append)
+            858 LOAD_CONST              24 ('bm=')
+            860 LOAD_FAST               10 (tf)
+            862 UNARY_NEGATIVE
+            864 LOAD_CONST               9 ('.4f')
+            866 FORMAT_VALUE             4 (with format)
+            868 BUILD_STRING             2
+            870 CALL                     1
+            878 POP_TOP
+
+ 54     >>  880 LOAD_FAST                8 (ti)
+            882 POP_JUMP_IF_FALSE       28 (to 940)
+
+ 55         884 LOAD_FAST                9 (cb)
+            886 LOAD_ATTR                9 (NULL|self + append)
+            906 LOAD_CONST              25 ('gm=')
+            908 LOAD_FAST                8 (ti)
+            910 LOAD_CONST               7 (100)
+            912 BINARY_OP               11 (/)
+            916 LOAD_CONST              22 (0.3)
+            918 BINARY_OP                5 (*)
+            922 UNARY_NEGATIVE
+            924 LOAD_CONST               9 ('.4f')
+            926 FORMAT_VALUE             4 (with format)
+            928 BUILD_STRING             2
+            930 CALL                     1
+            938 POP_TOP
+
+ 56     >>  940 LOAD_FAST                9 (cb)
+            942 POP_JUMP_IF_FALSE       35 (to 1014)
+
+ 57         944 LOAD_FAST                1 (f)
+            946 LOAD_ATTR                9 (NULL|self + append)
+            966 LOAD_CONST              26 ('colorbalance=')
+            968 LOAD_CONST              19 (':')
+            970 LOAD_ATTR               15 (NULL|self + join)
+            990 LOAD_FAST                9 (cb)
+            992 CALL                     1
+           1000 BINARY_OP                0 (+)
+           1004 CALL                     1
+           1012 POP_TOP
+
+ 60     >> 1014 LOAD_GLOBAL              7 (NULL + _num)
+           1024 LOAD_FAST                0 (grade)
+           1026 LOAD_ATTR                5 (NULL|self + get)
+           1046 LOAD_CONST              27 ('shadows')
+           1048 CALL                     1
+           1056 CALL                     1
+           1064 STORE_FAST              11 (sh)
+           1066 LOAD_GLOBAL              7 (NULL + _num)
+           1076 LOAD_FAST                0 (grade)
+           1078 LOAD_ATTR                5 (NULL|self + get)
+           1098 LOAD_CONST              28 ('highlights')
+           1100 CALL                     1
+           1108 CALL                     1
+           1116 STORE_FAST              12 (hi)
+
+ 61        1118 LOAD_FAST               11 (sh)
+           1120 POP_JUMP_IF_TRUE         2 (to 1126)
+           1122 LOAD_FAST               12 (hi)
+           1124 POP_JUMP_IF_FALSE       96 (to 1318)
+
+ 62     >> 1126 LOAD_FAST               11 (sh)
+           1128 LOAD_CONST              29 (0)
+           1130 COMPARE_OP              68 (>)
+           1134 POP_JUMP_IF_FALSE       28 (to 1192)
+           1136 LOAD_GLOBAL             13 (NULL + min)
+           1146 LOAD_CONST              30 (0.25)
+           1148 LOAD_GLOBAL             11 (NULL + max)
+           1158 LOAD_CONST              13 (0.0)
+           1160 LOAD_FAST               11 (sh)
+           1162 LOAD_CONST               7 (100)
+           1164 BINARY_OP               11 (/)
+           1168 LOAD_CONST              31 (0.15)
+           1170 BINARY_OP                5 (*)
+           1174 CALL                     2
+           1182 CALL                     2
+           1190 JUMP_FORWARD             1 (to 1194)
+        >> 1192 LOAD_CONST              13 (0.0)
+        >> 1194 STORE_FAST              13 (black)
+
+ 63        1196 LOAD_FAST               12 (hi)
+           1198 POP_JUMP_IF_FALSE       31 (to 1262)
+           1200 LOAD_GLOBAL             13 (NULL + min)
+           1210 LOAD_CONST              32 (1.0)
+           1212 LOAD_GLOBAL             11 (NULL + max)
+           1222 LOAD_CONST               8 (0.5)
+           1224 LOAD_CONST              11 (1)
+           1226 LOAD_FAST               12 (hi)
+           1228 LOAD_CONST               7 (100)
+           1230 BINARY_OP               11 (/)
+           1234 LOAD_CONST              31 (0.15)
+           1236 BINARY_OP                5 (*)
+           1240 BINARY_OP                0 (+)
+           1244 CALL                     2
+           1252 CALL                     2
+           1260 JUMP_FORWARD             1 (to 1264)
+        >> 1262 LOAD_CONST              32 (1.0)
+        >> 1264 STORE_FAST              14 (white)
+
+ 64        1266 LOAD_FAST                1 (f)
+           1268 LOAD_ATTR                9 (NULL|self + append)
+           1288 LOAD_CONST              33 ("curves=all='0/")
+           1290 LOAD_FAST               13 (black)
+           1292 LOAD_CONST              34 ('.3f')
+           1294 FORMAT_VALUE             4 (with format)
+           1296 LOAD_CONST              35 (' 1/')
+           1298 LOAD_FAST               14 (white)
+           1300 LOAD_CONST              34 ('.3f')
+           1302 FORMAT_VALUE             4 (with format)
+           1304 LOAD_CONST              36 ("'")
+           1306 BUILD_STRING             5
+           1308 CALL                     1
+           1316 POP_TOP
+
+ 66     >> 1318 LOAD_FAST                0 (grade)
+           1320 LOAD_ATTR                5 (NULL|self + get)
+           1340 LOAD_CONST              37 ('lut_path')
+           1342 CALL                     1
+           1350 STORE_FAST              15 (lut)
+
+ 67        1352 LOAD_FAST               15 (lut)
+           1354 POP_JUMP_IF_FALSE       38 (to 1432)
+
+ 69        1356 LOAD_FAST                1 (f)
+           1358 LOAD_ATTR                9 (NULL|self + append)
+           1378 LOAD_CONST              38 ('lut3d=')
+           1380 LOAD_GLOBAL             17 (NULL + _lut_value)
+           1390 LOAD_GLOBAL             19 (NULL + str)
+           1400 LOAD_FAST               15 (lut)
+           1402 CALL                     1
+           1410 CALL                     1
+           1418 FORMAT_VALUE             0
+           1420 BUILD_STRING             2
+           1422 CALL                     1
+           1430 POP_TOP
+
+ 70     >> 1432 LOAD_FAST                1 (f)
+           1434 RETURN_VALUE
+
+Disassembly of <code object _letterbox_frac at 0x7f6c92c3de60, file "app\render\color_grade.py", line 73>:
+ 73           0 RESUME                   0
+
+ 74           2 LOAD_CONST               1 (2.35)
+              4 LOAD_CONST               2 (2.39)
+              6 LOAD_CONST               3 (1.7777777777777777)
+              8 LOAD_CONST               4 (('2.35', '2.39', '16:9'))
+             10 BUILD_CONST_KEY_MAP      3
+             12 LOAD_ATTR                1 (NULL|self + get)
+             32 LOAD_FAST                0 (letterbox)
+             34 COPY                     1
+             36 POP_JUMP_IF_TRUE         2 (to 42)
+             38 POP_TOP
+             40 LOAD_CONST               5 ('none')
+        >>   42 LOAD_CONST               6 (0.0)
+             44 CALL                     2
+             52 STORE_FAST               2 (target)
+
+ 75          54 LOAD_FAST                2 (target)
+             56 POP_JUMP_IF_FALSE        7 (to 72)
+             58 LOAD_FAST                1 (aspect)
+             60 POP_JUMP_IF_FALSE        5 (to 72)
+             62 LOAD_FAST                1 (aspect)
+             64 LOAD_FAST                2 (target)
+             66 COMPARE_OP              92 (>=)
+             70 POP_JUMP_IF_FALSE        1 (to 74)
+
+ 76     >>   72 RETURN_CONST             6 (0.0)
+
+ 77     >>   74 LOAD_GLOBAL              3 (NULL + max)
+             84 LOAD_CONST               6 (0.0)
+             86 LOAD_GLOBAL              5 (NULL + min)
+             96 LOAD_CONST               7 (0.35)
+             98 LOAD_CONST               8 (1)
+            100 LOAD_FAST                1 (aspect)
+            102 LOAD_FAST                2 (target)
+            104 BINARY_OP               11 (/)
+            108 BINARY_OP               10 (-)
+            112 LOAD_CONST               9 (2)
+            114 BINARY_OP               11 (/)
+            118 CALL                     2
+            126 CALL                     2
+            134 RETURN_VALUE
+
+Disassembly of <code object video_fx_pre_sub at 0x26a06b60, file "app\render\color_grade.py", line 80>:
+ 80           0 RESUME                   0
+
+ 82           2 LOAD_GLOBAL              1 (NULL + isinstance)
+             12 LOAD_FAST                0 (effects)
+             14 LOAD_GLOBAL              2 (dict)
+             24 CALL                     2
+             32 POP_JUMP_IF_TRUE         2 (to 38)
+
+ 83          34 BUILD_LIST               0
+             36 RETURN_VALUE
+
+ 84     >>   38 BUILD_LIST               0
+             40 STORE_FAST               3 (f)
+
+ 85          42 LOAD_GLOBAL              5 (NULL + _num)
+             52 LOAD_FAST                0 (effects)
+             54 LOAD_ATTR                7 (NULL|self + get)
+             74 LOAD_CONST               1 ('blur')
+             76 CALL                     1
+             84 CALL                     1
+             92 STORE_FAST               4 (blur)
+
+ 86          94 LOAD_FAST                4 (blur)
+             96 LOAD_CONST               2 (0)
+             98 COMPARE_OP              68 (>)
+            102 POP_JUMP_IF_FALSE       27 (to 158)
+
+ 87         104 LOAD_FAST                3 (f)
+            106 LOAD_ATTR                9 (NULL|self + append)
+            126 LOAD_CONST               3 ('gblur=sigma=')
+            128 LOAD_FAST                4 (blur)
+            130 LOAD_CONST               4 (100)
+            132 BINARY_OP               11 (/)
+            136 LOAD_CONST               5 (4)
+            138 BINARY_OP                5 (*)
+            142 LOAD_CONST               6 ('.3f')
+            144 FORMAT_VALUE             4 (with format)
+            146 BUILD_STRING             2
+            148 CALL                     1
+            156 POP_TOP
+
+ 88     >>  158 LOAD_GLOBAL              5 (NULL + _num)
+            168 LOAD_FAST                0 (effects)
+            170 LOAD_ATTR                7 (NULL|self + get)
+            190 LOAD_CONST               7 ('sharpen')
+            192 CALL                     1
+            200 CALL                     1
+            208 STORE_FAST               5 (sharp)
+
+ 89         210 LOAD_FAST                5 (sharp)
+            212 LOAD_CONST               2 (0)
+            214 COMPARE_OP              68 (>)
+            218 POP_JUMP_IF_FALSE       28 (to 276)
+
+ 90         220 LOAD_FAST                3 (f)
+            222 LOAD_ATTR                9 (NULL|self + append)
+            242 LOAD_CONST               8 ('unsharp=5:5:')
+            244 LOAD_FAST                5 (sharp)
+            246 LOAD_CONST               4 (100)
+            248 BINARY_OP               11 (/)
+            252 LOAD_CONST               9 (1.5)
+            254 BINARY_OP                5 (*)
+            258 LOAD_CONST               6 ('.3f')
+            260 FORMAT_VALUE             4 (with format)
+            262 LOAD_CONST              10 (':5:5:0.0')
+            264 BUILD_STRING             3
+            266 CALL                     1
+            274 POP_TOP
+
+ 91     >>  276 LOAD_GLOBAL              5 (NULL + _num)
+            286 LOAD_FAST                0 (effects)
+            288 LOAD_ATTR                7 (NULL|self + get)
+            308 LOAD_CONST              11 ('grain')
+            310 CALL                     1
+            318 CALL                     1
+            326 STORE_FAST               6 (grain)
+
+ 92         328 LOAD_FAST                6 (grain)
+            330 LOAD_CONST               2 (0)
+            332 COMPARE_OP              68 (>)
+            336 POP_JUMP_IF_FALSE       36 (to 410)
+
+ 93         338 LOAD_FAST                3 (f)
+            340 LOAD_ATTR                9 (NULL|self + append)
+            360 LOAD_CONST              12 ('noise=alls=')
+            362 LOAD_GLOBAL             11 (NULL + int)
+            372 LOAD_FAST                6 (grain)
+            374 LOAD_CONST               4 (100)
+            376 BINARY_OP               11 (/)
+            380 LOAD_CONST              13 (20)
+            382 BINARY_OP                5 (*)
+            386 CALL                     1
+            394 FORMAT_VALUE             0
+            396 LOAD_CONST              14 (':allf=t')
+            398 BUILD_STRING             3
+            400 CALL                     1
+            408 POP_TOP
+
+ 94     >>  410 LOAD_GLOBAL              5 (NULL + _num)
+            420 LOAD_FAST                0 (effects)
+            422 LOAD_ATTR                7 (NULL|self + get)
+            442 LOAD_CONST              15 ('vignette')
+            444 CALL                     1
+            452 CALL                     1
+            460 STORE_FAST               7 (vig)
+
+ 95         462 LOAD_FAST                7 (vig)
+            464 LOAD_CONST               2 (0)
+            466 COMPARE_OP              68 (>)
+            470 POP_JUMP_IF_FALSE       30 (to 532)
+
+ 96         472 LOAD_FAST                3 (f)
+            474 LOAD_ATTR                9 (NULL|self + append)
+            494 LOAD_CONST              16 ('vignette=a=')
+            496 LOAD_CONST              17 (0.4)
+            498 LOAD_FAST                7 (vig)
+            500 LOAD_CONST               4 (100)
+            502 BINARY_OP               11 (/)
+            506 LOAD_CONST              18 (1.1)
+            508 BINARY_OP                5 (*)
+            512 BINARY_OP                0 (+)
+            516 LOAD_CONST              19 ('.4f')
+            518 FORMAT_VALUE             4 (with format)
+            520 BUILD_STRING             2
+            522 CALL                     1
+            530 POP_TOP
+
+ 97     >>  532 LOAD_FAST                1 (frame_w)
+            534 POP_JUMP_IF_FALSE        7 (to 550)
+            536 LOAD_FAST                2 (frame_h)
+            538 POP_JUMP_IF_FALSE        5 (to 550)
+            540 LOAD_FAST                1 (frame_w)
+            542 LOAD_FAST                2 (frame_h)
+            544 BINARY_OP               11 (/)
+            548 JUMP_FORWARD             1 (to 552)
+        >>  550 LOAD_CONST              20 (0.0)
+        >>  552 STORE_FAST               8 (aspect)
+
+ 98         554 LOAD_GLOBAL             13 (NULL + _letterbox_frac)
+            564 LOAD_GLOBAL             15 (NULL + str)
+            574 LOAD_FAST                0 (effects)
+            576 LOAD_ATTR                7 (NULL|self + get)
+            596 LOAD_CONST              21 ('letterbox')
+            598 LOAD_CONST              22 ('none')
+            600 CALL                     2
+            608 CALL                     1
+            616 LOAD_FAST                8 (aspect)
+            618 CALL                     2
+            626 STORE_FAST               9 (frac)
+
+ 99         628 LOAD_FAST                9 (frac)
+            630 LOAD_CONST               2 (0)
+            632 COMPARE_OP              68 (>)
+            636 POP_JUMP_IF_FALSE       88 (to 814)
+            638 LOAD_FAST                1 (frame_w)
+            640 POP_JUMP_IF_FALSE       86 (to 814)
+            642 LOAD_FAST                2 (frame_h)
+            644 POP_JUMP_IF_FALSE       84 (to 814)
+
+100         646 LOAD_GLOBAL             17 (NULL + max)
+            656 LOAD_CONST              23 (2)
+            658 LOAD_GLOBAL             11 (NULL + int)
+            668 LOAD_FAST                2 (frame_h)
+            670 LOAD_FAST                9 (frac)
+            672 BINARY_OP                5 (*)
+            676 CALL                     1
+            684 LOAD_CONST              23 (2)
+            686 BINARY_OP                2 (//)
+            690 LOAD_CONST              23 (2)
+            692 BINARY_OP                5 (*)
+            696 CALL                     2
+            704 STORE_FAST              10 (bar)
+
+101         706 LOAD_FAST                3 (f)
+            708 LOAD_ATTR                9 (NULL|self + append)
+            728 LOAD_CONST              24 ('drawbox=x=0:y=0:w=')
+            730 LOAD_FAST                1 (frame_w)
+            732 FORMAT_VALUE             0
+            734 LOAD_CONST              25 (':h=')
+            736 LOAD_FAST               10 (bar)
+            738 FORMAT_VALUE             0
+            740 LOAD_CONST              26 (':color=black@1.0:t=fill')
+            742 BUILD_STRING             5
+            744 CALL                     1
+            752 POP_TOP
+
+102         754 LOAD_FAST                3 (f)
+            756 LOAD_ATTR                9 (NULL|self + append)
+            776 LOAD_CONST              27 ('drawbox=x=0:y=')
+            778 LOAD_FAST                2 (frame_h)
+            780 LOAD_FAST               10 (bar)
+            782 BINARY_OP               10 (-)
+            786 FORMAT_VALUE             0
+            788 LOAD_CONST              28 (':w=')
+            790 LOAD_FAST                1 (frame_w)
+            792 FORMAT_VALUE             0
+            794 LOAD_CONST              25 (':h=')
+            796 LOAD_FAST               10 (bar)
+            798 FORMAT_VALUE             0
+            800 LOAD_CONST              26 (':color=black@1.0:t=fill')
+            802 BUILD_STRING             7
+            804 CALL                     1
+            812 POP_TOP
+
+103     >>  814 LOAD_FAST                3 (f)
+            816 RETURN_VALUE
+
+Disassembly of <code object video_fx_post_sub at 0x7f6c819a4410, file "app\render\color_grade.py", line 106>:
+106           0 RESUME                   0
+
+108           2 LOAD_GLOBAL              1 (NULL + isinstance)
+             12 LOAD_FAST                0 (effects)
+             14 LOAD_GLOBAL              2 (dict)
+             24 CALL                     2
+             32 POP_JUMP_IF_TRUE         2 (to 38)
+
+109          34 BUILD_LIST               0
+             36 RETURN_VALUE
+
+110     >>   38 BUILD_LIST               0
+             40 STORE_FAST               2 (f)
+
+111          42 LOAD_GLOBAL              5 (NULL + _num)
+             52 LOAD_FAST                0 (effects)
+             54 LOAD_ATTR                7 (NULL|self + get)
+             74 LOAD_CONST               1 ('fade_in_ms')
+             76 CALL                     1
+             84 CALL                     1
+             92 LOAD_CONST               2 (1000.0)
+             94 BINARY_OP               11 (/)
+             98 STORE_FAST               3 (fin)
+
+112         100 LOAD_GLOBAL              5 (NULL + _num)
+            110 LOAD_FAST                0 (effects)
+            112 LOAD_ATTR                7 (NULL|self + get)
+            132 LOAD_CONST               3 ('fade_out_ms')
+            134 CALL                     1
+            142 CALL                     1
+            150 LOAD_CONST               2 (1000.0)
+            152 BINARY_OP               11 (/)
+            156 STORE_FAST               4 (fout)
+
+113         158 LOAD_FAST                3 (fin)
+            160 LOAD_CONST               4 (0)
+            162 COMPARE_OP              68 (>)
+            166 POP_JUMP_IF_FALSE       21 (to 210)
+
+114         168 LOAD_FAST                2 (f)
+            170 LOAD_ATTR                9 (NULL|self + append)
+            190 LOAD_CONST               5 ('fade=t=in:st=0:d=')
+            192 LOAD_FAST                3 (fin)
+            194 LOAD_CONST               6 ('.3f')
+            196 FORMAT_VALUE             4 (with format)
+            198 BUILD_STRING             2
+            200 CALL                     1
+            208 POP_TOP
+
+115     >>  210 LOAD_FAST                4 (fout)
+            212 LOAD_CONST               4 (0)
+            214 COMPARE_OP              68 (>)
+            218 POP_JUMP_IF_FALSE       35 (to 290)
+            220 LOAD_FAST                1 (duration_sec)
+            222 POP_JUMP_IF_FALSE       33 (to 290)
+            224 LOAD_FAST                1 (duration_sec)
+            226 LOAD_FAST                4 (fout)
+            228 COMPARE_OP              68 (>)
+            232 POP_JUMP_IF_FALSE       28 (to 290)
+
+116         234 LOAD_FAST                2 (f)
+            236 LOAD_ATTR                9 (NULL|self + append)
+            256 LOAD_CONST               7 ('fade=t=out:st=')
+            258 LOAD_FAST                1 (duration_sec)
+            260 LOAD_FAST                4 (fout)
+            262 BINARY_OP               10 (-)
+            266 LOAD_CONST               6 ('.3f')
+            268 FORMAT_VALUE             4 (with format)
+            270 LOAD_CONST               8 (':d=')
+            272 LOAD_FAST                4 (fout)
+            274 LOAD_CONST               6 ('.3f')
+            276 FORMAT_VALUE             4 (with format)
+            278 BUILD_STRING             4
+            280 CALL                     1
+            288 POP_TOP
+
+117     >>  290 LOAD_FAST                2 (f)
+            292 RETURN_VALUE

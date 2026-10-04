@@ -1,0 +1,129 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Compatibility entry point for the single Facebook publisher.\n\nHistorically this module implemented a second daemon with different retry,\ntoken and scheduling rules. All publishing now delegates to\n``fb_publish_service`` so scheduled and manual paths share one policy engine.\n')
+              4 STORE_NAME               0 (__doc__)
+
+  7           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+  9          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('Session',))
+             22 IMPORT_NAME              3 (sqlalchemy.orm)
+             24 IMPORT_FROM              4 (Session)
+             26 STORE_NAME               4 (Session)
+             28 POP_TOP
+
+ 11          30 LOAD_CONST               1 (0)
+             32 LOAD_CONST               4 (('FbPost', 'PostCard'))
+             34 IMPORT_NAME              5 (app.db.models)
+             36 IMPORT_FROM              6 (FbPost)
+             38 STORE_NAME               6 (FbPost)
+             40 IMPORT_FROM              7 (PostCard)
+             42 STORE_NAME               7 (PostCard)
+             44 POP_TOP
+
+ 12          46 LOAD_CONST               1 (0)
+             48 LOAD_CONST               5 (('ai_post_service', 'fb_publish_service'))
+             50 IMPORT_NAME              8 (app.services)
+             52 IMPORT_FROM              9 (ai_post_service)
+             54 STORE_NAME               9 (ai_post_service)
+             56 IMPORT_FROM             10 (fb_publish_service)
+             58 STORE_NAME              10 (fb_publish_service)
+             60 POP_TOP
+
+ 15          62 LOAD_CONST               8 (('db', 'Session', 'post_id', 'str', 'return', 'dict'))
+             64 LOAD_CONST               6 (<code object publish_single_post at 0x7f6c926bc430, file "app\services\fb_publisher_service.py", line 15>)
+             66 MAKE_FUNCTION            4 (annotations)
+             68 STORE_NAME              11 (publish_single_post)
+             70 RETURN_CONST             7 (None)
+
+Disassembly of <code object publish_single_post at 0x7f6c926bc430, file "app\services\fb_publisher_service.py", line 15>:
+ 15           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 17           6 LOAD_FAST                0 (db)
+              8 LOAD_ATTR                1 (NULL|self + get)
+             28 LOAD_GLOBAL              2 (FbPost)
+             38 LOAD_FAST                1 (post_id)
+             40 CALL                     2
+             48 POP_JUMP_IF_NONE        57 (to 164)
+
+ 18          50 LOAD_GLOBAL              5 (NULL + fb_publish_service)
+             60 LOAD_ATTR                6 (publish_now_in_session)
+             80 LOAD_FAST                0 (db)
+             82 LOAD_FAST                1 (post_id)
+             84 CALL                     2
+             92 GET_AWAITABLE            0
+             94 LOAD_CONST               1 (None)
+        >>   96 SEND                     3 (to 106)
+            100 YIELD_VALUE              2
+            102 RESUME                   3
+            104 JUMP_BACKWARD_NO_INTERRUPT     5 (to 96)
+        >>  106 END_SEND
+            108 STORE_FAST               2 (result)
+
+ 19         110 LOAD_FAST                2 (result)
+            112 LOAD_ATTR                1 (NULL|self + get)
+            132 LOAD_CONST               2 ('reason')
+            134 CALL                     1
+            142 LOAD_CONST               3 ('skipped_already_claimed')
+            144 COMPARE_OP              40 (==)
+            148 POP_JUMP_IF_FALSE        5 (to 160)
+
+ 20         150 LOAD_CONST               4 (False)
+            152 LOAD_CONST               3 ('skipped_already_claimed')
+            154 LOAD_CONST               5 (('ok', 'reason'))
+            156 BUILD_CONST_KEY_MAP      2
+            158 RETURN_VALUE
+
+ 21     >>  160 LOAD_FAST                2 (result)
+            162 RETURN_VALUE
+
+ 22     >>  164 LOAD_FAST                0 (db)
+            166 LOAD_ATTR                1 (NULL|self + get)
+            186 LOAD_GLOBAL              8 (PostCard)
+            196 LOAD_FAST                1 (post_id)
+            198 CALL                     2
+            206 POP_JUMP_IF_NONE        30 (to 268)
+
+ 23         208 LOAD_GLOBAL             11 (NULL + ai_post_service)
+            218 LOAD_ATTR               12 (publish_now)
+            238 LOAD_FAST                0 (db)
+            240 LOAD_FAST                1 (post_id)
+            242 CALL                     2
+            250 GET_AWAITABLE            0
+            252 LOAD_CONST               1 (None)
+        >>  254 SEND                     3 (to 264)
+            258 YIELD_VALUE              2
+            260 RESUME                   3
+            262 JUMP_BACKWARD_NO_INTERRUPT     5 (to 254)
+        >>  264 END_SEND
+            266 RETURN_VALUE
+
+ 24     >>  268 LOAD_GLOBAL             15 (NULL + ValueError)
+            278 LOAD_CONST               6 ('Không tìm thấy bài viết ID: ')
+            280 LOAD_FAST                1 (post_id)
+            282 FORMAT_VALUE             0
+            284 BUILD_STRING             2
+            286 CALL                     1
+            294 RAISE_VARARGS            1
+
+ 18     >>  296 CLEANUP_THROW
+            298 JUMP_BACKWARD           97 (to 106)
+
+ 23     >>  300 CLEANUP_THROW
+            302 JUMP_BACKWARD           20 (to 264)
+        >>  304 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            306 RERAISE                  1
+ExceptionTable:
+  4 to 98 -> 304 [0] lasti
+  100 to 100 -> 296 [2]
+  102 to 256 -> 304 [0] lasti
+  258 to 258 -> 300 [2]
+  260 to 296 -> 304 [0] lasti
+  300 to 300 -> 304 [0] lasti

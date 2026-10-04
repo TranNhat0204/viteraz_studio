@@ -1,0 +1,1798 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Quản lý nhiều tài khoản Google Flow + xoay vòng khi hết quota NGÀY / bị throttle tạm thời.\n\nCookie/đăng nhập Google sống bên Electron (mỗi account = 1 partition `persist:google-flow:<id>`).\nBackend chỉ giữ DANH SÁCH + TRẠNG THÁI QUOTA để pipeline biết account nào còn dùng được:\n\n  - `next_available()` : account `enabled`, chưa hết quota, không đang nghỉ, theo `order_index`.\n  - `mark_exhausted()` : gặp FLOW_QUOTA → khoá tới NỬA ĐÊM hôm sau (quota Flow reset theo ngày).\n  - `mark_cooldown()`  : gặp FLOW_RATE_LIMIT → NGHỈ NGẮN (mặc định 1 phút cho cả throttle thường lẫn\n                         cờ "hoạt động bất thường" — xem ghi chú ở COOLDOWN_RATE_LIMIT_MIN).\n  - `mark_used()`      : ghi mốc dùng gần nhất (để round-robin "dùng cũ nhất trước").\n\nVì sao cooldown phải nằm ở DB chứ không phải RAM: cả ba lớp chống throttle cũ (`qstates` của step,\n`FlowFailover.tried`, circuit-breaker trong `FlowSessionClient`) đều chết theo lượt chạy. Bấm "Tải lại\ncảnh thiếu" là job MỚI ⇒ cả ba reset ⇒ account vừa bị Flow chặn lại đứng đầu hàng và lại ôm nguyên\nmột dải cảnh để fail tiếp. Xem docs/plan-flow-profile-stuck-scenes.md §5.\n\nBảng rỗng = chế độ TƯƠNG THÍCH 1-tài-khoản cũ: pipeline dùng partition Electron mặc định\n(`account_id=None`). Xem plan đa-tài-khoản Flow.\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 20           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 22          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('datetime', 'timedelta'))
+             22 IMPORT_NAME              3 (datetime)
+             24 IMPORT_FROM              3 (datetime)
+             26 STORE_NAME               3 (datetime)
+             28 IMPORT_FROM              4 (timedelta)
+             30 STORE_NAME               4 (timedelta)
+             32 POP_TOP
+
+ 24          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               4 (('func', 'select'))
+             38 IMPORT_NAME              5 (sqlalchemy)
+             40 IMPORT_FROM              6 (func)
+             42 STORE_NAME               6 (func)
+             44 IMPORT_FROM              7 (select)
+             46 STORE_NAME               7 (select)
+             48 POP_TOP
+
+ 25          50 LOAD_CONST               1 (0)
+             52 LOAD_CONST               5 (('Session',))
+             54 IMPORT_NAME              8 (sqlalchemy.orm)
+             56 IMPORT_FROM              9 (Session)
+             58 STORE_NAME               9 (Session)
+             60 POP_TOP
+
+ 27          62 LOAD_CONST               1 (0)
+             64 LOAD_CONST               6 (('StudioError', 'E'))
+             66 IMPORT_NAME             10 (app.core.errors)
+             68 IMPORT_FROM             11 (StudioError)
+             70 STORE_NAME              11 (StudioError)
+             72 IMPORT_FROM             12 (E)
+             74 STORE_NAME              12 (E)
+             76 POP_TOP
+
+ 28          78 LOAD_CONST               1 (0)
+             80 LOAD_CONST               7 (('log',))
+             82 IMPORT_NAME             13 (app.core.logging)
+             84 IMPORT_FROM             14 (log)
+             86 STORE_NAME              14 (log)
+             88 POP_TOP
+
+ 29          90 LOAD_CONST               1 (0)
+             92 LOAD_CONST               8 (('BrowserProfile', 'FlowAccount', 'FlowUsageEvent', 'Setting', 'Video'))
+             94 IMPORT_NAME             15 (app.db.models)
+             96 IMPORT_FROM             16 (BrowserProfile)
+             98 STORE_NAME              16 (BrowserProfile)
+            100 IMPORT_FROM             17 (FlowAccount)
+            102 STORE_NAME              17 (FlowAccount)
+            104 IMPORT_FROM             18 (FlowUsageEvent)
+            106 STORE_NAME              18 (FlowUsageEvent)
+            108 IMPORT_FROM             19 (Setting)
+            110 STORE_NAME              19 (Setting)
+            112 IMPORT_FROM             20 (Video)
+            114 STORE_NAME              20 (Video)
+            116 POP_TOP
+
+ 38         118 LOAD_CONST               9 (1)
+            120 STORE_NAME              21 (COOLDOWN_RATE_LIMIT_MIN)
+
+ 39         122 LOAD_CONST               9 (1)
+            124 STORE_NAME              22 (COOLDOWN_HARD_BLOCK_MIN)
+
+ 40         126 LOAD_CONST              10 ('flow_cooldown_rate_limit_min')
+            128 STORE_NAME              23 (_SETTING_RATE_LIMIT_MIN)
+
+ 41         130 LOAD_CONST              11 ('flow_cooldown_hard_block_min')
+            132 STORE_NAME              24 (_SETTING_HARD_BLOCK_MIN)
+
+ 44         134 LOAD_CONST              40 (('return', 'datetime'))
+            136 LOAD_CONST              12 (<code object _next_midnight at 0x7f6c926fe630, file "app\services\flow_account_service.py", line 44>)
+            138 MAKE_FUNCTION            4 (annotations)
+            140 STORE_NAME              25 (_next_midnight)
+
+ 50         142 LOAD_CONST              40 (('return', 'datetime'))
+            144 LOAD_CONST              13 (<code object _today_start at 0x7f6c926f8470, file "app\services\flow_account_service.py", line 50>)
+            146 MAKE_FUNCTION            4 (annotations)
+            148 STORE_NAME              26 (_today_start)
+
+ 55         150 LOAD_CONST              40 (('return', 'datetime'))
+            152 LOAD_CONST              14 (<code object _month_start at 0x7f6c9268fab0, file "app\services\flow_account_service.py", line 55>)
+            154 MAKE_FUNCTION            4 (annotations)
+            156 STORE_NAME              27 (_month_start)
+
+ 60         158 LOAD_CONST              41 (('a', 'FlowAccount', 'now', 'datetime', 'return', 'str'))
+            160 LOAD_CONST              15 (<code object _status at 0x7f6c9247a730, file "app\services\flow_account_service.py", line 60>)
+            162 MAKE_FUNCTION            4 (annotations)
+            164 STORE_NAME              28 (_status)
+
+ 78         166 LOAD_CONST              42 ((None,))
+            168 LOAD_CONST              43 (('a', 'FlowAccount', 'now', 'datetime | None', 'return', 'bool'))
+            170 LOAD_CONST              17 (<code object is_cooling at 0x7f6c92150030, file "app\services\flow_account_service.py", line 78>)
+            172 MAKE_FUNCTION            5 (defaults, annotations)
+            174 STORE_NAME              29 (is_cooling)
+
+ 83         176 LOAD_CONST              44 (('db', 'Session', 'partition_id', 'str', 'return', 'dict'))
+            178 LOAD_CONST              18 (<code object usage_stats at 0x7f6c9234d3e0, file "app\services\flow_account_service.py", line 83>)
+            180 MAKE_FUNCTION            4 (annotations)
+            182 STORE_NAME              30 (usage_stats)
+
+102         184 LOAD_CONST              42 ((None,))
+            186 LOAD_CONST              45 (('a', 'FlowAccount', 'db', 'Session | None', 'return', 'dict'))
+            188 LOAD_CONST              19 (<code object to_dict at 0x28bd3050, file "app\services\flow_account_service.py", line 102>)
+            190 MAKE_FUNCTION            5 (defaults, annotations)
+            192 STORE_NAME              31 (to_dict)
+
+144         194 LOAD_CONST              46 (('db', 'Session', 'return', 'list[FlowAccount]'))
+            196 LOAD_CONST              20 (<code object list_accounts at 0x7f6c92408fd0, file "app\services\flow_account_service.py", line 144>)
+            198 MAKE_FUNCTION            4 (annotations)
+            200 STORE_NAME              32 (list_accounts)
+
+149         202 LOAD_CONST              47 (('db', 'Session', 'account_id', 'str', 'return', 'FlowAccount'))
+            204 LOAD_CONST              21 (<code object get_account at 0x7f6c926fdb80, file "app\services\flow_account_service.py", line 149>)
+            206 MAKE_FUNCTION            4 (annotations)
+            208 STORE_NAME              33 (get_account)
+
+157         210 NOP
+
+156         212 LOAD_CONST              48 ((None, None))
+
+157         214 NOP
+
+156         216 NOP
+
+157         218 NOP
+
+156         220 NOP
+
+157         222 NOP
+
+156         224 LOAD_CONST              49 (('db', 'Session', 'partition_id', 'str', 'label', 'str | None', 'email', 'str | None', 'return', 'FlowAccount'))
+            226 LOAD_CONST              22 (<code object create_account at 0x28b378c0, file "app\services\flow_account_service.py", line 156>)
+            228 MAKE_FUNCTION            5 (defaults, annotations)
+            230 STORE_NAME              34 (create_account)
+
+173         232 LOAD_CONST              16 (None)
+
+174         234 LOAD_CONST              16 (None)
+            236 LOAD_CONST              16 (None)
+
+175         238 LOAD_CONST              16 (None)
+
+176         240 LOAD_CONST              23 (Ellipsis)
+
+173         242 LOAD_CONST              24 (('label', 'email', 'enabled', 'daily_image_cap', 'video_engine'))
+            244 BUILD_CONST_KEY_MAP      5
+
+174         246 NOP
+
+173         248 NOP
+
+174         250 NOP
+
+173         252 NOP
+
+175         254 NOP
+
+173         256 NOP
+
+176         258 NOP
+
+173         260 NOP
+
+176         262 NOP
+
+173         264 LOAD_CONST              50 (('db', 'Session', 'account_id', 'str', 'label', 'str | None', 'email', 'str | None', 'enabled', 'bool | None', 'daily_image_cap', 'int | None', 'video_engine', 'str | None', 'return', 'FlowAccount'))
+            266 LOAD_CONST              25 (<code object update_account at 0x7f6c92410770, file "app\services\flow_account_service.py", line 173>)
+            268 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            270 STORE_NAME              35 (update_account)
+
+198         272 NOP
+
+199         274 NOP
+
+198         276 NOP
+
+199         278 NOP
+
+198         280 LOAD_CONST              51 (('db', 'Session', 'account_id', 'str', 'credits', 'int | None', 'tier', 'str | None', 'return', 'FlowAccount'))
+            282 LOAD_CONST              26 (<code object set_credits_cache at 0x7f6c9247a8d0, file "app\services\flow_account_service.py", line 198>)
+            284 MAKE_FUNCTION            4 (annotations)
+            286 STORE_NAME              36 (set_credits_cache)
+
+212         288 LOAD_CONST              52 (('db', 'Session', 'partition_id', 'str | None', 'kind', 'str', 'return', 'None'))
+            290 LOAD_CONST              27 (<code object record_usage at 0x7f6c9247aa70, file "app\services\flow_account_service.py", line 212>)
+            292 MAKE_FUNCTION            4 (annotations)
+            294 STORE_NAME              37 (record_usage)
+
+224         296 LOAD_CONST              53 (('db', 'Session', 'account_id', 'str', 'return', 'None'))
+            298 LOAD_CONST              28 (<code object delete_account at 0x28c08a70, file "app\services\flow_account_service.py", line 224>)
+            300 MAKE_FUNCTION            4 (annotations)
+            302 STORE_NAME              38 (delete_account)
+
+259         304 LOAD_CONST              54 (('db', 'Session', 'ordered_ids', 'list[str]', 'return', 'None'))
+            306 LOAD_CONST              29 (<code object reorder at 0x7f6c9234d680, file "app\services\flow_account_service.py", line 259>)
+            308 MAKE_FUNCTION            4 (annotations)
+            310 STORE_NAME              39 (reorder)
+
+268         312 LOAD_CONST              47 (('db', 'Session', 'account_id', 'str', 'return', 'FlowAccount'))
+            314 LOAD_CONST              30 (<code object clear_exhausted at 0x7f6c926fe890, file "app\services\flow_account_service.py", line 268>)
+            316 MAKE_FUNCTION            4 (annotations)
+            318 STORE_NAME              40 (clear_exhausted)
+
+277         320 LOAD_CONST              47 (('db', 'Session', 'account_id', 'str', 'return', 'FlowAccount'))
+            322 LOAD_CONST              31 (<code object clear_cooldown at 0x7f6c926af3f0, file "app\services\flow_account_service.py", line 277>)
+            324 MAKE_FUNCTION            4 (annotations)
+            326 STORE_NAME              41 (clear_cooldown)
+
+295         328 LOAD_CONST              42 ((None,))
+            330 LOAD_CONST              55 (('db', 'Session', 'exclude', 'set[str] | None', 'return', 'FlowAccount | None'))
+            332 LOAD_CONST              32 (<code object next_available at 0x28c19ef0, file "app\services\flow_account_service.py", line 295>)
+            334 MAKE_FUNCTION            5 (defaults, annotations)
+            336 STORE_NAME              42 (next_available)
+
+323         338 LOAD_CONST              56 (('db', 'Session', 'partition_id', 'str', 'return', 'None'))
+            340 LOAD_CONST              33 (<code object mark_exhausted at 0x7f6c92408e40, file "app\services\flow_account_service.py", line 323>)
+            342 MAKE_FUNCTION            4 (annotations)
+            344 STORE_NAME              43 (mark_exhausted)
+
+331         346 LOAD_CONST              57 (('db', 'Session', 'hard_block', 'bool', 'return', 'int'))
+            348 LOAD_CONST              34 (<code object cooldown_minutes at 0x7f6c9269a1f0, file "app\services\flow_account_service.py", line 331>)
+            350 MAKE_FUNCTION            4 (annotations)
+            352 STORE_NAME              44 (cooldown_minutes)
+
+347         354 LOAD_CONST              35 (False)
+
+348         356 LOAD_CONST              16 (None)
+
+347         358 LOAD_CONST              36 (('hard_block', 'minutes'))
+            360 BUILD_CONST_KEY_MAP      2
+
+348         362 NOP
+
+347         364 NOP
+
+348         366 NOP
+
+347         368 LOAD_CONST              58 (('db', 'Session', 'partition_id', 'str | None', 'hard_block', 'bool', 'minutes', 'int | None', 'return', 'datetime | None'))
+            370 LOAD_CONST              37 (<code object mark_cooldown at 0x28bfa430, file "app\services\flow_account_service.py", line 347>)
+            372 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            374 STORE_NAME              45 (mark_cooldown)
+
+373         376 LOAD_CONST              46 (('db', 'Session', 'return', 'list[FlowAccount]'))
+            378 LOAD_CONST              38 (<code object cooling_accounts at 0x7f6c92682170, file "app\services\flow_account_service.py", line 373>)
+            380 MAKE_FUNCTION            4 (annotations)
+            382 STORE_NAME              46 (cooling_accounts)
+
+380         384 LOAD_CONST              56 (('db', 'Session', 'partition_id', 'str', 'return', 'None'))
+            386 LOAD_CONST              39 (<code object mark_used at 0x7f6c9247ac10, file "app\services\flow_account_service.py", line 380>)
+            388 MAKE_FUNCTION            4 (annotations)
+            390 STORE_NAME              47 (mark_used)
+            392 RETURN_CONST            16 (None)
+
+Disassembly of <code object _next_midnight at 0x7f6c926fe630, file "app\services\flow_account_service.py", line 44>:
+ 44           0 RESUME                   0
+
+ 46           2 LOAD_GLOBAL              1 (NULL + datetime)
+             12 LOAD_ATTR                2 (now)
+             32 CALL                     0
+             40 LOAD_GLOBAL              5 (NULL + timedelta)
+             50 LOAD_CONST               1 (1)
+             52 KW_NAMES                 2 (('days',))
+             54 CALL                     1
+             62 BINARY_OP                0 (+)
+             66 STORE_FAST               0 (tomorrow)
+
+ 47          68 LOAD_FAST                0 (tomorrow)
+             70 LOAD_ATTR                7 (NULL|self + replace)
+             90 LOAD_CONST               3 (0)
+             92 LOAD_CONST               3 (0)
+             94 LOAD_CONST               3 (0)
+             96 LOAD_CONST               3 (0)
+             98 KW_NAMES                 4 (('hour', 'minute', 'second', 'microsecond'))
+            100 CALL                     4
+            108 RETURN_VALUE
+
+Disassembly of <code object _today_start at 0x7f6c926f8470, file "app\services\flow_account_service.py", line 50>:
+ 50           0 RESUME                   0
+
+ 52           2 LOAD_GLOBAL              1 (NULL + datetime)
+             12 LOAD_ATTR                2 (now)
+             32 CALL                     0
+             40 LOAD_ATTR                5 (NULL|self + replace)
+             60 LOAD_CONST               1 (0)
+             62 LOAD_CONST               1 (0)
+             64 LOAD_CONST               1 (0)
+             66 LOAD_CONST               1 (0)
+             68 KW_NAMES                 2 (('hour', 'minute', 'second', 'microsecond'))
+             70 CALL                     4
+             78 RETURN_VALUE
+
+Disassembly of <code object _month_start at 0x7f6c9268fab0, file "app\services\flow_account_service.py", line 55>:
+ 55           0 RESUME                   0
+
+ 57           2 LOAD_GLOBAL              1 (NULL + datetime)
+             12 LOAD_ATTR                2 (now)
+             32 CALL                     0
+             40 LOAD_ATTR                5 (NULL|self + replace)
+             60 LOAD_CONST               1 (1)
+             62 LOAD_CONST               2 (0)
+             64 LOAD_CONST               2 (0)
+             66 LOAD_CONST               2 (0)
+             68 LOAD_CONST               2 (0)
+             70 KW_NAMES                 3 (('day', 'hour', 'minute', 'second', 'microsecond'))
+             72 CALL                     5
+             80 RETURN_VALUE
+
+Disassembly of <code object _status at 0x7f6c9247a730, file "app\services\flow_account_service.py", line 60>:
+ 60           0 RESUME                   0
+
+ 61           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('flow_profile_health',))
+              6 IMPORT_NAME              0 (app.services)
+              8 IMPORT_FROM              1 (flow_profile_health)
+             10 STORE_FAST               2 (flow_health)
+             12 POP_TOP
+
+ 63          14 LOAD_FAST                0 (a)
+             16 LOAD_ATTR                4 (enabled)
+             36 POP_JUMP_IF_TRUE         1 (to 40)
+
+ 64          38 RETURN_CONST             3 ('disabled')
+
+ 65     >>   40 LOAD_FAST                0 (a)
+             42 LOAD_ATTR                6 (exhausted_until)
+             62 POP_JUMP_IF_FALSE       16 (to 96)
+             64 LOAD_FAST                0 (a)
+             66 LOAD_ATTR                6 (exhausted_until)
+             86 LOAD_FAST                1 (now)
+             88 COMPARE_OP              68 (>)
+             92 POP_JUMP_IF_FALSE        1 (to 96)
+
+ 66          94 RETURN_CONST             4 ('exhausted')
+
+ 69     >>   96 LOAD_FAST                0 (a)
+             98 LOAD_ATTR                8 (cooldown_until)
+            118 POP_JUMP_IF_FALSE       16 (to 152)
+            120 LOAD_FAST                0 (a)
+            122 LOAD_ATTR                8 (cooldown_until)
+            142 LOAD_FAST                1 (now)
+            144 COMPARE_OP              68 (>)
+            148 POP_JUMP_IF_FALSE        1 (to 152)
+
+ 70         150 RETURN_CONST             5 ('cooldown')
+
+ 73     >>  152 LOAD_FAST                2 (flow_health)
+            154 LOAD_ATTR               11 (NULL|self + is_sick)
+            174 LOAD_FAST                0 (a)
+            176 LOAD_ATTR               12 (partition_id)
+            196 CALL                     1
+            204 POP_JUMP_IF_FALSE        1 (to 208)
+
+ 74         206 RETURN_CONST             6 ('sick')
+
+ 75     >>  208 RETURN_CONST             7 ('ready')
+
+Disassembly of <code object is_cooling at 0x7f6c92150030, file "app\services\flow_account_service.py", line 78>:
+ 78           0 RESUME                   0
+
+ 80           2 LOAD_GLOBAL              1 (NULL + bool)
+             12 LOAD_FAST                0 (a)
+             14 LOAD_ATTR                2 (cooldown_until)
+             34 COPY                     1
+             36 POP_JUMP_IF_FALSE       37 (to 112)
+             38 POP_TOP
+             40 LOAD_FAST                0 (a)
+             42 LOAD_ATTR                2 (cooldown_until)
+             62 LOAD_FAST                1 (now)
+             64 COPY                     1
+             66 POP_JUMP_IF_TRUE        20 (to 108)
+             68 POP_TOP
+             70 LOAD_GLOBAL              5 (NULL + datetime)
+             80 LOAD_ATTR                6 (now)
+            100 CALL                     0
+        >>  108 COMPARE_OP              68 (>)
+        >>  112 CALL                     1
+            120 RETURN_VALUE
+
+Disassembly of <code object usage_stats at 0x7f6c9234d3e0, file "app\services\flow_account_service.py", line 83>:
+              0 MAKE_CELL                0 (db)
+              2 MAKE_CELL                1 (partition_id)
+
+ 83           4 RESUME                   0
+
+ 85           6 LOAD_GLOBAL              1 (NULL + _today_start)
+             16 CALL                     0
+             24 LOAD_GLOBAL              3 (NULL + _month_start)
+             34 CALL                     0
+             42 STORE_FAST               3 (month)
+             44 STORE_FAST               2 (today)
+
+ 87          46 LOAD_CONST               5 (('kind', 'str', 'since', 'datetime', 'return', 'int'))
+             48 LOAD_CLOSURE             0 (db)
+             50 LOAD_CLOSURE             1 (partition_id)
+             52 BUILD_TUPLE              2
+             54 LOAD_CONST               1 (<code object _count at 0x7f6c819a6310, file "app\services\flow_account_service.py", line 87>)
+             56 MAKE_FUNCTION           12 (annotations, closure)
+             58 STORE_FAST               4 (_count)
+
+ 95          60 PUSH_NULL
+             62 LOAD_FAST                4 (_count)
+             64 LOAD_CONST               2 ('image')
+             66 LOAD_FAST                2 (today)
+             68 CALL                     2
+
+ 96          76 PUSH_NULL
+             78 LOAD_FAST                4 (_count)
+             80 LOAD_CONST               3 ('video')
+             82 LOAD_FAST                2 (today)
+             84 CALL                     2
+
+ 97          92 PUSH_NULL
+             94 LOAD_FAST                4 (_count)
+             96 LOAD_CONST               2 ('image')
+             98 LOAD_FAST                3 (month)
+            100 CALL                     2
+
+ 98         108 PUSH_NULL
+            110 LOAD_FAST                4 (_count)
+            112 LOAD_CONST               3 ('video')
+            114 LOAD_FAST                3 (month)
+            116 CALL                     2
+
+ 94         124 LOAD_CONST               4 (('images_today', 'videos_today', 'images_month', 'videos_month'))
+            126 BUILD_CONST_KEY_MAP      4
+            128 RETURN_VALUE
+
+Disassembly of <code object _count at 0x7f6c819a6310, file "app\services\flow_account_service.py", line 87>:
+              0 COPY_FREE_VARS           2
+
+ 87           2 RESUME                   0
+
+ 88           4 LOAD_GLOBAL              1 (NULL + int)
+             14 LOAD_DEREF               2 (db)
+             16 LOAD_ATTR                3 (NULL|self + scalar)
+
+ 89          36 LOAD_GLOBAL              5 (NULL + select)
+             46 LOAD_GLOBAL              7 (NULL + func)
+             56 LOAD_ATTR                8 (count)
+             76 CALL                     0
+             84 CALL                     1
+             92 LOAD_ATTR               11 (NULL|self + select_from)
+            112 LOAD_GLOBAL             12 (FlowUsageEvent)
+            122 CALL                     1
+
+ 90         130 LOAD_ATTR               15 (NULL|self + where)
+            150 LOAD_GLOBAL             12 (FlowUsageEvent)
+            160 LOAD_ATTR               16 (partition_id)
+            180 LOAD_DEREF               3 (partition_id)
+            182 COMPARE_OP              40 (==)
+
+ 91         186 LOAD_GLOBAL             12 (FlowUsageEvent)
+            196 LOAD_ATTR               18 (kind)
+            216 LOAD_FAST                0 (kind)
+            218 COMPARE_OP              40 (==)
+
+ 92         222 LOAD_GLOBAL             12 (FlowUsageEvent)
+            232 LOAD_ATTR               20 (created_at)
+            252 LOAD_FAST                1 (since)
+            254 COMPARE_OP              92 (>=)
+
+ 90         258 CALL                     3
+
+ 88         266 CALL                     1
+            274 COPY                     1
+            276 POP_JUMP_IF_TRUE         2 (to 282)
+            278 POP_TOP
+
+ 92         280 LOAD_CONST               1 (0)
+
+ 88     >>  282 CALL                     1
+            290 RETURN_VALUE
+
+Disassembly of <code object to_dict at 0x28bd3050, file "app\services\flow_account_service.py", line 102>:
+102           0 RESUME                   0
+
+103           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('flow_profile_health',))
+              6 IMPORT_NAME              0 (app.services)
+              8 IMPORT_FROM              1 (flow_profile_health)
+             10 STORE_FAST               2 (flow_health)
+             12 POP_TOP
+
+105          14 LOAD_GLOBAL              5 (NULL + datetime)
+             24 LOAD_ATTR                6 (now)
+             44 CALL                     0
+             52 STORE_FAST               3 (now)
+
+106          54 LOAD_FAST                2 (flow_health)
+             56 LOAD_ATTR                9 (NULL|self + sick_info)
+             76 LOAD_FAST                0 (a)
+             78 LOAD_ATTR               10 (partition_id)
+             98 CALL                     1
+            106 STORE_FAST               4 (sick)
+
+107         108 BUILD_MAP                0
+
+108         110 LOAD_CONST               3 ('id')
+            112 LOAD_FAST                0 (a)
+            114 LOAD_ATTR               12 (id)
+
+107         134 MAP_ADD                  1
+
+109         136 LOAD_CONST               4 ('partition_id')
+            138 LOAD_FAST                0 (a)
+            140 LOAD_ATTR               10 (partition_id)
+
+107         160 MAP_ADD                  1
+
+110         162 LOAD_CONST               5 ('label')
+            164 LOAD_FAST                0 (a)
+            166 LOAD_ATTR               14 (label)
+
+107         186 MAP_ADD                  1
+
+111         188 LOAD_CONST               6 ('email')
+            190 LOAD_FAST                0 (a)
+            192 LOAD_ATTR               16 (email)
+
+107         212 MAP_ADD                  1
+
+112         214 LOAD_CONST               7 ('enabled')
+            216 LOAD_GLOBAL             19 (NULL + bool)
+            226 LOAD_FAST                0 (a)
+            228 LOAD_ATTR               20 (enabled)
+            248 CALL                     1
+
+107         256 MAP_ADD                  1
+
+113         258 LOAD_CONST               8 ('order_index')
+            260 LOAD_FAST                0 (a)
+            262 LOAD_ATTR               22 (order_index)
+
+107         282 MAP_ADD                  1
+
+114         284 LOAD_CONST               9 ('status')
+            286 LOAD_GLOBAL             25 (NULL + _status)
+            296 LOAD_FAST                0 (a)
+            298 LOAD_FAST                3 (now)
+            300 CALL                     2
+
+107         308 MAP_ADD                  1
+
+115         310 LOAD_CONST              10 ('exhausted_until')
+            312 LOAD_FAST                0 (a)
+            314 LOAD_ATTR               26 (exhausted_until)
+            334 POP_JUMP_IF_FALSE       26 (to 388)
+            336 LOAD_FAST                0 (a)
+            338 LOAD_ATTR               26 (exhausted_until)
+            358 LOAD_ATTR               29 (NULL|self + isoformat)
+            378 CALL                     0
+            386 JUMP_FORWARD             1 (to 390)
+        >>  388 LOAD_CONST               0 (None)
+
+107     >>  390 MAP_ADD                  1
+
+118         392 LOAD_CONST              11 ('cooldown_until')
+            394 LOAD_FAST                0 (a)
+            396 LOAD_ATTR               30 (cooldown_until)
+            416 POP_JUMP_IF_FALSE       26 (to 470)
+            418 LOAD_FAST                0 (a)
+            420 LOAD_ATTR               30 (cooldown_until)
+            440 LOAD_ATTR               29 (NULL|self + isoformat)
+            460 CALL                     0
+            468 JUMP_FORWARD             1 (to 472)
+        >>  470 LOAD_CONST               0 (None)
+
+107     >>  472 MAP_ADD                  1
+
+119         474 LOAD_CONST              12 ('cooldown_seconds_left')
+
+120         476 LOAD_GLOBAL             33 (NULL + is_cooling)
+            486 LOAD_FAST                0 (a)
+            488 LOAD_FAST                3 (now)
+            490 CALL                     2
+            498 POP_JUMP_IF_FALSE       48 (to 596)
+            500 LOAD_GLOBAL             35 (NULL + max)
+            510 LOAD_GLOBAL             37 (NULL + int)
+            520 LOAD_FAST                0 (a)
+            522 LOAD_ATTR               30 (cooldown_until)
+            542 LOAD_FAST                3 (now)
+            544 BINARY_OP               10 (-)
+            548 LOAD_ATTR               39 (NULL|self + total_seconds)
+            568 CALL                     0
+            576 CALL                     1
+            584 LOAD_CONST               1 (0)
+            586 CALL                     2
+            594 JUMP_FORWARD             1 (to 598)
+        >>  596 LOAD_CONST               1 (0)
+
+107     >>  598 MAP_ADD                  1
+
+121         600 LOAD_CONST              13 ('last_used_at')
+            602 LOAD_FAST                0 (a)
+            604 LOAD_ATTR               40 (last_used_at)
+            624 POP_JUMP_IF_FALSE       26 (to 678)
+            626 LOAD_FAST                0 (a)
+            628 LOAD_ATTR               40 (last_used_at)
+            648 LOAD_ATTR               29 (NULL|self + isoformat)
+            668 CALL                     0
+            676 JUMP_FORWARD             1 (to 680)
+        >>  678 LOAD_CONST               0 (None)
+
+107     >>  680 MAP_ADD                  1
+
+123         682 LOAD_CONST              14 ('sick_until')
+            684 LOAD_FAST                4 (sick)
+            686 POP_JUMP_IF_FALSE       19 (to 726)
+            688 LOAD_FAST                4 (sick)
+            690 LOAD_CONST              15 ('until')
+            692 BINARY_SUBSCR
+            696 LOAD_ATTR               29 (NULL|self + isoformat)
+            716 CALL                     0
+            724 JUMP_FORWARD             1 (to 728)
+        >>  726 LOAD_CONST               0 (None)
+
+107     >>  728 MAP_ADD                  1
+
+124         730 LOAD_CONST              16 ('sick_seconds_left')
+            732 LOAD_FAST                4 (sick)
+            734 POP_JUMP_IF_FALSE        5 (to 746)
+            736 LOAD_FAST                4 (sick)
+            738 LOAD_CONST              17 ('seconds_left')
+            740 BINARY_SUBSCR
+            744 JUMP_FORWARD             1 (to 748)
+        >>  746 LOAD_CONST               1 (0)
+
+107     >>  748 MAP_ADD                  1
+
+125         750 LOAD_CONST              18 ('sick_reason')
+            752 LOAD_FAST                4 (sick)
+            754 POP_JUMP_IF_FALSE        5 (to 766)
+            756 LOAD_FAST                4 (sick)
+            758 LOAD_CONST              19 ('reason')
+            760 BINARY_SUBSCR
+            764 JUMP_FORWARD             1 (to 768)
+        >>  766 LOAD_CONST               0 (None)
+
+107     >>  768 MAP_ADD                  1
+
+126         770 LOAD_CONST              20 ('daily_image_cap')
+            772 LOAD_GLOBAL             37 (NULL + int)
+            782 LOAD_FAST                0 (a)
+            784 LOAD_ATTR               42 (daily_image_cap)
+            804 COPY                     1
+            806 POP_JUMP_IF_TRUE         2 (to 812)
+            808 POP_TOP
+            810 LOAD_CONST               1 (0)
+        >>  812 CALL                     1
+
+107         820 MAP_ADD                  1
+
+127         822 LOAD_CONST              21 ('credits')
+            824 LOAD_FAST                0 (a)
+            826 LOAD_ATTR               44 (credits)
+
+107         846 MAP_ADD                  1
+
+128         848 LOAD_CONST              22 ('credits_tier')
+            850 LOAD_FAST                0 (a)
+            852 LOAD_ATTR               46 (credits_tier)
+
+107         872 MAP_ADD                  1
+
+129         874 LOAD_FAST                0 (a)
+            876 LOAD_ATTR               48 (credits_synced_at)
+            896 POP_JUMP_IF_FALSE       26 (to 950)
+            898 LOAD_FAST                0 (a)
+            900 LOAD_ATTR               48 (credits_synced_at)
+            920 LOAD_ATTR               29 (NULL|self + isoformat)
+            940 CALL                     0
+            948 JUMP_FORWARD             1 (to 952)
+        >>  950 LOAD_CONST               0 (None)
+
+131     >>  952 LOAD_FAST                0 (a)
+            954 LOAD_ATTR               50 (video_engine)
+            974 COPY                     1
+            976 POP_JUMP_IF_TRUE         2 (to 982)
+            978 POP_TOP
+            980 LOAD_CONST               0 (None)
+
+107     >>  982 LOAD_CONST              23 (('credits_synced_at', 'video_engine'))
+            984 BUILD_CONST_KEY_MAP      2
+            986 DICT_UPDATE              1
+            988 STORE_FAST               5 (d)
+
+133         990 LOAD_FAST                1 (db)
+            992 POP_JUMP_IF_NONE        92 (to 1178)
+
+134         994 LOAD_GLOBAL             53 (NULL + usage_stats)
+           1004 LOAD_FAST                1 (db)
+           1006 LOAD_FAST                0 (a)
+           1008 LOAD_ATTR               10 (partition_id)
+           1028 CALL                     2
+           1036 STORE_FAST               6 (stats)
+
+135        1038 LOAD_FAST                5 (d)
+           1040 LOAD_ATTR               55 (NULL|self + update)
+           1060 LOAD_FAST                6 (stats)
+           1062 CALL                     1
+           1070 POP_TOP
+
+136        1072 LOAD_GLOBAL             37 (NULL + int)
+           1082 LOAD_FAST                0 (a)
+           1084 LOAD_ATTR               42 (daily_image_cap)
+           1104 COPY                     1
+           1106 POP_JUMP_IF_TRUE         2 (to 1112)
+           1108 POP_TOP
+           1110 LOAD_CONST               1 (0)
+        >> 1112 CALL                     1
+           1120 STORE_FAST               7 (cap)
+
+138        1122 LOAD_FAST                7 (cap)
+           1124 LOAD_CONST               1 (0)
+           1126 COMPARE_OP              68 (>)
+           1130 POP_JUMP_IF_FALSE       18 (to 1168)
+           1132 LOAD_GLOBAL             35 (NULL + max)
+           1142 LOAD_FAST                7 (cap)
+           1144 LOAD_FAST                6 (stats)
+           1146 LOAD_CONST              24 ('images_today')
+           1148 BINARY_SUBSCR
+           1152 BINARY_OP               10 (-)
+           1156 LOAD_CONST               1 (0)
+           1158 CALL                     2
+           1166 JUMP_FORWARD             1 (to 1170)
+        >> 1168 LOAD_CONST               0 (None)
+        >> 1170 LOAD_FAST                5 (d)
+           1172 LOAD_CONST              25 ('images_remaining_today')
+           1174 STORE_SUBSCR
+
+139     >> 1178 LOAD_FAST                5 (d)
+           1180 RETURN_VALUE
+
+Disassembly of <code object list_accounts at 0x7f6c92408fd0, file "app\services\flow_account_service.py", line 144>:
+144           0 RESUME                   0
+
+145           2 LOAD_GLOBAL              1 (NULL + list)
+             12 LOAD_FAST                0 (db)
+             14 LOAD_ATTR                3 (NULL|self + scalars)
+
+146          34 LOAD_GLOBAL              5 (NULL + select)
+             44 LOAD_GLOBAL              6 (FlowAccount)
+             54 CALL                     1
+             62 LOAD_ATTR                9 (NULL|self + order_by)
+             82 LOAD_GLOBAL              6 (FlowAccount)
+             92 LOAD_ATTR               10 (order_index)
+            112 LOAD_GLOBAL              6 (FlowAccount)
+            122 LOAD_ATTR               12 (created_at)
+            142 CALL                     2
+
+145         150 CALL                     1
+
+146         158 LOAD_ATTR               15 (NULL|self + all)
+            178 CALL                     0
+
+145         186 CALL                     1
+            194 RETURN_VALUE
+
+Disassembly of <code object get_account at 0x7f6c926fdb80, file "app\services\flow_account_service.py", line 149>:
+149           0 RESUME                   0
+
+150           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_GLOBAL              2 (FlowAccount)
+             34 LOAD_FAST                1 (account_id)
+             36 CALL                     2
+             44 STORE_FAST               2 (a)
+
+151          46 LOAD_FAST                2 (a)
+             48 POP_JUMP_IF_TRUE        28 (to 106)
+
+152          50 LOAD_GLOBAL              5 (NULL + StudioError)
+             60 LOAD_GLOBAL              6 (E)
+             70 LOAD_ATTR                8 (UNKNOWN)
+             90 LOAD_CONST               1 ('Tài khoản Flow không tồn tại')
+             92 LOAD_CONST               2 (404)
+             94 KW_NAMES                 3 (('status_code',))
+             96 CALL                     3
+            104 RAISE_VARARGS            1
+
+153     >>  106 LOAD_FAST                2 (a)
+            108 RETURN_VALUE
+
+Disassembly of <code object create_account at 0x28b378c0, file "app\services\flow_account_service.py", line 156>:
+156           0 RESUME                   0
+
+158           2 LOAD_FAST                1 (partition_id)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 LOAD_CONST               1 ('')
+        >>   12 LOAD_ATTR                1 (NULL|self + strip)
+             32 CALL                     0
+             40 STORE_FAST               1 (partition_id)
+
+159          42 LOAD_FAST                1 (partition_id)
+             44 POP_JUMP_IF_TRUE        28 (to 102)
+
+160          46 LOAD_GLOBAL              3 (NULL + StudioError)
+             56 LOAD_GLOBAL              4 (E)
+             66 LOAD_ATTR                6 (UNKNOWN)
+             86 LOAD_CONST               2 ('Thiếu partition_id tài khoản Flow')
+             88 LOAD_CONST               3 (422)
+             90 KW_NAMES                 4 (('status_code',))
+             92 CALL                     3
+            100 RAISE_VARARGS            1
+
+161     >>  102 LOAD_FAST                0 (db)
+            104 LOAD_ATTR                9 (NULL|self + scalar)
+            124 LOAD_GLOBAL             11 (NULL + select)
+            134 LOAD_GLOBAL             12 (FlowAccount)
+            144 CALL                     1
+            152 LOAD_ATTR               15 (NULL|self + where)
+            172 LOAD_GLOBAL             12 (FlowAccount)
+            182 LOAD_ATTR               16 (partition_id)
+            202 LOAD_FAST                1 (partition_id)
+            204 COMPARE_OP              40 (==)
+            208 CALL                     1
+            216 CALL                     1
+            224 POP_JUMP_IF_FALSE       32 (to 290)
+
+162         226 LOAD_GLOBAL              3 (NULL + StudioError)
+            236 LOAD_GLOBAL              4 (E)
+            246 LOAD_ATTR                6 (UNKNOWN)
+            266 LOAD_CONST               5 ("Tài khoản Flow '")
+            268 LOAD_FAST                1 (partition_id)
+            270 FORMAT_VALUE             0
+            272 LOAD_CONST               6 ("' đã tồn tại")
+            274 BUILD_STRING             3
+            276 LOAD_CONST               7 (409)
+            278 KW_NAMES                 4 (('status_code',))
+            280 CALL                     3
+            288 RAISE_VARARGS            1
+
+163     >>  290 LOAD_FAST                0 (db)
+            292 LOAD_ATTR                9 (NULL|self + scalar)
+            312 LOAD_GLOBAL             11 (NULL + select)
+            322 LOAD_GLOBAL             12 (FlowAccount)
+            332 LOAD_ATTR               18 (order_index)
+            352 CALL                     1
+
+164         360 LOAD_ATTR               21 (NULL|self + order_by)
+            380 LOAD_GLOBAL             12 (FlowAccount)
+            390 LOAD_ATTR               18 (order_index)
+            410 LOAD_ATTR               23 (NULL|self + desc)
+            430 CALL                     0
+            438 CALL                     1
+
+163         446 CALL                     1
+            454 COPY                     1
+            456 POP_JUMP_IF_TRUE         2 (to 462)
+            458 POP_TOP
+
+164         460 LOAD_CONST               8 (0)
+
+163     >>  462 STORE_FAST               4 (max_order)
+
+165         464 LOAD_GLOBAL             13 (NULL + FlowAccount)
+            474 LOAD_FAST                1 (partition_id)
+            476 LOAD_FAST                2 (label)
+            478 LOAD_FAST                3 (email)
+
+166         480 LOAD_FAST                4 (max_order)
+            482 LOAD_CONST               9 (1)
+            484 BINARY_OP                0 (+)
+
+165         488 KW_NAMES                10 (('partition_id', 'label', 'email', 'order_index'))
+            490 CALL                     4
+            498 STORE_FAST               5 (a)
+
+167         500 LOAD_FAST                0 (db)
+            502 LOAD_ATTR               25 (NULL|self + add)
+            522 LOAD_FAST                5 (a)
+            524 CALL                     1
+            532 POP_TOP
+
+168         534 LOAD_FAST                0 (db)
+            536 LOAD_ATTR               27 (NULL|self + commit)
+            556 CALL                     0
+            564 POP_TOP
+
+169         566 LOAD_FAST                0 (db)
+            568 LOAD_ATTR               29 (NULL|self + refresh)
+            588 LOAD_FAST                5 (a)
+            590 CALL                     1
+            598 POP_TOP
+
+170         600 LOAD_FAST                5 (a)
+            602 RETURN_VALUE
+
+Disassembly of <code object update_account at 0x7f6c92410770, file "app\services\flow_account_service.py", line 173>:
+173           0 RESUME                   0
+
+179           2 LOAD_GLOBAL              1 (NULL + get_account)
+             12 LOAD_FAST                0 (db)
+             14 LOAD_FAST                1 (account_id)
+             16 CALL                     2
+             24 STORE_FAST               7 (a)
+
+180          26 LOAD_FAST                2 (label)
+             28 POP_JUMP_IF_NONE         7 (to 44)
+
+181          30 LOAD_FAST                2 (label)
+             32 LOAD_FAST                7 (a)
+             34 STORE_ATTR               1 (label)
+
+182     >>   44 LOAD_FAST                3 (email)
+             46 POP_JUMP_IF_NONE         7 (to 62)
+
+183          48 LOAD_FAST                3 (email)
+             50 LOAD_FAST                7 (a)
+             52 STORE_ATTR               2 (email)
+
+184     >>   62 LOAD_FAST                4 (enabled)
+             64 POP_JUMP_IF_NONE        11 (to 88)
+
+185          66 LOAD_FAST                4 (enabled)
+             68 POP_JUMP_IF_FALSE        2 (to 74)
+             70 LOAD_CONST               2 (1)
+             72 JUMP_FORWARD             1 (to 76)
+        >>   74 LOAD_CONST               3 (0)
+        >>   76 LOAD_FAST                7 (a)
+             78 STORE_ATTR               3 (enabled)
+
+186     >>   88 LOAD_FAST                5 (daily_image_cap)
+             90 POP_JUMP_IF_NONE        26 (to 144)
+
+187          92 LOAD_GLOBAL              9 (NULL + max)
+            102 LOAD_GLOBAL             11 (NULL + int)
+            112 LOAD_FAST                5 (daily_image_cap)
+            114 CALL                     1
+            122 LOAD_CONST               3 (0)
+            124 CALL                     2
+            132 LOAD_FAST                7 (a)
+            134 STORE_ATTR               6 (daily_image_cap)
+
+189     >>  144 LOAD_FAST                6 (video_engine)
+            146 LOAD_CONST               4 (Ellipsis)
+            148 IS_OP                    1
+            150 POP_JUMP_IF_FALSE       19 (to 190)
+
+190         152 BUILD_SET                0
+            154 LOAD_CONST               5 (frozenset({None, 'omni', 'agent'}))
+            156 SET_UPDATE               1
+            158 STORE_FAST               8 (valid)
+
+191         160 LOAD_FAST                6 (video_engine)
+            162 LOAD_FAST                8 (valid)
+            164 CONTAINS_OP              0
+            166 POP_JUMP_IF_FALSE        2 (to 172)
+            168 LOAD_FAST                6 (video_engine)
+            170 JUMP_FORWARD             1 (to 174)
+        >>  172 LOAD_CONST               1 (None)
+        >>  174 STORE_FAST               9 (engine_val)
+
+192         176 LOAD_FAST                9 (engine_val)
+            178 LOAD_FAST                7 (a)
+            180 STORE_ATTR               7 (video_engine)
+
+193     >>  190 LOAD_FAST                0 (db)
+            192 LOAD_ATTR               17 (NULL|self + commit)
+            212 CALL                     0
+            220 POP_TOP
+
+194         222 LOAD_FAST                0 (db)
+            224 LOAD_ATTR               19 (NULL|self + refresh)
+            244 LOAD_FAST                7 (a)
+            246 CALL                     1
+            254 POP_TOP
+
+195         256 LOAD_FAST                7 (a)
+            258 RETURN_VALUE
+
+Disassembly of <code object set_credits_cache at 0x7f6c9247a8d0, file "app\services\flow_account_service.py", line 198>:
+198           0 RESUME                   0
+
+201           2 LOAD_GLOBAL              1 (NULL + get_account)
+             12 LOAD_FAST                0 (db)
+             14 LOAD_FAST                1 (account_id)
+             16 CALL                     2
+             24 STORE_FAST               4 (a)
+
+202          26 LOAD_FAST                2 (credits)
+             28 POP_JUMP_IF_NONE        16 (to 62)
+             30 LOAD_FAST                2 (credits)
+             32 LOAD_CONST               2 (0)
+             34 COMPARE_OP              92 (>=)
+             38 POP_JUMP_IF_FALSE       11 (to 62)
+             40 LOAD_GLOBAL              3 (NULL + int)
+             50 LOAD_FAST                2 (credits)
+             52 CALL                     1
+             60 JUMP_FORWARD             1 (to 64)
+        >>   62 LOAD_CONST               1 (None)
+        >>   64 LOAD_FAST                4 (a)
+             66 STORE_ATTR               2 (credits)
+
+203          76 LOAD_FAST                3 (tier)
+             78 COPY                     1
+             80 POP_JUMP_IF_TRUE         2 (to 86)
+             82 POP_TOP
+             84 LOAD_CONST               1 (None)
+        >>   86 LOAD_FAST                4 (a)
+             88 STORE_ATTR               3 (credits_tier)
+
+204          98 LOAD_GLOBAL              9 (NULL + datetime)
+            108 LOAD_ATTR               10 (now)
+            128 CALL                     0
+            136 LOAD_FAST                4 (a)
+            138 STORE_ATTR               6 (credits_synced_at)
+
+205         148 LOAD_FAST                0 (db)
+            150 LOAD_ATTR               15 (NULL|self + commit)
+            170 CALL                     0
+            178 POP_TOP
+
+206         180 LOAD_FAST                0 (db)
+            182 LOAD_ATTR               17 (NULL|self + refresh)
+            202 LOAD_FAST                4 (a)
+            204 CALL                     1
+            212 POP_TOP
+
+207         214 LOAD_FAST                4 (a)
+            216 RETURN_VALUE
+
+Disassembly of <code object record_usage at 0x7f6c9247aa70, file "app\services\flow_account_service.py", line 212>:
+212           0 RESUME                   0
+
+215           2 LOAD_FAST                2 (kind)
+              4 LOAD_CONST               1 ('video')
+              6 COMPARE_OP              40 (==)
+             10 POP_JUMP_IF_FALSE        2 (to 16)
+             12 LOAD_CONST               1 ('video')
+             14 JUMP_FORWARD             1 (to 18)
+        >>   16 LOAD_CONST               2 ('image')
+        >>   18 STORE_FAST               2 (kind)
+
+216          20 LOAD_FAST                1 (partition_id)
+             22 COPY                     1
+             24 POP_JUMP_IF_TRUE         2 (to 30)
+             26 POP_TOP
+             28 LOAD_CONST               3 ('default')
+        >>   30 LOAD_ATTR                1 (NULL|self + strip)
+             50 CALL                     0
+             58 COPY                     1
+             60 POP_JUMP_IF_TRUE         2 (to 66)
+             62 POP_TOP
+             64 LOAD_CONST               3 ('default')
+        >>   66 STORE_FAST               3 (part)
+
+217          68 NOP
+
+218          70 LOAD_FAST                0 (db)
+             72 LOAD_ATTR                3 (NULL|self + add)
+             92 LOAD_GLOBAL              5 (NULL + FlowUsageEvent)
+            102 LOAD_FAST                3 (part)
+            104 LOAD_FAST                2 (kind)
+            106 KW_NAMES                 4 (('partition_id', 'kind'))
+            108 CALL                     2
+            116 CALL                     1
+            124 POP_TOP
+
+219         126 LOAD_FAST                0 (db)
+            128 LOAD_ATTR                7 (NULL|self + commit)
+            148 CALL                     0
+            156 POP_TOP
+            158 RETURN_CONST             5 (None)
+        >>  160 PUSH_EXC_INFO
+
+220         162 LOAD_GLOBAL              8 (Exception)
+            172 CHECK_EXC_MATCH
+            174 POP_JUMP_IF_FALSE       19 (to 214)
+            176 POP_TOP
+
+221         178 LOAD_FAST                0 (db)
+            180 LOAD_ATTR               11 (NULL|self + rollback)
+            200 CALL                     0
+            208 POP_TOP
+            210 POP_EXCEPT
+            212 RETURN_CONST             5 (None)
+
+220     >>  214 RERAISE                  0
+        >>  216 COPY                     3
+            218 POP_EXCEPT
+            220 RERAISE                  1
+ExceptionTable:
+  70 to 156 -> 160 [0]
+  160 to 208 -> 216 [1] lasti
+  214 to 214 -> 216 [1] lasti
+
+Disassembly of <code object delete_account at 0x28c08a70, file "app\services\flow_account_service.py", line 224>:
+224           0 RESUME                   0
+
+232           2 LOAD_GLOBAL              1 (NULL + get_account)
+             12 LOAD_FAST                0 (db)
+             14 LOAD_FAST                1 (account_id)
+             16 CALL                     2
+             24 STORE_FAST               2 (a)
+
+233          26 LOAD_FAST                2 (a)
+             28 LOAD_ATTR                2 (partition_id)
+             48 LOAD_FAST                2 (a)
+             50 LOAD_ATTR                4 (browser_profile_id)
+             70 STORE_FAST               4 (profile_id)
+             72 STORE_FAST               3 (partition)
+
+234          74 LOAD_FAST                0 (db)
+             76 LOAD_ATTR                7 (NULL|self + delete)
+             96 LOAD_FAST                2 (a)
+             98 CALL                     1
+            106 POP_TOP
+
+235         108 LOAD_FAST                0 (db)
+            110 LOAD_ATTR                9 (NULL|self + flush)
+            130 CALL                     0
+            138 POP_TOP
+
+238         140 LOAD_FAST                0 (db)
+            142 LOAD_ATTR               11 (NULL|self + query)
+            162 LOAD_GLOBAL             12 (Video)
+            172 CALL                     1
+            180 LOAD_ATTR               15 (NULL|self + filter)
+            200 LOAD_GLOBAL             12 (Video)
+            210 LOAD_ATTR               16 (flow_account_id)
+            230 LOAD_FAST                3 (partition)
+            232 COMPARE_OP              40 (==)
+            236 CALL                     1
+
+239         244 LOAD_ATTR               19 (NULL|self + update)
+            264 LOAD_GLOBAL             12 (Video)
+            274 LOAD_ATTR               16 (flow_account_id)
+            294 LOAD_CONST               1 (None)
+            296 BUILD_MAP                1
+            298 LOAD_CONST               2 (False)
+            300 KW_NAMES                 3 (('synchronize_session',))
+            302 CALL                     2
+
+238         310 STORE_FAST               5 (unpinned)
+
+243         312 LOAD_CONST               2 (False)
+            314 STORE_FAST               6 (released)
+
+244         316 LOAD_FAST                4 (profile_id)
+            318 POP_JUMP_IF_FALSE      128 (to 576)
+            320 LOAD_FAST                0 (db)
+            322 LOAD_ATTR               21 (NULL|self + scalar)
+
+245         342 LOAD_GLOBAL             23 (NULL + select)
+            352 LOAD_GLOBAL             24 (FlowAccount)
+            362 CALL                     1
+            370 LOAD_ATTR               27 (NULL|self + where)
+            390 LOAD_GLOBAL             24 (FlowAccount)
+            400 LOAD_ATTR                4 (browser_profile_id)
+            420 LOAD_FAST                4 (profile_id)
+            422 COMPARE_OP              40 (==)
+            426 CALL                     1
+
+244         434 CALL                     1
+            442 POP_JUMP_IF_TRUE        66 (to 576)
+
+246         444 LOAD_FAST                0 (db)
+            446 LOAD_ATTR               29 (NULL|self + get)
+            466 LOAD_GLOBAL             30 (BrowserProfile)
+            476 LOAD_FAST                4 (profile_id)
+            478 CALL                     2
+            486 STORE_FAST               7 (prof)
+
+247         488 LOAD_FAST                7 (prof)
+            490 POP_JUMP_IF_NONE        42 (to 576)
+            492 LOAD_FAST                7 (prof)
+            494 LOAD_ATTR               32 (leased_by_video_id)
+            514 POP_JUMP_IF_FALSE       30 (to 576)
+
+248         516 LOAD_CONST               1 (None)
+            518 LOAD_FAST                7 (prof)
+            520 STORE_ATTR              16 (leased_by_video_id)
+
+249         530 LOAD_CONST               1 (None)
+            532 LOAD_FAST                7 (prof)
+            534 STORE_ATTR              17 (leased_job_id)
+
+250         544 LOAD_CONST               1 (None)
+            546 LOAD_FAST                7 (prof)
+            548 STORE_ATTR              18 (lease_kind)
+
+251         558 LOAD_CONST               1 (None)
+            560 LOAD_FAST                7 (prof)
+            562 STORE_ATTR              19 (lease_heartbeat_at)
+
+252         572 LOAD_CONST               4 (True)
+            574 STORE_FAST               6 (released)
+
+253     >>  576 LOAD_FAST                0 (db)
+            578 LOAD_ATTR               41 (NULL|self + commit)
+            598 CALL                     0
+            606 POP_TOP
+
+254         608 LOAD_FAST                5 (unpinned)
+            610 POP_JUMP_IF_TRUE         2 (to 616)
+            612 LOAD_FAST                6 (released)
+            614 POP_JUMP_IF_FALSE       39 (to 694)
+
+255     >>  616 LOAD_GLOBAL             43 (NULL + log)
+            626 LOAD_ATTR               44 (info)
+            646 LOAD_CONST               5 ('[flow_acct] xoá ')
+            648 LOAD_FAST                3 (partition)
+            650 FORMAT_VALUE             0
+            652 LOAD_CONST               6 (': gỡ pin ')
+            654 LOAD_FAST                5 (unpinned)
+            656 FORMAT_VALUE             0
+            658 LOAD_CONST               7 (' video')
+            660 BUILD_STRING             5
+
+256         662 LOAD_FAST                6 (released)
+            664 POP_JUMP_IF_FALSE        2 (to 670)
+            666 LOAD_CONST               8 (', nhả lease profile')
+            668 JUMP_FORWARD             1 (to 672)
+        >>  670 LOAD_CONST               9 ('')
+
+255     >>  672 BINARY_OP                0 (+)
+
+256         676 LOAD_CONST              10 ('.')
+
+255         678 BINARY_OP                0 (+)
+            682 CALL                     1
+            690 POP_TOP
+            692 RETURN_CONST             1 (None)
+
+254     >>  694 RETURN_CONST             1 (None)
+
+Disassembly of <code object reorder at 0x7f6c9234d680, file "app\services\flow_account_service.py", line 259>:
+259           0 RESUME                   0
+
+261           2 LOAD_GLOBAL              1 (NULL + enumerate)
+             12 LOAD_FAST                1 (ordered_ids)
+             14 CALL                     1
+             22 GET_ITER
+        >>   24 FOR_ITER                37 (to 102)
+             28 UNPACK_SEQUENCE          2
+             32 STORE_FAST               2 (idx)
+             34 STORE_FAST               3 (aid)
+
+262          36 LOAD_FAST                0 (db)
+             38 LOAD_ATTR                3 (NULL|self + get)
+             58 LOAD_GLOBAL              4 (FlowAccount)
+             68 LOAD_FAST                3 (aid)
+             70 CALL                     2
+             78 STORE_FAST               4 (a)
+
+263          80 LOAD_FAST                4 (a)
+             82 POP_JUMP_IF_TRUE         1 (to 86)
+             84 JUMP_BACKWARD           31 (to 24)
+
+264     >>   86 LOAD_FAST                2 (idx)
+             88 LOAD_FAST                4 (a)
+             90 STORE_ATTR               3 (order_index)
+            100 JUMP_BACKWARD           39 (to 24)
+
+261     >>  102 END_FOR
+
+265         104 LOAD_FAST                0 (db)
+            106 LOAD_ATTR                9 (NULL|self + commit)
+            126 CALL                     0
+            134 POP_TOP
+            136 RETURN_CONST             1 (None)
+
+Disassembly of <code object clear_exhausted at 0x7f6c926fe890, file "app\services\flow_account_service.py", line 268>:
+268           0 RESUME                   0
+
+270           2 LOAD_GLOBAL              1 (NULL + get_account)
+             12 LOAD_FAST                0 (db)
+             14 LOAD_FAST                1 (account_id)
+             16 CALL                     2
+             24 STORE_FAST               2 (a)
+
+271          26 LOAD_CONST               1 (None)
+             28 LOAD_FAST                2 (a)
+             30 STORE_ATTR               1 (exhausted_until)
+
+272          40 LOAD_FAST                0 (db)
+             42 LOAD_ATTR                5 (NULL|self + commit)
+             62 CALL                     0
+             70 POP_TOP
+
+273          72 LOAD_FAST                0 (db)
+             74 LOAD_ATTR                7 (NULL|self + refresh)
+             94 LOAD_FAST                2 (a)
+             96 CALL                     1
+            104 POP_TOP
+
+274         106 LOAD_FAST                2 (a)
+            108 RETURN_VALUE
+
+Disassembly of <code object clear_cooldown at 0x7f6c926af3f0, file "app\services\flow_account_service.py", line 277>:
+277           0 RESUME                   0
+
+283           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('flow_profile_health',))
+              6 IMPORT_NAME              0 (app.services)
+              8 IMPORT_FROM              1 (flow_profile_health)
+             10 STORE_FAST               2 (flow_health)
+             12 POP_TOP
+
+285          14 LOAD_GLOBAL              5 (NULL + get_account)
+             24 LOAD_FAST                0 (db)
+             26 LOAD_FAST                1 (account_id)
+             28 CALL                     2
+             36 STORE_FAST               3 (a)
+
+286          38 LOAD_CONST               3 (None)
+             40 LOAD_FAST                3 (a)
+             42 STORE_ATTR               3 (cooldown_until)
+
+287          52 LOAD_FAST                0 (db)
+             54 LOAD_ATTR                9 (NULL|self + commit)
+             74 CALL                     0
+             82 POP_TOP
+
+288          84 LOAD_FAST                0 (db)
+             86 LOAD_ATTR               11 (NULL|self + refresh)
+            106 LOAD_FAST                3 (a)
+            108 CALL                     1
+            116 POP_TOP
+
+289         118 LOAD_FAST                2 (flow_health)
+            120 LOAD_ATTR               13 (NULL|self + clear_sick)
+            140 LOAD_FAST                3 (a)
+            142 LOAD_ATTR               14 (partition_id)
+            162 CALL                     1
+            170 POP_TOP
+
+290         172 LOAD_FAST                3 (a)
+            174 RETURN_VALUE
+
+Disassembly of <code object next_available at 0x28c19ef0, file "app\services\flow_account_service.py", line 295>:
+295           0 RESUME                   0
+
+305           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('flow_profile_health',))
+              6 IMPORT_NAME              0 (app.services)
+              8 IMPORT_FROM              1 (flow_profile_health)
+             10 STORE_FAST               2 (flow_health)
+             12 POP_TOP
+
+307          14 LOAD_FAST                1 (exclude)
+             16 COPY                     1
+             18 POP_JUMP_IF_TRUE        10 (to 40)
+             20 POP_TOP
+             22 LOAD_GLOBAL              5 (NULL + set)
+             32 CALL                     0
+        >>   40 STORE_FAST               1 (exclude)
+
+308          42 LOAD_GLOBAL              7 (NULL + datetime)
+             52 LOAD_ATTR                8 (now)
+             72 CALL                     0
+             80 STORE_FAST               3 (now)
+
+309          82 LOAD_FAST                0 (db)
+             84 LOAD_ATTR               11 (NULL|self + scalars)
+
+310         104 LOAD_GLOBAL             13 (NULL + select)
+            114 LOAD_GLOBAL             14 (FlowAccount)
+            124 CALL                     1
+
+311         132 LOAD_ATTR               17 (NULL|self + where)
+            152 LOAD_GLOBAL             14 (FlowAccount)
+            162 LOAD_ATTR               18 (enabled)
+            182 LOAD_CONST               3 (1)
+            184 COMPARE_OP              40 (==)
+            188 CALL                     1
+
+312         196 LOAD_ATTR               21 (NULL|self + order_by)
+            216 LOAD_GLOBAL             14 (FlowAccount)
+            226 LOAD_ATTR               22 (order_index)
+            246 LOAD_GLOBAL             14 (FlowAccount)
+            256 LOAD_ATTR               24 (last_used_at)
+            276 LOAD_ATTR               27 (NULL|self + is_)
+            296 LOAD_CONST               4 (None)
+            298 CALL                     1
+            306 LOAD_ATTR               29 (NULL|self + desc)
+            326 CALL                     0
+
+313         334 LOAD_GLOBAL             14 (FlowAccount)
+            344 LOAD_ATTR               24 (last_used_at)
+            364 LOAD_GLOBAL             14 (FlowAccount)
+            374 LOAD_ATTR               30 (created_at)
+
+312         394 CALL                     4
+
+309         402 CALL                     1
+
+314         410 LOAD_ATTR               33 (NULL|self + all)
+            430 CALL                     0
+
+309         438 STORE_FAST               4 (rows)
+
+315         440 LOAD_FAST                4 (rows)
+            442 GET_ITER
+            444 LOAD_FAST_AND_CLEAR      5 (a)
+            446 SWAP                     2
+            448 BUILD_LIST               0
+            450 SWAP                     2
+        >>  452 FOR_ITER                57 (to 570)
+            456 STORE_FAST               5 (a)
+
+316         458 LOAD_FAST                5 (a)
+            460 LOAD_ATTR               34 (partition_id)
+            480 LOAD_FAST                1 (exclude)
+            482 CONTAINS_OP              1
+            484 POP_JUMP_IF_FALSE       41 (to 568)
+
+317         486 LOAD_FAST                5 (a)
+            488 LOAD_ATTR               36 (exhausted_until)
+            508 POP_JUMP_IF_FALSE       15 (to 540)
+            510 LOAD_FAST                5 (a)
+            512 LOAD_ATTR               36 (exhausted_until)
+            532 LOAD_FAST                3 (now)
+            534 COMPARE_OP              68 (>)
+            538 POP_JUMP_IF_TRUE        14 (to 568)
+
+318     >>  540 LOAD_GLOBAL             39 (NULL + is_cooling)
+            550 LOAD_FAST                5 (a)
+            552 LOAD_FAST                3 (now)
+            554 CALL                     2
+            562 POP_JUMP_IF_TRUE         2 (to 568)
+
+315         564 LOAD_FAST                5 (a)
+            566 LIST_APPEND              2
+        >>  568 JUMP_BACKWARD           59 (to 452)
+        >>  570 END_FOR
+            572 STORE_FAST               6 (usable)
+            574 STORE_FAST               5 (a)
+
+319         576 LOAD_FAST                2 (flow_health)
+            578 LOAD_ATTR               41 (NULL|self + drop_sick)
+            598 LOAD_FAST                6 (usable)
+            600 LOAD_CONST               5 (<code object <lambda> at 0x7f6c926f7bb0, file "app\services\flow_account_service.py", line 319>)
+            602 MAKE_FUNCTION            0
+            604 LOAD_CONST               6 ('next_available')
+            606 KW_NAMES                 7 (('where',))
+            608 CALL                     3
+            616 STORE_FAST               7 (healthy)
+
+320         618 LOAD_FAST                7 (healthy)
+            620 POP_JUMP_IF_FALSE        5 (to 632)
+            622 LOAD_FAST                7 (healthy)
+            624 LOAD_CONST               1 (0)
+            626 BINARY_SUBSCR
+            630 RETURN_VALUE
+        >>  632 LOAD_CONST               4 (None)
+            634 RETURN_VALUE
+        >>  636 SWAP                     2
+            638 POP_TOP
+
+315         640 SWAP                     2
+            642 STORE_FAST               5 (a)
+            644 RERAISE                  0
+ExceptionTable:
+  448 to 570 -> 636 [2]
+
+Disassembly of <code object <lambda> at 0x7f6c926f7bb0, file "app\services\flow_account_service.py", line 319>:
+319           0 RESUME                   0
+              2 LOAD_FAST                0 (a)
+              4 LOAD_ATTR                0 (partition_id)
+             24 RETURN_VALUE
+
+Disassembly of <code object mark_exhausted at 0x7f6c92408e40, file "app\services\flow_account_service.py", line 323>:
+323           0 RESUME                   0
+
+325           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + scalar)
+             24 LOAD_GLOBAL              3 (NULL + select)
+             34 LOAD_GLOBAL              4 (FlowAccount)
+             44 CALL                     1
+             52 LOAD_ATTR                7 (NULL|self + where)
+             72 LOAD_GLOBAL              4 (FlowAccount)
+             82 LOAD_ATTR                8 (partition_id)
+            102 LOAD_FAST                1 (partition_id)
+            104 COMPARE_OP              40 (==)
+            108 CALL                     1
+            116 CALL                     1
+            124 STORE_FAST               2 (a)
+
+326         126 LOAD_FAST                2 (a)
+            128 POP_JUMP_IF_FALSE       32 (to 194)
+
+327         130 LOAD_GLOBAL             11 (NULL + _next_midnight)
+            140 CALL                     0
+            148 LOAD_FAST                2 (a)
+            150 STORE_ATTR               6 (exhausted_until)
+
+328         160 LOAD_FAST                0 (db)
+            162 LOAD_ATTR               15 (NULL|self + commit)
+            182 CALL                     0
+            190 POP_TOP
+            192 RETURN_CONST             1 (None)
+
+326     >>  194 RETURN_CONST             1 (None)
+
+Disassembly of <code object cooldown_minutes at 0x7f6c9269a1f0, file "app\services\flow_account_service.py", line 331>:
+331           0 RESUME                   0
+
+333           2 LOAD_FAST                1 (hard_block)
+              4 POP_JUMP_IF_FALSE        6 (to 18)
+              6 LOAD_GLOBAL              0 (_SETTING_HARD_BLOCK_MIN)
+             16 JUMP_FORWARD             5 (to 28)
+        >>   18 LOAD_GLOBAL              2 (_SETTING_RATE_LIMIT_MIN)
+        >>   28 STORE_FAST               2 (key)
+
+334          30 LOAD_FAST                1 (hard_block)
+             32 POP_JUMP_IF_FALSE        6 (to 46)
+             34 LOAD_GLOBAL              4 (COOLDOWN_HARD_BLOCK_MIN)
+             44 JUMP_FORWARD             5 (to 56)
+        >>   46 LOAD_GLOBAL              6 (COOLDOWN_RATE_LIMIT_MIN)
+        >>   56 STORE_FAST               3 (default)
+
+336          58 NOP
+
+337          60 LOAD_FAST                0 (db)
+             62 LOAD_ATTR                9 (NULL|self + get)
+             82 LOAD_GLOBAL             10 (Setting)
+             92 LOAD_FAST                2 (key)
+             94 CALL                     2
+            102 STORE_FAST               4 (row)
+
+338         104 LOAD_FAST                4 (row)
+            106 POP_JUMP_IF_NONE        12 (to 132)
+            108 LOAD_FAST                4 (row)
+            110 LOAD_ATTR               12 (value)
+            130 JUMP_FORWARD             1 (to 134)
+        >>  132 LOAD_CONST               1 (None)
+        >>  134 STORE_FAST               5 (raw)
+
+341     >>  136 NOP
+
+342         138 LOAD_FAST                5 (raw)
+            140 POP_JUMP_IF_NONE        31 (to 204)
+            142 LOAD_GLOBAL             17 (NULL + max)
+            152 LOAD_CONST               2 (0)
+            154 LOAD_GLOBAL             19 (NULL + min)
+            164 LOAD_GLOBAL             21 (NULL + int)
+            174 LOAD_FAST                5 (raw)
+            176 CALL                     1
+            184 LOAD_CONST               3 (1440)
+            186 CALL                     2
+            194 CALL                     2
+            202 RETURN_VALUE
+        >>  204 LOAD_FAST                3 (default)
+            206 RETURN_VALUE
+        >>  208 PUSH_EXC_INFO
+
+339         210 LOAD_GLOBAL             14 (Exception)
+            220 CHECK_EXC_MATCH
+            222 POP_JUMP_IF_FALSE        5 (to 234)
+            224 POP_TOP
+
+340         226 LOAD_CONST               1 (None)
+            228 STORE_FAST               5 (raw)
+            230 POP_EXCEPT
+            232 JUMP_BACKWARD           49 (to 136)
+
+339     >>  234 RERAISE                  0
+        >>  236 COPY                     3
+            238 POP_EXCEPT
+            240 RERAISE                  1
+        >>  242 PUSH_EXC_INFO
+
+343         244 LOAD_GLOBAL             22 (TypeError)
+            254 LOAD_GLOBAL             24 (ValueError)
+            264 BUILD_TUPLE              2
+            266 CHECK_EXC_MATCH
+            268 POP_JUMP_IF_FALSE        5 (to 280)
+            270 POP_TOP
+
+344         272 LOAD_FAST                3 (default)
+            274 SWAP                     2
+            276 POP_EXCEPT
+            278 RETURN_VALUE
+
+343     >>  280 RERAISE                  0
+        >>  282 COPY                     3
+            284 POP_EXCEPT
+            286 RERAISE                  1
+ExceptionTable:
+  60 to 134 -> 208 [0]
+  138 to 200 -> 242 [0]
+  204 to 204 -> 242 [0]
+  208 to 228 -> 236 [1] lasti
+  234 to 234 -> 236 [1] lasti
+  242 to 274 -> 282 [1] lasti
+  280 to 280 -> 282 [1] lasti
+
+Disassembly of <code object mark_cooldown at 0x28bfa430, file "app\services\flow_account_service.py", line 347>:
+347           0 RESUME                   0
+
+355           2 LOAD_FAST                1 (partition_id)
+              4 POP_JUMP_IF_TRUE         1 (to 8)
+
+356           6 RETURN_CONST             1 (None)
+
+357     >>    8 LOAD_FAST                3 (minutes)
+             10 POP_JUMP_IF_NOT_NONE    13 (to 38)
+             12 LOAD_GLOBAL              1 (NULL + cooldown_minutes)
+             22 LOAD_FAST                0 (db)
+             24 LOAD_FAST                2 (hard_block)
+             26 KW_NAMES                 2 (('hard_block',))
+             28 CALL                     2
+             36 JUMP_FORWARD            20 (to 78)
+        >>   38 LOAD_GLOBAL              3 (NULL + max)
+             48 LOAD_CONST               3 (0)
+             50 LOAD_GLOBAL              5 (NULL + int)
+             60 LOAD_FAST                3 (minutes)
+             62 CALL                     1
+             70 CALL                     2
+        >>   78 STORE_FAST               4 (mins)
+
+358          80 LOAD_FAST                4 (mins)
+             82 LOAD_CONST               3 (0)
+             84 COMPARE_OP              26 (<=)
+             88 POP_JUMP_IF_FALSE        1 (to 92)
+
+359          90 RETURN_CONST             1 (None)
+
+360     >>   92 LOAD_FAST                0 (db)
+             94 LOAD_ATTR                7 (NULL|self + scalar)
+            114 LOAD_GLOBAL              9 (NULL + select)
+            124 LOAD_GLOBAL             10 (FlowAccount)
+            134 CALL                     1
+            142 LOAD_ATTR               13 (NULL|self + where)
+            162 LOAD_GLOBAL             10 (FlowAccount)
+            172 LOAD_ATTR               14 (partition_id)
+            192 LOAD_FAST                1 (partition_id)
+            194 COMPARE_OP              40 (==)
+            198 CALL                     1
+            206 CALL                     1
+            214 STORE_FAST               5 (a)
+
+361         216 LOAD_FAST                5 (a)
+            218 POP_JUMP_IF_NOT_NONE     1 (to 222)
+
+362         220 RETURN_CONST             1 (None)
+
+363     >>  222 LOAD_GLOBAL             17 (NULL + datetime)
+            232 LOAD_ATTR               18 (now)
+            252 CALL                     0
+            260 LOAD_GLOBAL             21 (NULL + timedelta)
+            270 LOAD_FAST                4 (mins)
+            272 KW_NAMES                 4 (('minutes',))
+            274 CALL                     1
+            282 BINARY_OP                0 (+)
+            286 STORE_FAST               6 (until)
+
+364         288 LOAD_FAST                5 (a)
+            290 LOAD_ATTR               22 (cooldown_until)
+            310 POP_JUMP_IF_FALSE       27 (to 366)
+            312 LOAD_FAST                5 (a)
+            314 LOAD_ATTR               22 (cooldown_until)
+            334 LOAD_FAST                6 (until)
+            336 COMPARE_OP              68 (>)
+            340 POP_JUMP_IF_FALSE       12 (to 366)
+
+365         342 LOAD_FAST                5 (a)
+            344 LOAD_ATTR               22 (cooldown_until)
+            364 RETURN_VALUE
+
+366     >>  366 LOAD_FAST                6 (until)
+            368 LOAD_FAST                5 (a)
+            370 STORE_ATTR              11 (cooldown_until)
+
+367         380 LOAD_FAST                0 (db)
+            382 LOAD_ATTR               25 (NULL|self + commit)
+            402 CALL                     0
+            410 POP_TOP
+
+368         412 LOAD_FAST                2 (hard_block)
+            414 POP_JUMP_IF_FALSE        2 (to 420)
+            416 LOAD_CONST               5 ('hoạt động bất thường')
+            418 JUMP_FORWARD             1 (to 422)
+        >>  420 LOAD_CONST               6 ('throttle')
+        >>  422 STORE_FAST               7 (why)
+
+369         424 LOAD_GLOBAL             27 (NULL + log)
+            434 LOAD_ATTR               28 (info)
+            454 LOAD_CONST               7 ('[flow_acct] ')
+            456 LOAD_FAST                1 (partition_id)
+            458 FORMAT_VALUE             0
+            460 LOAD_CONST               8 (': nghỉ ')
+            462 LOAD_FAST                4 (mins)
+            464 FORMAT_VALUE             0
+            466 LOAD_CONST               9 (' phút (')
+            468 LOAD_FAST                7 (why)
+            470 FORMAT_VALUE             0
+            472 LOAD_CONST              10 (') → tới ')
+            474 LOAD_FAST                6 (until)
+            476 LOAD_CONST              11 ('%H:%M')
+            478 FORMAT_VALUE             4 (with format)
+            480 LOAD_CONST              12 ('.')
+            482 BUILD_STRING             9
+            484 CALL                     1
+            492 POP_TOP
+
+370         494 LOAD_FAST                6 (until)
+            496 RETURN_VALUE
+
+Disassembly of <code object cooling_accounts at 0x7f6c92682170, file "app\services\flow_account_service.py", line 373>:
+373           0 RESUME                   0
+
+375           2 LOAD_GLOBAL              1 (NULL + datetime)
+             12 LOAD_ATTR                2 (now)
+             32 CALL                     0
+             40 STORE_FAST               1 (now)
+
+376          42 LOAD_FAST                0 (db)
+             44 LOAD_ATTR                5 (NULL|self + scalars)
+             64 LOAD_GLOBAL              7 (NULL + select)
+             74 LOAD_GLOBAL              8 (FlowAccount)
+             84 CALL                     1
+             92 LOAD_ATTR               11 (NULL|self + where)
+            112 LOAD_GLOBAL              8 (FlowAccount)
+            122 LOAD_ATTR               12 (enabled)
+            142 LOAD_CONST               1 (1)
+            144 COMPARE_OP              40 (==)
+            148 CALL                     1
+            156 CALL                     1
+            164 LOAD_ATTR               15 (NULL|self + all)
+            184 CALL                     0
+            192 GET_ITER
+            194 LOAD_FAST_AND_CLEAR      2 (a)
+            196 SWAP                     2
+            198 BUILD_LIST               0
+            200 SWAP                     2
+        >>  202 FOR_ITER                16 (to 238)
+            206 STORE_FAST               2 (a)
+
+377         208 LOAD_GLOBAL             17 (NULL + is_cooling)
+            218 LOAD_FAST                2 (a)
+            220 LOAD_FAST                1 (now)
+            222 CALL                     2
+            230 POP_JUMP_IF_FALSE        2 (to 236)
+
+376         232 LOAD_FAST                2 (a)
+            234 LIST_APPEND              2
+        >>  236 JUMP_BACKWARD           18 (to 202)
+        >>  238 END_FOR
+            240 SWAP                     2
+            242 STORE_FAST               2 (a)
+            244 RETURN_VALUE
+        >>  246 SWAP                     2
+            248 POP_TOP
+            250 SWAP                     2
+            252 STORE_FAST               2 (a)
+            254 RERAISE                  0
+ExceptionTable:
+  198 to 238 -> 246 [2]
+
+Disassembly of <code object mark_used at 0x7f6c9247ac10, file "app\services\flow_account_service.py", line 380>:
+380           0 RESUME                   0
+
+381           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + scalar)
+             24 LOAD_GLOBAL              3 (NULL + select)
+             34 LOAD_GLOBAL              4 (FlowAccount)
+             44 CALL                     1
+             52 LOAD_ATTR                7 (NULL|self + where)
+             72 LOAD_GLOBAL              4 (FlowAccount)
+             82 LOAD_ATTR                8 (partition_id)
+            102 LOAD_FAST                1 (partition_id)
+            104 COMPARE_OP              40 (==)
+            108 CALL                     1
+            116 CALL                     1
+            124 STORE_FAST               2 (a)
+
+382         126 LOAD_FAST                2 (a)
+            128 POP_JUMP_IF_FALSE       42 (to 214)
+
+383         130 LOAD_GLOBAL             11 (NULL + datetime)
+            140 LOAD_ATTR               12 (now)
+            160 CALL                     0
+            168 LOAD_FAST                2 (a)
+            170 STORE_ATTR               7 (last_used_at)
+
+384         180 LOAD_FAST                0 (db)
+            182 LOAD_ATTR               17 (NULL|self + commit)
+            202 CALL                     0
+            210 POP_TOP
+            212 RETURN_CONST             0 (None)
+
+382     >>  214 RETURN_CONST             0 (None)

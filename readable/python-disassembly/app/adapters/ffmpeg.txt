@@ -1,0 +1,3145 @@
+  0           0 RESUME                   0
+
+  1           2 SETUP_ANNOTATIONS
+              4 LOAD_CONST               0 ('FFmpeg adapter — Trích xuất âm thanh, render video, probe metadata. Xem docs/06 §6.6, docs/13.')
+              6 STORE_NAME               0 (__doc__)
+
+  2           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('annotations',))
+             12 IMPORT_NAME              1 (__future__)
+             14 IMPORT_FROM              2 (annotations)
+             16 STORE_NAME               2 (annotations)
+             18 POP_TOP
+
+  4          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               3 (None)
+             24 IMPORT_NAME              3 (asyncio)
+             26 STORE_NAME               3 (asyncio)
+
+  5          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               3 (None)
+             32 IMPORT_NAME              4 (json)
+             34 STORE_NAME               4 (json)
+
+  6          36 LOAD_CONST               1 (0)
+             38 LOAD_CONST               3 (None)
+             40 IMPORT_NAME              5 (re)
+             42 STORE_NAME               5 (re)
+
+  7          44 LOAD_CONST               1 (0)
+             46 LOAD_CONST               3 (None)
+             48 IMPORT_NAME              6 (shutil)
+             50 STORE_NAME               6 (shutil)
+
+  8          52 LOAD_CONST               1 (0)
+             54 LOAD_CONST               4 (('Path',))
+             56 IMPORT_NAME              7 (pathlib)
+             58 IMPORT_FROM              8 (Path)
+             60 STORE_NAME               8 (Path)
+             62 POP_TOP
+
+  9          64 LOAD_CONST               1 (0)
+             66 LOAD_CONST               5 (('Callable',))
+             68 IMPORT_NAME              9 (typing)
+             70 IMPORT_FROM             10 (Callable)
+             72 STORE_NAME              10 (Callable)
+             74 POP_TOP
+
+ 11          76 LOAD_CONST               1 (0)
+             78 LOAD_CONST               6 (('get_settings',))
+             80 IMPORT_NAME             11 (app.config)
+             82 IMPORT_FROM             12 (get_settings)
+             84 STORE_NAME              12 (get_settings)
+             86 POP_TOP
+
+ 12          88 LOAD_CONST               1 (0)
+             90 LOAD_CONST               7 (('StudioError', 'E', 'make_error'))
+             92 IMPORT_NAME             13 (app.core.errors)
+             94 IMPORT_FROM             14 (StudioError)
+             96 STORE_NAME              14 (StudioError)
+             98 IMPORT_FROM             15 (E)
+            100 STORE_NAME              15 (E)
+            102 IMPORT_FROM             16 (make_error)
+            104 STORE_NAME              16 (make_error)
+            106 POP_TOP
+
+ 13         108 LOAD_CONST               1 (0)
+            110 LOAD_CONST               8 (('no_window_kwargs', 'terminate_proc', 'cancelled_error'))
+            112 IMPORT_NAME             17 (app.core.proc)
+            114 IMPORT_FROM             18 (no_window_kwargs)
+            116 STORE_NAME              18 (no_window_kwargs)
+            118 IMPORT_FROM             19 (terminate_proc)
+            120 STORE_NAME              19 (terminate_proc)
+            122 IMPORT_FROM             20 (cancelled_error)
+            124 STORE_NAME              20 (cancelled_error)
+            126 POP_TOP
+
+ 14         128 LOAD_CONST               1 (0)
+            130 LOAD_CONST               9 (('SessionLocal',))
+            132 IMPORT_NAME             21 (app.db.session)
+            134 IMPORT_FROM             22 (SessionLocal)
+            136 STORE_NAME              22 (SessionLocal)
+            138 POP_TOP
+
+ 15         140 LOAD_CONST               1 (0)
+            142 LOAD_CONST              10 (('Setting',))
+            144 IMPORT_NAME             23 (app.db.models)
+            146 IMPORT_FROM             24 (Setting)
+            148 STORE_NAME              24 (Setting)
+            150 POP_TOP
+
+ 18         152 PUSH_NULL
+            154 LOAD_NAME                5 (re)
+            156 LOAD_ATTR               50 (compile)
+            176 LOAD_CONST              11 ('Duration:\\s+(\\d{2}):(\\d{2}):(\\d{2})\\.(\\d{2})')
+            178 CALL                     1
+            186 STORE_NAME              26 (_DUR_PAT)
+
+ 19         188 PUSH_NULL
+            190 LOAD_NAME                5 (re)
+            192 LOAD_ATTR               50 (compile)
+            212 LOAD_CONST              12 ('time=(\\d{2}):(\\d{2}):(\\d{2})\\.(\\d{2})')
+            214 CALL                     1
+            222 STORE_NAME              27 (_TIME_PAT)
+
+ 20         224 PUSH_NULL
+            226 LOAD_NAME                5 (re)
+            228 LOAD_ATTR               50 (compile)
+            248 LOAD_CONST              13 ('Video:.*?(\\d{2,5})x(\\d{2,5})')
+            250 CALL                     1
+            258 STORE_NAME              28 (_RES_PAT)
+
+ 23         260 LOAD_CONST              33 (('rate', 'str | None', 'return', 'float'))
+            262 LOAD_CONST              14 (<code object _parse_fps at 0x7f6c933aec10, file "app\adapters\ffmpeg.py", line 23>)
+            264 MAKE_FUNCTION            4 (annotations)
+            266 STORE_NAME              29 (_parse_fps)
+
+ 37         268 LOAD_CONST              15 (<code object _iter_ffmpeg_lines at 0x2908c5d0, file "app\adapters\ffmpeg.py", line 37>)
+            270 MAKE_FUNCTION            0
+            272 STORE_NAME              30 (_iter_ffmpeg_lines)
+
+ 62         274 BUILD_MAP                0
+            276 STORE_NAME              31 (_PROBE_CACHE)
+            278 LOAD_CONST              16 ('dict[tuple, dict]')
+            280 LOAD_NAME               32 (__annotations__)
+            282 LOAD_CONST              17 ('_PROBE_CACHE')
+            284 STORE_SUBSCR
+
+ 63         288 BUILD_MAP                0
+            290 STORE_NAME              33 (_FFMPEG_PATH_CACHE)
+            292 LOAD_CONST              18 ('dict[str, str]')
+            294 LOAD_NAME               32 (__annotations__)
+            296 LOAD_CONST              19 ('_FFMPEG_PATH_CACHE')
+            298 STORE_SUBSCR
+
+ 65         302 LOAD_CONST               3 (None)
+            304 STORE_GLOBAL            34 (_ENCODERS_CACHE)
+            306 LOAD_CONST              20 ('set[str] | None')
+            308 LOAD_NAME               32 (__annotations__)
+            310 LOAD_CONST              21 ('_ENCODERS_CACHE')
+            312 STORE_SUBSCR
+
+ 66         316 PUSH_NULL
+            318 LOAD_NAME                5 (re)
+            320 LOAD_ATTR               50 (compile)
+            340 LOAD_CONST              22 ('^[VASFXBDL.]{6}$')
+            342 CALL                     1
+            350 STORE_NAME              35 (_ENCODER_FLAG_RE)
+
+ 68         352 BUILD_MAP                0
+            354 STORE_NAME              36 (_ENCODER_USABLE_CACHE)
+            356 LOAD_CONST              23 ('dict[tuple[str, str], bool]')
+            358 LOAD_NAME               32 (__annotations__)
+            360 LOAD_CONST              24 ('_ENCODER_USABLE_CACHE')
+            362 STORE_SUBSCR
+
+ 69         366 PUSH_NULL
+            368 LOAD_NAME                3 (asyncio)
+            370 LOAD_ATTR               74 (Lock)
+            390 CALL                     0
+            398 STORE_NAME              38 (_ENCODER_PROBE_LOCK)
+
+ 72         400 LOAD_CONST              34 (('return', 'None'))
+            402 LOAD_CONST              25 (<code object clear_ffmpeg_path_cache at 0x7f6c9327d230, file "app\adapters\ffmpeg.py", line 72>)
+            404 MAKE_FUNCTION            4 (annotations)
+            406 STORE_NAME              39 (clear_ffmpeg_path_cache)
+
+ 80         408 LOAD_CONST              35 (('name', 'str', 'return', 'bool'))
+            410 LOAD_CONST              26 (<code object encoder_usable at 0x28e39e40, file "app\adapters\ffmpeg.py", line 80>)
+            412 MAKE_FUNCTION            4 (annotations)
+            414 STORE_NAME              40 (encoder_usable)
+
+120         416 LOAD_CONST              36 (('return', 'set[str]'))
+            418 LOAD_CONST              27 (<code object detect_encoders at 0x2906cc40, file "app\adapters\ffmpeg.py", line 120>)
+            420 MAKE_FUNCTION            4 (annotations)
+            422 STORE_NAME              41 (detect_encoders)
+
+144         424 LOAD_CONST              37 (('return', 'str'))
+            426 LOAD_CONST              28 (<code object get_ffmpeg_path at 0x290747d0, file "app\adapters\ffmpeg.py", line 144>)
+            428 MAKE_FUNCTION            4 (annotations)
+            430 STORE_NAME              42 (get_ffmpeg_path)
+
+188         432 LOAD_CONST              34 (('return', 'None'))
+            434 LOAD_CONST              29 (<code object _terminate at 0x7f6c933bfd30, file "app\adapters\ffmpeg.py", line 188>)
+            436 MAKE_FUNCTION            4 (annotations)
+            438 STORE_NAME              43 (_terminate)
+
+193         440 LOAD_CONST              38 (('return', 'str | None'))
+            442 LOAD_CONST              30 (<code object get_ffprobe_path at 0x7f6c933d92c0, file "app\adapters\ffmpeg.py", line 193>)
+            444 MAKE_FUNCTION            4 (annotations)
+            446 STORE_NAME              44 (get_ffprobe_path)
+
+205         448 PUSH_NULL
+            450 LOAD_BUILD_CLASS
+            452 LOAD_CONST              31 (<code object FFmpegRunner at 0x7f6c9326d4d0, file "app\adapters\ffmpeg.py", line 205>)
+            454 MAKE_FUNCTION            0
+            456 LOAD_CONST              32 ('FFmpegRunner')
+            458 CALL                     2
+            466 STORE_NAME              45 (FFmpegRunner)
+            468 RETURN_CONST             3 (None)
+
+Disassembly of <code object _parse_fps at 0x7f6c933aec10, file "app\adapters\ffmpeg.py", line 23>:
+ 23           0 RESUME                   0
+
+ 25           2 LOAD_FAST                0 (rate)
+              4 POP_JUMP_IF_FALSE       16 (to 38)
+              6 LOAD_GLOBAL              1 (NULL + isinstance)
+             16 LOAD_FAST                0 (rate)
+             18 LOAD_GLOBAL              2 (str)
+             28 CALL                     2
+             36 POP_JUMP_IF_TRUE         1 (to 40)
+
+ 26     >>   38 RETURN_CONST             1 (0.0)
+
+ 27     >>   40 NOP
+
+ 28          42 LOAD_CONST               2 ('/')
+             44 LOAD_FAST                0 (rate)
+             46 CONTAINS_OP              0
+             48 POP_JUMP_IF_FALSE       50 (to 150)
+
+ 29          50 LOAD_FAST                0 (rate)
+             52 LOAD_ATTR                5 (NULL|self + split)
+             72 LOAD_CONST               2 ('/')
+             74 LOAD_CONST               3 (1)
+             76 CALL                     2
+             84 UNPACK_SEQUENCE          2
+             88 STORE_FAST               1 (num)
+             90 STORE_FAST               2 (den)
+
+ 30          92 LOAD_GLOBAL              7 (NULL + float)
+            102 LOAD_FAST                2 (den)
+            104 CALL                     1
+            112 STORE_FAST               3 (den_f)
+
+ 31         114 LOAD_FAST                3 (den_f)
+            116 POP_JUMP_IF_FALSE       14 (to 146)
+            118 LOAD_GLOBAL              7 (NULL + float)
+            128 LOAD_FAST                1 (num)
+            130 CALL                     1
+            138 LOAD_FAST                3 (den_f)
+            140 BINARY_OP               11 (/)
+            144 RETURN_VALUE
+        >>  146 LOAD_CONST               1 (0.0)
+            148 RETURN_VALUE
+
+ 32     >>  150 LOAD_GLOBAL              7 (NULL + float)
+            160 LOAD_FAST                0 (rate)
+            162 CALL                     1
+            170 RETURN_VALUE
+        >>  172 PUSH_EXC_INFO
+
+ 33         174 LOAD_GLOBAL              8 (TypeError)
+            184 LOAD_GLOBAL             10 (ValueError)
+            194 BUILD_TUPLE              2
+            196 CHECK_EXC_MATCH
+            198 POP_JUMP_IF_FALSE        3 (to 206)
+            200 POP_TOP
+
+ 34         202 POP_EXCEPT
+            204 RETURN_CONST             1 (0.0)
+
+ 33     >>  206 RERAISE                  0
+        >>  208 COPY                     3
+            210 POP_EXCEPT
+            212 RERAISE                  1
+ExceptionTable:
+  42 to 142 -> 172 [0]
+  146 to 146 -> 172 [0]
+  150 to 168 -> 172 [0]
+  172 to 200 -> 208 [1] lasti
+  206 to 206 -> 208 [1] lasti
+
+Disassembly of <code object _iter_ffmpeg_lines at 0x2908c5d0, file "app\adapters\ffmpeg.py", line 37>:
+ 37           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 46           6 LOAD_CONST               1 ('')
+              8 STORE_FAST               1 (buf)
+
+ 47          10 NOP
+
+ 48     >>   12 LOAD_FAST                0 (stream)
+             14 LOAD_ATTR                1 (NULL|self + read)
+             34 LOAD_CONST               2 (4096)
+             36 CALL                     1
+             44 GET_AWAITABLE            0
+             46 LOAD_CONST               3 (None)
+        >>   48 SEND                     3 (to 58)
+             52 YIELD_VALUE              2
+             54 RESUME                   3
+             56 JUMP_BACKWARD_NO_INTERRUPT     5 (to 48)
+        >>   58 END_SEND
+             60 STORE_FAST               2 (chunk)
+
+ 49          62 LOAD_FAST                2 (chunk)
+             64 POP_JUMP_IF_TRUE         1 (to 68)
+
+ 50          66 JUMP_FORWARD            92 (to 252)
+
+ 51     >>   68 LOAD_FAST                1 (buf)
+             70 LOAD_FAST                2 (chunk)
+             72 LOAD_ATTR                3 (NULL|self + decode)
+             92 LOAD_CONST               4 ('utf-8')
+             94 LOAD_CONST               5 ('ignore')
+             96 KW_NAMES                 6 (('errors',))
+             98 CALL                     2
+            106 BINARY_OP               13 (+=)
+            110 STORE_FAST               1 (buf)
+
+ 52         112 LOAD_GLOBAL              5 (NULL + re)
+            122 LOAD_ATTR                6 (split)
+            142 LOAD_CONST               7 ('[\\r\\n]')
+            144 LOAD_FAST                1 (buf)
+            146 CALL                     2
+            154 STORE_FAST               3 (parts)
+
+ 53         156 LOAD_FAST                3 (parts)
+            158 LOAD_ATTR                9 (NULL|self + pop)
+            178 CALL                     0
+            186 STORE_FAST               1 (buf)
+
+ 54         188 LOAD_FAST                3 (parts)
+            190 GET_ITER
+        >>  192 FOR_ITER                26 (to 248)
+            196 STORE_FAST               4 (line)
+
+ 55         198 LOAD_FAST                4 (line)
+            200 LOAD_ATTR               11 (NULL|self + strip)
+            220 CALL                     0
+            228 STORE_FAST               4 (line)
+
+ 56         230 LOAD_FAST                4 (line)
+            232 POP_JUMP_IF_TRUE         1 (to 236)
+            234 JUMP_BACKWARD           22 (to 192)
+
+ 57     >>  236 LOAD_FAST                4 (line)
+            238 CALL_INTRINSIC_1         4 (INTRINSIC_ASYNC_GEN_WRAP)
+            240 YIELD_VALUE              1
+            242 RESUME                   1
+            244 POP_TOP
+            246 JUMP_BACKWARD           28 (to 192)
+
+ 54     >>  248 END_FOR
+
+ 47         250 JUMP_BACKWARD          120 (to 12)
+
+ 58     >>  252 LOAD_FAST                1 (buf)
+            254 LOAD_ATTR               11 (NULL|self + strip)
+            274 CALL                     0
+            282 POP_JUMP_IF_FALSE       20 (to 324)
+
+ 59         284 LOAD_FAST                1 (buf)
+            286 LOAD_ATTR               11 (NULL|self + strip)
+            306 CALL                     0
+            314 CALL_INTRINSIC_1         4 (INTRINSIC_ASYNC_GEN_WRAP)
+            316 YIELD_VALUE              1
+            318 RESUME                   1
+            320 POP_TOP
+            322 RETURN_CONST             3 (None)
+
+ 58     >>  324 RETURN_CONST             3 (None)
+
+ 48     >>  326 CLEANUP_THROW
+            328 JUMP_BACKWARD          136 (to 58)
+        >>  330 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            332 RERAISE                  1
+ExceptionTable:
+  4 to 50 -> 330 [0] lasti
+  52 to 52 -> 326 [2]
+  54 to 232 -> 330 [0] lasti
+  236 to 326 -> 330 [0] lasti
+
+Disassembly of <code object clear_ffmpeg_path_cache at 0x7f6c9327d230, file "app\adapters\ffmpeg.py", line 72>:
+ 72           0 RESUME                   0
+
+ 74           2 LOAD_GLOBAL              0 (_FFMPEG_PATH_CACHE)
+             12 LOAD_ATTR                3 (NULL|self + clear)
+             32 CALL                     0
+             40 POP_TOP
+
+ 76          42 LOAD_CONST               1 (None)
+             44 STORE_GLOBAL             2 (_ENCODERS_CACHE)
+
+ 77          46 LOAD_GLOBAL              6 (_ENCODER_USABLE_CACHE)
+             56 LOAD_ATTR                3 (NULL|self + clear)
+             76 CALL                     0
+             84 POP_TOP
+             86 RETURN_CONST             1 (None)
+
+Disassembly of <code object encoder_usable at 0x28e39e40, file "app\adapters\ffmpeg.py", line 80>:
+ 80           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 94           6 LOAD_GLOBAL              1 (NULL + get_ffmpeg_path)
+             16 CALL                     0
+             24 LOAD_FAST                0 (name)
+             26 BUILD_TUPLE              2
+             28 STORE_FAST               1 (key)
+
+ 95          30 LOAD_FAST                1 (key)
+             32 LOAD_GLOBAL              2 (_ENCODER_USABLE_CACHE)
+             42 CONTAINS_OP              0
+             44 POP_JUMP_IF_FALSE        9 (to 64)
+
+ 96          46 LOAD_GLOBAL              2 (_ENCODER_USABLE_CACHE)
+             56 LOAD_FAST                1 (key)
+             58 BINARY_SUBSCR
+             62 RETURN_VALUE
+
+ 97     >>   64 LOAD_GLOBAL              4 (_ENCODER_PROBE_LOCK)
+             74 BEFORE_ASYNC_WITH
+             76 GET_AWAITABLE            1
+             78 LOAD_CONST               1 (None)
+        >>   80 SEND                     3 (to 90)
+             84 YIELD_VALUE              2
+             86 RESUME                   3
+             88 JUMP_BACKWARD_NO_INTERRUPT     5 (to 80)
+        >>   90 END_SEND
+             92 POP_TOP
+
+ 98          94 LOAD_FAST                1 (key)
+             96 LOAD_GLOBAL              2 (_ENCODER_USABLE_CACHE)
+            106 CONTAINS_OP              0
+            108 POP_JUMP_IF_FALSE       26 (to 162)
+
+ 99         110 LOAD_GLOBAL              2 (_ENCODER_USABLE_CACHE)
+            120 LOAD_FAST                1 (key)
+            122 BINARY_SUBSCR
+
+ 97         126 SWAP                     2
+            128 LOAD_CONST               1 (None)
+            130 LOAD_CONST               1 (None)
+            132 LOAD_CONST               1 (None)
+            134 CALL                     2
+            142 GET_AWAITABLE            2
+            144 LOAD_CONST               1 (None)
+        >>  146 SEND                     3 (to 156)
+            150 YIELD_VALUE              2
+            152 RESUME                   3
+            154 JUMP_BACKWARD_NO_INTERRUPT     5 (to 146)
+        >>  156 END_SEND
+            158 POP_TOP
+            160 RETURN_VALUE
+
+100     >>  162 LOAD_CONST               2 (False)
+            164 STORE_FAST               2 (ok)
+
+101         166 NOP
+
+102         168 LOAD_GLOBAL              7 (NULL + asyncio)
+            178 LOAD_ATTR                8 (create_subprocess_exec)
+
+103         198 LOAD_FAST                1 (key)
+            200 LOAD_CONST               3 (0)
+            202 BINARY_SUBSCR
+            206 LOAD_CONST               4 ('-hide_banner')
+            208 LOAD_CONST               5 ('-loglevel')
+            210 LOAD_CONST               6 ('error')
+
+104         212 LOAD_CONST               7 ('-f')
+            214 LOAD_CONST               8 ('lavfi')
+            216 LOAD_CONST               9 ('-i')
+            218 LOAD_CONST              10 ('testsrc2=size=320x240:rate=30')
+
+105         220 LOAD_CONST              11 ('-frames:v')
+            222 LOAD_CONST              12 ('3')
+            224 LOAD_CONST              13 ('-c:v')
+            226 LOAD_FAST                0 (name)
+            228 LOAD_CONST               7 ('-f')
+            230 LOAD_CONST              14 ('null')
+            232 LOAD_CONST              15 ('-')
+
+102         234 BUILD_TUPLE             15
+
+106         236 LOAD_GLOBAL              6 (asyncio)
+            246 LOAD_ATTR               10 (subprocess)
+            266 LOAD_ATTR               12 (DEVNULL)
+            286 LOAD_GLOBAL              6 (asyncio)
+            296 LOAD_ATTR               10 (subprocess)
+            316 LOAD_ATTR               12 (DEVNULL)
+
+102         336 LOAD_CONST              16 (('stdout', 'stderr'))
+            338 BUILD_CONST_KEY_MAP      2
+
+107         340 LOAD_GLOBAL             15 (NULL + no_window_kwargs)
+            350 CALL                     0
+
+102         358 DICT_MERGE               1
+            360 CALL_FUNCTION_EX         1
+            362 GET_AWAITABLE            0
+            364 LOAD_CONST               1 (None)
+        >>  366 SEND                     3 (to 376)
+            370 YIELD_VALUE              4
+            372 RESUME                   3
+            374 JUMP_BACKWARD_NO_INTERRUPT     5 (to 366)
+        >>  376 END_SEND
+            378 STORE_FAST               3 (proc)
+
+110         380 LOAD_GLOBAL              7 (NULL + asyncio)
+            390 LOAD_ATTR               16 (wait_for)
+            410 LOAD_FAST                3 (proc)
+            412 LOAD_ATTR               19 (NULL|self + wait)
+            432 CALL                     0
+            440 LOAD_CONST              17 (30)
+            442 KW_NAMES                18 (('timeout',))
+            444 CALL                     2
+            452 GET_AWAITABLE            0
+            454 LOAD_CONST               1 (None)
+        >>  456 SEND                     3 (to 466)
+            460 YIELD_VALUE              4
+            462 RESUME                   3
+            464 JUMP_BACKWARD_NO_INTERRUPT     5 (to 456)
+        >>  466 END_SEND
+            468 POP_TOP
+
+111         470 LOAD_FAST                3 (proc)
+            472 LOAD_ATTR               20 (returncode)
+            492 LOAD_CONST               3 (0)
+            494 COMPARE_OP              40 (==)
+            498 STORE_FAST               2 (ok)
+
+116     >>  500 LOAD_FAST                2 (ok)
+            502 LOAD_GLOBAL              2 (_ENCODER_USABLE_CACHE)
+            512 LOAD_FAST                1 (key)
+            514 STORE_SUBSCR
+
+117         518 LOAD_FAST                2 (ok)
+
+ 97         520 SWAP                     2
+            522 LOAD_CONST               1 (None)
+            524 LOAD_CONST               1 (None)
+            526 LOAD_CONST               1 (None)
+            528 CALL                     2
+            536 GET_AWAITABLE            2
+            538 LOAD_CONST               1 (None)
+        >>  540 SEND                     3 (to 550)
+            544 YIELD_VALUE              2
+            546 RESUME                   3
+            548 JUMP_BACKWARD_NO_INTERRUPT     5 (to 540)
+        >>  550 END_SEND
+            552 POP_TOP
+            554 RETURN_VALUE
+        >>  556 CLEANUP_THROW
+            558 JUMP_BACKWARD          235 (to 90)
+        >>  560 CLEANUP_THROW
+            562 JUMP_BACKWARD          204 (to 156)
+
+102     >>  564 CLEANUP_THROW
+            566 JUMP_BACKWARD           96 (to 376)
+
+110     >>  568 CLEANUP_THROW
+            570 JUMP_BACKWARD           53 (to 466)
+        >>  572 PUSH_EXC_INFO
+
+112         574 LOAD_GLOBAL              6 (asyncio)
+            584 LOAD_ATTR               22 (TimeoutError)
+            604 CHECK_EXC_MATCH
+            606 POP_JUMP_IF_FALSE       23 (to 654)
+            608 POP_TOP
+
+113         610 LOAD_GLOBAL             25 (NULL + terminate_proc)
+            620 LOAD_FAST_CHECK          3 (proc)
+            622 CALL                     1
+            630 GET_AWAITABLE            0
+            632 LOAD_CONST               1 (None)
+        >>  634 SEND                     4 (to 646)
+            638 YIELD_VALUE              4
+            640 RESUME                   3
+            642 JUMP_BACKWARD_NO_INTERRUPT     5 (to 634)
+        >>  644 CLEANUP_THROW
+        >>  646 END_SEND
+            648 POP_TOP
+            650 POP_EXCEPT
+            652 JUMP_BACKWARD           77 (to 500)
+
+114     >>  654 LOAD_GLOBAL             26 (Exception)
+            664 CHECK_EXC_MATCH
+            666 POP_JUMP_IF_FALSE        3 (to 674)
+            668 POP_TOP
+
+115         670 POP_EXCEPT
+            672 JUMP_BACKWARD           87 (to 500)
+
+114     >>  674 RERAISE                  0
+        >>  676 COPY                     3
+            678 POP_EXCEPT
+            680 RERAISE                  1
+
+ 97     >>  682 CLEANUP_THROW
+            684 JUMP_BACKWARD           68 (to 550)
+        >>  686 PUSH_EXC_INFO
+            688 WITH_EXCEPT_START
+            690 GET_AWAITABLE            2
+            692 LOAD_CONST               1 (None)
+        >>  694 SEND                     4 (to 706)
+            698 YIELD_VALUE              3
+            700 RESUME                   3
+            702 JUMP_BACKWARD_NO_INTERRUPT     5 (to 694)
+        >>  704 CLEANUP_THROW
+        >>  706 END_SEND
+            708 POP_JUMP_IF_TRUE         1 (to 712)
+            710 RERAISE                  2
+        >>  712 POP_TOP
+            714 POP_EXCEPT
+            716 POP_TOP
+            718 POP_TOP
+            720 RETURN_CONST             1 (None)
+        >>  722 COPY                     3
+            724 POP_EXCEPT
+            726 RERAISE                  1
+        >>  728 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            730 RERAISE                  1
+ExceptionTable:
+  4 to 82 -> 728 [0] lasti
+  84 to 84 -> 556 [3]
+  86 to 90 -> 728 [0] lasti
+  92 to 124 -> 686 [1] lasti
+  126 to 148 -> 728 [0] lasti
+  150 to 150 -> 560 [3]
+  152 to 160 -> 728 [0] lasti
+  162 to 164 -> 686 [1] lasti
+  168 to 368 -> 572 [1]
+  370 to 370 -> 564 [3]
+  372 to 458 -> 572 [1]
+  460 to 460 -> 568 [3]
+  462 to 498 -> 572 [1]
+  500 to 518 -> 686 [1] lasti
+  520 to 542 -> 728 [0] lasti
+  544 to 544 -> 682 [3]
+  546 to 556 -> 728 [0] lasti
+  560 to 560 -> 728 [0] lasti
+  564 to 564 -> 572 [1]
+  568 to 568 -> 572 [1]
+  572 to 636 -> 676 [2] lasti
+  638 to 638 -> 644 [4]
+  640 to 648 -> 676 [2] lasti
+  650 to 652 -> 686 [1] lasti
+  654 to 668 -> 676 [2] lasti
+  670 to 672 -> 686 [1] lasti
+  674 to 674 -> 676 [2] lasti
+  676 to 680 -> 686 [1] lasti
+  682 to 682 -> 728 [0] lasti
+  686 to 696 -> 722 [3] lasti
+  698 to 698 -> 704 [6]
+  700 to 712 -> 722 [3] lasti
+  714 to 726 -> 728 [0] lasti
+
+Disassembly of <code object detect_encoders at 0x2906cc40, file "app\adapters\ffmpeg.py", line 120>:
+120           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+123           6 LOAD_GLOBAL              0 (_ENCODERS_CACHE)
+             16 POP_JUMP_IF_NONE         6 (to 30)
+
+124          18 LOAD_GLOBAL              0 (_ENCODERS_CACHE)
+             28 RETURN_VALUE
+
+125     >>   30 LOAD_GLOBAL              3 (NULL + set)
+             40 CALL                     0
+             48 STORE_FAST               0 (names)
+
+126          50 NOP
+
+127          52 LOAD_GLOBAL              5 (NULL + asyncio)
+             62 LOAD_ATTR                6 (create_subprocess_exec)
+
+128          82 LOAD_GLOBAL              9 (NULL + get_ffmpeg_path)
+             92 CALL                     0
+            100 LOAD_CONST               2 ('-hide_banner')
+            102 LOAD_CONST               3 ('-encoders')
+
+127         104 BUILD_TUPLE              3
+
+129         106 LOAD_GLOBAL              4 (asyncio)
+            116 LOAD_ATTR               10 (subprocess)
+            136 LOAD_ATTR               12 (PIPE)
+            156 LOAD_GLOBAL              4 (asyncio)
+            166 LOAD_ATTR               10 (subprocess)
+            186 LOAD_ATTR               14 (DEVNULL)
+
+127         206 LOAD_CONST               4 (('stdout', 'stderr'))
+            208 BUILD_CONST_KEY_MAP      2
+
+130         210 LOAD_GLOBAL             17 (NULL + no_window_kwargs)
+            220 CALL                     0
+
+127         228 DICT_MERGE               1
+            230 CALL_FUNCTION_EX         1
+            232 GET_AWAITABLE            0
+            234 LOAD_CONST               1 (None)
+        >>  236 SEND                     3 (to 246)
+            240 YIELD_VALUE              3
+            242 RESUME                   3
+            244 JUMP_BACKWARD_NO_INTERRUPT     5 (to 236)
+        >>  246 END_SEND
+            248 STORE_FAST               1 (proc)
+
+132         250 LOAD_FAST                1 (proc)
+            252 LOAD_ATTR               19 (NULL|self + communicate)
+            272 CALL                     0
+            280 GET_AWAITABLE            0
+            282 LOAD_CONST               1 (None)
+        >>  284 SEND                     3 (to 294)
+            288 YIELD_VALUE              3
+            290 RESUME                   3
+            292 JUMP_BACKWARD_NO_INTERRUPT     5 (to 284)
+        >>  294 END_SEND
+            296 UNPACK_SEQUENCE          2
+            300 STORE_FAST               2 (data)
+            302 STORE_FAST               3 (_)
+
+133         304 LOAD_FAST                2 (data)
+            306 LOAD_ATTR               21 (NULL|self + decode)
+            326 LOAD_CONST               5 ('utf-8')
+            328 LOAD_CONST               6 ('ignore')
+            330 CALL                     2
+            338 LOAD_ATTR               23 (NULL|self + splitlines)
+            358 CALL                     0
+            366 GET_ITER
+        >>  368 FOR_ITER                78 (to 528)
+            372 STORE_FAST               4 (line)
+
+134         374 LOAD_FAST                4 (line)
+            376 LOAD_ATTR               25 (NULL|self + split)
+            396 CALL                     0
+            404 STORE_FAST               5 (parts)
+
+136         406 LOAD_GLOBAL             27 (NULL + len)
+            416 LOAD_FAST                5 (parts)
+            418 CALL                     1
+            426 LOAD_CONST               7 (2)
+            428 COMPARE_OP              92 (>=)
+            432 POP_JUMP_IF_TRUE         1 (to 436)
+            434 JUMP_BACKWARD           34 (to 368)
+        >>  436 LOAD_GLOBAL             28 (_ENCODER_FLAG_RE)
+            446 LOAD_ATTR               31 (NULL|self + match)
+            466 LOAD_FAST                5 (parts)
+            468 LOAD_CONST               8 (0)
+            470 BINARY_SUBSCR
+            474 CALL                     1
+            482 POP_JUMP_IF_TRUE         1 (to 486)
+            484 JUMP_BACKWARD           59 (to 368)
+
+137     >>  486 LOAD_FAST                0 (names)
+            488 LOAD_ATTR               33 (NULL|self + add)
+            508 LOAD_FAST                5 (parts)
+            510 LOAD_CONST               9 (1)
+            512 BINARY_SUBSCR
+            516 CALL                     1
+            524 POP_TOP
+            526 JUMP_BACKWARD           80 (to 368)
+
+133     >>  528 END_FOR
+            530 NOP
+
+140         532 LOAD_FAST                0 (names)
+            534 STORE_GLOBAL             0 (_ENCODERS_CACHE)
+
+141         536 LOAD_FAST                0 (names)
+            538 RETURN_VALUE
+
+127     >>  540 CLEANUP_THROW
+            542 JUMP_BACKWARD          149 (to 246)
+
+132     >>  544 CLEANUP_THROW
+            546 JUMP_BACKWARD          127 (to 294)
+        >>  548 PUSH_EXC_INFO
+
+138         550 LOAD_GLOBAL             34 (Exception)
+            560 CHECK_EXC_MATCH
+            562 POP_JUMP_IF_FALSE        6 (to 576)
+            564 POP_TOP
+
+139         566 POP_EXCEPT
+
+140         568 LOAD_FAST                0 (names)
+            570 STORE_GLOBAL             0 (_ENCODERS_CACHE)
+
+141         572 LOAD_FAST                0 (names)
+            574 RETURN_VALUE
+
+138     >>  576 RERAISE                  0
+        >>  578 COPY                     3
+            580 POP_EXCEPT
+            582 RERAISE                  1
+        >>  584 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            586 RERAISE                  1
+ExceptionTable:
+  4 to 48 -> 584 [0] lasti
+  52 to 238 -> 548 [0]
+  240 to 240 -> 540 [2]
+  242 to 286 -> 548 [0]
+  288 to 288 -> 544 [2]
+  290 to 432 -> 548 [0]
+  436 to 482 -> 548 [0]
+  486 to 528 -> 548 [0]
+  532 to 538 -> 584 [0] lasti
+  540 to 540 -> 548 [0]
+  544 to 544 -> 548 [0]
+  548 to 564 -> 578 [1] lasti
+  566 to 574 -> 584 [0] lasti
+  576 to 576 -> 578 [1] lasti
+  578 to 582 -> 584 [0] lasti
+
+Disassembly of <code object get_ffmpeg_path at 0x290747d0, file "app\adapters\ffmpeg.py", line 144>:
+              0 MAKE_CELL                9 (cache_key)
+
+144           2 RESUME                   0
+
+147           4 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             14 CALL                     0
+             22 BEFORE_WITH
+             24 STORE_FAST               0 (db)
+
+148          26 LOAD_FAST                0 (db)
+             28 LOAD_ATTR                3 (NULL|self + get)
+             48 LOAD_GLOBAL              4 (Setting)
+             58 LOAD_CONST               1 ('ffmpeg_path')
+             60 CALL                     2
+             68 STORE_FAST               1 (row)
+
+149          70 LOAD_FAST                1 (row)
+             72 POP_JUMP_IF_FALSE       12 (to 98)
+             74 LOAD_FAST                1 (row)
+             76 LOAD_ATTR                6 (value)
+             96 JUMP_FORWARD             1 (to 100)
+        >>   98 LOAD_CONST               2 (None)
+        >>  100 STORE_FAST               2 (custom_path)
+
+147         102 LOAD_CONST               2 (None)
+            104 LOAD_CONST               2 (None)
+            106 LOAD_CONST               2 (None)
+            108 CALL                     2
+            116 POP_TOP
+
+151     >>  118 LOAD_FAST_CHECK          2 (custom_path)
+            120 COPY                     1
+            122 POP_JUMP_IF_TRUE         2 (to 128)
+            124 POP_TOP
+            126 LOAD_CONST               3 ('<auto>')
+        >>  128 STORE_DEREF              9 (cache_key)
+
+152         130 LOAD_GLOBAL              8 (_FFMPEG_PATH_CACHE)
+            140 LOAD_ATTR                3 (NULL|self + get)
+            160 LOAD_DEREF               9 (cache_key)
+            162 CALL                     1
+            170 STORE_FAST               3 (hit)
+
+153         172 LOAD_FAST                3 (hit)
+            174 POP_JUMP_IF_FALSE        2 (to 180)
+
+154         176 LOAD_FAST                3 (hit)
+            178 RETURN_VALUE
+
+156     >>  180 LOAD_CONST               9 (('v', 'str', 'return', 'str'))
+            182 LOAD_CLOSURE             9 (cache_key)
+            184 BUILD_TUPLE              1
+            186 LOAD_CONST               4 (<code object _cache at 0x7f6c9342f130, file "app\adapters\ffmpeg.py", line 156>)
+            188 MAKE_FUNCTION           12 (annotations, closure)
+            190 STORE_FAST               4 (_cache)
+
+160         192 LOAD_FAST                2 (custom_path)
+            194 POP_JUMP_IF_FALSE      191 (to 578)
+
+161         196 LOAD_GLOBAL             11 (NULL + Path)
+            206 LOAD_FAST                2 (custom_path)
+            208 CALL                     1
+            216 STORE_FAST               5 (p)
+
+162         218 LOAD_FAST                5 (p)
+            220 LOAD_ATTR               13 (NULL|self + exists)
+            240 CALL                     0
+            248 POP_JUMP_IF_FALSE       47 (to 344)
+            250 LOAD_FAST                5 (p)
+            252 LOAD_ATTR               15 (NULL|self + is_file)
+            272 CALL                     0
+            280 POP_JUMP_IF_FALSE       31 (to 344)
+
+163         282 PUSH_NULL
+            284 LOAD_FAST                4 (_cache)
+            286 LOAD_GLOBAL             17 (NULL + str)
+            296 LOAD_FAST                5 (p)
+            298 LOAD_ATTR               19 (NULL|self + resolve)
+            318 CALL                     0
+            326 CALL                     1
+            334 CALL                     1
+            342 RETURN_VALUE
+
+165     >>  344 LOAD_GLOBAL             21 (NULL + get_settings)
+            354 CALL                     0
+            362 LOAD_ATTR               22 (data_dir)
+            382 LOAD_FAST                5 (p)
+            384 BINARY_OP               11 (/)
+            388 LOAD_ATTR               19 (NULL|self + resolve)
+            408 CALL                     0
+            416 STORE_FAST               6 (resolved)
+
+166         418 LOAD_FAST                6 (resolved)
+            420 LOAD_ATTR               13 (NULL|self + exists)
+            440 CALL                     0
+            448 POP_JUMP_IF_FALSE       33 (to 516)
+            450 LOAD_FAST                6 (resolved)
+            452 LOAD_ATTR               15 (NULL|self + is_file)
+            472 CALL                     0
+            480 POP_JUMP_IF_FALSE       17 (to 516)
+
+167         482 PUSH_NULL
+            484 LOAD_FAST                4 (_cache)
+            486 LOAD_GLOBAL             17 (NULL + str)
+            496 LOAD_FAST                6 (resolved)
+            498 CALL                     1
+            506 CALL                     1
+            514 RETURN_VALUE
+
+168     >>  516 LOAD_GLOBAL             25 (NULL + shutil)
+            526 LOAD_ATTR               26 (which)
+            546 LOAD_FAST                2 (custom_path)
+            548 CALL                     1
+            556 STORE_FAST               7 (exe)
+
+169         558 LOAD_FAST                7 (exe)
+            560 POP_JUMP_IF_FALSE        8 (to 578)
+
+170         562 PUSH_NULL
+            564 LOAD_FAST                4 (_cache)
+            566 LOAD_FAST                7 (exe)
+            568 CALL                     1
+            576 RETURN_VALUE
+
+173     >>  578 LOAD_GLOBAL             21 (NULL + get_settings)
+            588 CALL                     0
+            596 LOAD_ATTR               22 (data_dir)
+            616 LOAD_CONST               5 ('resources')
+            618 BINARY_OP               11 (/)
+            622 LOAD_CONST               6 ('ffmpeg')
+            624 BINARY_OP               11 (/)
+            628 LOAD_CONST               7 ('ffmpeg.exe')
+            630 BINARY_OP               11 (/)
+            634 STORE_FAST               8 (local_path)
+
+174         636 LOAD_FAST                8 (local_path)
+            638 LOAD_ATTR               13 (NULL|self + exists)
+            658 CALL                     0
+            666 POP_JUMP_IF_FALSE       17 (to 702)
+
+175         668 PUSH_NULL
+            670 LOAD_FAST                4 (_cache)
+            672 LOAD_GLOBAL             17 (NULL + str)
+            682 LOAD_FAST                8 (local_path)
+            684 CALL                     1
+            692 CALL                     1
+            700 RETURN_VALUE
+
+178     >>  702 LOAD_GLOBAL             25 (NULL + shutil)
+            712 LOAD_ATTR               26 (which)
+            732 LOAD_CONST               6 ('ffmpeg')
+            734 CALL                     1
+            742 STORE_FAST               7 (exe)
+
+179         744 LOAD_FAST                7 (exe)
+            746 POP_JUMP_IF_FALSE        8 (to 764)
+
+180         748 PUSH_NULL
+            750 LOAD_FAST                4 (_cache)
+            752 LOAD_FAST                7 (exe)
+            754 CALL                     1
+            762 RETURN_VALUE
+
+182     >>  764 LOAD_GLOBAL             29 (NULL + make_error)
+
+183         774 LOAD_GLOBAL             30 (E)
+            784 LOAD_ATTR               32 (FFMPEG_NOT_FOUND)
+
+184         804 LOAD_CONST               8 ('Không tìm thấy FFmpeg executable trên máy. Hãy cài đặt Bộ Công Cụ hoặc cấu hình đường dẫn trong cài đặt.')
+
+182         806 CALL                     2
+            814 RAISE_VARARGS            1
+
+147     >>  816 PUSH_EXC_INFO
+            818 WITH_EXCEPT_START
+            820 POP_JUMP_IF_TRUE         1 (to 824)
+            822 RERAISE                  2
+        >>  824 POP_TOP
+            826 POP_EXCEPT
+            828 POP_TOP
+            830 POP_TOP
+            832 EXTENDED_ARG             1
+            834 JUMP_BACKWARD          359 (to 118)
+        >>  836 COPY                     3
+            838 POP_EXCEPT
+            840 RERAISE                  1
+ExceptionTable:
+  24 to 100 -> 816 [1] lasti
+  816 to 824 -> 836 [3] lasti
+
+Disassembly of <code object _cache at 0x7f6c9342f130, file "app\adapters\ffmpeg.py", line 156>:
+              0 COPY_FREE_VARS           1
+
+156           2 RESUME                   0
+
+157           4 LOAD_FAST                0 (v)
+              6 LOAD_GLOBAL              0 (_FFMPEG_PATH_CACHE)
+             16 LOAD_DEREF               1 (cache_key)
+             18 STORE_SUBSCR
+
+158          22 LOAD_FAST                0 (v)
+             24 RETURN_VALUE
+
+Disassembly of <code object _terminate at 0x7f6c933bfd30, file "app\adapters\ffmpeg.py", line 188>:
+188           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+190           6 LOAD_GLOBAL              1 (NULL + terminate_proc)
+             16 LOAD_FAST                0 (process)
+             18 CALL                     1
+             26 GET_AWAITABLE            0
+             28 LOAD_CONST               1 (None)
+        >>   30 SEND                     3 (to 40)
+             34 YIELD_VALUE              2
+             36 RESUME                   3
+             38 JUMP_BACKWARD_NO_INTERRUPT     5 (to 30)
+        >>   40 END_SEND
+             42 POP_TOP
+             44 RETURN_CONST             1 (None)
+        >>   46 CLEANUP_THROW
+             48 JUMP_BACKWARD            5 (to 40)
+        >>   50 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             52 RERAISE                  1
+ExceptionTable:
+  4 to 32 -> 50 [0] lasti
+  34 to 34 -> 46 [2]
+  36 to 46 -> 50 [0] lasti
+
+Disassembly of <code object get_ffprobe_path at 0x7f6c933d92c0, file "app\adapters\ffmpeg.py", line 193>:
+193           0 RESUME                   0
+
+195           2 NOP
+
+196           4 LOAD_GLOBAL              1 (NULL + Path)
+             14 LOAD_GLOBAL              3 (NULL + get_ffmpeg_path)
+             24 CALL                     0
+             32 CALL                     1
+             40 STORE_FAST               0 (ffmpeg)
+
+197          42 LOAD_FAST                0 (ffmpeg)
+             44 LOAD_ATTR                5 (NULL|self + with_name)
+             64 LOAD_CONST               1 ('ffprobe')
+             66 LOAD_FAST                0 (ffmpeg)
+             68 LOAD_ATTR                6 (suffix)
+             88 BINARY_OP                0 (+)
+             92 CALL                     1
+            100 STORE_FAST               1 (cand)
+
+198         102 LOAD_FAST                1 (cand)
+            104 LOAD_ATTR                9 (NULL|self + exists)
+            124 CALL                     0
+            132 POP_JUMP_IF_FALSE       11 (to 156)
+
+199         134 LOAD_GLOBAL             11 (NULL + str)
+            144 LOAD_FAST                1 (cand)
+            146 CALL                     1
+            154 RETURN_VALUE
+
+198     >>  156 NOP
+
+202     >>  158 LOAD_GLOBAL             15 (NULL + shutil)
+            168 LOAD_ATTR               16 (which)
+            188 LOAD_CONST               1 ('ffprobe')
+            190 CALL                     1
+            198 RETURN_VALUE
+        >>  200 PUSH_EXC_INFO
+
+200         202 LOAD_GLOBAL             12 (StudioError)
+            212 CHECK_EXC_MATCH
+            214 POP_JUMP_IF_FALSE        3 (to 222)
+            216 POP_TOP
+
+201         218 POP_EXCEPT
+            220 JUMP_BACKWARD           32 (to 158)
+
+200     >>  222 RERAISE                  0
+        >>  224 COPY                     3
+            226 POP_EXCEPT
+            228 RERAISE                  1
+ExceptionTable:
+  4 to 152 -> 200 [0]
+  200 to 216 -> 224 [1] lasti
+  222 to 222 -> 224 [1] lasti
+
+Disassembly of <code object FFmpegRunner at 0x7f6c9326d4d0, file "app\adapters\ffmpeg.py", line 205>:
+205           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('FFmpegRunner')
+              8 STORE_NAME               2 (__qualname__)
+
+206          10 LOAD_CONST              13 ((None,))
+             12 LOAD_CONST              14 (('ffmpeg_path', 'str | None'))
+             14 LOAD_CONST               2 (<code object __init__ at 0x7f6c9329e100, file "app\adapters\ffmpeg.py", line 206>)
+             16 MAKE_FUNCTION            5 (defaults, annotations)
+             18 STORE_NAME               3 (__init__)
+
+213          20 NOP
+
+214          22 NOP
+
+209          24 LOAD_CONST              15 ((None, None))
+
+211          26 NOP
+
+209          28 NOP
+
+212          30 NOP
+
+209          32 NOP
+
+213          34 NOP
+
+209          36 NOP
+
+214          38 NOP
+
+209          40 NOP
+
+215          42 NOP
+
+209          44 LOAD_CONST              16 (('input_mp4', 'str', 'output_wav', 'str', 'on_progress', 'Callable[[float], None] | None', 'cancel_check', 'Callable[[], bool] | None', 'return', 'None'))
+             46 LOAD_CONST               3 (<code object extract_audio at 0x7f6c933cbc30, file "app\adapters\ffmpeg.py", line 209>)
+             48 MAKE_FUNCTION            5 (defaults, annotations)
+             50 STORE_NAME               4 (extract_audio)
+
+235          52 NOP
+
+236          54 NOP
+
+230          56 LOAD_CONST              15 ((None, None))
+
+232          58 NOP
+
+230          60 NOP
+
+233          62 NOP
+
+230          64 NOP
+
+234          66 NOP
+
+230          68 NOP
+
+235          70 NOP
+
+230          72 NOP
+
+236          74 NOP
+
+230          76 NOP
+
+237          78 NOP
+
+230          80 LOAD_CONST              17 (('input_mp4', 'str', 'output_asr_wav', 'str', 'output_source_wav', 'str', 'on_progress', 'Callable[[float], None] | None', 'cancel_check', 'Callable[[], bool] | None', 'return', 'None'))
+             82 LOAD_CONST               4 (<code object extract_audio_dual at 0x7f6c933b70c0, file "app\adapters\ffmpeg.py", line 230>)
+             84 MAKE_FUNCTION            5 (defaults, annotations)
+             86 STORE_NAME               5 (extract_audio_dual)
+
+258          88 NOP
+
+259          90 NOP
+
+254          92 LOAD_CONST              15 ((None, None))
+
+256          94 NOP
+
+254          96 NOP
+
+257          98 NOP
+
+254         100 NOP
+
+258         102 NOP
+
+254         104 NOP
+
+259         106 NOP
+
+254         108 NOP
+
+260         110 NOP
+
+254         112 LOAD_CONST              16 (('input_mp4', 'str', 'output_wav', 'str', 'on_progress', 'Callable[[float], None] | None', 'cancel_check', 'Callable[[], bool] | None', 'return', 'None'))
+            114 LOAD_CONST               5 (<code object extract_audio_hq at 0x7f6c933cbd70, file "app\adapters\ffmpeg.py", line 254>)
+            116 MAKE_FUNCTION            5 (defaults, annotations)
+            118 STORE_NAME               6 (extract_audio_hq)
+
+272         120 NOP
+
+273         122 NOP
+
+269         124 LOAD_CONST              15 ((None, None))
+
+271         126 NOP
+
+269         128 NOP
+
+272         130 NOP
+
+269         132 NOP
+
+273         134 NOP
+
+269         136 NOP
+
+274         138 NOP
+
+269         140 LOAD_CONST              18 (('cmd', 'list[str]', 'on_progress', 'Callable[[float], None] | None', 'cancel_check', 'Callable[[], bool] | None', 'return', 'None'))
+            142 LOAD_CONST               6 (<code object _run_extract at 0x269ff760, file "app\adapters\ffmpeg.py", line 269>)
+            144 MAKE_FUNCTION            5 (defaults, annotations)
+            146 STORE_NAME               7 (_run_extract)
+
+343         148 LOAD_CONST              19 (('input_path', 'str', 'return', 'dict'))
+            150 LOAD_CONST               7 (<code object probe at 0x269f8010, file "app\adapters\ffmpeg.py", line 343>)
+            152 MAKE_FUNCTION            4 (annotations)
+            154 STORE_NAME               8 (probe)
+
+360         156 LOAD_CONST              19 (('input_path', 'str', 'return', 'dict'))
+            158 LOAD_CONST               8 (<code object _probe_uncached at 0x2907de20, file "app\adapters\ffmpeg.py", line 360>)
+            160 MAKE_FUNCTION            4 (annotations)
+            162 STORE_NAME               9 (_probe_uncached)
+
+394         164 LOAD_CONST              19 (('input_path', 'str', 'return', 'dict'))
+            166 LOAD_CONST               9 (<code object _probe_via_ffmpeg at 0x26996370, file "app\adapters\ffmpeg.py", line 394>)
+            168 MAKE_FUNCTION            4 (annotations)
+            170 STORE_NAME              10 (_probe_via_ffmpeg)
+
+420         172 LOAD_CONST              10 (0.0)
+
+421         174 LOAD_CONST               1 (None)
+
+422         176 LOAD_CONST               1 (None)
+
+423         178 LOAD_CONST               1 (None)
+
+424         180 LOAD_NAME               11 (E)
+            182 LOAD_ATTR               24 (RENDER_FAILED)
+
+417         202 BUILD_TUPLE              5
+
+419         204 NOP
+
+417         206 NOP
+
+420         208 NOP
+
+417         210 NOP
+
+421         212 NOP
+
+417         214 NOP
+
+422         216 NOP
+
+417         218 NOP
+
+423         220 NOP
+
+417         222 NOP
+
+424         224 NOP
+
+417         226 NOP
+
+425         228 NOP
+
+417         230 LOAD_CONST              20 (('args', 'list[str]', 'duration_sec', 'float', 'on_progress', 'Callable[[float], None] | None', 'cancel_check', 'Callable[[], bool] | None', 'cwd', 'str | None', 'error_code', 'str', 'return', 'None'))
+            232 LOAD_CONST              11 (<code object run_render at 0x29082700, file "app\adapters\ffmpeg.py", line 417>)
+            234 MAKE_FUNCTION            5 (defaults, annotations)
+            236 STORE_NAME              13 (run_render)
+
+480         238 LOAD_CONST               1 (None)
+
+481         240 LOAD_NAME               11 (E)
+            242 LOAD_ATTR               24 (RENDER_FAILED)
+
+482         262 LOAD_CONST               1 (None)
+
+480         264 BUILD_TUPLE              3
+
+481         266 NOP
+
+480         268 NOP
+
+482         270 NOP
+
+480         272 NOP
+
+482         274 NOP
+
+480         276 LOAD_CONST              21 (('args', 'list[str]', 'cwd', 'str | None', 'error_code', 'str', 'cancel_check', 'Callable[[], bool] | None', 'return', 'bytes'))
+            278 LOAD_CONST              12 (<code object run_capture at 0x269cdee0, file "app\adapters\ffmpeg.py", line 480>)
+            280 MAKE_FUNCTION            5 (defaults, annotations)
+            282 STORE_NAME              14 (run_capture)
+            284 RETURN_CONST             1 (None)
+
+Disassembly of <code object __init__ at 0x7f6c9329e100, file "app\adapters\ffmpeg.py", line 206>:
+206           0 RESUME                   0
+
+207           2 LOAD_FAST                1 (ffmpeg_path)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE        10 (to 28)
+              8 POP_TOP
+             10 LOAD_GLOBAL              1 (NULL + get_ffmpeg_path)
+             20 CALL                     0
+        >>   28 LOAD_FAST                0 (self)
+             30 STORE_ATTR               1 (ffmpeg_path)
+             40 RETURN_CONST             0 (None)
+
+Disassembly of <code object extract_audio at 0x7f6c933cbc30, file "app\adapters\ffmpeg.py", line 209>:
+209           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+218           6 LOAD_FAST                0 (self)
+              8 LOAD_ATTR                0 (ffmpeg_path)
+
+219          28 LOAD_CONST               1 ('-y')
+
+220          30 LOAD_CONST               2 ('-i')
+             32 LOAD_FAST                1 (input_mp4)
+
+221          34 LOAD_CONST               3 ('-vn')
+
+222          36 LOAD_CONST               4 ('-ar')
+             38 LOAD_CONST               5 ('16000')
+
+223          40 LOAD_CONST               6 ('-ac')
+             42 LOAD_CONST               7 ('1')
+
+224          44 LOAD_CONST               8 ('-c:a')
+             46 LOAD_CONST               9 ('pcm_s16le')
+
+225          48 LOAD_FAST                2 (output_wav)
+
+217          50 BUILD_LIST              12
+             52 STORE_FAST               5 (cmd)
+
+228          54 LOAD_FAST                0 (self)
+             56 LOAD_ATTR                3 (NULL|self + _run_extract)
+             76 LOAD_FAST                5 (cmd)
+             78 LOAD_FAST                3 (on_progress)
+             80 LOAD_FAST                4 (cancel_check)
+             82 CALL                     3
+             90 GET_AWAITABLE            0
+             92 LOAD_CONST              10 (None)
+        >>   94 SEND                     3 (to 104)
+             98 YIELD_VALUE              2
+            100 RESUME                   3
+            102 JUMP_BACKWARD_NO_INTERRUPT     5 (to 94)
+        >>  104 END_SEND
+            106 POP_TOP
+            108 RETURN_CONST            10 (None)
+        >>  110 CLEANUP_THROW
+            112 JUMP_BACKWARD            5 (to 104)
+        >>  114 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            116 RERAISE                  1
+ExceptionTable:
+  4 to 96 -> 114 [0] lasti
+  98 to 98 -> 110 [2]
+  100 to 110 -> 114 [0] lasti
+
+Disassembly of <code object extract_audio_dual at 0x7f6c933b70c0, file "app\adapters\ffmpeg.py", line 230>:
+230           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+244           6 LOAD_FAST                0 (self)
+              8 LOAD_ATTR                0 (ffmpeg_path)
+
+245          28 LOAD_CONST               1 ('-y')
+
+246          30 LOAD_CONST               2 ('-i')
+             32 LOAD_FAST                1 (input_mp4)
+
+248          34 LOAD_CONST               3 ('-map')
+             36 LOAD_CONST               4 ('0:a:0')
+             38 LOAD_CONST               5 ('-vn')
+             40 LOAD_CONST               6 ('-ar')
+             42 LOAD_CONST               7 ('16000')
+             44 LOAD_CONST               8 ('-ac')
+             46 LOAD_CONST               9 ('1')
+             48 LOAD_CONST              10 ('-c:a')
+             50 LOAD_CONST              11 ('pcm_s16le')
+             52 LOAD_FAST                2 (output_asr_wav)
+
+250          54 LOAD_CONST               3 ('-map')
+             56 LOAD_CONST               4 ('0:a:0')
+             58 LOAD_CONST               5 ('-vn')
+             60 LOAD_CONST               6 ('-ar')
+             62 LOAD_CONST              12 ('48000')
+             64 LOAD_CONST               8 ('-ac')
+             66 LOAD_CONST              13 ('2')
+             68 LOAD_CONST              10 ('-c:a')
+             70 LOAD_CONST              11 ('pcm_s16le')
+             72 LOAD_FAST                3 (output_source_wav)
+
+243          74 BUILD_LIST              24
+             76 STORE_FAST               6 (cmd)
+
+252          78 LOAD_FAST                0 (self)
+             80 LOAD_ATTR                3 (NULL|self + _run_extract)
+            100 LOAD_FAST                6 (cmd)
+            102 LOAD_FAST                4 (on_progress)
+            104 LOAD_FAST                5 (cancel_check)
+            106 CALL                     3
+            114 GET_AWAITABLE            0
+            116 LOAD_CONST              14 (None)
+        >>  118 SEND                     3 (to 128)
+            122 YIELD_VALUE              2
+            124 RESUME                   3
+            126 JUMP_BACKWARD_NO_INTERRUPT     5 (to 118)
+        >>  128 END_SEND
+            130 POP_TOP
+            132 RETURN_CONST            14 (None)
+        >>  134 CLEANUP_THROW
+            136 JUMP_BACKWARD            5 (to 128)
+        >>  138 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            140 RERAISE                  1
+ExceptionTable:
+  4 to 120 -> 138 [0] lasti
+  122 to 122 -> 134 [2]
+  124 to 134 -> 138 [0] lasti
+
+Disassembly of <code object extract_audio_hq at 0x7f6c933cbd70, file "app\adapters\ffmpeg.py", line 254>:
+254           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+264           6 LOAD_FAST                0 (self)
+              8 LOAD_ATTR                0 (ffmpeg_path)
+             28 LOAD_CONST               1 ('-y')
+             30 LOAD_CONST               2 ('-i')
+             32 LOAD_FAST                1 (input_mp4)
+
+265          34 LOAD_CONST               3 ('-map')
+             36 LOAD_CONST               4 ('0:a:0')
+             38 LOAD_CONST               5 ('-vn')
+             40 LOAD_CONST               6 ('-ar')
+             42 LOAD_CONST               7 ('48000')
+             44 LOAD_CONST               8 ('-ac')
+             46 LOAD_CONST               9 ('2')
+             48 LOAD_CONST              10 ('-c:a')
+             50 LOAD_CONST              11 ('pcm_s16le')
+             52 LOAD_FAST                2 (output_wav)
+
+263          54 BUILD_LIST              14
+             56 STORE_FAST               5 (cmd)
+
+267          58 LOAD_FAST                0 (self)
+             60 LOAD_ATTR                3 (NULL|self + _run_extract)
+             80 LOAD_FAST                5 (cmd)
+             82 LOAD_FAST                3 (on_progress)
+             84 LOAD_FAST                4 (cancel_check)
+             86 CALL                     3
+             94 GET_AWAITABLE            0
+             96 LOAD_CONST              12 (None)
+        >>   98 SEND                     3 (to 108)
+            102 YIELD_VALUE              2
+            104 RESUME                   3
+            106 JUMP_BACKWARD_NO_INTERRUPT     5 (to 98)
+        >>  108 END_SEND
+            110 POP_TOP
+            112 RETURN_CONST            12 (None)
+        >>  114 CLEANUP_THROW
+            116 JUMP_BACKWARD            5 (to 108)
+        >>  118 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            120 RERAISE                  1
+ExceptionTable:
+  4 to 100 -> 118 [0] lasti
+  102 to 102 -> 114 [2]
+  104 to 114 -> 118 [0] lasti
+
+Disassembly of <code object _run_extract at 0x269ff760, file "app\adapters\ffmpeg.py", line 269>:
+              0 MAKE_CELL                2 (on_progress)
+              2 MAKE_CELL                3 (cancel_check)
+              4 MAKE_CELL                7 (cancelled)
+              6 MAKE_CELL                8 (dur_pat)
+              8 MAKE_CELL                9 (duration_sec)
+             10 MAKE_CELL               10 (process)
+             12 MAKE_CELL               11 (time_pat)
+
+269          14 RETURN_GENERATOR
+             16 POP_TOP
+             18 RESUME                   0
+
+276          20 LOAD_GLOBAL              1 (NULL + asyncio)
+             30 LOAD_ATTR                2 (create_subprocess_exec)
+
+277          50 LOAD_FAST                1 (cmd)
+
+278          52 LOAD_GLOBAL              0 (asyncio)
+             62 LOAD_ATTR                4 (subprocess)
+             82 LOAD_ATTR                6 (PIPE)
+
+279         102 LOAD_GLOBAL              0 (asyncio)
+            112 LOAD_ATTR                4 (subprocess)
+            132 LOAD_ATTR                6 (PIPE)
+
+276         152 LOAD_CONST               1 (('stdout', 'stderr'))
+            154 BUILD_CONST_KEY_MAP      2
+
+280         156 LOAD_GLOBAL              9 (NULL + no_window_kwargs)
+            166 LOAD_CONST               2 (True)
+            168 KW_NAMES                 3 (('low_priority',))
+            170 CALL                     1
+
+276         178 DICT_MERGE               1
+            180 CALL_FUNCTION_EX         1
+            182 GET_AWAITABLE            0
+            184 LOAD_CONST               4 (None)
+        >>  186 SEND                     3 (to 196)
+            190 YIELD_VALUE              2
+            192 RESUME                   3
+            194 JUMP_BACKWARD_NO_INTERRUPT     5 (to 186)
+        >>  196 END_SEND
+            198 STORE_DEREF             10 (process)
+
+283         200 LOAD_CONST               5 (0.0)
+            202 STORE_DEREF              9 (duration_sec)
+
+284         204 LOAD_CONST               6 (False)
+            206 STORE_DEREF              7 (cancelled)
+
+285         208 LOAD_GLOBAL             11 (NULL + re)
+            218 LOAD_ATTR               12 (compile)
+            238 LOAD_CONST               7 ('Duration:\\s+(\\d{2}):(\\d{2}):(\\d{2})\\.(\\d{2})')
+            240 CALL                     1
+            248 STORE_DEREF              8 (dur_pat)
+
+286         250 LOAD_GLOBAL             11 (NULL + re)
+            260 LOAD_ATTR               12 (compile)
+            280 LOAD_CONST               8 ('time=(\\d{2}):(\\d{2}):(\\d{2})\\.(\\d{2})')
+            282 CALL                     1
+            290 STORE_DEREF             11 (time_pat)
+
+288         292 LOAD_CLOSURE             3 (cancel_check)
+            294 LOAD_CLOSURE             7 (cancelled)
+            296 LOAD_CLOSURE             8 (dur_pat)
+            298 LOAD_CLOSURE             9 (duration_sec)
+            300 LOAD_CLOSURE             2 (on_progress)
+            302 LOAD_CLOSURE            10 (process)
+            304 LOAD_CLOSURE            11 (time_pat)
+            306 BUILD_TUPLE              7
+            308 LOAD_CONST               9 (<code object read_stderr at 0x2907c790, file "app\adapters\ffmpeg.py", line 288>)
+            310 MAKE_FUNCTION            8 (closure)
+            312 STORE_FAST               4 (read_stderr)
+
+312         314 LOAD_CLOSURE             3 (cancel_check)
+            316 LOAD_CLOSURE             7 (cancelled)
+            318 LOAD_CLOSURE            10 (process)
+            320 BUILD_TUPLE              3
+            322 LOAD_CONST              10 (<code object monitor at 0x7f6c9327ad80, file "app\adapters\ffmpeg.py", line 312>)
+            324 MAKE_FUNCTION            8 (closure)
+            326 STORE_FAST               5 (monitor)
+
+321         328 NOP
+
+322         330 LOAD_GLOBAL              1 (NULL + asyncio)
+            340 LOAD_ATTR               14 (gather)
+
+323         360 LOAD_DEREF              10 (process)
+            362 LOAD_ATTR               17 (NULL|self + wait)
+            382 CALL                     0
+
+324         390 PUSH_NULL
+            392 LOAD_FAST                4 (read_stderr)
+            394 CALL                     0
+
+325         402 PUSH_NULL
+            404 LOAD_FAST                5 (monitor)
+            406 CALL                     0
+
+322         414 CALL                     3
+            422 GET_AWAITABLE            0
+            424 LOAD_CONST               4 (None)
+        >>  426 SEND                     3 (to 436)
+            430 YIELD_VALUE              3
+            432 RESUME                   3
+            434 JUMP_BACKWARD_NO_INTERRUPT     5 (to 426)
+        >>  436 END_SEND
+            438 POP_TOP
+
+332         440 LOAD_DEREF               7 (cancelled)
+            442 POP_JUMP_IF_FALSE       11 (to 466)
+
+333         444 LOAD_GLOBAL             23 (NULL + cancelled_error)
+            454 LOAD_CONST              11 ('tách âm thanh')
+            456 CALL                     1
+            464 RAISE_VARARGS            1
+
+335     >>  466 LOAD_DEREF              10 (process)
+            468 LOAD_ATTR               24 (returncode)
+            488 LOAD_CONST              12 (0)
+            490 COMPARE_OP              55 (!=)
+            494 POP_JUMP_IF_FALSE      110 (to 716)
+
+336         496 LOAD_DEREF              10 (process)
+            498 LOAD_ATTR               26 (stderr)
+            518 LOAD_ATTR               29 (NULL|self + read)
+            538 CALL                     0
+            546 GET_AWAITABLE            0
+            548 LOAD_CONST               4 (None)
+        >>  550 SEND                     3 (to 560)
+            554 YIELD_VALUE              2
+            556 RESUME                   3
+            558 JUMP_BACKWARD_NO_INTERRUPT     5 (to 550)
+        >>  560 END_SEND
+            562 LOAD_ATTR               31 (NULL|self + decode)
+            582 LOAD_CONST              13 ('utf-8')
+            584 LOAD_CONST              14 ('ignore')
+            586 KW_NAMES                15 (('errors',))
+            588 CALL                     2
+            596 LOAD_ATTR               33 (NULL|self + strip)
+            616 CALL                     0
+            624 STORE_FAST               6 (err_msg)
+
+337         626 LOAD_GLOBAL             35 (NULL + make_error)
+
+338         636 LOAD_GLOBAL             36 (E)
+            646 LOAD_ATTR               38 (FFMPEG_RUNTIME_ERROR)
+
+339         666 LOAD_CONST              16 ('FFmpeg thất bại (code ')
+            668 LOAD_DEREF              10 (process)
+            670 LOAD_ATTR               24 (returncode)
+            690 FORMAT_VALUE             0
+            692 LOAD_CONST              17 ('): ')
+            694 LOAD_FAST                6 (err_msg)
+            696 LOAD_CONST               4 (None)
+            698 LOAD_CONST              18 (500)
+            700 BINARY_SLICE
+            702 FORMAT_VALUE             0
+            704 BUILD_STRING             4
+
+337         706 CALL                     2
+            714 RAISE_VARARGS            1
+
+335     >>  716 RETURN_CONST             4 (None)
+
+276     >>  718 CLEANUP_THROW
+            720 EXTENDED_ARG             1
+            722 JUMP_BACKWARD          264 (to 196)
+
+322     >>  724 CLEANUP_THROW
+            726 JUMP_BACKWARD          146 (to 436)
+        >>  728 PUSH_EXC_INFO
+
+327         730 LOAD_GLOBAL              0 (asyncio)
+            740 LOAD_ATTR               18 (CancelledError)
+            760 CHECK_EXC_MATCH
+            762 POP_JUMP_IF_FALSE       22 (to 808)
+            764 POP_TOP
+
+328         766 LOAD_GLOBAL             21 (NULL + _terminate)
+            776 LOAD_DEREF              10 (process)
+            778 CALL                     1
+            786 GET_AWAITABLE            0
+            788 LOAD_CONST               4 (None)
+        >>  790 SEND                     4 (to 802)
+            794 YIELD_VALUE              3
+            796 RESUME                   3
+            798 JUMP_BACKWARD_NO_INTERRUPT     5 (to 790)
+        >>  800 CLEANUP_THROW
+        >>  802 END_SEND
+            804 POP_TOP
+
+329         806 RAISE_VARARGS            0
+
+327     >>  808 RERAISE                  0
+        >>  810 COPY                     3
+            812 POP_EXCEPT
+            814 RERAISE                  1
+
+336     >>  816 CLEANUP_THROW
+            818 JUMP_BACKWARD          130 (to 560)
+        >>  820 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            822 RERAISE                  1
+ExceptionTable:
+  18 to 188 -> 820 [0] lasti
+  190 to 190 -> 718 [2]
+  192 to 326 -> 820 [0] lasti
+  330 to 428 -> 728 [0]
+  430 to 430 -> 724 [2]
+  432 to 438 -> 728 [0]
+  440 to 552 -> 820 [0] lasti
+  554 to 554 -> 816 [2]
+  556 to 718 -> 820 [0] lasti
+  724 to 724 -> 728 [0]
+  728 to 792 -> 810 [1] lasti
+  794 to 794 -> 800 [3]
+  796 to 808 -> 810 [1] lasti
+  810 to 816 -> 820 [0] lasti
+
+Disassembly of <code object read_stderr at 0x2907c790, file "app\adapters\ffmpeg.py", line 288>:
+              0 COPY_FREE_VARS           7
+
+288           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+290           8 LOAD_GLOBAL              1 (NULL + _iter_ffmpeg_lines)
+             18 LOAD_DEREF              13 (process)
+             20 LOAD_ATTR                2 (stderr)
+             40 CALL                     1
+             48 GET_AITER
+        >>   50 GET_ANEXT
+             52 LOAD_CONST               0 (None)
+        >>   54 SEND                     3 (to 64)
+             58 YIELD_VALUE              3
+             60 RESUME                   3
+             62 JUMP_BACKWARD_NO_INTERRUPT     5 (to 54)
+        >>   64 END_SEND
+             66 STORE_FAST               0 (line)
+
+291          68 LOAD_DEREF               8 (cancel_check)
+             70 POP_JUMP_IF_FALSE       30 (to 132)
+             72 PUSH_NULL
+             74 LOAD_DEREF               8 (cancel_check)
+             76 CALL                     0
+             84 POP_JUMP_IF_FALSE       23 (to 132)
+
+292          86 LOAD_CONST               1 (True)
+             88 STORE_DEREF              9 (cancelled)
+
+293          90 LOAD_GLOBAL              5 (NULL + _terminate)
+            100 LOAD_DEREF              13 (process)
+            102 CALL                     1
+            110 GET_AWAITABLE            0
+            112 LOAD_CONST               0 (None)
+        >>  114 SEND                     3 (to 124)
+            118 YIELD_VALUE              2
+            120 RESUME                   3
+            122 JUMP_BACKWARD_NO_INTERRUPT     5 (to 114)
+        >>  124 END_SEND
+            126 POP_TOP
+
+294         128 POP_TOP
+            130 RETURN_CONST             0 (None)
+
+297     >>  132 LOAD_DEREF              11 (duration_sec)
+            134 LOAD_CONST               2 (0.0)
+            136 COMPARE_OP              40 (==)
+            140 POP_JUMP_IF_FALSE       74 (to 290)
+
+298         142 LOAD_DEREF              10 (dur_pat)
+            144 LOAD_ATTR                7 (NULL|self + search)
+            164 LOAD_FAST                0 (line)
+            166 CALL                     1
+            174 STORE_FAST               1 (m)
+
+299         176 LOAD_FAST                1 (m)
+            178 POP_JUMP_IF_FALSE       55 (to 290)
+
+300         180 LOAD_GLOBAL              9 (NULL + map)
+            190 LOAD_GLOBAL             10 (int)
+            200 LOAD_FAST                1 (m)
+            202 LOAD_ATTR               13 (NULL|self + groups)
+            222 CALL                     0
+            230 CALL                     2
+            238 UNPACK_SEQUENCE          4
+            242 STORE_FAST               2 (h)
+            244 STORE_FAST               3 (m_val)
+            246 STORE_FAST               4 (s)
+            248 STORE_FAST               5 (ms)
+
+301         250 LOAD_FAST                2 (h)
+            252 LOAD_CONST               3 (3600)
+            254 BINARY_OP                5 (*)
+            258 LOAD_FAST                3 (m_val)
+            260 LOAD_CONST               4 (60)
+            262 BINARY_OP                5 (*)
+            266 BINARY_OP                0 (+)
+            270 LOAD_FAST                4 (s)
+            272 BINARY_OP                0 (+)
+            276 LOAD_FAST                5 (ms)
+            278 LOAD_CONST               5 (100.0)
+            280 BINARY_OP               11 (/)
+            284 BINARY_OP                0 (+)
+            288 STORE_DEREF             11 (duration_sec)
+
+304     >>  290 LOAD_DEREF              14 (time_pat)
+            292 LOAD_ATTR                7 (NULL|self + search)
+            312 LOAD_FAST                0 (line)
+            314 CALL                     1
+            322 STORE_FAST               1 (m)
+
+305         324 LOAD_FAST                1 (m)
+            326 POP_JUMP_IF_TRUE         1 (to 330)
+            328 JUMP_BACKWARD          140 (to 50)
+        >>  330 LOAD_DEREF              11 (duration_sec)
+            332 LOAD_CONST               2 (0.0)
+            334 COMPARE_OP              68 (>)
+            338 POP_JUMP_IF_TRUE         1 (to 342)
+            340 JUMP_BACKWARD          146 (to 50)
+
+306     >>  342 LOAD_GLOBAL              9 (NULL + map)
+            352 LOAD_GLOBAL             10 (int)
+            362 LOAD_FAST                1 (m)
+            364 LOAD_ATTR               13 (NULL|self + groups)
+            384 CALL                     0
+            392 CALL                     2
+            400 UNPACK_SEQUENCE          4
+            404 STORE_FAST               2 (h)
+            406 STORE_FAST               3 (m_val)
+            408 STORE_FAST               4 (s)
+            410 STORE_FAST               5 (ms)
+
+307         412 LOAD_FAST                2 (h)
+            414 LOAD_CONST               3 (3600)
+            416 BINARY_OP                5 (*)
+            420 LOAD_FAST                3 (m_val)
+            422 LOAD_CONST               4 (60)
+            424 BINARY_OP                5 (*)
+            428 BINARY_OP                0 (+)
+            432 LOAD_FAST                4 (s)
+            434 BINARY_OP                0 (+)
+            438 LOAD_FAST                5 (ms)
+            440 LOAD_CONST               5 (100.0)
+            442 BINARY_OP               11 (/)
+            446 BINARY_OP                0 (+)
+            450 STORE_FAST               6 (current_sec)
+
+308         452 LOAD_GLOBAL             15 (NULL + min)
+            462 LOAD_CONST               6 (1.0)
+            464 LOAD_FAST                6 (current_sec)
+            466 LOAD_DEREF              11 (duration_sec)
+            468 BINARY_OP               11 (/)
+            472 CALL                     2
+            480 STORE_FAST               7 (progress)
+
+309         482 LOAD_DEREF              12 (on_progress)
+            484 POP_JUMP_IF_TRUE         1 (to 488)
+            486 JUMP_BACKWARD          219 (to 50)
+
+310     >>  488 PUSH_NULL
+            490 LOAD_DEREF              12 (on_progress)
+            492 LOAD_FAST                7 (progress)
+            494 CALL                     1
+            502 POP_TOP
+            504 JUMP_BACKWARD          228 (to 50)
+
+290     >>  506 CLEANUP_THROW
+            508 JUMP_BACKWARD          223 (to 64)
+
+293     >>  510 CLEANUP_THROW
+            512 JUMP_BACKWARD          195 (to 124)
+
+290     >>  514 END_ASYNC_FOR
+            516 RETURN_CONST             0 (None)
+        >>  518 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            520 RERAISE                  1
+ExceptionTable:
+  6 to 48 -> 518 [0] lasti
+  50 to 56 -> 514 [1]
+  58 to 58 -> 506 [3]
+  60 to 64 -> 514 [1]
+  66 to 116 -> 518 [0] lasti
+  118 to 118 -> 510 [3]
+  120 to 326 -> 518 [0] lasti
+  330 to 338 -> 518 [0] lasti
+  342 to 484 -> 518 [0] lasti
+  488 to 504 -> 518 [0] lasti
+  506 to 506 -> 514 [1]
+  510 to 510 -> 518 [0] lasti
+  514 to 516 -> 518 [0] lasti
+
+Disassembly of <code object monitor at 0x7f6c9327ad80, file "app\adapters\ffmpeg.py", line 312>:
+              0 COPY_FREE_VARS           3
+
+312           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+314           8 LOAD_DEREF               2 (process)
+             10 LOAD_ATTR                0 (returncode)
+             30 POP_JUMP_IF_NOT_NONE    74 (to 180)
+
+315     >>   32 LOAD_DEREF               0 (cancel_check)
+             34 POP_JUMP_IF_FALSE       29 (to 94)
+             36 PUSH_NULL
+             38 LOAD_DEREF               0 (cancel_check)
+             40 CALL                     0
+             48 POP_JUMP_IF_FALSE       22 (to 94)
+
+316          50 LOAD_CONST               1 (True)
+             52 STORE_DEREF              1 (cancelled)
+
+317          54 LOAD_GLOBAL              3 (NULL + _terminate)
+             64 LOAD_DEREF               2 (process)
+             66 CALL                     1
+             74 GET_AWAITABLE            0
+             76 LOAD_CONST               0 (None)
+        >>   78 SEND                     3 (to 88)
+             82 YIELD_VALUE              2
+             84 RESUME                   3
+             86 JUMP_BACKWARD_NO_INTERRUPT     5 (to 78)
+        >>   88 END_SEND
+             90 POP_TOP
+
+318          92 RETURN_CONST             0 (None)
+
+319     >>   94 LOAD_GLOBAL              5 (NULL + asyncio)
+            104 LOAD_ATTR                6 (sleep)
+            124 LOAD_CONST               2 (0.5)
+            126 CALL                     1
+            134 GET_AWAITABLE            0
+            136 LOAD_CONST               0 (None)
+        >>  138 SEND                     3 (to 148)
+            142 YIELD_VALUE              2
+            144 RESUME                   3
+            146 JUMP_BACKWARD_NO_INTERRUPT     5 (to 138)
+        >>  148 END_SEND
+            150 POP_TOP
+
+314         152 LOAD_DEREF               2 (process)
+            154 LOAD_ATTR                0 (returncode)
+            174 POP_JUMP_IF_NOT_NONE     1 (to 178)
+            176 JUMP_BACKWARD           73 (to 32)
+        >>  178 RETURN_CONST             0 (None)
+        >>  180 RETURN_CONST             0 (None)
+
+317     >>  182 CLEANUP_THROW
+            184 JUMP_BACKWARD           49 (to 88)
+
+319     >>  186 CLEANUP_THROW
+            188 JUMP_BACKWARD           21 (to 148)
+        >>  190 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            192 RERAISE                  1
+ExceptionTable:
+  6 to 80 -> 190 [0] lasti
+  82 to 82 -> 182 [2]
+  84 to 140 -> 190 [0] lasti
+  142 to 142 -> 186 [2]
+  144 to 174 -> 190 [0] lasti
+  178 to 182 -> 190 [0] lasti
+  186 to 186 -> 190 [0] lasti
+
+Disassembly of <code object probe at 0x269f8010, file "app\adapters\ffmpeg.py", line 343>:
+343           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+345           6 NOP
+
+346           8 LOAD_GLOBAL              1 (NULL + Path)
+             18 LOAD_FAST                1 (input_path)
+             20 CALL                     1
+             28 LOAD_ATTR                3 (NULL|self + stat)
+             48 CALL                     0
+             56 STORE_FAST               2 (st)
+
+347          58 LOAD_GLOBAL              5 (NULL + str)
+             68 LOAD_FAST                1 (input_path)
+             70 CALL                     1
+             78 LOAD_FAST                2 (st)
+             80 LOAD_ATTR                6 (st_mtime_ns)
+            100 LOAD_FAST                2 (st)
+            102 LOAD_ATTR                8 (st_size)
+            122 BUILD_TUPLE              3
+            124 STORE_FAST               3 (key)
+
+348         126 LOAD_GLOBAL             10 (_PROBE_CACHE)
+            136 LOAD_ATTR               13 (NULL|self + get)
+            156 LOAD_FAST                3 (key)
+            158 CALL                     1
+            166 STORE_FAST               4 (cached)
+
+349         168 LOAD_FAST                4 (cached)
+            170 POP_JUMP_IF_NONE         2 (to 176)
+
+350         172 LOAD_FAST                4 (cached)
+            174 RETURN_VALUE
+
+349     >>  176 NOP
+
+353     >>  178 LOAD_FAST                0 (self)
+            180 LOAD_ATTR               17 (NULL|self + _probe_uncached)
+            200 LOAD_FAST                1 (input_path)
+            202 CALL                     1
+            210 GET_AWAITABLE            0
+            212 LOAD_CONST               1 (None)
+        >>  214 SEND                     3 (to 224)
+            218 YIELD_VALUE              2
+            220 RESUME                   3
+            222 JUMP_BACKWARD_NO_INTERRUPT     5 (to 214)
+        >>  224 END_SEND
+            226 STORE_FAST               5 (result)
+
+354         228 LOAD_FAST                3 (key)
+            230 POP_JUMP_IF_NONE        64 (to 360)
+            232 LOAD_FAST                5 (result)
+            234 LOAD_ATTR               13 (NULL|self + get)
+            254 LOAD_CONST               2 ('width')
+            256 CALL                     1
+            264 POP_JUMP_IF_FALSE       47 (to 360)
+
+355         266 LOAD_GLOBAL             19 (NULL + len)
+            276 LOAD_GLOBAL             10 (_PROBE_CACHE)
+            286 CALL                     1
+            294 LOAD_CONST               3 (256)
+            296 COMPARE_OP              68 (>)
+            300 POP_JUMP_IF_FALSE       20 (to 342)
+
+356         302 LOAD_GLOBAL             10 (_PROBE_CACHE)
+            312 LOAD_ATTR               21 (NULL|self + clear)
+            332 CALL                     0
+            340 POP_TOP
+
+357     >>  342 LOAD_FAST                5 (result)
+            344 LOAD_GLOBAL             10 (_PROBE_CACHE)
+            354 LOAD_FAST                3 (key)
+            356 STORE_SUBSCR
+
+358     >>  360 LOAD_FAST                5 (result)
+            362 RETURN_VALUE
+        >>  364 PUSH_EXC_INFO
+
+351         366 LOAD_GLOBAL             14 (OSError)
+            376 CHECK_EXC_MATCH
+            378 POP_JUMP_IF_FALSE        5 (to 390)
+            380 POP_TOP
+
+352         382 LOAD_CONST               1 (None)
+            384 STORE_FAST               3 (key)
+            386 POP_EXCEPT
+            388 JUMP_BACKWARD          106 (to 178)
+
+351     >>  390 RERAISE                  0
+        >>  392 COPY                     3
+            394 POP_EXCEPT
+            396 RERAISE                  1
+
+353     >>  398 CLEANUP_THROW
+            400 JUMP_BACKWARD           89 (to 224)
+        >>  402 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            404 RERAISE                  1
+ExceptionTable:
+  4 to 4 -> 402 [0] lasti
+  8 to 172 -> 364 [0]
+  174 to 216 -> 402 [0] lasti
+  218 to 218 -> 398 [2]
+  220 to 362 -> 402 [0] lasti
+  364 to 384 -> 392 [1] lasti
+  386 to 388 -> 402 [0] lasti
+  390 to 390 -> 392 [1] lasti
+  392 to 398 -> 402 [0] lasti
+
+Disassembly of <code object _probe_uncached at 0x2907de20, file "app\adapters\ffmpeg.py", line 360>:
+360           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+361           6 LOAD_GLOBAL              1 (NULL + get_ffprobe_path)
+             16 CALL                     0
+             24 STORE_FAST               2 (ffprobe)
+
+362          26 LOAD_FAST                2 (ffprobe)
+             28 EXTENDED_ARG             1
+             30 POP_JUMP_IF_FALSE      445 (to 922)
+
+363          32 LOAD_GLOBAL              3 (NULL + asyncio)
+             42 LOAD_ATTR                4 (create_subprocess_exec)
+
+364          62 LOAD_FAST                2 (ffprobe)
+             64 LOAD_CONST               1 ('-v')
+             66 LOAD_CONST               2 ('quiet')
+             68 LOAD_CONST               3 ('-print_format')
+             70 LOAD_CONST               4 ('json')
+
+365          72 LOAD_CONST               5 ('-show_streams')
+             74 LOAD_CONST               6 ('-show_format')
+             76 LOAD_GLOBAL              7 (NULL + str)
+             86 LOAD_FAST                1 (input_path)
+             88 CALL                     1
+
+363          96 BUILD_TUPLE              8
+
+366          98 LOAD_GLOBAL              2 (asyncio)
+            108 LOAD_ATTR                8 (subprocess)
+            128 LOAD_ATTR               10 (PIPE)
+            148 LOAD_GLOBAL              2 (asyncio)
+            158 LOAD_ATTR                8 (subprocess)
+            178 LOAD_ATTR               10 (PIPE)
+
+363         198 LOAD_CONST               7 (('stdout', 'stderr'))
+            200 BUILD_CONST_KEY_MAP      2
+
+367         202 LOAD_GLOBAL             13 (NULL + no_window_kwargs)
+            212 CALL                     0
+
+363         220 DICT_MERGE               1
+            222 CALL_FUNCTION_EX         1
+            224 GET_AWAITABLE            0
+            226 LOAD_CONST               0 (None)
+        >>  228 SEND                     3 (to 238)
+            232 YIELD_VALUE              2
+            234 RESUME                   3
+            236 JUMP_BACKWARD_NO_INTERRUPT     5 (to 228)
+        >>  238 END_SEND
+            240 STORE_FAST               3 (proc)
+
+369         242 LOAD_FAST                3 (proc)
+            244 LOAD_ATTR               15 (NULL|self + communicate)
+            264 CALL                     0
+            272 GET_AWAITABLE            0
+            274 LOAD_CONST               0 (None)
+        >>  276 SEND                     3 (to 286)
+            280 YIELD_VALUE              2
+            282 RESUME                   3
+            284 JUMP_BACKWARD_NO_INTERRUPT     5 (to 276)
+        >>  286 END_SEND
+            288 UNPACK_SEQUENCE          2
+            292 STORE_FAST               4 (out)
+            294 STORE_FAST               5 (_)
+
+370         296 LOAD_FAST                3 (proc)
+            298 LOAD_ATTR               16 (returncode)
+            318 LOAD_CONST               8 (0)
+            320 COMPARE_OP              40 (==)
+            324 EXTENDED_ARG             1
+            326 POP_JUMP_IF_FALSE      297 (to 922)
+
+371         328 NOP
+
+372         330 LOAD_GLOBAL             19 (NULL + json)
+            340 LOAD_ATTR               20 (loads)
+            360 LOAD_FAST                4 (out)
+            362 LOAD_ATTR               23 (NULL|self + decode)
+            382 LOAD_CONST               9 ('utf-8')
+            384 LOAD_CONST              10 ('ignore')
+            386 KW_NAMES                11 (('errors',))
+            388 CALL                     2
+            396 COPY                     1
+            398 POP_JUMP_IF_TRUE         2 (to 404)
+            400 POP_TOP
+            402 LOAD_CONST              12 ('{}')
+        >>  404 CALL                     1
+            412 STORE_FAST               6 (data)
+
+375     >>  414 LOAD_CONST               8 (0)
+            416 COPY                     1
+            418 STORE_FAST               7 (w)
+            420 STORE_FAST               8 (h)
+
+376         422 LOAD_CONST              13 (0.0)
+            424 STORE_FAST               9 (fps)
+
+377         426 LOAD_CONST              14 (False)
+            428 STORE_FAST              10 (has_audio)
+
+378         430 LOAD_FAST                6 (data)
+            432 LOAD_ATTR               27 (NULL|self + get)
+            452 LOAD_CONST              15 ('streams')
+            454 BUILD_LIST               0
+            456 CALL                     2
+            464 GET_ITER
+        >>  466 FOR_ITER               166 (to 802)
+            470 STORE_FAST              11 (s)
+
+379         472 LOAD_FAST               11 (s)
+            474 LOAD_ATTR               27 (NULL|self + get)
+            494 LOAD_CONST              16 ('codec_type')
+            496 CALL                     1
+            504 LOAD_CONST              17 ('video')
+            506 COMPARE_OP              40 (==)
+            510 POP_JUMP_IF_FALSE      121 (to 754)
+            512 LOAD_FAST                7 (w)
+            514 POP_JUMP_IF_TRUE       119 (to 754)
+
+380         516 LOAD_GLOBAL             29 (NULL + int)
+            526 LOAD_FAST               11 (s)
+            528 LOAD_ATTR               27 (NULL|self + get)
+            548 LOAD_CONST              18 ('width')
+            550 CALL                     1
+            558 COPY                     1
+            560 POP_JUMP_IF_TRUE         2 (to 566)
+            562 POP_TOP
+            564 LOAD_CONST               8 (0)
+        >>  566 CALL                     1
+            574 STORE_FAST               7 (w)
+
+381         576 LOAD_GLOBAL             29 (NULL + int)
+            586 LOAD_FAST               11 (s)
+            588 LOAD_ATTR               27 (NULL|self + get)
+            608 LOAD_CONST              19 ('height')
+            610 CALL                     1
+            618 COPY                     1
+            620 POP_JUMP_IF_TRUE         2 (to 626)
+            622 POP_TOP
+            624 LOAD_CONST               8 (0)
+        >>  626 CALL                     1
+            634 STORE_FAST               8 (h)
+
+382         636 LOAD_GLOBAL             31 (NULL + _parse_fps)
+            646 LOAD_FAST               11 (s)
+            648 LOAD_ATTR               27 (NULL|self + get)
+            668 LOAD_CONST              20 ('avg_frame_rate')
+            670 CALL                     1
+            678 CALL                     1
+            686 COPY                     1
+            688 POP_JUMP_IF_TRUE        30 (to 750)
+            690 POP_TOP
+            692 LOAD_GLOBAL             31 (NULL + _parse_fps)
+            702 LOAD_FAST               11 (s)
+            704 LOAD_ATTR               27 (NULL|self + get)
+            724 LOAD_CONST              21 ('r_frame_rate')
+            726 CALL                     1
+            734 CALL                     1
+            742 COPY                     1
+            744 POP_JUMP_IF_TRUE         2 (to 750)
+            746 POP_TOP
+            748 LOAD_CONST              13 (0.0)
+        >>  750 STORE_FAST               9 (fps)
+            752 JUMP_BACKWARD          144 (to 466)
+
+383     >>  754 LOAD_FAST               11 (s)
+            756 LOAD_ATTR               27 (NULL|self + get)
+            776 LOAD_CONST              16 ('codec_type')
+            778 CALL                     1
+            786 LOAD_CONST              22 ('audio')
+            788 COMPARE_OP              40 (==)
+            792 POP_JUMP_IF_TRUE         1 (to 796)
+            794 JUMP_BACKWARD          165 (to 466)
+
+384     >>  796 LOAD_CONST              23 (True)
+            798 STORE_FAST              10 (has_audio)
+            800 JUMP_BACKWARD          168 (to 466)
+
+378     >>  802 END_FOR
+
+385         804 NOP
+
+386         806 LOAD_GLOBAL             33 (NULL + float)
+            816 LOAD_FAST                6 (data)
+            818 LOAD_ATTR               27 (NULL|self + get)
+            838 LOAD_CONST              24 ('format')
+            840 BUILD_MAP                0
+            842 CALL                     2
+            850 LOAD_ATTR               27 (NULL|self + get)
+            870 LOAD_CONST              25 ('duration')
+            872 CALL                     1
+            880 COPY                     1
+            882 POP_JUMP_IF_TRUE         2 (to 888)
+            884 POP_TOP
+            886 LOAD_CONST              13 (0.0)
+        >>  888 CALL                     1
+            896 STORE_FAST              12 (dur)
+
+389     >>  898 LOAD_FAST                7 (w)
+            900 POP_JUMP_IF_FALSE       10 (to 922)
+            902 LOAD_FAST                8 (h)
+            904 POP_JUMP_IF_FALSE        8 (to 922)
+
+390         906 LOAD_FAST                7 (w)
+            908 LOAD_FAST                8 (h)
+            910 LOAD_FAST               12 (dur)
+
+391         912 LOAD_FAST               10 (has_audio)
+            914 LOAD_FAST                9 (fps)
+
+390         916 LOAD_CONST              26 (('width', 'height', 'duration_sec', 'has_audio', 'fps'))
+            918 BUILD_CONST_KEY_MAP      5
+            920 RETURN_VALUE
+
+392     >>  922 LOAD_FAST                0 (self)
+            924 LOAD_ATTR               39 (NULL|self + _probe_via_ffmpeg)
+            944 LOAD_FAST                1 (input_path)
+            946 CALL                     1
+            954 GET_AWAITABLE            0
+            956 LOAD_CONST               0 (None)
+        >>  958 SEND                     3 (to 968)
+            962 YIELD_VALUE              2
+            964 RESUME                   3
+            966 JUMP_BACKWARD_NO_INTERRUPT     5 (to 958)
+        >>  968 END_SEND
+            970 RETURN_VALUE
+
+363     >>  972 CLEANUP_THROW
+            974 EXTENDED_ARG             1
+            976 JUMP_BACKWARD          370 (to 238)
+
+369     >>  978 CLEANUP_THROW
+            980 EXTENDED_ARG             1
+            982 JUMP_BACKWARD          349 (to 286)
+        >>  984 PUSH_EXC_INFO
+
+373         986 LOAD_GLOBAL             18 (json)
+            996 LOAD_ATTR               24 (JSONDecodeError)
+           1016 CHECK_EXC_MATCH
+           1018 POP_JUMP_IF_FALSE        6 (to 1032)
+           1020 POP_TOP
+
+374        1022 BUILD_MAP                0
+           1024 STORE_FAST               6 (data)
+           1026 POP_EXCEPT
+           1028 EXTENDED_ARG             1
+           1030 JUMP_BACKWARD          309 (to 414)
+
+373     >> 1032 RERAISE                  0
+        >> 1034 COPY                     3
+           1036 POP_EXCEPT
+           1038 RERAISE                  1
+        >> 1040 PUSH_EXC_INFO
+
+387        1042 LOAD_GLOBAL             34 (TypeError)
+           1052 LOAD_GLOBAL             36 (ValueError)
+           1062 BUILD_TUPLE              2
+           1064 CHECK_EXC_MATCH
+           1066 POP_JUMP_IF_FALSE        5 (to 1078)
+           1068 POP_TOP
+
+388        1070 LOAD_CONST              13 (0.0)
+           1072 STORE_FAST              12 (dur)
+           1074 POP_EXCEPT
+           1076 JUMP_BACKWARD           90 (to 898)
+
+387     >> 1078 RERAISE                  0
+        >> 1080 COPY                     3
+           1082 POP_EXCEPT
+           1084 RERAISE                  1
+
+392     >> 1086 CLEANUP_THROW
+           1088 JUMP_BACKWARD           61 (to 968)
+        >> 1090 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1092 RERAISE                  1
+ExceptionTable:
+  4 to 230 -> 1090 [0] lasti
+  232 to 232 -> 972 [2]
+  234 to 278 -> 1090 [0] lasti
+  280 to 280 -> 978 [2]
+  282 to 326 -> 1090 [0] lasti
+  330 to 412 -> 984 [0]
+  414 to 792 -> 1090 [0] lasti
+  796 to 802 -> 1090 [0] lasti
+  806 to 896 -> 1040 [0]
+  898 to 960 -> 1090 [0] lasti
+  962 to 962 -> 1086 [2]
+  964 to 972 -> 1090 [0] lasti
+  978 to 978 -> 1090 [0] lasti
+  984 to 1024 -> 1034 [1] lasti
+  1026 to 1030 -> 1090 [0] lasti
+  1032 to 1032 -> 1034 [1] lasti
+  1034 to 1038 -> 1090 [0] lasti
+  1040 to 1072 -> 1080 [1] lasti
+  1074 to 1076 -> 1090 [0] lasti
+  1078 to 1078 -> 1080 [1] lasti
+  1080 to 1086 -> 1090 [0] lasti
+
+Disassembly of <code object _probe_via_ffmpeg at 0x26996370, file "app\adapters\ffmpeg.py", line 394>:
+394           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+395           6 LOAD_GLOBAL              1 (NULL + asyncio)
+             16 LOAD_ATTR                2 (create_subprocess_exec)
+
+396          36 LOAD_FAST                0 (self)
+             38 LOAD_ATTR                4 (ffmpeg_path)
+             58 LOAD_CONST               1 ('-i')
+             60 LOAD_GLOBAL              7 (NULL + str)
+             70 LOAD_FAST                1 (input_path)
+             72 CALL                     1
+
+395          80 BUILD_TUPLE              3
+
+397          82 LOAD_GLOBAL              0 (asyncio)
+             92 LOAD_ATTR                8 (subprocess)
+            112 LOAD_ATTR               10 (DEVNULL)
+            132 LOAD_GLOBAL              0 (asyncio)
+            142 LOAD_ATTR                8 (subprocess)
+            162 LOAD_ATTR               12 (PIPE)
+
+395         182 LOAD_CONST               2 (('stdout', 'stderr'))
+            184 BUILD_CONST_KEY_MAP      2
+
+398         186 LOAD_GLOBAL             15 (NULL + no_window_kwargs)
+            196 CALL                     0
+
+395         204 DICT_MERGE               1
+            206 CALL_FUNCTION_EX         1
+            208 GET_AWAITABLE            0
+            210 LOAD_CONST               0 (None)
+        >>  212 SEND                     3 (to 222)
+            216 YIELD_VALUE              2
+            218 RESUME                   3
+            220 JUMP_BACKWARD_NO_INTERRUPT     5 (to 212)
+        >>  222 END_SEND
+            224 STORE_FAST               2 (proc)
+
+400         226 LOAD_FAST                2 (proc)
+            228 LOAD_ATTR               17 (NULL|self + communicate)
+            248 CALL                     0
+            256 GET_AWAITABLE            0
+            258 LOAD_CONST               0 (None)
+        >>  260 SEND                     3 (to 270)
+            264 YIELD_VALUE              2
+            266 RESUME                   3
+            268 JUMP_BACKWARD_NO_INTERRUPT     5 (to 260)
+        >>  270 END_SEND
+            272 LOAD_CONST               3 (1)
+            274 BINARY_SUBSCR
+            278 LOAD_ATTR               19 (NULL|self + decode)
+            298 LOAD_CONST               4 ('utf-8')
+            300 LOAD_CONST               5 ('ignore')
+            302 KW_NAMES                 6 (('errors',))
+            304 CALL                     2
+            312 STORE_FAST               3 (stderr)
+
+401         314 LOAD_CONST               7 (0)
+            316 COPY                     1
+            318 STORE_FAST               4 (w)
+            320 STORE_FAST               5 (h)
+
+402         322 LOAD_GLOBAL             20 (_RES_PAT)
+            332 LOAD_ATTR               23 (NULL|self + search)
+            352 LOAD_FAST                3 (stderr)
+            354 CALL                     1
+            362 STORE_FAST               6 (m)
+
+403         364 LOAD_FAST                6 (m)
+            366 POP_JUMP_IF_FALSE       52 (to 472)
+
+404         368 LOAD_GLOBAL             25 (NULL + int)
+            378 LOAD_FAST                6 (m)
+            380 LOAD_ATTR               27 (NULL|self + group)
+            400 LOAD_CONST               3 (1)
+            402 CALL                     1
+            410 CALL                     1
+            418 LOAD_GLOBAL             25 (NULL + int)
+            428 LOAD_FAST                6 (m)
+            430 LOAD_ATTR               27 (NULL|self + group)
+            450 LOAD_CONST               8 (2)
+            452 CALL                     1
+            460 CALL                     1
+            468 STORE_FAST               5 (h)
+            470 STORE_FAST               4 (w)
+
+405     >>  472 LOAD_CONST               9 (0.0)
+            474 STORE_FAST               7 (dur)
+
+406         476 LOAD_GLOBAL             28 (_DUR_PAT)
+            486 LOAD_ATTR               23 (NULL|self + search)
+            506 LOAD_FAST                3 (stderr)
+            508 CALL                     1
+            516 STORE_FAST               8 (md)
+
+407         518 LOAD_FAST                8 (md)
+            520 POP_JUMP_IF_FALSE       55 (to 632)
+
+408         522 LOAD_GLOBAL             31 (NULL + map)
+            532 LOAD_GLOBAL             24 (int)
+            542 LOAD_FAST                8 (md)
+            544 LOAD_ATTR               33 (NULL|self + groups)
+            564 CALL                     0
+            572 CALL                     2
+            580 UNPACK_SEQUENCE          4
+            584 STORE_FAST               9 (hh)
+            586 STORE_FAST              10 (mm)
+            588 STORE_FAST              11 (ss)
+            590 STORE_FAST              12 (cs)
+
+409         592 LOAD_FAST                9 (hh)
+            594 LOAD_CONST              10 (3600)
+            596 BINARY_OP                5 (*)
+            600 LOAD_FAST               10 (mm)
+            602 LOAD_CONST              11 (60)
+            604 BINARY_OP                5 (*)
+            608 BINARY_OP                0 (+)
+            612 LOAD_FAST               11 (ss)
+            614 BINARY_OP                0 (+)
+            618 LOAD_FAST               12 (cs)
+            620 LOAD_CONST              12 (100.0)
+            622 BINARY_OP               11 (/)
+            626 BINARY_OP                0 (+)
+            630 STORE_FAST               7 (dur)
+
+410     >>  632 LOAD_CONST              13 ('Audio:')
+            634 LOAD_FAST                3 (stderr)
+            636 CONTAINS_OP              0
+            638 STORE_FAST              13 (has_audio)
+
+411         640 LOAD_GLOBAL             35 (NULL + re)
+            650 LOAD_ATTR               22 (search)
+            670 LOAD_CONST              14 ('(\\d+(?:\\.\\d+)?)\\s*fps')
+            672 LOAD_FAST                3 (stderr)
+            674 CALL                     2
+            682 STORE_FAST              14 (mf)
+
+412         684 LOAD_FAST               14 (mf)
+            686 POP_JUMP_IF_FALSE       26 (to 740)
+            688 LOAD_GLOBAL             37 (NULL + float)
+            698 LOAD_FAST               14 (mf)
+            700 LOAD_ATTR               27 (NULL|self + group)
+            720 LOAD_CONST               3 (1)
+            722 CALL                     1
+            730 CALL                     1
+            738 JUMP_FORWARD             1 (to 742)
+        >>  740 LOAD_CONST               9 (0.0)
+        >>  742 STORE_FAST              15 (fps)
+
+413         744 LOAD_FAST                4 (w)
+            746 COPY                     1
+            748 POP_JUMP_IF_TRUE         2 (to 754)
+            750 POP_TOP
+            752 LOAD_CONST              15 (1080)
+        >>  754 LOAD_FAST                5 (h)
+            756 COPY                     1
+            758 POP_JUMP_IF_TRUE         2 (to 764)
+            760 POP_TOP
+            762 LOAD_CONST              16 (1920)
+        >>  764 LOAD_FAST                7 (dur)
+
+414         766 LOAD_FAST               13 (has_audio)
+            768 LOAD_FAST               15 (fps)
+
+413         770 LOAD_CONST              17 (('width', 'height', 'duration_sec', 'has_audio', 'fps'))
+            772 BUILD_CONST_KEY_MAP      5
+            774 RETURN_VALUE
+
+395     >>  776 CLEANUP_THROW
+            778 EXTENDED_ARG             1
+            780 JUMP_BACKWARD          280 (to 222)
+
+400     >>  782 CLEANUP_THROW
+            784 EXTENDED_ARG             1
+            786 JUMP_BACKWARD          259 (to 270)
+        >>  788 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            790 RERAISE                  1
+ExceptionTable:
+  4 to 214 -> 788 [0] lasti
+  216 to 216 -> 776 [2]
+  218 to 262 -> 788 [0] lasti
+  264 to 264 -> 782 [2]
+  266 to 776 -> 788 [0] lasti
+  782 to 782 -> 788 [0] lasti
+
+Disassembly of <code object run_render at 0x29082700, file "app\adapters\ffmpeg.py", line 417>:
+              0 MAKE_CELL                2 (duration_sec)
+              2 MAKE_CELL                3 (on_progress)
+              4 MAKE_CELL                4 (cancel_check)
+              6 MAKE_CELL               10 (cancelled)
+              8 MAKE_CELL               11 (process)
+             10 MAKE_CELL               12 (tail)
+
+417          12 RETURN_GENERATOR
+             14 POP_TOP
+             16 RESUME                   0
+
+427          18 LOAD_FAST                0 (self)
+             20 LOAD_ATTR                0 (ffmpeg_path)
+             40 LOAD_CONST               1 ('-hide_banner')
+             42 LOAD_CONST               2 ('-y')
+             44 BUILD_LIST               3
+             46 LOAD_FAST                1 (args)
+             48 LIST_EXTEND              1
+             50 STORE_FAST               7 (cmd)
+
+428          52 LOAD_GLOBAL              3 (NULL + asyncio)
+             62 LOAD_ATTR                4 (create_subprocess_exec)
+
+429          82 LOAD_FAST                7 (cmd)
+             84 LOAD_FAST                5 (cwd)
+
+430          86 LOAD_GLOBAL              2 (asyncio)
+             96 LOAD_ATTR                6 (subprocess)
+            116 LOAD_ATTR                8 (PIPE)
+            136 LOAD_GLOBAL              2 (asyncio)
+            146 LOAD_ATTR                6 (subprocess)
+            166 LOAD_ATTR                8 (PIPE)
+
+428         186 LOAD_CONST               3 (('cwd', 'stdout', 'stderr'))
+            188 BUILD_CONST_KEY_MAP      3
+
+433         190 LOAD_GLOBAL             11 (NULL + no_window_kwargs)
+            200 LOAD_CONST               4 (True)
+            202 KW_NAMES                 5 (('low_priority',))
+            204 CALL                     1
+
+428         212 DICT_MERGE               1
+            214 CALL_FUNCTION_EX         1
+            216 GET_AWAITABLE            0
+            218 LOAD_CONST               6 (None)
+        >>  220 SEND                     3 (to 230)
+            224 YIELD_VALUE              2
+            226 RESUME                   3
+            228 JUMP_BACKWARD_NO_INTERRUPT     5 (to 220)
+        >>  230 END_SEND
+            232 STORE_DEREF             11 (process)
+
+435         234 BUILD_LIST               0
+            236 STORE_DEREF             12 (tail)
+
+436         238 LOAD_CONST               7 (False)
+            240 STORE_DEREF             10 (cancelled)
+
+438         242 LOAD_CLOSURE             4 (cancel_check)
+            244 LOAD_CLOSURE            10 (cancelled)
+            246 LOAD_CLOSURE             2 (duration_sec)
+            248 LOAD_CLOSURE             3 (on_progress)
+            250 LOAD_CLOSURE            11 (process)
+            252 LOAD_CLOSURE            12 (tail)
+            254 BUILD_TUPLE              6
+            256 LOAD_CONST               8 (<code object read_stderr at 0x2907ea50, file "app\adapters\ffmpeg.py", line 438>)
+            258 MAKE_FUNCTION            8 (closure)
+            260 STORE_FAST               8 (read_stderr)
+
+459         262 LOAD_CLOSURE             4 (cancel_check)
+            264 LOAD_CLOSURE            10 (cancelled)
+            266 LOAD_CLOSURE            11 (process)
+            268 BUILD_TUPLE              3
+            270 LOAD_CONST               9 (<code object monitor at 0x7f6c9327b0a0, file "app\adapters\ffmpeg.py", line 459>)
+            272 MAKE_FUNCTION            8 (closure)
+            274 STORE_FAST               9 (monitor)
+
+468         276 NOP
+
+469         278 LOAD_GLOBAL              3 (NULL + asyncio)
+            288 LOAD_ATTR               12 (gather)
+            308 LOAD_DEREF              11 (process)
+            310 LOAD_ATTR               15 (NULL|self + wait)
+            330 CALL                     0
+            338 PUSH_NULL
+            340 LOAD_FAST                8 (read_stderr)
+            342 CALL                     0
+            350 PUSH_NULL
+            352 LOAD_FAST                9 (monitor)
+            354 CALL                     0
+            362 CALL                     3
+            370 GET_AWAITABLE            0
+            372 LOAD_CONST               6 (None)
+        >>  374 SEND                     3 (to 384)
+            378 YIELD_VALUE              3
+            380 RESUME                   3
+            382 JUMP_BACKWARD_NO_INTERRUPT     5 (to 374)
+        >>  384 END_SEND
+            386 POP_TOP
+
+474         388 LOAD_DEREF              10 (cancelled)
+            390 POP_JUMP_IF_FALSE       11 (to 414)
+
+475         392 LOAD_GLOBAL             21 (NULL + cancelled_error)
+            402 LOAD_CONST              10 ('render')
+            404 CALL                     1
+            412 RAISE_VARARGS            1
+
+477     >>  414 LOAD_DEREF              11 (process)
+            416 LOAD_ATTR               22 (returncode)
+            436 LOAD_CONST              11 (0)
+            438 COMPARE_OP              55 (!=)
+            442 POP_JUMP_IF_FALSE       46 (to 536)
+
+478         444 LOAD_GLOBAL             25 (NULL + make_error)
+            454 LOAD_FAST                6 (error_code)
+            456 LOAD_CONST              12 ('FFmpeg render lỗi (code ')
+            458 LOAD_DEREF              11 (process)
+            460 LOAD_ATTR               22 (returncode)
+            480 FORMAT_VALUE             0
+            482 LOAD_CONST              13 ('): ')
+            484 LOAD_CONST              14 (' ')
+            486 LOAD_ATTR               27 (NULL|self + join)
+            506 LOAD_DEREF              12 (tail)
+            508 CALL                     1
+            516 LOAD_CONST              15 (-500)
+            518 LOAD_CONST               6 (None)
+            520 BINARY_SLICE
+            522 FORMAT_VALUE             0
+            524 BUILD_STRING             4
+            526 CALL                     2
+            534 RAISE_VARARGS            1
+
+477     >>  536 RETURN_CONST             6 (None)
+
+428     >>  538 CLEANUP_THROW
+            540 JUMP_BACKWARD          156 (to 230)
+
+469     >>  542 CLEANUP_THROW
+            544 JUMP_BACKWARD           81 (to 384)
+        >>  546 PUSH_EXC_INFO
+
+470         548 LOAD_GLOBAL              2 (asyncio)
+            558 LOAD_ATTR               16 (CancelledError)
+            578 CHECK_EXC_MATCH
+            580 POP_JUMP_IF_FALSE       22 (to 626)
+            582 POP_TOP
+
+471         584 LOAD_GLOBAL             19 (NULL + _terminate)
+            594 LOAD_DEREF              11 (process)
+            596 CALL                     1
+            604 GET_AWAITABLE            0
+            606 LOAD_CONST               6 (None)
+        >>  608 SEND                     4 (to 620)
+            612 YIELD_VALUE              3
+            614 RESUME                   3
+            616 JUMP_BACKWARD_NO_INTERRUPT     5 (to 608)
+        >>  618 CLEANUP_THROW
+        >>  620 END_SEND
+            622 POP_TOP
+
+472         624 RAISE_VARARGS            0
+
+470     >>  626 RERAISE                  0
+        >>  628 COPY                     3
+            630 POP_EXCEPT
+            632 RERAISE                  1
+        >>  634 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            636 RERAISE                  1
+ExceptionTable:
+  16 to 222 -> 634 [0] lasti
+  224 to 224 -> 538 [2]
+  226 to 274 -> 634 [0] lasti
+  278 to 376 -> 546 [0]
+  378 to 378 -> 542 [2]
+  380 to 386 -> 546 [0]
+  388 to 538 -> 634 [0] lasti
+  542 to 542 -> 546 [0]
+  546 to 610 -> 628 [1] lasti
+  612 to 612 -> 618 [3]
+  614 to 626 -> 628 [1] lasti
+  628 to 632 -> 634 [0] lasti
+
+Disassembly of <code object read_stderr at 0x2907ea50, file "app\adapters\ffmpeg.py", line 438>:
+              0 COPY_FREE_VARS           6
+
+438           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+440           8 LOAD_GLOBAL              1 (NULL + _iter_ffmpeg_lines)
+             18 LOAD_DEREF              12 (process)
+             20 LOAD_ATTR                2 (stderr)
+             40 CALL                     1
+             48 GET_AITER
+        >>   50 GET_ANEXT
+             52 LOAD_CONST               0 (None)
+        >>   54 SEND                     3 (to 64)
+             58 YIELD_VALUE              3
+             60 RESUME                   3
+             62 JUMP_BACKWARD_NO_INTERRUPT     5 (to 54)
+        >>   64 END_SEND
+             66 STORE_FAST               0 (line)
+
+441          68 LOAD_DEREF              13 (tail)
+             70 LOAD_ATTR                5 (NULL|self + append)
+             90 LOAD_FAST                0 (line)
+             92 CALL                     1
+            100 POP_TOP
+
+442         102 LOAD_GLOBAL              7 (NULL + len)
+            112 LOAD_DEREF              13 (tail)
+            114 CALL                     1
+            122 LOAD_CONST               1 (40)
+            124 COMPARE_OP              68 (>)
+            128 POP_JUMP_IF_FALSE       17 (to 164)
+
+443         130 LOAD_DEREF              13 (tail)
+            132 LOAD_ATTR                9 (NULL|self + pop)
+            152 LOAD_CONST               2 (0)
+            154 CALL                     1
+            162 POP_TOP
+
+444     >>  164 LOAD_DEREF               8 (cancel_check)
+            166 POP_JUMP_IF_FALSE       30 (to 228)
+            168 PUSH_NULL
+            170 LOAD_DEREF               8 (cancel_check)
+            172 CALL                     0
+            180 POP_JUMP_IF_FALSE       23 (to 228)
+
+445         182 LOAD_CONST               3 (True)
+            184 STORE_DEREF              9 (cancelled)
+
+446         186 LOAD_GLOBAL             11 (NULL + _terminate)
+            196 LOAD_DEREF              12 (process)
+            198 CALL                     1
+            206 GET_AWAITABLE            0
+            208 LOAD_CONST               0 (None)
+        >>  210 SEND                     3 (to 220)
+            214 YIELD_VALUE              2
+            216 RESUME                   3
+            218 JUMP_BACKWARD_NO_INTERRUPT     5 (to 210)
+        >>  220 END_SEND
+            222 POP_TOP
+
+447         224 POP_TOP
+            226 RETURN_CONST             0 (None)
+
+448     >>  228 LOAD_DEREF              10 (duration_sec)
+            230 LOAD_CONST               4 (0.0)
+            232 COMPARE_OP              26 (<=)
+            236 POP_JUMP_IF_FALSE       78 (to 394)
+
+449         238 LOAD_GLOBAL             12 (_DUR_PAT)
+            248 LOAD_ATTR               15 (NULL|self + search)
+            268 LOAD_FAST                0 (line)
+            270 CALL                     1
+            278 STORE_FAST               1 (md)
+
+450         280 LOAD_FAST                1 (md)
+            282 POP_JUMP_IF_FALSE       55 (to 394)
+
+451         284 LOAD_GLOBAL             17 (NULL + map)
+            294 LOAD_GLOBAL             18 (int)
+            304 LOAD_FAST                1 (md)
+            306 LOAD_ATTR               21 (NULL|self + groups)
+            326 CALL                     0
+            334 CALL                     2
+            342 UNPACK_SEQUENCE          4
+            346 STORE_FAST               2 (hh)
+            348 STORE_FAST               3 (mm)
+            350 STORE_FAST               4 (ss)
+            352 STORE_FAST               5 (cs)
+
+452         354 LOAD_FAST                2 (hh)
+            356 LOAD_CONST               5 (3600)
+            358 BINARY_OP                5 (*)
+            362 LOAD_FAST                3 (mm)
+            364 LOAD_CONST               6 (60)
+            366 BINARY_OP                5 (*)
+            370 BINARY_OP                0 (+)
+            374 LOAD_FAST                4 (ss)
+            376 BINARY_OP                0 (+)
+            380 LOAD_FAST                5 (cs)
+            382 LOAD_CONST               7 (100.0)
+            384 BINARY_OP               11 (/)
+            388 BINARY_OP                0 (+)
+            392 STORE_DEREF             10 (duration_sec)
+
+453     >>  394 LOAD_GLOBAL             22 (_TIME_PAT)
+            404 LOAD_ATTR               15 (NULL|self + search)
+            424 LOAD_FAST                0 (line)
+            426 CALL                     1
+            434 STORE_FAST               6 (mt)
+
+454         436 LOAD_FAST                6 (mt)
+            438 POP_JUMP_IF_TRUE         1 (to 442)
+            440 JUMP_BACKWARD          196 (to 50)
+        >>  442 LOAD_DEREF              10 (duration_sec)
+            444 LOAD_CONST               4 (0.0)
+            446 COMPARE_OP              68 (>)
+            450 POP_JUMP_IF_TRUE         1 (to 454)
+            452 JUMP_BACKWARD          202 (to 50)
+        >>  454 LOAD_DEREF              11 (on_progress)
+            456 POP_JUMP_IF_TRUE         1 (to 460)
+            458 JUMP_BACKWARD          205 (to 50)
+
+455     >>  460 LOAD_GLOBAL             17 (NULL + map)
+            470 LOAD_GLOBAL             18 (int)
+            480 LOAD_FAST                6 (mt)
+            482 LOAD_ATTR               21 (NULL|self + groups)
+            502 CALL                     0
+            510 CALL                     2
+            518 UNPACK_SEQUENCE          4
+            522 STORE_FAST               2 (hh)
+            524 STORE_FAST               3 (mm)
+            526 STORE_FAST               4 (ss)
+            528 STORE_FAST               5 (cs)
+
+456         530 LOAD_FAST                2 (hh)
+            532 LOAD_CONST               5 (3600)
+            534 BINARY_OP                5 (*)
+            538 LOAD_FAST                3 (mm)
+            540 LOAD_CONST               6 (60)
+            542 BINARY_OP                5 (*)
+            546 BINARY_OP                0 (+)
+            550 LOAD_FAST                4 (ss)
+            552 BINARY_OP                0 (+)
+            556 LOAD_FAST                5 (cs)
+            558 LOAD_CONST               7 (100.0)
+            560 BINARY_OP               11 (/)
+            564 BINARY_OP                0 (+)
+            568 STORE_FAST               7 (cur)
+
+457         570 PUSH_NULL
+            572 LOAD_DEREF              11 (on_progress)
+            574 LOAD_GLOBAL             25 (NULL + min)
+            584 LOAD_CONST               8 (1.0)
+            586 LOAD_FAST                7 (cur)
+            588 LOAD_DEREF              10 (duration_sec)
+            590 BINARY_OP               11 (/)
+            594 CALL                     2
+            602 CALL                     1
+            610 POP_TOP
+            612 EXTENDED_ARG             1
+            614 JUMP_BACKWARD          283 (to 50)
+
+440     >>  616 CLEANUP_THROW
+            618 EXTENDED_ARG             1
+            620 JUMP_BACKWARD          279 (to 64)
+
+446     >>  622 CLEANUP_THROW
+            624 JUMP_BACKWARD          203 (to 220)
+
+440     >>  626 END_ASYNC_FOR
+            628 RETURN_CONST             0 (None)
+        >>  630 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            632 RERAISE                  1
+ExceptionTable:
+  6 to 48 -> 630 [0] lasti
+  50 to 56 -> 626 [1]
+  58 to 58 -> 616 [3]
+  60 to 64 -> 626 [1]
+  66 to 212 -> 630 [0] lasti
+  214 to 214 -> 622 [3]
+  216 to 438 -> 630 [0] lasti
+  442 to 450 -> 630 [0] lasti
+  454 to 456 -> 630 [0] lasti
+  460 to 614 -> 630 [0] lasti
+  616 to 616 -> 626 [1]
+  622 to 622 -> 630 [0] lasti
+  626 to 628 -> 630 [0] lasti
+
+Disassembly of <code object monitor at 0x7f6c9327b0a0, file "app\adapters\ffmpeg.py", line 459>:
+              0 COPY_FREE_VARS           3
+
+459           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+461           8 LOAD_DEREF               2 (process)
+             10 LOAD_ATTR                0 (returncode)
+             30 POP_JUMP_IF_NOT_NONE    74 (to 180)
+
+462     >>   32 LOAD_DEREF               0 (cancel_check)
+             34 POP_JUMP_IF_FALSE       29 (to 94)
+             36 PUSH_NULL
+             38 LOAD_DEREF               0 (cancel_check)
+             40 CALL                     0
+             48 POP_JUMP_IF_FALSE       22 (to 94)
+
+463          50 LOAD_CONST               1 (True)
+             52 STORE_DEREF              1 (cancelled)
+
+464          54 LOAD_GLOBAL              3 (NULL + _terminate)
+             64 LOAD_DEREF               2 (process)
+             66 CALL                     1
+             74 GET_AWAITABLE            0
+             76 LOAD_CONST               0 (None)
+        >>   78 SEND                     3 (to 88)
+             82 YIELD_VALUE              2
+             84 RESUME                   3
+             86 JUMP_BACKWARD_NO_INTERRUPT     5 (to 78)
+        >>   88 END_SEND
+             90 POP_TOP
+
+465          92 RETURN_CONST             0 (None)
+
+466     >>   94 LOAD_GLOBAL              5 (NULL + asyncio)
+            104 LOAD_ATTR                6 (sleep)
+            124 LOAD_CONST               2 (0.5)
+            126 CALL                     1
+            134 GET_AWAITABLE            0
+            136 LOAD_CONST               0 (None)
+        >>  138 SEND                     3 (to 148)
+            142 YIELD_VALUE              2
+            144 RESUME                   3
+            146 JUMP_BACKWARD_NO_INTERRUPT     5 (to 138)
+        >>  148 END_SEND
+            150 POP_TOP
+
+461         152 LOAD_DEREF               2 (process)
+            154 LOAD_ATTR                0 (returncode)
+            174 POP_JUMP_IF_NOT_NONE     1 (to 178)
+            176 JUMP_BACKWARD           73 (to 32)
+        >>  178 RETURN_CONST             0 (None)
+        >>  180 RETURN_CONST             0 (None)
+
+464     >>  182 CLEANUP_THROW
+            184 JUMP_BACKWARD           49 (to 88)
+
+466     >>  186 CLEANUP_THROW
+            188 JUMP_BACKWARD           21 (to 148)
+        >>  190 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            192 RERAISE                  1
+ExceptionTable:
+  6 to 80 -> 190 [0] lasti
+  82 to 82 -> 182 [2]
+  84 to 140 -> 190 [0] lasti
+  142 to 142 -> 186 [2]
+  144 to 174 -> 190 [0] lasti
+  178 to 182 -> 190 [0] lasti
+  186 to 186 -> 190 [0] lasti
+
+Disassembly of <code object run_capture at 0x269cdee0, file "app\adapters\ffmpeg.py", line 480>:
+480           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+484           6 LOAD_FAST                0 (self)
+              8 LOAD_ATTR                0 (ffmpeg_path)
+             28 LOAD_CONST               1 ('-hide_banner')
+             30 LOAD_CONST               2 ('-y')
+             32 BUILD_LIST               3
+             34 LOAD_FAST                1 (args)
+             36 LIST_EXTEND              1
+             38 STORE_FAST               5 (cmd)
+
+485          40 LOAD_GLOBAL              3 (NULL + asyncio)
+             50 LOAD_ATTR                4 (create_subprocess_exec)
+
+486          70 LOAD_FAST                5 (cmd)
+             72 LOAD_FAST                2 (cwd)
+
+487          74 LOAD_GLOBAL              2 (asyncio)
+             84 LOAD_ATTR                6 (subprocess)
+            104 LOAD_ATTR                8 (PIPE)
+            124 LOAD_GLOBAL              2 (asyncio)
+            134 LOAD_ATTR                6 (subprocess)
+            154 LOAD_ATTR                8 (PIPE)
+
+485         174 LOAD_CONST               3 (('cwd', 'stdout', 'stderr'))
+            176 BUILD_CONST_KEY_MAP      3
+
+488         178 LOAD_GLOBAL             11 (NULL + no_window_kwargs)
+            188 CALL                     0
+
+485         196 DICT_MERGE               1
+            198 CALL_FUNCTION_EX         1
+            200 GET_AWAITABLE            0
+            202 LOAD_CONST               4 (None)
+        >>  204 SEND                     3 (to 214)
+            208 YIELD_VALUE              2
+            210 RESUME                   3
+            212 JUMP_BACKWARD_NO_INTERRUPT     5 (to 204)
+        >>  214 END_SEND
+            216 STORE_FAST               6 (process)
+
+490         218 NOP
+
+491         220 LOAD_FAST                6 (process)
+            222 LOAD_ATTR               13 (NULL|self + communicate)
+            242 CALL                     0
+            250 GET_AWAITABLE            0
+            252 LOAD_CONST               4 (None)
+        >>  254 SEND                     3 (to 264)
+            258 YIELD_VALUE              3
+            260 RESUME                   3
+            262 JUMP_BACKWARD_NO_INTERRUPT     5 (to 254)
+        >>  264 END_SEND
+            266 UNPACK_SEQUENCE          2
+            270 STORE_FAST               7 (out)
+            272 STORE_FAST               8 (err)
+
+495         274 LOAD_FAST                4 (cancel_check)
+            276 POP_JUMP_IF_FALSE       18 (to 314)
+            278 PUSH_NULL
+            280 LOAD_FAST                4 (cancel_check)
+            282 CALL                     0
+            290 POP_JUMP_IF_FALSE       11 (to 314)
+
+496         292 LOAD_GLOBAL             19 (NULL + cancelled_error)
+            302 LOAD_CONST               5 ('capture')
+            304 CALL                     1
+            312 RAISE_VARARGS            1
+
+497     >>  314 LOAD_FAST                6 (process)
+            316 LOAD_ATTR               20 (returncode)
+            336 LOAD_CONST               6 (0)
+            338 COMPARE_OP              55 (!=)
+            342 POP_JUMP_IF_TRUE         2 (to 348)
+            344 LOAD_FAST                7 (out)
+            346 POP_JUMP_IF_TRUE        50 (to 448)
+
+498     >>  348 LOAD_FAST                8 (err)
+            350 LOAD_ATTR               23 (NULL|self + decode)
+            370 LOAD_CONST               7 ('utf-8')
+            372 LOAD_CONST               8 ('ignore')
+            374 KW_NAMES                 9 (('errors',))
+            376 CALL                     2
+            384 LOAD_CONST              10 (-400)
+            386 LOAD_CONST               4 (None)
+            388 BINARY_SLICE
+            390 STORE_FAST               9 (msg)
+
+499         392 LOAD_GLOBAL             25 (NULL + make_error)
+            402 LOAD_FAST                3 (error_code)
+            404 LOAD_CONST              11 ('FFmpeg capture lỗi (code ')
+            406 LOAD_FAST                6 (process)
+            408 LOAD_ATTR               20 (returncode)
+            428 FORMAT_VALUE             0
+            430 LOAD_CONST              12 ('): ')
+            432 LOAD_FAST                9 (msg)
+            434 FORMAT_VALUE             0
+            436 BUILD_STRING             4
+            438 CALL                     2
+            446 RAISE_VARARGS            1
+
+500     >>  448 LOAD_FAST                7 (out)
+            450 RETURN_VALUE
+
+485     >>  452 CLEANUP_THROW
+            454 JUMP_BACKWARD          121 (to 214)
+
+491     >>  456 CLEANUP_THROW
+            458 JUMP_BACKWARD           98 (to 264)
+        >>  460 PUSH_EXC_INFO
+
+492         462 LOAD_GLOBAL              2 (asyncio)
+            472 LOAD_ATTR               14 (CancelledError)
+            492 CHECK_EXC_MATCH
+            494 POP_JUMP_IF_FALSE       22 (to 540)
+            496 POP_TOP
+
+493         498 LOAD_GLOBAL             17 (NULL + _terminate)
+            508 LOAD_FAST                6 (process)
+            510 CALL                     1
+            518 GET_AWAITABLE            0
+            520 LOAD_CONST               4 (None)
+        >>  522 SEND                     4 (to 534)
+            526 YIELD_VALUE              3
+            528 RESUME                   3
+            530 JUMP_BACKWARD_NO_INTERRUPT     5 (to 522)
+        >>  532 CLEANUP_THROW
+        >>  534 END_SEND
+            536 POP_TOP
+
+494         538 RAISE_VARARGS            0
+
+492     >>  540 RERAISE                  0
+        >>  542 COPY                     3
+            544 POP_EXCEPT
+            546 RERAISE                  1
+        >>  548 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            550 RERAISE                  1
+ExceptionTable:
+  4 to 206 -> 548 [0] lasti
+  208 to 208 -> 452 [2]
+  210 to 216 -> 548 [0] lasti
+  220 to 256 -> 460 [0]
+  258 to 258 -> 456 [2]
+  260 to 272 -> 460 [0]
+  274 to 452 -> 548 [0] lasti
+  456 to 456 -> 460 [0]
+  460 to 524 -> 542 [1] lasti
+  526 to 526 -> 532 [3]
+  528 to 540 -> 542 [1] lasti
+  542 to 546 -> 548 [0] lasti

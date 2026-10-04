@@ -1,0 +1,1180 @@
+  0           0 RESUME                   0
+
+  1           2 SETUP_ANNOTATIONS
+              4 LOAD_CONST               0 ('Dò CUDA & thiết lập DLL path — nguồn chân lý duy nhất cho cả sidebar lẫn worker.\n\nVấn đề thực tế: trên máy có card NVIDIA, driver (nvcuda.dll) LUÔN tồn tại nên phần kiểm\ntra cũ báo "CUDA ✓". Nhưng faster-whisper/ctranslate2 (4.8, CUDA 12 + cuDNN 9) khi nhận\ndiện còn cần:\n  - cuBLAS: cublas64_12.dll, cublasLt64_12.dll  (KHÔNG được bundle ở đâu cả)\n  - cuDNN 9 đầy đủ: cudnn_ops64_9.dll, cudnn_cnn64_9.dll, ...  (ctranslate2 chỉ bundle\n    mỗi cudnn64_9.dll — là loader gọi tới các sub-lib trên lúc chạy)\n\nMáy dev gốc có sẵn CUDA Toolkit/cuDNN trong PATH nên chạy được; máy "sạch" (chỉ cài\ndriver) sẽ crash khi transcribe. Module này:\n  1. setup_cuda_dll_dirs(): thêm MỌI thư mục chứa cuBLAS/cuDNN vào nơi Windows tìm DLL,\n     phải gọi TRƯỚC khi import ctranslate2/faster_whisper.\n  2. probe_cuda(): kiểm tra CUDA có THỰC SỰ dùng được không (driver + nạp được đủ DLL),\n     không chỉ "có driver". Worker dùng để tự chọn cuda/cpu; sidebar dùng để hiển thị đúng.\n')
+              6 STORE_NAME               0 (__doc__)
+
+ 17           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('annotations',))
+             12 IMPORT_NAME              1 (__future__)
+             14 IMPORT_FROM              2 (annotations)
+             16 STORE_NAME               2 (annotations)
+             18 POP_TOP
+
+ 19          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               3 (None)
+             24 IMPORT_NAME              3 (os)
+             26 STORE_NAME               3 (os)
+
+ 20          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               3 (None)
+             32 IMPORT_NAME              4 (sys)
+             34 STORE_NAME               4 (sys)
+
+ 21          36 LOAD_CONST               1 (0)
+             38 LOAD_CONST               4 (('Path',))
+             40 IMPORT_NAME              5 (pathlib)
+             42 IMPORT_FROM              6 (Path)
+             44 STORE_NAME               6 (Path)
+             46 POP_TOP
+
+ 25          48 BUILD_LIST               0
+             50 LOAD_CONST               5 (('cublas64_12.dll', 'cublasLt64_12.dll', 'cudnn64_9.dll', 'cudnn_ops64_9.dll'))
+             52 LIST_EXTEND              1
+             54 STORE_NAME               7 (_REQUIRED_CUDA_DLLS)
+
+ 32          56 LOAD_CONST               6 (False)
+             58 STORE_GLOBAL             8 (_dll_dirs_ready)
+
+ 35          60 LOAD_CONST              28 (('return', 'bool'))
+             62 LOAD_CONST               7 (<code object _is_windows at 0x7f6c92badb30, file "app\core\gpu.py", line 35>)
+             64 MAKE_FUNCTION            4 (annotations)
+             66 STORE_NAME               9 (_is_windows)
+
+ 39          68 LOAD_CONST              29 (('return', 'list[Path]'))
+             70 LOAD_CONST               8 (<code object _candidate_dll_dirs at 0x28e5a9b0, file "app\core\gpu.py", line 39>)
+             72 MAKE_FUNCTION            4 (annotations)
+             74 STORE_NAME              10 (_candidate_dll_dirs)
+
+107          76 LOAD_CONST              30 (('return', 'None'))
+             78 LOAD_CONST               9 (<code object setup_cuda_dll_dirs at 0x290ccb50, file "app\core\gpu.py", line 107>)
+             80 MAKE_FUNCTION            4 (annotations)
+             82 STORE_NAME              11 (setup_cuda_dll_dirs)
+
+130          84 LOAD_CONST              30 (('return', 'None'))
+             86 LOAD_CONST              10 (<code object reset_dll_dirs at 0x7f6c92eb5530, file "app\core\gpu.py", line 130>)
+             88 MAKE_FUNCTION            4 (annotations)
+             90 STORE_NAME              12 (reset_dll_dirs)
+
+138          92 LOAD_CONST               6 (False)
+             94 STORE_GLOBAL            13 (_ctypes_unwrapped)
+
+141          96 LOAD_CONST              30 (('return', 'None'))
+             98 LOAD_CONST              11 (<code object unwrap_pyinstaller_ctypes at 0x7f6c9324f9f0, file "app\core\gpu.py", line 141>)
+            100 MAKE_FUNCTION            4 (annotations)
+            102 STORE_NAME              14 (unwrap_pyinstaller_ctypes)
+
+168         104 LOAD_CONST              31 (('dll_name', 'str', 'return', 'bool'))
+            106 LOAD_CONST              12 (<code object _can_load at 0x7f6c92b71680, file "app\core\gpu.py", line 168>)
+            108 MAKE_FUNCTION            4 (annotations)
+            110 STORE_NAME              15 (_can_load)
+
+177         112 LOAD_CONST              32 (('return', 'dict'))
+            114 LOAD_CONST              13 (<code object probe_cuda at 0x290c7b80, file "app\core\gpu.py", line 177>)
+            116 MAKE_FUNCTION            4 (annotations)
+            118 STORE_NAME              16 (probe_cuda)
+
+219         120 LOAD_CONST              33 (('return', 'tuple[int, int] | None'))
+            122 LOAD_CONST              14 (<code object cuda_driver_version at 0x7f6c93427630, file "app\core\gpu.py", line 219>)
+            124 MAKE_FUNCTION            4 (annotations)
+            126 STORE_NAME              17 (cuda_driver_version)
+
+243         128 LOAD_CONST              15 ('auto')
+            130 STORE_NAME              18 (DEVICE_AUTO)
+
+244         132 LOAD_CONST              16 ('cuda')
+            134 STORE_NAME              19 (DEVICE_CUDA)
+
+245         136 LOAD_CONST              17 ('cpu')
+            138 STORE_NAME              20 (DEVICE_CPU)
+
+247         140 LOAD_NAME               19 (DEVICE_CUDA)
+            142 LOAD_NAME               19 (DEVICE_CUDA)
+            144 LOAD_NAME               19 (DEVICE_CUDA)
+            146 LOAD_NAME               19 (DEVICE_CUDA)
+
+248         148 LOAD_NAME               20 (DEVICE_CPU)
+            150 LOAD_NAME               20 (DEVICE_CPU)
+            152 LOAD_NAME               20 (DEVICE_CPU)
+            154 LOAD_NAME               20 (DEVICE_CPU)
+
+246         156 LOAD_CONST              18 (('cuda', 'gpu', 'nvidia', 'nvenc', 'cpu', 'software', 'none', 'off'))
+            158 BUILD_CONST_KEY_MAP      8
+            160 STORE_NAME              21 (_DEVICE_ALIASES)
+
+252         162 LOAD_CONST              34 (('pref', 'str | None', 'return', 'str'))
+            164 LOAD_CONST              19 (<code object normalize_device at 0x7f6c92d63750, file "app\core\gpu.py", line 252>)
+            166 MAKE_FUNCTION            4 (annotations)
+            168 STORE_NAME              22 (normalize_device)
+
+264         170 LOAD_CONST              35 (('auto',))
+            172 LOAD_CONST              34 (('pref', 'str | None', 'return', 'str'))
+            174 LOAD_CONST              20 (<code object resolve_device at 0x7f6c929f12e0, file "app\core\gpu.py", line 264>)
+            176 MAKE_FUNCTION            5 (defaults, annotations)
+            178 STORE_NAME              23 (resolve_device)
+
+287         180 LOAD_CONST              36 (('key', 'str', 'return', 'str'))
+            182 LOAD_CONST              21 (<code object _global_setting at 0x7f6c92ea7c30, file "app\core\gpu.py", line 287>)
+            184 MAKE_FUNCTION            4 (annotations)
+            186 STORE_NAME              24 (_global_setting)
+
+296         188 LOAD_CONST              37 ((None,))
+            190 LOAD_CONST              38 (('config', 'dict | None', 'return', 'str'))
+            192 LOAD_CONST              22 (<code object effective_whisper_device at 0x7f6c92c2b630, file "app\core\gpu.py", line 296>)
+            194 MAKE_FUNCTION            5 (defaults, annotations)
+            196 STORE_NAME              25 (effective_whisper_device)
+
+309         198 LOAD_CONST              37 ((None,))
+            200 LOAD_CONST              38 (('config', 'dict | None', 'return', 'str'))
+            202 LOAD_CONST              23 (<code object effective_hw_encoder at 0x7f6c92c2bab0, file "app\core\gpu.py", line 309>)
+            204 MAKE_FUNCTION            5 (defaults, annotations)
+            206 STORE_NAME              26 (effective_hw_encoder)
+
+324         208 BUILD_LIST               0
+            210 LOAD_CONST              24 (((12, 9, 'cu129'), (12, 8, 'cu128'), (12, 6, 'cu126')))
+            212 LIST_EXTEND              1
+            214 STORE_NAME              27 (_TORCH28_CUDA_TAGS)
+            216 LOAD_CONST              25 ('list[tuple[int, int, str]]')
+            218 LOAD_NAME               28 (__annotations__)
+            220 LOAD_CONST              26 ('_TORCH28_CUDA_TAGS')
+            222 STORE_SUBSCR
+
+331         226 LOAD_CONST              39 (('return', 'str | None'))
+            228 LOAD_CONST              27 (<code object pick_torch_cuda_tag at 0x7f6c81b7f990, file "app\core\gpu.py", line 331>)
+            230 MAKE_FUNCTION            4 (annotations)
+            232 STORE_NAME              29 (pick_torch_cuda_tag)
+            234 RETURN_CONST             3 (None)
+
+Disassembly of <code object _is_windows at 0x7f6c92badb30, file "app\core\gpu.py", line 35>:
+ 35           0 RESUME                   0
+
+ 36           2 LOAD_GLOBAL              0 (sys)
+             12 LOAD_ATTR                2 (platform)
+             32 LOAD_ATTR                5 (NULL|self + startswith)
+             52 LOAD_CONST               1 ('win')
+             54 CALL                     1
+             62 RETURN_VALUE
+
+Disassembly of <code object _candidate_dll_dirs at 0x28e5a9b0, file "app\core\gpu.py", line 39>:
+ 39           0 RESUME                   0
+
+ 41           2 BUILD_LIST               0
+              4 STORE_FAST               0 (dirs)
+
+ 47           6 NOP
+
+ 48           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('get_settings',))
+             12 IMPORT_NAME              0 (app.config)
+             14 IMPORT_FROM              1 (get_settings)
+             16 STORE_FAST               1 (get_settings)
+             18 POP_TOP
+
+ 49          20 PUSH_NULL
+             22 LOAD_FAST                1 (get_settings)
+             24 CALL                     0
+             32 LOAD_ATTR                4 (data_dir)
+             52 LOAD_CONST               3 ('resources')
+             54 BINARY_OP               11 (/)
+             58 LOAD_CONST               4 ('cuda')
+             60 BINARY_OP               11 (/)
+             64 LOAD_CONST               5 ('nvidia')
+             66 BINARY_OP               11 (/)
+             70 STORE_FAST               2 (cuda_root)
+
+ 50          72 LOAD_FAST                2 (cuda_root)
+             74 LOAD_ATTR                7 (NULL|self + is_dir)
+             94 CALL                     0
+            102 POP_JUMP_IF_FALSE       49 (to 202)
+
+ 51         104 LOAD_CONST               6 (('cublas', 'cudnn', 'cuda_runtime'))
+            106 GET_ITER
+        >>  108 FOR_ITER                44 (to 200)
+            112 STORE_FAST               3 (sub)
+
+ 52         114 LOAD_FAST                2 (cuda_root)
+            116 LOAD_FAST                3 (sub)
+            118 BINARY_OP               11 (/)
+            122 LOAD_CONST               7 ('bin')
+            124 BINARY_OP               11 (/)
+            128 STORE_FAST               4 (bin_dir)
+
+ 53         130 LOAD_FAST                4 (bin_dir)
+            132 LOAD_ATTR                7 (NULL|self + is_dir)
+            152 CALL                     0
+            160 POP_JUMP_IF_TRUE         1 (to 164)
+            162 JUMP_BACKWARD           28 (to 108)
+
+ 54     >>  164 LOAD_FAST                0 (dirs)
+            166 LOAD_ATTR                9 (NULL|self + append)
+            186 LOAD_FAST                4 (bin_dir)
+            188 CALL                     1
+            196 POP_TOP
+            198 JUMP_BACKWARD           46 (to 108)
+
+ 51     >>  200 END_FOR
+
+ 61     >>  202 LOAD_GLOBAL             13 (NULL + list)
+            212 LOAD_GLOBAL             14 (sys)
+            222 LOAD_ATTR               16 (path)
+            242 CALL                     1
+            250 GET_ITER
+        >>  252 FOR_ITER                83 (to 422)
+            256 STORE_FAST               5 (base)
+
+ 62         258 NOP
+
+ 63         260 LOAD_GLOBAL             19 (NULL + Path)
+            270 LOAD_FAST                5 (base)
+            272 CALL                     1
+            280 LOAD_CONST               5 ('nvidia')
+            282 BINARY_OP               11 (/)
+            286 STORE_FAST               6 (nv)
+
+ 66         288 LOAD_FAST                6 (nv)
+            290 LOAD_ATTR                7 (NULL|self + is_dir)
+            310 CALL                     0
+            318 POP_JUMP_IF_TRUE         1 (to 322)
+            320 JUMP_BACKWARD           35 (to 252)
+
+ 67     >>  322 LOAD_CONST               6 (('cublas', 'cudnn', 'cuda_runtime'))
+            324 GET_ITER
+        >>  326 FOR_ITER                44 (to 418)
+            330 STORE_FAST               3 (sub)
+
+ 68         332 LOAD_FAST                6 (nv)
+            334 LOAD_FAST                3 (sub)
+            336 BINARY_OP               11 (/)
+            340 LOAD_CONST               7 ('bin')
+            342 BINARY_OP               11 (/)
+            346 STORE_FAST               4 (bin_dir)
+
+ 69         348 LOAD_FAST                4 (bin_dir)
+            350 LOAD_ATTR                7 (NULL|self + is_dir)
+            370 CALL                     0
+            378 POP_JUMP_IF_TRUE         1 (to 382)
+            380 JUMP_BACKWARD           28 (to 326)
+
+ 70     >>  382 LOAD_FAST                0 (dirs)
+            384 LOAD_ATTR                9 (NULL|self + append)
+            404 LOAD_FAST                4 (bin_dir)
+            406 CALL                     1
+            414 POP_TOP
+            416 JUMP_BACKWARD           46 (to 326)
+
+ 67     >>  418 END_FOR
+            420 JUMP_BACKWARD           85 (to 252)
+
+ 61     >>  422 END_FOR
+
+ 73         424 NOP
+
+ 74         426 LOAD_CONST               1 (0)
+            428 LOAD_CONST               8 (None)
+            430 IMPORT_NAME             10 (ctranslate2)
+            432 STORE_FAST               7 (ctranslate2)
+
+ 75         434 LOAD_FAST                0 (dirs)
+            436 LOAD_ATTR                9 (NULL|self + append)
+            456 LOAD_GLOBAL             19 (NULL + Path)
+            466 LOAD_FAST                7 (ctranslate2)
+            468 LOAD_ATTR               22 (__file__)
+            488 CALL                     1
+            496 LOAD_ATTR               24 (parent)
+            516 CALL                     1
+            524 POP_TOP
+
+ 80     >>  526 LOAD_GLOBAL             27 (NULL + getattr)
+            536 LOAD_GLOBAL             14 (sys)
+            546 LOAD_CONST               9 ('frozen')
+            548 LOAD_CONST              10 (False)
+            550 CALL                     3
+            558 POP_JUMP_IF_FALSE       72 (to 704)
+
+ 81         560 LOAD_GLOBAL             19 (NULL + Path)
+            570 LOAD_GLOBAL             14 (sys)
+            580 LOAD_ATTR               28 (executable)
+            600 CALL                     1
+            608 LOAD_ATTR               24 (parent)
+            628 STORE_FAST               8 (exe_dir)
+
+ 82         630 LOAD_FAST                0 (dirs)
+            632 LOAD_ATTR                9 (NULL|self + append)
+            652 LOAD_FAST                8 (exe_dir)
+            654 CALL                     1
+            662 POP_TOP
+
+ 83         664 LOAD_FAST                0 (dirs)
+            666 LOAD_ATTR                9 (NULL|self + append)
+            686 LOAD_FAST                8 (exe_dir)
+            688 LOAD_CONST              11 ('_internal')
+            690 BINARY_OP               11 (/)
+            694 CALL                     1
+            702 POP_TOP
+
+ 86     >>  704 LOAD_CONST              12 (('CUDA_PATH', 'CUDA_HOME'))
+            706 GET_ITER
+        >>  708 FOR_ITER                84 (to 880)
+            712 STORE_FAST               9 (env_key)
+
+ 87         714 LOAD_GLOBAL             30 (os)
+            724 LOAD_ATTR               32 (environ)
+            744 LOAD_ATTR               35 (NULL|self + get)
+            764 LOAD_FAST                9 (env_key)
+            766 CALL                     1
+            774 STORE_FAST              10 (p)
+
+ 88         776 LOAD_FAST               10 (p)
+            778 POP_JUMP_IF_TRUE         1 (to 782)
+            780 JUMP_BACKWARD           37 (to 708)
+
+ 89     >>  782 LOAD_GLOBAL             19 (NULL + Path)
+            792 LOAD_FAST               10 (p)
+            794 CALL                     1
+            802 LOAD_CONST               7 ('bin')
+            804 BINARY_OP               11 (/)
+            808 STORE_FAST               4 (bin_dir)
+
+ 90         810 LOAD_FAST                4 (bin_dir)
+            812 LOAD_ATTR                7 (NULL|self + is_dir)
+            832 CALL                     0
+            840 POP_JUMP_IF_TRUE         1 (to 844)
+            842 JUMP_BACKWARD           68 (to 708)
+
+ 91     >>  844 LOAD_FAST                0 (dirs)
+            846 LOAD_ATTR                9 (NULL|self + append)
+            866 LOAD_FAST                4 (bin_dir)
+            868 CALL                     1
+            876 POP_TOP
+            878 JUMP_BACKWARD           86 (to 708)
+
+ 86     >>  880 END_FOR
+
+ 94         882 LOAD_GLOBAL             37 (NULL + set)
+            892 CALL                     0
+            900 STORE_FAST              11 (seen)
+
+ 95         902 BUILD_LIST               0
+            904 STORE_FAST              12 (uniq)
+
+ 96         906 LOAD_FAST                0 (dirs)
+            908 GET_ITER
+        >>  910 FOR_ITER                98 (to 1110)
+            914 STORE_FAST              13 (d)
+
+ 97         916 NOP
+
+ 98         918 LOAD_GLOBAL             39 (NULL + str)
+            928 LOAD_FAST               13 (d)
+            930 LOAD_ATTR               41 (NULL|self + resolve)
+            950 CALL                     0
+            958 CALL                     1
+            966 LOAD_ATTR               43 (NULL|self + lower)
+            986 CALL                     0
+            994 STORE_FAST              14 (key)
+
+101     >>  996 LOAD_FAST               14 (key)
+            998 LOAD_FAST               11 (seen)
+           1000 CONTAINS_OP              1
+           1002 POP_JUMP_IF_TRUE         1 (to 1006)
+           1004 JUMP_BACKWARD           48 (to 910)
+        >> 1006 LOAD_FAST               13 (d)
+           1008 LOAD_ATTR                7 (NULL|self + is_dir)
+           1028 CALL                     0
+           1036 POP_JUMP_IF_TRUE         1 (to 1040)
+           1038 JUMP_BACKWARD           65 (to 910)
+
+102     >> 1040 LOAD_FAST               11 (seen)
+           1042 LOAD_ATTR               45 (NULL|self + add)
+           1062 LOAD_FAST               14 (key)
+           1064 CALL                     1
+           1072 POP_TOP
+
+103        1074 LOAD_FAST               12 (uniq)
+           1076 LOAD_ATTR                9 (NULL|self + append)
+           1096 LOAD_FAST               13 (d)
+           1098 CALL                     1
+           1106 POP_TOP
+           1108 JUMP_BACKWARD          100 (to 910)
+
+ 96     >> 1110 END_FOR
+
+104        1112 LOAD_FAST               12 (uniq)
+           1114 RETURN_VALUE
+        >> 1116 PUSH_EXC_INFO
+
+ 55        1118 LOAD_GLOBAL             10 (Exception)
+           1128 CHECK_EXC_MATCH
+           1130 POP_JUMP_IF_FALSE        4 (to 1140)
+           1132 POP_TOP
+
+ 56        1134 POP_EXCEPT
+           1136 EXTENDED_ARG             1
+           1138 JUMP_BACKWARD          469 (to 202)
+
+ 55     >> 1140 RERAISE                  0
+        >> 1142 COPY                     3
+           1144 POP_EXCEPT
+           1146 RERAISE                  1
+        >> 1148 PUSH_EXC_INFO
+
+ 64        1150 LOAD_GLOBAL             10 (Exception)
+           1160 CHECK_EXC_MATCH
+           1162 POP_JUMP_IF_FALSE        4 (to 1172)
+           1164 POP_TOP
+
+ 65        1166 POP_EXCEPT
+           1168 EXTENDED_ARG             1
+           1170 JUMP_BACKWARD          460 (to 252)
+
+ 64     >> 1172 RERAISE                  0
+        >> 1174 COPY                     3
+           1176 POP_EXCEPT
+           1178 RERAISE                  1
+        >> 1180 PUSH_EXC_INFO
+
+ 76        1182 LOAD_GLOBAL             10 (Exception)
+           1192 CHECK_EXC_MATCH
+           1194 POP_JUMP_IF_FALSE        4 (to 1204)
+           1196 POP_TOP
+
+ 77        1198 POP_EXCEPT
+           1200 EXTENDED_ARG             1
+           1202 JUMP_BACKWARD          339 (to 526)
+
+ 76     >> 1204 RERAISE                  0
+        >> 1206 COPY                     3
+           1208 POP_EXCEPT
+           1210 RERAISE                  1
+        >> 1212 PUSH_EXC_INFO
+
+ 99        1214 LOAD_GLOBAL             10 (Exception)
+           1224 CHECK_EXC_MATCH
+           1226 POP_JUMP_IF_FALSE       28 (to 1284)
+           1228 POP_TOP
+
+100        1230 LOAD_GLOBAL             39 (NULL + str)
+           1240 LOAD_FAST               13 (d)
+           1242 CALL                     1
+           1250 LOAD_ATTR               43 (NULL|self + lower)
+           1270 CALL                     0
+           1278 STORE_FAST              14 (key)
+           1280 POP_EXCEPT
+           1282 JUMP_BACKWARD          144 (to 996)
+
+ 99     >> 1284 RERAISE                  0
+        >> 1286 COPY                     3
+           1288 POP_EXCEPT
+           1290 RERAISE                  1
+ExceptionTable:
+  8 to 160 -> 1116 [0]
+  164 to 200 -> 1116 [0]
+  260 to 286 -> 1148 [1]
+  426 to 524 -> 1180 [0]
+  918 to 994 -> 1212 [1]
+  1116 to 1132 -> 1142 [1] lasti
+  1140 to 1140 -> 1142 [1] lasti
+  1148 to 1164 -> 1174 [2] lasti
+  1172 to 1172 -> 1174 [2] lasti
+  1180 to 1196 -> 1206 [1] lasti
+  1204 to 1204 -> 1206 [1] lasti
+  1212 to 1278 -> 1286 [2] lasti
+  1284 to 1284 -> 1286 [2] lasti
+
+Disassembly of <code object setup_cuda_dll_dirs at 0x290ccb50, file "app\core\gpu.py", line 107>:
+107           0 RESUME                   0
+
+113           2 LOAD_GLOBAL              0 (_dll_dirs_ready)
+             12 POP_JUMP_IF_TRUE        10 (to 34)
+             14 LOAD_GLOBAL              3 (NULL + _is_windows)
+             24 CALL                     0
+             32 POP_JUMP_IF_TRUE         3 (to 40)
+
+114     >>   34 LOAD_CONST               1 (True)
+             36 STORE_GLOBAL             0 (_dll_dirs_ready)
+
+115          38 RETURN_CONST             2 (None)
+
+116     >>   40 LOAD_GLOBAL              5 (NULL + _candidate_dll_dirs)
+             50 CALL                     0
+             58 GET_ITER
+        >>   60 FOR_ITER               183 (to 430)
+             64 STORE_FAST               0 (d)
+
+117          66 LOAD_GLOBAL              7 (NULL + str)
+             76 LOAD_FAST                0 (d)
+             78 CALL                     1
+             86 STORE_FAST               1 (s)
+
+119          88 LOAD_GLOBAL              9 (NULL + hasattr)
+             98 LOAD_GLOBAL             10 (os)
+            108 LOAD_CONST               3 ('add_dll_directory')
+            110 CALL                     2
+            118 POP_JUMP_IF_FALSE       22 (to 164)
+
+120         120 NOP
+
+121         122 LOAD_GLOBAL             11 (NULL + os)
+            132 LOAD_ATTR               12 (add_dll_directory)
+            152 LOAD_FAST                1 (s)
+            154 CALL                     1
+            162 POP_TOP
+
+125     >>  164 LOAD_FAST                1 (s)
+            166 LOAD_ATTR               17 (NULL|self + lower)
+            186 CALL                     0
+            194 LOAD_GLOBAL             10 (os)
+            204 LOAD_ATTR               18 (environ)
+            224 LOAD_ATTR               21 (NULL|self + get)
+            244 LOAD_CONST               4 ('PATH')
+            246 LOAD_CONST               5 ('')
+            248 CALL                     2
+            256 LOAD_ATTR               17 (NULL|self + lower)
+            276 CALL                     0
+            284 CONTAINS_OP              1
+            286 POP_JUMP_IF_TRUE         1 (to 290)
+            288 JUMP_BACKWARD          115 (to 60)
+
+126     >>  290 LOAD_FAST                1 (s)
+            292 LOAD_GLOBAL             10 (os)
+            302 LOAD_ATTR               22 (pathsep)
+            322 BINARY_OP                0 (+)
+            326 LOAD_GLOBAL             10 (os)
+            336 LOAD_ATTR               18 (environ)
+            356 LOAD_ATTR               21 (NULL|self + get)
+            376 LOAD_CONST               4 ('PATH')
+            378 LOAD_CONST               5 ('')
+            380 CALL                     2
+            388 BINARY_OP                0 (+)
+            392 LOAD_GLOBAL             10 (os)
+            402 LOAD_ATTR               18 (environ)
+            422 LOAD_CONST               4 ('PATH')
+            424 STORE_SUBSCR
+            428 JUMP_BACKWARD          185 (to 60)
+
+116     >>  430 END_FOR
+
+127         432 LOAD_CONST               1 (True)
+            434 STORE_GLOBAL             0 (_dll_dirs_ready)
+            436 RETURN_CONST             2 (None)
+        >>  438 PUSH_EXC_INFO
+
+122         440 LOAD_GLOBAL             14 (Exception)
+            450 CHECK_EXC_MATCH
+            452 POP_JUMP_IF_FALSE        3 (to 460)
+            454 POP_TOP
+
+123         456 POP_EXCEPT
+            458 JUMP_BACKWARD          148 (to 164)
+
+122     >>  460 RERAISE                  0
+        >>  462 COPY                     3
+            464 POP_EXCEPT
+            466 RERAISE                  1
+ExceptionTable:
+  122 to 162 -> 438 [1]
+  438 to 454 -> 462 [2] lasti
+  460 to 460 -> 462 [2] lasti
+
+Disassembly of <code object reset_dll_dirs at 0x7f6c92eb5530, file "app\core\gpu.py", line 130>:
+130           0 RESUME                   0
+
+134           2 LOAD_CONST               1 (False)
+              4 STORE_GLOBAL             0 (_dll_dirs_ready)
+
+135           6 LOAD_GLOBAL              3 (NULL + setup_cuda_dll_dirs)
+             16 CALL                     0
+             24 POP_TOP
+             26 RETURN_CONST             2 (None)
+
+Disassembly of <code object unwrap_pyinstaller_ctypes at 0x7f6c9324f9f0, file "app\core\gpu.py", line 141>:
+141           0 RESUME                   0
+
+152           2 LOAD_GLOBAL              0 (_ctypes_unwrapped)
+             12 POP_JUMP_IF_TRUE        10 (to 34)
+             14 LOAD_GLOBAL              3 (NULL + _is_windows)
+             24 CALL                     0
+             32 POP_JUMP_IF_TRUE         3 (to 40)
+
+153     >>   34 LOAD_CONST               1 (True)
+             36 STORE_GLOBAL             0 (_ctypes_unwrapped)
+
+154          38 RETURN_CONST             2 (None)
+
+155     >>   40 LOAD_CONST               3 (0)
+             42 LOAD_CONST               2 (None)
+             44 IMPORT_NAME              2 (ctypes)
+             46 STORE_FAST               0 (ctypes)
+
+156          48 LOAD_CONST               4 ((('CDLL', 'cdll'), ('PyDLL', 'pydll'), ('WinDLL', 'windll'), ('OleDLL', 'oledll')))
+             50 GET_ITER
+        >>   52 FOR_ITER                95 (to 246)
+             56 UNPACK_SEQUENCE          2
+             60 STORE_FAST               1 (cls_name)
+             62 STORE_FAST               2 (loader_name)
+
+159          64 LOAD_GLOBAL              7 (NULL + getattr)
+             74 LOAD_FAST                0 (ctypes)
+             76 LOAD_FAST                1 (cls_name)
+             78 LOAD_CONST               2 (None)
+             80 CALL                     3
+             88 STORE_FAST               3 (cls)
+
+160          90 LOAD_FAST                3 (cls)
+             92 POP_JUMP_IF_NONE        18 (to 130)
+             94 LOAD_FAST                3 (cls)
+             96 LOAD_ATTR                8 (__name__)
+            116 LOAD_CONST               5 ('PyInstaller')
+            118 LOAD_FAST                1 (cls_name)
+            120 FORMAT_VALUE             0
+            122 BUILD_STRING             2
+            124 COMPARE_OP              55 (!=)
+            128 POP_JUMP_IF_FALSE        1 (to 132)
+
+161     >>  130 JUMP_BACKWARD           40 (to 52)
+
+162     >>  132 LOAD_FAST                3 (cls)
+            134 LOAD_ATTR               10 (__bases__)
+            154 LOAD_CONST               3 (0)
+            156 BINARY_SUBSCR
+            160 STORE_FAST               4 (real)
+
+163         162 LOAD_GLOBAL             13 (NULL + setattr)
+            172 LOAD_FAST                0 (ctypes)
+            174 LOAD_FAST                1 (cls_name)
+            176 LOAD_FAST                4 (real)
+            178 CALL                     3
+            186 POP_TOP
+
+164         188 LOAD_GLOBAL             13 (NULL + setattr)
+            198 LOAD_FAST                0 (ctypes)
+            200 LOAD_FAST                2 (loader_name)
+            202 LOAD_FAST                0 (ctypes)
+            204 LOAD_ATTR               15 (NULL|self + LibraryLoader)
+            224 LOAD_FAST                4 (real)
+            226 CALL                     1
+            234 CALL                     3
+            242 POP_TOP
+            244 JUMP_BACKWARD           97 (to 52)
+
+156     >>  246 END_FOR
+
+165         248 LOAD_CONST               1 (True)
+            250 STORE_GLOBAL             0 (_ctypes_unwrapped)
+            252 RETURN_CONST             2 (None)
+
+Disassembly of <code object _can_load at 0x7f6c92b71680, file "app\core\gpu.py", line 168>:
+168           0 RESUME                   0
+
+169           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               0 (None)
+              6 IMPORT_NAME              0 (ctypes)
+              8 STORE_FAST               1 (ctypes)
+
+170          10 NOP
+
+171          12 LOAD_FAST                1 (ctypes)
+             14 LOAD_ATTR                3 (NULL|self + WinDLL)
+             34 LOAD_FAST                0 (dll_name)
+             36 CALL                     1
+             44 POP_TOP
+
+172          46 RETURN_CONST             2 (True)
+        >>   48 PUSH_EXC_INFO
+
+173          50 LOAD_GLOBAL              4 (Exception)
+             60 CHECK_EXC_MATCH
+             62 POP_JUMP_IF_FALSE        3 (to 70)
+             64 POP_TOP
+
+174          66 POP_EXCEPT
+             68 RETURN_CONST             3 (False)
+
+173     >>   70 RERAISE                  0
+        >>   72 COPY                     3
+             74 POP_EXCEPT
+             76 RERAISE                  1
+ExceptionTable:
+  12 to 44 -> 48 [0]
+  48 to 64 -> 72 [1] lasti
+  70 to 70 -> 72 [1] lasti
+
+Disassembly of <code object probe_cuda at 0x290c7b80, file "app\core\gpu.py", line 177>:
+177           0 RESUME                   0
+
+187           2 LOAD_GLOBAL              1 (NULL + _is_windows)
+             12 CALL                     0
+             20 POP_JUMP_IF_TRUE        21 (to 64)
+
+188          22 LOAD_CONST               1 (False)
+             24 LOAD_CONST               2 (0)
+             26 LOAD_CONST               1 (False)
+
+189          28 LOAD_GLOBAL              3 (NULL + list)
+             38 LOAD_GLOBAL              4 (_REQUIRED_CUDA_DLLS)
+             48 CALL                     1
+             56 LOAD_CONST               1 (False)
+
+188          58 LOAD_CONST               3 (('driver_ok', 'device_count', 'libs_ok', 'missing', 'usable'))
+             60 BUILD_CONST_KEY_MAP      5
+             62 RETURN_VALUE
+
+191     >>   64 LOAD_GLOBAL              7 (NULL + setup_cuda_dll_dirs)
+             74 CALL                     0
+             82 POP_TOP
+
+193          84 LOAD_CONST               2 (0)
+             86 LOAD_CONST               4 (None)
+             88 IMPORT_NAME              4 (ctypes)
+             90 STORE_FAST               0 (ctypes)
+
+195          92 LOAD_CONST               1 (False)
+             94 STORE_FAST               1 (driver_ok)
+
+196          96 LOAD_CONST               2 (0)
+             98 STORE_FAST               2 (device_count)
+
+197         100 NOP
+
+198         102 LOAD_FAST                0 (ctypes)
+            104 LOAD_ATTR               11 (NULL|self + WinDLL)
+            124 LOAD_CONST               5 ('nvcuda.dll')
+            126 CALL                     1
+            134 STORE_FAST               3 (nvcuda)
+
+199         136 LOAD_FAST                3 (nvcuda)
+            138 LOAD_ATTR               13 (NULL|self + cuInit)
+            158 LOAD_CONST               2 (0)
+            160 CALL                     1
+            168 LOAD_CONST               2 (0)
+            170 COMPARE_OP              40 (==)
+            174 POP_JUMP_IF_FALSE       62 (to 300)
+
+200         176 LOAD_CONST               6 (True)
+            178 STORE_FAST               1 (driver_ok)
+
+201         180 LOAD_FAST                0 (ctypes)
+            182 LOAD_ATTR               15 (NULL|self + c_int)
+            202 CALL                     0
+            210 STORE_FAST               4 (cnt)
+
+202         212 LOAD_FAST                3 (nvcuda)
+            214 LOAD_ATTR               17 (NULL|self + cuDeviceGetCount)
+            234 LOAD_FAST                0 (ctypes)
+            236 LOAD_ATTR               19 (NULL|self + byref)
+            256 LOAD_FAST                4 (cnt)
+            258 CALL                     1
+            266 CALL                     1
+            274 POP_TOP
+
+203         276 LOAD_FAST                4 (cnt)
+            278 LOAD_ATTR               20 (value)
+            298 STORE_FAST               2 (device_count)
+
+207     >>  300 LOAD_GLOBAL              4 (_REQUIRED_CUDA_DLLS)
+            310 GET_ITER
+            312 LOAD_FAST_AND_CLEAR      5 (d)
+            314 SWAP                     2
+            316 BUILD_LIST               0
+            318 SWAP                     2
+        >>  320 FOR_ITER                16 (to 356)
+            324 STORE_FAST               5 (d)
+            326 LOAD_GLOBAL             25 (NULL + _can_load)
+            336 LOAD_FAST                5 (d)
+            338 CALL                     1
+            346 POP_JUMP_IF_FALSE        1 (to 350)
+            348 JUMP_BACKWARD           15 (to 320)
+        >>  350 LOAD_FAST                5 (d)
+            352 LIST_APPEND              2
+            354 JUMP_BACKWARD           18 (to 320)
+        >>  356 END_FOR
+            358 STORE_FAST               6 (missing)
+            360 STORE_FAST               5 (d)
+
+208         362 LOAD_FAST                6 (missing)
+            364 UNARY_NOT
+            366 STORE_FAST               7 (libs_ok)
+
+211         368 LOAD_FAST                1 (driver_ok)
+
+212         370 LOAD_FAST                2 (device_count)
+
+213         372 LOAD_FAST                7 (libs_ok)
+
+214         374 LOAD_FAST                6 (missing)
+
+215         376 LOAD_GLOBAL             27 (NULL + bool)
+            386 LOAD_FAST                1 (driver_ok)
+            388 COPY                     1
+            390 POP_JUMP_IF_FALSE        9 (to 410)
+            392 POP_TOP
+            394 LOAD_FAST                2 (device_count)
+            396 LOAD_CONST               2 (0)
+            398 COMPARE_OP              68 (>)
+            402 COPY                     1
+            404 POP_JUMP_IF_FALSE        2 (to 410)
+            406 POP_TOP
+            408 LOAD_FAST                7 (libs_ok)
+        >>  410 CALL                     1
+
+210         418 LOAD_CONST               3 (('driver_ok', 'device_count', 'libs_ok', 'missing', 'usable'))
+            420 BUILD_CONST_KEY_MAP      5
+            422 RETURN_VALUE
+        >>  424 PUSH_EXC_INFO
+
+204         426 LOAD_GLOBAL             22 (Exception)
+            436 CHECK_EXC_MATCH
+            438 POP_JUMP_IF_FALSE        3 (to 446)
+            440 POP_TOP
+
+205         442 POP_EXCEPT
+            444 JUMP_BACKWARD           73 (to 300)
+
+204     >>  446 RERAISE                  0
+        >>  448 COPY                     3
+            450 POP_EXCEPT
+            452 RERAISE                  1
+        >>  454 SWAP                     2
+            456 POP_TOP
+
+207         458 SWAP                     2
+            460 STORE_FAST               5 (d)
+            462 RERAISE                  0
+ExceptionTable:
+  102 to 298 -> 424 [0]
+  316 to 346 -> 454 [2]
+  350 to 356 -> 454 [2]
+  424 to 440 -> 448 [1] lasti
+  446 to 446 -> 448 [1] lasti
+
+Disassembly of <code object cuda_driver_version at 0x7f6c93427630, file "app\core\gpu.py", line 219>:
+219           0 RESUME                   0
+
+226           2 LOAD_GLOBAL              1 (NULL + _is_windows)
+             12 CALL                     0
+             20 POP_JUMP_IF_TRUE         1 (to 24)
+
+227          22 RETURN_CONST             1 (None)
+
+228     >>   24 LOAD_CONST               2 (0)
+             26 LOAD_CONST               1 (None)
+             28 IMPORT_NAME              1 (ctypes)
+             30 STORE_FAST               0 (ctypes)
+
+229          32 NOP
+
+230          34 LOAD_FAST                0 (ctypes)
+             36 LOAD_ATTR                5 (NULL|self + WinDLL)
+             56 LOAD_CONST               3 ('nvcuda.dll')
+             58 CALL                     1
+             66 STORE_FAST               1 (nvcuda)
+
+231          68 LOAD_FAST                1 (nvcuda)
+             70 LOAD_ATTR                7 (NULL|self + cuInit)
+             90 LOAD_CONST               2 (0)
+             92 CALL                     1
+            100 LOAD_CONST               2 (0)
+            102 COMPARE_OP              55 (!=)
+            106 POP_JUMP_IF_FALSE        1 (to 110)
+
+232         108 RETURN_CONST             1 (None)
+
+233     >>  110 LOAD_FAST                0 (ctypes)
+            112 LOAD_ATTR                9 (NULL|self + c_int)
+            132 CALL                     0
+            140 STORE_FAST               2 (v)
+
+234         142 LOAD_FAST                1 (nvcuda)
+            144 LOAD_ATTR               11 (NULL|self + cuDriverGetVersion)
+            164 LOAD_FAST                0 (ctypes)
+            166 LOAD_ATTR               13 (NULL|self + byref)
+            186 LOAD_FAST                2 (v)
+            188 CALL                     1
+            196 CALL                     1
+            204 LOAD_CONST               2 (0)
+            206 COMPARE_OP              55 (!=)
+            210 POP_JUMP_IF_FALSE        1 (to 214)
+
+235         212 RETURN_CONST             1 (None)
+
+237     >>  214 LOAD_FAST                2 (v)
+            216 LOAD_ATTR               14 (value)
+            236 LOAD_CONST               4 (1000)
+            238 BINARY_OP                2 (//)
+            242 LOAD_FAST                2 (v)
+            244 LOAD_ATTR               14 (value)
+            264 LOAD_CONST               4 (1000)
+            266 BINARY_OP                6 (%)
+            270 LOAD_CONST               5 (10)
+            272 BINARY_OP                2 (//)
+            276 BUILD_TUPLE              2
+            278 RETURN_VALUE
+        >>  280 PUSH_EXC_INFO
+
+238         282 LOAD_GLOBAL             16 (Exception)
+            292 CHECK_EXC_MATCH
+            294 POP_JUMP_IF_FALSE        3 (to 302)
+            296 POP_TOP
+
+239         298 POP_EXCEPT
+            300 RETURN_CONST             1 (None)
+
+238     >>  302 RERAISE                  0
+        >>  304 COPY                     3
+            306 POP_EXCEPT
+            308 RERAISE                  1
+ExceptionTable:
+  34 to 106 -> 280 [0]
+  110 to 210 -> 280 [0]
+  214 to 276 -> 280 [0]
+  280 to 296 -> 304 [1] lasti
+  302 to 302 -> 304 [1] lasti
+
+Disassembly of <code object normalize_device at 0x7f6c92d63750, file "app\core\gpu.py", line 252>:
+252           0 RESUME                   0
+
+258           2 LOAD_GLOBAL              1 (NULL + str)
+             12 LOAD_FAST                0 (pref)
+             14 COPY                     1
+             16 POP_JUMP_IF_TRUE         2 (to 22)
+             18 POP_TOP
+             20 LOAD_CONST               1 ('')
+        >>   22 CALL                     1
+             30 LOAD_ATTR                3 (NULL|self + strip)
+             50 CALL                     0
+             58 LOAD_ATTR                5 (NULL|self + lower)
+             78 CALL                     0
+             86 STORE_FAST               1 (raw)
+
+259          88 LOAD_FAST                1 (raw)
+             90 LOAD_GLOBAL              6 (_DEVICE_ALIASES)
+            100 CONTAINS_OP              0
+            102 POP_JUMP_IF_FALSE        9 (to 122)
+
+260         104 LOAD_GLOBAL              6 (_DEVICE_ALIASES)
+            114 LOAD_FAST                1 (raw)
+            116 BINARY_SUBSCR
+            120 RETURN_VALUE
+
+261     >>  122 LOAD_GLOBAL              8 (DEVICE_AUTO)
+            132 RETURN_VALUE
+
+Disassembly of <code object resolve_device at 0x7f6c929f12e0, file "app\core\gpu.py", line 264>:
+264           0 RESUME                   0
+
+275           2 LOAD_GLOBAL              1 (NULL + normalize_device)
+             12 LOAD_FAST                0 (pref)
+             14 CALL                     1
+             22 STORE_FAST               1 (device)
+
+276          24 LOAD_FAST                1 (device)
+             26 LOAD_GLOBAL              2 (DEVICE_CPU)
+             36 COMPARE_OP              40 (==)
+             40 POP_JUMP_IF_FALSE        6 (to 54)
+
+277          42 LOAD_GLOBAL              2 (DEVICE_CPU)
+             52 RETURN_VALUE
+
+278     >>   54 NOP
+
+279          56 LOAD_GLOBAL              5 (NULL + probe_cuda)
+             66 CALL                     0
+             74 STORE_FAST               2 (info)
+
+280          76 LOAD_FAST                2 (info)
+             78 LOAD_ATTR                7 (NULL|self + get)
+             98 LOAD_CONST               1 ('usable')
+            100 CALL                     1
+            108 POP_JUMP_IF_FALSE        6 (to 122)
+
+281         110 LOAD_GLOBAL              8 (DEVICE_CUDA)
+            120 RETURN_VALUE
+
+280     >>  122 NOP
+
+284         124 LOAD_GLOBAL              2 (DEVICE_CPU)
+            134 RETURN_VALUE
+        >>  136 PUSH_EXC_INFO
+
+282         138 LOAD_GLOBAL             10 (Exception)
+            148 CHECK_EXC_MATCH
+            150 POP_JUMP_IF_FALSE        8 (to 168)
+            152 POP_TOP
+
+283         154 POP_EXCEPT
+
+284         156 LOAD_GLOBAL              2 (DEVICE_CPU)
+            166 RETURN_VALUE
+
+282     >>  168 RERAISE                  0
+        >>  170 COPY                     3
+            172 POP_EXCEPT
+            174 RERAISE                  1
+ExceptionTable:
+  56 to 118 -> 136 [0]
+  136 to 152 -> 170 [1] lasti
+  168 to 168 -> 170 [1] lasti
+
+Disassembly of <code object _global_setting at 0x7f6c92ea7c30, file "app\core\gpu.py", line 287>:
+287           0 RESUME                   0
+
+289           2 NOP
+
+290           4 LOAD_CONST               1 (0)
+              6 LOAD_CONST               2 (('get_setting_value',))
+              8 IMPORT_NAME              0 (app.adapters.tts.base)
+             10 IMPORT_FROM              1 (get_setting_value)
+             12 STORE_FAST               1 (get_setting_value)
+             14 POP_TOP
+
+291          16 PUSH_NULL
+             18 LOAD_FAST                1 (get_setting_value)
+             20 LOAD_FAST                0 (key)
+             22 CALL                     1
+             30 LOAD_ATTR                5 (NULL|self + strip)
+             50 CALL                     0
+             58 LOAD_ATTR                7 (NULL|self + lower)
+             78 CALL                     0
+             86 RETURN_VALUE
+        >>   88 PUSH_EXC_INFO
+
+292          90 LOAD_GLOBAL              8 (Exception)
+            100 CHECK_EXC_MATCH
+            102 POP_JUMP_IF_FALSE        3 (to 110)
+            104 POP_TOP
+
+293         106 POP_EXCEPT
+            108 RETURN_CONST             3 ('')
+
+292     >>  110 RERAISE                  0
+        >>  112 COPY                     3
+            114 POP_EXCEPT
+            116 RERAISE                  1
+ExceptionTable:
+  4 to 84 -> 88 [0]
+  88 to 104 -> 112 [1] lasti
+  110 to 110 -> 112 [1] lasti
+
+Disassembly of <code object effective_whisper_device at 0x7f6c92c2b630, file "app\core\gpu.py", line 296>:
+296           0 RESUME                   0
+
+303           2 LOAD_GLOBAL              1 (NULL + str)
+             12 LOAD_FAST                0 (config)
+             14 COPY                     1
+             16 POP_JUMP_IF_TRUE         2 (to 22)
+             18 POP_TOP
+             20 BUILD_MAP                0
+        >>   22 LOAD_ATTR                3 (NULL|self + get)
+             42 LOAD_CONST               1 ('device')
+             44 LOAD_CONST               2 ('')
+             46 CALL                     2
+             54 COPY                     1
+             56 POP_JUMP_IF_TRUE         2 (to 62)
+             58 POP_TOP
+             60 LOAD_CONST               2 ('')
+        >>   62 CALL                     1
+             70 LOAD_ATTR                5 (NULL|self + strip)
+             90 CALL                     0
+             98 LOAD_ATTR                7 (NULL|self + lower)
+            118 CALL                     0
+            126 STORE_FAST               1 (pref)
+
+304         128 LOAD_FAST                1 (pref)
+            130 LOAD_GLOBAL              8 (_DEVICE_ALIASES)
+            140 CONTAINS_OP              1
+            142 POP_JUMP_IF_FALSE       11 (to 166)
+
+305         144 LOAD_GLOBAL             11 (NULL + _global_setting)
+            154 LOAD_CONST               3 ('whisper_device')
+            156 CALL                     1
+            164 STORE_FAST               1 (pref)
+
+306     >>  166 LOAD_GLOBAL             13 (NULL + resolve_device)
+            176 LOAD_FAST                1 (pref)
+            178 CALL                     1
+            186 RETURN_VALUE
+
+Disassembly of <code object effective_hw_encoder at 0x7f6c92c2bab0, file "app\core\gpu.py", line 309>:
+309           0 RESUME                   0
+
+315           2 LOAD_GLOBAL              1 (NULL + str)
+             12 LOAD_FAST                0 (config)
+             14 COPY                     1
+             16 POP_JUMP_IF_TRUE         2 (to 22)
+             18 POP_TOP
+             20 BUILD_MAP                0
+        >>   22 LOAD_ATTR                3 (NULL|self + get)
+             42 LOAD_CONST               1 ('hw_encoder')
+             44 LOAD_CONST               2 ('')
+             46 CALL                     2
+             54 COPY                     1
+             56 POP_JUMP_IF_TRUE         2 (to 62)
+             58 POP_TOP
+             60 LOAD_CONST               2 ('')
+        >>   62 CALL                     1
+             70 LOAD_ATTR                5 (NULL|self + strip)
+             90 CALL                     0
+             98 LOAD_ATTR                7 (NULL|self + lower)
+            118 CALL                     0
+            126 STORE_FAST               1 (pref)
+
+316         128 BUILD_SET                0
+            130 LOAD_CONST               3 (frozenset({'auto', 'videotoolbox', 'amf', 'qsv', 'nvenc', 'libx264', 'cpu'}))
+            132 SET_UPDATE               1
+            134 STORE_FAST               2 (valid)
+
+317         136 LOAD_FAST                1 (pref)
+            138 LOAD_FAST                2 (valid)
+            140 CONTAINS_OP              1
+            142 POP_JUMP_IF_FALSE       11 (to 166)
+
+318         144 LOAD_GLOBAL              9 (NULL + _global_setting)
+            154 LOAD_CONST               1 ('hw_encoder')
+            156 CALL                     1
+            164 STORE_FAST               1 (pref)
+
+319     >>  166 LOAD_FAST                1 (pref)
+            168 LOAD_FAST                2 (valid)
+            170 CONTAINS_OP              0
+            172 POP_JUMP_IF_FALSE        2 (to 178)
+            174 LOAD_FAST                1 (pref)
+            176 RETURN_VALUE
+        >>  178 LOAD_CONST               4 ('auto')
+            180 RETURN_VALUE
+
+Disassembly of <code object pick_torch_cuda_tag at 0x7f6c81b7f990, file "app\core\gpu.py", line 331>:
+331           0 RESUME                   0
+
+336           2 LOAD_GLOBAL              1 (NULL + cuda_driver_version)
+             12 CALL                     0
+             20 STORE_FAST               0 (dv)
+
+337          22 LOAD_FAST                0 (dv)
+             24 POP_JUMP_IF_NOT_NONE     1 (to 28)
+
+338          26 RETURN_CONST             1 (None)
+
+339     >>   28 LOAD_GLOBAL              2 (_TORCH28_CUDA_TAGS)
+             38 GET_ITER
+        >>   40 FOR_ITER                17 (to 78)
+             44 UNPACK_SEQUENCE          3
+             48 STORE_FAST               1 (maj)
+             50 STORE_FAST               2 (mino)
+             52 STORE_FAST               3 (tag)
+
+340          54 LOAD_FAST                0 (dv)
+             56 LOAD_FAST                1 (maj)
+             58 LOAD_FAST                2 (mino)
+             60 BUILD_TUPLE              2
+             62 COMPARE_OP              92 (>=)
+             66 POP_JUMP_IF_TRUE         1 (to 70)
+             68 JUMP_BACKWARD           15 (to 40)
+
+341     >>   70 LOAD_FAST                3 (tag)
+             72 SWAP                     2
+             74 POP_TOP
+             76 RETURN_VALUE
+
+339     >>   78 END_FOR
+
+342          80 RETURN_CONST             1 (None)

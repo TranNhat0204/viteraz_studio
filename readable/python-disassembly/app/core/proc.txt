@@ -1,0 +1,820 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Tiện ích spawn subprocess: ẩn cửa sổ console, hạ ưu tiên CPU, huỷ sạch cây tiến trình.\n\nApp đóng gói (PyInstaller, console=False) là tiến trình "windowed" → khi nó spawn một exe\nkiểu console (ffmpeg / ffprobe / nvidia-smi …) thì Windows TỰ CẤP một cửa sổ console mới,\ngây hiện tượng "nháy" cmd liên tục rất khó chịu. Thêm cờ CREATE_NO_WINDOW để ẩn cửa sổ đó.\n\nDùng cho cả subprocess.run/Popen và asyncio.create_subprocess_exec:\n    subprocess.run(cmd, **no_window_kwargs())\n    await asyncio.create_subprocess_exec(*cmd, **no_window_kwargs(low_priority=True))\n\nNo-op trên macOS/Linux (trừ low_priority → dùng nice).\n\nQUY ƯỚC HUỶ (quan trọng — xem docs/plan-recap-throughput-queue-gpu.md §2):\n`asyncio.CancelledError` kế thừa BaseException nên KHÔNG lọt vào `except Exception` ở BaseStep/\nJobQueue → trước đây huỷ 1 job làm CHẾT LUÔN worker của lane (lane GPU chỉ 1 worker ⇒ mọi job sau\nkẹt vĩnh viễn). Vì vậy: **huỷ do người dùng phải raise StudioError(E.CANCELLED)**, còn\n`asyncio.CancelledError` chỉ dành cho việc task thật sự bị cancel (shutdown backend).\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 19           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 21          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (asyncio)
+             24 STORE_NAME               3 (asyncio)
+
+ 22          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               3 (None)
+             30 IMPORT_NAME              4 (os)
+             32 STORE_NAME               4 (os)
+
+ 23          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               3 (None)
+             38 IMPORT_NAME              5 (subprocess)
+             40 STORE_NAME               5 (subprocess)
+
+ 24          42 LOAD_CONST               1 (0)
+             44 LOAD_CONST               3 (None)
+             46 IMPORT_NAME              6 (sys)
+             48 STORE_NAME               6 (sys)
+
+ 25          50 LOAD_CONST               1 (0)
+             52 LOAD_CONST               4 (('Callable',))
+             54 IMPORT_NAME              7 (typing)
+             56 IMPORT_FROM              8 (Callable)
+             58 STORE_NAME               8 (Callable)
+             60 POP_TOP
+
+ 27          62 LOAD_CONST               1 (0)
+             64 LOAD_CONST               5 (('make_error', 'E'))
+             66 IMPORT_NAME              9 (app.core.errors)
+             68 IMPORT_FROM             10 (make_error)
+             70 STORE_NAME              10 (make_error)
+             72 IMPORT_FROM             11 (E)
+             74 STORE_NAME              11 (E)
+             76 POP_TOP
+
+ 30          78 PUSH_NULL
+             80 LOAD_NAME               12 (getattr)
+             82 LOAD_NAME                5 (subprocess)
+             84 LOAD_CONST               6 ('CREATE_NO_WINDOW')
+             86 LOAD_CONST               7 (134217728)
+             88 CALL                     3
+             96 STORE_NAME              13 (_CREATE_NO_WINDOW)
+
+ 33          98 PUSH_NULL
+            100 LOAD_NAME               12 (getattr)
+            102 LOAD_NAME                5 (subprocess)
+            104 LOAD_CONST               8 ('BELOW_NORMAL_PRIORITY_CLASS')
+            106 LOAD_CONST               9 (16384)
+            108 CALL                     3
+            116 STORE_NAME              14 (_BELOW_NORMAL_PRIORITY)
+
+ 36         118 LOAD_CONST              18 ((False,))
+            120 LOAD_CONST              19 (('low_priority', 'bool', 'return', 'dict'))
+            122 LOAD_CONST              10 (<code object no_window_kwargs at 0x7f6c92d63b40, file "app\core\proc.py", line 36>)
+            124 MAKE_FUNCTION            5 (defaults, annotations)
+            126 STORE_NAME              15 (no_window_kwargs)
+
+ 51         128 LOAD_CONST              11 (True)
+            130 LOAD_CONST              12 (('grace',))
+            132 BUILD_CONST_KEY_MAP      1
+            134 LOAD_CONST              20 (('grace', 'bool', 'return', 'None'))
+            136 LOAD_CONST              13 (<code object kill_tree at 0x290bc360, file "app\core\proc.py", line 51>)
+            138 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            140 STORE_NAME              16 (kill_tree)
+
+ 83         142 LOAD_CONST              21 (('return', 'None'))
+            144 LOAD_CONST              14 (<code object terminate_proc at 0x7f6c92996230, file "app\core\proc.py", line 83>)
+            146 MAKE_FUNCTION            4 (annotations)
+            148 STORE_NAME              17 (terminate_proc)
+
+ 96         150 LOAD_CONST              22 (('',))
+            152 LOAD_CONST              23 (('where', 'str'))
+            154 LOAD_CONST              15 (<code object cancelled_error at 0x7f6c92b70250, file "app\core\proc.py", line 96>)
+            156 MAKE_FUNCTION            5 (defaults, annotations)
+            158 STORE_NAME              18 (cancelled_error)
+
+103         160 NOP
+
+104         162 NOP
+
+101         164 LOAD_CONST              24 ((None, 0.5))
+
+102         166 NOP
+
+101         168 NOP
+
+103         170 NOP
+
+101         172 NOP
+
+104         174 NOP
+
+101         176 NOP
+
+105         178 NOP
+
+101         180 LOAD_CONST              25 (('proc', 'asyncio.subprocess.Process', 'cancel_check', 'Callable[[], bool] | None', 'check_interval', 'float', 'return', 'int'))
+            182 LOAD_CONST              16 (<code object safe_wait_proc at 0x7f6c92994c30, file "app\core\proc.py", line 101>)
+            184 MAKE_FUNCTION            5 (defaults, annotations)
+            186 STORE_NAME              19 (safe_wait_proc)
+
+138         188 NOP
+
+139         190 NOP
+
+136         192 LOAD_CONST              24 ((None, 0.5))
+
+137         194 NOP
+
+136         196 NOP
+
+138         198 NOP
+
+136         200 NOP
+
+139         202 NOP
+
+136         204 NOP
+
+140         206 NOP
+
+136         208 LOAD_CONST              26 (('proc', 'asyncio.subprocess.Process', 'cancel_check', 'Callable[[], bool] | None', 'check_interval', 'float', 'return', 'tuple[bytes, bytes]'))
+            210 LOAD_CONST              17 (<code object safe_communicate_proc at 0x7f6c92995e30, file "app\core\proc.py", line 136>)
+            212 MAKE_FUNCTION            5 (defaults, annotations)
+            214 STORE_NAME              20 (safe_communicate_proc)
+            216 RETURN_CONST             3 (None)
+
+Disassembly of <code object no_window_kwargs at 0x7f6c92d63b40, file "app\core\proc.py", line 36>:
+ 36           0 RESUME                   0
+
+ 41           2 LOAD_GLOBAL              0 (sys)
+             12 LOAD_ATTR                2 (platform)
+             32 LOAD_CONST               1 ('win32')
+             34 COMPARE_OP              40 (==)
+             38 POP_JUMP_IF_FALSE       21 (to 82)
+
+ 42          40 LOAD_GLOBAL              4 (_CREATE_NO_WINDOW)
+             50 STORE_FAST               1 (flags)
+
+ 43          52 LOAD_FAST                0 (low_priority)
+             54 POP_JUMP_IF_FALSE        9 (to 74)
+
+ 44          56 LOAD_FAST                1 (flags)
+             58 LOAD_GLOBAL              6 (_BELOW_NORMAL_PRIORITY)
+             68 BINARY_OP               20 (|=)
+             72 STORE_FAST               1 (flags)
+
+ 45     >>   74 LOAD_CONST               2 ('creationflags')
+             76 LOAD_FAST                1 (flags)
+             78 BUILD_MAP                1
+             80 RETURN_VALUE
+
+ 46     >>   82 LOAD_FAST                0 (low_priority)
+             84 POP_JUMP_IF_FALSE       21 (to 128)
+             86 LOAD_GLOBAL              9 (NULL + hasattr)
+             96 LOAD_GLOBAL             10 (os)
+            106 LOAD_CONST               3 ('nice')
+            108 CALL                     2
+            116 POP_JUMP_IF_FALSE        5 (to 128)
+
+ 47         118 LOAD_CONST               4 ('preexec_fn')
+            120 LOAD_CONST               5 (<code object <lambda> at 0x7f6c92ee9980, file "app\core\proc.py", line 47>)
+            122 MAKE_FUNCTION            0
+            124 BUILD_MAP                1
+            126 RETURN_VALUE
+
+ 48     >>  128 BUILD_MAP                0
+            130 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c92ee9980, file "app\core\proc.py", line 47>:
+ 47           0 RESUME                   0
+              2 LOAD_GLOBAL              1 (NULL + os)
+             12 LOAD_ATTR                2 (nice)
+             32 LOAD_CONST               1 (5)
+             34 CALL                     1
+             42 RETURN_VALUE
+
+Disassembly of <code object kill_tree at 0x290bc360, file "app\core\proc.py", line 51>:
+ 51           0 RESUME                   0
+
+ 60           2 LOAD_GLOBAL              1 (NULL + getattr)
+             12 LOAD_FAST                0 (proc)
+             14 LOAD_CONST               1 ('pid')
+             16 LOAD_CONST               2 (None)
+             18 CALL                     3
+             26 STORE_FAST               2 (pid)
+
+ 61          28 LOAD_FAST                2 (pid)
+             30 POP_JUMP_IF_TRUE         1 (to 34)
+
+ 62          32 RETURN_CONST             2 (None)
+
+ 63     >>   34 LOAD_GLOBAL              2 (sys)
+             44 LOAD_ATTR                4 (platform)
+             64 LOAD_CONST               3 ('win32')
+             66 COMPARE_OP              40 (==)
+             70 POP_JUMP_IF_FALSE       78 (to 228)
+
+ 64          72 NOP
+
+ 65          74 LOAD_GLOBAL              7 (NULL + subprocess)
+             84 LOAD_ATTR                8 (run)
+            104 LOAD_CONST               4 ('taskkill')
+            106 LOAD_CONST               5 ('/T')
+            108 LOAD_CONST               6 ('/F')
+            110 LOAD_CONST               7 ('/PID')
+            112 LOAD_GLOBAL             11 (NULL + str)
+            122 LOAD_FAST                2 (pid)
+            124 CALL                     1
+            132 BUILD_LIST               5
+            134 BUILD_TUPLE              1
+
+ 66         136 LOAD_GLOBAL              6 (subprocess)
+            146 LOAD_ATTR               12 (DEVNULL)
+            166 LOAD_GLOBAL              6 (subprocess)
+            176 LOAD_ATTR               12 (DEVNULL)
+
+ 67         196 LOAD_CONST               8 (10)
+
+ 65         198 LOAD_CONST               9 (('stdout', 'stderr', 'timeout'))
+            200 BUILD_CONST_KEY_MAP      3
+
+ 67         202 LOAD_GLOBAL             15 (NULL + no_window_kwargs)
+            212 CALL                     0
+
+ 65         220 DICT_MERGE               1
+            222 CALL_FUNCTION_EX         1
+            224 POP_TOP
+
+ 68         226 RETURN_CONST             2 (None)
+
+ 72     >>  228 NOP
+
+ 73         230 LOAD_GLOBAL             19 (NULL + os)
+            240 LOAD_ATTR               20 (killpg)
+            260 LOAD_GLOBAL             19 (NULL + os)
+            270 LOAD_ATTR               22 (getpgid)
+            290 LOAD_FAST                2 (pid)
+            292 CALL                     1
+            300 LOAD_CONST              10 (9)
+            302 CALL                     2
+            310 POP_TOP
+
+ 74         312 RETURN_CONST             2 (None)
+        >>  314 PUSH_EXC_INFO
+
+ 69         316 LOAD_GLOBAL             16 (Exception)
+            326 CHECK_EXC_MATCH
+            328 POP_JUMP_IF_FALSE        3 (to 336)
+            330 POP_TOP
+
+ 70         332 POP_EXCEPT
+            334 JUMP_FORWARD            19 (to 374)
+
+ 69     >>  336 RERAISE                  0
+        >>  338 COPY                     3
+            340 POP_EXCEPT
+            342 RERAISE                  1
+        >>  344 PUSH_EXC_INFO
+
+ 75         346 LOAD_GLOBAL             16 (Exception)
+            356 CHECK_EXC_MATCH
+            358 POP_JUMP_IF_FALSE        3 (to 366)
+            360 POP_TOP
+
+ 76         362 POP_EXCEPT
+            364 JUMP_FORWARD             4 (to 374)
+
+ 75     >>  366 RERAISE                  0
+        >>  368 COPY                     3
+            370 POP_EXCEPT
+            372 RERAISE                  1
+
+ 77     >>  374 NOP
+
+ 78         376 LOAD_FAST                1 (grace)
+            378 POP_JUMP_IF_FALSE       17 (to 414)
+            380 LOAD_FAST                0 (proc)
+            382 LOAD_ATTR               25 (NULL|self + terminate)
+            402 CALL                     0
+            410 POP_TOP
+            412 RETURN_CONST             2 (None)
+        >>  414 LOAD_FAST                0 (proc)
+            416 LOAD_ATTR               27 (NULL|self + kill)
+            436 CALL                     0
+            444 POP_TOP
+            446 RETURN_CONST             2 (None)
+        >>  448 PUSH_EXC_INFO
+
+ 79         450 LOAD_GLOBAL             16 (Exception)
+            460 CHECK_EXC_MATCH
+            462 POP_JUMP_IF_FALSE        3 (to 470)
+            464 POP_TOP
+
+ 80         466 POP_EXCEPT
+            468 RETURN_CONST             2 (None)
+
+ 79     >>  470 RERAISE                  0
+        >>  472 COPY                     3
+            474 POP_EXCEPT
+            476 RERAISE                  1
+ExceptionTable:
+  74 to 224 -> 314 [0]
+  230 to 310 -> 344 [0]
+  314 to 330 -> 338 [1] lasti
+  336 to 336 -> 338 [1] lasti
+  344 to 360 -> 368 [1] lasti
+  366 to 366 -> 368 [1] lasti
+  376 to 410 -> 448 [0]
+  414 to 444 -> 448 [0]
+  448 to 464 -> 472 [1] lasti
+  470 to 470 -> 472 [1] lasti
+
+Disassembly of <code object terminate_proc at 0x7f6c92996230, file "app\core\proc.py", line 83>:
+ 83           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 85           6 LOAD_GLOBAL              1 (NULL + kill_tree)
+             16 LOAD_FAST                0 (proc)
+             18 CALL                     1
+             26 POP_TOP
+
+ 86          28 NOP
+
+ 87          30 LOAD_GLOBAL              3 (NULL + asyncio)
+             40 LOAD_ATTR                4 (wait_for)
+             60 LOAD_FAST                0 (proc)
+             62 LOAD_ATTR                7 (NULL|self + wait)
+             82 CALL                     0
+             90 LOAD_CONST               1 (5)
+             92 KW_NAMES                 2 (('timeout',))
+             94 CALL                     2
+            102 GET_AWAITABLE            0
+            104 LOAD_CONST               3 (None)
+        >>  106 SEND                     3 (to 116)
+            110 YIELD_VALUE              3
+            112 RESUME                   3
+            114 JUMP_BACKWARD_NO_INTERRUPT     5 (to 106)
+        >>  116 END_SEND
+            118 POP_TOP
+            120 RETURN_CONST             3 (None)
+        >>  122 CLEANUP_THROW
+            124 JUMP_BACKWARD            5 (to 116)
+        >>  126 PUSH_EXC_INFO
+
+ 88         128 LOAD_GLOBAL              2 (asyncio)
+            138 LOAD_ATTR                8 (TimeoutError)
+            158 LOAD_GLOBAL             10 (Exception)
+            168 BUILD_TUPLE              2
+            170 CHECK_EXC_MATCH
+            172 POP_JUMP_IF_FALSE       61 (to 296)
+            174 POP_TOP
+
+ 89         176 NOP
+
+ 90         178 LOAD_FAST                0 (proc)
+            180 LOAD_ATTR               13 (NULL|self + kill)
+            200 CALL                     0
+            208 POP_TOP
+
+ 91         210 LOAD_FAST                0 (proc)
+            212 LOAD_ATTR                7 (NULL|self + wait)
+            232 CALL                     0
+            240 GET_AWAITABLE            0
+            242 LOAD_CONST               3 (None)
+        >>  244 SEND                     4 (to 256)
+            248 YIELD_VALUE              4
+            250 RESUME                   3
+            252 JUMP_BACKWARD_NO_INTERRUPT     5 (to 244)
+        >>  254 CLEANUP_THROW
+        >>  256 END_SEND
+            258 POP_TOP
+            260 POP_EXCEPT
+            262 RETURN_CONST             3 (None)
+        >>  264 PUSH_EXC_INFO
+
+ 92         266 LOAD_GLOBAL             10 (Exception)
+            276 CHECK_EXC_MATCH
+            278 POP_JUMP_IF_FALSE        4 (to 288)
+            280 POP_TOP
+
+ 93         282 POP_EXCEPT
+            284 POP_EXCEPT
+            286 RETURN_CONST             3 (None)
+
+ 92     >>  288 RERAISE                  0
+        >>  290 COPY                     3
+            292 POP_EXCEPT
+            294 RERAISE                  1
+
+ 88     >>  296 RERAISE                  0
+        >>  298 COPY                     3
+            300 POP_EXCEPT
+            302 RERAISE                  1
+        >>  304 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            306 RERAISE                  1
+ExceptionTable:
+  4 to 26 -> 304 [0] lasti
+  30 to 108 -> 126 [0]
+  110 to 110 -> 122 [2]
+  112 to 118 -> 126 [0]
+  120 to 120 -> 304 [0] lasti
+  122 to 122 -> 126 [0]
+  126 to 174 -> 298 [1] lasti
+  178 to 246 -> 264 [1]
+  248 to 248 -> 254 [3]
+  250 to 258 -> 264 [1]
+  260 to 262 -> 304 [0] lasti
+  264 to 280 -> 290 [2] lasti
+  282 to 282 -> 298 [1] lasti
+  284 to 286 -> 304 [0] lasti
+  288 to 288 -> 290 [2] lasti
+  290 to 296 -> 298 [1] lasti
+  298 to 302 -> 304 [0] lasti
+
+Disassembly of <code object cancelled_error at 0x7f6c92b70250, file "app\core\proc.py", line 96>:
+ 96           0 RESUME                   0
+
+ 98           2 LOAD_GLOBAL              1 (NULL + make_error)
+             12 LOAD_GLOBAL              2 (E)
+             22 LOAD_ATTR                4 (CANCELLED)
+             42 LOAD_CONST               1 ('Đã huỷ theo yêu cầu')
+             44 LOAD_FAST                0 (where)
+             46 POP_JUMP_IF_FALSE        5 (to 58)
+             48 LOAD_CONST               2 (' — ')
+             50 LOAD_FAST                0 (where)
+             52 BINARY_OP                0 (+)
+             56 JUMP_FORWARD             1 (to 60)
+        >>   58 LOAD_CONST               3 ('')
+        >>   60 FORMAT_VALUE             0
+             62 LOAD_CONST               4 ('.')
+             64 BUILD_STRING             3
+             66 CALL                     2
+             74 RETURN_VALUE
+
+Disassembly of <code object safe_wait_proc at 0x7f6c92994c30, file "app\core\proc.py", line 101>:
+              0 MAKE_CELL                0 (proc)
+              2 MAKE_CELL                1 (cancel_check)
+              4 MAKE_CELL                2 (check_interval)
+              6 MAKE_CELL                5 (cancelled)
+
+101           8 RETURN_GENERATOR
+             10 POP_TOP
+             12 RESUME                   0
+
+111          14 LOAD_DEREF               1 (cancel_check)
+             16 POP_JUMP_IF_TRUE        24 (to 66)
+
+112          18 LOAD_DEREF               0 (proc)
+             20 LOAD_ATTR                1 (NULL|self + wait)
+             40 CALL                     0
+             48 GET_AWAITABLE            0
+             50 LOAD_CONST               1 (None)
+        >>   52 SEND                     3 (to 62)
+             56 YIELD_VALUE              2
+             58 RESUME                   3
+             60 JUMP_BACKWARD_NO_INTERRUPT     5 (to 52)
+        >>   62 END_SEND
+             64 RETURN_VALUE
+
+114     >>   66 LOAD_CONST               2 (False)
+             68 STORE_DEREF              5 (cancelled)
+
+116          70 LOAD_CLOSURE             1 (cancel_check)
+             72 LOAD_CLOSURE             5 (cancelled)
+             74 LOAD_CLOSURE             2 (check_interval)
+             76 LOAD_CLOSURE             0 (proc)
+             78 BUILD_TUPLE              4
+             80 LOAD_CONST               3 (<code object monitor at 0x7f6c92c2bc30, file "app\core\proc.py", line 116>)
+             82 MAKE_FUNCTION            8 (closure)
+             84 STORE_FAST               3 (monitor)
+
+125          86 NOP
+
+126          88 LOAD_GLOBAL              3 (NULL + asyncio)
+             98 LOAD_ATTR                4 (gather)
+            118 LOAD_DEREF               0 (proc)
+            120 LOAD_ATTR                1 (NULL|self + wait)
+            140 CALL                     0
+            148 PUSH_NULL
+            150 LOAD_FAST                3 (monitor)
+            152 CALL                     0
+            160 CALL                     2
+            168 GET_AWAITABLE            0
+            170 LOAD_CONST               1 (None)
+        >>  172 SEND                     3 (to 182)
+            176 YIELD_VALUE              3
+            178 RESUME                   3
+            180 JUMP_BACKWARD_NO_INTERRUPT     5 (to 172)
+        >>  182 END_SEND
+            184 STORE_FAST               4 (results)
+
+131         186 LOAD_DEREF               5 (cancelled)
+            188 POP_JUMP_IF_FALSE       10 (to 210)
+
+132         190 LOAD_GLOBAL             11 (NULL + cancelled_error)
+            200 CALL                     0
+            208 RAISE_VARARGS            1
+
+133     >>  210 LOAD_FAST                4 (results)
+            212 LOAD_CONST               4 (0)
+            214 BINARY_SUBSCR
+            218 RETURN_VALUE
+
+112     >>  220 CLEANUP_THROW
+            222 JUMP_BACKWARD           81 (to 62)
+
+126     >>  224 CLEANUP_THROW
+            226 JUMP_BACKWARD           23 (to 182)
+        >>  228 PUSH_EXC_INFO
+
+127         230 LOAD_GLOBAL              2 (asyncio)
+            240 LOAD_ATTR                6 (CancelledError)
+            260 CHECK_EXC_MATCH
+            262 POP_JUMP_IF_FALSE       22 (to 308)
+            264 POP_TOP
+
+129         266 LOAD_GLOBAL              9 (NULL + terminate_proc)
+            276 LOAD_DEREF               0 (proc)
+            278 CALL                     1
+            286 GET_AWAITABLE            0
+            288 LOAD_CONST               1 (None)
+        >>  290 SEND                     4 (to 302)
+            294 YIELD_VALUE              3
+            296 RESUME                   3
+            298 JUMP_BACKWARD_NO_INTERRUPT     5 (to 290)
+        >>  300 CLEANUP_THROW
+        >>  302 END_SEND
+            304 POP_TOP
+
+130         306 RAISE_VARARGS            0
+
+127     >>  308 RERAISE                  0
+        >>  310 COPY                     3
+            312 POP_EXCEPT
+            314 RERAISE                  1
+        >>  316 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            318 RERAISE                  1
+ExceptionTable:
+  12 to 54 -> 316 [0] lasti
+  56 to 56 -> 220 [2]
+  58 to 84 -> 316 [0] lasti
+  88 to 174 -> 228 [0]
+  176 to 176 -> 224 [2]
+  178 to 184 -> 228 [0]
+  186 to 220 -> 316 [0] lasti
+  224 to 224 -> 228 [0]
+  228 to 292 -> 310 [1] lasti
+  294 to 294 -> 300 [3]
+  296 to 308 -> 310 [1] lasti
+  310 to 314 -> 316 [0] lasti
+
+Disassembly of <code object monitor at 0x7f6c92c2bc30, file "app\core\proc.py", line 116>:
+              0 COPY_FREE_VARS           4
+
+116           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+118           8 LOAD_DEREF               3 (proc)
+             10 LOAD_ATTR                0 (returncode)
+             30 POP_JUMP_IF_NOT_NONE    72 (to 176)
+
+119     >>   32 PUSH_NULL
+             34 LOAD_DEREF               0 (cancel_check)
+             36 CALL                     0
+             44 POP_JUMP_IF_FALSE       22 (to 90)
+
+120          46 LOAD_CONST               1 (True)
+             48 STORE_DEREF              1 (cancelled)
+
+121          50 LOAD_GLOBAL              3 (NULL + terminate_proc)
+             60 LOAD_DEREF               3 (proc)
+             62 CALL                     1
+             70 GET_AWAITABLE            0
+             72 LOAD_CONST               0 (None)
+        >>   74 SEND                     3 (to 84)
+             78 YIELD_VALUE              2
+             80 RESUME                   3
+             82 JUMP_BACKWARD_NO_INTERRUPT     5 (to 74)
+        >>   84 END_SEND
+             86 POP_TOP
+
+122          88 RETURN_CONST             0 (None)
+
+123     >>   90 LOAD_GLOBAL              5 (NULL + asyncio)
+            100 LOAD_ATTR                6 (sleep)
+            120 LOAD_DEREF               2 (check_interval)
+            122 CALL                     1
+            130 GET_AWAITABLE            0
+            132 LOAD_CONST               0 (None)
+        >>  134 SEND                     3 (to 144)
+            138 YIELD_VALUE              2
+            140 RESUME                   3
+            142 JUMP_BACKWARD_NO_INTERRUPT     5 (to 134)
+        >>  144 END_SEND
+            146 POP_TOP
+
+118         148 LOAD_DEREF               3 (proc)
+            150 LOAD_ATTR                0 (returncode)
+            170 POP_JUMP_IF_NOT_NONE     1 (to 174)
+            172 JUMP_BACKWARD           71 (to 32)
+        >>  174 RETURN_CONST             0 (None)
+        >>  176 RETURN_CONST             0 (None)
+
+121     >>  178 CLEANUP_THROW
+            180 JUMP_BACKWARD           49 (to 84)
+
+123     >>  182 CLEANUP_THROW
+            184 JUMP_BACKWARD           21 (to 144)
+        >>  186 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            188 RERAISE                  1
+ExceptionTable:
+  6 to 76 -> 186 [0] lasti
+  78 to 78 -> 178 [2]
+  80 to 136 -> 186 [0] lasti
+  138 to 138 -> 182 [2]
+  140 to 170 -> 186 [0] lasti
+  174 to 178 -> 186 [0] lasti
+  182 to 182 -> 186 [0] lasti
+
+Disassembly of <code object safe_communicate_proc at 0x7f6c92995e30, file "app\core\proc.py", line 136>:
+              0 MAKE_CELL                0 (proc)
+              2 MAKE_CELL                1 (cancel_check)
+              4 MAKE_CELL                2 (check_interval)
+              6 MAKE_CELL                5 (cancelled)
+
+136           8 RETURN_GENERATOR
+             10 POP_TOP
+             12 RESUME                   0
+
+142          14 LOAD_DEREF               1 (cancel_check)
+             16 POP_JUMP_IF_TRUE        24 (to 66)
+
+143          18 LOAD_DEREF               0 (proc)
+             20 LOAD_ATTR                1 (NULL|self + communicate)
+             40 CALL                     0
+             48 GET_AWAITABLE            0
+             50 LOAD_CONST               1 (None)
+        >>   52 SEND                     3 (to 62)
+             56 YIELD_VALUE              2
+             58 RESUME                   3
+             60 JUMP_BACKWARD_NO_INTERRUPT     5 (to 52)
+        >>   62 END_SEND
+             64 RETURN_VALUE
+
+145     >>   66 LOAD_CONST               2 (False)
+             68 STORE_DEREF              5 (cancelled)
+
+147          70 LOAD_CLOSURE             1 (cancel_check)
+             72 LOAD_CLOSURE             5 (cancelled)
+             74 LOAD_CLOSURE             2 (check_interval)
+             76 LOAD_CLOSURE             0 (proc)
+             78 BUILD_TUPLE              4
+             80 LOAD_CONST               3 (<code object monitor at 0x7f6c92c2b030, file "app\core\proc.py", line 147>)
+             82 MAKE_FUNCTION            8 (closure)
+             84 STORE_FAST               3 (monitor)
+
+156          86 NOP
+
+157          88 LOAD_GLOBAL              3 (NULL + asyncio)
+             98 LOAD_ATTR                4 (gather)
+            118 LOAD_DEREF               0 (proc)
+            120 LOAD_ATTR                1 (NULL|self + communicate)
+            140 CALL                     0
+            148 PUSH_NULL
+            150 LOAD_FAST                3 (monitor)
+            152 CALL                     0
+            160 CALL                     2
+            168 GET_AWAITABLE            0
+            170 LOAD_CONST               1 (None)
+        >>  172 SEND                     3 (to 182)
+            176 YIELD_VALUE              3
+            178 RESUME                   3
+            180 JUMP_BACKWARD_NO_INTERRUPT     5 (to 172)
+        >>  182 END_SEND
+            184 STORE_FAST               4 (results)
+
+161         186 LOAD_DEREF               5 (cancelled)
+            188 POP_JUMP_IF_FALSE       10 (to 210)
+
+162         190 LOAD_GLOBAL             11 (NULL + cancelled_error)
+            200 CALL                     0
+            208 RAISE_VARARGS            1
+
+163     >>  210 LOAD_FAST                4 (results)
+            212 LOAD_CONST               4 (0)
+            214 BINARY_SUBSCR
+            218 RETURN_VALUE
+
+143     >>  220 CLEANUP_THROW
+            222 JUMP_BACKWARD           81 (to 62)
+
+157     >>  224 CLEANUP_THROW
+            226 JUMP_BACKWARD           23 (to 182)
+        >>  228 PUSH_EXC_INFO
+
+158         230 LOAD_GLOBAL              2 (asyncio)
+            240 LOAD_ATTR                6 (CancelledError)
+            260 CHECK_EXC_MATCH
+            262 POP_JUMP_IF_FALSE       22 (to 308)
+            264 POP_TOP
+
+159         266 LOAD_GLOBAL              9 (NULL + terminate_proc)
+            276 LOAD_DEREF               0 (proc)
+            278 CALL                     1
+            286 GET_AWAITABLE            0
+            288 LOAD_CONST               1 (None)
+        >>  290 SEND                     4 (to 302)
+            294 YIELD_VALUE              3
+            296 RESUME                   3
+            298 JUMP_BACKWARD_NO_INTERRUPT     5 (to 290)
+        >>  300 CLEANUP_THROW
+        >>  302 END_SEND
+            304 POP_TOP
+
+160         306 RAISE_VARARGS            0
+
+158     >>  308 RERAISE                  0
+        >>  310 COPY                     3
+            312 POP_EXCEPT
+            314 RERAISE                  1
+        >>  316 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            318 RERAISE                  1
+ExceptionTable:
+  12 to 54 -> 316 [0] lasti
+  56 to 56 -> 220 [2]
+  58 to 84 -> 316 [0] lasti
+  88 to 174 -> 228 [0]
+  176 to 176 -> 224 [2]
+  178 to 184 -> 228 [0]
+  186 to 220 -> 316 [0] lasti
+  224 to 224 -> 228 [0]
+  228 to 292 -> 310 [1] lasti
+  294 to 294 -> 300 [3]
+  296 to 308 -> 310 [1] lasti
+  310 to 314 -> 316 [0] lasti
+
+Disassembly of <code object monitor at 0x7f6c92c2b030, file "app\core\proc.py", line 147>:
+              0 COPY_FREE_VARS           4
+
+147           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+149           8 LOAD_DEREF               3 (proc)
+             10 LOAD_ATTR                0 (returncode)
+             30 POP_JUMP_IF_NOT_NONE    72 (to 176)
+
+150     >>   32 PUSH_NULL
+             34 LOAD_DEREF               0 (cancel_check)
+             36 CALL                     0
+             44 POP_JUMP_IF_FALSE       22 (to 90)
+
+151          46 LOAD_CONST               1 (True)
+             48 STORE_DEREF              1 (cancelled)
+
+152          50 LOAD_GLOBAL              3 (NULL + terminate_proc)
+             60 LOAD_DEREF               3 (proc)
+             62 CALL                     1
+             70 GET_AWAITABLE            0
+             72 LOAD_CONST               0 (None)
+        >>   74 SEND                     3 (to 84)
+             78 YIELD_VALUE              2
+             80 RESUME                   3
+             82 JUMP_BACKWARD_NO_INTERRUPT     5 (to 74)
+        >>   84 END_SEND
+             86 POP_TOP
+
+153          88 RETURN_CONST             0 (None)
+
+154     >>   90 LOAD_GLOBAL              5 (NULL + asyncio)
+            100 LOAD_ATTR                6 (sleep)
+            120 LOAD_DEREF               2 (check_interval)
+            122 CALL                     1
+            130 GET_AWAITABLE            0
+            132 LOAD_CONST               0 (None)
+        >>  134 SEND                     3 (to 144)
+            138 YIELD_VALUE              2
+            140 RESUME                   3
+            142 JUMP_BACKWARD_NO_INTERRUPT     5 (to 134)
+        >>  144 END_SEND
+            146 POP_TOP
+
+149         148 LOAD_DEREF               3 (proc)
+            150 LOAD_ATTR                0 (returncode)
+            170 POP_JUMP_IF_NOT_NONE     1 (to 174)
+            172 JUMP_BACKWARD           71 (to 32)
+        >>  174 RETURN_CONST             0 (None)
+        >>  176 RETURN_CONST             0 (None)
+
+152     >>  178 CLEANUP_THROW
+            180 JUMP_BACKWARD           49 (to 84)
+
+154     >>  182 CLEANUP_THROW
+            184 JUMP_BACKWARD           21 (to 144)
+        >>  186 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            188 RERAISE                  1
+ExceptionTable:
+  6 to 76 -> 186 [0] lasti
+  78 to 78 -> 178 [2]
+  80 to 136 -> 186 [0] lasti
+  138 to 138 -> 182 [2]
+  140 to 170 -> 186 [0] lasti
+  174 to 178 -> 186 [0] lasti
+  182 to 182 -> 186 [0] lasti

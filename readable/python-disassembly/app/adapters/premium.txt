@@ -1,0 +1,2344 @@
+  0           0 RESUME                   0
+
+  1           2 SETUP_ANNOTATIONS
+              4 LOAD_CONST               0 ('Premium Voice — helpers dùng chung cho AI Script Engine (rewrite + emotion + timeline).\n\nTách riêng khỏi deepseek.py/chatgpt_session.py để 2 client (DeepSeek/ChatGPT) dùng chung\nprompt + parser + bảng emotion→voice_settings. Xem docs/premium-voice-pipeline-plan.md §5.\n\nHợp đồng output của LLM (JSON array), mỗi phần tử = 1 "group" (đã merge/split):\n  {\n    "src_seqs": [12, 13],          # seq baseline gộp lại (gợi ý timeline)\n    "start_ms": 12000,             # mốc bắt đầu (ms)\n    "end_ms":   17000,             # mốc kết thúc (ms)\n    "new_text": "...",             # lời thoại đã rewrite (ngôn ngữ đích)\n    "emotion":  "shock",           # 1 trong EMOTIONS\n    "intensity": 0.9,              # 0..1\n    "speech_rate": 0.95,           # 0.8..1.2 (gợi ý tốc độ đọc)\n    "prefix_tag": "[dramatic pause] "  # tuỳ chọn — audio tag ElevenLabs\n  }\n')
+              6 STORE_NAME               0 (__doc__)
+
+ 18           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('annotations',))
+             12 IMPORT_NAME              1 (__future__)
+             14 IMPORT_FROM              2 (annotations)
+             16 STORE_NAME               2 (annotations)
+             18 POP_TOP
+
+ 20          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               3 (None)
+             24 IMPORT_NAME              3 (json)
+             26 STORE_NAME               3 (json)
+
+ 21          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               3 (None)
+             32 IMPORT_NAME              4 (re)
+             34 STORE_NAME               4 (re)
+
+ 24          36 PUSH_NULL
+             38 LOAD_NAME                4 (re)
+             40 LOAD_ATTR               10 (compile)
+             60 LOAD_CONST               4 ('\\[[^\\]]*\\]')
+             62 CALL                     1
+             70 STORE_NAME               6 (_TAG_RE)
+
+ 29          72 LOAD_CONST               5 (15.0)
+             74 LOAD_CONST               6 (14.0)
+             76 LOAD_CONST               7 (8.0)
+             78 LOAD_CONST               8 (9.0)
+             80 LOAD_CONST               9 (7.0)
+
+ 30          82 LOAD_CONST               6 (14.0)
+             84 LOAD_CONST              10 (13.0)
+             86 LOAD_CONST               6 (14.0)
+             88 LOAD_CONST               6 (14.0)
+             90 LOAD_CONST               6 (14.0)
+             92 LOAD_CONST              10 (13.0)
+
+ 28          94 LOAD_CONST              11 (('vi', 'en', 'ja', 'ko', 'zh', 'fr', 'de', 'es', 'it', 'pt', 'ru'))
+             96 BUILD_CONST_KEY_MAP     11
+             98 STORE_NAME               7 (CHARS_PER_SEC)
+            100 LOAD_CONST              12 ('dict[str, float]')
+            102 LOAD_NAME                8 (__annotations__)
+            104 LOAD_CONST              13 ('CHARS_PER_SEC')
+            106 STORE_SUBSCR
+
+ 32         110 LOAD_CONST               6 (14.0)
+            112 STORE_NAME               9 (DEFAULT_CPS)
+
+ 34         114 LOAD_CONST              14 (1.1)
+            116 STORE_NAME              10 (_BUDGET_HEADROOM)
+
+ 37         118 LOAD_CONST              15 (('neutral', 'sad', 'happy', 'shock', 'tense', 'dramatic', 'calm', 'excited', 'whisper', 'angry', 'funny', 'formal', 'radio', 'robotic'))
+            120 STORE_NAME              11 (EMOTIONS)
+
+ 44         122 LOAD_CONST              16 (0.55)
+            124 LOAD_CONST              17 (0.75)
+            126 LOAD_CONST              18 (0.15)
+            128 LOAD_CONST              19 (False)
+            130 LOAD_CONST              20 (('stability', 'similarity_boost', 'style', 'use_speaker_boost'))
+            132 BUILD_CONST_KEY_MAP      4
+
+ 45         134 LOAD_CONST              21 (0.6)
+            136 LOAD_CONST              17 (0.75)
+            138 LOAD_CONST              22 (0.2)
+            140 LOAD_CONST              19 (False)
+            142 LOAD_CONST              20 (('stability', 'similarity_boost', 'style', 'use_speaker_boost'))
+            144 BUILD_CONST_KEY_MAP      4
+
+ 46         146 LOAD_CONST              23 (0.5)
+            148 LOAD_CONST              24 (0.8)
+            150 LOAD_CONST              25 (0.35)
+            152 LOAD_CONST              19 (False)
+            154 LOAD_CONST              20 (('stability', 'similarity_boost', 'style', 'use_speaker_boost'))
+            156 BUILD_CONST_KEY_MAP      4
+
+ 47         158 LOAD_CONST              26 (0.45)
+            160 LOAD_CONST              24 (0.8)
+            162 LOAD_CONST              26 (0.45)
+            164 LOAD_CONST              27 (True)
+            166 LOAD_CONST              20 (('stability', 'similarity_boost', 'style', 'use_speaker_boost'))
+            168 BUILD_CONST_KEY_MAP      4
+
+ 48         170 LOAD_CONST              28 (0.4)
+            172 LOAD_CONST              24 (0.8)
+            174 LOAD_CONST              29 (0.65)
+            176 LOAD_CONST              27 (True)
+            178 LOAD_CONST              20 (('stability', 'similarity_boost', 'style', 'use_speaker_boost'))
+            180 BUILD_CONST_KEY_MAP      4
+
+ 49         182 LOAD_CONST              25 (0.35)
+            184 LOAD_CONST              24 (0.8)
+            186 LOAD_CONST              30 (0.7)
+            188 LOAD_CONST              27 (True)
+            190 LOAD_CONST              20 (('stability', 'similarity_boost', 'style', 'use_speaker_boost'))
+            192 BUILD_CONST_KEY_MAP      4
+
+ 50         194 LOAD_CONST              25 (0.35)
+            196 LOAD_CONST              31 (0.85)
+            198 LOAD_CONST              17 (0.75)
+            200 LOAD_CONST              27 (True)
+            202 LOAD_CONST              20 (('stability', 'similarity_boost', 'style', 'use_speaker_boost'))
+            204 BUILD_CONST_KEY_MAP      4
+
+ 51         206 LOAD_CONST              32 (0.3)
+            208 LOAD_CONST              24 (0.8)
+            210 LOAD_CONST              24 (0.8)
+            212 LOAD_CONST              27 (True)
+            214 LOAD_CONST              20 (('stability', 'similarity_boost', 'style', 'use_speaker_boost'))
+            216 BUILD_CONST_KEY_MAP      4
+
+ 52         218 LOAD_CONST              23 (0.5)
+            220 LOAD_CONST              17 (0.75)
+            222 LOAD_CONST              33 (0.25)
+            224 LOAD_CONST              19 (False)
+            226 LOAD_CONST              20 (('stability', 'similarity_boost', 'style', 'use_speaker_boost'))
+            228 BUILD_CONST_KEY_MAP      4
+
+ 53         230 LOAD_CONST              28 (0.4)
+            232 LOAD_CONST              31 (0.85)
+            234 LOAD_CONST              21 (0.6)
+            236 LOAD_CONST              27 (True)
+            238 LOAD_CONST              20 (('stability', 'similarity_boost', 'style', 'use_speaker_boost'))
+            240 BUILD_CONST_KEY_MAP      4
+
+ 54         242 LOAD_CONST              26 (0.45)
+            244 LOAD_CONST              24 (0.8)
+            246 LOAD_CONST              28 (0.4)
+            248 LOAD_CONST              27 (True)
+            250 LOAD_CONST              20 (('stability', 'similarity_boost', 'style', 'use_speaker_boost'))
+            252 BUILD_CONST_KEY_MAP      4
+
+ 55         254 LOAD_CONST              29 (0.65)
+            256 LOAD_CONST              17 (0.75)
+            258 LOAD_CONST              34 (0.1)
+            260 LOAD_CONST              19 (False)
+            262 LOAD_CONST              20 (('stability', 'similarity_boost', 'style', 'use_speaker_boost'))
+            264 BUILD_CONST_KEY_MAP      4
+
+ 56         266 LOAD_CONST              16 (0.55)
+            268 LOAD_CONST              30 (0.7)
+            270 LOAD_CONST              22 (0.2)
+            272 LOAD_CONST              19 (False)
+            274 LOAD_CONST              20 (('stability', 'similarity_boost', 'style', 'use_speaker_boost'))
+            276 BUILD_CONST_KEY_MAP      4
+
+ 57         278 LOAD_CONST              30 (0.7)
+            280 LOAD_CONST              21 (0.6)
+            282 LOAD_CONST              35 (0.05)
+            284 LOAD_CONST              19 (False)
+            286 LOAD_CONST              20 (('stability', 'similarity_boost', 'style', 'use_speaker_boost'))
+            288 BUILD_CONST_KEY_MAP      4
+
+ 43         290 LOAD_CONST              36 (('neutral', 'calm', 'sad', 'happy', 'dramatic', 'tense', 'excited', 'shock', 'whisper', 'angry', 'funny', 'formal', 'radio', 'robotic'))
+            292 BUILD_CONST_KEY_MAP     14
+            294 STORE_NAME              12 (EMOTION_VOICE_SETTINGS)
+            296 LOAD_CONST              37 ('dict[str, dict]')
+            298 LOAD_NAME                8 (__annotations__)
+            300 LOAD_CONST              38 ('EMOTION_VOICE_SETTINGS')
+            302 STORE_SUBSCR
+
+ 63         306 LOAD_CONST              39 ('Plain, factual narration with no strong feeling — the default for informational lines.')
+
+ 64         308 LOAD_CONST              40 ('Soft, soothing, relaxed — reassurance, gentle reflection, slow quiet scenes.')
+
+ 65         310 LOAD_CONST              41 ('Warm, cheerful, upbeat — good news, pleasant moments, light positivity.')
+
+ 66         312 LOAD_CONST              42 ('High-energy, enthusiastic, fast — hype, big reveals, thrilling beats.')
+
+ 67         314 LOAD_CONST              43 ('Slow, low, sorrowful — loss, regret, melancholy, emotional lows.')
+
+ 68         316 LOAD_CONST              44 ('Sudden astonishment, gasping disbelief — jaw-dropping reveals and twists.')
+
+ 69         318 LOAD_CONST              45 ('Hushed, intimate, secretive — confiding a secret, quiet suspense build-up.')
+
+ 70         320 LOAD_CONST              46 ('Forceful, harsh, intense — conflict, outrage, heated confrontation.')
+
+ 71         322 LOAD_CONST              47 ('Deep, weighty, theatrical — climaxes, fateful turns, epic narration.')
+
+ 72         324 LOAD_CONST              48 ('Edgy, anxious, urgent — danger approaching, suspense, ticking-clock moments.')
+
+ 73         326 LOAD_CONST              49 ('Playful, comedic, teasing — jokes, gags, lighthearted ridicule.')
+
+ 74         328 LOAD_CONST              50 ('Composed, authoritative, professional — announcements, official statements, intros.')
+
+ 75         330 LOAD_CONST              51 ('Polished broadcast-announcer tone, projected and clear — show openings, presenter voice.')
+
+ 76         332 LOAD_CONST              52 ('Flat, mechanical, synthetic — AI/system voice, sci-fi, deadpan effect.')
+
+ 62         334 LOAD_CONST              53 (('neutral', 'calm', 'happy', 'excited', 'sad', 'shock', 'whisper', 'angry', 'dramatic', 'tense', 'funny', 'formal', 'radio', 'robotic'))
+            336 BUILD_CONST_KEY_MAP     14
+            338 STORE_NAME              13 (EMOTION_GUIDE)
+            340 LOAD_CONST              54 ('dict[str, str]')
+            342 LOAD_NAME                8 (__annotations__)
+            344 LOAD_CONST              55 ('EMOTION_GUIDE')
+            346 STORE_SUBSCR
+
+ 80         350 LOAD_CONST             120 (('return', 'str'))
+            352 LOAD_CONST              56 (<code object emotion_palette_text at 0x7f6c93320a30, file "app\adapters\premium.py", line 80>)
+            354 MAKE_FUNCTION            4 (annotations)
+            356 STORE_NAME              14 (emotion_palette_text)
+
+ 85         358 LOAD_CONST             121 (('groups', 'list[dict]', 'return', 'int'))
+            360 LOAD_CONST              57 (<code object estimate_chars at 0x7f6c9327bb90, file "app\adapters\premium.py", line 85>)
+            362 MAKE_FUNCTION            4 (annotations)
+            364 STORE_NAME              15 (estimate_chars)
+
+ 94         366 LOAD_CONST             122 ((1.0,))
+            368 LOAD_CONST             123 (('slot_ms', 'int', 'dst_lang', 'str', 'speech_rate', 'float', 'return', 'int'))
+            370 LOAD_CONST              59 (<code object char_budget at 0x7f6c933da550, file "app\adapters\premium.py", line 94>)
+            372 MAKE_FUNCTION            5 (defaults, annotations)
+            374 STORE_NAME              16 (char_budget)
+
+100         376 LOAD_CONST             124 ((0.7,))
+            378 LOAD_CONST             125 (('emotion', 'str', 'intensity', 'float', 'return', 'dict'))
+            380 LOAD_CONST              60 (<code object style_for_emotion at 0x7f6c9343a6f0, file "app\adapters\premium.py", line 100>)
+            382 MAKE_FUNCTION            5 (defaults, annotations)
+            384 STORE_NAME              17 (style_for_emotion)
+
+119         386 BUILD_LIST               0
+            388 LOAD_CONST              61 ((('Hook mở đầu (gây chú ý)', '[shouting] GOOOO • [cheering] ZÔoooo/Yeahhhh • [amazed] WAOOOO • [realization] Ồoooo • [exclaims] thôi chết rồiiii • [surprised] u là trờiiii • [excited gasp] ôi khônggg • [screams] áaaaaa • [yelling] Êeeeee'), ('Cười (hài/châm biếm)', '[chuckles] hé hé/hehehee • [smile] hí hí/hihihiii • [laughing] hahahaaa • [giggles] cười khanh khách • [awkward laugh] hơ hơ/hê hê'), ('Biểu cảm & hơi thở (chân thật)', '[crying] hicccccc • [sobbing] huhuhuuu/nức nở • [sighs] haizzz/thở dài • [sneezes] hắt xì • [coughs] ho • [clears throat] e hèm • [hmm] hừmmm • [lip smacks] chậc/chép miệng • [whispering] suyttttt • [exhales sharply] thở ra • [inhales deeply] hít vào • [gasping] hổn hển • [breathing heavily] thở nặng nhọc • [sniffles] sụt sịt'), ('Tông giọng & nhịp', '[surprised] à ahh • [realization] ô • [hesitant] ừm • [uncertain] umm • [questioning] eh • [annoyed] chậc • [affirmative] ừ hử • [stuttering] nói lắp • [long pause] ngắt nghỉ • [yelling] la hét • [murmuring] lẩm bẩm • [speaking fast] nói nhanh • [speaking slowly] nói chậm • [monotone] giọng đều đều'), ('Phong cách nội dung', '[storytelling] kể chuyện • [conversational] trò chuyện • [announcer style] phát thanh viên • [trailer voice] giọng trailer • [podcast tone] giọng podcast • [ASMR style] ASMR')))
+            390 LIST_EXTEND              1
+            392 STORE_NAME              18 (AUDIO_TAG_PALETTE)
+            394 LOAD_CONST              62 ('list[tuple[str, str]]')
+            396 LOAD_NAME                8 (__annotations__)
+            398 LOAD_CONST              63 ('AUDIO_TAG_PALETTE')
+            400 STORE_SUBSCR
+
+143         404 LOAD_CONST             120 (('return', 'str'))
+            406 LOAD_CONST              64 (<code object audio_tag_palette_text at 0x7f6c93321730, file "app\adapters\premium.py", line 143>)
+            408 MAKE_FUNCTION            4 (annotations)
+            410 STORE_NAME              19 (audio_tag_palette_text)
+
+150         412 LOAD_CONST              65 ("MODE — LITERAL / FAITHFUL (premium narration).\nGoal: a clean, accurate, broadcast-quality reading that mirrors the source 1:1. Merge choppy fragments into smooth, grammatically complete sentences and fix awkward machine-translation phrasing, but ADD NOTHING — no narration, hooks, dramatization, or invented detail. Keep the author's meaning exactly.\nDELIVERY (ElevenLabs): stay natural and composed; let clean punctuation carry the rhythm (commas for micro-pauses, periods for full stops, ellipses '…' only where the source genuinely trails off). Use mostly 'neutral' and 'calm' — only the emotion the line truly carries — at low-to-mid intensity. Do NOT use audio tags: leave prefix_tag empty and let the voice, not effects, do the work.")
+
+162         414 LOAD_CONST              66 ("MODE — CINEMATIC FILM RECAP / REVIEW (premium narration).\nGoal: re-author the dialogue into a polished, emotionally colored voice-over like a world-class movie-recap channel — natural rhythm, vivid imagery, controlled gravitas. You MAY add light connective tissue and scene transitions for flow, but stay faithful to the source meaning — never invent plot, names, or outcomes. Shape a real emotional arc across groups; do not stay flat.\nDELIVERY (ElevenLabs): let punctuation drive prosody — ellipses '…' for a held beat before a reveal, an em-dash '—' for an abrupt turn, ALL-CAPS on a single key word for emphasis, '?' to lift intonation. Pick 'emotion'/'intensity' from each scene's mood. Use prefix_tag sparingly (e.g. '[dramatic pause] ', '[whispers] ') only when it genuinely elevates a beat; otherwise leave it empty.")
+
+175         416 LOAD_CONST              67 ("MODE — TIKTOK VIRAL RECAP (premium narration).\nGoal: a gripping, retention-engineered recap. Open with a scroll-stopping hook, open a curiosity loop early, and end beats on micro-cliffhangers (e.g. 'Nhưng thứ hắn không ngờ tới là…', 'Khoan — còn sốc hơn nữa.'). Punch up pacing and emotion, and speak to the viewer. ABSOLUTE RULE: never fabricate events not in the source — heighten the telling, not the facts.\nDELIVERY (ElevenLabs): build tension with ellipses '…', snap with an em-dash '—', SHOUT a single key word in ALL-CAPS, and ride intonation with '!' and '?'. Swing 'emotion' dynamically beat to beat (e.g. 'tense' → 'shock' → 'excited'), never two identical tones in a row. Use prefix_tag to land a hook or a gasp where it pays off (e.g. '[whispers] ', '[gasps] ', '[excited] '); keep it tasteful — at most one per group.")
+
+188         418 LOAD_CONST              68 ('MODE — ADAM HOT TREND (high-energy, trend-style premium narration).\nGoal: a hyper-engaging, trending recap voiced like a hot TikTok \'Adam\' narrator — punchy hook, relentless energy, suspense, and vivid reactions. CRUCIAL — EMBED ElevenLabs audio tags INLINE inside "new_text": put "[tag] " right before the phrase it colors, and sprinkle short, natural target-language interjections so it sounds human and alive (e.g. "[excited] WAOOOO", "[laughs] hé hé", "[whispers] suyttt", "[gasps] ôi không"). RULES: about 1–3 tags per group, never on every word, only where they land; match each tag to the real moment; pick ONE overall content-style tag for the vibe (e.g. [storytelling] or [trailer voice]). Reinforce with punctuation — ellipses \'…\' for suspense, em-dash \'—\' for a hard cut, ALL-CAPS for shouted words. STILL faithful to the source plot — heighten the delivery, never invent events.')
+
+148         420 LOAD_CONST              69 (('literal', 'review', 'viral', 'adam_hot_trend'))
+            422 BUILD_CONST_KEY_MAP      4
+            424 STORE_NAME              20 (MODE_PROMPTS)
+            426 LOAD_CONST              54 ('dict[str, str]')
+            428 LOAD_NAME                8 (__annotations__)
+            430 LOAD_CONST              70 ('MODE_PROMPTS')
+            432 STORE_SUBSCR
+
+206         436 LOAD_CONST              71 ('clean')
+
+207         438 LOAD_CONST              72 ("MODE — CLEAN NATURAL NARRATION (plain voice).\nGoal: turn choppy, word-for-word machine-translated subtitles into smooth, natural, easy-to-listen narration. Merge fragments into complete sentences, fix awkward phrasing and wrong word order, and use natural spoken rhythm — but DO NOT dramatize, add hooks, narration, or invent anything. Keep the author's meaning EXACTLY 1:1. Plain, clear, neutral delivery — the goal is clarity and flow, not performance.")
+
+205         440 BUILD_MAP                1
+            442 STORE_NAME              21 (STANDARD_PROMPTS)
+            444 LOAD_CONST              54 ('dict[str, str]')
+            446 LOAD_NAME                8 (__annotations__)
+            448 LOAD_CONST              73 ('STANDARD_PROMPTS')
+            450 STORE_SUBSCR
+
+216         454 LOAD_CONST              74 (('neutral', 'calm'))
+            456 STORE_NAME              22 (STANDARD_EMOTIONS)
+            458 LOAD_CONST              75 ('tuple[str, ...]')
+            460 LOAD_NAME                8 (__annotations__)
+            462 LOAD_CONST              76 ('STANDARD_EMOTIONS')
+            464 STORE_SUBSCR
+
+222         468 LOAD_CONST              77 ("STYLE — CINEMATIC DRAMATIC FILM RECAP.\nGoal: narrate like a top-tier movie-recap channel — gripping, cinematic, emotionally charged. CRAFT: (1) open each major beat with a curiosity gap and withhold the payoff for one line before the reveal; (2) use vivid, concrete sensory verbs and present tense to put the viewer inside the scene; (3) shape a clear emotional arc — calm setup → rising 'tense' → 'dramatic' peak → brief 'sad'/'calm' aftermath; (4) keep sentences short and rhythmic, varying length to control pacing. Vietnamese flavor (when dst=vi): 'Không ai ngờ được điều sắp xảy ra...', 'Và rồi, sự thật rùng rợn dần hé lộ...', 'Nhưng mọi chuyện chỉ mới bắt đầu.' Favor 'tense', 'dramatic', 'excited' for big beats; 'neutral'/'calm' for connective lines; 'sad' for emotional lows. Never melodramatic for its own sake — earn every peak from the scene.")
+
+234         470 LOAD_CONST              78 ("STYLE — COMEDIC / SARCASTIC RECAP.\nGoal: make the viewer laugh out loud while still following the plot. CRAFT: (1) comedic timing — set up plainly in 'neutral', then land the punchline on the next line; (2) ironic understatement and playful roasting of characters' bad decisions; (3) sprinkle trendy Vietnamese gen-Z slang naturally, never forced (e.g. 'Ú là trời...', 'báo thủ', 'kiếp nạn thứ 82', 'pha xử lý kém miếng', 'flex nhẹ', 'gãy cánh'); (4) keep jokes tied to what actually happens on screen — exaggerate the telling, not the facts. Favor 'funny', 'happy', 'excited'; use 'neutral' for deadpan setups before a punchline.")
+
+244         472 LOAD_CONST              79 ("STYLE — HIGH-RETENTION TIKTOK VIRAL.\nGoal: engineer maximum watch-time and rewatches. CRAFT: (1) first 3 seconds = a scroll-stopping hook that promises a payoff (a bold claim, a question, or a 'wait for it' tease); (2) open a curiosity loop early and only close it near the end; (3) end most segments on a micro-cliffhanger so the next line feels unmissable; (4) speak directly to the viewer ('bạn'), use pattern interrupts and short punchy beats. Vietnamese flavor: 'Khoan đã, xem kỹ chi tiết này...', 'Chưa hết đâu, còn sốc hơn nữa...', 'Cái kết khiến ai cũng lặng người...'. Swing emotion dynamically between 'neutral', 'tense' and 'excited' to keep energy from going flat — never the same tone two beats in a row.")
+
+255         474 LOAD_CONST              80 ("STYLE — INTIMATE, REFLECTIVE STORYTELLING.\nGoal: a warm late-night-radio confessional that moves the listener and leaves a quiet life lesson. CRAFT: (1) speak softly and personally, often to 'bạn', as if sharing a secret close to the mic; (2) slow burn — let silences and short sentences breathe; (3) build to one understated emotional truth rather than loud drama; (4) end on a gentle, resonant reflection. Vietnamese flavor: 'Có những điều, ta chỉ hiểu khi đã quá muộn...', 'Đôi khi, im lặng lại nói nhiều hơn lời...'. Favor 'calm', 'sad' and 'whisper' for intimacy; reserve 'dramatic' for a single key turning point. Restraint is the craft — never overact.")
+
+265         476 LOAD_CONST              81 ("STYLE — AFFILIATE / SALES REVIEW (conversion-focused).\nGoal: a trustworthy review that genuinely drives action, using the Problem–Agitate–Solution arc. CRAFT: (1) hook with the viewer's pain point; (2) briefly agitate the frustration so the need feels real; (3) present the product as the clear solution, leading with benefits (outcomes) over raw specs; (4) build credibility with specific, believable detail — no hollow hype; (5) close with one confident, low-pressure call to action. Vietnamese flavor: 'Nếu bạn đang đau đầu vì...', 'Đây đúng là thứ bạn đang tìm...', 'Bấm vào giỏ hàng bên dưới để nhận ưu đãi nhé.' Favor 'excited' and 'happy' for benefits, 'formal' for credibility, 'neutral'/'calm' for specs.")
+
+220         478 LOAD_CONST              82 (('recap_dramatic', 'recap_funny', 'viral_hook', 'storytelling_deep', 'sales_review'))
+            480 BUILD_CONST_KEY_MAP      5
+            482 STORE_NAME              23 (MEDIUM_VN_PROMPTS)
+            484 LOAD_CONST              54 ('dict[str, str]')
+            486 LOAD_NAME                8 (__annotations__)
+            488 LOAD_CONST              83 ('MEDIUM_VN_PROMPTS')
+            490 STORE_SUBSCR
+
+277         494 LOAD_CONST              84 (1.15)
+            496 LOAD_CONST              85 (1.12)
+            498 LOAD_CONST              86 ('highpass=f=120,volume=1.1')
+            500 LOAD_CONST              87 (('speed_factor', 'pitch_shift', 'filter'))
+            502 BUILD_CONST_KEY_MAP      3
+
+278         504 LOAD_CONST              58 (1.0)
+            506 LOAD_CONST              88 (1.06)
+            508 LOAD_CONST              89 ('equalizer=f=3000:width_type=h:width=200:g=3')
+            510 LOAD_CONST              87 (('speed_factor', 'pitch_shift', 'filter'))
+            512 BUILD_CONST_KEY_MAP      3
+
+279         514 LOAD_CONST              90 (0.82)
+            516 LOAD_CONST              91 (0.9)
+            518 LOAD_CONST              92 ('lowpass=f=2800')
+            520 LOAD_CONST              87 (('speed_factor', 'pitch_shift', 'filter'))
+            522 BUILD_CONST_KEY_MAP      3
+
+280         524 LOAD_CONST              58 (1.0)
+            526 LOAD_CONST              93 (0.95)
+            528 LOAD_CONST              94 ('volume=-12dB,lowpass=f=4000')
+            530 LOAD_CONST              87 (('speed_factor', 'pitch_shift', 'filter'))
+            532 BUILD_CONST_KEY_MAP      3
+
+281         534 LOAD_CONST              14 (1.1)
+            536 LOAD_CONST              95 (0.97)
+            538 LOAD_CONST              96 ('volume=1.2,aecho=0.8:0.88:30:0.3')
+            540 LOAD_CONST              87 (('speed_factor', 'pitch_shift', 'filter'))
+            542 BUILD_CONST_KEY_MAP      3
+
+282         544 LOAD_CONST              91 (0.9)
+            546 LOAD_CONST              58 (1.0)
+            548 LOAD_CONST              97 ('aecho=0.8:0.88:60:0.4,bass=g=6')
+            550 LOAD_CONST              87 (('speed_factor', 'pitch_shift', 'filter'))
+            552 BUILD_CONST_KEY_MAP      3
+
+283         554 LOAD_CONST              58 (1.0)
+            556 LOAD_CONST              14 (1.1)
+            558 LOAD_CONST              98 ('equalizer=f=3000:width_type=h:width=200:g=4')
+            560 LOAD_CONST              87 (('speed_factor', 'pitch_shift', 'filter'))
+            562 BUILD_CONST_KEY_MAP      3
+
+284         564 LOAD_CONST              93 (0.95)
+            566 LOAD_CONST              99 (0.92)
+            568 LOAD_CONST             100 ('bass=g=5')
+            570 LOAD_CONST              87 (('speed_factor', 'pitch_shift', 'filter'))
+            572 BUILD_CONST_KEY_MAP      3
+
+285         574 LOAD_CONST              58 (1.0)
+            576 LOAD_CONST              58 (1.0)
+            578 LOAD_CONST             101 ('bandpass=f=1000:width=250')
+            580 LOAD_CONST              87 (('speed_factor', 'pitch_shift', 'filter'))
+            582 BUILD_CONST_KEY_MAP      3
+
+286         584 LOAD_CONST              58 (1.0)
+            586 LOAD_CONST              58 (1.0)
+            588 LOAD_CONST             102 ('flanger')
+            590 LOAD_CONST              87 (('speed_factor', 'pitch_shift', 'filter'))
+            592 BUILD_CONST_KEY_MAP      3
+
+287         594 LOAD_CONST              58 (1.0)
+            596 LOAD_CONST              58 (1.0)
+            598 LOAD_CONST             103 ('')
+            600 LOAD_CONST              87 (('speed_factor', 'pitch_shift', 'filter'))
+            602 BUILD_CONST_KEY_MAP      3
+
+288         604 LOAD_CONST              93 (0.95)
+            606 LOAD_CONST              58 (1.0)
+            608 LOAD_CONST             103 ('')
+            610 LOAD_CONST              87 (('speed_factor', 'pitch_shift', 'filter'))
+            612 BUILD_CONST_KEY_MAP      3
+
+289         614 LOAD_CONST              14 (1.1)
+            616 LOAD_CONST              58 (1.0)
+            618 LOAD_CONST             104 ('aecho=0.8:0.88:40:0.4')
+            620 LOAD_CONST              87 (('speed_factor', 'pitch_shift', 'filter'))
+            622 BUILD_CONST_KEY_MAP      3
+
+276         624 LOAD_CONST             105 (('excited', 'happy', 'sad', 'whisper', 'angry', 'dramatic', 'funny', 'formal', 'radio', 'robotic', 'neutral', 'calm', 'tense'))
+            626 BUILD_CONST_KEY_MAP     13
+            628 STORE_NAME              24 (MEDIUM_VN_EMOTION_MAP)
+            630 LOAD_CONST              37 ('dict[str, dict]')
+            632 LOAD_NAME                8 (__annotations__)
+            634 LOAD_CONST             106 ('MEDIUM_VN_EMOTION_MAP')
+            636 STORE_SUBSCR
+
+294         640 PUSH_NULL
+            642 LOAD_NAME               25 (tuple)
+            644 LOAD_NAME               24 (MEDIUM_VN_EMOTION_MAP)
+            646 LOAD_ATTR               53 (NULL|self + keys)
+            666 CALL                     0
+            674 CALL                     1
+            682 STORE_NAME              27 (MELO_EMOTIONS)
+            684 LOAD_CONST              75 ('tuple[str, ...]')
+            686 LOAD_NAME                8 (__annotations__)
+            688 LOAD_CONST             107 ('MELO_EMOTIONS')
+            690 STORE_SUBSCR
+
+297         694 LOAD_CONST             126 ((0.7, 1.0))
+            696 LOAD_CONST             127 (('emotion', 'str', 'intensity', 'float', 'speech_rate', 'float', 'return', 'dict'))
+            698 LOAD_CONST             108 (<code object medium_vn_style_for at 0x29098420, file "app\adapters\premium.py", line 297>)
+            700 MAKE_FUNCTION            5 (defaults, annotations)
+            702 STORE_NAME              28 (medium_vn_style_for)
+
+323         704 LOAD_CONST             128 (('batch', 'list[dict]', 'dst_lang', 'str', 'return', 'list[dict]'))
+            706 LOAD_CONST             109 (<code object to_blocks at 0x7f6c933932f0, file "app\adapters\premium.py", line 323>)
+            708 MAKE_FUNCTION            4 (annotations)
+            710 STORE_NAME              29 (to_blocks)
+
+340         712 LOAD_CONST             129 (('blocks', 'list[dict]', 'src_lang', 'str', 'dst_lang', 'str', 'mode', 'str', 'return', 'list[dict]'))
+            714 LOAD_CONST             110 (<code object build_rewrite_messages at 0x29074c20, file "app\adapters\premium.py", line 340>)
+            716 MAKE_FUNCTION            4 (annotations)
+            718 STORE_NAME              30 (build_rewrite_messages)
+
+452         720 LOAD_CONST             130 (('raw', 'str', 'return', 'str'))
+            722 LOAD_CONST             111 (<code object _clean_json_array at 0x28b105e0, file "app\adapters\premium.py", line 452>)
+            724 MAKE_FUNCTION            4 (annotations)
+            726 STORE_NAME              31 (_clean_json_array)
+
+464         728 LOAD_CONST             131 (('default', 'int', 'return', 'int'))
+            730 LOAD_CONST             112 (<code object _coerce_int at 0x7f6c9324a890, file "app\adapters\premium.py", line 464>)
+            732 MAKE_FUNCTION            4 (annotations)
+            734 STORE_NAME              32 (_coerce_int)
+
+471         736 LOAD_CONST             132 (('text', 'str', 'return', 'list[dict]'))
+            738 LOAD_CONST             113 (<code object _salvage_objects at 0x269d9710, file "app\adapters\premium.py", line 471>)
+            740 MAKE_FUNCTION            4 (annotations)
+            742 STORE_NAME              33 (_salvage_objects)
+
+511         744 LOAD_CONST             133 (('raw', 'str', 'batch', 'list[dict]', 'return', 'list[dict]'))
+            746 LOAD_CONST             114 (<code object parse_rewrite_response at 0x28e2dd70, file "app\adapters\premium.py", line 511>)
+            748 MAKE_FUNCTION            4 (annotations)
+            750 STORE_NAME              34 (parse_rewrite_response)
+
+588         752 LOAD_CONST             134 (('text', 'str', 'return', 'int'))
+            754 LOAD_CONST             115 (<code object spoken_len at 0x7f6c9324afb0, file "app\adapters\premium.py", line 588>)
+            756 MAKE_FUNCTION            4 (annotations)
+            758 STORE_NAME              35 (spoken_len)
+
+593         760 LOAD_CONST             135 (('text', 'str', 'max_spoken', 'int', 'return', 'str'))
+            762 LOAD_CONST             116 (<code object _trim_to_spoken at 0x28b10130, file "app\adapters\premium.py", line 593>)
+            764 MAKE_FUNCTION            4 (annotations)
+            766 STORE_NAME              36 (_trim_to_spoken)
+
+611         768 LOAD_CONST             136 (('meta', 'dict', 'tier', 'str', 'return', 'float'))
+            770 LOAD_CONST             117 (<code object effective_speech_rate at 0x7f6c93393690, file "app\adapters\premium.py", line 611>)
+            772 MAKE_FUNCTION            4 (annotations)
+            774 STORE_NAME              37 (effective_speech_rate)
+
+630         776 NOP
+
+631         778 NOP
+
+630         780 LOAD_CONST             137 (('vi', 'premium', 1.5))
+
+631         782 NOP
+
+630         784 NOP
+
+631         786 NOP
+
+630         788 LOAD_CONST             138 (('groups', 'list[dict]', 'dst_lang', 'str', 'tier', 'str', 'trim_ratio', 'float', 'return', 'dict'))
+            790 LOAD_CONST             118 (<code object audit_and_fit at 0x28b10380, file "app\adapters\premium.py", line 630>)
+            792 MAKE_FUNCTION            5 (defaults, annotations)
+            794 STORE_NAME              38 (audit_and_fit)
+
+665         796 LOAD_CONST             139 (('groups', 'list[dict]', 'lo', 'int', 'hi', 'int', 'return', 'list[dict]'))
+            798 LOAD_CONST             119 (<code object _normalize_timeline at 0x2906a8e0, file "app\adapters\premium.py", line 665>)
+            800 MAKE_FUNCTION            4 (annotations)
+            802 STORE_NAME              39 (_normalize_timeline)
+            804 RETURN_CONST             3 (None)
+
+Disassembly of <code object emotion_palette_text at 0x7f6c93320a30, file "app\adapters\premium.py", line 80>:
+ 80           0 RESUME                   0
+
+ 82           2 LOAD_CONST               1 ('\n')
+              4 LOAD_ATTR                1 (NULL|self + join)
+             24 LOAD_CONST               2 (<code object <genexpr> at 0x7f6c92a39ac0, file "app\adapters\premium.py", line 82>)
+             26 MAKE_FUNCTION            0
+             28 LOAD_FAST                0 (emotions)
+             30 GET_ITER
+             32 CALL                     0
+             40 CALL                     1
+             48 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c92a39ac0, file "app\adapters\premium.py", line 82>:
+ 82           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                28 (to 68)
+             12 STORE_FAST               1 (e)
+             14 LOAD_FAST                1 (e)
+             16 LOAD_GLOBAL              0 (EMOTION_GUIDE)
+             26 CONTAINS_OP              0
+             28 POP_JUMP_IF_TRUE         1 (to 32)
+             30 JUMP_BACKWARD           12 (to 8)
+        >>   32 LOAD_CONST               0 ('  - ')
+             34 LOAD_FAST                1 (e)
+             36 FORMAT_VALUE             0
+             38 LOAD_CONST               1 (': ')
+             40 LOAD_GLOBAL              0 (EMOTION_GUIDE)
+             50 LOAD_FAST                1 (e)
+             52 BINARY_SUBSCR
+             56 FORMAT_VALUE             0
+             58 BUILD_STRING             4
+             60 YIELD_VALUE              1
+             62 RESUME                   1
+             64 POP_TOP
+             66 JUMP_BACKWARD           30 (to 8)
+        >>   68 END_FOR
+             70 RETURN_CONST             2 (None)
+        >>   72 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             74 RERAISE                  1
+ExceptionTable:
+  4 to 28 -> 72 [0] lasti
+  32 to 70 -> 72 [0] lasti
+
+Disassembly of <code object estimate_chars at 0x7f6c9327bb90, file "app\adapters\premium.py", line 85>:
+ 85           0 RESUME                   0
+
+ 87           2 LOAD_CONST               1 (0)
+              4 STORE_FAST               1 (total)
+
+ 88           6 LOAD_FAST                0 (groups)
+              8 GET_ITER
+        >>   10 FOR_ITER                87 (to 188)
+             14 STORE_FAST               2 (g)
+
+ 89          16 LOAD_FAST                2 (g)
+             18 LOAD_ATTR                1 (NULL|self + get)
+             38 LOAD_CONST               2 ('meta')
+             40 CALL                     1
+             48 COPY                     1
+             50 POP_JUMP_IF_TRUE         2 (to 56)
+             52 POP_TOP
+             54 BUILD_MAP                0
+        >>   56 STORE_FAST               3 (meta)
+
+ 90          58 LOAD_FAST                1 (total)
+             60 LOAD_GLOBAL              3 (NULL + len)
+             70 LOAD_FAST                3 (meta)
+             72 LOAD_ATTR                1 (NULL|self + get)
+             92 LOAD_CONST               3 ('prefix_tag')
+             94 CALL                     1
+            102 COPY                     1
+            104 POP_JUMP_IF_TRUE         2 (to 110)
+            106 POP_TOP
+            108 LOAD_CONST               4 ('')
+        >>  110 CALL                     1
+            118 LOAD_GLOBAL              3 (NULL + len)
+            128 LOAD_FAST                2 (g)
+            130 LOAD_ATTR                1 (NULL|self + get)
+            150 LOAD_CONST               5 ('text')
+            152 CALL                     1
+            160 COPY                     1
+            162 POP_JUMP_IF_TRUE         2 (to 168)
+            164 POP_TOP
+            166 LOAD_CONST               4 ('')
+        >>  168 CALL                     1
+            176 BINARY_OP                0 (+)
+            180 BINARY_OP               13 (+=)
+            184 STORE_FAST               1 (total)
+            186 JUMP_BACKWARD           89 (to 10)
+
+ 88     >>  188 END_FOR
+
+ 91         190 LOAD_FAST                1 (total)
+            192 RETURN_VALUE
+
+Disassembly of <code object char_budget at 0x7f6c933da550, file "app\adapters\premium.py", line 94>:
+ 94           0 RESUME                   0
+
+ 95           2 LOAD_GLOBAL              0 (CHARS_PER_SEC)
+             12 LOAD_ATTR                3 (NULL|self + get)
+             32 LOAD_FAST                1 (dst_lang)
+             34 COPY                     1
+             36 POP_JUMP_IF_TRUE         2 (to 42)
+             38 POP_TOP
+             40 LOAD_CONST               1 ('')
+        >>   42 LOAD_ATTR                5 (NULL|self + lower)
+             62 CALL                     0
+             70 LOAD_GLOBAL              6 (DEFAULT_CPS)
+             80 CALL                     2
+             88 STORE_FAST               3 (cps)
+
+ 96          90 LOAD_GLOBAL              9 (NULL + max)
+            100 LOAD_FAST                0 (slot_ms)
+            102 LOAD_CONST               2 (0)
+            104 CALL                     2
+            112 LOAD_CONST               3 (1000.0)
+            114 BINARY_OP               11 (/)
+            118 LOAD_FAST                3 (cps)
+            120 BINARY_OP                5 (*)
+            124 LOAD_GLOBAL              9 (NULL + max)
+            134 LOAD_FAST                2 (speech_rate)
+            136 LOAD_CONST               4 (0.5)
+            138 CALL                     2
+            146 BINARY_OP                5 (*)
+            150 LOAD_GLOBAL             10 (_BUDGET_HEADROOM)
+            160 BINARY_OP                5 (*)
+            164 STORE_FAST               4 (budget)
+
+ 97         166 LOAD_GLOBAL              9 (NULL + max)
+            176 LOAD_GLOBAL             13 (NULL + int)
+            186 LOAD_GLOBAL             15 (NULL + round)
+            196 LOAD_FAST                4 (budget)
+            198 CALL                     1
+            206 CALL                     1
+            214 LOAD_CONST               5 (8)
+            216 CALL                     2
+            224 RETURN_VALUE
+
+Disassembly of <code object style_for_emotion at 0x7f6c9343a6f0, file "app\adapters\premium.py", line 100>:
+100           0 RESUME                   0
+
+102           2 LOAD_GLOBAL              0 (EMOTION_VOICE_SETTINGS)
+             12 LOAD_ATTR                3 (NULL|self + get)
+             32 LOAD_FAST                0 (emotion)
+             34 LOAD_GLOBAL              0 (EMOTION_VOICE_SETTINGS)
+             44 LOAD_CONST               1 ('neutral')
+             46 BINARY_SUBSCR
+             50 CALL                     2
+             58 STORE_FAST               2 (base)
+
+103          60 NOP
+
+104          62 LOAD_GLOBAL              5 (NULL + max)
+             72 LOAD_CONST               2 (0.0)
+             74 LOAD_GLOBAL              7 (NULL + min)
+             84 LOAD_GLOBAL              9 (NULL + float)
+             94 LOAD_FAST                1 (intensity)
+             96 CALL                     1
+            104 LOAD_CONST               3 (1.0)
+            106 CALL                     2
+            114 CALL                     2
+            122 STORE_FAST               3 (f)
+
+107     >>  124 LOAD_GLOBAL              5 (NULL + max)
+            134 LOAD_CONST               2 (0.0)
+            136 LOAD_GLOBAL              7 (NULL + min)
+            146 LOAD_FAST                2 (base)
+            148 LOAD_CONST               5 ('style')
+            150 BINARY_SUBSCR
+            154 LOAD_CONST               4 (0.7)
+            156 LOAD_CONST               6 (0.6)
+            158 LOAD_FAST                3 (f)
+            160 BINARY_OP                5 (*)
+            164 BINARY_OP                0 (+)
+            168 BINARY_OP                5 (*)
+            172 LOAD_CONST               3 (1.0)
+            174 CALL                     2
+            182 CALL                     2
+            190 STORE_FAST               4 (style)
+
+109         192 LOAD_FAST                2 (base)
+            194 LOAD_CONST               7 ('stability')
+            196 BINARY_SUBSCR
+
+110         200 LOAD_FAST                2 (base)
+            202 LOAD_CONST               8 ('similarity_boost')
+            204 BINARY_SUBSCR
+
+111         208 LOAD_GLOBAL             15 (NULL + round)
+            218 LOAD_FAST                4 (style)
+            220 LOAD_CONST               9 (3)
+            222 CALL                     2
+
+112         230 LOAD_FAST                2 (base)
+            232 LOAD_CONST              10 ('use_speaker_boost')
+            234 BINARY_SUBSCR
+
+108         238 LOAD_CONST              11 (('stability', 'similarity_boost', 'style', 'use_speaker_boost'))
+            240 BUILD_CONST_KEY_MAP      4
+            242 RETURN_VALUE
+        >>  244 PUSH_EXC_INFO
+
+105         246 LOAD_GLOBAL             10 (TypeError)
+            256 LOAD_GLOBAL             12 (ValueError)
+            266 BUILD_TUPLE              2
+            268 CHECK_EXC_MATCH
+            270 POP_JUMP_IF_FALSE        5 (to 282)
+            272 POP_TOP
+
+106         274 LOAD_CONST               4 (0.7)
+            276 STORE_FAST               3 (f)
+            278 POP_EXCEPT
+            280 JUMP_BACKWARD           79 (to 124)
+
+105     >>  282 RERAISE                  0
+        >>  284 COPY                     3
+            286 POP_EXCEPT
+            288 RERAISE                  1
+ExceptionTable:
+  62 to 122 -> 244 [0]
+  244 to 276 -> 284 [1] lasti
+  282 to 282 -> 284 [1] lasti
+
+Disassembly of <code object audio_tag_palette_text at 0x7f6c93321730, file "app\adapters\premium.py", line 143>:
+143           0 RESUME                   0
+
+144           2 LOAD_CONST               1 ('\n')
+              4 LOAD_ATTR                1 (NULL|self + join)
+             24 LOAD_CONST               2 (<code object <genexpr> at 0x7f6c93321f30, file "app\adapters\premium.py", line 144>)
+             26 MAKE_FUNCTION            0
+             28 LOAD_GLOBAL              2 (AUDIO_TAG_PALETTE)
+             38 GET_ITER
+             40 CALL                     0
+             48 CALL                     1
+             56 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c93321f30, file "app\adapters\premium.py", line 144>:
+144           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                15 (to 42)
+             12 UNPACK_SEQUENCE          2
+             16 STORE_FAST               1 (name)
+             18 STORE_FAST               2 (guide)
+             20 LOAD_CONST               0 ('  - ')
+             22 LOAD_FAST                1 (name)
+             24 FORMAT_VALUE             0
+             26 LOAD_CONST               1 (': ')
+             28 LOAD_FAST                2 (guide)
+             30 FORMAT_VALUE             0
+             32 BUILD_STRING             4
+             34 YIELD_VALUE              1
+             36 RESUME                   1
+             38 POP_TOP
+             40 JUMP_BACKWARD           17 (to 8)
+        >>   42 END_FOR
+             44 RETURN_CONST             2 (None)
+        >>   46 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             48 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 46 [0] lasti
+
+Disassembly of <code object medium_vn_style_for at 0x29098420, file "app\adapters\premium.py", line 297>:
+297           0 RESUME                   0
+
+304           2 LOAD_GLOBAL              0 (MEDIUM_VN_EMOTION_MAP)
+             12 LOAD_ATTR                3 (NULL|self + get)
+             32 LOAD_FAST                0 (emotion)
+             34 LOAD_GLOBAL              0 (MEDIUM_VN_EMOTION_MAP)
+             44 LOAD_CONST               1 ('neutral')
+             46 BINARY_SUBSCR
+             50 CALL                     2
+             58 STORE_FAST               3 (base)
+
+305          60 NOP
+
+306          62 LOAD_GLOBAL              5 (NULL + max)
+             72 LOAD_CONST               2 (0.0)
+             74 LOAD_GLOBAL              7 (NULL + min)
+             84 LOAD_GLOBAL              9 (NULL + float)
+             94 LOAD_FAST                1 (intensity)
+             96 CALL                     1
+            104 LOAD_CONST               3 (1.0)
+            106 CALL                     2
+            114 CALL                     2
+            122 STORE_FAST               4 (f)
+
+309     >>  124 NOP
+
+310         126 LOAD_GLOBAL              5 (NULL + max)
+            136 LOAD_CONST               5 (0.5)
+            138 LOAD_GLOBAL              7 (NULL + min)
+            148 LOAD_GLOBAL              9 (NULL + float)
+            158 LOAD_FAST                2 (speech_rate)
+            160 CALL                     1
+            168 LOAD_CONST               6 (2.0)
+            170 CALL                     2
+            178 CALL                     2
+            186 STORE_FAST               5 (sr)
+
+313     >>  188 LOAD_CONST               5 (0.5)
+            190 LOAD_CONST               5 (0.5)
+            192 LOAD_FAST                4 (f)
+            194 BINARY_OP                5 (*)
+            198 BINARY_OP                0 (+)
+            202 STORE_FAST               6 (scale)
+
+314         204 LOAD_CONST               3 (1.0)
+            206 LOAD_FAST                3 (base)
+            208 LOAD_CONST               7 ('pitch_shift')
+            210 BINARY_SUBSCR
+            214 LOAD_CONST               3 (1.0)
+            216 BINARY_OP               10 (-)
+            220 LOAD_FAST                6 (scale)
+            222 BINARY_OP                5 (*)
+            226 BINARY_OP                0 (+)
+            230 STORE_FAST               7 (pitch)
+
+315         232 LOAD_CONST               3 (1.0)
+            234 LOAD_FAST                3 (base)
+            236 LOAD_CONST               8 ('speed_factor')
+            238 BINARY_SUBSCR
+            242 LOAD_CONST               3 (1.0)
+            244 BINARY_OP               10 (-)
+            248 LOAD_FAST                6 (scale)
+            250 BINARY_OP                5 (*)
+            254 BINARY_OP                0 (+)
+            258 STORE_FAST               8 (emo_speed)
+
+317         260 LOAD_GLOBAL             15 (NULL + round)
+            270 LOAD_FAST                5 (sr)
+            272 LOAD_FAST                8 (emo_speed)
+            274 BINARY_OP                5 (*)
+            278 LOAD_CONST               9 (4)
+            280 CALL                     2
+
+318         288 LOAD_GLOBAL             15 (NULL + round)
+            298 LOAD_FAST                7 (pitch)
+            300 LOAD_CONST               9 (4)
+            302 CALL                     2
+
+319         310 LOAD_FAST                3 (base)
+            312 LOAD_CONST              10 ('filter')
+            314 BINARY_SUBSCR
+
+316         318 LOAD_CONST              11 (('speed_factor', 'pitch_shift', 'filter'))
+            320 BUILD_CONST_KEY_MAP      3
+            322 RETURN_VALUE
+        >>  324 PUSH_EXC_INFO
+
+307         326 LOAD_GLOBAL             10 (TypeError)
+            336 LOAD_GLOBAL             12 (ValueError)
+            346 BUILD_TUPLE              2
+            348 CHECK_EXC_MATCH
+            350 POP_JUMP_IF_FALSE        5 (to 362)
+            352 POP_TOP
+
+308         354 LOAD_CONST               4 (0.7)
+            356 STORE_FAST               4 (f)
+            358 POP_EXCEPT
+            360 JUMP_BACKWARD          119 (to 124)
+
+307     >>  362 RERAISE                  0
+        >>  364 COPY                     3
+            366 POP_EXCEPT
+            368 RERAISE                  1
+        >>  370 PUSH_EXC_INFO
+
+311         372 LOAD_GLOBAL             10 (TypeError)
+            382 LOAD_GLOBAL             12 (ValueError)
+            392 BUILD_TUPLE              2
+            394 CHECK_EXC_MATCH
+            396 POP_JUMP_IF_FALSE        5 (to 408)
+            398 POP_TOP
+
+312         400 LOAD_CONST               3 (1.0)
+            402 STORE_FAST               5 (sr)
+            404 POP_EXCEPT
+            406 JUMP_BACKWARD          110 (to 188)
+
+311     >>  408 RERAISE                  0
+        >>  410 COPY                     3
+            412 POP_EXCEPT
+            414 RERAISE                  1
+ExceptionTable:
+  62 to 122 -> 324 [0]
+  126 to 186 -> 370 [0]
+  324 to 356 -> 364 [1] lasti
+  362 to 362 -> 364 [1] lasti
+  370 to 402 -> 410 [1] lasti
+  408 to 408 -> 410 [1] lasti
+
+Disassembly of <code object to_blocks at 0x7f6c933932f0, file "app\adapters\premium.py", line 323>:
+323           0 RESUME                   0
+
+325           2 BUILD_LIST               0
+              4 STORE_FAST               2 (blocks)
+
+326           6 LOAD_FAST                0 (batch)
+              8 GET_ITER
+        >>   10 FOR_ITER               125 (to 264)
+             14 STORE_FAST               3 (s)
+
+327          16 LOAD_GLOBAL              1 (NULL + max)
+             26 LOAD_GLOBAL              3 (NULL + int)
+             36 LOAD_FAST                3 (s)
+             38 LOAD_CONST               1 ('end_ms')
+             40 BINARY_SUBSCR
+             44 CALL                     1
+             52 LOAD_GLOBAL              3 (NULL + int)
+             62 LOAD_FAST                3 (s)
+             64 LOAD_CONST               2 ('start_ms')
+             66 BINARY_SUBSCR
+             70 CALL                     1
+             78 BINARY_OP               10 (-)
+             82 LOAD_CONST               3 (0)
+             84 CALL                     2
+             92 STORE_FAST               4 (slot_ms)
+
+328          94 LOAD_FAST                2 (blocks)
+             96 LOAD_ATTR                5 (NULL|self + append)
+
+329         116 LOAD_FAST                3 (s)
+            118 LOAD_CONST               4 ('seq')
+            120 BINARY_SUBSCR
+
+330         124 LOAD_FAST                3 (s)
+            126 LOAD_CONST               2 ('start_ms')
+            128 BINARY_SUBSCR
+
+331         132 LOAD_FAST                3 (s)
+            134 LOAD_CONST               1 ('end_ms')
+            136 BINARY_SUBSCR
+
+332         140 LOAD_FAST                4 (slot_ms)
+
+333         142 LOAD_GLOBAL              7 (NULL + char_budget)
+            152 LOAD_FAST                4 (slot_ms)
+            154 LOAD_FAST                1 (dst_lang)
+            156 CALL                     2
+
+334         164 LOAD_FAST                3 (s)
+            166 LOAD_ATTR                9 (NULL|self + get)
+            186 LOAD_CONST               5 ('text')
+            188 LOAD_CONST               6 ('')
+            190 CALL                     2
+            198 COPY                     1
+            200 POP_JUMP_IF_TRUE         2 (to 206)
+            202 POP_TOP
+            204 LOAD_CONST               6 ('')
+
+335     >>  206 LOAD_FAST                3 (s)
+            208 LOAD_ATTR                9 (NULL|self + get)
+            228 LOAD_CONST               7 ('text_src')
+            230 LOAD_CONST               6 ('')
+            232 CALL                     2
+            240 COPY                     1
+            242 POP_JUMP_IF_TRUE         2 (to 248)
+            244 POP_TOP
+            246 LOAD_CONST               6 ('')
+
+328     >>  248 LOAD_CONST               8 (('seq', 'start_ms', 'end_ms', 'slot_ms', 'max_chars', 'text', 'text_src'))
+            250 BUILD_CONST_KEY_MAP      7
+            252 CALL                     1
+            260 POP_TOP
+            262 JUMP_BACKWARD          127 (to 10)
+
+326     >>  264 END_FOR
+
+337         266 LOAD_FAST                2 (blocks)
+            268 RETURN_VALUE
+
+Disassembly of <code object build_rewrite_messages at 0x29074c20, file "app\adapters\premium.py", line 340>:
+340           0 RESUME                   0
+
+346           2 LOAD_FAST                3 (mode)
+              4 LOAD_GLOBAL              0 (STANDARD_PROMPTS)
+             14 CONTAINS_OP              0
+             16 POP_JUMP_IF_FALSE       20 (to 58)
+
+347          18 LOAD_GLOBAL              0 (STANDARD_PROMPTS)
+             28 LOAD_FAST                3 (mode)
+             30 BINARY_SUBSCR
+             34 STORE_FAST               4 (mode_instr)
+
+348          36 LOAD_GLOBAL              2 (STANDARD_EMOTIONS)
+             46 STORE_FAST               5 (allowed)
+
+350          48 LOAD_CONST               1 ("VOICE ENGINE — plain TTS (no acting, no audio tags). The voice reads flat, so emotion is NOT rendered: do not try to perform feeling. Write purely for clarity and natural spoken rhythm; keep 'emotion' at 'neutral' (or 'calm') and 'speech_rate' near 1.0.")
+
+349          50 STORE_FAST               6 (engine_note)
+
+354          52 LOAD_CONST               2 (False)
+             54 STORE_FAST               7 (want_prefix_tag)
+             56 JUMP_FORWARD            67 (to 192)
+
+355     >>   58 LOAD_FAST                3 (mode)
+             60 LOAD_GLOBAL              4 (MEDIUM_VN_PROMPTS)
+             70 CONTAINS_OP              0
+             72 POP_JUMP_IF_FALSE       20 (to 114)
+
+356          74 LOAD_GLOBAL              4 (MEDIUM_VN_PROMPTS)
+             84 LOAD_FAST                3 (mode)
+             86 BINARY_SUBSCR
+             90 STORE_FAST               4 (mode_instr)
+
+357          92 LOAD_GLOBAL              6 (MELO_EMOTIONS)
+            102 STORE_FAST               5 (allowed)
+
+359         104 LOAD_CONST               3 ("VOICE ENGINE — Edge-TTS Vietnamese base + OpenVoice tone-color (optional clone). Emotions are rendered by post-processing (speed / pitch / audio filters), not by an acting model, so each label is a tonal color. Pick the SINGLE closest label from the palette below and NEVER use a label outside it. Because the engine cannot truly 'act', also carry the feeling through word choice and sentence rhythm.")
+
+358         106 STORE_FAST               6 (engine_note)
+
+365         108 LOAD_CONST               2 (False)
+            110 STORE_FAST               7 (want_prefix_tag)
+            112 JUMP_FORWARD            39 (to 192)
+
+367     >>  114 LOAD_GLOBAL              8 (MODE_PROMPTS)
+            124 LOAD_ATTR               11 (NULL|self + get)
+            144 LOAD_FAST                3 (mode)
+            146 LOAD_GLOBAL              8 (MODE_PROMPTS)
+            156 LOAD_CONST               4 ('review')
+            158 BINARY_SUBSCR
+            162 CALL                     2
+            170 STORE_FAST               4 (mode_instr)
+
+368         172 LOAD_GLOBAL             12 (EMOTIONS)
+            182 STORE_FAST               5 (allowed)
+
+370         184 LOAD_CONST               5 ("VOICE ENGINE — ElevenLabs v3 (premium). Each emotion label maps to expressive voice_settings AND the model genuinely ACTS the emotion. It also obeys delivery cues you write into the text: audio tags in [brackets] (e.g. [whispers], [excited], [sighs], [laughs], [sarcastic], [crying]); ellipses '…' for a pause or hesitation; ALL-CAPS for emphasis/volume; an em-dash '—' for an abrupt break; and '?' / '!' for intonation. Tags work best on this engine — use ONLY tags that suit the voice's range, place them right before the phrase they color, and never spam them. Punctuation and word choice should carry most of the feeling; tags are accents, not decoration.")
+
+369         186 STORE_FAST               6 (engine_note)
+
+379         188 LOAD_CONST               6 (True)
+            190 STORE_FAST               7 (want_prefix_tag)
+
+380     >>  192 LOAD_CONST               7 (', ')
+            194 LOAD_ATTR               15 (NULL|self + join)
+            214 LOAD_FAST                5 (allowed)
+            216 CALL                     1
+            224 STORE_FAST               8 (emotions)
+
+381         226 LOAD_GLOBAL             17 (NULL + emotion_palette_text)
+            236 LOAD_FAST                5 (allowed)
+            238 CALL                     1
+            246 STORE_FAST               9 (palette)
+
+382         248 LOAD_FAST                7 (want_prefix_tag)
+            250 POP_JUMP_IF_FALSE        5 (to 262)
+
+384         252 LOAD_CONST               8 ('  5. DELIVERY: optionally set "prefix_tag" to an ElevenLabs audio tag (e.g. "[dramatic pause] ", "[whispers] ") — use rarely, only when it elevates the moment; otherwise an empty string.\n')
+
+383         254 STORE_FAST              10 (delivery_rule)
+
+388         256 LOAD_CONST               9 ('[dramatic pause] ')
+            258 STORE_FAST              11 (example_prefix)
+            260 JUMP_FORWARD             4 (to 270)
+
+391     >>  262 LOAD_CONST              10 ('  5. DELIVERY: this engine does NOT support inline audio tags — always set "prefix_tag" to an empty string "".\n')
+
+390         264 STORE_FAST              10 (delivery_rule)
+
+394         266 LOAD_CONST              11 ('')
+            268 STORE_FAST              11 (example_prefix)
+
+396     >>  270 LOAD_CONST              12 ('You are an award-winning film-recap screenwriter and dubbing director. Your craft is turning raw, machine-translated subtitles into a natural, emotionally compelling voice-over script written in ')
+
+398         272 LOAD_FAST                2 (dst_lang)
+            274 FORMAT_VALUE             0
+            276 LOAD_CONST              13 (' (source language: ')
+            278 LOAD_FAST                1 (src_lang)
+            280 FORMAT_VALUE             0
+            282 LOAD_CONST              14 (') that sounds like a professional movie-recap narrator — never robotic, never word-for-word.\n\n')
+
+400         284 LOAD_FAST                4 (mode_instr)
+            286 FORMAT_VALUE             0
+            288 LOAD_CONST              15 ('\n\n')
+
+401         290 LOAD_FAST                6 (engine_note)
+            292 FORMAT_VALUE             0
+            294 LOAD_CONST              16 ("\n\nEMOTION PALETTE — the ONLY emotion labels you may use, with their meaning. Read each group's mood and pick the one that fits best:\n")
+
+404         296 LOAD_FAST                9 (palette)
+            298 FORMAT_VALUE             0
+            300 LOAD_CONST              17 ('\n\nINPUT: a JSON array of subtitle blocks. Each block has:\n  - "seq": id; "start_ms"/"end_ms": timing; "slot_ms": duration in ms;\n  - "text": the baseline ')
+
+407         302 LOAD_FAST                2 (dst_lang)
+            304 FORMAT_VALUE             0
+            306 LOAD_CONST              18 (' translation; "text_src": the original ')
+
+408         308 LOAD_FAST                1 (src_lang)
+            310 FORMAT_VALUE             0
+            312 LOAD_CONST              19 (' line (use it to stay faithful).\n\nTASK — re-author the script as an ordered list of "groups" optimized for voice-over:\n  1. RE-SEGMENT: merge choppy fragments into complete, flowing sentences (list the merged ids in "src_seqs"); split any over-long block into several groups. Aim for thought-complete lines, not word fragments.\n  2. TIMING: set each group\'s "start_ms"/"end_ms" to span exactly its source blocks — contiguous, no overlaps, no large gaps.\n  3. LENGTH & PACING — HARD LIMIT (most important rule): the voice-over MUST fit the time slot or the video desyncs. Every input block carries a "max_chars" already computed from its duration. For each output group, the length of "new_text" (including any prefix_tag / inline tags) MUST NOT exceed the SUM of "max_chars" of the blocks you merged into it (the ones listed in "src_seqs"). Treat this as a STRICT CEILING, not a target — when in doubt, write SHORTER and tighter, cut filler words. Slow emotions (\'sad\',\'calm\') should land well under the limit; fast emotions (\'excited\',\'angry\') may approach it but NEVER exceed it. Count characters before finalizing each line.\n  4. EMOTION: tag each group with "emotion" (EXACTLY one of: ')
+
+423         314 LOAD_FAST                8 (emotions)
+            316 FORMAT_VALUE             0
+            318 LOAD_CONST              20 ('), "intensity" (0..1 — how strongly to apply it) and "speech_rate" (0.8..1.2), all chosen to match the scene\'s mood. Vary the emotion across groups to follow the story\'s arc — do NOT leave everything \'neutral\'.\n')
+
+427         320 LOAD_FAST               10 (delivery_rule)
+            322 FORMAT_VALUE             0
+
+428         324 LOAD_CONST              21 ('  6. FIDELITY: never invent plot facts, names, or outcomes not present in the source.\n\nOUTPUT: ONLY a JSON array of group objects — no markdown, no commentary. Each object:\n  {"src_seqs":[int], "start_ms":int, "end_ms":int, "new_text":string, "emotion":string, "intensity":number, "speech_rate":number, "prefix_tag":string}\n\nExample (format only — write new_text in ')
+
+432         326 LOAD_FAST                2 (dst_lang)
+            328 FORMAT_VALUE             0
+            330 LOAD_CONST              22 ('):\n  [{"src_seqs":[12,13,14],"start_ms":12000,"end_ms":17000,"new_text":"...","emotion":"tense","intensity":0.9,"speech_rate":0.95,"prefix_tag":"')
+
+434         332 LOAD_FAST               11 (example_prefix)
+            334 FORMAT_VALUE             0
+            336 LOAD_CONST              23 ('"}]')
+
+396         338 BUILD_STRING            23
+
+395         340 STORE_FAST              12 (system_msg)
+
+437         342 LOAD_FAST                3 (mode)
+            344 LOAD_CONST              24 ('adam_hot_trend')
+            346 COMPARE_OP              40 (==)
+            350 POP_JUMP_IF_FALSE       19 (to 390)
+
+438         352 LOAD_FAST               12 (system_msg)
+
+439         354 LOAD_CONST              25 ('\n\nAUDIO TAG PALETTE — embed these inline inside new_text (place "[tag] " right before the phrase). Examples include target-language interjections:\n')
+
+441         356 LOAD_GLOBAL             19 (NULL + audio_tag_palette_text)
+            366 CALL                     0
+
+439         374 BINARY_OP                0 (+)
+
+442         378 LOAD_CONST              26 ('\nExample new_text: "[amazed] WAOOOO... [whispering] nhưng điều hắn không ngờ tới là... [shouting] tất cả chỉ là một cái bẫy!"')
+
+439         380 BINARY_OP                0 (+)
+
+438         384 BINARY_OP               13 (+=)
+            388 STORE_FAST              12 (system_msg)
+
+445     >>  390 LOAD_GLOBAL             21 (NULL + json)
+            400 LOAD_ATTR               22 (dumps)
+            420 LOAD_FAST                0 (blocks)
+            422 LOAD_CONST               2 (False)
+            424 KW_NAMES                27 (('ensure_ascii',))
+            426 CALL                     2
+            434 STORE_FAST              13 (payload)
+
+447         436 LOAD_CONST              28 ('system')
+            438 LOAD_FAST               12 (system_msg)
+            440 LOAD_CONST              29 (('role', 'content'))
+            442 BUILD_CONST_KEY_MAP      2
+
+448         444 LOAD_CONST              30 ('user')
+            446 LOAD_FAST               13 (payload)
+            448 LOAD_CONST              29 (('role', 'content'))
+            450 BUILD_CONST_KEY_MAP      2
+
+446         452 BUILD_LIST               2
+            454 RETURN_VALUE
+
+Disassembly of <code object _clean_json_array at 0x28b105e0, file "app\adapters\premium.py", line 452>:
+452           0 RESUME                   0
+
+453           2 LOAD_FAST                0 (raw)
+              4 LOAD_ATTR                1 (NULL|self + strip)
+             24 CALL                     0
+             32 STORE_FAST               1 (cleaned)
+
+454          34 LOAD_FAST                1 (cleaned)
+             36 LOAD_ATTR                3 (NULL|self + startswith)
+             56 LOAD_CONST               1 ('```')
+             58 CALL                     1
+             66 POP_JUMP_IF_FALSE       81 (to 230)
+
+455          68 LOAD_FAST                1 (cleaned)
+             70 LOAD_ATTR                1 (NULL|self + strip)
+             90 LOAD_CONST               2 ('`')
+             92 CALL                     1
+            100 LOAD_ATTR                1 (NULL|self + strip)
+            120 CALL                     0
+            128 STORE_FAST               1 (cleaned)
+
+456         130 LOAD_FAST                1 (cleaned)
+            132 LOAD_ATTR                5 (NULL|self + lower)
+            152 CALL                     0
+            160 LOAD_ATTR                3 (NULL|self + startswith)
+            180 LOAD_CONST               3 ('json')
+            182 CALL                     1
+            190 POP_JUMP_IF_FALSE       19 (to 230)
+
+457         192 LOAD_FAST                1 (cleaned)
+            194 LOAD_CONST               4 (4)
+            196 LOAD_CONST               0 (None)
+            198 BINARY_SLICE
+            200 LOAD_ATTR                1 (NULL|self + strip)
+            220 CALL                     0
+            228 STORE_FAST               1 (cleaned)
+
+458     >>  230 LOAD_FAST                1 (cleaned)
+            232 LOAD_ATTR                7 (NULL|self + find)
+            252 LOAD_CONST               5 ('[')
+            254 CALL                     1
+            262 LOAD_FAST                1 (cleaned)
+            264 LOAD_ATTR                9 (NULL|self + rfind)
+            284 LOAD_CONST               6 (']')
+            286 CALL                     1
+            294 STORE_FAST               3 (b)
+            296 STORE_FAST               2 (a)
+
+459         298 LOAD_FAST                2 (a)
+            300 LOAD_CONST               7 (-1)
+            302 COMPARE_OP              55 (!=)
+            306 POP_JUMP_IF_FALSE       18 (to 344)
+            308 LOAD_FAST                3 (b)
+            310 LOAD_CONST               7 (-1)
+            312 COMPARE_OP              55 (!=)
+            316 POP_JUMP_IF_FALSE       13 (to 344)
+            318 LOAD_FAST                3 (b)
+            320 LOAD_FAST                2 (a)
+            322 COMPARE_OP              68 (>)
+            326 POP_JUMP_IF_FALSE        8 (to 344)
+
+460         328 LOAD_FAST                1 (cleaned)
+            330 LOAD_FAST                2 (a)
+            332 LOAD_FAST                3 (b)
+            334 LOAD_CONST               8 (1)
+            336 BINARY_OP                0 (+)
+            340 BINARY_SLICE
+            342 RETURN_VALUE
+
+461     >>  344 LOAD_FAST                1 (cleaned)
+            346 RETURN_VALUE
+
+Disassembly of <code object _coerce_int at 0x7f6c9324a890, file "app\adapters\premium.py", line 464>:
+464           0 RESUME                   0
+
+465           2 NOP
+
+466           4 LOAD_GLOBAL              1 (NULL + int)
+             14 LOAD_GLOBAL              3 (NULL + round)
+             24 LOAD_GLOBAL              5 (NULL + float)
+             34 LOAD_FAST                0 (val)
+             36 CALL                     1
+             44 CALL                     1
+             52 CALL                     1
+             60 RETURN_VALUE
+        >>   62 PUSH_EXC_INFO
+
+467          64 LOAD_GLOBAL              6 (TypeError)
+             74 LOAD_GLOBAL              8 (ValueError)
+             84 BUILD_TUPLE              2
+             86 CHECK_EXC_MATCH
+             88 POP_JUMP_IF_FALSE        5 (to 100)
+             90 POP_TOP
+
+468          92 LOAD_FAST                1 (default)
+             94 SWAP                     2
+             96 POP_EXCEPT
+             98 RETURN_VALUE
+
+467     >>  100 RERAISE                  0
+        >>  102 COPY                     3
+            104 POP_EXCEPT
+            106 RERAISE                  1
+ExceptionTable:
+  4 to 58 -> 62 [0]
+  62 to 94 -> 102 [1] lasti
+  100 to 100 -> 102 [1] lasti
+
+Disassembly of <code object _salvage_objects at 0x269d9710, file "app\adapters\premium.py", line 471>:
+471           0 RESUME                   0
+
+477           2 BUILD_LIST               0
+              4 STORE_FAST               1 (objs)
+
+478           6 LOAD_CONST               1 (0)
+              8 STORE_FAST               2 (depth)
+
+479          10 LOAD_CONST               2 (-1)
+             12 STORE_FAST               3 (start)
+
+480          14 LOAD_CONST               3 (False)
+             16 STORE_FAST               4 (in_str)
+
+481          18 LOAD_CONST               3 (False)
+             20 STORE_FAST               5 (esc)
+
+482          22 LOAD_GLOBAL              1 (NULL + enumerate)
+             32 LOAD_FAST                0 (text)
+             34 CALL                     1
+             42 GET_ITER
+        >>   44 FOR_ITER               146 (to 340)
+             48 UNPACK_SEQUENCE          2
+             52 STORE_FAST               6 (i)
+             54 STORE_FAST               7 (ch)
+
+483          56 LOAD_FAST                4 (in_str)
+             58 POP_JUMP_IF_FALSE       21 (to 102)
+
+484          60 LOAD_FAST                5 (esc)
+             62 POP_JUMP_IF_FALSE        3 (to 70)
+
+485          64 LOAD_CONST               3 (False)
+             66 STORE_FAST               5 (esc)
+             68 JUMP_FORWARD            15 (to 100)
+
+486     >>   70 LOAD_FAST                7 (ch)
+             72 LOAD_CONST               4 ('\\')
+             74 COMPARE_OP              40 (==)
+             78 POP_JUMP_IF_FALSE        3 (to 86)
+
+487          80 LOAD_CONST               5 (True)
+             82 STORE_FAST               5 (esc)
+             84 JUMP_FORWARD             7 (to 100)
+
+488     >>   86 LOAD_FAST                7 (ch)
+             88 LOAD_CONST               6 ('"')
+             90 COMPARE_OP              40 (==)
+             94 POP_JUMP_IF_FALSE        2 (to 100)
+
+489          96 LOAD_CONST               3 (False)
+             98 STORE_FAST               4 (in_str)
+
+490     >>  100 JUMP_BACKWARD           29 (to 44)
+
+491     >>  102 LOAD_FAST                7 (ch)
+            104 LOAD_CONST               6 ('"')
+            106 COMPARE_OP              40 (==)
+            110 POP_JUMP_IF_FALSE        3 (to 118)
+
+492         112 LOAD_CONST               5 (True)
+            114 STORE_FAST               4 (in_str)
+            116 JUMP_BACKWARD           37 (to 44)
+
+493     >>  118 LOAD_FAST                7 (ch)
+            120 LOAD_CONST               7 ('{')
+            122 COMPARE_OP              40 (==)
+            126 POP_JUMP_IF_FALSE       13 (to 154)
+
+494         128 LOAD_FAST                2 (depth)
+            130 LOAD_CONST               1 (0)
+            132 COMPARE_OP              40 (==)
+            136 POP_JUMP_IF_FALSE        2 (to 142)
+
+495         138 LOAD_FAST                6 (i)
+            140 STORE_FAST               3 (start)
+
+496     >>  142 LOAD_FAST                2 (depth)
+            144 LOAD_CONST               8 (1)
+            146 BINARY_OP               13 (+=)
+            150 STORE_FAST               2 (depth)
+            152 JUMP_BACKWARD           55 (to 44)
+
+497     >>  154 LOAD_FAST                7 (ch)
+            156 LOAD_CONST               9 ('}')
+            158 COMPARE_OP              40 (==)
+            162 POP_JUMP_IF_TRUE         1 (to 166)
+            164 JUMP_BACKWARD           61 (to 44)
+
+498     >>  166 LOAD_FAST                2 (depth)
+            168 LOAD_CONST               1 (0)
+            170 COMPARE_OP              68 (>)
+            174 POP_JUMP_IF_TRUE         1 (to 178)
+            176 JUMP_BACKWARD           67 (to 44)
+
+499     >>  178 LOAD_FAST                2 (depth)
+            180 LOAD_CONST               8 (1)
+            182 BINARY_OP               23 (-=)
+            186 STORE_FAST               2 (depth)
+
+500         188 LOAD_FAST                2 (depth)
+            190 LOAD_CONST               1 (0)
+            192 COMPARE_OP              40 (==)
+            196 POP_JUMP_IF_TRUE         1 (to 200)
+            198 JUMP_BACKWARD           78 (to 44)
+        >>  200 LOAD_FAST                3 (start)
+            202 LOAD_CONST               2 (-1)
+            204 COMPARE_OP              55 (!=)
+            208 POP_JUMP_IF_TRUE         1 (to 212)
+            210 JUMP_BACKWARD           84 (to 44)
+
+501     >>  212 NOP
+
+502         214 LOAD_GLOBAL              3 (NULL + json)
+            224 LOAD_ATTR                4 (loads)
+            244 LOAD_FAST                0 (text)
+            246 LOAD_FAST                3 (start)
+            248 LOAD_FAST                6 (i)
+            250 LOAD_CONST               8 (1)
+            252 BINARY_OP                0 (+)
+            256 BINARY_SLICE
+            258 CALL                     1
+            266 STORE_FAST               8 (obj)
+
+503         268 LOAD_GLOBAL              7 (NULL + isinstance)
+            278 LOAD_FAST                8 (obj)
+            280 LOAD_GLOBAL              8 (dict)
+            290 CALL                     2
+            298 POP_JUMP_IF_FALSE       17 (to 334)
+
+504         300 LOAD_FAST                1 (objs)
+            302 LOAD_ATTR               11 (NULL|self + append)
+            322 LOAD_FAST                8 (obj)
+            324 CALL                     1
+            332 POP_TOP
+
+507     >>  334 LOAD_CONST               2 (-1)
+            336 STORE_FAST               3 (start)
+            338 JUMP_BACKWARD          148 (to 44)
+
+482     >>  340 END_FOR
+
+508         342 LOAD_FAST                1 (objs)
+            344 RETURN_VALUE
+        >>  346 PUSH_EXC_INFO
+
+505         348 LOAD_GLOBAL              2 (json)
+            358 LOAD_ATTR               12 (JSONDecodeError)
+            378 CHECK_EXC_MATCH
+            380 POP_JUMP_IF_FALSE        3 (to 388)
+            382 POP_TOP
+
+506         384 POP_EXCEPT
+            386 JUMP_BACKWARD           27 (to 334)
+
+505     >>  388 RERAISE                  0
+        >>  390 COPY                     3
+            392 POP_EXCEPT
+            394 RERAISE                  1
+ExceptionTable:
+  214 to 332 -> 346 [1]
+  346 to 382 -> 390 [2] lasti
+  388 to 388 -> 390 [2] lasti
+
+Disassembly of <code object parse_rewrite_response at 0x28e2dd70, file "app\adapters\premium.py", line 511>:
+              0 MAKE_CELL               17 (seq_map)
+
+511           2 RESUME                   0
+
+517           4 LOAD_GLOBAL              1 (NULL + _clean_json_array)
+             14 LOAD_FAST                0 (raw)
+             16 CALL                     1
+             24 STORE_FAST               2 (cleaned)
+
+518          26 NOP
+
+519          28 LOAD_GLOBAL              3 (NULL + json)
+             38 LOAD_ATTR                4 (loads)
+             58 LOAD_FAST                2 (cleaned)
+             60 CALL                     1
+             68 STORE_FAST               3 (parsed)
+
+520          70 LOAD_GLOBAL              7 (NULL + isinstance)
+             80 LOAD_FAST                3 (parsed)
+             82 LOAD_GLOBAL              8 (list)
+             92 CALL                     2
+            100 POP_JUMP_IF_TRUE        11 (to 124)
+
+522         102 LOAD_GLOBAL             11 (NULL + _salvage_objects)
+            112 LOAD_FAST                2 (cleaned)
+            114 CALL                     1
+            122 STORE_FAST               3 (parsed)
+
+529     >>  124 LOAD_FAST                1 (batch)
+            126 GET_ITER
+            128 LOAD_FAST_AND_CLEAR      4 (s)
+            130 SWAP                     2
+            132 BUILD_MAP                0
+            134 SWAP                     2
+        >>  136 FOR_ITER                 8 (to 156)
+            140 STORE_FAST               4 (s)
+            142 LOAD_FAST                4 (s)
+            144 LOAD_CONST               2 ('seq')
+            146 BINARY_SUBSCR
+            150 LOAD_FAST                4 (s)
+            152 MAP_ADD                  2
+            154 JUMP_BACKWARD           10 (to 136)
+        >>  156 END_FOR
+            158 SWAP                     2
+            160 STORE_FAST               4 (s)
+            162 STORE_DEREF             17 (seq_map)
+
+530         164 LOAD_GLOBAL             17 (NULL + min)
+            174 LOAD_CONST               3 (<code object <genexpr> at 0x7f6c932dc3f0, file "app\adapters\premium.py", line 530>)
+            176 MAKE_FUNCTION            0
+            178 LOAD_FAST                1 (batch)
+            180 GET_ITER
+            182 CALL                     0
+            190 LOAD_CONST               4 (0)
+            192 KW_NAMES                 5 (('default',))
+            194 CALL                     2
+            202 STORE_FAST               5 (batch_start)
+
+531         204 LOAD_GLOBAL             19 (NULL + max)
+            214 LOAD_CONST               6 (<code object <genexpr> at 0x7f6c932dc4e0, file "app\adapters\premium.py", line 531>)
+            216 MAKE_FUNCTION            0
+            218 LOAD_FAST                1 (batch)
+            220 GET_ITER
+            222 CALL                     0
+            230 LOAD_CONST               4 (0)
+            232 KW_NAMES                 5 (('default',))
+            234 CALL                     2
+            242 STORE_FAST               6 (batch_end)
+
+533         244 BUILD_LIST               0
+            246 STORE_FAST               7 (groups)
+
+534         248 LOAD_FAST                3 (parsed)
+            250 GET_ITER
+        >>  252 EXTENDED_ARG             1
+            254 FOR_ITER               478 (to 1214)
+            258 STORE_FAST               8 (item)
+
+535         260 LOAD_GLOBAL              7 (NULL + isinstance)
+            270 LOAD_FAST                8 (item)
+            272 LOAD_GLOBAL             20 (dict)
+            282 CALL                     2
+            290 POP_JUMP_IF_TRUE         1 (to 294)
+
+536         292 JUMP_BACKWARD           21 (to 252)
+
+537     >>  294 LOAD_FAST                8 (item)
+            296 LOAD_ATTR               23 (NULL|self + get)
+            316 LOAD_CONST               7 ('new_text')
+            318 CALL                     1
+            326 COPY                     1
+            328 POP_JUMP_IF_TRUE        21 (to 372)
+            330 POP_TOP
+            332 LOAD_FAST                8 (item)
+            334 LOAD_ATTR               23 (NULL|self + get)
+            354 LOAD_CONST               8 ('text')
+            356 CALL                     1
+            364 COPY                     1
+            366 POP_JUMP_IF_TRUE         2 (to 372)
+            368 POP_TOP
+            370 LOAD_CONST               9 ('')
+        >>  372 LOAD_ATTR               25 (NULL|self + strip)
+            392 CALL                     0
+            400 STORE_FAST               9 (text)
+
+538         402 LOAD_FAST                9 (text)
+            404 POP_JUMP_IF_TRUE         1 (to 408)
+
+539         406 JUMP_BACKWARD           78 (to 252)
+
+545     >>  408 LOAD_FAST                8 (item)
+            410 LOAD_ATTR               23 (NULL|self + get)
+            430 LOAD_CONST              10 ('src_seqs')
+            432 CALL                     1
+            440 COPY                     1
+            442 POP_JUMP_IF_TRUE         2 (to 448)
+            444 POP_TOP
+            446 BUILD_LIST               0
+        >>  448 GET_ITER
+            450 LOAD_FAST_AND_CLEAR      4 (s)
+            452 SWAP                     2
+            454 BUILD_LIST               0
+            456 SWAP                     2
+        >>  458 FOR_ITER                 9 (to 480)
+            462 STORE_FAST               4 (s)
+            464 LOAD_FAST                4 (s)
+            466 LOAD_DEREF              17 (seq_map)
+            468 CONTAINS_OP              0
+            470 POP_JUMP_IF_TRUE         1 (to 474)
+            472 JUMP_BACKWARD            8 (to 458)
+        >>  474 LOAD_FAST                4 (s)
+            476 LIST_APPEND              2
+            478 JUMP_BACKWARD           11 (to 458)
+        >>  480 END_FOR
+            482 STORE_FAST              10 (src_seqs)
+            484 STORE_FAST               4 (s)
+
+546         486 LOAD_FAST               10 (src_seqs)
+            488 POP_JUMP_IF_FALSE       41 (to 572)
+
+547         490 LOAD_GLOBAL             17 (NULL + min)
+            500 LOAD_CLOSURE            17 (seq_map)
+            502 BUILD_TUPLE              1
+            504 LOAD_CONST              11 (<code object <genexpr> at 0x7f6c932dc5d0, file "app\adapters\premium.py", line 547>)
+            506 MAKE_FUNCTION            8 (closure)
+            508 LOAD_FAST               10 (src_seqs)
+            510 GET_ITER
+            512 CALL                     0
+            520 CALL                     1
+            528 STORE_FAST              11 (start_ms)
+
+548         530 LOAD_GLOBAL             19 (NULL + max)
+            540 LOAD_CLOSURE            17 (seq_map)
+            542 BUILD_TUPLE              1
+            544 LOAD_CONST              12 (<code object <genexpr> at 0x7f6c932dc6c0, file "app\adapters\premium.py", line 548>)
+            546 MAKE_FUNCTION            8 (closure)
+            548 LOAD_FAST               10 (src_seqs)
+            550 GET_ITER
+            552 CALL                     0
+            560 CALL                     1
+            568 STORE_FAST              12 (end_ms)
+            570 JUMP_FORWARD            54 (to 680)
+
+550     >>  572 LOAD_GLOBAL             27 (NULL + _coerce_int)
+            582 LOAD_FAST                8 (item)
+            584 LOAD_ATTR               23 (NULL|self + get)
+            604 LOAD_CONST              13 ('start_ms')
+            606 CALL                     1
+            614 LOAD_FAST                5 (batch_start)
+            616 CALL                     2
+            624 STORE_FAST              11 (start_ms)
+
+551         626 LOAD_GLOBAL             27 (NULL + _coerce_int)
+            636 LOAD_FAST                8 (item)
+            638 LOAD_ATTR               23 (NULL|self + get)
+            658 LOAD_CONST              14 ('end_ms')
+            660 CALL                     1
+            668 LOAD_FAST                6 (batch_end)
+            670 CALL                     2
+            678 STORE_FAST              12 (end_ms)
+
+552     >>  680 LOAD_FAST               12 (end_ms)
+            682 LOAD_FAST               11 (start_ms)
+            684 COMPARE_OP              26 (<=)
+            688 POP_JUMP_IF_FALSE        5 (to 700)
+
+553         690 LOAD_FAST               11 (start_ms)
+            692 LOAD_CONST              15 (1000)
+            694 BINARY_OP                0 (+)
+            698 STORE_FAST              12 (end_ms)
+
+555     >>  700 LOAD_FAST                8 (item)
+            702 LOAD_ATTR               23 (NULL|self + get)
+            722 LOAD_CONST              16 ('emotion')
+            724 CALL                     1
+            732 LOAD_GLOBAL             28 (EMOTIONS)
+            742 CONTAINS_OP              0
+            744 POP_JUMP_IF_FALSE       17 (to 780)
+            746 LOAD_FAST                8 (item)
+            748 LOAD_ATTR               23 (NULL|self + get)
+            768 LOAD_CONST              16 ('emotion')
+            770 CALL                     1
+            778 JUMP_FORWARD             1 (to 782)
+        >>  780 LOAD_CONST              17 ('neutral')
+        >>  782 STORE_FAST              13 (emotion)
+
+556         784 NOP
+
+557         786 LOAD_GLOBAL             19 (NULL + max)
+            796 LOAD_CONST              18 (0.0)
+            798 LOAD_GLOBAL             17 (NULL + min)
+            808 LOAD_GLOBAL             31 (NULL + float)
+            818 LOAD_FAST                8 (item)
+            820 LOAD_ATTR               23 (NULL|self + get)
+            840 LOAD_CONST              19 ('intensity')
+            842 LOAD_CONST              20 (0.6)
+            844 CALL                     2
+            852 CALL                     1
+            860 LOAD_CONST              21 (1.0)
+            862 CALL                     2
+            870 CALL                     2
+            878 STORE_FAST              14 (intensity)
+
+560     >>  880 NOP
+
+561         882 LOAD_GLOBAL             19 (NULL + max)
+            892 LOAD_CONST              22 (0.7)
+            894 LOAD_GLOBAL             17 (NULL + min)
+            904 LOAD_GLOBAL             31 (NULL + float)
+            914 LOAD_FAST                8 (item)
+            916 LOAD_ATTR               23 (NULL|self + get)
+            936 LOAD_CONST              23 ('speech_rate')
+            938 LOAD_CONST              21 (1.0)
+            940 CALL                     2
+            948 CALL                     1
+            956 LOAD_CONST              24 (1.3)
+            958 CALL                     2
+            966 CALL                     2
+            974 STORE_FAST              15 (speech_rate)
+
+564     >>  976 LOAD_FAST                8 (item)
+            978 LOAD_ATTR               23 (NULL|self + get)
+            998 LOAD_CONST              25 ('prefix_tag')
+           1000 CALL                     1
+           1008 COPY                     1
+           1010 POP_JUMP_IF_TRUE         2 (to 1016)
+           1012 POP_TOP
+           1014 LOAD_CONST               9 ('')
+        >> 1016 STORE_FAST              16 (prefix_tag)
+
+565        1018 LOAD_GLOBAL              7 (NULL + isinstance)
+           1028 LOAD_FAST               16 (prefix_tag)
+           1030 LOAD_GLOBAL             34 (str)
+           1040 CALL                     2
+           1048 POP_JUMP_IF_TRUE         2 (to 1054)
+
+566        1050 LOAD_CONST               9 ('')
+           1052 STORE_FAST              16 (prefix_tag)
+
+568     >> 1054 LOAD_FAST                7 (groups)
+           1056 LOAD_ATTR               37 (NULL|self + append)
+
+569        1076 LOAD_FAST               11 (start_ms)
+
+570        1078 LOAD_FAST               12 (end_ms)
+
+571        1080 LOAD_FAST                9 (text)
+
+573        1082 LOAD_FAST               13 (emotion)
+
+574        1084 LOAD_GLOBAL             39 (NULL + round)
+           1094 LOAD_FAST               14 (intensity)
+           1096 LOAD_CONST              26 (3)
+           1098 CALL                     2
+
+575        1106 LOAD_GLOBAL             39 (NULL + round)
+           1116 LOAD_FAST               15 (speech_rate)
+           1118 LOAD_CONST              26 (3)
+           1120 CALL                     2
+
+576        1128 LOAD_FAST                8 (item)
+           1130 LOAD_ATTR               23 (NULL|self + get)
+           1150 LOAD_CONST              27 ('group_id')
+           1152 CALL                     1
+           1160 COPY                     1
+           1162 POP_JUMP_IF_TRUE         2 (to 1168)
+           1164 POP_TOP
+           1166 LOAD_CONST               9 ('')
+
+577     >> 1168 LOAD_FAST               16 (prefix_tag)
+
+578        1170 LOAD_GLOBAL             41 (NULL + style_for_emotion)
+           1180 LOAD_FAST               13 (emotion)
+           1182 LOAD_FAST               14 (intensity)
+           1184 CALL                     2
+
+572        1192 LOAD_CONST              28 (('emotion', 'intensity', 'speech_rate', 'group_id', 'prefix_tag', 'tts_style'))
+           1194 BUILD_CONST_KEY_MAP      6
+
+568        1196 LOAD_CONST              29 (('start_ms', 'end_ms', 'text', 'meta'))
+           1198 BUILD_CONST_KEY_MAP      4
+           1200 CALL                     1
+           1208 POP_TOP
+           1210 EXTENDED_ARG             1
+           1212 JUMP_BACKWARD          481 (to 252)
+
+534     >> 1214 END_FOR
+
+582        1216 LOAD_FAST                7 (groups)
+           1218 POP_JUMP_IF_TRUE        11 (to 1242)
+
+583        1220 LOAD_GLOBAL             15 (NULL + ValueError)
+           1230 LOAD_CONST              30 ('rewrite response không có group hợp lệ')
+           1232 CALL                     1
+           1240 RAISE_VARARGS            1
+
+585     >> 1242 LOAD_GLOBAL             43 (NULL + _normalize_timeline)
+           1252 LOAD_FAST                7 (groups)
+           1254 LOAD_FAST                5 (batch_start)
+           1256 LOAD_FAST                6 (batch_end)
+           1258 CALL                     3
+           1266 RETURN_VALUE
+        >> 1268 PUSH_EXC_INFO
+
+523        1270 LOAD_GLOBAL              2 (json)
+           1280 LOAD_ATTR               12 (JSONDecodeError)
+           1300 CHECK_EXC_MATCH
+           1302 POP_JUMP_IF_FALSE       28 (to 1360)
+           1304 POP_TOP
+
+525        1306 LOAD_GLOBAL             11 (NULL + _salvage_objects)
+           1316 LOAD_FAST                2 (cleaned)
+           1318 CALL                     1
+           1326 STORE_FAST               3 (parsed)
+
+526        1328 LOAD_FAST                3 (parsed)
+           1330 POP_JUMP_IF_TRUE        11 (to 1354)
+
+527        1332 LOAD_GLOBAL             15 (NULL + ValueError)
+           1342 LOAD_CONST               1 ('rewrite response JSON hỏng và không cứu được object nào')
+           1344 CALL                     1
+           1352 RAISE_VARARGS            1
+
+526     >> 1354 POP_EXCEPT
+           1356 EXTENDED_ARG             2
+           1358 JUMP_BACKWARD          618 (to 124)
+
+523     >> 1360 RERAISE                  0
+        >> 1362 COPY                     3
+           1364 POP_EXCEPT
+           1366 RERAISE                  1
+        >> 1368 SWAP                     2
+           1370 POP_TOP
+
+529        1372 SWAP                     2
+           1374 STORE_FAST               4 (s)
+           1376 RERAISE                  0
+        >> 1378 SWAP                     2
+           1380 POP_TOP
+
+545        1382 SWAP                     2
+           1384 STORE_FAST               4 (s)
+           1386 RERAISE                  0
+        >> 1388 PUSH_EXC_INFO
+
+558        1390 LOAD_GLOBAL             32 (TypeError)
+           1400 LOAD_GLOBAL             14 (ValueError)
+           1410 BUILD_TUPLE              2
+           1412 CHECK_EXC_MATCH
+           1414 POP_JUMP_IF_FALSE        6 (to 1428)
+           1416 POP_TOP
+
+559        1418 LOAD_CONST              20 (0.6)
+           1420 STORE_FAST              14 (intensity)
+           1422 POP_EXCEPT
+           1424 EXTENDED_ARG             1
+           1426 JUMP_BACKWARD          274 (to 880)
+
+558     >> 1428 RERAISE                  0
+        >> 1430 COPY                     3
+           1432 POP_EXCEPT
+           1434 RERAISE                  1
+        >> 1436 PUSH_EXC_INFO
+
+562        1438 LOAD_GLOBAL             32 (TypeError)
+           1448 LOAD_GLOBAL             14 (ValueError)
+           1458 BUILD_TUPLE              2
+           1460 CHECK_EXC_MATCH
+           1462 POP_JUMP_IF_FALSE        5 (to 1474)
+           1464 POP_TOP
+
+563        1466 LOAD_CONST              21 (1.0)
+           1468 STORE_FAST              15 (speech_rate)
+           1470 POP_EXCEPT
+           1472 JUMP_BACKWARD          249 (to 976)
+
+562     >> 1474 RERAISE                  0
+        >> 1476 COPY                     3
+           1478 POP_EXCEPT
+           1480 RERAISE                  1
+ExceptionTable:
+  28 to 122 -> 1268 [0]
+  132 to 156 -> 1368 [2]
+  454 to 470 -> 1378 [3]
+  474 to 480 -> 1378 [3]
+  786 to 878 -> 1388 [1]
+  882 to 974 -> 1436 [1]
+  1268 to 1352 -> 1362 [1] lasti
+  1360 to 1360 -> 1362 [1] lasti
+  1388 to 1420 -> 1430 [2] lasti
+  1428 to 1428 -> 1430 [2] lasti
+  1436 to 1468 -> 1476 [2] lasti
+  1474 to 1474 -> 1476 [2] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c932dc3f0, file "app\adapters\premium.py", line 530>:
+530           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                 9 (to 30)
+             12 STORE_FAST               1 (s)
+             14 LOAD_FAST                1 (s)
+             16 LOAD_CONST               0 ('start_ms')
+             18 BINARY_SUBSCR
+             22 YIELD_VALUE              1
+             24 RESUME                   1
+             26 POP_TOP
+             28 JUMP_BACKWARD           11 (to 8)
+        >>   30 END_FOR
+             32 RETURN_CONST             1 (None)
+        >>   34 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             36 RERAISE                  1
+ExceptionTable:
+  4 to 32 -> 34 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c932dc4e0, file "app\adapters\premium.py", line 531>:
+531           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                 9 (to 30)
+             12 STORE_FAST               1 (s)
+             14 LOAD_FAST                1 (s)
+             16 LOAD_CONST               0 ('end_ms')
+             18 BINARY_SUBSCR
+             22 YIELD_VALUE              1
+             24 RESUME                   1
+             26 POP_TOP
+             28 JUMP_BACKWARD           11 (to 8)
+        >>   30 END_FOR
+             32 RETURN_CONST             1 (None)
+        >>   34 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             36 RERAISE                  1
+ExceptionTable:
+  4 to 32 -> 34 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c932dc5d0, file "app\adapters\premium.py", line 547>:
+              0 COPY_FREE_VARS           1
+
+547           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                12 (to 38)
+             14 STORE_FAST               1 (s)
+             16 LOAD_DEREF               2 (seq_map)
+             18 LOAD_FAST                1 (s)
+             20 BINARY_SUBSCR
+             24 LOAD_CONST               0 ('start_ms')
+             26 BINARY_SUBSCR
+             30 YIELD_VALUE              1
+             32 RESUME                   1
+             34 POP_TOP
+             36 JUMP_BACKWARD           14 (to 10)
+        >>   38 END_FOR
+             40 RETURN_CONST             1 (None)
+        >>   42 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             44 RERAISE                  1
+ExceptionTable:
+  6 to 40 -> 42 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c932dc6c0, file "app\adapters\premium.py", line 548>:
+              0 COPY_FREE_VARS           1
+
+548           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                12 (to 38)
+             14 STORE_FAST               1 (s)
+             16 LOAD_DEREF               2 (seq_map)
+             18 LOAD_FAST                1 (s)
+             20 BINARY_SUBSCR
+             24 LOAD_CONST               0 ('end_ms')
+             26 BINARY_SUBSCR
+             30 YIELD_VALUE              1
+             32 RESUME                   1
+             34 POP_TOP
+             36 JUMP_BACKWARD           14 (to 10)
+        >>   38 END_FOR
+             40 RETURN_CONST             1 (None)
+        >>   42 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             44 RERAISE                  1
+ExceptionTable:
+  6 to 40 -> 42 [0] lasti
+
+Disassembly of <code object spoken_len at 0x7f6c9324afb0, file "app\adapters\premium.py", line 588>:
+588           0 RESUME                   0
+
+590           2 LOAD_GLOBAL              1 (NULL + len)
+             12 LOAD_GLOBAL              2 (_TAG_RE)
+             22 LOAD_ATTR                5 (NULL|self + sub)
+             42 LOAD_CONST               1 ('')
+             44 LOAD_FAST                0 (text)
+             46 COPY                     1
+             48 POP_JUMP_IF_TRUE         2 (to 54)
+             50 POP_TOP
+             52 LOAD_CONST               1 ('')
+        >>   54 CALL                     2
+             62 LOAD_ATTR                7 (NULL|self + strip)
+             82 CALL                     0
+             90 CALL                     1
+             98 RETURN_VALUE
+
+Disassembly of <code object _trim_to_spoken at 0x28b10130, file "app\adapters\premium.py", line 593>:
+593           0 RESUME                   0
+
+595           2 LOAD_FAST                0 (text)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 LOAD_CONST               1 ('')
+        >>   12 LOAD_ATTR                1 (NULL|self + split)
+             32 CALL                     0
+             40 STORE_FAST               2 (words)
+
+596          42 BUILD_LIST               0
+             44 STORE_FAST               3 (out)
+
+597          46 LOAD_CONST               2 (0)
+             48 STORE_FAST               4 (cur)
+
+598          50 LOAD_FAST                2 (words)
+             52 GET_ITER
+        >>   54 FOR_ITER                73 (to 204)
+             58 STORE_FAST               5 (w)
+
+599          60 LOAD_GLOBAL              3 (NULL + len)
+             70 LOAD_GLOBAL              4 (_TAG_RE)
+             80 LOAD_ATTR                7 (NULL|self + sub)
+            100 LOAD_CONST               1 ('')
+            102 LOAD_FAST                5 (w)
+            104 CALL                     2
+            112 CALL                     1
+            120 STORE_FAST               6 (wl)
+
+600         122 LOAD_FAST                3 (out)
+            124 POP_JUMP_IF_FALSE       13 (to 152)
+            126 LOAD_FAST                4 (cur)
+            128 LOAD_FAST                6 (wl)
+            130 BINARY_OP                0 (+)
+            134 LOAD_CONST               3 (1)
+            136 BINARY_OP                0 (+)
+            140 LOAD_FAST                1 (max_spoken)
+            142 COMPARE_OP              68 (>)
+            146 POP_JUMP_IF_FALSE        2 (to 152)
+
+601         148 POP_TOP
+            150 JUMP_FORWARD            27 (to 206)
+
+602     >>  152 LOAD_FAST                3 (out)
+            154 LOAD_ATTR                9 (NULL|self + append)
+            174 LOAD_FAST                5 (w)
+            176 CALL                     1
+            184 POP_TOP
+
+603         186 LOAD_FAST                4 (cur)
+            188 LOAD_FAST                6 (wl)
+            190 LOAD_CONST               3 (1)
+            192 BINARY_OP                0 (+)
+            196 BINARY_OP               13 (+=)
+            200 STORE_FAST               4 (cur)
+            202 JUMP_BACKWARD           75 (to 54)
+
+598     >>  204 END_FOR
+
+604     >>  206 LOAD_CONST               4 (' ')
+            208 LOAD_ATTR               11 (NULL|self + join)
+            228 LOAD_FAST                3 (out)
+            230 CALL                     1
+            238 LOAD_ATTR               13 (NULL|self + rstrip)
+            258 LOAD_CONST               5 (' ,;:—-')
+            260 CALL                     1
+            268 STORE_FAST               7 (s)
+
+606         270 LOAD_FAST                7 (s)
+            272 POP_JUMP_IF_FALSE       14 (to 302)
+            274 LOAD_GLOBAL             15 (NULL + spoken_len)
+            284 LOAD_FAST                7 (s)
+            286 CALL                     1
+            294 LOAD_FAST                1 (max_spoken)
+            296 COMPARE_OP              68 (>)
+            300 POP_JUMP_IF_FALSE       33 (to 368)
+
+607     >>  302 LOAD_FAST                0 (text)
+            304 COPY                     1
+            306 POP_JUMP_IF_TRUE         2 (to 312)
+            308 POP_TOP
+            310 LOAD_CONST               1 ('')
+        >>  312 LOAD_CONST               6 (None)
+            314 LOAD_GLOBAL             17 (NULL + max)
+            324 LOAD_FAST                1 (max_spoken)
+            326 LOAD_CONST               3 (1)
+            328 CALL                     2
+            336 BINARY_SLICE
+            338 LOAD_ATTR               13 (NULL|self + rstrip)
+            358 CALL                     0
+            366 STORE_FAST               7 (s)
+
+608     >>  368 LOAD_FAST                7 (s)
+            370 LOAD_CONST               7 ('…')
+            372 BINARY_OP                0 (+)
+            376 RETURN_VALUE
+
+Disassembly of <code object effective_speech_rate at 0x7f6c93393690, file "app\adapters\premium.py", line 611>:
+611           0 RESUME                   0
+
+618           2 LOAD_FAST                0 (meta)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 BUILD_MAP                0
+        >>   12 STORE_FAST               0 (meta)
+
+619          14 LOAD_FAST                0 (meta)
+             16 LOAD_ATTR                1 (NULL|self + get)
+             36 LOAD_CONST               1 ('speech_rate')
+             38 LOAD_CONST               2 (1.0)
+             40 CALL                     2
+             48 STORE_FAST               2 (sr)
+
+620          50 LOAD_FAST                1 (tier)
+             52 LOAD_CONST               3 ('medium_vn')
+             54 COMPARE_OP              40 (==)
+             58 POP_JUMP_IF_FALSE       67 (to 194)
+
+621          60 LOAD_GLOBAL              3 (NULL + medium_vn_style_for)
+             70 LOAD_FAST                0 (meta)
+             72 LOAD_ATTR                1 (NULL|self + get)
+             92 LOAD_CONST               4 ('emotion')
+             94 LOAD_CONST               5 ('neutral')
+             96 CALL                     2
+
+622         104 LOAD_FAST                0 (meta)
+            106 LOAD_ATTR                1 (NULL|self + get)
+            126 LOAD_CONST               6 ('intensity')
+            128 LOAD_CONST               7 (0.7)
+            130 CALL                     2
+            138 LOAD_FAST                2 (sr)
+
+621         140 CALL                     3
+            148 STORE_FAST               3 (style)
+
+623         150 LOAD_FAST                3 (style)
+            152 LOAD_ATTR                1 (NULL|self + get)
+            172 LOAD_CONST               8 ('speed_factor')
+            174 LOAD_FAST                2 (sr)
+            176 CALL                     2
+            184 COPY                     1
+            186 POP_JUMP_IF_TRUE         2 (to 192)
+            188 POP_TOP
+            190 LOAD_FAST                2 (sr)
+        >>  192 RETURN_VALUE
+
+624     >>  194 NOP
+
+625         196 LOAD_GLOBAL              5 (NULL + float)
+            206 LOAD_FAST                2 (sr)
+            208 CALL                     1
+            216 RETURN_VALUE
+        >>  218 PUSH_EXC_INFO
+
+626         220 LOAD_GLOBAL              6 (TypeError)
+            230 LOAD_GLOBAL              8 (ValueError)
+            240 BUILD_TUPLE              2
+            242 CHECK_EXC_MATCH
+            244 POP_JUMP_IF_FALSE        3 (to 252)
+            246 POP_TOP
+
+627         248 POP_EXCEPT
+            250 RETURN_CONST             2 (1.0)
+
+626     >>  252 RERAISE                  0
+        >>  254 COPY                     3
+            256 POP_EXCEPT
+            258 RERAISE                  1
+ExceptionTable:
+  196 to 214 -> 218 [0]
+  218 to 246 -> 254 [1] lasti
+  252 to 252 -> 254 [1] lasti
+
+Disassembly of <code object audit_and_fit at 0x28b10380, file "app\adapters\premium.py", line 630>:
+630           0 RESUME                   0
+
+638           2 LOAD_CONST               1 (0)
+              4 COPY                     1
+              6 STORE_FAST               4 (over)
+              8 COPY                     1
+             10 STORE_FAST               5 (trimmed)
+             12 STORE_FAST               6 (covered)
+
+639          14 LOAD_CONST               2 (1.0)
+             16 STORE_FAST               7 (worst_ratio)
+
+640          18 LOAD_FAST                0 (groups)
+             20 GET_ITER
+        >>   22 FOR_ITER               161 (to 348)
+             26 STORE_FAST               8 (g)
+
+641          28 LOAD_GLOBAL              1 (NULL + max)
+             38 LOAD_GLOBAL              3 (NULL + int)
+             48 LOAD_FAST                8 (g)
+             50 LOAD_CONST               3 ('end_ms')
+             52 BINARY_SUBSCR
+             56 CALL                     1
+             64 LOAD_GLOBAL              3 (NULL + int)
+             74 LOAD_FAST                8 (g)
+             76 LOAD_CONST               4 ('start_ms')
+             78 BINARY_SUBSCR
+             82 CALL                     1
+             90 BINARY_OP               10 (-)
+             94 LOAD_CONST               1 (0)
+             96 CALL                     2
+            104 STORE_FAST               9 (slot)
+
+642         106 LOAD_FAST                6 (covered)
+            108 LOAD_FAST                9 (slot)
+            110 BINARY_OP               13 (+=)
+            114 STORE_FAST               6 (covered)
+
+643         116 LOAD_GLOBAL              5 (NULL + effective_speech_rate)
+            126 LOAD_FAST                8 (g)
+            128 LOAD_ATTR                7 (NULL|self + get)
+            148 LOAD_CONST               5 ('meta')
+            150 CALL                     1
+            158 COPY                     1
+            160 POP_JUMP_IF_TRUE         2 (to 166)
+            162 POP_TOP
+            164 BUILD_MAP                0
+        >>  166 LOAD_FAST                2 (tier)
+            168 CALL                     2
+            176 STORE_FAST              10 (eff)
+
+644         178 LOAD_GLOBAL              9 (NULL + char_budget)
+            188 LOAD_FAST                9 (slot)
+            190 LOAD_FAST                1 (dst_lang)
+            192 LOAD_FAST               10 (eff)
+            194 CALL                     3
+            202 STORE_FAST              11 (budget)
+
+645         204 LOAD_GLOBAL             11 (NULL + spoken_len)
+            214 LOAD_FAST                8 (g)
+            216 LOAD_ATTR                7 (NULL|self + get)
+            236 LOAD_CONST               6 ('text')
+            238 LOAD_CONST               7 ('')
+            240 CALL                     2
+            248 CALL                     1
+            256 STORE_FAST              12 (sp)
+
+646         258 LOAD_FAST               11 (budget)
+            260 LOAD_CONST               1 (0)
+            262 COMPARE_OP              26 (<=)
+            266 POP_JUMP_IF_FALSE        1 (to 270)
+
+647         268 JUMP_BACKWARD          124 (to 22)
+
+648     >>  270 LOAD_FAST               12 (sp)
+            272 LOAD_FAST               11 (budget)
+            274 BINARY_OP               11 (/)
+            278 STORE_FAST              13 (ratio)
+
+649         280 LOAD_FAST               13 (ratio)
+            282 LOAD_CONST               2 (1.0)
+            284 COMPARE_OP              68 (>)
+            288 POP_JUMP_IF_FALSE       17 (to 324)
+
+650         290 LOAD_FAST                4 (over)
+            292 LOAD_CONST               8 (1)
+            294 BINARY_OP               13 (+=)
+            298 STORE_FAST               4 (over)
+
+651         300 LOAD_GLOBAL              1 (NULL + max)
+            310 LOAD_FAST                7 (worst_ratio)
+            312 LOAD_FAST               13 (ratio)
+            314 CALL                     2
+            322 STORE_FAST               7 (worst_ratio)
+
+652     >>  324 LOAD_FAST               13 (ratio)
+            326 LOAD_FAST                3 (trim_ratio)
+            328 COMPARE_OP              68 (>)
+            332 POP_JUMP_IF_TRUE         1 (to 336)
+            334 JUMP_BACKWARD          157 (to 22)
+
+655     >>  336 LOAD_FAST                5 (trimmed)
+            338 LOAD_CONST               8 (1)
+            340 BINARY_OP               13 (+=)
+            344 STORE_FAST               5 (trimmed)
+            346 JUMP_BACKWARD          163 (to 22)
+
+640     >>  348 END_FOR
+
+657         350 LOAD_GLOBAL             13 (NULL + len)
+            360 LOAD_FAST                0 (groups)
+            362 CALL                     1
+
+658         370 LOAD_FAST                4 (over)
+
+659         372 LOAD_GLOBAL             15 (NULL + round)
+            382 LOAD_FAST                7 (worst_ratio)
+            384 LOAD_CONST               9 (2)
+            386 CALL                     2
+
+660         394 LOAD_FAST                5 (trimmed)
+
+661         396 LOAD_FAST                6 (covered)
+
+656         398 LOAD_CONST              10 (('groups', 'over_budget', 'worst_ratio', 'trimmed', 'covered_ms'))
+            400 BUILD_CONST_KEY_MAP      5
+            402 RETURN_VALUE
+
+Disassembly of <code object _normalize_timeline at 0x2906a8e0, file "app\adapters\premium.py", line 665>:
+665           0 RESUME                   0
+
+670           2 LOAD_FAST                0 (groups)
+              4 POP_JUMP_IF_TRUE         2 (to 10)
+
+671           6 LOAD_FAST                0 (groups)
+              8 RETURN_VALUE
+
+672     >>   10 LOAD_FAST                0 (groups)
+             12 LOAD_ATTR                1 (NULL|self + sort)
+             32 LOAD_CONST               1 (<code object <lambda> at 0x7f6c929b4b90, file "app\adapters\premium.py", line 672>)
+             34 MAKE_FUNCTION            0
+             36 KW_NAMES                 2 (('key',))
+             38 CALL                     1
+             46 POP_TOP
+
+673          48 LOAD_FAST                1 (lo)
+             50 STORE_FAST               3 (prev_end)
+
+674          52 LOAD_FAST                0 (groups)
+             54 GET_ITER
+        >>   56 FOR_ITER               142 (to 344)
+             60 STORE_FAST               4 (g)
+
+675          62 LOAD_GLOBAL              3 (NULL + max)
+             72 LOAD_FAST                1 (lo)
+             74 LOAD_GLOBAL              5 (NULL + min)
+             84 LOAD_GLOBAL              7 (NULL + int)
+             94 LOAD_FAST                4 (g)
+             96 LOAD_CONST               3 ('start_ms')
+             98 BINARY_SUBSCR
+            102 CALL                     1
+            110 LOAD_FAST                2 (hi)
+            112 CALL                     2
+            120 CALL                     2
+            128 LOAD_FAST                4 (g)
+            130 LOAD_CONST               3 ('start_ms')
+            132 STORE_SUBSCR
+
+676         136 LOAD_GLOBAL              3 (NULL + max)
+            146 LOAD_FAST                4 (g)
+            148 LOAD_CONST               3 ('start_ms')
+            150 BINARY_SUBSCR
+            154 LOAD_CONST               4 (1)
+            156 BINARY_OP                0 (+)
+            160 LOAD_GLOBAL              5 (NULL + min)
+            170 LOAD_GLOBAL              7 (NULL + int)
+            180 LOAD_FAST                4 (g)
+            182 LOAD_CONST               5 ('end_ms')
+            184 BINARY_SUBSCR
+            188 CALL                     1
+            196 LOAD_FAST                2 (hi)
+            198 CALL                     2
+            206 CALL                     2
+            214 LOAD_FAST                4 (g)
+            216 LOAD_CONST               5 ('end_ms')
+            218 STORE_SUBSCR
+
+677         222 LOAD_FAST                4 (g)
+            224 LOAD_CONST               3 ('start_ms')
+            226 BINARY_SUBSCR
+            230 LOAD_FAST                3 (prev_end)
+            232 COMPARE_OP               2 (<)
+            236 POP_JUMP_IF_FALSE       47 (to 332)
+
+678         238 LOAD_GLOBAL              5 (NULL + min)
+            248 LOAD_FAST                3 (prev_end)
+            250 LOAD_FAST                2 (hi)
+            252 CALL                     2
+            260 LOAD_FAST                4 (g)
+            262 LOAD_CONST               3 ('start_ms')
+            264 STORE_SUBSCR
+
+679         268 LOAD_FAST                4 (g)
+            270 LOAD_CONST               5 ('end_ms')
+            272 BINARY_SUBSCR
+            276 LOAD_FAST                4 (g)
+            278 LOAD_CONST               3 ('start_ms')
+            280 BINARY_SUBSCR
+            284 COMPARE_OP              26 (<=)
+            288 POP_JUMP_IF_FALSE       21 (to 332)
+
+680         290 LOAD_GLOBAL              5 (NULL + min)
+            300 LOAD_FAST                4 (g)
+            302 LOAD_CONST               3 ('start_ms')
+            304 BINARY_SUBSCR
+            308 LOAD_CONST               6 (200)
+            310 BINARY_OP                0 (+)
+            314 LOAD_FAST                2 (hi)
+            316 CALL                     2
+            324 LOAD_FAST                4 (g)
+            326 LOAD_CONST               5 ('end_ms')
+            328 STORE_SUBSCR
+
+681     >>  332 LOAD_FAST                4 (g)
+            334 LOAD_CONST               5 ('end_ms')
+            336 BINARY_SUBSCR
+            340 STORE_FAST               3 (prev_end)
+            342 JUMP_BACKWARD          144 (to 56)
+
+674     >>  344 END_FOR
+
+682         346 LOAD_FAST                0 (groups)
+            348 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c929b4b90, file "app\adapters\premium.py", line 672>:
+672           0 RESUME                   0
+              2 LOAD_FAST                0 (g)
+              4 LOAD_CONST               1 ('start_ms')
+              6 BINARY_SUBSCR
+             10 LOAD_FAST                0 (g)
+             12 LOAD_CONST               2 ('end_ms')
+             14 BINARY_SUBSCR
+             18 BUILD_TUPLE              2
+             20 RETURN_VALUE

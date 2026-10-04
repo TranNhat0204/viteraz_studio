@@ -1,0 +1,619 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Phóng nhẹ khung hình để cắt chữ "Veo" nằm sát góc asset Flow.\n\nChia việc với ``app/media/flow_watermark.py``:\n\n* **Sparkle** nằm sâu ~16% cạnh ngắn tính từ viền → phóng để cắt được nó thì mất quá nhiều khung,\n  nên vẫn phải xoá bằng filter (inverse alpha / removelogo).\n* **Wordmark "Veo"** nằm sát viền (~1–1.5% cạnh) → chỉ cần cắt 2–3% mép là bay sạch. Dò rồi nội suy\n  một hộp chữ nhỏ xíu vừa đắt vừa hay trượt (hộp chữ trước đây là công thức ĐOÁN), trong khi phóng\n  6% gần như không đổi bố cục.\n\nCảnh AI đi qua filtergraph lúc dựng nên được phóng ngay trong ``-vf`` — không đụng file gốc, không\nthêm một lần encode nào. Ảnh đứng một mình (thumbnail, ảnh bìa) không đi qua timeline nên phải cắt\nthẳng vào file.\n\nTắt bằng cách đặt setting ``flow_logo_safe_zoom_pct`` = 0.\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 17           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 19          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (logging)
+             24 STORE_NAME               3 (logging)
+
+ 20          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               3 (None)
+             30 IMPORT_NAME              4 (os)
+             32 STORE_NAME               4 (os)
+
+ 21          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               4 (('Path',))
+             38 IMPORT_NAME              5 (pathlib)
+             40 IMPORT_FROM              6 (Path)
+             42 STORE_NAME               6 (Path)
+             44 POP_TOP
+
+ 23          46 PUSH_NULL
+             48 LOAD_NAME                3 (logging)
+             50 LOAD_ATTR               14 (getLogger)
+             70 LOAD_NAME                8 (__name__)
+             72 CALL                     1
+             80 STORE_NAME               9 (log)
+
+ 25          82 LOAD_CONST               5 ('flow_logo_safe_zoom_pct')
+             84 STORE_NAME              10 (SETTING_KEY)
+
+ 26          86 LOAD_CONST               6 (6)
+             88 STORE_NAME              11 (DEFAULT_ZOOM_PCT)
+
+ 27          90 LOAD_CONST               7 (15)
+             92 STORE_NAME              12 (MAX_ZOOM_PCT)
+
+ 30          94 LOAD_CONST              13 (('return', 'int'))
+             96 LOAD_CONST               8 (<code object safe_zoom_pct at 0x290e81c0, file "app\media\logo_zoom.py", line 30>)
+             98 MAKE_FUNCTION            4 (annotations)
+            100 STORE_NAME              13 (safe_zoom_pct)
+
+ 46         102 LOAD_CONST              14 (('return', 'float'))
+            104 LOAD_CONST               9 (<code object safe_zoom_factor at 0x7f6c92eeb960, file "app\media\logo_zoom.py", line 46>)
+            106 MAKE_FUNCTION            4 (annotations)
+            108 STORE_NAME              14 (safe_zoom_factor)
+
+ 51         110 LOAD_CONST              15 ((None,))
+            112 LOAD_CONST              16 (('w', 'int', 'h', 'int', 'factor', 'float | None', 'return', 'tuple[int, int]'))
+            114 LOAD_CONST              10 (<code object zoom_dims at 0x7f6c92c29230, file "app\media\logo_zoom.py", line 51>)
+            116 MAKE_FUNCTION            5 (defaults, annotations)
+            118 STORE_NAME              15 (zoom_dims)
+
+ 57         120 LOAD_CONST              17 ((None, None))
+            122 LOAD_CONST              18 (('w', 'int', 'h', 'int', 'fps', 'int | None', 'factor', 'float | None', 'return', 'str'))
+            124 LOAD_CONST              11 (<code object cover_zoom_vf at 0x7f6c81b7f990, file "app\media\logo_zoom.py", line 57>)
+            126 MAKE_FUNCTION            5 (defaults, annotations)
+            128 STORE_NAME              16 (cover_zoom_vf)
+
+ 68         130 LOAD_CONST              15 ((None,))
+            132 LOAD_CONST              19 (('path', 'Path', 'factor', 'float | None', 'return', 'bool'))
+            134 LOAD_CONST              12 (<code object zoom_crop_image at 0x28b1b1e0, file "app\media\logo_zoom.py", line 68>)
+            136 MAKE_FUNCTION            5 (defaults, annotations)
+            138 STORE_NAME              17 (zoom_crop_image)
+            140 RETURN_CONST             3 (None)
+
+Disassembly of <code object safe_zoom_pct at 0x290e81c0, file "app\media\logo_zoom.py", line 30>:
+ 30           0 RESUME                   0
+
+ 32           2 NOP
+
+ 33           4 LOAD_CONST               1 (0)
+              6 LOAD_CONST               2 (('Setting',))
+              8 IMPORT_NAME              0 (app.db.models)
+             10 IMPORT_FROM              1 (Setting)
+             12 STORE_FAST               0 (Setting)
+             14 POP_TOP
+
+ 34          16 LOAD_CONST               1 (0)
+             18 LOAD_CONST               3 (('SessionLocal',))
+             20 IMPORT_NAME              2 (app.db.session)
+             22 IMPORT_FROM              3 (SessionLocal)
+             24 STORE_FAST               1 (SessionLocal)
+             26 POP_TOP
+
+ 36          28 PUSH_NULL
+             30 LOAD_FAST                1 (SessionLocal)
+             32 CALL                     0
+             40 BEFORE_WITH
+             42 STORE_FAST               2 (db)
+
+ 37          44 LOAD_FAST                2 (db)
+             46 LOAD_ATTR                9 (NULL|self + get)
+             66 LOAD_FAST                0 (Setting)
+             68 LOAD_GLOBAL             10 (SETTING_KEY)
+             78 CALL                     2
+             86 STORE_FAST               3 (row)
+
+ 38          88 LOAD_FAST                3 (row)
+             90 POP_JUMP_IF_NOT_NONE     2 (to 96)
+             92 LOAD_CONST               4 (None)
+             94 JUMP_FORWARD            11 (to 118)
+        >>   96 LOAD_FAST                3 (row)
+             98 LOAD_ATTR               12 (value)
+        >>  118 STORE_FAST               4 (raw)
+
+ 36         120 LOAD_CONST               4 (None)
+            122 LOAD_CONST               4 (None)
+            124 LOAD_CONST               4 (None)
+            126 CALL                     2
+            134 POP_TOP
+
+ 39     >>  136 LOAD_FAST_CHECK          4 (raw)
+            138 POP_JUMP_IF_NONE        28 (to 196)
+            140 LOAD_GLOBAL             15 (NULL + str)
+            150 LOAD_FAST                4 (raw)
+            152 CALL                     1
+            160 LOAD_ATTR               17 (NULL|self + strip)
+            180 CALL                     0
+            188 LOAD_CONST               5 ('')
+            190 COMPARE_OP              40 (==)
+            194 POP_JUMP_IF_FALSE        6 (to 208)
+
+ 40     >>  196 LOAD_GLOBAL             18 (DEFAULT_ZOOM_PCT)
+            206 RETURN_VALUE
+
+ 41     >>  208 LOAD_GLOBAL             21 (NULL + max)
+            218 LOAD_CONST               1 (0)
+            220 LOAD_GLOBAL             23 (NULL + min)
+            230 LOAD_GLOBAL             24 (MAX_ZOOM_PCT)
+            240 LOAD_GLOBAL             27 (NULL + int)
+            250 LOAD_GLOBAL             15 (NULL + str)
+            260 LOAD_FAST                4 (raw)
+            262 CALL                     1
+            270 LOAD_ATTR               17 (NULL|self + strip)
+            290 CALL                     0
+            298 CALL                     1
+            306 CALL                     2
+            314 CALL                     2
+            322 RETURN_VALUE
+
+ 36     >>  324 PUSH_EXC_INFO
+            326 WITH_EXCEPT_START
+            328 POP_JUMP_IF_TRUE         1 (to 332)
+            330 RERAISE                  2
+        >>  332 POP_TOP
+            334 POP_EXCEPT
+            336 POP_TOP
+            338 POP_TOP
+            340 JUMP_BACKWARD          103 (to 136)
+        >>  342 COPY                     3
+            344 POP_EXCEPT
+            346 RERAISE                  1
+        >>  348 PUSH_EXC_INFO
+
+ 42         350 LOAD_GLOBAL             28 (Exception)
+            360 CHECK_EXC_MATCH
+            362 POP_JUMP_IF_FALSE        9 (to 382)
+            364 POP_TOP
+
+ 43         366 LOAD_GLOBAL             18 (DEFAULT_ZOOM_PCT)
+            376 SWAP                     2
+            378 POP_EXCEPT
+            380 RETURN_VALUE
+
+ 42     >>  382 RERAISE                  0
+        >>  384 COPY                     3
+            386 POP_EXCEPT
+            388 RERAISE                  1
+ExceptionTable:
+  4 to 40 -> 348 [0]
+  42 to 118 -> 324 [1] lasti
+  120 to 204 -> 348 [0]
+  208 to 320 -> 348 [0]
+  324 to 332 -> 342 [3] lasti
+  334 to 346 -> 348 [0]
+  348 to 376 -> 384 [1] lasti
+  382 to 382 -> 384 [1] lasti
+
+Disassembly of <code object safe_zoom_factor at 0x7f6c92eeb960, file "app\media\logo_zoom.py", line 46>:
+ 46           0 RESUME                   0
+
+ 48           2 LOAD_CONST               1 (1.0)
+              4 LOAD_GLOBAL              1 (NULL + safe_zoom_pct)
+             14 CALL                     0
+             22 LOAD_CONST               2 (100.0)
+             24 BINARY_OP               11 (/)
+             28 BINARY_OP                0 (+)
+             32 RETURN_VALUE
+
+Disassembly of <code object zoom_dims at 0x7f6c92c29230, file "app\media\logo_zoom.py", line 51>:
+ 51           0 RESUME                   0
+
+ 53           2 LOAD_FAST                2 (factor)
+              4 POP_JUMP_IF_NOT_NONE    10 (to 26)
+              6 LOAD_GLOBAL              1 (NULL + safe_zoom_factor)
+             16 CALL                     0
+             24 JUMP_FORWARD             1 (to 28)
+        >>   26 LOAD_FAST                2 (factor)
+        >>   28 STORE_FAST               3 (z)
+
+ 54          30 LOAD_GLOBAL              3 (NULL + max)
+             40 LOAD_CONST               1 (2)
+             42 LOAD_GLOBAL              5 (NULL + int)
+             52 LOAD_GLOBAL              7 (NULL + round)
+             62 LOAD_FAST                0 (w)
+             64 LOAD_FAST                3 (z)
+             66 BINARY_OP                5 (*)
+             70 CALL                     1
+             78 CALL                     1
+             86 LOAD_CONST               1 (2)
+             88 BINARY_OP                2 (//)
+             92 LOAD_CONST               1 (2)
+             94 BINARY_OP                5 (*)
+             98 CALL                     2
+            106 LOAD_GLOBAL              3 (NULL + max)
+            116 LOAD_CONST               1 (2)
+            118 LOAD_GLOBAL              5 (NULL + int)
+            128 LOAD_GLOBAL              7 (NULL + round)
+            138 LOAD_FAST                1 (h)
+            140 LOAD_FAST                3 (z)
+            142 BINARY_OP                5 (*)
+            146 CALL                     1
+            154 CALL                     1
+            162 LOAD_CONST               1 (2)
+            164 BINARY_OP                2 (//)
+            168 LOAD_CONST               1 (2)
+            170 BINARY_OP                5 (*)
+            174 CALL                     2
+            182 BUILD_TUPLE              2
+            184 RETURN_VALUE
+
+Disassembly of <code object cover_zoom_vf at 0x7f6c81b7f990, file "app\media\logo_zoom.py", line 57>:
+ 57           0 RESUME                   0
+
+ 59           2 LOAD_GLOBAL              1 (NULL + zoom_dims)
+             12 LOAD_FAST                0 (w)
+             14 LOAD_FAST                1 (h)
+             16 LOAD_FAST                3 (factor)
+             18 CALL                     3
+             26 UNPACK_SEQUENCE          2
+             30 STORE_FAST               4 (zw)
+             32 STORE_FAST               5 (zh)
+
+ 60          34 LOAD_FAST                2 (fps)
+             36 POP_JUMP_IF_FALSE        6 (to 50)
+             38 LOAD_CONST               1 ('fps=')
+             40 LOAD_FAST                2 (fps)
+             42 FORMAT_VALUE             0
+             44 LOAD_CONST               2 (',')
+             46 BUILD_STRING             3
+             48 JUMP_FORWARD             1 (to 52)
+        >>   50 LOAD_CONST               3 ('')
+        >>   52 STORE_FAST               6 (fps_part)
+
+ 64          54 LOAD_CONST               4 ('scale=')
+             56 LOAD_FAST                4 (zw)
+             58 FORMAT_VALUE             0
+             60 LOAD_CONST               5 (':')
+             62 LOAD_FAST                5 (zh)
+             64 FORMAT_VALUE             0
+             66 LOAD_CONST               6 (':force_original_aspect_ratio=increase:flags=lanczos,crop=')
+
+ 65          68 LOAD_FAST                0 (w)
+             70 FORMAT_VALUE             0
+             72 LOAD_CONST               5 (':')
+             74 LOAD_FAST                1 (h)
+             76 FORMAT_VALUE             0
+             78 LOAD_CONST               2 (',')
+             80 LOAD_FAST                6 (fps_part)
+             82 FORMAT_VALUE             0
+             84 LOAD_CONST               7 ('format=yuv420p,setsar=1')
+
+ 64          86 BUILD_STRING            11
+             88 RETURN_VALUE
+
+Disassembly of <code object zoom_crop_image at 0x28b1b1e0, file "app\media\logo_zoom.py", line 68>:
+ 68           0 RESUME                   0
+
+ 74           2 LOAD_FAST                1 (factor)
+              4 POP_JUMP_IF_NOT_NONE    10 (to 26)
+              6 LOAD_GLOBAL              1 (NULL + safe_zoom_factor)
+             16 CALL                     0
+             24 JUMP_FORWARD             1 (to 28)
+        >>   26 LOAD_FAST                1 (factor)
+        >>   28 STORE_FAST               2 (z)
+
+ 75          30 LOAD_FAST                2 (z)
+             32 LOAD_CONST               2 (1.0009)
+             34 COMPARE_OP              26 (<=)
+             38 POP_JUMP_IF_FALSE        1 (to 42)
+
+ 76          40 RETURN_CONST             3 (False)
+
+ 77     >>   42 LOAD_FAST                0 (path)
+             44 LOAD_ATTR                3 (NULL|self + with_name)
+             64 LOAD_CONST               4 ('.')
+             66 LOAD_FAST                0 (path)
+             68 LOAD_ATTR                4 (stem)
+             88 FORMAT_VALUE             0
+             90 LOAD_CONST               5 ('.zoom.tmp')
+             92 LOAD_FAST                0 (path)
+             94 LOAD_ATTR                6 (suffix)
+            114 FORMAT_VALUE             0
+            116 BUILD_STRING             4
+            118 CALL                     1
+            126 STORE_FAST               3 (tmp)
+
+ 78         128 NOP
+
+ 79         130 LOAD_CONST               6 (0)
+            132 LOAD_CONST               7 (('Image',))
+            134 IMPORT_NAME              4 (PIL)
+            136 IMPORT_FROM              5 (Image)
+            138 STORE_FAST               4 (Image)
+            140 POP_TOP
+
+ 81         142 LOAD_FAST                4 (Image)
+            144 LOAD_ATTR               13 (NULL|self + open)
+            164 LOAD_FAST                0 (path)
+            166 CALL                     1
+            174 BEFORE_WITH
+            176 STORE_FAST               5 (source)
+
+ 82         178 LOAD_FAST                5 (source)
+            180 LOAD_ATTR               14 (format)
+            200 COPY                     1
+            202 POP_JUMP_IF_TRUE         2 (to 208)
+            204 POP_TOP
+            206 LOAD_CONST               8 ('PNG')
+        >>  208 LOAD_ATTR               17 (NULL|self + upper)
+            228 CALL                     0
+            236 STORE_FAST               6 (fmt)
+
+ 83         238 LOAD_GLOBAL             19 (NULL + dict)
+            248 LOAD_FAST                5 (source)
+            250 LOAD_ATTR               20 (info)
+            270 CALL                     1
+            278 STORE_FAST               7 (info)
+
+ 84         280 LOAD_FAST                5 (source)
+            282 LOAD_ATTR               22 (size)
+            302 UNPACK_SEQUENCE          2
+            306 STORE_FAST               8 (w)
+            308 STORE_FAST               9 (h)
+
+ 85         310 LOAD_FAST                8 (w)
+            312 LOAD_CONST               9 (1.0)
+            314 LOAD_CONST               9 (1.0)
+            316 LOAD_FAST                2 (z)
+            318 BINARY_OP               11 (/)
+            322 BINARY_OP               10 (-)
+            326 BINARY_OP                5 (*)
+            330 LOAD_CONST              10 (2.0)
+            332 BINARY_OP               11 (/)
+            336 LOAD_FAST                9 (h)
+            338 LOAD_CONST               9 (1.0)
+            340 LOAD_CONST               9 (1.0)
+            342 LOAD_FAST                2 (z)
+            344 BINARY_OP               11 (/)
+            348 BINARY_OP               10 (-)
+            352 BINARY_OP                5 (*)
+            356 LOAD_CONST              10 (2.0)
+            358 BINARY_OP               11 (/)
+            362 STORE_FAST              11 (margin_y)
+            364 STORE_FAST              10 (margin_x)
+
+ 86         366 LOAD_GLOBAL             25 (NULL + int)
+            376 LOAD_GLOBAL             27 (NULL + round)
+            386 LOAD_FAST               10 (margin_x)
+            388 CALL                     1
+            396 CALL                     1
+            404 LOAD_GLOBAL             25 (NULL + int)
+            414 LOAD_GLOBAL             27 (NULL + round)
+            424 LOAD_FAST               11 (margin_y)
+            426 CALL                     1
+            434 CALL                     1
+
+ 87         442 LOAD_FAST                8 (w)
+            444 LOAD_GLOBAL             25 (NULL + int)
+            454 LOAD_GLOBAL             27 (NULL + round)
+            464 LOAD_FAST               10 (margin_x)
+            466 CALL                     1
+            474 CALL                     1
+            482 BINARY_OP               10 (-)
+            486 LOAD_FAST                9 (h)
+            488 LOAD_GLOBAL             25 (NULL + int)
+            498 LOAD_GLOBAL             27 (NULL + round)
+            508 LOAD_FAST               11 (margin_y)
+            510 CALL                     1
+            518 CALL                     1
+            526 BINARY_OP               10 (-)
+
+ 86         530 BUILD_TUPLE              4
+            532 STORE_FAST              12 (box)
+
+ 88         534 LOAD_FAST               12 (box)
+            536 LOAD_CONST              11 (2)
+            538 BINARY_SUBSCR
+            542 LOAD_FAST               12 (box)
+            544 LOAD_CONST               6 (0)
+            546 BINARY_SUBSCR
+            550 BINARY_OP               10 (-)
+            554 LOAD_CONST              12 (16)
+            556 COMPARE_OP               2 (<)
+            560 POP_JUMP_IF_TRUE        14 (to 590)
+            562 LOAD_FAST               12 (box)
+            564 LOAD_CONST              13 (3)
+            566 BINARY_SUBSCR
+            570 LOAD_FAST               12 (box)
+            572 LOAD_CONST              14 (1)
+            574 BINARY_SUBSCR
+            578 BINARY_OP               10 (-)
+            582 LOAD_CONST              12 (16)
+            584 COMPARE_OP               2 (<)
+            588 POP_JUMP_IF_FALSE       28 (to 646)
+
+ 89     >>  590 NOP
+
+ 81         592 LOAD_CONST               1 (None)
+            594 LOAD_CONST               1 (None)
+            596 LOAD_CONST               1 (None)
+            598 CALL                     2
+            606 POP_TOP
+
+105         608 LOAD_FAST                3 (tmp)
+            610 LOAD_ATTR               29 (NULL|self + unlink)
+            630 LOAD_CONST              15 (True)
+            632 KW_NAMES                16 (('missing_ok',))
+            634 CALL                     1
+            642 POP_TOP
+            644 RETURN_CONST             3 (False)
+
+ 90     >>  646 LOAD_FAST                5 (source)
+            648 LOAD_ATTR               31 (NULL|self + crop)
+            668 LOAD_FAST               12 (box)
+            670 CALL                     1
+            678 LOAD_ATTR               33 (NULL|self + resize)
+            698 LOAD_FAST                8 (w)
+            700 LOAD_FAST                9 (h)
+            702 BUILD_TUPLE              2
+            704 LOAD_FAST                4 (Image)
+            706 LOAD_ATTR               34 (LANCZOS)
+            726 CALL                     2
+            734 STORE_FAST              13 (zoomed)
+
+ 81         736 LOAD_CONST               1 (None)
+            738 LOAD_CONST               1 (None)
+            740 LOAD_CONST               1 (None)
+            742 CALL                     2
+            750 POP_TOP
+
+ 92     >>  752 LOAD_FAST_CHECK          6 (fmt)
+            754 LOAD_CONST              17 ('JPEG')
+            756 COMPARE_OP              40 (==)
+            760 POP_JUMP_IF_FALSE        6 (to 774)
+
+ 91         762 LOAD_CONST              18 (92)
+            764 LOAD_CONST              11 (2)
+            766 LOAD_CONST              15 (True)
+            768 LOAD_CONST              19 (('quality', 'subsampling', 'optimize'))
+            770 BUILD_CONST_KEY_MAP      3
+            772 JUMP_FORWARD             3 (to 780)
+
+ 92     >>  774 LOAD_CONST              20 ('compress_level')
+            776 LOAD_CONST              13 (3)
+            778 BUILD_MAP                1
+
+ 91     >>  780 STORE_FAST              14 (options)
+
+ 93         782 LOAD_CONST              21 (('exif', 'xmp', 'icc_profile'))
+            784 GET_ITER
+        >>  786 FOR_ITER                28 (to 846)
+            790 STORE_FAST              15 (metadata_key)
+
+ 94         792 LOAD_FAST_CHECK          7 (info)
+            794 LOAD_ATTR               37 (NULL|self + get)
+            814 LOAD_FAST               15 (metadata_key)
+            816 CALL                     1
+            824 POP_JUMP_IF_TRUE         1 (to 828)
+            826 JUMP_BACKWARD           21 (to 786)
+
+ 95     >>  828 LOAD_FAST                7 (info)
+            830 LOAD_FAST               15 (metadata_key)
+            832 BINARY_SUBSCR
+            836 LOAD_FAST               14 (options)
+            838 LOAD_FAST               15 (metadata_key)
+            840 STORE_SUBSCR
+            844 JUMP_BACKWARD           30 (to 786)
+
+ 93     >>  846 END_FOR
+
+ 96         848 PUSH_NULL
+            850 LOAD_FAST_CHECK         13 (zoomed)
+            852 LOAD_ATTR               38 (save)
+            872 LOAD_FAST                3 (tmp)
+            874 BUILD_TUPLE              1
+            876 LOAD_CONST              22 ('format')
+            878 LOAD_FAST                6 (fmt)
+            880 BUILD_MAP                1
+            882 LOAD_FAST               14 (options)
+            884 DICT_MERGE               1
+            886 CALL_FUNCTION_EX         1
+            888 POP_TOP
+
+ 97         890 LOAD_FAST                3 (tmp)
+            892 LOAD_ATTR               41 (NULL|self + stat)
+            912 CALL                     0
+            920 LOAD_ATTR               42 (st_size)
+            940 LOAD_CONST              23 (1024)
+            942 COMPARE_OP               2 (<)
+            946 POP_JUMP_IF_FALSE       11 (to 970)
+
+ 98         948 LOAD_GLOBAL             45 (NULL + ValueError)
+            958 LOAD_CONST              24 ('ảnh sau khi phóng nhỏ bất thường')
+            960 CALL                     1
+            968 RAISE_VARARGS            1
+
+ 99     >>  970 LOAD_GLOBAL             47 (NULL + os)
+            980 LOAD_ATTR               48 (replace)
+           1000 LOAD_FAST                3 (tmp)
+           1002 LOAD_FAST                0 (path)
+           1004 CALL                     2
+           1012 POP_TOP
+
+100        1014 NOP
+
+105        1016 LOAD_FAST                3 (tmp)
+           1018 LOAD_ATTR               29 (NULL|self + unlink)
+           1038 LOAD_CONST              15 (True)
+           1040 KW_NAMES                16 (('missing_ok',))
+           1042 CALL                     1
+           1050 POP_TOP
+           1052 RETURN_CONST            15 (True)
+
+ 81     >> 1054 PUSH_EXC_INFO
+           1056 WITH_EXCEPT_START
+           1058 POP_JUMP_IF_TRUE         1 (to 1062)
+           1060 RERAISE                  2
+        >> 1062 POP_TOP
+           1064 POP_EXCEPT
+           1066 POP_TOP
+           1068 POP_TOP
+           1070 JUMP_BACKWARD          160 (to 752)
+        >> 1072 COPY                     3
+           1074 POP_EXCEPT
+           1076 RERAISE                  1
+        >> 1078 PUSH_EXC_INFO
+
+101        1080 LOAD_GLOBAL             50 (Exception)
+           1090 CHECK_EXC_MATCH
+           1092 POP_JUMP_IF_FALSE       61 (to 1216)
+           1094 STORE_FAST              16 (exc)
+
+102        1096 LOAD_GLOBAL             52 (log)
+           1106 LOAD_ATTR               55 (NULL|self + warning)
+           1126 LOAD_CONST              25 ('[logo-zoom] %s: giữ ảnh gốc vì phóng lỗi: %s')
+           1128 LOAD_FAST                0 (path)
+           1130 LOAD_ATTR               56 (name)
+           1150 LOAD_FAST               16 (exc)
+           1152 CALL                     3
+           1160 POP_TOP
+
+103        1162 POP_EXCEPT
+           1164 LOAD_CONST               1 (None)
+           1166 STORE_FAST              16 (exc)
+           1168 DELETE_FAST             16 (exc)
+
+105        1170 LOAD_FAST                3 (tmp)
+           1172 LOAD_ATTR               29 (NULL|self + unlink)
+           1192 LOAD_CONST              15 (True)
+           1194 KW_NAMES                16 (('missing_ok',))
+           1196 CALL                     1
+           1204 POP_TOP
+           1206 RETURN_CONST             3 (False)
+        >> 1208 LOAD_CONST               1 (None)
+           1210 STORE_FAST              16 (exc)
+           1212 DELETE_FAST             16 (exc)
+           1214 RERAISE                  1
+
+101     >> 1216 RERAISE                  0
+        >> 1218 COPY                     3
+           1220 POP_EXCEPT
+           1222 RERAISE                  1
+        >> 1224 PUSH_EXC_INFO
+
+105        1226 LOAD_FAST                3 (tmp)
+           1228 LOAD_ATTR               29 (NULL|self + unlink)
+           1248 LOAD_CONST              15 (True)
+           1250 KW_NAMES                16 (('missing_ok',))
+           1252 CALL                     1
+           1260 POP_TOP
+           1262 RERAISE                  0
+        >> 1264 COPY                     3
+           1266 POP_EXCEPT
+           1268 RERAISE                  1
+ExceptionTable:
+  130 to 174 -> 1078 [0]
+  176 to 590 -> 1054 [1] lasti
+  592 to 606 -> 1078 [0]
+  646 to 734 -> 1054 [1] lasti
+  736 to 824 -> 1078 [0]
+  828 to 1012 -> 1078 [0]
+  1054 to 1062 -> 1072 [3] lasti
+  1064 to 1076 -> 1078 [0]
+  1078 to 1094 -> 1218 [1] lasti
+  1096 to 1160 -> 1208 [1] lasti
+  1162 to 1168 -> 1224 [0]
+  1208 to 1216 -> 1218 [1] lasti
+  1218 to 1222 -> 1224 [0]
+  1224 to 1262 -> 1264 [1] lasti

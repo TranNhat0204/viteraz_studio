@@ -1,0 +1,2713 @@
+  0           0 RESUME                   0
+
+  1           2 SETUP_ANNOTATIONS
+              4 LOAD_CONST               0 ('CapCut TTS provider — bọc client CapCut common_task vendored (giọng Việt + vài ngôn ngữ khác).\n\nLuồng TTS là job bất đồng bộ 2 bước:\n  1. POST /lv/v1/common_task/new   (tts_new_body)          → nhận task id + token\n  2. POST /lv/v1/common_task/query (query_body) — POLL     → tới khi success, lấy URL audio (mp3)\n  3. Tải mp3 về output_path (pipeline sẽ normalize 24kHz WAV bằng FFmpeg — như ElevenLabs).\n\nClient vendored dùng `requests` ĐỒNG BỘ; ta chạy trong thread (asyncio.to_thread) để không chặn\nevent loop và tôn trọng cancel_check/on_progress.\n\nDanh sách giọng đọc từ `vendor/capcut_tts/Voice.json` (voice_type + resource_id + display_name).\nKhông hỗ trợ pitch/style/context → bỏ qua (như Azure). `rate` app kiểu "+0%" → số (1.0) cho client.\n\nDevice identity (device_id/tdid) XOAY VÒNG: xem capcut_device.py (theo tuổi + số lần dùng, ép xoay\nkhi bị anti-abuse từ chối).\n')
+              6 STORE_NAME               0 (__doc__)
+
+ 17           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('annotations',))
+             12 IMPORT_NAME              1 (__future__)
+             14 IMPORT_FROM              2 (annotations)
+             16 STORE_NAME               2 (annotations)
+             18 POP_TOP
+
+ 19          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               3 (None)
+             24 IMPORT_NAME              3 (asyncio)
+             26 STORE_NAME               3 (asyncio)
+
+ 20          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               3 (None)
+             32 IMPORT_NAME              4 (json)
+             34 STORE_NAME               4 (json)
+
+ 21          36 LOAD_CONST               1 (0)
+             38 LOAD_CONST               3 (None)
+             40 IMPORT_NAME              5 (os)
+             42 STORE_NAME               5 (os)
+
+ 22          44 LOAD_CONST               1 (0)
+             46 LOAD_CONST               3 (None)
+             48 IMPORT_NAME              6 (re)
+             50 STORE_NAME               6 (re)
+
+ 23          52 LOAD_CONST               1 (0)
+             54 LOAD_CONST               3 (None)
+             56 IMPORT_NAME              7 (time)
+             58 STORE_NAME               7 (time)
+
+ 24          60 LOAD_CONST               1 (0)
+             62 LOAD_CONST               4 (('deepcopy',))
+             64 IMPORT_NAME              8 (copy)
+             66 IMPORT_FROM              9 (deepcopy)
+             68 STORE_NAME               9 (deepcopy)
+             70 POP_TOP
+
+ 25          72 LOAD_CONST               1 (0)
+             74 LOAD_CONST               5 (('Path',))
+             76 IMPORT_NAME             10 (pathlib)
+             78 IMPORT_FROM             11 (Path)
+             80 STORE_NAME              11 (Path)
+             82 POP_TOP
+
+ 26          84 LOAD_CONST               1 (0)
+             86 LOAD_CONST               6 (('Callable',))
+             88 IMPORT_NAME             12 (typing)
+             90 IMPORT_FROM             13 (Callable)
+             92 STORE_NAME              13 (Callable)
+             94 POP_TOP
+
+ 27          96 LOAD_CONST               1 (0)
+             98 LOAD_CONST               7 (('urlencode',))
+            100 IMPORT_NAME             14 (urllib.parse)
+            102 IMPORT_FROM             15 (urlencode)
+            104 STORE_NAME              15 (urlencode)
+            106 POP_TOP
+
+ 29         108 LOAD_CONST               1 (0)
+            110 LOAD_CONST               3 (None)
+            112 IMPORT_NAME             16 (httpx)
+            114 STORE_NAME              16 (httpx)
+
+ 31         116 LOAD_CONST               1 (0)
+            118 LOAD_CONST               8 (('make_error', 'StudioError', 'E'))
+            120 IMPORT_NAME             17 (app.core.errors)
+            122 IMPORT_FROM             18 (make_error)
+            124 STORE_NAME              18 (make_error)
+            126 IMPORT_FROM             19 (StudioError)
+            128 STORE_NAME              19 (StudioError)
+            130 IMPORT_FROM             20 (E)
+            132 STORE_NAME              20 (E)
+            134 POP_TOP
+
+ 32         136 LOAD_CONST               1 (0)
+            138 LOAD_CONST               9 (('log',))
+            140 IMPORT_NAME             21 (app.core.logging)
+            142 IMPORT_FROM             22 (log)
+            144 STORE_NAME              22 (log)
+            146 POP_TOP
+
+ 33         148 LOAD_CONST               1 (0)
+            150 LOAD_CONST              10 (('TTSProvider', 'LANGUAGE_MAP'))
+            152 IMPORT_NAME             23 (app.adapters.tts.base)
+            154 IMPORT_FROM             24 (TTSProvider)
+            156 STORE_NAME              24 (TTSProvider)
+            158 IMPORT_FROM             25 (LANGUAGE_MAP)
+            160 STORE_NAME              25 (LANGUAGE_MAP)
+            162 POP_TOP
+
+ 34         164 LOAD_CONST               1 (0)
+            166 LOAD_CONST              11 (('capcut_client',))
+            168 IMPORT_NAME             26 (app.adapters.tts)
+            170 IMPORT_FROM             27 (capcut_client)
+            172 STORE_NAME              27 (capcut_client)
+            174 POP_TOP
+
+ 35         176 LOAD_CONST               1 (0)
+            178 LOAD_CONST              12 (('capcut_device',))
+            180 IMPORT_NAME             26 (app.adapters.tts)
+            182 IMPORT_FROM             28 (capcut_device)
+            184 STORE_NAME              28 (capcut_device)
+            186 POP_TOP
+
+ 37         188 LOAD_CONST              13 ('capcut-tts')
+            190 STORE_NAME              29 (PROVIDER_ID)
+
+ 38         192 LOAD_CONST              14 ('audio/mpeg')
+            194 STORE_NAME              30 (PREVIEW_MIME)
+
+ 41         196 LOAD_CONST              15 (120.0)
+            198 STORE_NAME              31 (_POLL_TIMEOUT_S)
+
+ 42         200 LOAD_CONST              16 (1.5)
+            202 STORE_NAME              32 (_POLL_INTERVAL_S)
+
+ 43         204 LOAD_CONST              17 (60.0)
+            206 STORE_NAME              33 (_HTTP_TIMEOUT)
+
+ 44         208 LOAD_CONST              15 (120.0)
+            210 STORE_NAME              34 (_DOWNLOAD_TIMEOUT)
+
+ 45         212 LOAD_CONST              18 ('sami_text_to_speech')
+            214 STORE_NAME              35 (_REQ_KEY)
+
+ 48         216 PUSH_NULL
+            218 LOAD_NAME               36 (frozenset)
+            220 BUILD_SET                0
+            222 LOAD_CONST              19 (frozenset({'done', 'success', 'succeeded', 'succeed', 'complete', 'completed', 'finished'}))
+            224 SET_UPDATE               1
+            226 CALL                     1
+            234 STORE_NAME              37 (_SUCCESS_STATUSES)
+
+ 49         236 PUSH_NULL
+            238 LOAD_NAME               36 (frozenset)
+            240 BUILD_SET                0
+            242 LOAD_CONST              20 (frozenset({'error', 'cancelled', 'failed', 'canceled', 'fail'}))
+            244 SET_UPDATE               1
+            246 CALL                     1
+            254 STORE_NAME              38 (_FAILURE_STATUSES)
+
+ 53         256 LOAD_CONST              21 ('|')
+            258 STORE_NAME              39 (_VOICE_SEP)
+
+ 55         260 LOAD_CONST               3 (None)
+            262 STORE_GLOBAL            40 (_VOICES_CACHE)
+            264 LOAD_CONST              22 ('list[dict] | None')
+            266 LOAD_NAME               41 (__annotations__)
+            268 LOAD_CONST              23 ('_VOICES_CACHE')
+            270 STORE_SUBSCR
+
+ 59         274 LOAD_CONST              51 (('return', 'None'))
+            276 LOAD_CONST              24 (<code object clear_voices_cache at 0x7f6c92a139e0, file "app\adapters\tts\capcut_tts.py", line 59>)
+            278 MAKE_FUNCTION            4 (annotations)
+            280 STORE_NAME              42 (clear_voices_cache)
+
+ 64         282 LOAD_CONST              52 (('return', 'Path'))
+            284 LOAD_CONST              25 (<code object _voice_json_path at 0x7f6c932dd3e0, file "app\adapters\tts\capcut_tts.py", line 64>)
+            286 MAKE_FUNCTION            4 (annotations)
+            288 STORE_NAME              43 (_voice_json_path)
+
+ 68         290 LOAD_CONST              53 (('return', 'list[dict]'))
+            292 LOAD_CONST              26 (<code object _load_voice_catalog at 0x26a0a550, file "app\adapters\tts\capcut_tts.py", line 68>)
+            294 MAKE_FUNCTION            4 (annotations)
+            296 STORE_NAME              44 (_load_voice_catalog)
+
+ 81         298 LOAD_CONST              54 (('voice_type', 'str', 'resource_id', 'str', 'return', 'str'))
+            300 LOAD_CONST              27 (<code object encode_voice at 0x7f6c929b5d10, file "app\adapters\tts\capcut_tts.py", line 81>)
+            302 MAKE_FUNCTION            4 (annotations)
+            304 STORE_NAME              45 (encode_voice)
+
+ 85         306 LOAD_CONST              55 (('name', 'str', 'return', 'tuple[str, str]'))
+            308 LOAD_CONST              28 (<code object _decode_voice at 0x29098420, file "app\adapters\tts\capcut_tts.py", line 85>)
+            310 MAKE_FUNCTION            4 (annotations)
+            312 STORE_NAME              46 (_decode_voice)
+
+103         314 LOAD_CONST              56 (('entry', 'dict', 'return', 'str'))
+            316 LOAD_CONST              29 (<code object _lang_code at 0x7f6c9296a8b0, file "app\adapters\tts\capcut_tts.py", line 103>)
+            318 MAKE_FUNCTION            4 (annotations)
+            320 STORE_NAME              47 (_lang_code)
+
+108         322 LOAD_CONST              53 (('return', 'list[dict]'))
+            324 LOAD_CONST              30 (<code object list_voices at 0x2907b0d0, file "app\adapters\tts\capcut_tts.py", line 108>)
+            326 MAKE_FUNCTION            4 (annotations)
+            328 STORE_NAME              48 (list_voices)
+
+143         330 LOAD_CONST              57 (('rate', 'str | float | None', 'return', 'str'))
+            332 LOAD_CONST              31 (<code object _parse_rate at 0x269d6910, file "app\adapters\tts\capcut_tts.py", line 143>)
+            334 MAKE_FUNCTION            4 (annotations)
+            336 STORE_NAME              49 (_parse_rate)
+
+161         338 LOAD_CONST              58 (('override', 'dict', 'return', 'dict'))
+            340 LOAD_CONST              32 (<code object _build_device at 0x7f6c92d60ea0, file "app\adapters\tts\capcut_tts.py", line 161>)
+            342 MAKE_FUNCTION            4 (annotations)
+            344 STORE_NAME              50 (_build_device)
+
+168         346 LOAD_CONST              59 (('text', 'str', 'voice_type', 'str', 'resource_id', 'str', 'rate', 'str', 'device', 'dict'))
+            348 LOAD_CONST              33 (<code object _build_new_request at 0x269b8190, file "app\adapters\tts\capcut_tts.py", line 168>)
+            350 MAKE_FUNCTION            4 (annotations)
+            352 STORE_NAME              51 (_build_new_request)
+
+182         354 LOAD_CONST              60 (('task_id', 'str', 'token', 'str', 'bind_id', 'str', 'device', 'dict'))
+            356 LOAD_CONST              34 (<code object _build_query_request at 0x29082700, file "app\adapters\tts\capcut_tts.py", line 182>)
+            358 MAKE_FUNCTION            4 (annotations)
+            360 STORE_NAME              52 (_build_query_request)
+
+196         362 PUSH_NULL
+            364 LOAD_NAME                6 (re)
+            366 LOAD_ATTR              106 (compile)
+            386 LOAD_CONST              35 ('https?://[^\\s\\"\'\\\\]+')
+            388 CALL                     1
+            396 STORE_NAME              54 (_URL_RE)
+
+199         398 LOAD_CONST              61 (('resp_json', 'dict', 'return', 'dict'))
+            400 LOAD_CONST              36 (<code object _extract_task at 0x7f6c929693b0, file "app\adapters\tts\capcut_tts.py", line 199>)
+            402 MAKE_FUNCTION            4 (annotations)
+            404 STORE_NAME              55 (_extract_task)
+
+206         406 LOAD_CONST              62 (('task', 'dict', 'return', 'str'))
+            408 LOAD_CONST              37 (<code object _task_status at 0x7f6c9327f630, file "app\adapters\tts\capcut_tts.py", line 206>)
+            410 MAKE_FUNCTION            4 (annotations)
+            412 STORE_NAME              56 (_task_status)
+
+211         414 LOAD_CONST              38 (('speech_url', 'audio_url', 'url', 'tos_url', 'audio', 'voice_url', 'data_url', 'result_url'))
+            416 STORE_NAME              57 (_AUDIO_URL_KEYS)
+
+214         418 LOAD_CONST              63 (('task', 'dict', 'return', 'str | None'))
+            420 LOAD_CONST              39 (<code object _find_audio_url at 0x2906d320, file "app\adapters\tts\capcut_tts.py", line 214>)
+            422 MAKE_FUNCTION            4 (annotations)
+            424 STORE_NAME              58 (_find_audio_url)
+
+255         426 LOAD_CONST              64 ((0,))
+            428 LOAD_CONST              65 (('depth', 'int'))
+            430 LOAD_CONST              40 (<code object _deep_find_url at 0x269ed3c0, file "app\adapters\tts\capcut_tts.py", line 255>)
+            432 MAKE_FUNCTION            5 (defaults, annotations)
+            434 STORE_NAME              59 (_deep_find_url)
+
+276         436 LOAD_CONST              66 (('url', 'str', 'return', 'bool'))
+            438 LOAD_CONST              41 (<code object _looks_like_audio at 0x7f6c93272d90, file "app\adapters\tts\capcut_tts.py", line 276>)
+            440 MAKE_FUNCTION            4 (annotations)
+            442 STORE_NAME              60 (_looks_like_audio)
+
+285         444 LOAD_CONST              67 (('status_code', 'int', 'text', 'str', 'return', 'bool'))
+            446 LOAD_CONST              42 (<code object _is_rejection at 0x7f6c9327f750, file "app\adapters\tts\capcut_tts.py", line 285>)
+            448 MAKE_FUNCTION            4 (annotations)
+            450 STORE_NAME              61 (_is_rejection)
+
+294         452 LOAD_CONST              68 (('url', 'str', 'headers', 'dict', 'body_text', 'str', 'timeout', 'float'))
+            454 LOAD_CONST              43 (<code object _post at 0x7f6c92e4a730, file "app\adapters\tts\capcut_tts.py", line 294>)
+            456 MAKE_FUNCTION            4 (annotations)
+            458 STORE_NAME              62 (_post)
+
+302         460 NOP
+
+303         462 NOP
+
+302         464 NOP
+
+304         466 NOP
+
+302         468 NOP
+
+304         470 NOP
+
+302         472 LOAD_CONST              69 (('text', 'str', 'voice_type', 'str', 'resource_id', 'str', 'rate', 'str', 'cancel_check', 'Callable[[], bool] | None', 'on_progress', 'Callable[[float, str], None] | None', 'return', 'bytes'))
+            474 LOAD_CONST              44 (<code object _submit_and_poll_sync at 0x269e93d0, file "app\adapters\tts\capcut_tts.py", line 302>)
+            476 MAKE_FUNCTION            4 (annotations)
+            478 STORE_NAME              63 (_submit_and_poll_sync)
+
+384         480 LOAD_CONST              45 (250)
+            482 STORE_NAME              64 (CAPCUT_CHAR_LIMIT)
+
+387         484 LOAD_NAME               64 (CAPCUT_CHAR_LIMIT)
+            486 BUILD_TUPLE              1
+            488 LOAD_CONST              70 (('text', 'str', 'limit', 'int', 'return', 'list[str]'))
+            490 LOAD_CONST              46 (<code object _split_chunks at 0x290e8f30, file "app\adapters\tts\capcut_tts.py", line 387>)
+            492 MAKE_FUNCTION            5 (defaults, annotations)
+            494 STORE_NAME              65 (_split_chunks)
+
+425         496 NOP
+
+426         498 NOP
+
+427         500 NOP
+
+424         502 LOAD_CONST              71 (('+0%', None, None))
+
+425         504 NOP
+
+424         506 NOP
+
+426         508 NOP
+
+424         510 NOP
+
+427         512 NOP
+
+424         514 NOP
+
+427         516 NOP
+
+424         518 LOAD_CONST              72 (('text', 'str', 'voice', 'str', 'rate', 'str', 'on_progress', 'Callable[[float, str], None] | None', 'cancel_check', 'Callable[[], bool] | None', 'return', 'bytes'))
+            520 LOAD_CONST              47 (<code object _synthesize_bytes at 0x2905c420, file "app\adapters\tts\capcut_tts.py", line 424>)
+            522 MAKE_FUNCTION            5 (defaults, annotations)
+            524 STORE_NAME              66 (_synthesize_bytes)
+
+457         526 LOAD_CONST              73 (('voice', 'str', 'text', 'str', 'return', 'tuple[bytes, str]'))
+            528 LOAD_CONST              48 (<code object preview_voice at 0x7f6c92a3a670, file "app\adapters\tts\capcut_tts.py", line 457>)
+            530 MAKE_FUNCTION            4 (annotations)
+            532 STORE_NAME              67 (preview_voice)
+
+461         534 PUSH_NULL
+            536 LOAD_BUILD_CLASS
+            538 LOAD_CONST              49 (<code object CapCutTTSProvider at 0x7f6c92a3a780, file "app\adapters\tts\capcut_tts.py", line 461>)
+            540 MAKE_FUNCTION            0
+            542 LOAD_CONST              50 ('CapCutTTSProvider')
+            544 LOAD_NAME               24 (TTSProvider)
+            546 CALL                     3
+            554 STORE_NAME              68 (CapCutTTSProvider)
+            556 RETURN_CONST             3 (None)
+
+Disassembly of <code object clear_voices_cache at 0x7f6c92a139e0, file "app\adapters\tts\capcut_tts.py", line 59>:
+ 59           0 RESUME                   0
+
+ 61           2 LOAD_CONST               0 (None)
+              4 STORE_GLOBAL             0 (_VOICES_CACHE)
+              6 RETURN_CONST             0 (None)
+
+Disassembly of <code object _voice_json_path at 0x7f6c932dd3e0, file "app\adapters\tts\capcut_tts.py", line 64>:
+ 64           0 RESUME                   0
+
+ 65           2 LOAD_GLOBAL              1 (NULL + capcut_client)
+             12 LOAD_ATTR                2 (vendored_dir)
+             32 CALL                     0
+             40 LOAD_CONST               1 ('Voice.json')
+             42 BINARY_OP               11 (/)
+             46 RETURN_VALUE
+
+Disassembly of <code object _load_voice_catalog at 0x26a0a550, file "app\adapters\tts\capcut_tts.py", line 68>:
+ 68           0 RESUME                   0
+
+ 69           2 LOAD_GLOBAL              1 (NULL + _voice_json_path)
+             12 CALL                     0
+             20 STORE_FAST               0 (path)
+
+ 70          22 LOAD_FAST                0 (path)
+             24 LOAD_ATTR                3 (NULL|self + exists)
+             44 CALL                     0
+             52 POP_JUMP_IF_TRUE        30 (to 114)
+
+ 71          54 LOAD_GLOBAL              5 (NULL + make_error)
+             64 LOAD_GLOBAL              6 (E)
+             74 LOAD_ATTR                8 (TTS_VOICE_INVALID)
+
+ 72          94 LOAD_CONST               1 ('Không tìm thấy Voice.json cho CapCut TTS (')
+             96 LOAD_FAST                0 (path)
+             98 FORMAT_VALUE             0
+            100 LOAD_CONST               2 (').')
+            102 BUILD_STRING             3
+
+ 71         104 CALL                     2
+            112 RAISE_VARARGS            1
+
+ 73     >>  114 NOP
+
+ 74         116 LOAD_GLOBAL             11 (NULL + open)
+            126 LOAD_FAST                0 (path)
+            128 LOAD_CONST               3 ('r')
+            130 LOAD_CONST               4 ('utf-8')
+            132 KW_NAMES                 5 (('encoding',))
+            134 CALL                     3
+            142 BEFORE_WITH
+            144 STORE_FAST               1 (fp)
+
+ 75         146 LOAD_GLOBAL             13 (NULL + json)
+            156 LOAD_ATTR               14 (load)
+            176 LOAD_FAST                1 (fp)
+            178 CALL                     1
+            186 STORE_FAST               2 (data)
+
+ 74         188 LOAD_CONST               0 (None)
+            190 LOAD_CONST               0 (None)
+            192 LOAD_CONST               0 (None)
+            194 CALL                     2
+            202 POP_TOP
+
+ 78     >>  204 LOAD_GLOBAL             21 (NULL + isinstance)
+            214 LOAD_FAST_CHECK          2 (data)
+            216 LOAD_GLOBAL             22 (list)
+            226 CALL                     2
+            234 POP_JUMP_IF_FALSE        2 (to 240)
+            236 LOAD_FAST                2 (data)
+            238 RETURN_VALUE
+        >>  240 BUILD_LIST               0
+            242 RETURN_VALUE
+
+ 74     >>  244 PUSH_EXC_INFO
+            246 WITH_EXCEPT_START
+            248 POP_JUMP_IF_TRUE         1 (to 252)
+            250 RERAISE                  2
+        >>  252 POP_TOP
+            254 POP_EXCEPT
+            256 POP_TOP
+            258 POP_TOP
+            260 JUMP_BACKWARD           29 (to 204)
+        >>  262 COPY                     3
+            264 POP_EXCEPT
+            266 RERAISE                  1
+        >>  268 PUSH_EXC_INFO
+
+ 76         270 LOAD_GLOBAL             16 (OSError)
+            280 LOAD_GLOBAL             12 (json)
+            290 LOAD_ATTR               18 (JSONDecodeError)
+            310 BUILD_TUPLE              2
+            312 CHECK_EXC_MATCH
+            314 POP_JUMP_IF_FALSE       34 (to 384)
+            316 STORE_FAST               3 (e)
+
+ 77         318 LOAD_GLOBAL              5 (NULL + make_error)
+            328 LOAD_GLOBAL              6 (E)
+            338 LOAD_ATTR                8 (TTS_VOICE_INVALID)
+            358 LOAD_CONST               6 ('Voice.json CapCut hỏng: ')
+            360 LOAD_FAST                3 (e)
+            362 FORMAT_VALUE             0
+            364 BUILD_STRING             2
+            366 CALL                     2
+            374 RAISE_VARARGS            1
+        >>  376 LOAD_CONST               0 (None)
+            378 STORE_FAST               3 (e)
+            380 DELETE_FAST              3 (e)
+            382 RERAISE                  1
+
+ 76     >>  384 RERAISE                  0
+        >>  386 COPY                     3
+            388 POP_EXCEPT
+            390 RERAISE                  1
+ExceptionTable:
+  116 to 142 -> 268 [0]
+  144 to 186 -> 244 [1] lasti
+  188 to 202 -> 268 [0]
+  244 to 252 -> 262 [3] lasti
+  254 to 266 -> 268 [0]
+  268 to 316 -> 386 [1] lasti
+  318 to 374 -> 376 [1] lasti
+  376 to 384 -> 386 [1] lasti
+
+Disassembly of <code object encode_voice at 0x7f6c929b5d10, file "app\adapters\tts\capcut_tts.py", line 81>:
+ 81           0 RESUME                   0
+
+ 82           2 LOAD_FAST                0 (voice_type)
+              4 FORMAT_VALUE             0
+              6 LOAD_GLOBAL              0 (_VOICE_SEP)
+             16 FORMAT_VALUE             0
+             18 LOAD_FAST                1 (resource_id)
+             20 FORMAT_VALUE             0
+             22 BUILD_STRING             3
+             24 RETURN_VALUE
+
+Disassembly of <code object _decode_voice at 0x29098420, file "app\adapters\tts\capcut_tts.py", line 85>:
+ 85           0 RESUME                   0
+
+ 87           2 LOAD_GLOBAL              0 (_VOICE_SEP)
+             12 LOAD_FAST                0 (name)
+             14 COPY                     1
+             16 POP_JUMP_IF_TRUE         2 (to 22)
+             18 POP_TOP
+             20 LOAD_CONST               1 ('')
+        >>   22 CONTAINS_OP              0
+             24 POP_JUMP_IF_FALSE       65 (to 156)
+
+ 88          26 LOAD_FAST                0 (name)
+             28 LOAD_ATTR                3 (NULL|self + split)
+             48 LOAD_GLOBAL              0 (_VOICE_SEP)
+             58 LOAD_CONST               2 (1)
+             60 CALL                     2
+             68 UNPACK_SEQUENCE          2
+             72 STORE_FAST               1 (vt)
+             74 STORE_FAST               2 (rid)
+
+ 89          76 LOAD_FAST                1 (vt)
+             78 LOAD_ATTR                5 (NULL|self + strip)
+             98 CALL                     0
+            106 LOAD_FAST                2 (rid)
+            108 LOAD_ATTR                5 (NULL|self + strip)
+            128 CALL                     0
+            136 STORE_FAST               2 (rid)
+            138 STORE_FAST               1 (vt)
+
+ 90         140 LOAD_FAST                1 (vt)
+            142 POP_JUMP_IF_FALSE        6 (to 156)
+            144 LOAD_FAST                2 (rid)
+            146 POP_JUMP_IF_FALSE        4 (to 156)
+
+ 91         148 LOAD_FAST                1 (vt)
+            150 LOAD_FAST                2 (rid)
+            152 BUILD_TUPLE              2
+            154 RETURN_VALUE
+
+ 93     >>  156 LOAD_FAST                0 (name)
+            158 COPY                     1
+            160 POP_JUMP_IF_TRUE         2 (to 166)
+            162 POP_TOP
+            164 LOAD_CONST               1 ('')
+        >>  166 LOAD_ATTR                5 (NULL|self + strip)
+            186 CALL                     0
+            194 STORE_FAST               1 (vt)
+
+ 94         196 LOAD_GLOBAL              7 (NULL + _load_voice_catalog)
+            206 CALL                     0
+            214 GET_ITER
+        >>  216 FOR_ITER                79 (to 378)
+            220 STORE_FAST               3 (entry)
+
+ 95         222 LOAD_FAST                3 (entry)
+            224 LOAD_ATTR                9 (NULL|self + get)
+            244 LOAD_CONST               3 ('voice_type')
+            246 CALL                     1
+            254 COPY                     1
+            256 POP_JUMP_IF_TRUE         2 (to 262)
+            258 POP_TOP
+            260 LOAD_CONST               1 ('')
+        >>  262 LOAD_FAST                1 (vt)
+            264 COMPARE_OP              40 (==)
+            268 POP_JUMP_IF_TRUE         1 (to 272)
+            270 JUMP_BACKWARD           28 (to 216)
+
+ 96     >>  272 LOAD_GLOBAL             11 (NULL + str)
+            282 LOAD_FAST                3 (entry)
+            284 LOAD_ATTR                9 (NULL|self + get)
+            304 LOAD_CONST               4 ('resource_id')
+            306 CALL                     1
+            314 COPY                     1
+            316 POP_JUMP_IF_TRUE         2 (to 322)
+            318 POP_TOP
+            320 LOAD_CONST               1 ('')
+        >>  322 CALL                     1
+            330 LOAD_ATTR                5 (NULL|self + strip)
+            350 CALL                     0
+            358 STORE_FAST               2 (rid)
+
+ 97         360 LOAD_FAST                2 (rid)
+            362 POP_JUMP_IF_TRUE         1 (to 366)
+            364 JUMP_BACKWARD           75 (to 216)
+
+ 98     >>  366 LOAD_FAST                1 (vt)
+            368 LOAD_FAST                2 (rid)
+            370 BUILD_TUPLE              2
+            372 SWAP                     2
+            374 POP_TOP
+            376 RETURN_VALUE
+
+ 94     >>  378 END_FOR
+
+ 99         380 LOAD_GLOBAL             13 (NULL + make_error)
+            390 LOAD_GLOBAL             14 (E)
+            400 LOAD_ATTR               16 (TTS_VOICE_INVALID)
+
+100         420 LOAD_CONST               5 ('Giọng CapCut không hợp lệ hoặc thiếu resource_id: ')
+            422 LOAD_FAST                0 (name)
+            424 FORMAT_VALUE             2 (repr)
+            426 BUILD_STRING             2
+
+ 99         428 CALL                     2
+            436 RAISE_VARARGS            1
+
+Disassembly of <code object _lang_code at 0x7f6c9296a8b0, file "app\adapters\tts\capcut_tts.py", line 103>:
+103           0 RESUME                   0
+
+104           2 LOAD_FAST                0 (entry)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_CONST               1 ('lan')
+             26 CALL                     1
+             34 COPY                     1
+             36 POP_JUMP_IF_TRUE        43 (to 124)
+             38 POP_TOP
+             40 LOAD_FAST                0 (entry)
+             42 LOAD_ATTR                1 (NULL|self + get)
+             62 LOAD_CONST               2 ('lang')
+             64 CALL                     1
+             72 COPY                     1
+             74 POP_JUMP_IF_TRUE         2 (to 80)
+             76 POP_TOP
+             78 LOAD_CONST               3 ('')
+        >>   80 LOAD_ATTR                3 (NULL|self + split)
+            100 LOAD_CONST               4 ('-')
+            102 CALL                     1
+            110 LOAD_CONST               5 (0)
+            112 BINARY_SUBSCR
+            116 COPY                     1
+            118 POP_JUMP_IF_TRUE         2 (to 124)
+            120 POP_TOP
+            122 LOAD_CONST               6 ('vi')
+        >>  124 LOAD_ATTR                5 (NULL|self + lower)
+            144 CALL                     0
+            152 STORE_FAST               1 (code)
+
+105         154 LOAD_FAST                1 (code)
+            156 LOAD_GLOBAL              6 (LANGUAGE_MAP)
+            166 CONTAINS_OP              0
+            168 POP_JUMP_IF_FALSE        2 (to 174)
+            170 LOAD_FAST                1 (code)
+            172 RETURN_VALUE
+        >>  174 LOAD_FAST                1 (code)
+            176 RETURN_VALUE
+
+Disassembly of <code object list_voices at 0x2907b0d0, file "app\adapters\tts\capcut_tts.py", line 108>:
+108           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+110           6 LOAD_GLOBAL              0 (_VOICES_CACHE)
+             16 POP_JUMP_IF_NONE         6 (to 30)
+
+111          18 LOAD_GLOBAL              0 (_VOICES_CACHE)
+             28 RETURN_VALUE
+
+112     >>   30 LOAD_GLOBAL              3 (NULL + asyncio)
+             40 LOAD_ATTR                4 (to_thread)
+             60 LOAD_GLOBAL              6 (_load_voice_catalog)
+             70 CALL                     1
+             78 GET_AWAITABLE            0
+             80 LOAD_CONST               0 (None)
+        >>   82 SEND                     3 (to 92)
+             86 YIELD_VALUE              2
+             88 RESUME                   3
+             90 JUMP_BACKWARD_NO_INTERRUPT     5 (to 82)
+        >>   92 END_SEND
+             94 STORE_FAST               0 (catalog)
+
+113          96 BUILD_LIST               0
+             98 STORE_FAST               1 (voices)
+
+114         100 LOAD_GLOBAL              9 (NULL + set)
+            110 CALL                     0
+            118 STORE_FAST               2 (seen)
+
+115         120 LOAD_FAST                0 (catalog)
+            122 GET_ITER
+        >>  124 FOR_ITER               234 (to 596)
+            128 STORE_FAST               3 (entry)
+
+116         130 LOAD_GLOBAL             11 (NULL + str)
+            140 LOAD_FAST                3 (entry)
+            142 LOAD_ATTR               13 (NULL|self + get)
+            162 LOAD_CONST               1 ('voice_type')
+            164 CALL                     1
+            172 COPY                     1
+            174 POP_JUMP_IF_TRUE         2 (to 180)
+            176 POP_TOP
+            178 LOAD_CONST               2 ('')
+        >>  180 CALL                     1
+            188 LOAD_ATTR               15 (NULL|self + strip)
+            208 CALL                     0
+            216 STORE_FAST               4 (vt)
+
+117         218 LOAD_GLOBAL             11 (NULL + str)
+            228 LOAD_FAST                3 (entry)
+            230 LOAD_ATTR               13 (NULL|self + get)
+            250 LOAD_CONST               3 ('resource_id')
+            252 CALL                     1
+            260 COPY                     1
+            262 POP_JUMP_IF_TRUE         2 (to 268)
+            264 POP_TOP
+            266 LOAD_CONST               2 ('')
+        >>  268 CALL                     1
+            276 LOAD_ATTR               15 (NULL|self + strip)
+            296 CALL                     0
+            304 STORE_FAST               5 (rid)
+
+118         306 LOAD_FAST                4 (vt)
+            308 POP_JUMP_IF_FALSE        2 (to 314)
+            310 LOAD_FAST                5 (rid)
+            312 POP_JUMP_IF_TRUE         1 (to 316)
+
+119     >>  314 JUMP_BACKWARD           96 (to 124)
+
+120     >>  316 LOAD_GLOBAL             17 (NULL + encode_voice)
+            326 LOAD_FAST                4 (vt)
+            328 LOAD_FAST                5 (rid)
+            330 CALL                     2
+            338 STORE_FAST               6 (name)
+
+121         340 LOAD_FAST                6 (name)
+            342 LOAD_FAST                2 (seen)
+            344 CONTAINS_OP              0
+            346 POP_JUMP_IF_FALSE        1 (to 350)
+
+122         348 JUMP_BACKWARD          113 (to 124)
+
+123     >>  350 LOAD_FAST                2 (seen)
+            352 LOAD_ATTR               19 (NULL|self + add)
+            372 LOAD_FAST                6 (name)
+            374 CALL                     1
+            382 POP_TOP
+
+124         384 LOAD_GLOBAL             21 (NULL + _lang_code)
+            394 LOAD_FAST                3 (entry)
+            396 CALL                     1
+            404 STORE_FAST               7 (code)
+
+125         406 LOAD_GLOBAL             11 (NULL + str)
+            416 LOAD_FAST                3 (entry)
+            418 LOAD_ATTR               13 (NULL|self + get)
+            438 LOAD_CONST               4 ('display_name')
+            440 CALL                     1
+            448 COPY                     1
+            450 POP_JUMP_IF_TRUE         2 (to 456)
+            452 POP_TOP
+            454 LOAD_FAST                4 (vt)
+        >>  456 CALL                     1
+            464 LOAD_ATTR               15 (NULL|self + strip)
+            484 CALL                     0
+            492 STORE_FAST               8 (display)
+
+126         494 LOAD_FAST                1 (voices)
+            496 LOAD_ATTR               23 (NULL|self + append)
+
+127         516 LOAD_FAST                6 (name)
+
+128         518 LOAD_FAST                7 (code)
+
+129         520 LOAD_FAST                7 (code)
+
+130         522 LOAD_GLOBAL             25 (NULL + LANGUAGE_MAP)
+            532 LOAD_ATTR               12 (get)
+            552 LOAD_FAST                7 (code)
+            554 LOAD_FAST                7 (code)
+            556 CALL                     2
+
+131         564 LOAD_FAST                8 (display)
+
+132         566 LOAD_CONST               2 ('')
+
+133         568 LOAD_GLOBAL             26 (PROVIDER_ID)
+
+134         578 LOAD_CONST               5 (False)
+
+126         580 LOAD_CONST               6 (('name', 'locale', 'language_code', 'language_name', 'friendly_name', 'gender', 'provider', 'hot'))
+            582 BUILD_CONST_KEY_MAP      8
+            584 CALL                     1
+            592 POP_TOP
+            594 JUMP_BACKWARD          236 (to 124)
+
+115     >>  596 END_FOR
+
+136         598 LOAD_FAST                1 (voices)
+            600 LOAD_ATTR               29 (NULL|self + sort)
+            620 LOAD_CONST               7 (<code object <lambda> at 0x7f6c929b6410, file "app\adapters\tts\capcut_tts.py", line 136>)
+            622 MAKE_FUNCTION            0
+            624 KW_NAMES                 8 (('key',))
+            626 CALL                     1
+            634 POP_TOP
+
+137         636 LOAD_FAST                1 (voices)
+            638 STORE_GLOBAL             0 (_VOICES_CACHE)
+
+138         640 LOAD_GLOBAL             31 (NULL + log)
+            650 LOAD_ATTR               32 (info)
+            670 LOAD_CONST               9 ('Loaded ')
+            672 LOAD_GLOBAL             35 (NULL + len)
+            682 LOAD_FAST                1 (voices)
+            684 CALL                     1
+            692 FORMAT_VALUE             0
+            694 LOAD_CONST              10 (' ')
+            696 LOAD_GLOBAL             26 (PROVIDER_ID)
+            706 FORMAT_VALUE             0
+            708 LOAD_CONST              11 (' voices from Voice.json')
+            710 BUILD_STRING             5
+            712 CALL                     1
+            720 POP_TOP
+
+139         722 LOAD_FAST                1 (voices)
+            724 RETURN_VALUE
+
+112     >>  726 CLEANUP_THROW
+            728 EXTENDED_ARG             1
+            730 JUMP_BACKWARD          320 (to 92)
+        >>  732 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            734 RERAISE                  1
+ExceptionTable:
+  4 to 84 -> 732 [0] lasti
+  86 to 86 -> 726 [2]
+  88 to 726 -> 732 [0] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c929b6410, file "app\adapters\tts\capcut_tts.py", line 136>:
+136           0 RESUME                   0
+              2 LOAD_FAST                0 (x)
+              4 LOAD_CONST               1 ('language_code')
+              6 BINARY_SUBSCR
+             10 LOAD_FAST                0 (x)
+             12 LOAD_CONST               2 ('friendly_name')
+             14 BINARY_SUBSCR
+             18 BUILD_TUPLE              2
+             20 RETURN_VALUE
+
+Disassembly of <code object _parse_rate at 0x269d6910, file "app\adapters\tts\capcut_tts.py", line 143>:
+143           0 RESUME                   0
+
+145           2 LOAD_FAST                0 (rate)
+              4 POP_JUMP_IF_NOT_NONE     1 (to 8)
+
+146           6 RETURN_CONST             1 ('1.0')
+
+147     >>    8 LOAD_GLOBAL              1 (NULL + isinstance)
+             18 LOAD_FAST                0 (rate)
+             20 LOAD_GLOBAL              2 (int)
+             30 LOAD_GLOBAL              4 (float)
+             40 BUILD_TUPLE              2
+             42 CALL                     2
+             50 POP_JUMP_IF_FALSE       33 (to 118)
+
+148          52 LOAD_GLOBAL              7 (NULL + max)
+             62 LOAD_CONST               2 (0.5)
+             64 LOAD_GLOBAL              9 (NULL + min)
+             74 LOAD_CONST               3 (2.0)
+             76 LOAD_GLOBAL              5 (NULL + float)
+             86 LOAD_FAST                0 (rate)
+             88 CALL                     1
+             96 CALL                     2
+            104 CALL                     2
+            112 LOAD_CONST               4 ('.2f')
+            114 FORMAT_VALUE             4 (with format)
+            116 RETURN_VALUE
+
+149     >>  118 LOAD_GLOBAL             11 (NULL + str)
+            128 LOAD_FAST                0 (rate)
+            130 CALL                     1
+            138 LOAD_ATTR               13 (NULL|self + strip)
+            158 CALL                     0
+            166 STORE_FAST               1 (s)
+
+150         168 LOAD_GLOBAL             15 (NULL + re)
+            178 LOAD_ATTR               16 (fullmatch)
+            198 LOAD_CONST               5 ('([+-]?\\d+(?:\\.\\d+)?)\\s*%')
+            200 LOAD_FAST                1 (s)
+            202 CALL                     2
+            210 STORE_FAST               2 (m)
+
+151         212 LOAD_FAST                2 (m)
+            214 POP_JUMP_IF_FALSE       56 (to 328)
+
+152         216 LOAD_CONST               6 (1.0)
+            218 LOAD_GLOBAL              5 (NULL + float)
+            228 LOAD_FAST                2 (m)
+            230 LOAD_ATTR               19 (NULL|self + group)
+            250 LOAD_CONST               7 (1)
+            252 CALL                     1
+            260 CALL                     1
+            268 LOAD_CONST               8 (100.0)
+            270 BINARY_OP               11 (/)
+            274 BINARY_OP                0 (+)
+            278 STORE_FAST               3 (factor)
+
+153         280 LOAD_GLOBAL              7 (NULL + max)
+            290 LOAD_CONST               2 (0.5)
+            292 LOAD_GLOBAL              9 (NULL + min)
+            302 LOAD_CONST               3 (2.0)
+            304 LOAD_FAST                3 (factor)
+            306 CALL                     2
+            314 CALL                     2
+            322 LOAD_CONST               4 ('.2f')
+            324 FORMAT_VALUE             4 (with format)
+            326 RETURN_VALUE
+
+154     >>  328 NOP
+
+155         330 LOAD_GLOBAL              7 (NULL + max)
+            340 LOAD_CONST               2 (0.5)
+            342 LOAD_GLOBAL              9 (NULL + min)
+            352 LOAD_CONST               3 (2.0)
+            354 LOAD_GLOBAL              5 (NULL + float)
+            364 LOAD_FAST                1 (s)
+            366 CALL                     1
+            374 CALL                     2
+            382 CALL                     2
+            390 LOAD_CONST               4 ('.2f')
+            392 FORMAT_VALUE             4 (with format)
+            394 RETURN_VALUE
+        >>  396 PUSH_EXC_INFO
+
+156         398 LOAD_GLOBAL             20 (ValueError)
+            408 CHECK_EXC_MATCH
+            410 POP_JUMP_IF_FALSE        3 (to 418)
+            412 POP_TOP
+
+157         414 POP_EXCEPT
+            416 RETURN_CONST             1 ('1.0')
+
+156     >>  418 RERAISE                  0
+        >>  420 COPY                     3
+            422 POP_EXCEPT
+            424 RERAISE                  1
+ExceptionTable:
+  330 to 392 -> 396 [0]
+  396 to 412 -> 420 [1] lasti
+  418 to 418 -> 420 [1] lasti
+
+Disassembly of <code object _build_device at 0x7f6c92d60ea0, file "app\adapters\tts\capcut_tts.py", line 161>:
+161           0 RESUME                   0
+
+162           2 LOAD_GLOBAL              1 (NULL + capcut_client)
+             12 LOAD_ATTR                2 (load_client)
+             32 CALL                     0
+             40 STORE_FAST               1 (client)
+
+163          42 LOAD_GLOBAL              5 (NULL + deepcopy)
+             52 LOAD_FAST                1 (client)
+             54 LOAD_ATTR                6 (DEFAULT_DEVICE)
+             74 CALL                     1
+             82 STORE_FAST               2 (device)
+
+164          84 LOAD_FAST                2 (device)
+             86 LOAD_ATTR                9 (NULL|self + update)
+            106 LOAD_FAST                0 (override)
+            108 COPY                     1
+            110 POP_JUMP_IF_TRUE         2 (to 116)
+            112 POP_TOP
+            114 BUILD_MAP                0
+        >>  116 CALL                     1
+            124 POP_TOP
+
+165         126 LOAD_FAST                2 (device)
+            128 RETURN_VALUE
+
+Disassembly of <code object _build_new_request at 0x269b8190, file "app\adapters\tts\capcut_tts.py", line 168>:
+168           0 RESUME                   0
+
+170           2 LOAD_GLOBAL              1 (NULL + capcut_client)
+             12 LOAD_ATTR                2 (load_client)
+             32 CALL                     0
+             40 STORE_FAST               5 (client)
+
+171          42 LOAD_FAST                5 (client)
+             44 LOAD_ATTR                5 (NULL|self + tts_new_body)
+             64 LOAD_FAST                0 (text)
+             66 BUILD_LIST               1
+             68 LOAD_FAST                1 (voice_type)
+             70 LOAD_FAST                2 (resource_id)
+             72 LOAD_FAST                3 (rate)
+             74 LOAD_FAST                4 (device)
+             76 CALL                     5
+             84 UNPACK_SEQUENCE          2
+             88 STORE_FAST               6 (babi)
+             90 STORE_FAST               7 (body)
+
+172          92 LOAD_FAST                5 (client)
+             94 LOAD_ATTR                7 (NULL|self + compact_json)
+            114 LOAD_FAST                7 (body)
+            116 CALL                     1
+            124 STORE_FAST               8 (body_text)
+
+173         126 LOAD_FAST                5 (client)
+            128 LOAD_ATTR                9 (NULL|self + common_query)
+            148 LOAD_FAST                4 (device)
+            150 LOAD_FAST                6 (babi)
+            152 LOAD_CONST               1 (True)
+            154 KW_NAMES                 2 (('include_region',))
+            156 CALL                     3
+            164 STORE_FAST               9 (query)
+
+174         166 LOAD_FAST                5 (client)
+            168 LOAD_ATTR               10 (BASE)
+            188 LOAD_CONST               3 ('/lv/v1/common_task/new?')
+            190 BINARY_OP                0 (+)
+            194 LOAD_GLOBAL             13 (NULL + urlencode)
+            204 LOAD_FAST                9 (query)
+            206 CALL                     1
+            214 BINARY_OP                0 (+)
+            218 STORE_FAST              10 (url)
+
+175         220 LOAD_FAST                5 (client)
+            222 LOAD_ATTR               15 (NULL|self + base_headers)
+            242 LOAD_FAST                4 (device)
+            244 LOAD_FAST                8 (body_text)
+            246 LOAD_CONST               1 (True)
+            248 KW_NAMES                 4 (('appid',))
+            250 CALL                     3
+            258 STORE_FAST              11 (headers)
+
+176         260 LOAD_FAST               11 (headers)
+            262 LOAD_ATTR               17 (NULL|self + items)
+            282 CALL                     0
+            290 GET_ITER
+            292 LOAD_FAST_AND_CLEAR     12 (k)
+            294 LOAD_FAST_AND_CLEAR     13 (v)
+            296 SWAP                     3
+            298 BUILD_MAP                0
+            300 SWAP                     2
+        >>  302 FOR_ITER                22 (to 350)
+            306 UNPACK_SEQUENCE          2
+            310 STORE_FAST              12 (k)
+            312 STORE_FAST              13 (v)
+            314 LOAD_FAST               12 (k)
+            316 LOAD_ATTR               19 (NULL|self + lower)
+            336 CALL                     0
+            344 LOAD_FAST               13 (v)
+            346 MAP_ADD                  2
+            348 JUMP_BACKWARD           24 (to 302)
+        >>  350 END_FOR
+            352 STORE_FAST              14 (lower)
+            354 STORE_FAST              12 (k)
+            356 STORE_FAST              13 (v)
+
+177         358 LOAD_CONST               5 ('sign')
+            360 LOAD_FAST               14 (lower)
+            362 CONTAINS_OP              1
+            364 POP_JUMP_IF_FALSE       32 (to 430)
+
+178         366 LOAD_FAST                5 (client)
+            368 LOAD_ATTR               21 (NULL|self + make_sign_header)
+            388 LOAD_FAST               10 (url)
+            390 LOAD_FAST                4 (device)
+            392 LOAD_CONST               6 ('appvr')
+            394 BINARY_SUBSCR
+            398 LOAD_FAST               14 (lower)
+            400 LOAD_CONST               7 ('device-time')
+            402 BINARY_SUBSCR
+            406 LOAD_FAST                4 (device)
+            408 LOAD_CONST               8 ('tdid')
+            410 BINARY_SUBSCR
+            414 CALL                     4
+            422 LOAD_FAST               11 (headers)
+            424 LOAD_CONST               5 ('sign')
+            426 STORE_SUBSCR
+
+179     >>  430 LOAD_FAST               10 (url)
+            432 LOAD_FAST               11 (headers)
+            434 LOAD_FAST                8 (body_text)
+            436 BUILD_TUPLE              3
+            438 RETURN_VALUE
+        >>  440 SWAP                     2
+            442 POP_TOP
+
+176         444 SWAP                     3
+            446 STORE_FAST              13 (v)
+            448 STORE_FAST              12 (k)
+            450 RERAISE                  0
+ExceptionTable:
+  298 to 350 -> 440 [3]
+
+Disassembly of <code object _build_query_request at 0x29082700, file "app\adapters\tts\capcut_tts.py", line 182>:
+182           0 RESUME                   0
+
+183           2 LOAD_GLOBAL              1 (NULL + capcut_client)
+             12 LOAD_ATTR                2 (load_client)
+             32 CALL                     0
+             40 STORE_FAST               4 (client)
+
+184          42 LOAD_FAST                4 (client)
+             44 LOAD_ATTR                5 (NULL|self + query_body)
+             64 LOAD_FAST                0 (task_id)
+             66 LOAD_FAST                1 (token)
+             68 LOAD_GLOBAL              6 (_REQ_KEY)
+             78 LOAD_FAST                2 (bind_id)
+             80 CALL                     4
+             88 STORE_FAST               5 (body)
+
+185          90 LOAD_FAST                4 (client)
+             92 LOAD_ATTR                9 (NULL|self + compact_json)
+            112 LOAD_FAST                5 (body)
+            114 CALL                     1
+            122 STORE_FAST               6 (body_text)
+
+186         124 LOAD_FAST                4 (client)
+            126 LOAD_ATTR               11 (NULL|self + common_query)
+            146 LOAD_FAST                3 (device)
+            148 LOAD_CONST               0 (None)
+            150 LOAD_CONST               1 (False)
+            152 KW_NAMES                 2 (('include_region',))
+            154 CALL                     3
+            162 STORE_FAST               7 (query)
+
+187         164 LOAD_FAST                4 (client)
+            166 LOAD_ATTR               12 (BASE)
+            186 LOAD_CONST               3 ('/lv/v1/common_task/query?')
+            188 BINARY_OP                0 (+)
+            192 LOAD_GLOBAL             15 (NULL + urlencode)
+            202 LOAD_FAST                7 (query)
+            204 CALL                     1
+            212 BINARY_OP                0 (+)
+            216 STORE_FAST               8 (url)
+
+188         218 LOAD_FAST                4 (client)
+            220 LOAD_ATTR               17 (NULL|self + base_headers)
+            240 LOAD_FAST                3 (device)
+            242 LOAD_FAST                6 (body_text)
+            244 LOAD_CONST               4 (True)
+            246 KW_NAMES                 5 (('appid',))
+            248 CALL                     3
+            256 STORE_FAST               9 (headers)
+
+189         258 LOAD_FAST                9 (headers)
+            260 LOAD_ATTR               19 (NULL|self + items)
+            280 CALL                     0
+            288 GET_ITER
+            290 LOAD_FAST_AND_CLEAR     10 (k)
+            292 LOAD_FAST_AND_CLEAR     11 (v)
+            294 SWAP                     3
+            296 BUILD_MAP                0
+            298 SWAP                     2
+        >>  300 FOR_ITER                22 (to 348)
+            304 UNPACK_SEQUENCE          2
+            308 STORE_FAST              10 (k)
+            310 STORE_FAST              11 (v)
+            312 LOAD_FAST               10 (k)
+            314 LOAD_ATTR               21 (NULL|self + lower)
+            334 CALL                     0
+            342 LOAD_FAST               11 (v)
+            344 MAP_ADD                  2
+            346 JUMP_BACKWARD           24 (to 300)
+        >>  348 END_FOR
+            350 STORE_FAST              12 (lower)
+            352 STORE_FAST              10 (k)
+            354 STORE_FAST              11 (v)
+
+190         356 LOAD_CONST               6 ('sign')
+            358 LOAD_FAST               12 (lower)
+            360 CONTAINS_OP              1
+            362 POP_JUMP_IF_FALSE       32 (to 428)
+
+191         364 LOAD_FAST                4 (client)
+            366 LOAD_ATTR               23 (NULL|self + make_sign_header)
+            386 LOAD_FAST                8 (url)
+            388 LOAD_FAST                3 (device)
+            390 LOAD_CONST               7 ('appvr')
+            392 BINARY_SUBSCR
+            396 LOAD_FAST               12 (lower)
+            398 LOAD_CONST               8 ('device-time')
+            400 BINARY_SUBSCR
+            404 LOAD_FAST                3 (device)
+            406 LOAD_CONST               9 ('tdid')
+            408 BINARY_SUBSCR
+            412 CALL                     4
+            420 LOAD_FAST                9 (headers)
+            422 LOAD_CONST               6 ('sign')
+            424 STORE_SUBSCR
+
+192     >>  428 LOAD_FAST                8 (url)
+            430 LOAD_FAST                9 (headers)
+            432 LOAD_FAST                6 (body_text)
+            434 BUILD_TUPLE              3
+            436 RETURN_VALUE
+        >>  438 SWAP                     2
+            440 POP_TOP
+
+189         442 SWAP                     3
+            444 STORE_FAST              11 (v)
+            446 STORE_FAST              10 (k)
+            448 RERAISE                  0
+ExceptionTable:
+  296 to 348 -> 438 [3]
+
+Disassembly of <code object _extract_task at 0x7f6c929693b0, file "app\adapters\tts\capcut_tts.py", line 199>:
+199           0 RESUME                   0
+
+200           2 LOAD_FAST                0 (resp_json)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 BUILD_MAP                0
+        >>   12 LOAD_ATTR                1 (NULL|self + get)
+             32 LOAD_CONST               1 ('data')
+             34 CALL                     1
+             42 COPY                     1
+             44 POP_JUMP_IF_TRUE         2 (to 50)
+             46 POP_TOP
+             48 BUILD_MAP                0
+        >>   50 LOAD_ATTR                1 (NULL|self + get)
+             70 LOAD_CONST               2 ('tasks')
+             72 CALL                     1
+             80 COPY                     1
+             82 POP_JUMP_IF_TRUE         2 (to 88)
+             84 POP_TOP
+             86 BUILD_LIST               0
+        >>   88 STORE_FAST               1 (tasks)
+
+201          90 LOAD_FAST                1 (tasks)
+             92 POP_JUMP_IF_TRUE        41 (to 176)
+
+202          94 LOAD_GLOBAL              3 (NULL + make_error)
+            104 LOAD_GLOBAL              4 (E)
+            114 LOAD_ATTR                6 (TTS_NETWORK)
+            134 LOAD_CONST               3 ('CapCut không trả task: ')
+            136 LOAD_GLOBAL              9 (NULL + str)
+            146 LOAD_FAST                0 (resp_json)
+            148 CALL                     1
+            156 LOAD_CONST               0 (None)
+            158 LOAD_CONST               4 (200)
+            160 BINARY_SLICE
+            162 FORMAT_VALUE             0
+            164 BUILD_STRING             2
+            166 CALL                     2
+            174 RAISE_VARARGS            1
+
+203     >>  176 LOAD_FAST                1 (tasks)
+            178 LOAD_CONST               5 (0)
+            180 BINARY_SUBSCR
+            184 RETURN_VALUE
+
+Disassembly of <code object _task_status at 0x7f6c9327f630, file "app\adapters\tts\capcut_tts.py", line 206>:
+206           0 RESUME                   0
+
+207           2 LOAD_GLOBAL              1 (NULL + str)
+             12 LOAD_FAST                0 (task)
+             14 LOAD_ATTR                3 (NULL|self + get)
+             34 LOAD_CONST               1 ('status')
+             36 CALL                     1
+             44 COPY                     1
+             46 POP_JUMP_IF_TRUE         2 (to 52)
+             48 POP_TOP
+             50 LOAD_CONST               2 ('')
+        >>   52 CALL                     1
+             60 LOAD_ATTR                5 (NULL|self + lower)
+             80 CALL                     0
+             88 RETURN_VALUE
+
+Disassembly of <code object _find_audio_url at 0x2906d320, file "app\adapters\tts\capcut_tts.py", line 214>:
+214           0 RESUME                   0
+
+222           2 LOAD_FAST                0 (task)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_CONST               1 ('payload')
+             26 CALL                     1
+             34 STORE_FAST               1 (payload)
+
+223          36 LOAD_GLOBAL              3 (NULL + isinstance)
+             46 LOAD_FAST                1 (payload)
+             48 LOAD_GLOBAL              4 (str)
+             58 CALL                     2
+             66 POP_JUMP_IF_FALSE       38 (to 144)
+             68 LOAD_FAST                1 (payload)
+             70 LOAD_ATTR                7 (NULL|self + strip)
+             90 CALL                     0
+             98 POP_JUMP_IF_FALSE       22 (to 144)
+
+224         100 NOP
+
+225         102 LOAD_GLOBAL              9 (NULL + json)
+            112 LOAD_ATTR               10 (loads)
+            132 LOAD_FAST                1 (payload)
+            134 CALL                     1
+            142 STORE_FAST               1 (payload)
+
+231     >>  144 LOAD_GLOBAL              3 (NULL + isinstance)
+            154 LOAD_FAST                1 (payload)
+            156 LOAD_GLOBAL             20 (dict)
+            166 CALL                     2
+            174 POP_JUMP_IF_FALSE      125 (to 426)
+
+232         176 LOAD_FAST                1 (payload)
+            178 LOAD_ATTR                1 (NULL|self + get)
+            198 LOAD_CONST               4 ('audio_subtitles')
+            200 CALL                     1
+            208 STORE_FAST               3 (subs)
+
+233         210 LOAD_GLOBAL              3 (NULL + isinstance)
+            220 LOAD_FAST                3 (subs)
+            222 LOAD_GLOBAL             22 (list)
+            232 CALL                     2
+            240 POP_JUMP_IF_FALSE       92 (to 426)
+
+234         242 LOAD_FAST                3 (subs)
+            244 GET_ITER
+        >>  246 FOR_ITER                87 (to 424)
+            250 STORE_FAST               4 (item)
+
+235         252 LOAD_GLOBAL              3 (NULL + isinstance)
+            262 LOAD_FAST                4 (item)
+            264 LOAD_GLOBAL             20 (dict)
+            274 CALL                     2
+            282 POP_JUMP_IF_TRUE         1 (to 286)
+            284 JUMP_BACKWARD           20 (to 246)
+
+236     >>  286 LOAD_GLOBAL             24 (_AUDIO_URL_KEYS)
+            296 GET_ITER
+        >>  298 FOR_ITER                59 (to 420)
+            302 STORE_FAST               5 (k)
+
+237         304 LOAD_FAST                4 (item)
+            306 LOAD_ATTR                1 (NULL|self + get)
+            326 LOAD_FAST                5 (k)
+            328 CALL                     1
+            336 STORE_FAST               6 (v)
+
+238         338 LOAD_GLOBAL              3 (NULL + isinstance)
+            348 LOAD_FAST                6 (v)
+            350 LOAD_GLOBAL              4 (str)
+            360 CALL                     2
+            368 POP_JUMP_IF_TRUE         1 (to 372)
+            370 JUMP_BACKWARD           37 (to 298)
+        >>  372 LOAD_FAST                6 (v)
+            374 LOAD_ATTR               27 (NULL|self + startswith)
+            394 LOAD_CONST               5 ('http')
+            396 CALL                     1
+            404 POP_JUMP_IF_TRUE         1 (to 408)
+            406 JUMP_BACKWARD           55 (to 298)
+
+239     >>  408 LOAD_FAST                6 (v)
+            410 SWAP                     2
+            412 POP_TOP
+            414 SWAP                     2
+            416 POP_TOP
+            418 RETURN_VALUE
+
+236     >>  420 END_FOR
+            422 JUMP_BACKWARD           89 (to 246)
+
+234     >>  424 END_FOR
+
+242     >>  426 LOAD_FAST                1 (payload)
+            428 LOAD_FAST                0 (task)
+            430 BUILD_TUPLE              2
+            432 GET_ITER
+        >>  434 FOR_ITER                19 (to 476)
+            438 STORE_FAST               7 (root)
+
+243         440 LOAD_GLOBAL             29 (NULL + _deep_find_url)
+            450 LOAD_FAST                7 (root)
+            452 CALL                     1
+            460 STORE_FAST               8 (found)
+
+244         462 LOAD_FAST                8 (found)
+            464 POP_JUMP_IF_TRUE         1 (to 468)
+            466 JUMP_BACKWARD           17 (to 434)
+
+245     >>  468 LOAD_FAST                8 (found)
+            470 SWAP                     2
+            472 POP_TOP
+            474 RETURN_VALUE
+
+242     >>  476 END_FOR
+
+248         478 LOAD_GLOBAL              9 (NULL + json)
+            488 LOAD_ATTR               30 (dumps)
+            508 LOAD_FAST                1 (payload)
+            510 LOAD_FAST                0 (task)
+            512 LOAD_CONST               6 (('payload', 'task'))
+            514 BUILD_CONST_KEY_MAP      2
+            516 LOAD_CONST               7 (False)
+            518 LOAD_GLOBAL              4 (str)
+            528 KW_NAMES                 8 (('ensure_ascii', 'default'))
+            530 CALL                     3
+            538 STORE_FAST               9 (blob)
+
+249         540 LOAD_GLOBAL             14 (_URL_RE)
+            550 LOAD_ATTR               33 (NULL|self + finditer)
+            570 LOAD_FAST                9 (blob)
+            572 CALL                     1
+            580 GET_ITER
+        >>  582 FOR_ITER                47 (to 680)
+            586 STORE_FAST               2 (m)
+
+250         588 LOAD_GLOBAL             35 (NULL + _looks_like_audio)
+            598 LOAD_FAST                2 (m)
+            600 LOAD_ATTR               19 (NULL|self + group)
+            620 LOAD_CONST               2 (0)
+            622 CALL                     1
+            630 CALL                     1
+            638 POP_JUMP_IF_TRUE         1 (to 642)
+            640 JUMP_BACKWARD           30 (to 582)
+
+251     >>  642 LOAD_FAST                2 (m)
+            644 LOAD_ATTR               19 (NULL|self + group)
+            664 LOAD_CONST               2 (0)
+            666 CALL                     1
+            674 SWAP                     2
+            676 POP_TOP
+            678 RETURN_VALUE
+
+249     >>  680 END_FOR
+
+252         682 RETURN_CONST             3 (None)
+        >>  684 PUSH_EXC_INFO
+
+226         686 LOAD_GLOBAL              8 (json)
+            696 LOAD_ATTR               12 (JSONDecodeError)
+            716 CHECK_EXC_MATCH
+            718 POP_JUMP_IF_FALSE       47 (to 814)
+            720 POP_TOP
+
+227         722 LOAD_GLOBAL             14 (_URL_RE)
+            732 LOAD_ATTR               17 (NULL|self + search)
+            752 LOAD_FAST                1 (payload)
+            754 CALL                     1
+            762 STORE_FAST               2 (m)
+
+228         764 LOAD_FAST                2 (m)
+            766 POP_JUMP_IF_FALSE       19 (to 806)
+            768 LOAD_FAST                2 (m)
+            770 LOAD_ATTR               19 (NULL|self + group)
+            790 LOAD_CONST               2 (0)
+            792 CALL                     1
+            800 SWAP                     2
+            802 POP_EXCEPT
+            804 RETURN_VALUE
+        >>  806 LOAD_CONST               3 (None)
+            808 SWAP                     2
+            810 POP_EXCEPT
+            812 RETURN_VALUE
+
+226     >>  814 RERAISE                  0
+        >>  816 COPY                     3
+            818 POP_EXCEPT
+            820 RERAISE                  1
+ExceptionTable:
+  102 to 142 -> 684 [0]
+  684 to 800 -> 816 [1] lasti
+  806 to 808 -> 816 [1] lasti
+  814 to 814 -> 816 [1] lasti
+
+Disassembly of <code object _deep_find_url at 0x269ed3c0, file "app\adapters\tts\capcut_tts.py", line 255>:
+255           0 RESUME                   0
+
+257           2 LOAD_FAST                1 (depth)
+              4 LOAD_CONST               1 (6)
+              6 COMPARE_OP              68 (>)
+             10 POP_JUMP_IF_FALSE        1 (to 14)
+
+258          12 RETURN_CONST             2 (None)
+
+259     >>   14 LOAD_GLOBAL              1 (NULL + isinstance)
+             24 LOAD_FAST                0 (node)
+             26 LOAD_GLOBAL              2 (dict)
+             36 CALL                     2
+             44 POP_JUMP_IF_FALSE      109 (to 264)
+
+260          46 LOAD_GLOBAL              4 (_AUDIO_URL_KEYS)
+             56 GET_ITER
+        >>   58 FOR_ITER                57 (to 176)
+             62 STORE_FAST               2 (k)
+
+261          64 LOAD_FAST                0 (node)
+             66 LOAD_ATTR                7 (NULL|self + get)
+             86 LOAD_FAST                2 (k)
+             88 CALL                     1
+             96 STORE_FAST               3 (v)
+
+262          98 LOAD_GLOBAL              1 (NULL + isinstance)
+            108 LOAD_FAST                3 (v)
+            110 LOAD_GLOBAL              8 (str)
+            120 CALL                     2
+            128 POP_JUMP_IF_TRUE         1 (to 132)
+            130 JUMP_BACKWARD           37 (to 58)
+        >>  132 LOAD_FAST                3 (v)
+            134 LOAD_ATTR               11 (NULL|self + startswith)
+            154 LOAD_CONST               3 ('http')
+            156 CALL                     1
+            164 POP_JUMP_IF_TRUE         1 (to 168)
+            166 JUMP_BACKWARD           55 (to 58)
+
+263     >>  168 LOAD_FAST                3 (v)
+            170 SWAP                     2
+            172 POP_TOP
+            174 RETURN_VALUE
+
+260     >>  176 END_FOR
+
+264         178 LOAD_FAST                0 (node)
+            180 LOAD_ATTR               13 (NULL|self + values)
+            200 CALL                     0
+            208 GET_ITER
+        >>  210 FOR_ITER                23 (to 260)
+            214 STORE_FAST               3 (v)
+
+265         216 LOAD_GLOBAL             15 (NULL + _deep_find_url)
+            226 LOAD_FAST                3 (v)
+            228 LOAD_FAST                1 (depth)
+            230 LOAD_CONST               4 (1)
+            232 BINARY_OP                0 (+)
+            236 CALL                     2
+            244 STORE_FAST               4 (found)
+
+266         246 LOAD_FAST                4 (found)
+            248 POP_JUMP_IF_TRUE         1 (to 252)
+            250 JUMP_BACKWARD           21 (to 210)
+
+267     >>  252 LOAD_FAST                4 (found)
+            254 SWAP                     2
+            256 POP_TOP
+            258 RETURN_VALUE
+
+264     >>  260 END_FOR
+
+273         262 RETURN_CONST             2 (None)
+
+268     >>  264 LOAD_GLOBAL              1 (NULL + isinstance)
+            274 LOAD_FAST                0 (node)
+            276 LOAD_GLOBAL             16 (list)
+            286 CALL                     2
+            294 POP_JUMP_IF_FALSE       28 (to 352)
+
+269         296 LOAD_FAST                0 (node)
+            298 GET_ITER
+        >>  300 FOR_ITER                23 (to 350)
+            304 STORE_FAST               5 (item)
+
+270         306 LOAD_GLOBAL             15 (NULL + _deep_find_url)
+            316 LOAD_FAST                5 (item)
+            318 LOAD_FAST                1 (depth)
+            320 LOAD_CONST               4 (1)
+            322 BINARY_OP                0 (+)
+            326 CALL                     2
+            334 STORE_FAST               4 (found)
+
+271         336 LOAD_FAST                4 (found)
+            338 POP_JUMP_IF_TRUE         1 (to 342)
+            340 JUMP_BACKWARD           21 (to 300)
+
+272     >>  342 LOAD_FAST                4 (found)
+            344 SWAP                     2
+            346 POP_TOP
+            348 RETURN_VALUE
+
+269     >>  350 END_FOR
+
+273     >>  352 RETURN_CONST             2 (None)
+
+Disassembly of <code object _looks_like_audio at 0x7f6c93272d90, file "app\adapters\tts\capcut_tts.py", line 276>:
+              0 MAKE_CELL                2 (low)
+
+276           2 RESUME                   0
+
+277           4 LOAD_FAST                0 (url)
+              6 LOAD_ATTR                1 (NULL|self + lower)
+             26 CALL                     0
+             34 STORE_DEREF              2 (low)
+
+278          36 LOAD_DEREF               2 (low)
+             38 LOAD_ATTR                3 (NULL|self + split)
+             58 LOAD_CONST               1 ('?')
+             60 LOAD_CONST               2 (1)
+             62 CALL                     2
+             70 LOAD_CONST               3 (0)
+             72 BINARY_SUBSCR
+             76 STORE_FAST               1 (path)
+
+279          78 LOAD_FAST                1 (path)
+             80 LOAD_ATTR                5 (NULL|self + endswith)
+            100 LOAD_CONST               4 (('.mp3', '.m4a', '.aac', '.wav'))
+            102 CALL                     1
+            110 POP_JUMP_IF_FALSE        1 (to 114)
+
+280         112 RETURN_CONST             5 (True)
+
+282     >>  114 LOAD_GLOBAL              7 (NULL + any)
+            124 LOAD_CLOSURE             2 (low)
+            126 BUILD_TUPLE              1
+            128 LOAD_CONST               6 (<code object <genexpr> at 0x7f6c932dd6b0, file "app\adapters\tts\capcut_tts.py", line 282>)
+            130 MAKE_FUNCTION            8 (closure)
+            132 LOAD_CONST               7 (('mime_type=audio', 'speech_url', 'tos', 'audio', 'tiktokcdn'))
+            134 GET_ITER
+            136 CALL                     0
+            144 CALL                     1
+            152 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c932dd6b0, file "app\adapters\tts\capcut_tts.py", line 282>:
+              0 COPY_FREE_VARS           1
+
+282           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                 8 (to 30)
+             14 STORE_FAST               1 (s)
+             16 LOAD_FAST                1 (s)
+             18 LOAD_DEREF               2 (low)
+             20 CONTAINS_OP              0
+             22 YIELD_VALUE              1
+             24 RESUME                   1
+             26 POP_TOP
+             28 JUMP_BACKWARD           10 (to 10)
+        >>   30 END_FOR
+             32 RETURN_CONST             0 (None)
+        >>   34 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             36 RERAISE                  1
+ExceptionTable:
+  6 to 32 -> 34 [0] lasti
+
+Disassembly of <code object _is_rejection at 0x7f6c9327f750, file "app\adapters\tts\capcut_tts.py", line 285>:
+              0 MAKE_CELL                2 (low)
+
+285           2 RESUME                   0
+
+287           4 LOAD_FAST                0 (status_code)
+              6 LOAD_CONST               1 ((401, 403))
+              8 CONTAINS_OP              0
+             10 POP_JUMP_IF_FALSE        1 (to 14)
+
+288          12 RETURN_CONST             2 (True)
+
+289     >>   14 LOAD_FAST                1 (text)
+             16 COPY                     1
+             18 POP_JUMP_IF_TRUE         2 (to 24)
+             20 POP_TOP
+             22 LOAD_CONST               3 ('')
+        >>   24 LOAD_ATTR                1 (NULL|self + lower)
+             44 CALL                     0
+             52 STORE_DEREF              2 (low)
+
+290          54 LOAD_GLOBAL              3 (NULL + any)
+             64 LOAD_CLOSURE             2 (low)
+             66 BUILD_TUPLE              1
+             68 LOAD_CONST               4 (<code object <genexpr> at 0x7f6c932dd7a0, file "app\adapters\tts\capcut_tts.py", line 290>)
+             70 MAKE_FUNCTION            8 (closure)
+             72 LOAD_CONST               5 (('risk', 'forbidden', 'invalid sign', 'device', 'verify', 'blocked'))
+             74 GET_ITER
+             76 CALL                     0
+             84 CALL                     1
+             92 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c932dd7a0, file "app\adapters\tts\capcut_tts.py", line 290>:
+              0 COPY_FREE_VARS           1
+
+290           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                 8 (to 30)
+             14 STORE_FAST               1 (s)
+             16 LOAD_FAST                1 (s)
+             18 LOAD_DEREF               2 (low)
+             20 CONTAINS_OP              0
+             22 YIELD_VALUE              1
+             24 RESUME                   1
+             26 POP_TOP
+             28 JUMP_BACKWARD           10 (to 10)
+        >>   30 END_FOR
+             32 RETURN_CONST             0 (None)
+        >>   34 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             36 RERAISE                  1
+ExceptionTable:
+  6 to 32 -> 34 [0] lasti
+
+Disassembly of <code object _post at 0x7f6c92e4a730, file "app\adapters\tts\capcut_tts.py", line 294>:
+294           0 RESUME                   0
+
+296           2 LOAD_GLOBAL              1 (NULL + capcut_client)
+             12 LOAD_ATTR                2 (load_client)
+             32 CALL                     0
+             40 STORE_FAST               4 (client)
+
+297          42 LOAD_FAST                4 (client)
+             44 LOAD_ATTR                4 (requests)
+             64 POP_JUMP_IF_NOT_NONE    26 (to 118)
+
+298          66 LOAD_GLOBAL              7 (NULL + make_error)
+             76 LOAD_GLOBAL              8 (E)
+             86 LOAD_ATTR               10 (TTS_NETWORK)
+            106 LOAD_CONST               1 ("Thiếu thư viện 'requests' cho CapCut TTS.")
+            108 CALL                     2
+            116 RAISE_VARARGS            1
+
+299     >>  118 LOAD_FAST                4 (client)
+            120 LOAD_ATTR                4 (requests)
+            140 LOAD_ATTR               13 (NULL|self + post)
+            160 LOAD_FAST                0 (url)
+            162 LOAD_FAST                1 (headers)
+            164 LOAD_FAST                2 (body_text)
+            166 LOAD_ATTR               15 (NULL|self + encode)
+            186 LOAD_CONST               2 ('utf-8')
+            188 CALL                     1
+            196 LOAD_FAST                3 (timeout)
+            198 KW_NAMES                 3 (('headers', 'data', 'timeout'))
+            200 CALL                     4
+            208 RETURN_VALUE
+
+Disassembly of <code object _submit_and_poll_sync at 0x269e93d0, file "app\adapters\tts\capcut_tts.py", line 302>:
+              0 MAKE_CELL                4 (cancel_check)
+
+302           2 RESUME                   0
+
+306           4 LOAD_GLOBAL              1 (NULL + capcut_client)
+             14 LOAD_ATTR                2 (load_client)
+             34 CALL                     0
+             42 STORE_FAST               6 (client)
+
+308          44 LOAD_CONST              34 (('return', 'bool'))
+             46 LOAD_CLOSURE             4 (cancel_check)
+             48 BUILD_TUPLE              1
+             50 LOAD_CONST               1 (<code object _cancelled at 0x7f6c932dd980, file "app\adapters\tts\capcut_tts.py", line 308>)
+             52 MAKE_FUNCTION           12 (annotations, closure)
+             54 STORE_FAST               7 (_cancelled)
+
+311          56 PUSH_NULL
+             58 LOAD_FAST                7 (_cancelled)
+             60 CALL                     0
+             68 POP_JUMP_IF_FALSE       26 (to 122)
+
+312          70 LOAD_GLOBAL              5 (NULL + make_error)
+             80 LOAD_GLOBAL              6 (E)
+             90 LOAD_ATTR                8 (CANCELLED)
+            110 LOAD_CONST               2 ('Đã huỷ khi tạo giọng CapCut.')
+            112 CALL                     2
+            120 RAISE_VARARGS            1
+
+314     >>  122 LOAD_GLOBAL             11 (NULL + capcut_device)
+            132 LOAD_ATTR               12 (get_active_device)
+            152 CALL                     0
+            160 STORE_FAST               8 (override)
+
+315         162 LOAD_GLOBAL             15 (NULL + _build_device)
+            172 LOAD_FAST                8 (override)
+            174 CALL                     1
+            182 STORE_FAST               9 (device)
+
+318         184 LOAD_GLOBAL             17 (NULL + _build_new_request)
+            194 LOAD_FAST                0 (text)
+            196 LOAD_FAST                1 (voice_type)
+            198 LOAD_FAST                2 (resource_id)
+            200 LOAD_FAST                3 (rate)
+            202 LOAD_FAST                9 (device)
+            204 CALL                     5
+            212 UNPACK_SEQUENCE          3
+            216 STORE_FAST              10 (url)
+            218 STORE_FAST              11 (headers)
+            220 STORE_FAST              12 (body_text)
+
+319         222 LOAD_GLOBAL             19 (NULL + _post)
+            232 LOAD_FAST               10 (url)
+            234 LOAD_FAST               11 (headers)
+            236 LOAD_FAST               12 (body_text)
+            238 LOAD_GLOBAL             20 (_HTTP_TIMEOUT)
+            248 CALL                     4
+            256 STORE_FAST              13 (resp)
+
+320         258 LOAD_GLOBAL             23 (NULL + _is_rejection)
+            268 LOAD_FAST               13 (resp)
+            270 LOAD_ATTR               24 (status_code)
+            290 LOAD_FAST               13 (resp)
+            292 LOAD_ATTR               26 (text)
+            312 CALL                     2
+            320 POP_JUMP_IF_FALSE       61 (to 444)
+
+321         322 LOAD_GLOBAL             11 (NULL + capcut_device)
+            332 LOAD_ATTR               28 (force_rotate)
+            352 LOAD_CONST               3 ('rejected')
+            354 CALL                     1
+            362 POP_TOP
+
+322         364 LOAD_GLOBAL              5 (NULL + make_error)
+            374 LOAD_GLOBAL              6 (E)
+            384 LOAD_ATTR               30 (TTS_AUTH)
+
+323         404 LOAD_CONST               4 ('CapCut từ chối request (HTTP ')
+            406 LOAD_FAST               13 (resp)
+            408 LOAD_ATTR               24 (status_code)
+            428 FORMAT_VALUE             0
+            430 LOAD_CONST               5 ('). Đã xoay device, thử lại.')
+            432 BUILD_STRING             3
+
+322         434 CALL                     2
+            442 RAISE_VARARGS            1
+
+324     >>  444 LOAD_FAST               13 (resp)
+            446 LOAD_ATTR               24 (status_code)
+            466 LOAD_CONST               6 (429)
+            468 COMPARE_OP              40 (==)
+            472 POP_JUMP_IF_FALSE       26 (to 526)
+
+325         474 LOAD_GLOBAL              5 (NULL + make_error)
+            484 LOAD_GLOBAL              6 (E)
+            494 LOAD_ATTR               32 (TTS_RATE_LIMIT)
+            514 LOAD_CONST               7 ('CapCut giới hạn tần suất (429).')
+            516 CALL                     2
+            524 RAISE_VARARGS            1
+
+326     >>  526 LOAD_FAST               13 (resp)
+            528 LOAD_ATTR               24 (status_code)
+            548 LOAD_CONST               8 (200)
+            550 COMPARE_OP              55 (!=)
+            554 POP_JUMP_IF_FALSE       55 (to 666)
+
+327         556 LOAD_GLOBAL              5 (NULL + make_error)
+            566 LOAD_GLOBAL              6 (E)
+            576 LOAD_ATTR               34 (TTS_NETWORK)
+            596 LOAD_CONST               9 ('CapCut new HTTP ')
+            598 LOAD_FAST               13 (resp)
+            600 LOAD_ATTR               24 (status_code)
+            620 FORMAT_VALUE             0
+            622 LOAD_CONST              10 (': ')
+            624 LOAD_FAST               13 (resp)
+            626 LOAD_ATTR               26 (text)
+            646 LOAD_CONST              11 (None)
+            648 LOAD_CONST               8 (200)
+            650 BINARY_SLICE
+            652 FORMAT_VALUE             0
+            654 BUILD_STRING             4
+            656 CALL                     2
+            664 RAISE_VARARGS            1
+
+328     >>  666 NOP
+
+329         668 LOAD_FAST               13 (resp)
+            670 LOAD_ATTR               37 (NULL|self + json)
+            690 CALL                     0
+            698 STORE_FAST              14 (new_json)
+
+333         700 LOAD_GLOBAL             41 (NULL + _extract_task)
+            710 LOAD_FAST               14 (new_json)
+            712 CALL                     1
+            720 STORE_FAST              15 (task)
+
+334         722 LOAD_FAST               15 (task)
+            724 LOAD_ATTR               43 (NULL|self + get)
+            744 LOAD_CONST              13 ('id')
+            746 CALL                     1
+            754 STORE_FAST              16 (task_id)
+
+335         756 LOAD_FAST               15 (task)
+            758 LOAD_ATTR               43 (NULL|self + get)
+            778 LOAD_CONST              14 ('token')
+            780 CALL                     1
+            788 STORE_FAST              17 (token)
+
+336         790 LOAD_FAST               14 (new_json)
+            792 LOAD_ATTR               43 (NULL|self + get)
+            812 LOAD_CONST              15 ('data')
+            814 BUILD_MAP                0
+            816 CALL                     2
+            824 LOAD_ATTR               43 (NULL|self + get)
+            844 LOAD_CONST              16 ('bind_id')
+            846 CALL                     1
+            854 COPY                     1
+            856 POP_JUMP_IF_TRUE        21 (to 900)
+            858 POP_TOP
+            860 LOAD_FAST               15 (task)
+            862 LOAD_ATTR               43 (NULL|self + get)
+            882 LOAD_CONST              16 ('bind_id')
+            884 CALL                     1
+            892 COPY                     1
+            894 POP_JUMP_IF_TRUE         2 (to 900)
+            896 POP_TOP
+            898 LOAD_CONST              17 ('')
+        >>  900 STORE_FAST              18 (bind_id)
+
+337         902 LOAD_FAST               16 (task_id)
+            904 POP_JUMP_IF_FALSE        2 (to 910)
+            906 LOAD_FAST               17 (token)
+            908 POP_JUMP_IF_TRUE        41 (to 992)
+
+338     >>  910 LOAD_GLOBAL              5 (NULL + make_error)
+            920 LOAD_GLOBAL              6 (E)
+            930 LOAD_ATTR               34 (TTS_NETWORK)
+            950 LOAD_CONST              18 ('CapCut new thiếu id/token: ')
+            952 LOAD_GLOBAL             45 (NULL + str)
+            962 LOAD_FAST               14 (new_json)
+            964 CALL                     1
+            972 LOAD_CONST              11 (None)
+            974 LOAD_CONST               8 (200)
+            976 BINARY_SLICE
+            978 FORMAT_VALUE             0
+            980 BUILD_STRING             2
+            982 CALL                     2
+            990 RAISE_VARARGS            1
+
+340     >>  992 LOAD_FAST                5 (on_progress)
+            994 POP_JUMP_IF_FALSE        9 (to 1014)
+
+341         996 PUSH_NULL
+            998 LOAD_FAST                5 (on_progress)
+           1000 LOAD_CONST              19 (0.1)
+           1002 LOAD_CONST              20 ('CapCut: đã gửi task, đang chờ tổng hợp…')
+           1004 CALL                     2
+           1012 POP_TOP
+
+344     >> 1014 LOAD_GLOBAL             47 (NULL + time)
+           1024 LOAD_ATTR               46 (time)
+           1044 CALL                     0
+           1052 LOAD_GLOBAL             48 (_POLL_TIMEOUT_S)
+           1062 BINARY_OP                0 (+)
+           1066 STORE_FAST              19 (deadline)
+
+345        1068 LOAD_CONST              11 (None)
+           1070 STORE_FAST              20 (audio_url)
+
+346     >> 1072 LOAD_GLOBAL             47 (NULL + time)
+           1082 LOAD_ATTR               46 (time)
+           1102 CALL                     0
+           1110 LOAD_FAST               19 (deadline)
+           1112 COMPARE_OP               2 (<)
+           1116 EXTENDED_ARG             1
+           1118 POP_JUMP_IF_FALSE      332 (to 1784)
+
+347     >> 1120 PUSH_NULL
+           1122 LOAD_FAST                7 (_cancelled)
+           1124 CALL                     0
+           1132 POP_JUMP_IF_FALSE       26 (to 1186)
+
+348        1134 LOAD_GLOBAL              5 (NULL + make_error)
+           1144 LOAD_GLOBAL              6 (E)
+           1154 LOAD_ATTR                8 (CANCELLED)
+           1174 LOAD_CONST              21 ('Đã huỷ khi chờ CapCut tổng hợp.')
+           1176 CALL                     2
+           1184 RAISE_VARARGS            1
+
+349     >> 1186 LOAD_GLOBAL             47 (NULL + time)
+           1196 LOAD_ATTR               50 (sleep)
+           1216 LOAD_GLOBAL             52 (_POLL_INTERVAL_S)
+           1226 CALL                     1
+           1234 POP_TOP
+
+350        1236 LOAD_GLOBAL             55 (NULL + _build_query_request)
+           1246 LOAD_FAST               16 (task_id)
+           1248 LOAD_FAST               17 (token)
+           1250 LOAD_FAST               18 (bind_id)
+           1252 LOAD_FAST                9 (device)
+           1254 CALL                     4
+           1262 UNPACK_SEQUENCE          3
+           1266 STORE_FAST              21 (q_url)
+           1268 STORE_FAST              22 (q_headers)
+           1270 STORE_FAST              23 (q_body)
+
+351        1272 LOAD_GLOBAL             19 (NULL + _post)
+           1282 LOAD_FAST               21 (q_url)
+           1284 LOAD_FAST               22 (q_headers)
+           1286 LOAD_FAST               23 (q_body)
+           1288 LOAD_GLOBAL             20 (_HTTP_TIMEOUT)
+           1298 CALL                     4
+           1306 STORE_FAST              24 (q_resp)
+
+352        1308 LOAD_FAST               24 (q_resp)
+           1310 LOAD_ATTR               24 (status_code)
+           1330 LOAD_CONST               6 (429)
+           1332 COMPARE_OP              40 (==)
+           1336 POP_JUMP_IF_FALSE        1 (to 1340)
+
+353        1338 JUMP_BACKWARD          134 (to 1072)
+
+354     >> 1340 LOAD_FAST               24 (q_resp)
+           1342 LOAD_ATTR               24 (status_code)
+           1362 LOAD_CONST               8 (200)
+           1364 COMPARE_OP              55 (!=)
+           1368 POP_JUMP_IF_FALSE       55 (to 1480)
+
+355        1370 LOAD_GLOBAL              5 (NULL + make_error)
+           1380 LOAD_GLOBAL              6 (E)
+           1390 LOAD_ATTR               34 (TTS_NETWORK)
+           1410 LOAD_CONST              22 ('CapCut query HTTP ')
+           1412 LOAD_FAST               24 (q_resp)
+           1414 LOAD_ATTR               24 (status_code)
+           1434 FORMAT_VALUE             0
+           1436 LOAD_CONST              10 (': ')
+           1438 LOAD_FAST               24 (q_resp)
+           1440 LOAD_ATTR               26 (text)
+           1460 LOAD_CONST              11 (None)
+           1462 LOAD_CONST               8 (200)
+           1464 BINARY_SLICE
+           1466 FORMAT_VALUE             0
+           1468 BUILD_STRING             4
+           1470 CALL                     2
+           1478 RAISE_VARARGS            1
+
+356     >> 1480 NOP
+
+357        1482 LOAD_FAST               24 (q_resp)
+           1484 LOAD_ATTR               37 (NULL|self + json)
+           1504 CALL                     0
+           1512 STORE_FAST              25 (q_json)
+
+360        1514 LOAD_GLOBAL             41 (NULL + _extract_task)
+           1524 LOAD_FAST               25 (q_json)
+           1526 CALL                     1
+           1534 STORE_FAST              26 (q_task)
+
+361        1536 LOAD_GLOBAL             57 (NULL + _task_status)
+           1546 LOAD_FAST               26 (q_task)
+           1548 CALL                     1
+           1556 STORE_FAST              27 (status)
+
+362        1558 LOAD_FAST               27 (status)
+           1560 LOAD_GLOBAL             58 (_SUCCESS_STATUSES)
+           1570 CONTAINS_OP              0
+           1572 POP_JUMP_IF_FALSE       12 (to 1598)
+
+363        1574 LOAD_GLOBAL             61 (NULL + _find_audio_url)
+           1584 LOAD_FAST               26 (q_task)
+           1586 CALL                     1
+           1594 STORE_FAST              20 (audio_url)
+
+364        1596 JUMP_FORWARD            93 (to 1784)
+
+365     >> 1598 LOAD_FAST               27 (status)
+           1600 LOAD_GLOBAL             62 (_FAILURE_STATUSES)
+           1610 CONTAINS_OP              0
+           1612 POP_JUMP_IF_FALSE       41 (to 1696)
+
+366        1614 LOAD_GLOBAL              5 (NULL + make_error)
+           1624 LOAD_GLOBAL              6 (E)
+           1634 LOAD_ATTR               34 (TTS_NETWORK)
+           1654 LOAD_CONST              23 ('CapCut tổng hợp thất bại: ')
+           1656 LOAD_GLOBAL             45 (NULL + str)
+           1666 LOAD_FAST               26 (q_task)
+           1668 CALL                     1
+           1676 LOAD_CONST              11 (None)
+           1678 LOAD_CONST               8 (200)
+           1680 BINARY_SLICE
+           1682 FORMAT_VALUE             0
+           1684 BUILD_STRING             2
+           1686 CALL                     2
+           1694 RAISE_VARARGS            1
+
+368     >> 1696 LOAD_FAST                5 (on_progress)
+           1698 POP_JUMP_IF_FALSE       17 (to 1734)
+
+369        1700 PUSH_NULL
+           1702 LOAD_FAST                5 (on_progress)
+           1704 LOAD_CONST              24 (0.5)
+           1706 LOAD_CONST              25 ('CapCut: ')
+           1708 LOAD_FAST               27 (status)
+           1710 COPY                     1
+           1712 POP_JUMP_IF_TRUE         2 (to 1718)
+           1714 POP_TOP
+           1716 LOAD_CONST              26 ('đang xử lý')
+        >> 1718 FORMAT_VALUE             0
+           1720 LOAD_CONST              27 ('…')
+           1722 BUILD_STRING             3
+           1724 CALL                     2
+           1732 POP_TOP
+
+346     >> 1734 LOAD_GLOBAL             47 (NULL + time)
+           1744 LOAD_ATTR               46 (time)
+           1764 CALL                     0
+           1772 LOAD_FAST               19 (deadline)
+           1774 COMPARE_OP               2 (<)
+           1778 POP_JUMP_IF_FALSE        2 (to 1784)
+           1780 EXTENDED_ARG             1
+           1782 JUMP_BACKWARD          332 (to 1120)
+
+371     >> 1784 LOAD_FAST               20 (audio_url)
+           1786 POP_JUMP_IF_TRUE        26 (to 1840)
+
+372        1788 LOAD_GLOBAL              5 (NULL + make_error)
+           1798 LOAD_GLOBAL              6 (E)
+           1808 LOAD_ATTR               34 (TTS_NETWORK)
+           1828 LOAD_CONST              28 ('CapCut không trả URL audio (timeout hoặc payload lạ).')
+           1830 CALL                     2
+           1838 RAISE_VARARGS            1
+
+375     >> 1840 LOAD_FAST                5 (on_progress)
+           1842 POP_JUMP_IF_FALSE        9 (to 1862)
+
+376        1844 PUSH_NULL
+           1846 LOAD_FAST                5 (on_progress)
+           1848 LOAD_CONST              29 (0.9)
+           1850 LOAD_CONST              30 ('CapCut: tải audio…')
+           1852 CALL                     2
+           1860 POP_TOP
+
+377     >> 1862 LOAD_FAST                6 (client)
+           1864 LOAD_ATTR               64 (requests)
+           1884 LOAD_ATTR               43 (NULL|self + get)
+           1904 LOAD_FAST               20 (audio_url)
+           1906 LOAD_GLOBAL             66 (_DOWNLOAD_TIMEOUT)
+           1916 KW_NAMES                31 (('timeout',))
+           1918 CALL                     2
+           1926 STORE_FAST              28 (dl)
+
+378        1928 LOAD_FAST               28 (dl)
+           1930 LOAD_ATTR               24 (status_code)
+           1950 LOAD_CONST               8 (200)
+           1952 COMPARE_OP              55 (!=)
+           1956 POP_JUMP_IF_TRUE        12 (to 1982)
+           1958 LOAD_FAST               28 (dl)
+           1960 LOAD_ATTR               68 (content)
+           1980 POP_JUMP_IF_TRUE        40 (to 2062)
+
+379     >> 1982 LOAD_GLOBAL              5 (NULL + make_error)
+           1992 LOAD_GLOBAL              6 (E)
+           2002 LOAD_ATTR               34 (TTS_NETWORK)
+           2022 LOAD_CONST              32 ('Tải audio CapCut lỗi HTTP ')
+           2024 LOAD_FAST               28 (dl)
+           2026 LOAD_ATTR               24 (status_code)
+           2046 FORMAT_VALUE             0
+           2048 LOAD_CONST              33 ('.')
+           2050 BUILD_STRING             3
+           2052 CALL                     2
+           2060 RAISE_VARARGS            1
+
+380     >> 2062 LOAD_FAST               28 (dl)
+           2064 LOAD_ATTR               68 (content)
+           2084 RETURN_VALUE
+        >> 2086 PUSH_EXC_INFO
+
+330        2088 LOAD_GLOBAL             38 (ValueError)
+           2098 CHECK_EXC_MATCH
+           2100 POP_JUMP_IF_FALSE       43 (to 2188)
+           2102 POP_TOP
+
+331        2104 LOAD_GLOBAL              5 (NULL + make_error)
+           2114 LOAD_GLOBAL              6 (E)
+           2124 LOAD_ATTR               34 (TTS_NETWORK)
+           2144 LOAD_CONST              12 ('CapCut new trả về non-JSON: ')
+           2146 LOAD_FAST               13 (resp)
+           2148 LOAD_ATTR               26 (text)
+           2168 LOAD_CONST              11 (None)
+           2170 LOAD_CONST               8 (200)
+           2172 BINARY_SLICE
+           2174 FORMAT_VALUE             0
+           2176 BUILD_STRING             2
+           2178 CALL                     2
+           2186 RAISE_VARARGS            1
+
+330     >> 2188 RERAISE                  0
+        >> 2190 COPY                     3
+           2192 POP_EXCEPT
+           2194 RERAISE                  1
+        >> 2196 PUSH_EXC_INFO
+
+358        2198 LOAD_GLOBAL             38 (ValueError)
+           2208 CHECK_EXC_MATCH
+           2210 POP_JUMP_IF_FALSE        4 (to 2220)
+           2212 POP_TOP
+
+359        2214 POP_EXCEPT
+           2216 EXTENDED_ARG             2
+           2218 JUMP_BACKWARD          574 (to 1072)
+
+358     >> 2220 RERAISE                  0
+        >> 2222 COPY                     3
+           2224 POP_EXCEPT
+           2226 RERAISE                  1
+ExceptionTable:
+  668 to 698 -> 2086 [0]
+  1482 to 1512 -> 2196 [0]
+  2086 to 2188 -> 2190 [1] lasti
+  2196 to 2212 -> 2222 [1] lasti
+  2220 to 2220 -> 2222 [1] lasti
+
+Disassembly of <code object _cancelled at 0x7f6c932dd980, file "app\adapters\tts\capcut_tts.py", line 308>:
+              0 COPY_FREE_VARS           1
+
+308           2 RESUME                   0
+
+309           4 LOAD_GLOBAL              1 (NULL + bool)
+             14 LOAD_DEREF               0 (cancel_check)
+             16 COPY                     1
+             18 POP_JUMP_IF_FALSE        7 (to 34)
+             20 POP_TOP
+             22 PUSH_NULL
+             24 LOAD_DEREF               0 (cancel_check)
+             26 CALL                     0
+        >>   34 CALL                     1
+             42 RETURN_VALUE
+
+Disassembly of <code object _split_chunks at 0x290e8f30, file "app\adapters\tts\capcut_tts.py", line 387>:
+387           0 RESUME                   0
+
+389           2 LOAD_FAST                0 (text)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 LOAD_CONST               1 ('')
+        >>   12 LOAD_ATTR                1 (NULL|self + strip)
+             32 CALL                     0
+             40 STORE_FAST               0 (text)
+
+390          42 LOAD_FAST                0 (text)
+             44 POP_JUMP_IF_TRUE         2 (to 50)
+
+391          46 BUILD_LIST               0
+             48 RETURN_VALUE
+
+392     >>   50 LOAD_GLOBAL              3 (NULL + len)
+             60 LOAD_FAST                0 (text)
+             62 CALL                     1
+             70 LOAD_FAST                1 (limit)
+             72 COMPARE_OP              26 (<=)
+             76 POP_JUMP_IF_FALSE        3 (to 84)
+
+393          78 LOAD_FAST                0 (text)
+             80 BUILD_LIST               1
+             82 RETURN_VALUE
+
+395     >>   84 LOAD_GLOBAL              5 (NULL + re)
+             94 LOAD_ATTR                6 (split)
+            114 LOAD_CONST               2 ('(?<=[.!?…\\n])\\s+')
+            116 LOAD_FAST                0 (text)
+            118 CALL                     2
+            126 STORE_FAST               2 (parts)
+
+396         128 BUILD_LIST               0
+            130 STORE_FAST               3 (chunks)
+
+397         132 LOAD_CONST               1 ('')
+            134 STORE_FAST               4 (cur)
+
+398         136 LOAD_FAST                2 (parts)
+            138 GET_ITER
+        >>  140 FOR_ITER               214 (to 572)
+            144 STORE_FAST               5 (p)
+
+399         146 LOAD_FAST                5 (p)
+            148 LOAD_ATTR                1 (NULL|self + strip)
+            168 CALL                     0
+            176 STORE_FAST               5 (p)
+
+400         178 LOAD_FAST                5 (p)
+            180 POP_JUMP_IF_TRUE         1 (to 184)
+
+401         182 JUMP_BACKWARD           22 (to 140)
+
+402     >>  184 LOAD_GLOBAL              3 (NULL + len)
+            194 LOAD_FAST                5 (p)
+            196 CALL                     1
+            204 LOAD_FAST                1 (limit)
+            206 COMPARE_OP              68 (>)
+            210 POP_JUMP_IF_FALSE      115 (to 442)
+
+403     >>  212 LOAD_FAST                5 (p)
+            214 LOAD_CONST               3 (None)
+            216 LOAD_FAST                1 (limit)
+            218 BINARY_SLICE
+            220 STORE_FAST               6 (head)
+
+404         222 LOAD_FAST                6 (head)
+            224 LOAD_ATTR                9 (NULL|self + rfind)
+            244 LOAD_CONST               4 (' ')
+            246 CALL                     1
+            254 STORE_FAST               7 (sp)
+
+405         256 LOAD_FAST                7 (sp)
+            258 LOAD_GLOBAL             11 (NULL + int)
+            268 LOAD_FAST                1 (limit)
+            270 LOAD_CONST               5 (0.6)
+            272 BINARY_OP                5 (*)
+            276 CALL                     1
+            284 COMPARE_OP              68 (>)
+            288 POP_JUMP_IF_FALSE        2 (to 294)
+            290 LOAD_FAST                7 (sp)
+            292 JUMP_FORWARD             1 (to 296)
+        >>  294 LOAD_FAST                1 (limit)
+        >>  296 STORE_FAST               8 (cut)
+
+406         298 LOAD_FAST                5 (p)
+            300 LOAD_CONST               3 (None)
+            302 LOAD_FAST                8 (cut)
+            304 BINARY_SLICE
+            306 LOAD_ATTR                1 (NULL|self + strip)
+            326 CALL                     0
+            334 STORE_FAST               9 (sub_chunk)
+
+407         336 LOAD_FAST                9 (sub_chunk)
+            338 POP_JUMP_IF_FALSE       17 (to 374)
+
+408         340 LOAD_FAST                3 (chunks)
+            342 LOAD_ATTR               13 (NULL|self + append)
+            362 LOAD_FAST                9 (sub_chunk)
+            364 CALL                     1
+            372 POP_TOP
+
+409     >>  374 LOAD_FAST                5 (p)
+            376 LOAD_FAST                8 (cut)
+            378 LOAD_CONST               3 (None)
+            380 BINARY_SLICE
+            382 LOAD_ATTR                1 (NULL|self + strip)
+            402 CALL                     0
+            410 STORE_FAST               5 (p)
+
+402         412 LOAD_GLOBAL              3 (NULL + len)
+            422 LOAD_FAST                5 (p)
+            424 CALL                     1
+            432 LOAD_FAST                1 (limit)
+            434 COMPARE_OP              68 (>)
+            438 POP_JUMP_IF_FALSE        1 (to 442)
+            440 JUMP_BACKWARD          115 (to 212)
+
+410     >>  442 LOAD_FAST                5 (p)
+            444 POP_JUMP_IF_TRUE         1 (to 448)
+
+411         446 JUMP_BACKWARD          154 (to 140)
+
+412     >>  448 LOAD_FAST                4 (cur)
+            450 POP_JUMP_IF_TRUE         3 (to 458)
+
+413         452 LOAD_FAST                5 (p)
+            454 STORE_FAST               4 (cur)
+            456 JUMP_BACKWARD          159 (to 140)
+
+414     >>  458 LOAD_GLOBAL              3 (NULL + len)
+            468 LOAD_FAST                4 (cur)
+            470 CALL                     1
+            478 LOAD_CONST               6 (1)
+            480 BINARY_OP                0 (+)
+            484 LOAD_GLOBAL              3 (NULL + len)
+            494 LOAD_FAST                5 (p)
+            496 CALL                     1
+            504 BINARY_OP                0 (+)
+            508 LOAD_FAST                1 (limit)
+            510 COMPARE_OP              26 (<=)
+            514 POP_JUMP_IF_FALSE        8 (to 532)
+
+415         516 LOAD_FAST                4 (cur)
+            518 FORMAT_VALUE             0
+            520 LOAD_CONST               4 (' ')
+            522 LOAD_FAST                5 (p)
+            524 FORMAT_VALUE             0
+            526 BUILD_STRING             3
+            528 STORE_FAST               4 (cur)
+            530 JUMP_BACKWARD          196 (to 140)
+
+417     >>  532 LOAD_FAST                3 (chunks)
+            534 LOAD_ATTR               13 (NULL|self + append)
+            554 LOAD_FAST                4 (cur)
+            556 CALL                     1
+            564 POP_TOP
+
+418         566 LOAD_FAST                5 (p)
+            568 STORE_FAST               4 (cur)
+            570 JUMP_BACKWARD          216 (to 140)
+
+398     >>  572 END_FOR
+
+419         574 LOAD_FAST                4 (cur)
+            576 POP_JUMP_IF_FALSE       17 (to 612)
+
+420         578 LOAD_FAST                3 (chunks)
+            580 LOAD_ATTR               13 (NULL|self + append)
+            600 LOAD_FAST                4 (cur)
+            602 CALL                     1
+            610 POP_TOP
+
+421     >>  612 LOAD_FAST                3 (chunks)
+            614 RETURN_VALUE
+
+Disassembly of <code object _synthesize_bytes at 0x2905c420, file "app\adapters\tts\capcut_tts.py", line 424>:
+              0 MAKE_CELL                3 (on_progress)
+              2 MAKE_CELL               13 (idx)
+              4 MAKE_CELL               14 (total_chunks)
+
+424           6 RETURN_GENERATOR
+              8 POP_TOP
+             10 RESUME                   0
+
+428          12 LOAD_FAST                0 (text)
+             14 COPY                     1
+             16 POP_JUMP_IF_TRUE         2 (to 22)
+             18 POP_TOP
+             20 LOAD_CONST               1 ('')
+        >>   22 LOAD_ATTR                1 (NULL|self + strip)
+             42 CALL                     0
+             50 POP_JUMP_IF_TRUE        26 (to 104)
+
+429          52 LOAD_GLOBAL              3 (NULL + make_error)
+             62 LOAD_GLOBAL              4 (E)
+             72 LOAD_ATTR                6 (TTS_EMPTY_TEXT)
+             92 LOAD_CONST               2 ('Đoạn văn bản rỗng.')
+             94 CALL                     2
+            102 RAISE_VARARGS            1
+
+430     >>  104 LOAD_GLOBAL              9 (NULL + _decode_voice)
+            114 LOAD_FAST                1 (voice)
+            116 CALL                     1
+            124 UNPACK_SEQUENCE          2
+            128 STORE_FAST               5 (voice_type)
+            130 STORE_FAST               6 (resource_id)
+
+431         132 LOAD_GLOBAL             11 (NULL + _parse_rate)
+            142 LOAD_FAST                2 (rate)
+            144 CALL                     1
+            152 STORE_FAST               7 (rate_val)
+
+433         154 LOAD_GLOBAL             13 (NULL + _split_chunks)
+            164 LOAD_FAST                0 (text)
+            166 LOAD_GLOBAL             14 (CAPCUT_CHAR_LIMIT)
+            176 KW_NAMES                 3 (('limit',))
+            178 CALL                     2
+            186 STORE_FAST               8 (chunks)
+
+434         188 LOAD_FAST                8 (chunks)
+            190 POP_JUMP_IF_TRUE        26 (to 244)
+
+435         192 LOAD_GLOBAL              3 (NULL + make_error)
+            202 LOAD_GLOBAL              4 (E)
+            212 LOAD_ATTR                6 (TTS_EMPTY_TEXT)
+            232 LOAD_CONST               2 ('Đoạn văn bản rỗng.')
+            234 CALL                     2
+            242 RAISE_VARARGS            1
+
+437     >>  244 BUILD_LIST               0
+            246 STORE_FAST               9 (audio_chunks)
+
+438         248 LOAD_GLOBAL             17 (NULL + len)
+            258 LOAD_FAST                8 (chunks)
+            260 CALL                     1
+            268 STORE_DEREF             14 (total_chunks)
+
+439         270 LOAD_GLOBAL             19 (NULL + enumerate)
+            280 LOAD_FAST                8 (chunks)
+            282 LOAD_CONST               4 (1)
+            284 CALL                     2
+            292 GET_ITER
+        >>  294 FOR_ITER               108 (to 514)
+            298 UNPACK_SEQUENCE          2
+            302 STORE_DEREF             13 (idx)
+            304 STORE_FAST              10 (chunk)
+
+440         306 LOAD_FAST                4 (cancel_check)
+            308 POP_JUMP_IF_FALSE       33 (to 376)
+            310 PUSH_NULL
+            312 LOAD_FAST                4 (cancel_check)
+            314 CALL                     0
+            322 POP_JUMP_IF_FALSE       26 (to 376)
+
+441         324 LOAD_GLOBAL              3 (NULL + make_error)
+            334 LOAD_GLOBAL              4 (E)
+            344 LOAD_ATTR               20 (CANCELLED)
+            364 LOAD_CONST               5 ('Đã huỷ khi tạo giọng CapCut.')
+            366 CALL                     2
+            374 RAISE_VARARGS            1
+
+443     >>  376 LOAD_CONST               8 (('p', 'float', 'msg', 'str'))
+            378 LOAD_CLOSURE            13 (idx)
+            380 LOAD_CLOSURE             3 (on_progress)
+            382 LOAD_CLOSURE            14 (total_chunks)
+            384 BUILD_TUPLE              3
+            386 LOAD_CONST               6 (<code object _chunk_progress at 0x7f6c92a3a560, file "app\adapters\tts\capcut_tts.py", line 443>)
+            388 MAKE_FUNCTION           12 (annotations, closure)
+            390 STORE_FAST              11 (_chunk_progress)
+
+448         392 LOAD_GLOBAL             23 (NULL + asyncio)
+            402 LOAD_ATTR               24 (to_thread)
+
+449         422 LOAD_GLOBAL             26 (_submit_and_poll_sync)
+            432 LOAD_FAST               10 (chunk)
+            434 LOAD_FAST                5 (voice_type)
+            436 LOAD_FAST                6 (resource_id)
+            438 LOAD_FAST                7 (rate_val)
+            440 LOAD_FAST                4 (cancel_check)
+
+450         442 LOAD_DEREF               3 (on_progress)
+            444 POP_JUMP_IF_FALSE        2 (to 450)
+            446 LOAD_FAST               11 (_chunk_progress)
+            448 JUMP_FORWARD             1 (to 452)
+        >>  450 LOAD_CONST               0 (None)
+
+448     >>  452 CALL                     7
+            460 GET_AWAITABLE            0
+            462 LOAD_CONST               0 (None)
+        >>  464 SEND                     3 (to 474)
+            468 YIELD_VALUE              2
+            470 RESUME                   3
+            472 JUMP_BACKWARD_NO_INTERRUPT     5 (to 464)
+        >>  474 END_SEND
+            476 STORE_FAST              12 (data)
+
+452         478 LOAD_FAST                9 (audio_chunks)
+            480 LOAD_ATTR               29 (NULL|self + append)
+            500 LOAD_FAST               12 (data)
+            502 CALL                     1
+            510 POP_TOP
+            512 JUMP_BACKWARD          110 (to 294)
+
+439     >>  514 END_FOR
+
+454         516 LOAD_CONST               7 (b'')
+            518 LOAD_ATTR               31 (NULL|self + join)
+            538 LOAD_FAST                9 (audio_chunks)
+            540 CALL                     1
+            548 RETURN_VALUE
+
+448     >>  550 CLEANUP_THROW
+            552 JUMP_BACKWARD           40 (to 474)
+        >>  554 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            556 RERAISE                  1
+ExceptionTable:
+  10 to 466 -> 554 [0] lasti
+  468 to 468 -> 550 [3]
+  470 to 550 -> 554 [0] lasti
+
+Disassembly of <code object _chunk_progress at 0x7f6c92a3a560, file "app\adapters\tts\capcut_tts.py", line 443>:
+              0 COPY_FREE_VARS           3
+
+443           2 RESUME                   0
+
+444           4 LOAD_DEREF               4 (on_progress)
+              6 POP_JUMP_IF_FALSE       30 (to 68)
+
+445           8 LOAD_DEREF               3 (idx)
+             10 LOAD_CONST               1 (1)
+             12 BINARY_OP               10 (-)
+             16 LOAD_FAST                0 (p)
+             18 BINARY_OP                0 (+)
+             22 LOAD_DEREF               5 (total_chunks)
+             24 BINARY_OP               11 (/)
+             28 STORE_FAST               2 (overall_p)
+
+446          30 PUSH_NULL
+             32 LOAD_DEREF               4 (on_progress)
+             34 LOAD_FAST                2 (overall_p)
+             36 LOAD_CONST               2 ('[')
+             38 LOAD_DEREF               3 (idx)
+             40 FORMAT_VALUE             0
+             42 LOAD_CONST               3 ('/')
+             44 LOAD_DEREF               5 (total_chunks)
+             46 FORMAT_VALUE             0
+             48 LOAD_CONST               4 ('] ')
+             50 LOAD_FAST                1 (msg)
+             52 FORMAT_VALUE             0
+             54 BUILD_STRING             6
+             56 CALL                     2
+             64 POP_TOP
+             66 RETURN_CONST             0 (None)
+
+444     >>   68 RETURN_CONST             0 (None)
+
+Disassembly of <code object preview_voice at 0x7f6c92a3a670, file "app\adapters\tts\capcut_tts.py", line 457>:
+457           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+458           6 LOAD_GLOBAL              1 (NULL + _synthesize_bytes)
+             16 LOAD_FAST                1 (text)
+             18 LOAD_FAST                0 (voice)
+             20 CALL                     2
+             28 GET_AWAITABLE            0
+             30 LOAD_CONST               0 (None)
+        >>   32 SEND                     3 (to 42)
+             36 YIELD_VALUE              2
+             38 RESUME                   3
+             40 JUMP_BACKWARD_NO_INTERRUPT     5 (to 32)
+        >>   42 END_SEND
+             44 LOAD_GLOBAL              2 (PREVIEW_MIME)
+             54 BUILD_TUPLE              2
+             56 RETURN_VALUE
+        >>   58 CLEANUP_THROW
+             60 JUMP_BACKWARD           10 (to 42)
+        >>   62 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             64 RERAISE                  1
+ExceptionTable:
+  4 to 34 -> 62 [0] lasti
+  36 to 36 -> 58 [2]
+  38 to 58 -> 62 [0] lasti
+
+Disassembly of <code object CapCutTTSProvider at 0x7f6c92a3a780, file "app\adapters\tts\capcut_tts.py", line 461>:
+461           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('CapCutTTSProvider')
+              8 STORE_NAME               2 (__qualname__)
+
+467          10 NOP
+
+468          12 NOP
+
+469          14 NOP
+
+470          16 NOP
+
+471          18 NOP
+
+472          20 NOP
+
+462          22 LOAD_CONST               3 (('+0%', '+0Hz', None, None, None, None))
+
+464          24 NOP
+
+462          26 NOP
+
+465          28 NOP
+
+462          30 NOP
+
+466          32 NOP
+
+462          34 NOP
+
+467          36 NOP
+
+462          38 NOP
+
+468          40 NOP
+
+462          42 NOP
+
+469          44 NOP
+
+462          46 NOP
+
+470          48 NOP
+
+462          50 NOP
+
+471          52 NOP
+
+462          54 NOP
+
+472          56 NOP
+
+462          58 NOP
+
+473          60 NOP
+
+462          62 LOAD_CONST               4 (('text', 'str', 'voice', 'str', 'output_path', 'str', 'rate', 'str', 'pitch', 'str', 'style', 'dict | None', 'context', 'dict | None', 'on_progress', 'Callable[[float, str], None] | None', 'cancel_check', 'Callable[[], bool] | None', 'return', 'None'))
+             64 LOAD_CONST               2 (<code object synthesize at 0x7f6c92eb9230, file "app\adapters\tts\capcut_tts.py", line 462>)
+             66 MAKE_FUNCTION            5 (defaults, annotations)
+             68 STORE_NAME               3 (synthesize)
+             70 RETURN_CONST             1 (None)
+
+Disassembly of <code object synthesize at 0x7f6c92eb9230, file "app\adapters\tts\capcut_tts.py", line 462>:
+462           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+474           6 LOAD_GLOBAL              1 (NULL + _synthesize_bytes)
+             16 LOAD_FAST                1 (text)
+             18 LOAD_FAST                2 (voice)
+             20 LOAD_FAST                4 (rate)
+
+475          22 LOAD_FAST                8 (on_progress)
+             24 LOAD_FAST                9 (cancel_check)
+
+474          26 KW_NAMES                 1 (('rate', 'on_progress', 'cancel_check'))
+             28 CALL                     5
+             36 GET_AWAITABLE            0
+             38 LOAD_CONST               0 (None)
+        >>   40 SEND                     3 (to 50)
+             44 YIELD_VALUE              2
+             46 RESUME                   3
+             48 JUMP_BACKWARD_NO_INTERRUPT     5 (to 40)
+        >>   50 END_SEND
+             52 STORE_FAST              10 (data)
+
+476          54 LOAD_FAST                9 (cancel_check)
+             56 POP_JUMP_IF_FALSE       33 (to 124)
+             58 PUSH_NULL
+             60 LOAD_FAST                9 (cancel_check)
+             62 CALL                     0
+             70 POP_JUMP_IF_FALSE       26 (to 124)
+
+477          72 LOAD_GLOBAL              3 (NULL + make_error)
+             82 LOAD_GLOBAL              4 (E)
+             92 LOAD_ATTR                6 (CANCELLED)
+            112 LOAD_CONST               2 ('Đã huỷ khi tạo giọng CapCut.')
+            114 CALL                     2
+            122 RAISE_VARARGS            1
+
+478     >>  124 LOAD_FAST                3 (output_path)
+            126 LOAD_CONST               3 ('.tmp')
+            128 BINARY_OP                0 (+)
+            132 STORE_FAST              11 (tmp)
+
+479         134 LOAD_GLOBAL              9 (NULL + open)
+            144 LOAD_FAST               11 (tmp)
+            146 LOAD_CONST               4 ('wb')
+            148 CALL                     2
+            156 BEFORE_WITH
+            158 STORE_FAST              12 (f)
+
+480         160 LOAD_FAST               12 (f)
+            162 LOAD_ATTR               11 (NULL|self + write)
+            182 LOAD_FAST               10 (data)
+            184 CALL                     1
+            192 POP_TOP
+
+479         194 LOAD_CONST               0 (None)
+            196 LOAD_CONST               0 (None)
+            198 LOAD_CONST               0 (None)
+            200 CALL                     2
+            208 POP_TOP
+
+481     >>  210 LOAD_GLOBAL             13 (NULL + os)
+            220 LOAD_ATTR               14 (replace)
+            240 LOAD_FAST               11 (tmp)
+            242 LOAD_FAST                3 (output_path)
+            244 CALL                     2
+            252 POP_TOP
+
+482         254 LOAD_FAST                8 (on_progress)
+            256 POP_JUMP_IF_FALSE       10 (to 278)
+
+483         258 PUSH_NULL
+            260 LOAD_FAST                8 (on_progress)
+            262 LOAD_CONST               5 (1.0)
+            264 LOAD_CONST               6 ('CapCut: xong.')
+            266 CALL                     2
+            274 POP_TOP
+            276 RETURN_CONST             0 (None)
+
+482     >>  278 RETURN_CONST             0 (None)
+
+474     >>  280 CLEANUP_THROW
+            282 JUMP_BACKWARD          117 (to 50)
+
+479     >>  284 PUSH_EXC_INFO
+            286 WITH_EXCEPT_START
+            288 POP_JUMP_IF_TRUE         1 (to 292)
+            290 RERAISE                  2
+        >>  292 POP_TOP
+            294 POP_EXCEPT
+            296 POP_TOP
+            298 POP_TOP
+            300 JUMP_BACKWARD           46 (to 210)
+        >>  302 COPY                     3
+            304 POP_EXCEPT
+            306 RERAISE                  1
+        >>  308 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            310 RERAISE                  1
+ExceptionTable:
+  4 to 42 -> 308 [0] lasti
+  44 to 44 -> 280 [2]
+  46 to 156 -> 308 [0] lasti
+  158 to 192 -> 284 [1] lasti
+  194 to 280 -> 308 [0] lasti
+  284 to 292 -> 302 [3] lasti
+  294 to 306 -> 308 [0] lasti

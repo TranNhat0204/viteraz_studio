@@ -1,0 +1,130 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Tiện ích âm thanh dùng chung giữa pipeline (conform) và render (export).')
+              4 STORE_NAME               0 (__doc__)
+
+  2           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+  4          18 LOAD_CONST               3 ((0.5, 2.0))
+             20 UNPACK_SEQUENCE          2
+             24 STORE_NAME               3 (_ATEMPO_LO)
+             26 STORE_NAME               4 (_ATEMPO_HI)
+
+  5          28 LOAD_CONST               4 ((0.25, 4.0))
+             30 UNPACK_SEQUENCE          2
+             34 STORE_NAME               5 (_FACTOR_LO)
+             36 STORE_NAME               6 (_FACTOR_HI)
+
+  8          38 LOAD_CONST               7 (('factor', 'float', 'return', 'str'))
+             40 LOAD_CONST               5 (<code object atempo_chain at 0x290b46b0, file "app\core\audio.py", line 8>)
+             42 MAKE_FUNCTION            4 (annotations)
+             44 STORE_NAME               7 (atempo_chain)
+             46 RETURN_CONST             6 (None)
+
+Disassembly of <code object atempo_chain at 0x290b46b0, file "app\core\audio.py", line 8>:
+  8           0 RESUME                   0
+
+ 14           2 LOAD_GLOBAL              1 (NULL + min)
+             12 LOAD_GLOBAL              3 (NULL + max)
+             22 LOAD_GLOBAL              5 (NULL + float)
+             32 LOAD_FAST                0 (factor)
+             34 CALL                     1
+             42 LOAD_GLOBAL              6 (_FACTOR_LO)
+             52 CALL                     2
+             60 LOAD_GLOBAL              8 (_FACTOR_HI)
+             70 CALL                     2
+             78 STORE_FAST               0 (factor)
+
+ 15          80 BUILD_LIST               0
+             82 STORE_FAST               1 (stages)
+
+ 16          84 LOAD_FAST                0 (factor)
+             86 STORE_FAST               2 (f)
+
+ 17          88 LOAD_FAST                2 (f)
+             90 LOAD_GLOBAL             10 (_ATEMPO_HI)
+            100 COMPARE_OP              68 (>)
+            104 POP_JUMP_IF_FALSE       40 (to 186)
+
+ 18     >>  106 LOAD_FAST                1 (stages)
+            108 LOAD_ATTR               13 (NULL|self + append)
+            128 LOAD_GLOBAL             10 (_ATEMPO_HI)
+            138 CALL                     1
+            146 POP_TOP
+
+ 19         148 LOAD_FAST                2 (f)
+            150 LOAD_GLOBAL             10 (_ATEMPO_HI)
+            160 BINARY_OP               24 (/=)
+            164 STORE_FAST               2 (f)
+
+ 17         166 LOAD_FAST                2 (f)
+            168 LOAD_GLOBAL             10 (_ATEMPO_HI)
+            178 COMPARE_OP              68 (>)
+            182 POP_JUMP_IF_FALSE        1 (to 186)
+            184 JUMP_BACKWARD           40 (to 106)
+
+ 20     >>  186 LOAD_FAST                2 (f)
+            188 LOAD_GLOBAL             14 (_ATEMPO_LO)
+            198 COMPARE_OP               2 (<)
+            202 POP_JUMP_IF_FALSE       40 (to 284)
+
+ 21     >>  204 LOAD_FAST                1 (stages)
+            206 LOAD_ATTR               13 (NULL|self + append)
+            226 LOAD_GLOBAL             14 (_ATEMPO_LO)
+            236 CALL                     1
+            244 POP_TOP
+
+ 22         246 LOAD_FAST                2 (f)
+            248 LOAD_GLOBAL             14 (_ATEMPO_LO)
+            258 BINARY_OP               24 (/=)
+            262 STORE_FAST               2 (f)
+
+ 20         264 LOAD_FAST                2 (f)
+            266 LOAD_GLOBAL             14 (_ATEMPO_LO)
+            276 COMPARE_OP               2 (<)
+            280 POP_JUMP_IF_FALSE        1 (to 284)
+            282 JUMP_BACKWARD           40 (to 204)
+
+ 23     >>  284 LOAD_FAST                1 (stages)
+            286 LOAD_ATTR               13 (NULL|self + append)
+            306 LOAD_FAST                2 (f)
+            308 CALL                     1
+            316 POP_TOP
+
+ 24         318 LOAD_CONST               1 (',')
+            320 LOAD_ATTR               17 (NULL|self + join)
+            340 LOAD_CONST               2 (<code object <genexpr> at 0x7f6c92eeac40, file "app\core\audio.py", line 24>)
+            342 MAKE_FUNCTION            0
+            344 LOAD_FAST                1 (stages)
+            346 GET_ITER
+            348 CALL                     0
+            356 CALL                     1
+            364 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c92eeac40, file "app\core\audio.py", line 24>:
+ 24           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                10 (to 32)
+             12 STORE_FAST               1 (s)
+             14 LOAD_CONST               0 ('atempo=')
+             16 LOAD_FAST                1 (s)
+             18 LOAD_CONST               1 ('.6f')
+             20 FORMAT_VALUE             4 (with format)
+             22 BUILD_STRING             2
+             24 YIELD_VALUE              1
+             26 RESUME                   1
+             28 POP_TOP
+             30 JUMP_BACKWARD           12 (to 8)
+        >>   32 END_FOR
+             34 RETURN_CONST             2 (None)
+        >>   36 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             38 RERAISE                  1
+ExceptionTable:
+  4 to 34 -> 36 [0] lasti

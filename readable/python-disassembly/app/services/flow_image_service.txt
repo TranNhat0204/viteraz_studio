@@ -1,0 +1,2071 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Một đường DUY NHẤT để TẠO + LẤY ảnh Google Flow (storyboard, thumbnail ý tưởng, chân dung, ảnh bìa).\n\nTrước đây mỗi nơi tự viết vòng thử lại: storyboard (`pipeline/steps/flow_generate.py`) chịu khó thử\nlại cả timeout lẫn lỗi tải asset, còn thumbnail/chân dung/ảnh bìa\n(`services/post_media_service.py::_one_image`) chỉ thử lại đúng throttle 429/403 — nên hễ Flow render\nxong mà app poll quá hạn hoặc tải asset hỏng là rơi thẳng về ảnh tạm dù ảnh THẬT đã nằm trên\nlabs.google. Module này gom lại một chính sách chung:\n\n1. Flow đã nhận job (có operation_id) mà lấy về hỏng → **poll lại chính job đó** (`resume_operation`)\n   — không tốn thêm quota, không đẻ ảnh rác trong Flow project.\n2. Vẫn hỏng → backoff 6→12→24s (trần 45s) rồi submit lại, tối đa `tries` lượt.\n3. Hết quota NGÀY / mất đăng nhập / bị chặn tốc độ → xoay sang profile Flow trống khác (FlowFailover)\n   rồi thử lại, không tính lượt. Riêng chặn tốc độ: hết profile trống thì chờ backoff cho qua kỳ nghỉ\n   1 phút rồi thử lại trên chính nó (sửa 14/09/2026 — trước đây banner "hoạt động bất thường" làm\n   DỪNG hẳn và bắt user nghỉ 15-20 phút).\n4. Không submit lại khi user huỷ. Với FLOW_RESULT_LOST, mặc định dừng để giữ quota; riêng portrait\n   identity bắt buộc có thể bật retry giới hạn bằng `resubmit_lost`.\n\nXem docs/plan-flow-image-unified-fetch.md.\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 21           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 23          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (asyncio)
+             24 STORE_NAME               3 (asyncio)
+
+ 24          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               3 (None)
+             30 IMPORT_NAME              4 (threading)
+             32 STORE_NAME               4 (threading)
+
+ 25          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               3 (None)
+             38 IMPORT_NAME              5 (time)
+             40 STORE_NAME               5 (time)
+
+ 26          42 LOAD_CONST               1 (0)
+             44 LOAD_CONST               4 (('Path',))
+             46 IMPORT_NAME              6 (pathlib)
+             48 IMPORT_FROM              7 (Path)
+             50 STORE_NAME               7 (Path)
+             52 POP_TOP
+
+ 28          54 LOAD_CONST               1 (0)
+             56 LOAD_CONST               5 (('is_placeholder',))
+             58 IMPORT_NAME              8 (app.core.asset_names)
+             60 IMPORT_FROM              9 (is_placeholder)
+             62 STORE_NAME               9 (is_placeholder)
+             64 POP_TOP
+
+ 29          66 LOAD_CONST               1 (0)
+             68 LOAD_CONST               6 (('StudioError', 'E'))
+             70 IMPORT_NAME             10 (app.core.errors)
+             72 IMPORT_FROM             11 (StudioError)
+             74 STORE_NAME              11 (StudioError)
+             76 IMPORT_FROM             12 (E)
+             78 STORE_NAME              12 (E)
+             80 POP_TOP
+
+ 30          82 LOAD_CONST               1 (0)
+             84 LOAD_CONST               7 (('log',))
+             86 IMPORT_NAME             13 (app.core.logging)
+             88 IMPORT_FROM             14 (log)
+             90 STORE_NAME              14 (log)
+             92 POP_TOP
+
+ 33          94 LOAD_CONST               8 (3)
+             96 STORE_NAME              15 (FLOW_IMAGE_ATTEMPTS)
+
+ 34          98 LOAD_CONST               9 (6.0)
+            100 STORE_NAME              16 (_BACKOFF_BASE)
+
+ 35         102 LOAD_CONST              10 (45.0)
+            104 STORE_NAME              17 (_BACKOFF_MAX)
+
+ 37         106 LOAD_CONST              11 (6)
+            108 STORE_NAME              18 (_MAX_ROTATIONS)
+
+ 39         110 LOAD_CONST              12 (4096)
+            112 STORE_NAME              19 (_MIN_IMAGE_BYTES)
+
+ 44         114 LOAD_NAME               12 (E)
+            116 LOAD_ATTR               40 (FLOW_RATE_LIMIT)
+            136 LOAD_NAME               12 (E)
+            138 LOAD_ATTR               42 (FLOW_TIMEOUT)
+            158 LOAD_NAME               12 (E)
+            160 LOAD_ATTR               44 (FLOW_BAD_RESPONSE)
+
+ 45         180 LOAD_NAME               12 (E)
+            182 LOAD_ATTR               46 (FLOW_NETWORK)
+            202 LOAD_NAME               12 (E)
+            204 LOAD_ATTR               48 (FLOW_BRIDGE_UNAVAILABLE)
+            224 LOAD_NAME               12 (E)
+            226 LOAD_ATTR               50 (FLOW_WATERMARK_FAILED)
+
+ 46         246 LOAD_NAME               12 (E)
+            248 LOAD_ATTR               52 (FLOW_PROJECT_DEAD)
+
+ 44         268 BUILD_SET                7
+            270 STORE_NAME              27 (_RETRYABLE)
+
+ 48         272 LOAD_NAME               12 (E)
+            274 LOAD_ATTR               42 (FLOW_TIMEOUT)
+            294 LOAD_NAME               12 (E)
+            296 LOAD_ATTR               44 (FLOW_BAD_RESPONSE)
+            316 LOAD_NAME               12 (E)
+            318 LOAD_ATTR               50 (FLOW_WATERMARK_FAILED)
+            338 BUILD_SET                3
+            340 STORE_NAME              28 (_RESUMABLE)
+
+ 77         342 LOAD_CONST              13 ('flow_asset_fingerprints.v2.json')
+            344 STORE_NAME              29 (_FINGERPRINT_FILE)
+
+ 78         346 LOAD_CONST              14 (16)
+            348 STORE_NAME              30 (_FP_GRID)
+
+ 79         350 LOAD_CONST              15 (600)
+            352 STORE_NAME              31 (_FP_KEEP)
+
+ 80         354 LOAD_CONST              16 (10)
+            356 STORE_NAME              32 (_FP_MAX_DISTANCE)
+
+ 81         358 PUSH_NULL
+            360 LOAD_NAME                4 (threading)
+            362 LOAD_ATTR               66 (Lock)
+            382 CALL                     0
+            390 STORE_NAME              34 (_fp_lock)
+
+ 84         392 LOAD_CONST              31 (('path', 'Path', 'return', 'str | None'))
+            394 LOAD_CONST              17 (<code object _dhash at 0x28c296a0, file "app\services\flow_image_service.py", line 84>)
+            396 MAKE_FUNCTION            4 (annotations)
+            398 STORE_NAME              35 (_dhash)
+
+103         400 LOAD_CONST              32 (('return', 'Path'))
+            402 LOAD_CONST              18 (<code object _fp_file at 0x7f6c92406530, file "app\services\flow_image_service.py", line 103>)
+            404 MAKE_FUNCTION            4 (annotations)
+            406 STORE_NAME              36 (_fp_file)
+
+109         408 LOAD_CONST              33 (('return', 'dict[str, str]'))
+            410 LOAD_CONST              19 (<code object _fp_load at 0x7f6c9269a790, file "app\services\flow_image_service.py", line 109>)
+            412 MAKE_FUNCTION            4 (annotations)
+            414 STORE_NAME              37 (_fp_load)
+
+119         416 LOAD_CONST              34 (('book', 'dict[str, str]', 'return', 'None'))
+            418 LOAD_CONST              20 (<code object _fp_save at 0x28ae3df0, file "app\services\flow_image_service.py", line 119>)
+            420 MAKE_FUNCTION            4 (annotations)
+            422 STORE_NAME              38 (_fp_save)
+
+132         424 LOAD_CONST              31 (('path', 'Path', 'return', 'str | None'))
+            426 LOAD_CONST              21 (<code object claim_asset at 0x28c2be50, file "app\services\flow_image_service.py", line 132>)
+            428 MAKE_FUNCTION            4 (annotations)
+            430 STORE_NAME              39 (claim_asset)
+
+162         432 LOAD_CONST              35 ((400,))
+            434 LOAD_CONST              36 (('root', 'str | Path | None', 'limit', 'int', 'return', 'int'))
+            436 LOAD_CONST              22 (<code object seed_fingerprints at 0x28c13800, file "app\services\flow_image_service.py", line 162>)
+            438 MAKE_FUNCTION            5 (defaults, annotations)
+            440 STORE_NAME              40 (seed_fingerprints)
+
+195         442 LOAD_CONST               3 (None)
+            444 LOAD_CONST              23 (('newer_than',))
+            446 BUILD_CONST_KEY_MAP      1
+            448 LOAD_CONST              37 (('path', 'Path | None', 'newer_than', 'float | None', 'return', 'bool'))
+            450 LOAD_CONST              24 (<code object usable_image at 0x7f6c9247b0f0, file "app\services\flow_image_service.py", line 195>)
+            452 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            454 STORE_NAME              41 (usable_image)
+
+210         456 LOAD_CONST              38 (('e', 'StudioError', 'return', 'bool'))
+            458 LOAD_CONST              25 (<code object _is_hard_block at 0x7f6c926fec20, file "app\services\flow_image_service.py", line 210>)
+            460 MAKE_FUNCTION            4 (annotations)
+            462 STORE_NAME              42 (_is_hard_block)
+
+225         464 LOAD_CONST              26 ('16:9')
+
+226         466 LOAD_CONST               3 (None)
+
+227         468 LOAD_CONST              27 ('ảnh')
+
+228         470 LOAD_NAME               15 (FLOW_IMAGE_ATTEMPTS)
+
+229         472 LOAD_CONST               3 (None)
+
+230         474 LOAD_CONST               3 (None)
+
+231         476 LOAD_CONST              28 (False)
+
+220         478 LOAD_CONST              29 (('aspect', 'refs', 'label', 'tries', 'cancel_check', 'on_log', 'resubmit_lost'))
+            480 BUILD_CONST_KEY_MAP      7
+
+222         482 NOP
+
+220         484 NOP
+
+223         486 NOP
+
+220         488 NOP
+
+225         490 NOP
+
+220         492 NOP
+
+226         494 NOP
+
+220         496 NOP
+
+227         498 NOP
+
+220         500 NOP
+
+228         502 NOP
+
+220         504 NOP
+
+231         506 NOP
+
+220         508 NOP
+
+232         510 NOP
+
+220         512 LOAD_CONST              39 (('prompt', 'str', 'out', 'Path', 'aspect', 'str', 'refs', 'list[str] | None', 'label', 'str', 'tries', 'int', 'resubmit_lost', 'bool', 'return', 'Path'))
+            514 LOAD_CONST              30 (<code object generate_flow_image at 0x28c44b10, file "app\services\flow_image_service.py", line 220>)
+            516 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            518 STORE_NAME              43 (generate_flow_image)
+            520 RETURN_CONST             3 (None)
+
+Disassembly of <code object _dhash at 0x28c296a0, file "app\services\flow_image_service.py", line 84>:
+ 84           0 RESUME                   0
+
+ 86           2 NOP
+
+ 87           4 LOAD_CONST               1 (0)
+              6 LOAD_CONST               2 (('Image',))
+              8 IMPORT_NAME              0 (PIL)
+             10 IMPORT_FROM              1 (Image)
+             12 STORE_FAST               1 (Image)
+             14 POP_TOP
+
+ 89          16 LOAD_GLOBAL              4 (_FP_GRID)
+             26 STORE_FAST               2 (n)
+
+ 90          28 LOAD_FAST                1 (Image)
+             30 LOAD_ATTR                7 (NULL|self + open)
+             50 LOAD_FAST                0 (path)
+             52 CALL                     1
+             60 BEFORE_WITH
+             62 STORE_FAST               3 (im)
+
+ 91          64 LOAD_FAST                3 (im)
+             66 LOAD_ATTR                9 (NULL|self + convert)
+             86 LOAD_CONST               3 ('L')
+             88 CALL                     1
+             96 LOAD_ATTR               11 (NULL|self + resize)
+            116 LOAD_FAST                2 (n)
+            118 LOAD_CONST               4 (1)
+            120 BINARY_OP                0 (+)
+            124 LOAD_FAST                2 (n)
+            126 BUILD_TUPLE              2
+            128 LOAD_FAST                1 (Image)
+            130 LOAD_ATTR               12 (LANCZOS)
+            150 CALL                     2
+            158 STORE_FAST               4 (small)
+
+ 92         160 LOAD_GLOBAL             15 (NULL + list)
+            170 LOAD_FAST                4 (small)
+            172 LOAD_ATTR               17 (NULL|self + getdata)
+            192 CALL                     0
+            200 CALL                     1
+            208 STORE_FAST               5 (px)
+
+ 90         210 LOAD_CONST               5 (None)
+            212 LOAD_CONST               5 (None)
+            214 LOAD_CONST               5 (None)
+            216 CALL                     2
+            224 POP_TOP
+
+ 93     >>  226 LOAD_CONST               1 (0)
+            228 STORE_FAST               6 (bits)
+
+ 94         230 LOAD_GLOBAL             19 (NULL + range)
+            240 LOAD_FAST                2 (n)
+            242 CALL                     1
+            250 GET_ITER
+        >>  252 FOR_ITER                53 (to 362)
+            256 STORE_FAST               7 (row)
+
+ 95         258 LOAD_GLOBAL             19 (NULL + range)
+            268 LOAD_FAST                2 (n)
+            270 CALL                     1
+            278 GET_ITER
+        >>  280 FOR_ITER                37 (to 358)
+            284 STORE_FAST               8 (col)
+
+ 96         286 LOAD_FAST                7 (row)
+            288 LOAD_FAST                2 (n)
+            290 LOAD_CONST               4 (1)
+            292 BINARY_OP                0 (+)
+            296 BINARY_OP                5 (*)
+            300 LOAD_FAST                8 (col)
+            302 BINARY_OP                0 (+)
+            306 STORE_FAST               9 (i)
+
+ 97         308 LOAD_FAST                6 (bits)
+            310 LOAD_CONST               4 (1)
+            312 BINARY_OP                3 (<<)
+            316 LOAD_FAST_CHECK          5 (px)
+            318 LOAD_FAST                9 (i)
+            320 BINARY_SUBSCR
+            324 LOAD_FAST                5 (px)
+            326 LOAD_FAST                9 (i)
+            328 LOAD_CONST               4 (1)
+            330 BINARY_OP                0 (+)
+            334 BINARY_SUBSCR
+            338 COMPARE_OP               2 (<)
+            342 POP_JUMP_IF_FALSE        2 (to 348)
+            344 LOAD_CONST               4 (1)
+            346 JUMP_FORWARD             1 (to 350)
+        >>  348 LOAD_CONST               1 (0)
+        >>  350 BINARY_OP                7 (|)
+            354 STORE_FAST               6 (bits)
+            356 JUMP_BACKWARD           39 (to 280)
+
+ 95     >>  358 END_FOR
+            360 JUMP_BACKWARD           55 (to 252)
+
+ 94     >>  362 END_FOR
+
+ 98         364 LOAD_FAST                6 (bits)
+            366 LOAD_CONST               6 ('0')
+            368 LOAD_FAST                2 (n)
+            370 LOAD_FAST                2 (n)
+            372 BINARY_OP                5 (*)
+            376 LOAD_CONST               7 (4)
+            378 BINARY_OP                2 (//)
+            382 FORMAT_VALUE             0
+            384 LOAD_CONST               8 ('x')
+            386 BUILD_STRING             3
+            388 FORMAT_VALUE             4 (with format)
+            390 RETURN_VALUE
+
+ 90     >>  392 PUSH_EXC_INFO
+            394 WITH_EXCEPT_START
+            396 POP_JUMP_IF_TRUE         1 (to 400)
+            398 RERAISE                  2
+        >>  400 POP_TOP
+            402 POP_EXCEPT
+            404 POP_TOP
+            406 POP_TOP
+            408 JUMP_BACKWARD           92 (to 226)
+        >>  410 COPY                     3
+            412 POP_EXCEPT
+            414 RERAISE                  1
+        >>  416 PUSH_EXC_INFO
+
+ 99         418 LOAD_GLOBAL             20 (Exception)
+            428 CHECK_EXC_MATCH
+            430 POP_JUMP_IF_FALSE        3 (to 438)
+            432 POP_TOP
+
+100         434 POP_EXCEPT
+            436 RETURN_CONST             5 (None)
+
+ 99     >>  438 RERAISE                  0
+        >>  440 COPY                     3
+            442 POP_EXCEPT
+            444 RERAISE                  1
+ExceptionTable:
+  4 to 60 -> 416 [0]
+  62 to 208 -> 392 [1] lasti
+  210 to 388 -> 416 [0]
+  392 to 400 -> 410 [3] lasti
+  402 to 414 -> 416 [0]
+  416 to 432 -> 440 [1] lasti
+  438 to 438 -> 440 [1] lasti
+
+Disassembly of <code object _fp_file at 0x7f6c92406530, file "app\services\flow_image_service.py", line 103>:
+103           0 RESUME                   0
+
+104           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('get_settings',))
+              6 IMPORT_NAME              0 (app.config)
+              8 IMPORT_FROM              1 (get_settings)
+             10 STORE_FAST               0 (get_settings)
+             12 POP_TOP
+
+106          14 PUSH_NULL
+             16 LOAD_FAST                0 (get_settings)
+             18 CALL                     0
+             26 LOAD_ATTR                4 (data_dir)
+             46 LOAD_GLOBAL              6 (_FINGERPRINT_FILE)
+             56 BINARY_OP               11 (/)
+             60 RETURN_VALUE
+
+Disassembly of <code object _fp_load at 0x7f6c9269a790, file "app\services\flow_image_service.py", line 109>:
+109           0 RESUME                   0
+
+110           2 NOP
+
+111           4 LOAD_CONST               1 (0)
+              6 LOAD_CONST               0 (None)
+              8 IMPORT_NAME              0 (json)
+             10 STORE_FAST               0 (json)
+
+113          12 LOAD_FAST                0 (json)
+             14 LOAD_ATTR                3 (NULL|self + loads)
+             34 LOAD_GLOBAL              5 (NULL + _fp_file)
+             44 CALL                     0
+             52 LOAD_ATTR                7 (NULL|self + read_text)
+             72 LOAD_CONST               2 ('utf-8')
+             74 KW_NAMES                 3 (('encoding',))
+             76 CALL                     1
+             84 CALL                     1
+             92 STORE_FAST               1 (data)
+
+114          94 LOAD_GLOBAL              9 (NULL + isinstance)
+            104 LOAD_FAST                1 (data)
+            106 LOAD_GLOBAL             10 (dict)
+            116 CALL                     2
+            124 POP_JUMP_IF_FALSE       54 (to 234)
+            126 LOAD_FAST                1 (data)
+            128 LOAD_ATTR               13 (NULL|self + items)
+            148 CALL                     0
+            156 GET_ITER
+            158 LOAD_FAST_AND_CLEAR      2 (k)
+            160 LOAD_FAST_AND_CLEAR      3 (v)
+            162 SWAP                     3
+            164 BUILD_MAP                0
+            166 SWAP                     2
+        >>  168 FOR_ITER                26 (to 224)
+            172 UNPACK_SEQUENCE          2
+            176 STORE_FAST               2 (k)
+            178 STORE_FAST               3 (v)
+            180 LOAD_GLOBAL             15 (NULL + str)
+            190 LOAD_FAST                2 (k)
+            192 CALL                     1
+            200 LOAD_GLOBAL             15 (NULL + str)
+            210 LOAD_FAST                3 (v)
+            212 CALL                     1
+            220 MAP_ADD                  2
+            222 JUMP_BACKWARD           28 (to 168)
+        >>  224 END_FOR
+            226 SWAP                     3
+            228 STORE_FAST               3 (v)
+            230 STORE_FAST               2 (k)
+            232 RETURN_VALUE
+        >>  234 BUILD_MAP                0
+            236 RETURN_VALUE
+        >>  238 SWAP                     2
+            240 POP_TOP
+            242 SWAP                     3
+            244 STORE_FAST               3 (v)
+            246 STORE_FAST               2 (k)
+            248 RERAISE                  0
+        >>  250 PUSH_EXC_INFO
+
+115         252 LOAD_GLOBAL             16 (Exception)
+            262 CHECK_EXC_MATCH
+            264 POP_JUMP_IF_FALSE        5 (to 276)
+            266 POP_TOP
+
+116         268 BUILD_MAP                0
+            270 SWAP                     2
+            272 POP_EXCEPT
+            274 RETURN_VALUE
+
+115     >>  276 RERAISE                  0
+        >>  278 COPY                     3
+            280 POP_EXCEPT
+            282 RERAISE                  1
+ExceptionTable:
+  4 to 162 -> 250 [0]
+  164 to 224 -> 238 [3]
+  226 to 230 -> 250 [0]
+  234 to 234 -> 250 [0]
+  238 to 248 -> 250 [0]
+  250 to 270 -> 278 [1] lasti
+  276 to 276 -> 278 [1] lasti
+
+Disassembly of <code object _fp_save at 0x28ae3df0, file "app\services\flow_image_service.py", line 119>:
+119           0 RESUME                   0
+
+120           2 NOP
+
+121           4 LOAD_CONST               1 (0)
+              6 LOAD_CONST               0 (None)
+              8 IMPORT_NAME              0 (json)
+             10 STORE_FAST               1 (json)
+
+123          12 LOAD_GLOBAL              3 (NULL + len)
+             22 LOAD_FAST                0 (book)
+             24 CALL                     1
+             32 LOAD_GLOBAL              4 (_FP_KEEP)
+             42 COMPARE_OP              68 (>)
+             46 POP_JUMP_IF_FALSE       42 (to 132)
+
+124          48 LOAD_GLOBAL              7 (NULL + dict)
+             58 LOAD_GLOBAL              9 (NULL + list)
+             68 LOAD_FAST                0 (book)
+             70 LOAD_ATTR               11 (NULL|self + items)
+             90 CALL                     0
+             98 CALL                     1
+            106 LOAD_GLOBAL              4 (_FP_KEEP)
+            116 UNARY_NEGATIVE
+            118 LOAD_CONST               0 (None)
+            120 BINARY_SLICE
+            122 CALL                     1
+            130 STORE_FAST               0 (book)
+
+125     >>  132 LOAD_GLOBAL             13 (NULL + _fp_file)
+            142 CALL                     0
+            150 STORE_FAST               2 (f)
+
+126         152 LOAD_FAST                2 (f)
+            154 LOAD_ATTR               14 (parent)
+            174 LOAD_ATTR               17 (NULL|self + mkdir)
+            194 LOAD_CONST               2 (True)
+            196 LOAD_CONST               2 (True)
+            198 KW_NAMES                 3 (('parents', 'exist_ok'))
+            200 CALL                     2
+            208 POP_TOP
+
+127         210 LOAD_FAST                2 (f)
+            212 LOAD_ATTR               19 (NULL|self + write_text)
+            232 LOAD_FAST                1 (json)
+            234 LOAD_ATTR               21 (NULL|self + dumps)
+            254 LOAD_FAST                0 (book)
+            256 LOAD_CONST               4 (False)
+            258 KW_NAMES                 5 (('ensure_ascii',))
+            260 CALL                     2
+            268 LOAD_CONST               6 ('utf-8')
+            270 KW_NAMES                 7 (('encoding',))
+            272 CALL                     2
+            280 POP_TOP
+            282 RETURN_CONST             0 (None)
+        >>  284 PUSH_EXC_INFO
+
+128         286 LOAD_GLOBAL             22 (Exception)
+            296 CHECK_EXC_MATCH
+            298 POP_JUMP_IF_FALSE       34 (to 368)
+            300 STORE_FAST               3 (e)
+
+129         302 LOAD_GLOBAL             25 (NULL + log)
+            312 LOAD_ATTR               26 (info)
+            332 LOAD_CONST               8 ('[flow_image] không ghi được sổ vân tay ảnh: ')
+            334 LOAD_FAST                3 (e)
+            336 FORMAT_VALUE             0
+            338 BUILD_STRING             2
+            340 CALL                     1
+            348 POP_TOP
+            350 POP_EXCEPT
+            352 LOAD_CONST               0 (None)
+            354 STORE_FAST               3 (e)
+            356 DELETE_FAST              3 (e)
+            358 RETURN_CONST             0 (None)
+        >>  360 LOAD_CONST               0 (None)
+            362 STORE_FAST               3 (e)
+            364 DELETE_FAST              3 (e)
+            366 RERAISE                  1
+
+128     >>  368 RERAISE                  0
+        >>  370 COPY                     3
+            372 POP_EXCEPT
+            374 RERAISE                  1
+ExceptionTable:
+  4 to 280 -> 284 [0]
+  284 to 300 -> 370 [1] lasti
+  302 to 348 -> 360 [1] lasti
+  360 to 368 -> 370 [1] lasti
+
+Disassembly of <code object claim_asset at 0x28c2be50, file "app\services\flow_image_service.py", line 132>:
+132           0 RESUME                   0
+
+138           2 LOAD_GLOBAL              1 (NULL + _dhash)
+             12 LOAD_FAST                0 (path)
+             14 CALL                     1
+             22 STORE_FAST               1 (fp)
+
+139          24 LOAD_FAST                1 (fp)
+             26 POP_JUMP_IF_TRUE         1 (to 30)
+
+140          28 RETURN_CONST             1 (None)
+
+141     >>   30 LOAD_GLOBAL              3 (NULL + str)
+             40 LOAD_FAST                0 (path)
+             42 LOAD_ATTR                5 (NULL|self + resolve)
+             62 CALL                     0
+             70 CALL                     1
+             78 LOAD_ATTR                7 (NULL|self + lower)
+             98 CALL                     0
+            106 STORE_FAST               2 (me)
+
+142         108 LOAD_GLOBAL              9 (NULL + int)
+            118 LOAD_FAST                1 (fp)
+            120 LOAD_CONST               2 (16)
+            122 CALL                     2
+            130 STORE_FAST               3 (mine)
+
+143         132 LOAD_GLOBAL             10 (_fp_lock)
+            142 BEFORE_WITH
+            144 POP_TOP
+
+144         146 LOAD_GLOBAL             13 (NULL + _fp_load)
+            156 CALL                     0
+            164 STORE_FAST               4 (book)
+
+145         166 LOAD_FAST                4 (book)
+            168 LOAD_ATTR               15 (NULL|self + items)
+            188 CALL                     0
+            196 GET_ITER
+        >>  198 FOR_ITER               136 (to 474)
+            202 UNPACK_SEQUENCE          2
+            206 STORE_FAST               5 (other_fp)
+            208 STORE_FAST               6 (other_path)
+
+146         210 LOAD_FAST                6 (other_path)
+            212 LOAD_ATTR                7 (NULL|self + lower)
+            232 CALL                     0
+            240 LOAD_FAST                2 (me)
+            242 COMPARE_OP              40 (==)
+            246 POP_JUMP_IF_FALSE        1 (to 250)
+
+147         248 JUMP_BACKWARD           26 (to 198)
+
+148     >>  250 LOAD_GLOBAL             17 (NULL + len)
+            260 LOAD_FAST                5 (other_fp)
+            262 CALL                     1
+            270 LOAD_GLOBAL             17 (NULL + len)
+            280 LOAD_FAST                1 (fp)
+            282 CALL                     1
+            290 COMPARE_OP              55 (!=)
+            294 POP_JUMP_IF_FALSE        1 (to 298)
+
+149         296 JUMP_BACKWARD           50 (to 198)
+
+150     >>  298 NOP
+
+151         300 LOAD_GLOBAL             19 (NULL + bin)
+            310 LOAD_FAST                3 (mine)
+            312 LOAD_GLOBAL              9 (NULL + int)
+            322 LOAD_FAST                5 (other_fp)
+            324 LOAD_CONST               2 (16)
+            326 CALL                     2
+            334 BINARY_OP               12 (^)
+            338 CALL                     1
+            346 LOAD_ATTR               21 (NULL|self + count)
+            366 LOAD_CONST               3 ('1')
+            368 CALL                     1
+            376 LOAD_GLOBAL             22 (_FP_MAX_DISTANCE)
+            386 COMPARE_OP              68 (>)
+            390 POP_JUMP_IF_FALSE        1 (to 394)
+
+152         392 JUMP_BACKWARD           98 (to 198)
+
+151     >>  394 NOP
+
+155         396 LOAD_GLOBAL             27 (NULL + Path)
+            406 LOAD_FAST                6 (other_path)
+            408 CALL                     1
+            416 LOAD_ATTR               29 (NULL|self + is_file)
+            436 CALL                     0
+            444 POP_JUMP_IF_TRUE         1 (to 448)
+            446 JUMP_BACKWARD          125 (to 198)
+
+156     >>  448 LOAD_FAST                6 (other_path)
+            450 SWAP                     2
+            452 POP_TOP
+
+143         454 SWAP                     2
+            456 LOAD_CONST               1 (None)
+            458 LOAD_CONST               1 (None)
+            460 LOAD_CONST               1 (None)
+            462 CALL                     2
+            470 POP_TOP
+            472 RETURN_VALUE
+
+145     >>  474 END_FOR
+
+157         476 LOAD_GLOBAL              3 (NULL + str)
+            486 LOAD_FAST                0 (path)
+            488 LOAD_ATTR                5 (NULL|self + resolve)
+            508 CALL                     0
+            516 CALL                     1
+            524 LOAD_FAST                4 (book)
+            526 LOAD_FAST                1 (fp)
+            528 STORE_SUBSCR
+
+158         532 LOAD_GLOBAL             31 (NULL + _fp_save)
+            542 LOAD_FAST                4 (book)
+            544 CALL                     1
+            552 POP_TOP
+
+143         554 LOAD_CONST               1 (None)
+            556 LOAD_CONST               1 (None)
+            558 LOAD_CONST               1 (None)
+            560 CALL                     2
+            568 POP_TOP
+
+159         570 RETURN_CONST             1 (None)
+        >>  572 PUSH_EXC_INFO
+
+153         574 LOAD_GLOBAL             24 (ValueError)
+            584 CHECK_EXC_MATCH
+            586 POP_JUMP_IF_FALSE        3 (to 594)
+            588 POP_TOP
+
+154         590 POP_EXCEPT
+            592 JUMP_BACKWARD          198 (to 198)
+
+153     >>  594 RERAISE                  0
+        >>  596 COPY                     3
+            598 POP_EXCEPT
+            600 RERAISE                  1
+
+143     >>  602 PUSH_EXC_INFO
+            604 WITH_EXCEPT_START
+            606 POP_JUMP_IF_TRUE         1 (to 610)
+            608 RERAISE                  2
+        >>  610 POP_TOP
+            612 POP_EXCEPT
+            614 POP_TOP
+            616 POP_TOP
+
+159         618 RETURN_CONST             1 (None)
+        >>  620 COPY                     3
+            622 POP_EXCEPT
+            624 RERAISE                  1
+ExceptionTable:
+  144 to 296 -> 602 [1] lasti
+  300 to 390 -> 572 [2]
+  392 to 444 -> 602 [1] lasti
+  448 to 452 -> 602 [1] lasti
+  474 to 552 -> 602 [1] lasti
+  572 to 588 -> 596 [3] lasti
+  590 to 592 -> 602 [1] lasti
+  594 to 594 -> 596 [3] lasti
+  596 to 600 -> 602 [1] lasti
+  602 to 610 -> 620 [3] lasti
+
+Disassembly of <code object seed_fingerprints at 0x28c13800, file "app\services\flow_image_service.py", line 162>:
+162           0 RESUME                   0
+
+169           2 LOAD_FAST                0 (root)
+              4 POP_JUMP_IF_TRUE         1 (to 8)
+
+170           6 RETURN_CONST             1 (0)
+
+171     >>    8 LOAD_GLOBAL              1 (NULL + Path)
+             18 LOAD_FAST                0 (root)
+             20 CALL                     1
+             28 STORE_FAST               2 (base)
+
+172          30 LOAD_FAST                2 (base)
+             32 LOAD_ATTR                3 (NULL|self + is_dir)
+             52 CALL                     0
+             60 POP_JUMP_IF_TRUE         1 (to 64)
+
+173          62 RETURN_CONST             1 (0)
+
+174     >>   64 LOAD_GLOBAL              4 (_fp_lock)
+             74 BEFORE_WITH
+             76 POP_TOP
+
+175          78 LOAD_GLOBAL              7 (NULL + _fp_load)
+             88 CALL                     0
+             96 STORE_FAST               3 (book)
+
+176          98 LOAD_FAST                3 (book)
+            100 LOAD_ATTR                9 (NULL|self + values)
+            120 CALL                     0
+            128 GET_ITER
+            130 LOAD_FAST_AND_CLEAR      4 (v)
+            132 SWAP                     2
+            134 BUILD_SET                0
+            136 SWAP                     2
+        >>  138 FOR_ITER                18 (to 178)
+            142 STORE_FAST               4 (v)
+            144 LOAD_FAST                4 (v)
+            146 LOAD_ATTR               11 (NULL|self + lower)
+            166 CALL                     0
+            174 SET_ADD                  2
+            176 JUMP_BACKWARD           20 (to 138)
+        >>  178 END_FOR
+            180 STORE_FAST               5 (known)
+            182 STORE_FAST               4 (v)
+
+174         184 LOAD_CONST               2 (None)
+            186 LOAD_CONST               2 (None)
+            188 LOAD_CONST               2 (None)
+            190 CALL                     2
+            198 POP_TOP
+
+177     >>  200 LOAD_CONST               1 (0)
+            202 STORE_FAST               6 (added)
+
+178         204 LOAD_FAST                2 (base)
+            206 LOAD_CONST               3 ('characters')
+            208 BINARY_OP               11 (/)
+            212 LOAD_FAST                2 (base)
+            214 LOAD_CONST               4 ('ideas')
+            216 BINARY_OP               11 (/)
+            220 LOAD_FAST                2 (base)
+            222 LOAD_CONST               5 ('videos')
+            224 BINARY_OP               11 (/)
+            228 BUILD_TUPLE              3
+            230 GET_ITER
+        >>  232 FOR_ITER               147 (to 530)
+            236 STORE_FAST               7 (folder)
+
+179         238 LOAD_FAST                7 (folder)
+            240 LOAD_ATTR                3 (NULL|self + is_dir)
+            260 CALL                     0
+            268 POP_JUMP_IF_TRUE         1 (to 272)
+
+180         270 JUMP_BACKWARD           20 (to 232)
+
+181     >>  272 LOAD_FAST                7 (folder)
+            274 LOAD_ATTR               13 (NULL|self + rglob)
+            294 LOAD_CONST               6 ('*')
+            296 CALL                     1
+            304 GET_ITER
+        >>  306 FOR_ITER               108 (to 526)
+            310 STORE_FAST               8 (f)
+
+182         312 LOAD_FAST                6 (added)
+            314 LOAD_FAST                1 (limit)
+            316 COMPARE_OP              92 (>=)
+            320 POP_JUMP_IF_FALSE        2 (to 326)
+
+183         322 POP_TOP
+            324 JUMP_BACKWARD           47 (to 232)
+
+184     >>  326 LOAD_FAST                8 (f)
+            328 LOAD_ATTR               14 (suffix)
+            348 LOAD_ATTR               11 (NULL|self + lower)
+            368 CALL                     0
+            376 LOAD_CONST               7 (('.png', '.jpg', '.jpeg', '.webp'))
+            378 CONTAINS_OP              1
+            380 POP_JUMP_IF_TRUE        11 (to 404)
+            382 LOAD_GLOBAL             17 (NULL + is_placeholder)
+            392 LOAD_FAST                8 (f)
+            394 CALL                     1
+            402 POP_JUMP_IF_FALSE        1 (to 406)
+
+185     >>  404 JUMP_BACKWARD           50 (to 306)
+
+186     >>  406 LOAD_GLOBAL             19 (NULL + str)
+            416 LOAD_FAST                8 (f)
+            418 LOAD_ATTR               21 (NULL|self + resolve)
+            438 CALL                     0
+            446 CALL                     1
+            454 LOAD_ATTR               11 (NULL|self + lower)
+            474 CALL                     0
+            482 LOAD_FAST_CHECK          5 (known)
+            484 CONTAINS_OP              0
+            486 POP_JUMP_IF_FALSE        1 (to 490)
+
+187         488 JUMP_BACKWARD           92 (to 306)
+
+188     >>  490 LOAD_GLOBAL             23 (NULL + claim_asset)
+            500 LOAD_FAST                8 (f)
+            502 CALL                     1
+            510 POP_JUMP_IF_NONE         1 (to 514)
+            512 JUMP_BACKWARD          104 (to 306)
+
+189     >>  514 LOAD_FAST                6 (added)
+            516 LOAD_CONST               8 (1)
+            518 BINARY_OP               13 (+=)
+            522 STORE_FAST               6 (added)
+            524 JUMP_BACKWARD          110 (to 306)
+
+181     >>  526 END_FOR
+            528 JUMP_BACKWARD          149 (to 232)
+
+178     >>  530 END_FOR
+
+190         532 LOAD_FAST                6 (added)
+            534 POP_JUMP_IF_FALSE       25 (to 586)
+
+191         536 LOAD_GLOBAL             25 (NULL + log)
+            546 LOAD_ATTR               26 (info)
+            566 LOAD_CONST               9 ('[flow_image] nạp ')
+            568 LOAD_FAST                6 (added)
+            570 FORMAT_VALUE             0
+            572 LOAD_CONST              10 (' vân tay ảnh sẵn có của kênh vào sổ chống trùng.')
+            574 BUILD_STRING             3
+            576 CALL                     1
+            584 POP_TOP
+
+192     >>  586 LOAD_FAST                6 (added)
+            588 RETURN_VALUE
+        >>  590 SWAP                     2
+            592 POP_TOP
+
+176         594 SWAP                     2
+            596 STORE_FAST               4 (v)
+            598 RERAISE                  0
+
+174     >>  600 PUSH_EXC_INFO
+            602 WITH_EXCEPT_START
+            604 POP_JUMP_IF_TRUE         1 (to 608)
+            606 RERAISE                  2
+        >>  608 POP_TOP
+            610 POP_EXCEPT
+            612 POP_TOP
+            614 POP_TOP
+            616 JUMP_BACKWARD          209 (to 200)
+        >>  618 COPY                     3
+            620 POP_EXCEPT
+            622 RERAISE                  1
+ExceptionTable:
+  76 to 132 -> 600 [1] lasti
+  134 to 178 -> 590 [3]
+  180 to 182 -> 600 [1] lasti
+  590 to 598 -> 600 [1] lasti
+  600 to 608 -> 618 [3] lasti
+
+Disassembly of <code object usable_image at 0x7f6c9247b0f0, file "app\services\flow_image_service.py", line 195>:
+195           0 RESUME                   0
+
+197           2 LOAD_FAST                0 (path)
+              4 POP_JUMP_IF_TRUE         1 (to 8)
+
+198           6 RETURN_CONST             1 (False)
+
+199     >>    8 NOP
+
+200          10 LOAD_FAST                0 (path)
+             12 LOAD_ATTR                1 (NULL|self + exists)
+             32 CALL                     0
+             40 POP_JUMP_IF_FALSE       11 (to 64)
+             42 LOAD_GLOBAL              3 (NULL + is_placeholder)
+             52 LOAD_FAST                0 (path)
+             54 CALL                     1
+             62 POP_JUMP_IF_FALSE        1 (to 66)
+
+201     >>   64 RETURN_CONST             1 (False)
+
+202     >>   66 LOAD_FAST                0 (path)
+             68 LOAD_ATTR                5 (NULL|self + stat)
+             88 CALL                     0
+             96 STORE_FAST               2 (st)
+
+203          98 LOAD_FAST                2 (st)
+            100 LOAD_ATTR                6 (st_size)
+            120 LOAD_GLOBAL              8 (_MIN_IMAGE_BYTES)
+            130 COMPARE_OP               2 (<)
+            134 POP_JUMP_IF_FALSE        1 (to 138)
+
+204         136 RETURN_CONST             1 (False)
+
+205     >>  138 LOAD_FAST                1 (newer_than)
+            140 LOAD_CONST               2 (None)
+            142 IS_OP                    0
+            144 COPY                     1
+            146 POP_JUMP_IF_TRUE        18 (to 184)
+            148 POP_TOP
+            150 LOAD_FAST                2 (st)
+            152 LOAD_ATTR               10 (st_mtime)
+            172 LOAD_CONST               3 (1.0)
+            174 BINARY_OP                0 (+)
+            178 LOAD_FAST                1 (newer_than)
+            180 COMPARE_OP              92 (>=)
+        >>  184 RETURN_VALUE
+        >>  186 PUSH_EXC_INFO
+
+206         188 LOAD_GLOBAL             12 (OSError)
+            198 CHECK_EXC_MATCH
+            200 POP_JUMP_IF_FALSE        3 (to 208)
+            202 POP_TOP
+
+207         204 POP_EXCEPT
+            206 RETURN_CONST             1 (False)
+
+206     >>  208 RERAISE                  0
+        >>  210 COPY                     3
+            212 POP_EXCEPT
+            214 RERAISE                  1
+ExceptionTable:
+  10 to 62 -> 186 [0]
+  66 to 134 -> 186 [0]
+  138 to 182 -> 186 [0]
+  186 to 202 -> 210 [1] lasti
+  208 to 208 -> 210 [1] lasti
+
+Disassembly of <code object _is_hard_block at 0x7f6c926fec20, file "app\services\flow_image_service.py", line 210>:
+210           0 RESUME                   0
+
+217           2 LOAD_FAST                0 (e)
+              4 LOAD_ATTR                0 (code)
+             24 LOAD_GLOBAL              2 (E)
+             34 LOAD_ATTR                4 (FLOW_RATE_LIMIT)
+             54 COMPARE_OP              40 (==)
+             58 COPY                     1
+             60 POP_JUMP_IF_FALSE       18 (to 98)
+             62 POP_TOP
+             64 LOAD_CONST               1 ('hoạt động bất thường')
+             66 LOAD_FAST                0 (e)
+             68 LOAD_ATTR                6 (message)
+             88 COPY                     1
+             90 POP_JUMP_IF_TRUE         2 (to 96)
+             92 POP_TOP
+             94 LOAD_CONST               2 ('')
+        >>   96 CONTAINS_OP              0
+        >>   98 RETURN_VALUE
+
+Disassembly of <code object generate_flow_image at 0x28c44b10, file "app\services\flow_image_service.py", line 220>:
+              0 MAKE_CELL                5 (label)
+              2 MAKE_CELL                8 (on_log)
+              4 MAKE_CELL               29 (emit)
+
+220           6 RETURN_GENERATOR
+              8 POP_TOP
+             10 RESUME                   0
+
+237          12 LOAD_CONST              42 (('info',))
+             14 LOAD_CONST              43 (('msg', 'str', 'level', 'str', 'return', 'None'))
+             16 LOAD_CLOSURE             8 (on_log)
+             18 BUILD_TUPLE              1
+             20 LOAD_CONST               1 (<code object emit at 0x7f6c9288aef0, file "app\services\flow_image_service.py", line 237>)
+             22 MAKE_FUNCTION           13 (defaults, annotations, closure)
+             24 STORE_DEREF             29 (emit)
+
+246          26 LOAD_FAST                4 (refs)
+             28 COPY                     1
+             30 POP_JUMP_IF_TRUE         2 (to 36)
+             32 POP_TOP
+             34 BUILD_LIST               0
+        >>   36 GET_ITER
+             38 LOAD_FAST_AND_CLEAR     10 (r)
+             40 SWAP                     2
+             42 BUILD_LIST               0
+             44 SWAP                     2
+        >>   46 FOR_ITER                 7 (to 64)
+             50 STORE_FAST              10 (r)
+             52 LOAD_FAST               10 (r)
+             54 POP_JUMP_IF_TRUE         1 (to 58)
+             56 JUMP_BACKWARD            6 (to 46)
+        >>   58 LOAD_FAST               10 (r)
+             60 LIST_APPEND              2
+             62 JUMP_BACKWARD            9 (to 46)
+        >>   64 END_FOR
+             66 SWAP                     2
+             68 STORE_FAST              10 (r)
+             70 COPY                     1
+             72 POP_JUMP_IF_TRUE         2 (to 78)
+             74 POP_TOP
+             76 LOAD_CONST               2 (None)
+        >>   78 STORE_FAST               4 (refs)
+
+247          80 LOAD_GLOBAL              1 (NULL + time)
+             90 LOAD_ATTR                0 (time)
+            110 CALL                     0
+            118 STORE_FAST              11 (started)
+
+248         120 LOAD_CONST               3 (0)
+            122 STORE_FAST              12 (attempt)
+
+249         124 LOAD_CONST               3 (0)
+            126 STORE_FAST              13 (rotations)
+
+250         128 LOAD_GLOBAL              2 (_BACKOFF_BASE)
+            138 STORE_FAST              14 (delay)
+
+252         140 LOAD_CONST              44 (('path', 'Path', 'return', 'bool'))
+            142 LOAD_CLOSURE            29 (emit)
+            144 LOAD_CLOSURE             5 (label)
+            146 BUILD_TUPLE              2
+            148 LOAD_CONST               4 (<code object passed_logo_gate at 0x7f6c926af560, file "app\services\flow_image_service.py", line 252>)
+            150 MAKE_FUNCTION           12 (annotations, closure)
+            152 STORE_FAST              15 (passed_logo_gate)
+
+269         154 LOAD_CONST              44 (('path', 'Path', 'return', 'bool'))
+            156 LOAD_CLOSURE            29 (emit)
+            158 LOAD_CLOSURE             5 (label)
+            160 BUILD_TUPLE              2
+            162 LOAD_CONST               5 (<code object accept at 0x7f6c926af840, file "app\services\flow_image_service.py", line 269>)
+            164 MAKE_FUNCTION           12 (annotations, closure)
+            166 STORE_FAST              16 (accept)
+
+282     >>  168 NOP
+
+283     >>  170 LOAD_FAST               12 (attempt)
+            172 LOAD_CONST               7 (1)
+            174 BINARY_OP               13 (+=)
+            178 STORE_FAST              12 (attempt)
+
+284         180 BUILD_LIST               0
+            182 STORE_FAST              17 (op)
+
+285         184 LOAD_CONST               8 (False)
+            186 STORE_FAST              18 (stale)
+
+286         188 NOP
+
+287         190 LOAD_FAST                0 (fo)
+            192 LOAD_ATTR                4 (client)
+            212 LOAD_ATTR                7 (NULL|self + generate_image)
+
+288         232 LOAD_FAST                1 (prompt)
+            234 LOAD_FAST                2 (out)
+            236 LOAD_FAST                3 (aspect)
+            238 LOAD_FAST                4 (refs)
+
+289         240 LOAD_FAST                7 (cancel_check)
+            242 LOAD_FAST               17 (op)
+            244 LOAD_ATTR                8 (append)
+
+287         264 KW_NAMES                 9 (('aspect', 'refs', 'cancel_check', 'on_submit'))
+            266 CALL                     6
+            274 GET_AWAITABLE            0
+            276 LOAD_CONST               2 (None)
+        >>  278 SEND                     3 (to 288)
+            282 YIELD_VALUE              3
+            284 RESUME                   3
+            286 JUMP_BACKWARD_NO_INTERRUPT     5 (to 278)
+        >>  288 END_SEND
+            290 STORE_FAST              19 (got)
+
+290         292 PUSH_NULL
+            294 LOAD_FAST               16 (accept)
+            296 LOAD_FAST               19 (got)
+            298 CALL                     1
+            306 POP_JUMP_IF_FALSE        2 (to 312)
+
+291         308 LOAD_FAST               19 (got)
+            310 RETURN_VALUE
+
+292     >>  312 LOAD_CONST               6 (True)
+            314 STORE_FAST              18 (stale)
+
+393     >>  316 LOAD_FAST               18 (stale)
+            318 POP_JUMP_IF_FALSE       35 (to 390)
+            320 LOAD_FAST               12 (attempt)
+            322 LOAD_FAST                6 (tries)
+            324 COMPARE_OP              92 (>=)
+            328 POP_JUMP_IF_FALSE       30 (to 390)
+
+395         330 LOAD_GLOBAL             11 (NULL + StudioError)
+
+396         340 LOAD_GLOBAL             14 (E)
+            350 LOAD_ATTR               56 (FLOW_RESULT_LOST)
+
+397         370 LOAD_CONST              37 ('Flow liên tục trả về ảnh đã dùng ở chỗ khác (')
+            372 LOAD_FAST               12 (attempt)
+            374 FORMAT_VALUE             0
+            376 LOAD_CONST              38 (' lượt) — app không bắt được đúng ảnh vừa tạo. Đóng bớt tab Flow / khởi động lại app rồi bấm vẽ lại.')
+            378 BUILD_STRING             3
+
+395         380 CALL                     2
+            388 RAISE_VARARGS            1
+
+400     >>  390 PUSH_NULL
+            392 LOAD_DEREF              29 (emit)
+            394 LOAD_DEREF               5 (label)
+            396 FORMAT_VALUE             0
+            398 LOAD_CONST              39 (': chờ ')
+            400 LOAD_GLOBAL             63 (NULL + int)
+            410 LOAD_FAST               14 (delay)
+            412 CALL                     1
+            420 FORMAT_VALUE             0
+            422 LOAD_CONST              40 ('s rồi thử lại (')
+            424 LOAD_FAST               12 (attempt)
+            426 FORMAT_VALUE             0
+            428 LOAD_CONST              32 ('/')
+            430 LOAD_FAST                6 (tries)
+            432 FORMAT_VALUE             0
+            434 LOAD_CONST              16 (').')
+            436 BUILD_STRING             8
+            438 LOAD_CONST              13 ('warn')
+            440 CALL                     2
+            448 POP_TOP
+
+401         450 LOAD_GLOBAL             65 (NULL + asyncio)
+            460 LOAD_ATTR               66 (sleep)
+            480 LOAD_FAST               14 (delay)
+            482 CALL                     1
+            490 GET_AWAITABLE            0
+            492 LOAD_CONST               2 (None)
+        >>  494 SEND                     3 (to 504)
+            498 YIELD_VALUE              2
+            500 RESUME                   3
+            502 JUMP_BACKWARD_NO_INTERRUPT     5 (to 494)
+        >>  504 END_SEND
+            506 POP_TOP
+
+402         508 LOAD_GLOBAL             69 (NULL + min)
+            518 LOAD_FAST               14 (delay)
+            520 LOAD_CONST              41 (2)
+            522 BINARY_OP                5 (*)
+            526 LOAD_GLOBAL             70 (_BACKOFF_MAX)
+            536 CALL                     2
+            544 STORE_FAST              14 (delay)
+
+282         546 JUMP_BACKWARD          189 (to 170)
+        >>  548 SWAP                     2
+            550 POP_TOP
+
+246         552 SWAP                     2
+            554 STORE_FAST              10 (r)
+            556 RERAISE                  0
+
+287     >>  558 CLEANUP_THROW
+            560 JUMP_BACKWARD          137 (to 288)
+        >>  562 PUSH_EXC_INFO
+
+293         564 LOAD_GLOBAL             10 (StudioError)
+            574 CHECK_EXC_MATCH
+            576 EXTENDED_ARG             3
+            578 POP_JUMP_IF_FALSE      913 (to 2406)
+            580 STORE_FAST              20 (e)
+
+294         582 LOAD_FAST               20 (e)
+            584 LOAD_ATTR               12 (code)
+            604 LOAD_GLOBAL             14 (E)
+            614 LOAD_ATTR               16 (CANCELLED)
+            634 COMPARE_OP              40 (==)
+            638 POP_JUMP_IF_FALSE        1 (to 642)
+
+295         640 RAISE_VARARGS            0
+
+300     >>  642 LOAD_FAST               20 (e)
+            644 LOAD_ATTR               12 (code)
+            664 LOAD_GLOBAL             14 (E)
+            674 LOAD_ATTR               18 (FLOW_RATE_LIMIT)
+            694 COMPARE_OP              40 (==)
+            698 POP_JUMP_IF_FALSE       32 (to 764)
+
+302         700 LOAD_GLOBAL             21 (NULL + getattr)
+            710 LOAD_FAST                0 (fo)
+            712 LOAD_CONST              10 ('note_rate_limit')
+            714 LOAD_CONST               2 (None)
+            716 CALL                     3
+            724 STORE_FAST              21 (note)
+
+303         726 LOAD_FAST               21 (note)
+            728 POP_JUMP_IF_FALSE       17 (to 764)
+
+304         730 PUSH_NULL
+            732 LOAD_FAST               21 (note)
+            734 LOAD_GLOBAL             23 (NULL + _is_hard_block)
+            744 LOAD_FAST               20 (e)
+            746 CALL                     1
+            754 CALL                     1
+            762 POP_TOP
+
+307     >>  764 LOAD_FAST               20 (e)
+            766 LOAD_ATTR               12 (code)
+            786 LOAD_GLOBAL             24 (_RESUMABLE)
+            796 CONTAINS_OP              0
+            798 POP_JUMP_IF_FALSE      165 (to 1130)
+            800 LOAD_FAST               17 (op)
+            802 POP_JUMP_IF_FALSE      163 (to 1130)
+
+308         804 PUSH_NULL
+            806 LOAD_DEREF              29 (emit)
+            808 LOAD_DEREF               5 (label)
+            810 FORMAT_VALUE             0
+            812 LOAD_CONST              11 (': Flow đã tạo ảnh nhưng app chưa lấy được (')
+            814 LOAD_FAST               20 (e)
+            816 LOAD_ATTR               12 (code)
+            836 FORMAT_VALUE             0
+            838 LOAD_CONST              12 (') → poll lại job cũ, không tạo ảnh mới.')
+            840 BUILD_STRING             4
+
+309         842 LOAD_CONST              13 ('warn')
+
+308         844 CALL                     2
+            852 POP_TOP
+
+310         854 NOP
+
+311         856 LOAD_FAST                0 (fo)
+            858 LOAD_ATTR                4 (client)
+            878 LOAD_ATTR               27 (NULL|self + resume_operation)
+            898 LOAD_FAST               17 (op)
+            900 LOAD_CONST               3 (0)
+            902 BINARY_SUBSCR
+            906 LOAD_FAST                2 (out)
+            908 LOAD_FAST                7 (cancel_check)
+            910 KW_NAMES                14 (('cancel_check',))
+            912 CALL                     3
+            920 GET_AWAITABLE            0
+            922 LOAD_CONST               2 (None)
+        >>  924 SEND                     4 (to 936)
+            928 YIELD_VALUE              5
+            930 RESUME                   3
+            932 JUMP_BACKWARD_NO_INTERRUPT     5 (to 924)
+        >>  934 CLEANUP_THROW
+        >>  936 END_SEND
+            938 STORE_FAST              22 (resumed)
+
+312         940 PUSH_NULL
+            942 LOAD_FAST               16 (accept)
+            944 LOAD_FAST               22 (resumed)
+            946 CALL                     1
+            954 POP_JUMP_IF_FALSE        7 (to 970)
+
+313         956 LOAD_FAST               22 (resumed)
+            958 SWAP                     2
+            960 POP_EXCEPT
+            962 LOAD_CONST               2 (None)
+            964 STORE_FAST              20 (e)
+            966 DELETE_FAST             20 (e)
+            968 RETURN_VALUE
+
+315     >>  970 LOAD_CONST               6 (True)
+            972 STORE_FAST              18 (stale)
+            974 JUMP_FORWARD            77 (to 1130)
+        >>  976 PUSH_EXC_INFO
+
+316         978 LOAD_GLOBAL             10 (StudioError)
+            988 CHECK_EXC_MATCH
+            990 POP_JUMP_IF_FALSE       65 (to 1122)
+            992 STORE_FAST              23 (e2)
+
+317         994 LOAD_FAST               23 (e2)
+            996 LOAD_ATTR               12 (code)
+           1016 LOAD_GLOBAL             14 (E)
+           1026 LOAD_ATTR               16 (CANCELLED)
+           1046 COMPARE_OP              40 (==)
+           1050 POP_JUMP_IF_FALSE        1 (to 1054)
+
+318        1052 RAISE_VARARGS            0
+
+319     >> 1054 PUSH_NULL
+           1056 LOAD_DEREF              29 (emit)
+           1058 LOAD_DEREF               5 (label)
+           1060 FORMAT_VALUE             0
+           1062 LOAD_CONST              15 (': poll lại job cũ vẫn hỏng (')
+           1064 LOAD_FAST               23 (e2)
+           1066 LOAD_ATTR               12 (code)
+           1086 FORMAT_VALUE             0
+           1088 LOAD_CONST              16 (').')
+           1090 BUILD_STRING             4
+           1092 LOAD_CONST              13 ('warn')
+           1094 CALL                     2
+           1102 POP_TOP
+           1104 POP_EXCEPT
+           1106 LOAD_CONST               2 (None)
+           1108 STORE_FAST              23 (e2)
+           1110 DELETE_FAST             23 (e2)
+           1112 JUMP_FORWARD             8 (to 1130)
+        >> 1114 LOAD_CONST               2 (None)
+           1116 STORE_FAST              23 (e2)
+           1118 DELETE_FAST             23 (e2)
+           1120 RERAISE                  1
+
+316     >> 1122 RERAISE                  0
+        >> 1124 COPY                     3
+           1126 POP_EXCEPT
+           1128 RERAISE                  1
+
+323     >> 1130 LOAD_FAST               18 (stale)
+           1132 POP_JUMP_IF_TRUE        86 (to 1306)
+           1134 LOAD_FAST               20 (e)
+           1136 LOAD_ATTR               12 (code)
+           1156 LOAD_GLOBAL             14 (E)
+           1166 LOAD_ATTR               28 (FLOW_WATERMARK_FAILED)
+           1186 COMPARE_OP              55 (!=)
+           1190 POP_JUMP_IF_FALSE       57 (to 1306)
+
+324        1192 LOAD_GLOBAL             31 (NULL + usable_image)
+           1202 LOAD_FAST                2 (out)
+           1204 LOAD_FAST               11 (started)
+           1206 KW_NAMES                17 (('newer_than',))
+           1208 CALL                     2
+           1216 POP_JUMP_IF_FALSE       44 (to 1306)
+           1218 PUSH_NULL
+           1220 LOAD_FAST               16 (accept)
+           1222 LOAD_FAST                2 (out)
+           1224 CALL                     1
+           1232 POP_JUMP_IF_FALSE       36 (to 1306)
+
+325        1234 PUSH_NULL
+           1236 LOAD_FAST               15 (passed_logo_gate)
+           1238 LOAD_FAST                2 (out)
+           1240 CALL                     1
+           1248 GET_AWAITABLE            0
+           1250 LOAD_CONST               2 (None)
+        >> 1252 SEND                     4 (to 1264)
+           1256 YIELD_VALUE              4
+           1258 RESUME                   3
+           1260 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1252)
+        >> 1262 CLEANUP_THROW
+        >> 1264 END_SEND
+           1266 POP_JUMP_IF_FALSE       19 (to 1306)
+
+326        1268 PUSH_NULL
+           1270 LOAD_DEREF              29 (emit)
+           1272 LOAD_DEREF               5 (label)
+           1274 FORMAT_VALUE             0
+           1276 LOAD_CONST              18 (': đã có file ảnh thật trên đĩa dù lượt tạo báo lỗi — dùng lại, không tạo trùng.')
+           1278 BUILD_STRING             2
+
+327        1280 LOAD_CONST              13 ('warn')
+
+326        1282 CALL                     2
+           1290 POP_TOP
+
+328        1292 LOAD_FAST                2 (out)
+           1294 SWAP                     2
+           1296 POP_EXCEPT
+           1298 LOAD_CONST               2 (None)
+           1300 STORE_FAST              20 (e)
+           1302 DELETE_FAST             20 (e)
+           1304 RETURN_VALUE
+
+331     >> 1306 LOAD_FAST               13 (rotations)
+           1308 LOAD_GLOBAL             32 (_MAX_ROTATIONS)
+           1318 COMPARE_OP               2 (<)
+           1322 EXTENDED_ARG             1
+           1324 POP_JUMP_IF_FALSE      403 (to 2132)
+
+332        1326 LOAD_FAST               20 (e)
+           1328 LOAD_ATTR               12 (code)
+           1348 LOAD_GLOBAL             14 (E)
+           1358 LOAD_ATTR               34 (FLOW_QUOTA)
+           1378 COMPARE_OP              40 (==)
+           1382 POP_JUMP_IF_FALSE       57 (to 1498)
+           1384 LOAD_FAST                0 (fo)
+           1386 LOAD_ATTR               37 (NULL|self + on_quota)
+           1406 CALL                     0
+           1414 POP_JUMP_IF_FALSE       41 (to 1498)
+
+333        1416 LOAD_FAST               13 (rotations)
+           1418 LOAD_CONST               7 (1)
+           1420 BINARY_OP               13 (+=)
+           1424 STORE_FAST              13 (rotations)
+
+334        1426 LOAD_FAST               12 (attempt)
+           1428 LOAD_CONST               7 (1)
+           1430 BINARY_OP               23 (-=)
+           1434 STORE_FAST              12 (attempt)
+
+335        1436 PUSH_NULL
+           1438 LOAD_DEREF              29 (emit)
+           1440 LOAD_DEREF               5 (label)
+           1442 FORMAT_VALUE             0
+           1444 LOAD_CONST              19 (": tài khoản hết quota NGÀY → chuyển '")
+           1446 LOAD_FAST                0 (fo)
+           1448 LOAD_ATTR               38 (label)
+           1468 FORMAT_VALUE             0
+           1470 LOAD_CONST              20 ("', thử lại.")
+           1472 BUILD_STRING             4
+           1474 LOAD_CONST              13 ('warn')
+           1476 CALL                     2
+           1484 POP_TOP
+
+336        1486 POP_EXCEPT
+           1488 LOAD_CONST               2 (None)
+           1490 STORE_FAST              20 (e)
+           1492 DELETE_FAST             20 (e)
+           1494 EXTENDED_ARG             2
+           1496 JUMP_BACKWARD          665 (to 168)
+
+337     >> 1498 LOAD_FAST               20 (e)
+           1500 LOAD_ATTR               12 (code)
+           1520 LOAD_GLOBAL             14 (E)
+           1530 LOAD_ATTR               40 (FLOW_AUTH)
+           1550 COMPARE_OP              40 (==)
+           1554 POP_JUMP_IF_FALSE       57 (to 1670)
+           1556 LOAD_FAST                0 (fo)
+           1558 LOAD_ATTR               43 (NULL|self + on_auth)
+           1578 CALL                     0
+           1586 POP_JUMP_IF_FALSE       41 (to 1670)
+
+338        1588 LOAD_FAST               13 (rotations)
+           1590 LOAD_CONST               7 (1)
+           1592 BINARY_OP               13 (+=)
+           1596 STORE_FAST              13 (rotations)
+
+339        1598 LOAD_FAST               12 (attempt)
+           1600 LOAD_CONST               7 (1)
+           1602 BINARY_OP               23 (-=)
+           1606 STORE_FAST              12 (attempt)
+
+340        1608 PUSH_NULL
+           1610 LOAD_DEREF              29 (emit)
+           1612 LOAD_DEREF               5 (label)
+           1614 FORMAT_VALUE             0
+           1616 LOAD_CONST              21 (": tài khoản chưa đăng nhập → chuyển '")
+           1618 LOAD_FAST                0 (fo)
+           1620 LOAD_ATTR               38 (label)
+           1640 FORMAT_VALUE             0
+           1642 LOAD_CONST              20 ("', thử lại.")
+           1644 BUILD_STRING             4
+           1646 LOAD_CONST              13 ('warn')
+           1648 CALL                     2
+           1656 POP_TOP
+
+341        1658 POP_EXCEPT
+           1660 LOAD_CONST               2 (None)
+           1662 STORE_FAST              20 (e)
+           1664 DELETE_FAST             20 (e)
+           1666 EXTENDED_ARG             2
+           1668 JUMP_BACKWARD          751 (to 168)
+
+348     >> 1670 LOAD_CONST               3 (0)
+           1672 LOAD_CONST              22 (('rotate_on_rate_limit',))
+           1674 IMPORT_NAME             22 (app.pipeline.steps.flow_failover)
+           1676 IMPORT_FROM             23 (rotate_on_rate_limit)
+           1678 STORE_FAST              24 (rotate_on_rate_limit)
+           1680 POP_TOP
+
+349        1682 LOAD_FAST               20 (e)
+           1684 LOAD_ATTR               12 (code)
+           1704 LOAD_GLOBAL             14 (E)
+           1714 LOAD_ATTR               18 (FLOW_RATE_LIMIT)
+           1734 COMPARE_OP              40 (==)
+           1738 POP_JUMP_IF_FALSE       68 (to 1876)
+           1740 PUSH_NULL
+           1742 LOAD_FAST               24 (rotate_on_rate_limit)
+           1744 LOAD_FAST                0 (fo)
+           1746 LOAD_GLOBAL             23 (NULL + _is_hard_block)
+           1756 LOAD_FAST               20 (e)
+           1758 CALL                     1
+           1766 CALL                     2
+           1774 GET_AWAITABLE            0
+           1776 LOAD_CONST               2 (None)
+        >> 1778 SEND                     4 (to 1790)
+           1782 YIELD_VALUE              4
+           1784 RESUME                   3
+           1786 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1778)
+        >> 1788 CLEANUP_THROW
+        >> 1790 END_SEND
+           1792 POP_JUMP_IF_FALSE       41 (to 1876)
+
+350        1794 LOAD_FAST               13 (rotations)
+           1796 LOAD_CONST               7 (1)
+           1798 BINARY_OP               13 (+=)
+           1802 STORE_FAST              13 (rotations)
+
+351        1804 LOAD_FAST               12 (attempt)
+           1806 LOAD_CONST               7 (1)
+           1808 BINARY_OP               23 (-=)
+           1812 STORE_FAST              12 (attempt)
+
+352        1814 PUSH_NULL
+           1816 LOAD_DEREF              29 (emit)
+           1818 LOAD_DEREF               5 (label)
+           1820 FORMAT_VALUE             0
+           1822 LOAD_CONST              23 (": Flow chặn tốc độ → đóng Chrome profile cũ, chuyển '")
+           1824 LOAD_FAST                0 (fo)
+           1826 LOAD_ATTR               38 (label)
+           1846 FORMAT_VALUE             0
+           1848 LOAD_CONST              24 ("', thử lại ngay.")
+           1850 BUILD_STRING             4
+
+353        1852 LOAD_CONST              13 ('warn')
+
+352        1854 CALL                     2
+           1862 POP_TOP
+
+354        1864 POP_EXCEPT
+           1866 LOAD_CONST               2 (None)
+           1868 STORE_FAST              20 (e)
+           1870 DELETE_FAST             20 (e)
+           1872 EXTENDED_ARG             3
+           1874 JUMP_BACKWARD          854 (to 168)
+
+358     >> 1876 LOAD_CONST               3 (0)
+           1878 LOAD_CONST              25 (('reseed_characters', 'rotate_on_project_dead'))
+           1880 IMPORT_NAME             22 (app.pipeline.steps.flow_failover)
+           1882 IMPORT_FROM             24 (reseed_characters)
+           1884 STORE_FAST              25 (reseed_characters)
+           1886 IMPORT_FROM             25 (rotate_on_project_dead)
+           1888 STORE_FAST              26 (rotate_on_project_dead)
+           1890 POP_TOP
+
+359        1892 LOAD_FAST               20 (e)
+           1894 LOAD_ATTR               12 (code)
+           1914 LOAD_GLOBAL             14 (E)
+           1924 LOAD_ATTR               52 (FLOW_PROJECT_DEAD)
+           1944 COMPARE_OP              40 (==)
+           1948 POP_JUMP_IF_FALSE       91 (to 2132)
+           1950 PUSH_NULL
+           1952 LOAD_FAST               26 (rotate_on_project_dead)
+           1954 LOAD_FAST                0 (fo)
+           1956 LOAD_FAST               20 (e)
+           1958 LOAD_ATTR               54 (message)
+           1978 COPY                     1
+           1980 POP_JUMP_IF_TRUE         2 (to 1986)
+           1982 POP_TOP
+           1984 LOAD_CONST              26 ('')
+        >> 1986 CALL                     2
+           1994 GET_AWAITABLE            0
+           1996 LOAD_CONST               2 (None)
+        >> 1998 SEND                     4 (to 2010)
+           2002 YIELD_VALUE              4
+           2004 RESUME                   3
+           2006 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1998)
+        >> 2008 CLEANUP_THROW
+        >> 2010 END_SEND
+           2012 POP_JUMP_IF_FALSE       59 (to 2132)
+
+360        2014 LOAD_FAST               13 (rotations)
+           2016 LOAD_CONST               7 (1)
+           2018 BINARY_OP               13 (+=)
+           2022 STORE_FAST              13 (rotations)
+
+361        2024 LOAD_FAST               12 (attempt)
+           2026 LOAD_CONST               7 (1)
+           2028 BINARY_OP               23 (-=)
+           2032 STORE_FAST              12 (attempt)
+
+362        2034 PUSH_NULL
+           2036 LOAD_FAST               25 (reseed_characters)
+           2038 LOAD_FAST                0 (fo)
+           2040 CALL                     1
+           2048 GET_AWAITABLE            0
+           2050 LOAD_CONST               2 (None)
+        >> 2052 SEND                     4 (to 2064)
+           2056 YIELD_VALUE              4
+           2058 RESUME                   3
+           2060 JUMP_BACKWARD_NO_INTERRUPT     5 (to 2052)
+        >> 2062 CLEANUP_THROW
+        >> 2064 END_SEND
+           2066 STORE_FAST              27 (n)
+
+363        2068 PUSH_NULL
+           2070 LOAD_DEREF              29 (emit)
+           2072 LOAD_DEREF               5 (label)
+           2074 FORMAT_VALUE             0
+           2076 LOAD_CONST              27 (': project Flow hỏng → đã tạo project mới')
+           2078 BUILD_STRING             2
+
+364        2080 LOAD_FAST               27 (n)
+           2082 POP_JUMP_IF_FALSE        6 (to 2096)
+           2084 LOAD_CONST              28 (', nạp lại ')
+           2086 LOAD_FAST               27 (n)
+           2088 FORMAT_VALUE             0
+           2090 LOAD_CONST              29 (' nhân vật')
+           2092 BUILD_STRING             3
+           2094 JUMP_FORWARD             1 (to 2098)
+        >> 2096 LOAD_CONST              26 ('')
+
+363     >> 2098 BINARY_OP                0 (+)
+
+364        2102 LOAD_CONST              30 (', chạy tiếp.')
+
+363        2104 BINARY_OP                0 (+)
+
+364        2108 LOAD_CONST              13 ('warn')
+
+363        2110 CALL                     2
+           2118 POP_TOP
+
+365        2120 POP_EXCEPT
+           2122 LOAD_CONST               2 (None)
+           2124 STORE_FAST              20 (e)
+           2126 DELETE_FAST             20 (e)
+           2128 EXTENDED_ARG             3
+           2130 JUMP_BACKWARD          982 (to 168)
+
+369     >> 2132 LOAD_FAST               20 (e)
+           2134 LOAD_ATTR               12 (code)
+           2154 LOAD_GLOBAL             14 (E)
+           2164 LOAD_ATTR               56 (FLOW_RESULT_LOST)
+           2184 COMPARE_OP              40 (==)
+           2188 POP_JUMP_IF_FALSE       39 (to 2268)
+
+370        2190 LOAD_FAST                9 (resubmit_lost)
+           2192 POP_JUMP_IF_FALSE       24 (to 2242)
+           2194 LOAD_FAST               12 (attempt)
+           2196 LOAD_FAST                6 (tries)
+           2198 COMPARE_OP               2 (<)
+           2202 POP_JUMP_IF_FALSE       19 (to 2242)
+
+373        2204 PUSH_NULL
+           2206 LOAD_DEREF              29 (emit)
+           2208 LOAD_DEREF               5 (label)
+           2210 FORMAT_VALUE             0
+           2212 LOAD_CONST              31 (': ảnh nhân vật đã render nhưng app mất dấu kết quả → sẽ tạo lại có giới hạn (')
+
+374        2214 LOAD_FAST               12 (attempt)
+           2216 FORMAT_VALUE             0
+           2218 LOAD_CONST              32 ('/')
+           2220 LOAD_FAST                6 (tries)
+           2222 FORMAT_VALUE             0
+           2224 LOAD_CONST              33 (') để bảo đảm đủ identity.')
+
+373        2226 BUILD_STRING             6
+
+374        2228 LOAD_CONST              13 ('warn')
+
+373        2230 CALL                     2
+           2238 POP_TOP
+           2240 JUMP_FORWARD            13 (to 2268)
+
+376     >> 2242 PUSH_NULL
+           2244 LOAD_DEREF              29 (emit)
+           2246 LOAD_DEREF               5 (label)
+           2248 FORMAT_VALUE             0
+           2250 LOAD_CONST              34 (': Flow đã tạo ảnh nhưng app không bắt được asset → DỪNG, không tạo lại (tránh đốt quota). Thử lại sau khi khởi động lại app.')
+           2252 BUILD_STRING             2
+
+377        2254 LOAD_CONST              35 ('error')
+
+376        2256 CALL                     2
+           2264 POP_TOP
+
+378        2266 RAISE_VARARGS            0
+
+382     >> 2268 LOAD_FAST               20 (e)
+           2270 LOAD_ATTR               12 (code)
+           2290 LOAD_GLOBAL             14 (E)
+           2300 LOAD_ATTR               56 (FLOW_RESULT_LOST)
+           2320 COMPARE_OP              40 (==)
+           2324 COPY                     1
+           2326 POP_JUMP_IF_FALSE        2 (to 2332)
+           2328 POP_TOP
+           2330 LOAD_FAST                9 (resubmit_lost)
+        >> 2332 STORE_FAST              28 (retryable_lost)
+
+383        2334 LOAD_FAST               20 (e)
+           2336 LOAD_ATTR               12 (code)
+           2356 LOAD_GLOBAL             58 (_RETRYABLE)
+           2366 CONTAINS_OP              1
+           2368 POP_JUMP_IF_FALSE        2 (to 2374)
+           2370 LOAD_FAST               28 (retryable_lost)
+           2372 POP_JUMP_IF_FALSE        5 (to 2384)
+        >> 2374 LOAD_FAST               12 (attempt)
+           2376 LOAD_FAST                6 (tries)
+           2378 COMPARE_OP              92 (>=)
+           2382 POP_JUMP_IF_FALSE        1 (to 2386)
+
+384     >> 2384 RAISE_VARARGS            0
+
+383     >> 2386 POP_EXCEPT
+           2388 LOAD_CONST               2 (None)
+           2390 STORE_FAST              20 (e)
+           2392 DELETE_FAST             20 (e)
+           2394 EXTENDED_ARG             4
+           2396 JUMP_BACKWARD         1041 (to 316)
+        >> 2398 LOAD_CONST               2 (None)
+           2400 STORE_FAST              20 (e)
+           2402 DELETE_FAST             20 (e)
+           2404 RERAISE                  1
+
+385     >> 2406 LOAD_GLOBAL             60 (Exception)
+           2416 CHECK_EXC_MATCH
+           2418 POP_JUMP_IF_FALSE       77 (to 2574)
+           2420 STORE_FAST              20 (e)
+
+386        2422 LOAD_GLOBAL             31 (NULL + usable_image)
+           2432 LOAD_FAST                2 (out)
+           2434 LOAD_FAST               11 (started)
+           2436 KW_NAMES                17 (('newer_than',))
+           2438 CALL                     2
+           2446 POP_JUMP_IF_FALSE       32 (to 2512)
+           2448 PUSH_NULL
+           2450 LOAD_FAST               16 (accept)
+           2452 LOAD_FAST                2 (out)
+           2454 CALL                     1
+           2462 POP_JUMP_IF_FALSE       24 (to 2512)
+
+387        2464 PUSH_NULL
+           2466 LOAD_FAST               15 (passed_logo_gate)
+           2468 LOAD_FAST                2 (out)
+           2470 CALL                     1
+           2478 GET_AWAITABLE            0
+           2480 LOAD_CONST               2 (None)
+        >> 2482 SEND                     4 (to 2494)
+           2486 YIELD_VALUE              4
+           2488 RESUME                   3
+           2490 JUMP_BACKWARD_NO_INTERRUPT     5 (to 2482)
+        >> 2492 CLEANUP_THROW
+        >> 2494 END_SEND
+           2496 POP_JUMP_IF_FALSE        7 (to 2512)
+
+388        2498 LOAD_FAST                2 (out)
+           2500 SWAP                     2
+           2502 POP_EXCEPT
+           2504 LOAD_CONST               2 (None)
+           2506 STORE_FAST              20 (e)
+           2508 DELETE_FAST             20 (e)
+           2510 RETURN_VALUE
+
+389     >> 2512 LOAD_FAST               12 (attempt)
+           2514 LOAD_FAST                6 (tries)
+           2516 COMPARE_OP              92 (>=)
+           2520 POP_JUMP_IF_FALSE        1 (to 2524)
+
+390        2522 RAISE_VARARGS            0
+
+391     >> 2524 PUSH_NULL
+           2526 LOAD_DEREF              29 (emit)
+           2528 LOAD_DEREF               5 (label)
+           2530 FORMAT_VALUE             0
+           2532 LOAD_CONST              36 (': lỗi lạ khi tạo ảnh (')
+           2534 LOAD_FAST               20 (e)
+           2536 FORMAT_VALUE             0
+           2538 LOAD_CONST              16 (').')
+           2540 BUILD_STRING             4
+           2542 LOAD_CONST              13 ('warn')
+           2544 CALL                     2
+           2552 POP_TOP
+           2554 POP_EXCEPT
+           2556 LOAD_CONST               2 (None)
+           2558 STORE_FAST              20 (e)
+           2560 DELETE_FAST             20 (e)
+           2562 EXTENDED_ARG             4
+           2564 JUMP_BACKWARD         1125 (to 316)
+        >> 2566 LOAD_CONST               2 (None)
+           2568 STORE_FAST              20 (e)
+           2570 DELETE_FAST             20 (e)
+           2572 RERAISE                  1
+
+385     >> 2574 RERAISE                  0
+        >> 2576 COPY                     3
+           2578 POP_EXCEPT
+           2580 RERAISE                  1
+
+401     >> 2582 CLEANUP_THROW
+           2584 EXTENDED_ARG             4
+           2586 JUMP_BACKWARD         1042 (to 504)
+        >> 2588 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           2590 RERAISE                  1
+ExceptionTable:
+  10 to 40 -> 2588 [0] lasti
+  42 to 54 -> 548 [2]
+  58 to 64 -> 548 [2]
+  66 to 186 -> 2588 [0] lasti
+  190 to 280 -> 562 [0]
+  282 to 282 -> 558 [2]
+  284 to 308 -> 562 [0]
+  310 to 310 -> 2588 [0] lasti
+  312 to 314 -> 562 [0]
+  316 to 496 -> 2588 [0] lasti
+  498 to 498 -> 2582 [2]
+  500 to 556 -> 2588 [0] lasti
+  558 to 558 -> 562 [0]
+  562 to 580 -> 2576 [1] lasti
+  582 to 852 -> 2398 [1] lasti
+  856 to 926 -> 976 [1]
+  928 to 928 -> 934 [3]
+  930 to 956 -> 976 [1]
+  958 to 958 -> 2576 [1] lasti
+  960 to 968 -> 2588 [0] lasti
+  970 to 972 -> 976 [1]
+  974 to 974 -> 2398 [1] lasti
+  976 to 992 -> 1124 [2] lasti
+  994 to 1102 -> 1114 [2] lasti
+  1104 to 1112 -> 2398 [1] lasti
+  1114 to 1122 -> 1124 [2] lasti
+  1124 to 1254 -> 2398 [1] lasti
+  1256 to 1256 -> 1262 [3]
+  1258 to 1292 -> 2398 [1] lasti
+  1294 to 1294 -> 2576 [1] lasti
+  1296 to 1304 -> 2588 [0] lasti
+  1306 to 1484 -> 2398 [1] lasti
+  1486 to 1496 -> 2588 [0] lasti
+  1498 to 1656 -> 2398 [1] lasti
+  1658 to 1668 -> 2588 [0] lasti
+  1670 to 1780 -> 2398 [1] lasti
+  1782 to 1782 -> 1788 [3]
+  1784 to 1862 -> 2398 [1] lasti
+  1864 to 1874 -> 2588 [0] lasti
+  1876 to 2000 -> 2398 [1] lasti
+  2002 to 2002 -> 2008 [3]
+  2004 to 2054 -> 2398 [1] lasti
+  2056 to 2056 -> 2062 [3]
+  2058 to 2118 -> 2398 [1] lasti
+  2120 to 2130 -> 2588 [0] lasti
+  2132 to 2384 -> 2398 [1] lasti
+  2386 to 2396 -> 2588 [0] lasti
+  2398 to 2420 -> 2576 [1] lasti
+  2422 to 2484 -> 2566 [1] lasti
+  2486 to 2486 -> 2492 [3]
+  2488 to 2498 -> 2566 [1] lasti
+  2500 to 2500 -> 2576 [1] lasti
+  2502 to 2510 -> 2588 [0] lasti
+  2512 to 2552 -> 2566 [1] lasti
+  2554 to 2564 -> 2588 [0] lasti
+  2566 to 2574 -> 2576 [1] lasti
+  2576 to 2582 -> 2588 [0] lasti
+
+Disassembly of <code object emit at 0x7f6c9288aef0, file "app\services\flow_image_service.py", line 237>:
+              0 COPY_FREE_VARS           1
+
+237           2 RESUME                   0
+
+238           4 LOAD_DEREF               2 (on_log)
+              6 POP_JUMP_IF_FALSE       11 (to 30)
+
+239           8 NOP
+
+240          10 PUSH_NULL
+             12 LOAD_DEREF               2 (on_log)
+             14 LOAD_FAST                0 (msg)
+             16 LOAD_FAST                1 (level)
+             18 CALL                     2
+             26 POP_TOP
+
+241          28 RETURN_CONST             0 (None)
+
+244     >>   30 PUSH_NULL
+             32 LOAD_FAST                1 (level)
+             34 LOAD_CONST               1 (('warn', 'error'))
+             36 CONTAINS_OP              0
+             38 POP_JUMP_IF_FALSE       16 (to 72)
+             40 LOAD_GLOBAL              2 (log)
+             50 LOAD_ATTR                4 (warning)
+             70 JUMP_FORWARD            15 (to 102)
+        >>   72 LOAD_GLOBAL              2 (log)
+             82 LOAD_ATTR                6 (info)
+        >>  102 LOAD_CONST               2 ('[flow_image] ')
+            104 LOAD_FAST                0 (msg)
+            106 FORMAT_VALUE             0
+            108 BUILD_STRING             2
+            110 CALL                     1
+            118 POP_TOP
+            120 RETURN_CONST             0 (None)
+        >>  122 PUSH_EXC_INFO
+
+242         124 LOAD_GLOBAL              0 (Exception)
+            134 CHECK_EXC_MATCH
+            136 POP_JUMP_IF_FALSE        3 (to 144)
+            138 POP_TOP
+
+243         140 POP_EXCEPT
+            142 JUMP_BACKWARD           57 (to 30)
+
+242     >>  144 RERAISE                  0
+        >>  146 COPY                     3
+            148 POP_EXCEPT
+            150 RERAISE                  1
+ExceptionTable:
+  10 to 26 -> 122 [0]
+  122 to 138 -> 146 [1] lasti
+  144 to 144 -> 146 [1] lasti
+
+Disassembly of <code object passed_logo_gate at 0x7f6c926af560, file "app\services\flow_image_service.py", line 252>:
+              0 COPY_FREE_VARS           2
+
+252           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+259           8 NOP
+
+260          10 LOAD_CONST               1 (0)
+             12 LOAD_CONST               2 (('postprocess_flow_asset',))
+             14 IMPORT_NAME              0 (app.media.flow_watermark)
+             16 IMPORT_FROM              1 (postprocess_flow_asset)
+             18 STORE_FAST               1 (postprocess_flow_asset)
+             20 POP_TOP
+
+262          22 PUSH_NULL
+             24 LOAD_FAST                1 (postprocess_flow_asset)
+             26 LOAD_FAST                0 (path)
+             28 LOAD_CONST               3 (True)
+             30 KW_NAMES                 4 (('strict',))
+             32 CALL                     2
+             40 GET_AWAITABLE            0
+             42 LOAD_CONST               5 (None)
+        >>   44 SEND                     3 (to 54)
+             48 YIELD_VALUE              3
+             50 RESUME                   3
+             52 JUMP_BACKWARD_NO_INTERRUPT     5 (to 44)
+        >>   54 END_SEND
+             56 POP_TOP
+
+263          58 RETURN_CONST             3 (True)
+
+262     >>   60 CLEANUP_THROW
+             62 JUMP_BACKWARD            5 (to 54)
+        >>   64 PUSH_EXC_INFO
+
+264          66 LOAD_GLOBAL              4 (StudioError)
+             76 CHECK_EXC_MATCH
+             78 POP_JUMP_IF_FALSE       35 (to 150)
+             80 STORE_FAST               2 (ge)
+
+265          82 PUSH_NULL
+             84 LOAD_DEREF               3 (emit)
+             86 LOAD_DEREF               4 (label)
+             88 FORMAT_VALUE             0
+             90 LOAD_CONST               6 (': file trên đĩa chưa qua được cổng xoá logo (')
+             92 LOAD_FAST                2 (ge)
+             94 LOAD_ATTR                6 (code)
+            114 FORMAT_VALUE             0
+            116 LOAD_CONST               7 (') — bỏ, tạo lại.')
+            118 BUILD_STRING             4
+
+266         120 LOAD_CONST               8 ('warn')
+
+265         122 CALL                     2
+            130 POP_TOP
+
+267         132 POP_EXCEPT
+            134 LOAD_CONST               5 (None)
+            136 STORE_FAST               2 (ge)
+            138 DELETE_FAST              2 (ge)
+            140 RETURN_CONST             9 (False)
+        >>  142 LOAD_CONST               5 (None)
+            144 STORE_FAST               2 (ge)
+            146 DELETE_FAST              2 (ge)
+            148 RERAISE                  1
+
+264     >>  150 RERAISE                  0
+        >>  152 COPY                     3
+            154 POP_EXCEPT
+            156 RERAISE                  1
+        >>  158 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            160 RERAISE                  1
+ExceptionTable:
+  6 to 6 -> 158 [0] lasti
+  10 to 46 -> 64 [0]
+  48 to 48 -> 60 [2]
+  50 to 56 -> 64 [0]
+  58 to 58 -> 158 [0] lasti
+  60 to 60 -> 64 [0]
+  64 to 80 -> 152 [1] lasti
+  82 to 130 -> 142 [1] lasti
+  132 to 140 -> 158 [0] lasti
+  142 to 150 -> 152 [1] lasti
+  152 to 156 -> 158 [0] lasti
+
+Disassembly of <code object accept at 0x7f6c926af840, file "app\services\flow_image_service.py", line 269>:
+              0 COPY_FREE_VARS           2
+
+269           2 RESUME                   0
+
+271           4 LOAD_GLOBAL              1 (NULL + claim_asset)
+             14 LOAD_FAST                0 (path)
+             16 CALL                     1
+             24 STORE_FAST               1 (clash)
+
+272          26 LOAD_FAST                1 (clash)
+             28 POP_JUMP_IF_TRUE         1 (to 32)
+
+273          30 RETURN_CONST             1 (True)
+
+274     >>   32 PUSH_NULL
+             34 LOAD_DEREF               2 (emit)
+             36 LOAD_DEREF               3 (label)
+             38 FORMAT_VALUE             0
+             40 LOAD_CONST               2 (': Flow trả về ĐÚNG ẢNH ĐÃ DÙNG ở chỗ khác (')
+             42 LOAD_GLOBAL              3 (NULL + Path)
+             52 LOAD_FAST                1 (clash)
+             54 CALL                     1
+             62 LOAD_ATTR                4 (name)
+             82 FORMAT_VALUE             0
+             84 LOAD_CONST               3 (') — app bắt nhầm card cũ trên trang Flow. BỎ ảnh này, không gán nhầm.')
+             86 BUILD_STRING             4
+
+275          88 LOAD_CONST               4 ('warn')
+
+274          90 CALL                     2
+             98 POP_TOP
+
+276         100 NOP
+
+277         102 LOAD_FAST                0 (path)
+            104 LOAD_ATTR                7 (NULL|self + unlink)
+            124 LOAD_CONST               1 (True)
+            126 KW_NAMES                 5 (('missing_ok',))
+            128 CALL                     1
+            136 POP_TOP
+
+280         138 RETURN_CONST             6 (False)
+        >>  140 PUSH_EXC_INFO
+
+278         142 LOAD_GLOBAL              8 (OSError)
+            152 CHECK_EXC_MATCH
+            154 POP_JUMP_IF_FALSE        3 (to 162)
+            156 POP_TOP
+
+279         158 POP_EXCEPT
+
+280         160 RETURN_CONST             6 (False)
+
+278     >>  162 RERAISE                  0
+        >>  164 COPY                     3
+            166 POP_EXCEPT
+            168 RERAISE                  1
+ExceptionTable:
+  102 to 136 -> 140 [0]
+  140 to 156 -> 164 [1] lasti
+  162 to 162 -> 164 [1] lasti

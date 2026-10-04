@@ -1,0 +1,883 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Grok Imagine (grok.com) adapter — video image-to-video qua phiên SuperGrok, không cần API key.\n\nVì sao tồn tại: `api.x.ai` (ima2-gen/progrok) KHÔNG sinh nội dung thật trên token SuperGrok — nó trả\ncảnh stock bất chấp prompt (đo được SSIM ~0.05 so với keyframe), dù vẫn báo thành công + tính phí.\n`grok.com` là backend khác, được gói SuperGrok bao, tôn trọng prompt + ảnh tham chiếu (SSIM ~0.9).\nXem docs/grok-web-imagine-api.md.\n\nBackend KHÔNG gọi trực tiếp grok.com (cần cookie + anti-bot header trong trình duyệt). Thay vào đó gọi\n"bridge" HTTP do Electron mở (desktop/electron/grokweb/bridge.ts); Electron lái Chrome/CDP với phiên\nđã đăng nhập. URL bridge truyền qua --grokweb-bridge-url (config).\n\ngrok.com sinh video ĐỒNG BỘ theo stream → 1 request /grokweb/video trả luôn base64 mp4. Mọi lỗi ném\nStudioError mã GROK_* để step quyết định fallback (giữ keyframe ChatGPT thay thế).\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 15           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 17          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (base64)
+             24 STORE_NAME               3 (base64)
+
+ 18          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               4 (('Path',))
+             30 IMPORT_NAME              4 (pathlib)
+             32 IMPORT_FROM              5 (Path)
+             34 STORE_NAME               5 (Path)
+             36 POP_TOP
+
+ 20          38 LOAD_CONST               1 (0)
+             40 LOAD_CONST               3 (None)
+             42 IMPORT_NAME              6 (httpx)
+             44 STORE_NAME               6 (httpx)
+
+ 22          46 LOAD_CONST               1 (0)
+             48 LOAD_CONST               5 (('get_settings',))
+             50 IMPORT_NAME              7 (app.config)
+             52 IMPORT_FROM              8 (get_settings)
+             54 STORE_NAME               8 (get_settings)
+             56 POP_TOP
+
+ 23          58 LOAD_CONST               1 (0)
+             60 LOAD_CONST               6 (('StudioError', 'make_error', 'E'))
+             62 IMPORT_NAME              9 (app.core.errors)
+             64 IMPORT_FROM             10 (StudioError)
+             66 STORE_NAME              10 (StudioError)
+             68 IMPORT_FROM             11 (make_error)
+             70 STORE_NAME              11 (make_error)
+             72 IMPORT_FROM             12 (E)
+             74 STORE_NAME              12 (E)
+             76 POP_TOP
+
+ 25          78 LOAD_CONST               7 (25.0)
+             80 STORE_NAME              13 (STATUS_TIMEOUT)
+
+ 26          82 LOAD_CONST               8 (330.0)
+             84 STORE_NAME              14 (LOGIN_TIMEOUT)
+
+ 29          86 LOAD_CONST               9 (420.0)
+             88 STORE_NAME              15 (VIDEO_TIMEOUT)
+
+ 32          90 LOAD_NAME               12 (E)
+             92 LOAD_ATTR               32 (GROK_AUTH)
+            112 LOAD_NAME               12 (E)
+            114 LOAD_ATTR               34 (GROK_RATE_LIMIT)
+            134 LOAD_NAME               12 (E)
+            136 LOAD_ATTR               36 (GROK_NETWORK)
+            156 LOAD_NAME               12 (E)
+            158 LOAD_ATTR               38 (GROK_BAD_RESPONSE)
+
+ 33         178 LOAD_NAME               12 (E)
+            180 LOAD_ATTR               40 (GROK_MODERATED)
+            200 LOAD_NAME               12 (E)
+            202 LOAD_ATTR               42 (GROK_BRIDGE_UNAVAILABLE)
+
+ 31         222 BUILD_SET                6
+            224 STORE_NAME              22 (_KNOWN_CODES)
+
+ 37         226 PUSH_NULL
+            228 LOAD_BUILD_CLASS
+            230 LOAD_CONST              10 (<code object GrokWebClient at 0x7f6c933cbc30, file "app\adapters\grokweb_session.py", line 37>)
+            232 MAKE_FUNCTION            0
+            234 LOAD_CONST              11 ('GrokWebClient')
+            236 CALL                     2
+            244 STORE_NAME              23 (GrokWebClient)
+            246 RETURN_CONST             3 (None)
+
+Disassembly of <code object GrokWebClient at 0x7f6c933cbc30, file "app\adapters\grokweb_session.py", line 37>:
+ 37           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('GrokWebClient')
+              8 STORE_NAME               2 (__qualname__)
+
+ 38          10 LOAD_CONST               1 ('Client tới bridge grok.com. account_id = partition Chrome của tài khoản Grok (None = default).')
+             12 STORE_NAME               3 (__doc__)
+
+ 40          14 NOP
+
+ 41          16 NOP
+
+ 40          18 LOAD_CONST              14 ((None, None, None))
+
+ 41          20 NOP
+
+ 40          22 LOAD_CONST              15 (('bridge_url', 'str | None', 'token', 'str | None', 'account_id', 'str | None'))
+             24 LOAD_CONST               3 (<code object __init__ at 0x7f6c93288760, file "app\adapters\grokweb_session.py", line 40>)
+             26 MAKE_FUNCTION            5 (defaults, annotations)
+             28 STORE_NAME               4 (__init__)
+
+ 47          30 LOAD_NAME                5 (property)
+
+ 48          32 LOAD_CONST              16 (('return', 'bool'))
+             34 LOAD_CONST               4 (<code object available at 0x7f6c9329dc50, file "app\adapters\grokweb_session.py", line 47>)
+             36 MAKE_FUNCTION            4 (annotations)
+
+ 47          38 CALL                     0
+
+ 48          46 STORE_NAME               6 (available)
+
+ 51          48 LOAD_CONST              17 (('return', 'dict'))
+             50 LOAD_CONST               5 (<code object _headers at 0x7f6c929b4c70, file "app\adapters\grokweb_session.py", line 51>)
+             52 MAKE_FUNCTION            4 (annotations)
+             54 STORE_NAME               7 (_headers)
+
+ 54          56 LOAD_CONST              18 (('r', 'httpx.Response', 'return', 'None'))
+             58 LOAD_CONST               6 (<code object _raise_from at 0x290e9d00, file "app\adapters\grokweb_session.py", line 54>)
+             60 MAKE_FUNCTION            4 (annotations)
+             62 STORE_NAME               8 (_raise_from)
+
+ 63          64 LOAD_CONST              17 (('return', 'dict'))
+             66 LOAD_CONST               7 (<code object get_status at 0x29089530, file "app\adapters\grokweb_session.py", line 63>)
+             68 MAKE_FUNCTION            4 (annotations)
+             70 STORE_NAME               9 (get_status)
+
+ 76          72 LOAD_CONST              19 ((300000,))
+             74 LOAD_CONST              20 (('max_wait_ms', 'int', 'return', 'dict'))
+             76 LOAD_CONST               8 (<code object login at 0x29076070, file "app\adapters\grokweb_session.py", line 76>)
+             78 MAKE_FUNCTION            5 (defaults, annotations)
+             80 STORE_NAME              10 (login)
+
+ 91          82 LOAD_CONST               9 ('')
+
+ 92          84 LOAD_CONST              10 ('2:3')
+
+ 93          86 LOAD_CONST              11 (6)
+
+ 86          88 LOAD_CONST              12 (('prompt', 'aspect', 'duration_sec'))
+             90 BUILD_CONST_KEY_MAP      3
+
+ 88          92 NOP
+
+ 86          94 NOP
+
+ 89          96 NOP
+
+ 86          98 NOP
+
+ 91         100 NOP
+
+ 86         102 NOP
+
+ 92         104 NOP
+
+ 86         106 NOP
+
+ 93         108 NOP
+
+ 86         110 NOP
+
+ 94         112 NOP
+
+ 86         114 LOAD_CONST              21 (('keyframe_path', 'Path', 'out_path', 'Path', 'prompt', 'str', 'aspect', 'str', 'duration_sec', 'int', 'return', 'Path'))
+            116 LOAD_CONST              13 (<code object generate_video at 0x29063120, file "app\adapters\grokweb_session.py", line 86>)
+            118 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            120 STORE_NAME              11 (generate_video)
+            122 RETURN_CONST             2 (None)
+
+Disassembly of <code object __init__ at 0x7f6c93288760, file "app\adapters\grokweb_session.py", line 40>:
+ 40           0 RESUME                   0
+
+ 42           2 LOAD_GLOBAL              1 (NULL + get_settings)
+             12 CALL                     0
+             20 STORE_FAST               4 (st)
+
+ 43          22 LOAD_FAST                1 (bridge_url)
+             24 COPY                     1
+             26 POP_JUMP_IF_TRUE        17 (to 62)
+             28 POP_TOP
+             30 LOAD_GLOBAL              3 (NULL + getattr)
+             40 LOAD_FAST                4 (st)
+             42 LOAD_CONST               1 ('grokweb_bridge_url')
+             44 LOAD_CONST               2 ('')
+             46 CALL                     3
+             54 COPY                     1
+             56 POP_JUMP_IF_TRUE         2 (to 62)
+             58 POP_TOP
+             60 LOAD_CONST               2 ('')
+        >>   62 LOAD_ATTR                5 (NULL|self + rstrip)
+             82 LOAD_CONST               3 ('/')
+             84 CALL                     1
+             92 LOAD_FAST                0 (self)
+             94 STORE_ATTR               3 (bridge_url)
+
+ 44         104 LOAD_FAST                2 (token)
+            106 COPY                     1
+            108 POP_JUMP_IF_TRUE        12 (to 134)
+            110 POP_TOP
+            112 LOAD_FAST                4 (st)
+            114 LOAD_ATTR                8 (token)
+        >>  134 LOAD_FAST                0 (self)
+            136 STORE_ATTR               4 (token)
+
+ 45         146 LOAD_FAST                3 (account_id)
+            148 LOAD_FAST                0 (self)
+            150 STORE_ATTR               5 (account_id)
+            160 RETURN_CONST             0 (None)
+
+Disassembly of <code object available at 0x7f6c9329dc50, file "app\adapters\grokweb_session.py", line 47>:
+ 47           0 RESUME                   0
+
+ 49           2 LOAD_GLOBAL              1 (NULL + bool)
+             12 LOAD_FAST                0 (self)
+             14 LOAD_ATTR                2 (bridge_url)
+             34 CALL                     1
+             42 RETURN_VALUE
+
+Disassembly of <code object _headers at 0x7f6c929b4c70, file "app\adapters\grokweb_session.py", line 51>:
+ 51           0 RESUME                   0
+
+ 52           2 LOAD_FAST                0 (self)
+              4 LOAD_ATTR                0 (token)
+             24 LOAD_CONST               1 ('application/json')
+             26 LOAD_CONST               2 (('X-Studio-Token', 'Content-Type'))
+             28 BUILD_CONST_KEY_MAP      2
+             30 RETURN_VALUE
+
+Disassembly of <code object _raise_from at 0x290e9d00, file "app\adapters\grokweb_session.py", line 54>:
+ 54           0 RESUME                   0
+
+ 55           2 NOP
+
+ 56           4 LOAD_FAST                1 (r)
+              6 LOAD_ATTR                1 (NULL|self + json)
+             26 CALL                     0
+             34 STORE_FAST               2 (err)
+
+ 57          36 LOAD_FAST                2 (err)
+             38 LOAD_ATTR                3 (NULL|self + get)
+             58 LOAD_CONST               1 ('error_code')
+             60 LOAD_GLOBAL              4 (E)
+             70 LOAD_ATTR                6 (GROK_NETWORK)
+             90 CALL                     2
+             98 STORE_FAST               3 (code)
+
+ 58         100 LOAD_FAST                2 (err)
+            102 LOAD_ATTR                3 (NULL|self + get)
+            122 LOAD_CONST               2 ('message')
+            124 LOAD_CONST               3 ('HTTP ')
+            126 LOAD_FAST                1 (r)
+            128 LOAD_ATTR                8 (status_code)
+            148 FORMAT_VALUE             0
+            150 BUILD_STRING             2
+            152 CALL                     2
+            160 STORE_FAST               4 (msg)
+
+ 61     >>  162 LOAD_GLOBAL             13 (NULL + make_error)
+            172 LOAD_FAST                3 (code)
+            174 LOAD_GLOBAL             14 (_KNOWN_CODES)
+            184 CONTAINS_OP              0
+            186 POP_JUMP_IF_FALSE        7 (to 202)
+            188 LOAD_FAST                3 (code)
+            190 LOAD_FAST                4 (msg)
+            192 CALL                     2
+            200 RAISE_VARARGS            1
+        >>  202 LOAD_GLOBAL              4 (E)
+            212 LOAD_ATTR                6 (GROK_NETWORK)
+            232 LOAD_FAST                4 (msg)
+            234 CALL                     2
+            242 RAISE_VARARGS            1
+        >>  244 PUSH_EXC_INFO
+
+ 59         246 LOAD_GLOBAL             10 (Exception)
+            256 CHECK_EXC_MATCH
+            258 POP_JUMP_IF_FALSE       34 (to 328)
+            260 POP_TOP
+
+ 60         262 LOAD_GLOBAL              4 (E)
+            272 LOAD_ATTR                6 (GROK_NETWORK)
+            292 LOAD_CONST               3 ('HTTP ')
+            294 LOAD_FAST                1 (r)
+            296 LOAD_ATTR                8 (status_code)
+            316 FORMAT_VALUE             0
+            318 BUILD_STRING             2
+            320 STORE_FAST               4 (msg)
+            322 STORE_FAST               3 (code)
+            324 POP_EXCEPT
+            326 JUMP_BACKWARD           83 (to 162)
+
+ 59     >>  328 RERAISE                  0
+        >>  330 COPY                     3
+            332 POP_EXCEPT
+            334 RERAISE                  1
+ExceptionTable:
+  4 to 160 -> 244 [0]
+  244 to 322 -> 330 [1] lasti
+  328 to 328 -> 330 [1] lasti
+
+Disassembly of <code object get_status at 0x29089530, file "app\adapters\grokweb_session.py", line 63>:
+ 63           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 64           6 LOAD_FAST                0 (self)
+              8 LOAD_ATTR                0 (available)
+             28 POP_JUMP_IF_TRUE         4 (to 38)
+
+ 65          30 LOAD_CONST               1 ('connected')
+             32 LOAD_CONST               2 (False)
+             34 BUILD_MAP                1
+             36 RETURN_VALUE
+
+ 66     >>   38 NOP
+
+ 67          40 LOAD_FAST                0 (self)
+             42 LOAD_ATTR                2 (account_id)
+             62 POP_JUMP_IF_FALSE       14 (to 92)
+             64 LOAD_CONST               3 ('account_id')
+             66 LOAD_FAST                0 (self)
+             68 LOAD_ATTR                2 (account_id)
+             88 BUILD_MAP                1
+             90 JUMP_FORWARD             1 (to 94)
+        >>   92 LOAD_CONST               0 (None)
+        >>   94 STORE_FAST               1 (params)
+
+ 68          96 LOAD_GLOBAL              5 (NULL + httpx)
+            106 LOAD_ATTR                6 (AsyncClient)
+            126 LOAD_GLOBAL              8 (STATUS_TIMEOUT)
+            136 KW_NAMES                 4 (('timeout',))
+            138 CALL                     1
+            146 BEFORE_ASYNC_WITH
+            148 GET_AWAITABLE            1
+            150 LOAD_CONST               0 (None)
+        >>  152 SEND                     3 (to 162)
+            156 YIELD_VALUE              3
+            158 RESUME                   3
+            160 JUMP_BACKWARD_NO_INTERRUPT     5 (to 152)
+        >>  162 END_SEND
+            164 STORE_FAST               2 (c)
+
+ 69         166 LOAD_FAST                2 (c)
+            168 LOAD_ATTR               11 (NULL|self + get)
+            188 LOAD_FAST                0 (self)
+            190 LOAD_ATTR               12 (bridge_url)
+            210 FORMAT_VALUE             0
+            212 LOAD_CONST               5 ('/grokweb/status')
+            214 BUILD_STRING             2
+            216 LOAD_FAST                0 (self)
+            218 LOAD_ATTR               15 (NULL|self + _headers)
+            238 CALL                     0
+            246 LOAD_FAST                1 (params)
+            248 KW_NAMES                 6 (('headers', 'params'))
+            250 CALL                     3
+            258 GET_AWAITABLE            0
+            260 LOAD_CONST               0 (None)
+        >>  262 SEND                     3 (to 272)
+            266 YIELD_VALUE              4
+            268 RESUME                   3
+            270 JUMP_BACKWARD_NO_INTERRUPT     5 (to 262)
+        >>  272 END_SEND
+            274 STORE_FAST               3 (r)
+
+ 70         276 LOAD_FAST                3 (r)
+            278 LOAD_ATTR               16 (status_code)
+            298 LOAD_CONST               7 (200)
+            300 COMPARE_OP              40 (==)
+            304 POP_JUMP_IF_FALSE       33 (to 372)
+
+ 71         306 LOAD_FAST                3 (r)
+            308 LOAD_ATTR               19 (NULL|self + json)
+            328 CALL                     0
+
+ 68         336 SWAP                     2
+            338 LOAD_CONST               0 (None)
+            340 LOAD_CONST               0 (None)
+            342 LOAD_CONST               0 (None)
+            344 CALL                     2
+            352 GET_AWAITABLE            2
+            354 LOAD_CONST               0 (None)
+        >>  356 SEND                     3 (to 366)
+            360 YIELD_VALUE              3
+            362 RESUME                   3
+            364 JUMP_BACKWARD_NO_INTERRUPT     5 (to 356)
+        >>  366 END_SEND
+            368 POP_TOP
+            370 RETURN_VALUE
+
+ 72     >>  372 LOAD_CONST               1 ('connected')
+            374 LOAD_CONST               2 (False)
+            376 BUILD_MAP                1
+
+ 68         378 SWAP                     2
+            380 LOAD_CONST               0 (None)
+            382 LOAD_CONST               0 (None)
+            384 LOAD_CONST               0 (None)
+            386 CALL                     2
+            394 GET_AWAITABLE            2
+            396 LOAD_CONST               0 (None)
+        >>  398 SEND                     3 (to 408)
+            402 YIELD_VALUE              3
+            404 RESUME                   3
+            406 JUMP_BACKWARD_NO_INTERRUPT     5 (to 398)
+        >>  408 END_SEND
+            410 POP_TOP
+            412 RETURN_VALUE
+        >>  414 CLEANUP_THROW
+            416 JUMP_BACKWARD          128 (to 162)
+
+ 69     >>  418 CLEANUP_THROW
+            420 JUMP_BACKWARD           75 (to 272)
+
+ 68     >>  422 CLEANUP_THROW
+            424 JUMP_BACKWARD           30 (to 366)
+        >>  426 CLEANUP_THROW
+            428 JUMP_BACKWARD           11 (to 408)
+        >>  430 PUSH_EXC_INFO
+            432 WITH_EXCEPT_START
+            434 GET_AWAITABLE            2
+            436 LOAD_CONST               0 (None)
+        >>  438 SEND                     4 (to 450)
+            442 YIELD_VALUE              4
+            444 RESUME                   3
+            446 JUMP_BACKWARD_NO_INTERRUPT     5 (to 438)
+        >>  448 CLEANUP_THROW
+        >>  450 END_SEND
+            452 POP_JUMP_IF_TRUE         1 (to 456)
+            454 RERAISE                  2
+        >>  456 POP_TOP
+            458 POP_EXCEPT
+            460 POP_TOP
+            462 POP_TOP
+            464 RETURN_CONST             0 (None)
+        >>  466 COPY                     3
+            468 POP_EXCEPT
+            470 RERAISE                  1
+        >>  472 PUSH_EXC_INFO
+
+ 73         474 LOAD_GLOBAL             20 (Exception)
+            484 CHECK_EXC_MATCH
+            486 POP_JUMP_IF_FALSE        7 (to 502)
+            488 POP_TOP
+
+ 74         490 LOAD_CONST               1 ('connected')
+            492 LOAD_CONST               2 (False)
+            494 BUILD_MAP                1
+            496 SWAP                     2
+            498 POP_EXCEPT
+            500 RETURN_VALUE
+
+ 73     >>  502 RERAISE                  0
+        >>  504 COPY                     3
+            506 POP_EXCEPT
+            508 RERAISE                  1
+        >>  510 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            512 RERAISE                  1
+ExceptionTable:
+  4 to 36 -> 510 [0] lasti
+  40 to 154 -> 472 [0]
+  156 to 156 -> 414 [3]
+  158 to 162 -> 472 [0]
+  164 to 264 -> 430 [1] lasti
+  266 to 266 -> 418 [3]
+  268 to 334 -> 430 [1] lasti
+  336 to 358 -> 472 [0]
+  360 to 360 -> 422 [3]
+  362 to 368 -> 472 [0]
+  370 to 370 -> 510 [0] lasti
+  372 to 376 -> 430 [1] lasti
+  378 to 400 -> 472 [0]
+  402 to 402 -> 426 [3]
+  404 to 410 -> 472 [0]
+  412 to 412 -> 510 [0] lasti
+  414 to 414 -> 472 [0]
+  418 to 418 -> 430 [1] lasti
+  422 to 422 -> 472 [0]
+  426 to 426 -> 472 [0]
+  430 to 440 -> 466 [3] lasti
+  442 to 442 -> 448 [6]
+  444 to 456 -> 466 [3] lasti
+  458 to 462 -> 472 [0]
+  464 to 464 -> 510 [0] lasti
+  466 to 470 -> 472 [0]
+  472 to 496 -> 504 [1] lasti
+  498 to 500 -> 510 [0] lasti
+  502 to 502 -> 504 [1] lasti
+  504 to 508 -> 510 [0] lasti
+
+Disassembly of <code object login at 0x29076070, file "app\adapters\grokweb_session.py", line 76>:
+ 76           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 77           6 LOAD_FAST                0 (self)
+              8 LOAD_ATTR                0 (available)
+             28 POP_JUMP_IF_TRUE        26 (to 82)
+
+ 78          30 LOAD_GLOBAL              3 (NULL + make_error)
+             40 LOAD_GLOBAL              4 (E)
+             50 LOAD_ATTR                6 (GROK_BRIDGE_UNAVAILABLE)
+             70 LOAD_CONST               1 ('Bridge Grok web chưa sẵn sàng.')
+             72 CALL                     2
+             80 RAISE_VARARGS            1
+
+ 79     >>   82 LOAD_FAST                0 (self)
+             84 LOAD_ATTR                8 (account_id)
+            104 COPY                     1
+            106 POP_JUMP_IF_TRUE         2 (to 112)
+            108 POP_TOP
+            110 LOAD_CONST               2 ('default')
+        >>  112 LOAD_FAST                1 (max_wait_ms)
+            114 LOAD_CONST               3 (('account_id', 'max_wait_ms'))
+            116 BUILD_CONST_KEY_MAP      2
+            118 STORE_FAST               2 (payload)
+
+ 80         120 LOAD_GLOBAL             11 (NULL + httpx)
+            130 LOAD_ATTR               12 (AsyncClient)
+            150 LOAD_GLOBAL             14 (LOGIN_TIMEOUT)
+            160 KW_NAMES                 4 (('timeout',))
+            162 CALL                     1
+            170 BEFORE_ASYNC_WITH
+            172 GET_AWAITABLE            1
+            174 LOAD_CONST               0 (None)
+        >>  176 SEND                     3 (to 186)
+            180 YIELD_VALUE              2
+            182 RESUME                   3
+            184 JUMP_BACKWARD_NO_INTERRUPT     5 (to 176)
+        >>  186 END_SEND
+            188 STORE_FAST               3 (c)
+
+ 81         190 LOAD_FAST                3 (c)
+            192 LOAD_ATTR               17 (NULL|self + post)
+            212 LOAD_FAST                0 (self)
+            214 LOAD_ATTR               18 (bridge_url)
+            234 FORMAT_VALUE             0
+            236 LOAD_CONST               5 ('/grokweb/login')
+            238 BUILD_STRING             2
+            240 LOAD_FAST                0 (self)
+            242 LOAD_ATTR               21 (NULL|self + _headers)
+            262 CALL                     0
+            270 LOAD_FAST                2 (payload)
+            272 KW_NAMES                 6 (('headers', 'json'))
+            274 CALL                     3
+            282 GET_AWAITABLE            0
+            284 LOAD_CONST               0 (None)
+        >>  286 SEND                     3 (to 296)
+            290 YIELD_VALUE              3
+            292 RESUME                   3
+            294 JUMP_BACKWARD_NO_INTERRUPT     5 (to 286)
+        >>  296 END_SEND
+            298 STORE_FAST               4 (r)
+
+ 82         300 LOAD_FAST                4 (r)
+            302 LOAD_ATTR               22 (status_code)
+            322 LOAD_CONST               7 (200)
+            324 COMPARE_OP              55 (!=)
+            328 POP_JUMP_IF_FALSE       17 (to 364)
+
+ 83         330 LOAD_FAST                0 (self)
+            332 LOAD_ATTR               25 (NULL|self + _raise_from)
+            352 LOAD_FAST                4 (r)
+            354 CALL                     1
+            362 POP_TOP
+
+ 84     >>  364 LOAD_FAST                4 (r)
+            366 LOAD_ATTR               27 (NULL|self + json)
+            386 CALL                     0
+
+ 80         394 SWAP                     2
+            396 LOAD_CONST               0 (None)
+            398 LOAD_CONST               0 (None)
+            400 LOAD_CONST               0 (None)
+            402 CALL                     2
+            410 GET_AWAITABLE            2
+            412 LOAD_CONST               0 (None)
+        >>  414 SEND                     3 (to 424)
+            418 YIELD_VALUE              2
+            420 RESUME                   3
+            422 JUMP_BACKWARD_NO_INTERRUPT     5 (to 414)
+        >>  424 END_SEND
+            426 POP_TOP
+            428 RETURN_VALUE
+        >>  430 CLEANUP_THROW
+            432 JUMP_BACKWARD          124 (to 186)
+
+ 81     >>  434 CLEANUP_THROW
+            436 JUMP_BACKWARD           71 (to 296)
+
+ 80     >>  438 CLEANUP_THROW
+            440 JUMP_BACKWARD            9 (to 424)
+        >>  442 PUSH_EXC_INFO
+            444 WITH_EXCEPT_START
+            446 GET_AWAITABLE            2
+            448 LOAD_CONST               0 (None)
+        >>  450 SEND                     4 (to 462)
+            454 YIELD_VALUE              3
+            456 RESUME                   3
+            458 JUMP_BACKWARD_NO_INTERRUPT     5 (to 450)
+        >>  460 CLEANUP_THROW
+        >>  462 END_SEND
+            464 POP_JUMP_IF_TRUE         1 (to 468)
+            466 RERAISE                  2
+        >>  468 POP_TOP
+            470 POP_EXCEPT
+            472 POP_TOP
+            474 POP_TOP
+            476 RETURN_CONST             0 (None)
+        >>  478 COPY                     3
+            480 POP_EXCEPT
+            482 RERAISE                  1
+        >>  484 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            486 RERAISE                  1
+ExceptionTable:
+  4 to 178 -> 484 [0] lasti
+  180 to 180 -> 430 [3]
+  182 to 186 -> 484 [0] lasti
+  188 to 288 -> 442 [1] lasti
+  290 to 290 -> 434 [3]
+  292 to 392 -> 442 [1] lasti
+  394 to 416 -> 484 [0] lasti
+  418 to 418 -> 438 [3]
+  420 to 430 -> 484 [0] lasti
+  434 to 434 -> 442 [1] lasti
+  438 to 438 -> 484 [0] lasti
+  442 to 452 -> 478 [3] lasti
+  454 to 454 -> 460 [6]
+  456 to 468 -> 478 [3] lasti
+  470 to 482 -> 484 [0] lasti
+
+Disassembly of <code object generate_video at 0x29063120, file "app\adapters\grokweb_session.py", line 86>:
+ 86           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 96           6 LOAD_FAST                0 (self)
+              8 LOAD_ATTR                0 (available)
+             28 POP_JUMP_IF_TRUE        26 (to 82)
+
+ 97          30 LOAD_GLOBAL              3 (NULL + make_error)
+             40 LOAD_GLOBAL              4 (E)
+             50 LOAD_ATTR                6 (GROK_BRIDGE_UNAVAILABLE)
+             70 LOAD_CONST               1 ('Bridge Grok web chưa sẵn sàng.')
+             72 CALL                     2
+             80 RAISE_VARARGS            1
+
+ 98     >>   82 LOAD_GLOBAL              9 (NULL + Path)
+             92 LOAD_FAST                1 (keyframe_path)
+             94 CALL                     1
+            102 STORE_FAST               6 (kf)
+
+ 99         104 LOAD_FAST                6 (kf)
+            106 LOAD_ATTR               11 (NULL|self + is_file)
+            126 CALL                     0
+            134 POP_JUMP_IF_TRUE        29 (to 194)
+
+100         136 LOAD_GLOBAL              3 (NULL + make_error)
+            146 LOAD_GLOBAL              4 (E)
+            156 LOAD_ATTR               12 (GROK_BAD_RESPONSE)
+            176 LOAD_CONST               2 ('Không thấy keyframe: ')
+            178 LOAD_FAST                6 (kf)
+            180 FORMAT_VALUE             0
+            182 BUILD_STRING             2
+            184 CALL                     2
+            192 RAISE_VARARGS            1
+
+101     >>  194 LOAD_FAST                6 (kf)
+            196 LOAD_ATTR               14 (suffix)
+            216 LOAD_ATTR               17 (NULL|self + lower)
+            236 CALL                     0
+            244 LOAD_CONST               3 (('.jpg', '.jpeg'))
+            246 CONTAINS_OP              0
+            248 POP_JUMP_IF_FALSE        2 (to 254)
+            250 LOAD_CONST               4 ('image/jpeg')
+            252 JUMP_FORWARD             1 (to 256)
+        >>  254 LOAD_CONST               5 ('image/png')
+        >>  256 STORE_FAST               7 (mime)
+
+103         258 LOAD_FAST                0 (self)
+            260 LOAD_ATTR               18 (account_id)
+            280 COPY                     1
+            282 POP_JUMP_IF_TRUE         2 (to 288)
+            284 POP_TOP
+            286 LOAD_CONST               6 ('default')
+
+104     >>  288 LOAD_GLOBAL             21 (NULL + base64)
+            298 LOAD_ATTR               22 (b64encode)
+            318 LOAD_FAST                6 (kf)
+            320 LOAD_ATTR               25 (NULL|self + read_bytes)
+            340 CALL                     0
+            348 CALL                     1
+            356 LOAD_ATTR               27 (NULL|self + decode)
+            376 LOAD_CONST               7 ('ascii')
+            378 CALL                     1
+
+105         386 LOAD_FAST                7 (mime)
+
+106         388 LOAD_FAST                3 (prompt)
+            390 COPY                     1
+            392 POP_JUMP_IF_TRUE         2 (to 398)
+            394 POP_TOP
+            396 LOAD_CONST               8 ('')
+
+107     >>  398 LOAD_FAST                4 (aspect)
+            400 COPY                     1
+            402 POP_JUMP_IF_TRUE         2 (to 408)
+            404 POP_TOP
+            406 LOAD_CONST               9 ('2:3')
+
+108     >>  408 LOAD_GLOBAL             29 (NULL + int)
+            418 LOAD_FAST                5 (duration_sec)
+            420 COPY                     1
+            422 POP_JUMP_IF_TRUE         2 (to 428)
+            424 POP_TOP
+            426 LOAD_CONST              10 (6)
+        >>  428 CALL                     1
+
+102         436 LOAD_CONST              11 (('account_id', 'keyframe_b64', 'keyframe_mime', 'prompt', 'aspect', 'duration_sec'))
+            438 BUILD_CONST_KEY_MAP      6
+            440 STORE_FAST               8 (payload)
+
+110         442 LOAD_GLOBAL             31 (NULL + httpx)
+            452 LOAD_ATTR               32 (AsyncClient)
+            472 LOAD_GLOBAL             34 (VIDEO_TIMEOUT)
+            482 KW_NAMES                12 (('timeout',))
+            484 CALL                     1
+            492 BEFORE_ASYNC_WITH
+            494 GET_AWAITABLE            1
+            496 LOAD_CONST              13 (None)
+        >>  498 SEND                     3 (to 508)
+            502 YIELD_VALUE              2
+            504 RESUME                   3
+            506 JUMP_BACKWARD_NO_INTERRUPT     5 (to 498)
+        >>  508 END_SEND
+            510 STORE_FAST               9 (c)
+
+111         512 LOAD_FAST                9 (c)
+            514 LOAD_ATTR               37 (NULL|self + post)
+            534 LOAD_FAST                0 (self)
+            536 LOAD_ATTR               38 (bridge_url)
+            556 FORMAT_VALUE             0
+            558 LOAD_CONST              14 ('/grokweb/video')
+            560 BUILD_STRING             2
+            562 LOAD_FAST                0 (self)
+            564 LOAD_ATTR               41 (NULL|self + _headers)
+            584 CALL                     0
+            592 LOAD_FAST                8 (payload)
+            594 KW_NAMES                15 (('headers', 'json'))
+            596 CALL                     3
+            604 GET_AWAITABLE            0
+            606 LOAD_CONST              13 (None)
+        >>  608 SEND                     3 (to 618)
+            612 YIELD_VALUE              3
+            614 RESUME                   3
+            616 JUMP_BACKWARD_NO_INTERRUPT     5 (to 608)
+        >>  618 END_SEND
+            620 STORE_FAST              10 (r)
+
+112         622 LOAD_FAST               10 (r)
+            624 LOAD_ATTR               42 (status_code)
+            644 LOAD_CONST              16 (200)
+            646 COMPARE_OP              55 (!=)
+            650 POP_JUMP_IF_FALSE       17 (to 686)
+
+113         652 LOAD_FAST                0 (self)
+            654 LOAD_ATTR               45 (NULL|self + _raise_from)
+            674 LOAD_FAST               10 (r)
+            676 CALL                     1
+            684 POP_TOP
+
+114     >>  686 LOAD_FAST               10 (r)
+            688 LOAD_ATTR               47 (NULL|self + json)
+            708 CALL                     0
+            716 STORE_FAST              11 (data)
+
+110         718 LOAD_CONST              13 (None)
+            720 LOAD_CONST              13 (None)
+            722 LOAD_CONST              13 (None)
+            724 CALL                     2
+            732 GET_AWAITABLE            2
+            734 LOAD_CONST              13 (None)
+        >>  736 SEND                     3 (to 746)
+            740 YIELD_VALUE              2
+            742 RESUME                   3
+            744 JUMP_BACKWARD_NO_INTERRUPT     5 (to 736)
+        >>  746 END_SEND
+            748 POP_TOP
+
+115     >>  750 LOAD_FAST_CHECK         11 (data)
+            752 LOAD_ATTR               49 (NULL|self + get)
+            772 LOAD_CONST              17 ('base64')
+            774 CALL                     1
+            782 COPY                     1
+            784 POP_JUMP_IF_TRUE         2 (to 790)
+            786 POP_TOP
+            788 LOAD_CONST               8 ('')
+        >>  790 STORE_FAST              12 (b64)
+
+116         792 LOAD_FAST               12 (b64)
+            794 POP_JUMP_IF_TRUE        26 (to 848)
+
+117         796 LOAD_GLOBAL              3 (NULL + make_error)
+            806 LOAD_GLOBAL              4 (E)
+            816 LOAD_ATTR               12 (GROK_BAD_RESPONSE)
+            836 LOAD_CONST              18 ('Bridge Grok web không trả về video.')
+            838 CALL                     2
+            846 RAISE_VARARGS            1
+
+118     >>  848 LOAD_GLOBAL              9 (NULL + Path)
+            858 LOAD_FAST                2 (out_path)
+            860 CALL                     1
+            868 STORE_FAST              13 (out)
+
+119         870 LOAD_FAST               13 (out)
+            872 LOAD_ATTR               50 (parent)
+            892 LOAD_ATTR               53 (NULL|self + mkdir)
+            912 LOAD_CONST              19 (True)
+            914 LOAD_CONST              19 (True)
+            916 KW_NAMES                20 (('parents', 'exist_ok'))
+            918 CALL                     2
+            926 POP_TOP
+
+120         928 LOAD_FAST               13 (out)
+            930 LOAD_ATTR               55 (NULL|self + write_bytes)
+            950 LOAD_GLOBAL             21 (NULL + base64)
+            960 LOAD_ATTR               56 (b64decode)
+            980 LOAD_FAST               12 (b64)
+            982 CALL                     1
+            990 CALL                     1
+            998 POP_TOP
+
+121        1000 LOAD_FAST               13 (out)
+           1002 RETURN_VALUE
+
+110     >> 1004 CLEANUP_THROW
+           1006 JUMP_BACKWARD          250 (to 508)
+
+111     >> 1008 CLEANUP_THROW
+           1010 JUMP_BACKWARD          197 (to 618)
+
+110     >> 1012 CLEANUP_THROW
+           1014 JUMP_BACKWARD          135 (to 746)
+        >> 1016 PUSH_EXC_INFO
+           1018 WITH_EXCEPT_START
+           1020 GET_AWAITABLE            2
+           1022 LOAD_CONST              13 (None)
+        >> 1024 SEND                     4 (to 1036)
+           1028 YIELD_VALUE              3
+           1030 RESUME                   3
+           1032 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1024)
+        >> 1034 CLEANUP_THROW
+        >> 1036 END_SEND
+           1038 POP_JUMP_IF_TRUE         1 (to 1042)
+           1040 RERAISE                  2
+        >> 1042 POP_TOP
+           1044 POP_EXCEPT
+           1046 POP_TOP
+           1048 POP_TOP
+           1050 JUMP_BACKWARD          151 (to 750)
+        >> 1052 COPY                     3
+           1054 POP_EXCEPT
+           1056 RERAISE                  1
+        >> 1058 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1060 RERAISE                  1
+ExceptionTable:
+  4 to 500 -> 1058 [0] lasti
+  502 to 502 -> 1004 [3]
+  504 to 508 -> 1058 [0] lasti
+  510 to 610 -> 1016 [1] lasti
+  612 to 612 -> 1008 [3]
+  614 to 716 -> 1016 [1] lasti
+  718 to 738 -> 1058 [0] lasti
+  740 to 740 -> 1012 [2]
+  742 to 1004 -> 1058 [0] lasti
+  1008 to 1008 -> 1016 [1] lasti
+  1012 to 1012 -> 1058 [0] lasti
+  1016 to 1026 -> 1052 [3] lasti
+  1028 to 1028 -> 1034 [6]
+  1030 to 1042 -> 1052 [3] lasti
+  1044 to 1056 -> 1058 [0] lasti

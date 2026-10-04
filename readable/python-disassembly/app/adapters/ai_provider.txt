@@ -1,0 +1,1265 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Chọn nhà cung cấp AI cho khâu SẢN XUẤT (dịch · SEO · ý tưởng · kịch bản · storyboard).\n\nBốn loại provider, cùng một giao diện client:\n\n    deepseek            API key, đường HTTP thẳng\n    chatgpt / gemini    phiên đăng nhập trình duyệt (miễn phí theo gói của user, trần ~4.500 ký tự)\n    api:<id>[/<model>]  endpoint do NGƯỜI DÙNG tự thêm — OpenAI-compatible hoặc Anthropic\n                        (xem app/services/llm_endpoint_store.py, docs/plan-custom-llm-api.md)\n\nSetting `translate_provider` quyết định mặc định toàn app; mỗi kênh AI Studio ghi đè bằng\n`channel_profile.provider`. CHẶT THEO SETTING: đã chọn cái nào thì dùng đúng cái đó, lỗi → báo rõ\nràng (KHÔNG tự âm thầm fallback DeepSeek). Xem translate.py / seo.py.\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 14           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 16          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('make_error', 'E'))
+             22 IMPORT_NAME              3 (app.core.errors)
+             24 IMPORT_FROM              4 (make_error)
+             26 STORE_NAME               4 (make_error)
+             28 IMPORT_FROM              5 (E)
+             30 STORE_NAME               5 (E)
+             32 POP_TOP
+
+ 17          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               4 (('log',))
+             38 IMPORT_NAME              6 (app.core.logging)
+             40 IMPORT_FROM              7 (log)
+             42 STORE_NAME               7 (log)
+             44 POP_TOP
+
+ 18          46 LOAD_CONST               1 (0)
+             48 LOAD_CONST               5 (('SessionLocal',))
+             50 IMPORT_NAME              8 (app.db.session)
+             52 IMPORT_FROM              9 (SessionLocal)
+             54 STORE_NAME               9 (SessionLocal)
+             56 POP_TOP
+
+ 19          58 LOAD_CONST               1 (0)
+             60 LOAD_CONST               6 (('Setting',))
+             62 IMPORT_NAME             10 (app.db.models)
+             64 IMPORT_FROM             11 (Setting)
+             66 STORE_NAME              11 (Setting)
+             68 POP_TOP
+
+ 20          70 LOAD_CONST               1 (0)
+             72 LOAD_CONST               7 (('DeepSeekClient',))
+             74 IMPORT_NAME             12 (app.adapters.deepseek)
+             76 IMPORT_FROM             13 (DeepSeekClient)
+             78 STORE_NAME              13 (DeepSeekClient)
+             80 POP_TOP
+
+ 21          82 LOAD_CONST               1 (0)
+             84 LOAD_CONST               8 (('ChatGPTSessionClient',))
+             86 IMPORT_NAME             14 (app.adapters.chatgpt_session)
+             88 IMPORT_FROM             15 (ChatGPTSessionClient)
+             90 STORE_NAME              15 (ChatGPTSessionClient)
+             92 POP_TOP
+
+ 22          94 LOAD_CONST               1 (0)
+             96 LOAD_CONST               9 (('GeminiSessionClient',))
+             98 IMPORT_NAME             16 (app.adapters.gemini_session)
+            100 IMPORT_FROM             17 (GeminiSessionClient)
+            102 STORE_NAME              17 (GeminiSessionClient)
+            104 POP_TOP
+
+ 24         106 LOAD_CONST              10 ('deepseek')
+            108 STORE_NAME              18 (PROVIDER_DEEPSEEK)
+
+ 25         110 LOAD_CONST              11 ('chatgpt')
+            112 STORE_NAME              19 (PROVIDER_CHATGPT)
+
+ 26         114 LOAD_CONST              12 ('gemini')
+            116 STORE_NAME              20 (PROVIDER_GEMINI)
+
+ 27         118 LOAD_NAME               18 (PROVIDER_DEEPSEEK)
+            120 LOAD_NAME               19 (PROVIDER_CHATGPT)
+            122 LOAD_NAME               20 (PROVIDER_GEMINI)
+            124 BUILD_SET                3
+            126 STORE_NAME              21 (TRANSLATE_PROVIDER_IDS)
+
+ 28         128 LOAD_NAME               18 (PROVIDER_DEEPSEEK)
+            130 STORE_NAME              22 (DEFAULT_TRANSLATE_PROVIDER)
+
+ 33         132 LOAD_CONST              13 ('api:')
+            134 STORE_NAME              23 (ENDPOINT_PREFIX)
+
+ 37         136 LOAD_NAME               19 (PROVIDER_CHATGPT)
+            138 LOAD_NAME               20 (PROVIDER_GEMINI)
+            140 BUILD_SET                2
+            142 STORE_NAME              24 (SESSION_PROVIDERS)
+
+ 41         144 LOAD_NAME                5 (E)
+            146 LOAD_ATTR               50 (CHATGPT_AUTH)
+            166 LOAD_NAME                5 (E)
+            168 LOAD_ATTR               52 (CHATGPT_RATE_LIMIT)
+            188 LOAD_NAME                5 (E)
+            190 LOAD_ATTR               54 (CHATGPT_NETWORK)
+
+ 42         210 LOAD_NAME                5 (E)
+            212 LOAD_ATTR               56 (CHATGPT_BAD_RESPONSE)
+            232 LOAD_NAME                5 (E)
+            234 LOAD_ATTR               58 (CHATGPT_BRIDGE_UNAVAILABLE)
+
+ 40         254 BUILD_SET                5
+            256 STORE_NAME              30 (_CHATGPT_FALLBACKABLE)
+
+ 45         258 LOAD_NAME                5 (E)
+            260 LOAD_ATTR               62 (GEMINI_AUTH)
+            280 LOAD_NAME                5 (E)
+            282 LOAD_ATTR               64 (GEMINI_RATE_LIMIT)
+            302 LOAD_NAME                5 (E)
+            304 LOAD_ATTR               66 (GEMINI_OVERLOAD)
+            324 LOAD_NAME                5 (E)
+            326 LOAD_ATTR               68 (GEMINI_NETWORK)
+
+ 46         346 LOAD_NAME                5 (E)
+            348 LOAD_ATTR               70 (GEMINI_BAD_RESPONSE)
+            368 LOAD_NAME                5 (E)
+            370 LOAD_ATTR               72 (GEMINI_BRIDGE_UNAVAILABLE)
+
+ 44         390 BUILD_SET                6
+            392 STORE_NAME              37 (_GEMINI_FALLBACKABLE)
+
+ 52         394 LOAD_CONST              40 (('provider', 'str | None', 'return', 'bool'))
+            396 LOAD_CONST              14 (<code object is_endpoint_ref at 0x7f6c932489b0, file "app\adapters\ai_provider.py", line 52>)
+            398 MAKE_FUNCTION            4 (annotations)
+            400 STORE_NAME              38 (is_endpoint_ref)
+
+ 56         402 LOAD_CONST              41 (('provider', 'str', 'return', 'tuple[str, str | None]'))
+            404 LOAD_CONST              15 (<code object split_endpoint_ref at 0x7f6c92e4aa70, file "app\adapters\ai_provider.py", line 56>)
+            406 MAKE_FUNCTION            4 (annotations)
+            408 STORE_NAME              39 (split_endpoint_ref)
+
+ 63         410 LOAD_CONST              40 (('provider', 'str | None', 'return', 'bool'))
+            412 LOAD_CONST              16 (<code object is_valid_provider at 0x7f6c933b64f0, file "app\adapters\ai_provider.py", line 63>)
+            414 MAKE_FUNCTION            4 (annotations)
+            416 STORE_NAME              40 (is_valid_provider)
+
+ 79         418 LOAD_CONST              42 (('provider', 'str', 'return', 'dict | None'))
+            420 LOAD_CONST              17 (<code object _endpoint_row at 0x7f6c933d92c0, file "app\adapters\ai_provider.py", line 79>)
+            422 MAKE_FUNCTION            4 (annotations)
+            424 STORE_NAME              41 (_endpoint_row)
+
+ 94         426 LOAD_CONST              43 (('return', 'str'))
+            428 LOAD_CONST              18 (<code object get_translate_provider at 0x7f6c9324c570, file "app\adapters\ai_provider.py", line 94>)
+            430 MAKE_FUNCTION            4 (annotations)
+            432 STORE_NAME              42 (get_translate_provider)
+
+103         434 LOAD_CONST              44 ((None,))
+            436 LOAD_CONST              45 (('provider', 'str | None', 'return', 'str'))
+            438 LOAD_CONST              20 (<code object resolve_provider at 0x7f6c933d7990, file "app\adapters\ai_provider.py", line 103>)
+            440 MAKE_FUNCTION            5 (defaults, annotations)
+            442 STORE_NAME              43 (resolve_provider)
+
+108         444 LOAD_CONST              44 ((None,))
+            446 LOAD_CONST              46 (('provider', 'str | None'))
+            448 LOAD_CONST              21 (<code object make_primary_client at 0x7f6c9326cd50, file "app\adapters\ai_provider.py", line 108>)
+            450 MAKE_FUNCTION            5 (defaults, annotations)
+            452 STORE_NAME              44 (make_primary_client)
+
+138         454 LOAD_CONST              22 (0.7)
+
+139         456 LOAD_CONST              19 (None)
+
+134         458 LOAD_CONST              23 (('temperature', 'provider'))
+            460 BUILD_CONST_KEY_MAP      2
+
+135         462 NOP
+
+134         464 NOP
+
+136         466 NOP
+
+134         468 NOP
+
+138         470 NOP
+
+134         472 NOP
+
+139         474 NOP
+
+134         476 NOP
+
+140         478 NOP
+
+134         480 LOAD_CONST              47 (('system', 'str', 'user', 'str', 'temperature', 'float', 'provider', 'str | None', 'return', 'str'))
+            482 LOAD_CONST              24 (<code object complete_text at 0x7f6c93516b50, file "app\adapters\ai_provider.py", line 134>)
+            484 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            486 STORE_NAME              45 (complete_text)
+
+154         488 LOAD_CONST              44 ((None,))
+            490 LOAD_CONST              40 (('provider', 'str | None', 'return', 'bool'))
+            492 LOAD_CONST              25 (<code object uses_session at 0x7f6c933813e0, file "app\adapters\ai_provider.py", line 154>)
+            494 MAKE_FUNCTION            5 (defaults, annotations)
+            496 STORE_NAME              46 (uses_session)
+
+170         498 LOAD_CONST              26 (4500)
+            500 STORE_NAME              47 (_SESSION_MAX_TURN_CHARS)
+
+171         502 LOAD_CONST              27 (400000)
+            504 STORE_NAME              48 (_API_MAX_TURN_CHARS)
+
+174         506 LOAD_CONST              28 (3.0)
+            508 STORE_NAME              49 (_CHARS_PER_TOKEN)
+
+177         510 LOAD_CONST              29 (0.5)
+            512 STORE_NAME              50 (_INPUT_SHARE)
+
+180         514 LOAD_CONST              44 ((None,))
+            516 LOAD_CONST              48 (('provider', 'str | None', 'return', 'int'))
+            518 LOAD_CONST              30 (<code object max_turn_chars at 0x7f6c93248d40, file "app\adapters\ai_provider.py", line 180>)
+            520 MAKE_FUNCTION            5 (defaults, annotations)
+            522 STORE_NAME              51 (max_turn_chars)
+
+197         524 LOAD_CONST              49 (('provider', 'str', 'return', 'int'))
+            526 LOAD_CONST              31 (<code object _endpoint_turn_chars at 0x29091850, file "app\adapters\ai_provider.py", line 197>)
+            528 MAKE_FUNCTION            4 (annotations)
+            530 STORE_NAME              52 (_endpoint_turn_chars)
+
+210         532 LOAD_CONST              44 ((None,))
+            534 LOAD_CONST              50 (('provider', 'str | None', 'return', 'int | None'))
+            536 LOAD_CONST              32 (<code object max_output_tokens at 0x290ec120, file "app\adapters\ai_provider.py", line 210>)
+            538 MAKE_FUNCTION            5 (defaults, annotations)
+            540 STORE_NAME              53 (max_output_tokens)
+
+236         542 PUSH_NULL
+            544 LOAD_BUILD_CLASS
+            546 LOAD_CONST              33 (<code object _StatelessChatSession at 0x7f6c9357a5b0, file "app\adapters\ai_provider.py", line 236>)
+            548 MAKE_FUNCTION            0
+            550 LOAD_CONST              34 ('_StatelessChatSession')
+            552 CALL                     2
+            560 STORE_NAME              54 (_StatelessChatSession)
+
+264         562 LOAD_NAME               54 (_StatelessChatSession)
+            564 STORE_NAME              55 (_DeepSeekChatSession)
+
+267         566 LOAD_CONST              51 (('',))
+            568 LOAD_CONST              22 (0.7)
+            570 LOAD_CONST              19 (None)
+            572 LOAD_CONST              23 (('temperature', 'provider'))
+            574 BUILD_CONST_KEY_MAP      2
+            576 LOAD_CONST              52 (('system', 'str', 'temperature', 'float', 'provider', 'str | None'))
+            578 LOAD_CONST              35 (<code object make_chat_session at 0x7f6c933b6640, file "app\adapters\ai_provider.py", line 267>)
+            580 MAKE_FUNCTION            7 (defaults, kwdefaults, annotations)
+            582 STORE_NAME              56 (make_chat_session)
+
+281         584 LOAD_CONST              44 ((None,))
+            586 LOAD_CONST              45 (('provider', 'str | None', 'return', 'str'))
+            588 LOAD_CONST              36 (<code object provider_label at 0x7f6c93392470, file "app\adapters\ai_provider.py", line 281>)
+            590 MAKE_FUNCTION            5 (defaults, annotations)
+            592 STORE_NAME              57 (provider_label)
+
+300         594 LOAD_CONST              53 (('code', 'str', 'return', 'bool'))
+            596 LOAD_CONST              37 (<code object is_chatgpt_fallbackable at 0x7f6c9342fad0, file "app\adapters\ai_provider.py", line 300>)
+            598 MAKE_FUNCTION            4 (annotations)
+            600 STORE_NAME              58 (is_chatgpt_fallbackable)
+
+304         602 LOAD_CONST              53 (('code', 'str', 'return', 'bool'))
+            604 LOAD_CONST              38 (<code object is_gemini_fallbackable at 0x7f6c9342f910, file "app\adapters\ai_provider.py", line 304>)
+            606 MAKE_FUNCTION            4 (annotations)
+            608 STORE_NAME              59 (is_gemini_fallbackable)
+
+308         610 LOAD_CONST              54 (('provider', 'str', 'code', 'str', 'return', 'bool'))
+            612 LOAD_CONST              39 (<code object is_session_provider_recoverable at 0x7f6c9340eab0, file "app\adapters\ai_provider.py", line 308>)
+            614 MAKE_FUNCTION            4 (annotations)
+            616 STORE_NAME              60 (is_session_provider_recoverable)
+            618 RETURN_CONST            19 (None)
+
+Disassembly of <code object is_endpoint_ref at 0x7f6c932489b0, file "app\adapters\ai_provider.py", line 52>:
+ 52           0 RESUME                   0
+
+ 53           2 LOAD_GLOBAL              1 (NULL + str)
+             12 LOAD_FAST                0 (provider)
+             14 COPY                     1
+             16 POP_JUMP_IF_TRUE         2 (to 22)
+             18 POP_TOP
+             20 LOAD_CONST               1 ('')
+        >>   22 CALL                     1
+             30 LOAD_ATTR                3 (NULL|self + strip)
+             50 CALL                     0
+             58 LOAD_ATTR                5 (NULL|self + startswith)
+             78 LOAD_GLOBAL              6 (ENDPOINT_PREFIX)
+             88 CALL                     1
+             96 RETURN_VALUE
+
+Disassembly of <code object split_endpoint_ref at 0x7f6c92e4aa70, file "app\adapters\ai_provider.py", line 56>:
+ 56           0 RESUME                   0
+
+ 58           2 LOAD_GLOBAL              1 (NULL + str)
+             12 LOAD_FAST                0 (provider)
+             14 COPY                     1
+             16 POP_JUMP_IF_TRUE         2 (to 22)
+             18 POP_TOP
+             20 LOAD_CONST               1 ('')
+        >>   22 CALL                     1
+             30 LOAD_ATTR                3 (NULL|self + strip)
+             50 CALL                     0
+             58 LOAD_GLOBAL              5 (NULL + len)
+             68 LOAD_GLOBAL              6 (ENDPOINT_PREFIX)
+             78 CALL                     1
+             86 LOAD_CONST               2 (None)
+             88 BINARY_SLICE
+             90 STORE_FAST               1 (body)
+
+ 59          92 LOAD_FAST                1 (body)
+             94 LOAD_ATTR                9 (NULL|self + partition)
+            114 LOAD_CONST               3 ('/')
+            116 CALL                     1
+            124 UNPACK_SEQUENCE          3
+            128 STORE_FAST               2 (endpoint_id)
+            130 STORE_FAST               3 (sep)
+            132 STORE_FAST               4 (model_id)
+
+ 60         134 LOAD_FAST                2 (endpoint_id)
+            136 LOAD_ATTR                3 (NULL|self + strip)
+            156 CALL                     0
+            164 LOAD_FAST                3 (sep)
+            166 POP_JUMP_IF_FALSE       21 (to 210)
+            168 LOAD_FAST                4 (model_id)
+            170 LOAD_ATTR                3 (NULL|self + strip)
+            190 CALL                     0
+            198 COPY                     1
+            200 POP_JUMP_IF_TRUE         2 (to 206)
+            202 POP_TOP
+            204 LOAD_CONST               2 (None)
+        >>  206 BUILD_TUPLE              2
+            208 RETURN_VALUE
+        >>  210 LOAD_CONST               2 (None)
+            212 BUILD_TUPLE              2
+            214 RETURN_VALUE
+
+Disassembly of <code object is_valid_provider at 0x7f6c933b64f0, file "app\adapters\ai_provider.py", line 63>:
+ 63           0 RESUME                   0
+
+ 69           2 LOAD_GLOBAL              1 (NULL + str)
+             12 LOAD_FAST                0 (provider)
+             14 COPY                     1
+             16 POP_JUMP_IF_TRUE         2 (to 22)
+             18 POP_TOP
+             20 LOAD_CONST               1 ('')
+        >>   22 CALL                     1
+             30 LOAD_ATTR                3 (NULL|self + strip)
+             50 CALL                     0
+             58 STORE_FAST               1 (value)
+
+ 70          60 LOAD_FAST                1 (value)
+             62 POP_JUMP_IF_TRUE         1 (to 66)
+
+ 71          64 RETURN_CONST             2 (True)
+
+ 72     >>   66 LOAD_FAST                1 (value)
+             68 LOAD_GLOBAL              4 (TRANSLATE_PROVIDER_IDS)
+             78 CONTAINS_OP              0
+             80 POP_JUMP_IF_FALSE        1 (to 84)
+
+ 73          82 RETURN_CONST             2 (True)
+
+ 74     >>   84 LOAD_GLOBAL              7 (NULL + is_endpoint_ref)
+             94 LOAD_FAST                1 (value)
+             96 CALL                     1
+            104 POP_JUMP_IF_FALSE       13 (to 132)
+
+ 75         106 LOAD_GLOBAL              9 (NULL + _endpoint_row)
+            116 LOAD_FAST                1 (value)
+            118 CALL                     1
+            126 LOAD_CONST               3 (None)
+            128 IS_OP                    1
+            130 RETURN_VALUE
+
+ 76     >>  132 RETURN_CONST             4 (False)
+
+Disassembly of <code object _endpoint_row at 0x7f6c933d92c0, file "app\adapters\ai_provider.py", line 79>:
+ 79           0 RESUME                   0
+
+ 81           2 LOAD_GLOBAL              1 (NULL + split_endpoint_ref)
+             12 LOAD_FAST                0 (provider)
+             14 CALL                     1
+             22 UNPACK_SEQUENCE          2
+             26 STORE_FAST               1 (endpoint_id)
+             28 STORE_FAST               2 (_model)
+
+ 82          30 LOAD_FAST                1 (endpoint_id)
+             32 POP_JUMP_IF_TRUE         1 (to 36)
+
+ 83          34 RETURN_CONST             1 (None)
+
+ 84     >>   36 NOP
+
+ 85          38 LOAD_CONST               2 (0)
+             40 LOAD_CONST               3 (('llm_endpoint_store',))
+             42 IMPORT_NAME              1 (app.services)
+             44 IMPORT_FROM              2 (llm_endpoint_store)
+             46 STORE_FAST               3 (llm_endpoint_store)
+             48 POP_TOP
+
+ 87          50 LOAD_FAST                3 (llm_endpoint_store)
+             52 LOAD_ATTR                7 (NULL|self + get)
+             72 LOAD_FAST                1 (endpoint_id)
+             74 CALL                     1
+             82 STORE_FAST               4 (row)
+
+ 91          84 LOAD_FAST                4 (row)
+             86 POP_JUMP_IF_FALSE       19 (to 126)
+             88 LOAD_FAST                4 (row)
+             90 LOAD_ATTR                7 (NULL|self + get)
+            110 LOAD_CONST               6 ('enabled')
+            112 CALL                     1
+            120 POP_JUMP_IF_FALSE        2 (to 126)
+            122 LOAD_FAST                4 (row)
+            124 RETURN_VALUE
+        >>  126 LOAD_CONST               1 (None)
+            128 RETURN_VALUE
+        >>  130 PUSH_EXC_INFO
+
+ 88         132 LOAD_GLOBAL              8 (Exception)
+            142 CHECK_EXC_MATCH
+            144 POP_JUMP_IF_FALSE       37 (to 220)
+            146 STORE_FAST               5 (exc)
+
+ 89         148 LOAD_GLOBAL             11 (NULL + log)
+            158 LOAD_ATTR               12 (warning)
+            178 LOAD_CONST               4 ('[ai_provider] không đọc được endpoint ')
+            180 LOAD_FAST                1 (endpoint_id)
+            182 FORMAT_VALUE             2 (repr)
+            184 LOAD_CONST               5 (': ')
+            186 LOAD_FAST                5 (exc)
+            188 FORMAT_VALUE             0
+            190 BUILD_STRING             4
+            192 CALL                     1
+            200 POP_TOP
+
+ 90         202 POP_EXCEPT
+            204 LOAD_CONST               1 (None)
+            206 STORE_FAST               5 (exc)
+            208 DELETE_FAST              5 (exc)
+            210 RETURN_CONST             1 (None)
+        >>  212 LOAD_CONST               1 (None)
+            214 STORE_FAST               5 (exc)
+            216 DELETE_FAST              5 (exc)
+            218 RERAISE                  1
+
+ 88     >>  220 RERAISE                  0
+        >>  222 COPY                     3
+            224 POP_EXCEPT
+            226 RERAISE                  1
+ExceptionTable:
+  38 to 82 -> 130 [0]
+  130 to 146 -> 222 [1] lasti
+  148 to 200 -> 212 [1] lasti
+  212 to 220 -> 222 [1] lasti
+
+Disassembly of <code object get_translate_provider at 0x7f6c9324c570, file "app\adapters\ai_provider.py", line 94>:
+ 94           0 RESUME                   0
+
+ 95           2 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             12 CALL                     0
+             20 BEFORE_WITH
+             22 STORE_FAST               0 (db)
+
+ 96          24 LOAD_FAST                0 (db)
+             26 LOAD_ATTR                3 (NULL|self + get)
+             46 LOAD_GLOBAL              4 (Setting)
+             56 LOAD_CONST               1 ('translate_provider')
+             58 CALL                     2
+             66 STORE_FAST               1 (row)
+
+ 97          68 LOAD_FAST                1 (row)
+             70 POP_JUMP_IF_FALSE       24 (to 120)
+             72 LOAD_FAST                1 (row)
+             74 LOAD_ATTR                6 (value)
+             94 POP_JUMP_IF_FALSE       12 (to 120)
+             96 LOAD_FAST                1 (row)
+             98 LOAD_ATTR                6 (value)
+            118 JUMP_FORWARD             1 (to 122)
+        >>  120 LOAD_CONST               2 ('')
+        >>  122 LOAD_ATTR                9 (NULL|self + strip)
+            142 CALL                     0
+            150 STORE_FAST               2 (val)
+
+ 95         152 LOAD_CONST               0 (None)
+            154 LOAD_CONST               0 (None)
+            156 LOAD_CONST               0 (None)
+            158 CALL                     2
+            166 POP_TOP
+
+ 98     >>  168 LOAD_FAST_CHECK          2 (val)
+            170 LOAD_GLOBAL             10 (TRANSLATE_PROVIDER_IDS)
+            180 CONTAINS_OP              0
+            182 POP_JUMP_IF_TRUE        11 (to 206)
+            184 LOAD_GLOBAL             13 (NULL + is_endpoint_ref)
+            194 LOAD_FAST                2 (val)
+            196 CALL                     1
+            204 POP_JUMP_IF_FALSE        2 (to 210)
+
+ 99     >>  206 LOAD_FAST                2 (val)
+            208 RETURN_VALUE
+
+100     >>  210 LOAD_GLOBAL             14 (DEFAULT_TRANSLATE_PROVIDER)
+            220 RETURN_VALUE
+
+ 95     >>  222 PUSH_EXC_INFO
+            224 WITH_EXCEPT_START
+            226 POP_JUMP_IF_TRUE         1 (to 230)
+            228 RERAISE                  2
+        >>  230 POP_TOP
+            232 POP_EXCEPT
+            234 POP_TOP
+            236 POP_TOP
+            238 JUMP_BACKWARD           36 (to 168)
+        >>  240 COPY                     3
+            242 POP_EXCEPT
+            244 RERAISE                  1
+ExceptionTable:
+  22 to 150 -> 222 [1] lasti
+  222 to 230 -> 240 [3] lasti
+
+Disassembly of <code object resolve_provider at 0x7f6c933d7990, file "app\adapters\ai_provider.py", line 103>:
+103           0 RESUME                   0
+
+105           2 LOAD_FAST                0 (provider)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 LOAD_CONST               1 ('')
+        >>   12 LOAD_ATTR                1 (NULL|self + strip)
+             32 CALL                     0
+             40 COPY                     1
+             42 POP_JUMP_IF_TRUE        10 (to 64)
+             44 POP_TOP
+             46 LOAD_GLOBAL              3 (NULL + get_translate_provider)
+             56 CALL                     0
+        >>   64 RETURN_VALUE
+
+Disassembly of <code object make_primary_client at 0x7f6c9326cd50, file "app\adapters\ai_provider.py", line 108>:
+108           0 RESUME                   0
+
+115           2 LOAD_GLOBAL              1 (NULL + resolve_provider)
+             12 LOAD_FAST                0 (provider)
+             14 CALL                     1
+             22 STORE_FAST               0 (provider)
+
+116          24 LOAD_FAST                0 (provider)
+             26 LOAD_GLOBAL              2 (PROVIDER_CHATGPT)
+             36 COMPARE_OP              40 (==)
+             40 POP_JUMP_IF_FALSE       10 (to 62)
+
+117          42 LOAD_GLOBAL              5 (NULL + ChatGPTSessionClient)
+             52 CALL                     0
+             60 RETURN_VALUE
+
+118     >>   62 LOAD_FAST                0 (provider)
+             64 LOAD_GLOBAL              6 (PROVIDER_GEMINI)
+             74 COMPARE_OP              40 (==)
+             78 POP_JUMP_IF_FALSE       10 (to 100)
+
+119          80 LOAD_GLOBAL              9 (NULL + GeminiSessionClient)
+             90 CALL                     0
+             98 RETURN_VALUE
+
+120     >>  100 LOAD_FAST                0 (provider)
+            102 LOAD_GLOBAL             10 (PROVIDER_DEEPSEEK)
+            112 COMPARE_OP              40 (==)
+            116 POP_JUMP_IF_FALSE       10 (to 138)
+
+121         118 LOAD_GLOBAL             13 (NULL + DeepSeekClient)
+            128 CALL                     0
+            136 RETURN_VALUE
+
+122     >>  138 LOAD_GLOBAL             15 (NULL + is_endpoint_ref)
+            148 LOAD_FAST                0 (provider)
+            150 CALL                     1
+            158 POP_JUMP_IF_FALSE       29 (to 218)
+
+123         160 LOAD_CONST               1 (0)
+            162 LOAD_CONST               2 (('ApiTextClient',))
+            164 IMPORT_NAME              8 (app.adapters.llm_api.text_client)
+            166 IMPORT_FROM              9 (ApiTextClient)
+            168 STORE_FAST               1 (ApiTextClient)
+            170 POP_TOP
+
+125         172 LOAD_GLOBAL             21 (NULL + split_endpoint_ref)
+            182 LOAD_FAST                0 (provider)
+            184 CALL                     1
+            192 UNPACK_SEQUENCE          2
+            196 STORE_FAST               2 (endpoint_id)
+            198 STORE_FAST               3 (model_id)
+
+126         200 PUSH_NULL
+            202 LOAD_FAST                1 (ApiTextClient)
+            204 LOAD_FAST                2 (endpoint_id)
+            206 LOAD_FAST                3 (model_id)
+            208 CALL                     2
+            216 RETURN_VALUE
+
+127     >>  218 LOAD_GLOBAL             23 (NULL + make_error)
+
+128         228 LOAD_GLOBAL             24 (E)
+            238 LOAD_ATTR               26 (PRECONDITION_MISSING)
+
+129         258 LOAD_CONST               3 ('Nhà cung cấp AI ')
+            260 LOAD_FAST                0 (provider)
+            262 FORMAT_VALUE             2 (repr)
+            264 LOAD_CONST               4 (' không hợp lệ.')
+            266 BUILD_STRING             3
+
+130         268 LOAD_CONST               5 ('Mở Cài đặt → AI Dịch & Ảnh để chọn lại, hoặc chọn lại AI cho kênh này trong AI Studio.')
+
+127         270 KW_NAMES                 6 (('hint',))
+            272 CALL                     3
+            280 RAISE_VARARGS            1
+
+Disassembly of <code object complete_text at 0x7f6c93516b50, file "app\adapters\ai_provider.py", line 134>:
+134           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+146           6 LOAD_GLOBAL              1 (NULL + make_primary_client)
+             16 LOAD_FAST                3 (provider)
+             18 CALL                     1
+             26 STORE_FAST               4 (client)
+
+147          28 BUILD_LIST               0
+             30 STORE_FAST               5 (messages)
+
+148          32 LOAD_FAST                0 (system)
+             34 POP_JUMP_IF_FALSE       20 (to 76)
+
+149          36 LOAD_FAST                5 (messages)
+             38 LOAD_ATTR                3 (NULL|self + append)
+             58 LOAD_CONST               1 ('system')
+             60 LOAD_FAST                0 (system)
+             62 LOAD_CONST               2 (('role', 'content'))
+             64 BUILD_CONST_KEY_MAP      2
+             66 CALL                     1
+             74 POP_TOP
+
+150     >>   76 LOAD_FAST                5 (messages)
+             78 LOAD_ATTR                3 (NULL|self + append)
+             98 LOAD_CONST               3 ('user')
+            100 LOAD_FAST                1 (user)
+            102 LOAD_CONST               2 (('role', 'content'))
+            104 BUILD_CONST_KEY_MAP      2
+            106 CALL                     1
+            114 POP_TOP
+
+151         116 LOAD_FAST                4 (client)
+            118 LOAD_ATTR                5 (NULL|self + _call_api)
+            138 LOAD_FAST                5 (messages)
+            140 LOAD_FAST                2 (temperature)
+            142 CALL                     2
+            150 GET_AWAITABLE            0
+            152 LOAD_CONST               4 (None)
+        >>  154 SEND                     3 (to 164)
+            158 YIELD_VALUE              2
+            160 RESUME                   3
+            162 JUMP_BACKWARD_NO_INTERRUPT     5 (to 154)
+        >>  164 END_SEND
+            166 RETURN_VALUE
+        >>  168 CLEANUP_THROW
+            170 JUMP_BACKWARD            4 (to 164)
+        >>  172 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            174 RERAISE                  1
+ExceptionTable:
+  4 to 156 -> 172 [0] lasti
+  158 to 158 -> 168 [2]
+  160 to 168 -> 172 [0] lasti
+
+Disassembly of <code object uses_session at 0x7f6c933813e0, file "app\adapters\ai_provider.py", line 154>:
+154           0 RESUME                   0
+
+157           2 LOAD_GLOBAL              1 (NULL + resolve_provider)
+             12 LOAD_FAST                0 (provider)
+             14 CALL                     1
+             22 LOAD_GLOBAL              2 (SESSION_PROVIDERS)
+             32 CONTAINS_OP              0
+             34 RETURN_VALUE
+
+Disassembly of <code object max_turn_chars at 0x7f6c93248d40, file "app\adapters\ai_provider.py", line 180>:
+180           0 RESUME                   0
+
+189           2 LOAD_GLOBAL              1 (NULL + resolve_provider)
+             12 LOAD_FAST                0 (provider)
+             14 CALL                     1
+             22 STORE_FAST               0 (provider)
+
+190          24 LOAD_FAST                0 (provider)
+             26 LOAD_GLOBAL              2 (SESSION_PROVIDERS)
+             36 CONTAINS_OP              0
+             38 POP_JUMP_IF_FALSE        6 (to 52)
+
+191          40 LOAD_GLOBAL              4 (_SESSION_MAX_TURN_CHARS)
+             50 RETURN_VALUE
+
+192     >>   52 LOAD_GLOBAL              7 (NULL + is_endpoint_ref)
+             62 LOAD_FAST                0 (provider)
+             64 CALL                     1
+             72 POP_JUMP_IF_FALSE       11 (to 96)
+
+193          74 LOAD_GLOBAL              9 (NULL + _endpoint_turn_chars)
+             84 LOAD_FAST                0 (provider)
+             86 CALL                     1
+             94 RETURN_VALUE
+
+194     >>   96 LOAD_GLOBAL             10 (_API_MAX_TURN_CHARS)
+            106 RETURN_VALUE
+
+Disassembly of <code object _endpoint_turn_chars at 0x29091850, file "app\adapters\ai_provider.py", line 197>:
+              0 MAKE_CELL                7 (wanted)
+
+197           2 RESUME                   0
+
+198           4 LOAD_GLOBAL              1 (NULL + _endpoint_row)
+             14 LOAD_FAST                0 (provider)
+             16 CALL                     1
+             24 STORE_FAST               1 (row)
+
+199          26 LOAD_FAST                1 (row)
+             28 POP_JUMP_IF_NOT_NONE     6 (to 42)
+
+201          30 LOAD_GLOBAL              2 (_SESSION_MAX_TURN_CHARS)
+             40 RETURN_VALUE
+
+202     >>   42 LOAD_GLOBAL              5 (NULL + split_endpoint_ref)
+             52 LOAD_FAST                0 (provider)
+             54 CALL                     1
+             62 UNPACK_SEQUENCE          2
+             66 STORE_FAST               2 (_endpoint_id)
+             68 STORE_FAST               3 (model_id)
+
+203          70 LOAD_FAST                3 (model_id)
+             72 COPY                     1
+             74 POP_JUMP_IF_TRUE        17 (to 110)
+             76 POP_TOP
+             78 LOAD_FAST                1 (row)
+             80 LOAD_ATTR                7 (NULL|self + get)
+            100 LOAD_CONST               1 ('default_model')
+            102 CALL                     1
+        >>  110 STORE_DEREF              7 (wanted)
+
+204         112 LOAD_FAST                1 (row)
+            114 LOAD_ATTR                7 (NULL|self + get)
+            134 LOAD_CONST               2 ('models')
+            136 CALL                     1
+            144 COPY                     1
+            146 POP_JUMP_IF_TRUE         2 (to 152)
+            148 POP_TOP
+            150 BUILD_LIST               0
+        >>  152 STORE_FAST               4 (models)
+
+205         154 LOAD_GLOBAL              9 (NULL + next)
+            164 LOAD_CLOSURE             7 (wanted)
+            166 BUILD_TUPLE              1
+            168 LOAD_CONST               3 (<code object <genexpr> at 0x7f6c9340e230, file "app\adapters\ai_provider.py", line 205>)
+            170 MAKE_FUNCTION            8 (closure)
+            172 LOAD_FAST                4 (models)
+            174 GET_ITER
+            176 CALL                     0
+            184 LOAD_CONST               0 (None)
+            186 CALL                     2
+            194 COPY                     1
+            196 POP_JUMP_IF_TRUE         9 (to 216)
+            198 POP_TOP
+            200 LOAD_FAST                4 (models)
+            202 POP_JUMP_IF_FALSE        5 (to 214)
+            204 LOAD_FAST                4 (models)
+            206 LOAD_CONST               4 (0)
+            208 BINARY_SUBSCR
+            212 JUMP_FORWARD             1 (to 216)
+        >>  214 BUILD_MAP                0
+        >>  216 STORE_FAST               5 (chosen)
+
+206         218 LOAD_GLOBAL             11 (NULL + int)
+            228 LOAD_FAST                5 (chosen)
+            230 LOAD_ATTR                7 (NULL|self + get)
+            250 LOAD_CONST               5 ('max_input_tokens')
+            252 CALL                     1
+            260 COPY                     1
+            262 POP_JUMP_IF_TRUE         2 (to 268)
+            264 POP_TOP
+            266 LOAD_CONST               6 (128000)
+        >>  268 CALL                     1
+            276 STORE_FAST               6 (context)
+
+207         278 LOAD_GLOBAL             13 (NULL + max)
+            288 LOAD_CONST               7 (1000)
+            290 LOAD_GLOBAL             15 (NULL + min)
+            300 LOAD_GLOBAL             16 (_API_MAX_TURN_CHARS)
+            310 LOAD_GLOBAL             11 (NULL + int)
+            320 LOAD_FAST                6 (context)
+            322 LOAD_GLOBAL             18 (_CHARS_PER_TOKEN)
+            332 BINARY_OP                5 (*)
+            336 LOAD_GLOBAL             20 (_INPUT_SHARE)
+            346 BINARY_OP                5 (*)
+            350 CALL                     1
+            358 CALL                     2
+            366 CALL                     2
+            374 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c9340e230, file "app\adapters\ai_provider.py", line 205>:
+              0 COPY_FREE_VARS           1
+
+205           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                27 (to 68)
+             14 STORE_FAST               1 (m)
+             16 LOAD_FAST                1 (m)
+             18 LOAD_ATTR                1 (NULL|self + get)
+             38 LOAD_CONST               0 ('id')
+             40 CALL                     1
+             48 LOAD_DEREF               2 (wanted)
+             50 COMPARE_OP              40 (==)
+             54 POP_JUMP_IF_TRUE         1 (to 58)
+             56 JUMP_BACKWARD           24 (to 10)
+        >>   58 LOAD_FAST                1 (m)
+             60 YIELD_VALUE              1
+             62 RESUME                   1
+             64 POP_TOP
+             66 JUMP_BACKWARD           29 (to 10)
+        >>   68 END_FOR
+             70 RETURN_CONST             1 (None)
+        >>   72 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             74 RERAISE                  1
+ExceptionTable:
+  6 to 54 -> 72 [0] lasti
+  58 to 70 -> 72 [0] lasti
+
+Disassembly of <code object max_output_tokens at 0x290ec120, file "app\adapters\ai_provider.py", line 210>:
+              0 MAKE_CELL                8 (wanted)
+
+210           2 RESUME                   0
+
+216           4 LOAD_GLOBAL              1 (NULL + resolve_provider)
+             14 LOAD_FAST                0 (provider)
+             16 CALL                     1
+             24 STORE_FAST               0 (provider)
+
+217          26 LOAD_FAST                0 (provider)
+             28 LOAD_GLOBAL              2 (SESSION_PROVIDERS)
+             38 CONTAINS_OP              0
+             40 POP_JUMP_IF_FALSE        1 (to 44)
+
+218          42 RETURN_CONST             1 (None)
+
+219     >>   44 LOAD_GLOBAL              5 (NULL + is_endpoint_ref)
+             54 LOAD_FAST                0 (provider)
+             56 CALL                     1
+             64 POP_JUMP_IF_FALSE      132 (to 330)
+
+220          66 LOAD_GLOBAL              7 (NULL + _endpoint_row)
+             76 LOAD_FAST                0 (provider)
+             78 CALL                     1
+             86 STORE_FAST               1 (row)
+
+221          88 LOAD_FAST                1 (row)
+             90 POP_JUMP_IF_NOT_NONE     1 (to 94)
+
+222          92 RETURN_CONST             1 (None)
+
+223     >>   94 LOAD_GLOBAL              9 (NULL + split_endpoint_ref)
+            104 LOAD_FAST                0 (provider)
+            106 CALL                     1
+            114 UNPACK_SEQUENCE          2
+            118 STORE_FAST               2 (_endpoint_id)
+            120 STORE_FAST               3 (model_id)
+
+224         122 LOAD_FAST                3 (model_id)
+            124 COPY                     1
+            126 POP_JUMP_IF_TRUE        17 (to 162)
+            128 POP_TOP
+            130 LOAD_FAST                1 (row)
+            132 LOAD_ATTR               11 (NULL|self + get)
+            152 LOAD_CONST               2 ('default_model')
+            154 CALL                     1
+        >>  162 STORE_DEREF              8 (wanted)
+
+225         164 LOAD_FAST                1 (row)
+            166 LOAD_ATTR               11 (NULL|self + get)
+            186 LOAD_CONST               3 ('models')
+            188 CALL                     1
+            196 COPY                     1
+            198 POP_JUMP_IF_TRUE         2 (to 204)
+            200 POP_TOP
+            202 BUILD_LIST               0
+        >>  204 STORE_FAST               4 (models)
+
+226         206 LOAD_GLOBAL             13 (NULL + next)
+            216 LOAD_CLOSURE             8 (wanted)
+            218 BUILD_TUPLE              1
+            220 LOAD_CONST               4 (<code object <genexpr> at 0x7f6c9340c360, file "app\adapters\ai_provider.py", line 226>)
+            222 MAKE_FUNCTION            8 (closure)
+            224 LOAD_FAST                4 (models)
+            226 GET_ITER
+            228 CALL                     0
+            236 LOAD_CONST               1 (None)
+            238 CALL                     2
+            246 COPY                     1
+            248 POP_JUMP_IF_TRUE         9 (to 268)
+            250 POP_TOP
+            252 LOAD_FAST                4 (models)
+            254 POP_JUMP_IF_FALSE        5 (to 266)
+            256 LOAD_FAST                4 (models)
+            258 LOAD_CONST               5 (0)
+            260 BINARY_SUBSCR
+            264 JUMP_FORWARD             1 (to 268)
+        >>  266 BUILD_MAP                0
+        >>  268 STORE_FAST               5 (chosen)
+
+227         270 LOAD_GLOBAL             15 (NULL + int)
+            280 LOAD_FAST                5 (chosen)
+            282 LOAD_ATTR               11 (NULL|self + get)
+            302 LOAD_CONST               6 ('max_output_tokens')
+            304 CALL                     1
+            312 COPY                     1
+            314 POP_JUMP_IF_TRUE         2 (to 320)
+            316 POP_TOP
+            318 LOAD_CONST               7 (8192)
+        >>  320 CALL                     1
+            328 RETURN_VALUE
+
+228     >>  330 LOAD_FAST                0 (provider)
+            332 LOAD_GLOBAL             16 (PROVIDER_DEEPSEEK)
+            342 COMPARE_OP              40 (==)
+            346 POP_JUMP_IF_FALSE       54 (to 456)
+
+229         348 LOAD_CONST               5 (0)
+            350 LOAD_CONST               8 (('registry',))
+            352 IMPORT_NAME              9 (app.adapters.llm_api)
+            354 IMPORT_FROM             10 (registry)
+            356 STORE_FAST               6 (registry)
+            358 POP_TOP
+
+231         360 LOAD_FAST                6 (registry)
+            362 LOAD_ATTR               23 (NULL|self + get_provider)
+            382 LOAD_CONST               9 ('deepseek')
+            384 CALL                     1
+            392 STORE_FAST               7 (prov)
+
+232         394 LOAD_FAST                7 (prov)
+            396 POP_JUMP_IF_FALSE       27 (to 452)
+            398 LOAD_FAST                7 (prov)
+            400 LOAD_ATTR               25 (NULL|self + resolve_model)
+            420 LOAD_CONST               1 (None)
+            422 CALL                     1
+            430 LOAD_ATTR               26 (max_output_tokens)
+            450 RETURN_VALUE
+        >>  452 LOAD_CONST               1 (None)
+            454 RETURN_VALUE
+
+233     >>  456 RETURN_CONST             1 (None)
+
+Disassembly of <code object <genexpr> at 0x7f6c9340c360, file "app\adapters\ai_provider.py", line 226>:
+              0 COPY_FREE_VARS           1
+
+226           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                27 (to 68)
+             14 STORE_FAST               1 (m)
+             16 LOAD_FAST                1 (m)
+             18 LOAD_ATTR                1 (NULL|self + get)
+             38 LOAD_CONST               0 ('id')
+             40 CALL                     1
+             48 LOAD_DEREF               2 (wanted)
+             50 COMPARE_OP              40 (==)
+             54 POP_JUMP_IF_TRUE         1 (to 58)
+             56 JUMP_BACKWARD           24 (to 10)
+        >>   58 LOAD_FAST                1 (m)
+             60 YIELD_VALUE              1
+             62 RESUME                   1
+             64 POP_TOP
+             66 JUMP_BACKWARD           29 (to 10)
+        >>   68 END_FOR
+             70 RETURN_CONST             1 (None)
+        >>   72 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             74 RERAISE                  1
+ExceptionTable:
+  6 to 54 -> 72 [0] lasti
+  58 to 70 -> 72 [0] lasti
+
+Disassembly of <code object _StatelessChatSession at 0x7f6c9357a5b0, file "app\adapters\ai_provider.py", line 236>:
+236           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('_StatelessChatSession')
+              8 STORE_NAME               2 (__qualname__)
+
+237          10 LOAD_CONST               1 ('Phiên hội thoại trên API STATELESS (DeepSeek, endpoint tự thêm).\n\n    Giữ ngữ cảnh bằng cách tích luỹ messages rồi gửi lại toàn bộ mỗi lượt — context window của đường\n    API đủ lớn để làm vậy. Đồng nhất interface với phiên chatgpt/gemini (nơi ngữ cảnh do máy chủ của\n    họ giữ), để storyboard/script_improve không phải biết mình đang nói chuyện với ai.\n    ')
+             12 STORE_NAME               3 (__doc__)
+
+244          14 LOAD_CONST               6 (('', 0.7))
+             16 LOAD_CONST               7 (('system', 'str', 'temperature', 'float'))
+             18 LOAD_CONST               2 (<code object __init__ at 0x7f6c93249460, file "app\adapters\ai_provider.py", line 244>)
+             20 MAKE_FUNCTION            5 (defaults, annotations)
+             22 STORE_NAME               4 (__init__)
+
+251          24 LOAD_CONST               8 (('prompt', 'str', 'return', 'str'))
+             26 LOAD_CONST               3 (<code object send at 0x7f6c9324c8f0, file "app\adapters\ai_provider.py", line 251>)
+             28 MAKE_FUNCTION            4 (annotations)
+             30 STORE_NAME               5 (send)
+
+257          32 LOAD_CONST               9 (('return', 'None'))
+             34 LOAD_CONST               4 (<code object aclose at 0x7f6c9342fe50, file "app\adapters\ai_provider.py", line 257>)
+             36 MAKE_FUNCTION            4 (annotations)
+             38 STORE_NAME               6 (aclose)
+             40 RETURN_CONST             5 (None)
+
+Disassembly of <code object __init__ at 0x7f6c93249460, file "app\adapters\ai_provider.py", line 244>:
+244           0 RESUME                   0
+
+245           2 LOAD_FAST                1 (client)
+              4 LOAD_FAST                0 (self)
+              6 STORE_ATTR               0 (client)
+
+246          16 LOAD_FAST                3 (temperature)
+             18 LOAD_FAST                0 (self)
+             20 STORE_ATTR               1 (temperature)
+
+247          30 BUILD_LIST               0
+             32 LOAD_FAST                0 (self)
+             34 STORE_ATTR               2 (messages)
+
+248          44 LOAD_FAST                2 (system)
+             46 POP_JUMP_IF_FALSE       31 (to 110)
+
+249          48 LOAD_FAST                0 (self)
+             50 LOAD_ATTR                4 (messages)
+             70 LOAD_ATTR                7 (NULL|self + append)
+             90 LOAD_CONST               1 ('system')
+             92 LOAD_FAST                2 (system)
+             94 LOAD_CONST               2 (('role', 'content'))
+             96 BUILD_CONST_KEY_MAP      2
+             98 CALL                     1
+            106 POP_TOP
+            108 RETURN_CONST             0 (None)
+
+248     >>  110 RETURN_CONST             0 (None)
+
+Disassembly of <code object send at 0x7f6c9324c8f0, file "app\adapters\ai_provider.py", line 251>:
+251           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+252           6 LOAD_FAST                0 (self)
+              8 LOAD_ATTR                0 (messages)
+             28 LOAD_ATTR                3 (NULL|self + append)
+             48 LOAD_CONST               1 ('user')
+             50 LOAD_FAST                1 (prompt)
+             52 LOAD_CONST               2 (('role', 'content'))
+             54 BUILD_CONST_KEY_MAP      2
+             56 CALL                     1
+             64 POP_TOP
+
+253          66 LOAD_FAST                0 (self)
+             68 LOAD_ATTR                4 (client)
+             88 LOAD_ATTR                7 (NULL|self + _call_api)
+            108 LOAD_FAST                0 (self)
+            110 LOAD_ATTR                0 (messages)
+            130 LOAD_FAST                0 (self)
+            132 LOAD_ATTR                8 (temperature)
+            152 CALL                     2
+            160 GET_AWAITABLE            0
+            162 LOAD_CONST               0 (None)
+        >>  164 SEND                     3 (to 174)
+            168 YIELD_VALUE              2
+            170 RESUME                   3
+            172 JUMP_BACKWARD_NO_INTERRUPT     5 (to 164)
+        >>  174 END_SEND
+            176 STORE_FAST               2 (text)
+
+254         178 LOAD_FAST                0 (self)
+            180 LOAD_ATTR                0 (messages)
+            200 LOAD_ATTR                3 (NULL|self + append)
+            220 LOAD_CONST               3 ('assistant')
+            222 LOAD_FAST                2 (text)
+            224 LOAD_CONST               2 (('role', 'content'))
+            226 BUILD_CONST_KEY_MAP      2
+            228 CALL                     1
+            236 POP_TOP
+
+255         238 LOAD_FAST                2 (text)
+            240 RETURN_VALUE
+
+253     >>  242 CLEANUP_THROW
+            244 JUMP_BACKWARD           36 (to 174)
+        >>  246 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            248 RERAISE                  1
+ExceptionTable:
+  4 to 166 -> 246 [0] lasti
+  168 to 168 -> 242 [2]
+  170 to 242 -> 246 [0] lasti
+
+Disassembly of <code object aclose at 0x7f6c9342fe50, file "app\adapters\ai_provider.py", line 257>:
+257           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+260           6 BUILD_LIST               0
+              8 LOAD_FAST                0 (self)
+             10 STORE_ATTR               0 (messages)
+             20 RETURN_CONST             1 (None)
+        >>   22 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             24 RERAISE                  1
+ExceptionTable:
+  4 to 20 -> 22 [0] lasti
+
+Disassembly of <code object make_chat_session at 0x7f6c933b6640, file "app\adapters\ai_provider.py", line 267>:
+267           0 RESUME                   0
+
+274           2 LOAD_GLOBAL              1 (NULL + resolve_provider)
+             12 LOAD_FAST                2 (provider)
+             14 CALL                     1
+             22 STORE_FAST               2 (provider)
+
+275          24 LOAD_GLOBAL              3 (NULL + make_primary_client)
+             34 LOAD_FAST                2 (provider)
+             36 CALL                     1
+             44 STORE_FAST               3 (client)
+
+276          46 LOAD_FAST                2 (provider)
+             48 LOAD_GLOBAL              4 (PROVIDER_GEMINI)
+             58 LOAD_GLOBAL              6 (PROVIDER_CHATGPT)
+             68 BUILD_TUPLE              2
+             70 CONTAINS_OP              0
+             72 POP_JUMP_IF_FALSE       17 (to 108)
+
+277          74 LOAD_FAST                3 (client)
+             76 LOAD_ATTR                9 (NULL|self + start_chat)
+             96 LOAD_FAST                0 (system)
+             98 CALL                     1
+            106 RETURN_VALUE
+
+278     >>  108 LOAD_GLOBAL             11 (NULL + _StatelessChatSession)
+            118 LOAD_FAST                3 (client)
+            120 LOAD_FAST                0 (system)
+            122 LOAD_FAST                1 (temperature)
+            124 CALL                     3
+            132 RETURN_VALUE
+
+Disassembly of <code object provider_label at 0x7f6c93392470, file "app\adapters\ai_provider.py", line 281>:
+281           0 RESUME                   0
+
+283           2 LOAD_GLOBAL              1 (NULL + resolve_provider)
+             12 LOAD_FAST                0 (provider)
+             14 CALL                     1
+             22 STORE_FAST               0 (provider)
+
+284          24 LOAD_FAST                0 (provider)
+             26 LOAD_GLOBAL              2 (PROVIDER_CHATGPT)
+             36 COMPARE_OP              40 (==)
+             40 POP_JUMP_IF_FALSE        1 (to 44)
+
+285          42 RETURN_CONST             1 ('ChatGPT')
+
+286     >>   44 LOAD_FAST                0 (provider)
+             46 LOAD_GLOBAL              4 (PROVIDER_GEMINI)
+             56 COMPARE_OP              40 (==)
+             60 POP_JUMP_IF_FALSE        1 (to 64)
+
+287          62 RETURN_CONST             2 ('Gemini')
+
+288     >>   64 LOAD_FAST                0 (provider)
+             66 LOAD_GLOBAL              6 (PROVIDER_DEEPSEEK)
+             76 COMPARE_OP              40 (==)
+             80 POP_JUMP_IF_FALSE        1 (to 84)
+
+289          82 RETURN_CONST             3 ('DeepSeek')
+
+290     >>   84 LOAD_GLOBAL              9 (NULL + is_endpoint_ref)
+             94 LOAD_FAST                0 (provider)
+             96 CALL                     1
+            104 POP_JUMP_IF_FALSE       79 (to 264)
+
+291         106 LOAD_GLOBAL             11 (NULL + _endpoint_row)
+            116 LOAD_FAST                0 (provider)
+            118 CALL                     1
+            126 STORE_FAST               1 (row)
+
+292         128 LOAD_FAST                1 (row)
+            130 POP_JUMP_IF_NOT_NONE     1 (to 134)
+
+293         132 RETURN_CONST             4 ('endpoint AI đã bị xoá')
+
+294     >>  134 LOAD_GLOBAL             13 (NULL + split_endpoint_ref)
+            144 LOAD_FAST                0 (provider)
+            146 CALL                     1
+            154 UNPACK_SEQUENCE          2
+            158 STORE_FAST               2 (_endpoint_id)
+            160 STORE_FAST               3 (model_id)
+
+295         162 LOAD_FAST                3 (model_id)
+            164 COPY                     1
+            166 POP_JUMP_IF_TRUE        21 (to 210)
+            168 POP_TOP
+            170 LOAD_FAST                1 (row)
+            172 LOAD_ATTR               15 (NULL|self + get)
+            192 LOAD_CONST               5 ('default_model')
+            194 CALL                     1
+            202 COPY                     1
+            204 POP_JUMP_IF_TRUE         2 (to 210)
+            206 POP_TOP
+            208 LOAD_CONST               6 ('')
+        >>  210 STORE_FAST               4 (model)
+
+296         212 LOAD_FAST                4 (model)
+            214 POP_JUMP_IF_FALSE       10 (to 236)
+            216 LOAD_FAST                1 (row)
+            218 LOAD_CONST               7 ('name')
+            220 BINARY_SUBSCR
+            224 FORMAT_VALUE             0
+            226 LOAD_CONST               8 (' · ')
+            228 LOAD_FAST                4 (model)
+            230 FORMAT_VALUE             0
+            232 BUILD_STRING             3
+            234 RETURN_VALUE
+        >>  236 LOAD_GLOBAL             17 (NULL + str)
+            246 LOAD_FAST                1 (row)
+            248 LOAD_CONST               7 ('name')
+            250 BINARY_SUBSCR
+            254 CALL                     1
+            262 RETURN_VALUE
+
+297     >>  264 LOAD_FAST                0 (provider)
+            266 RETURN_VALUE
+
+Disassembly of <code object is_chatgpt_fallbackable at 0x7f6c9342fad0, file "app\adapters\ai_provider.py", line 300>:
+300           0 RESUME                   0
+
+301           2 LOAD_FAST                0 (code)
+              4 LOAD_GLOBAL              0 (_CHATGPT_FALLBACKABLE)
+             14 CONTAINS_OP              0
+             16 RETURN_VALUE
+
+Disassembly of <code object is_gemini_fallbackable at 0x7f6c9342f910, file "app\adapters\ai_provider.py", line 304>:
+304           0 RESUME                   0
+
+305           2 LOAD_FAST                0 (code)
+              4 LOAD_GLOBAL              0 (_GEMINI_FALLBACKABLE)
+             14 CONTAINS_OP              0
+             16 RETURN_VALUE
+
+Disassembly of <code object is_session_provider_recoverable at 0x7f6c9340eab0, file "app\adapters\ai_provider.py", line 308>:
+308           0 RESUME                   0
+
+310           2 LOAD_FAST                0 (provider)
+              4 LOAD_GLOBAL              0 (PROVIDER_CHATGPT)
+             14 COMPARE_OP              40 (==)
+             18 POP_JUMP_IF_FALSE        8 (to 36)
+
+311          20 LOAD_FAST                1 (code)
+             22 LOAD_GLOBAL              2 (_CHATGPT_FALLBACKABLE)
+             32 CONTAINS_OP              0
+             34 RETURN_VALUE
+
+312     >>   36 LOAD_FAST                0 (provider)
+             38 LOAD_GLOBAL              4 (PROVIDER_GEMINI)
+             48 COMPARE_OP              40 (==)
+             52 POP_JUMP_IF_FALSE        8 (to 70)
+
+313          54 LOAD_FAST                1 (code)
+             56 LOAD_GLOBAL              6 (_GEMINI_FALLBACKABLE)
+             66 CONTAINS_OP              0
+             68 RETURN_VALUE
+
+314     >>   70 RETURN_CONST             1 (False)

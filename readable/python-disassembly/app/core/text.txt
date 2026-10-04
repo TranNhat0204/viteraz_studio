@@ -1,0 +1,994 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Tiện ích xử lý text dùng chung cho pipeline.\n\nQuan trọng nhất: `ensure_terminal_punct` — đảm bảo KÝ TỰ CUỐI mỗi câu là dấu kết câu mạnh để TTS\nNGẮT NGHỈ giữa hai câu. Khi đọc voice-over, các câu được GHÉP liền nhau gửi cho TTS (xem\ntts.py `_chunk_texts`); câu nào thiếu dấu kết sẽ bị đọc dính sang câu sau → nghe rất nhanh, hụt hơi.\nDùng chung cho cả luồng viết kịch bản (script.py) lẫn luồng dịch recap/lồng tiếng (translate.py).\n')
+              4 STORE_NAME               0 (__doc__)
+
+  8           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 11          18 LOAD_CONST               3 ('"\'’”)）]】»」』')
+             20 STORE_NAME               3 (_CLOSERS)
+
+ 13          22 LOAD_CONST               4 ('.?!…。！？')
+             24 STORE_NAME               4 (_TERMINAL_PUNCT)
+
+ 16          26 LOAD_CONST              18 (('s', 'str', 'return', 'str'))
+             28 LOAD_CONST               5 (<code object ensure_terminal_punct at 0x28b7ba80, file "app\core\text.py", line 16>)
+             30 MAKE_FUNCTION            4 (annotations)
+             32 STORE_NAME               5 (ensure_terminal_punct)
+
+ 43          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               6 (None)
+             38 IMPORT_NAME              6 (re)
+             40 STORE_NAME               6 (re)
+
+ 45          42 PUSH_NULL
+             44 LOAD_NAME                6 (re)
+             46 LOAD_ATTR               14 (compile)
+
+ 46          66 LOAD_CONST               7 ("^(?:i(?:'m|’m| am)\\b|i(?:'ve|’ve| have)\\b|i(?:'ll|’ll| will| shall| must| need to| should| have to)\\b|we(?:'ll|’ll| will| need to)\\b|let(?:'s|’s)\\b|it(?:'s|’s| is) (?:confirmed|determined|decided|set|agreed|intended|noted|clear|important)\\b|the (?:focus|target|goal|duration|tone|hook|channel['’]s signature|structure|prompt|script|video|task|outline|narration|signature)\\b|this (?:task|script|short|video|idea|prompt|narration)\\b|(?:my|our) (?:goal|plan|task|approach|focus)\\b|as an ai\\b|here (?:is|'s|’s)\\b|below (?:is|'s|’s)\\b|(?:sure|certainly|ok|okay)[!,\\.]\\b|(?:dưới đây|sau đây|đây) (?:là|gồm)\\b|(?:tôi|mình) sẽ (?:viết|tóm tắt|tạo|trình bày)\\b|(?:note|thinking|thought|analysis|overview|script overview|narration overview|summary|reasoning|reflection|draft):)")
+
+ 64          68 LOAD_NAME                6 (re)
+             70 LOAD_ATTR               16 (IGNORECASE)
+
+ 45          90 CALL                     2
+             98 STORE_NAME               9 (_META_PREFIX_RE)
+
+ 67         100 BUILD_SET                0
+            102 LOAD_CONST               8 (frozenset({'thought process', 'analysis', 'reflection', 'internal monologue', 'thinking process', 'reasoning', 'suy nghĩ', 'phân tích', 'scratchpad', 'quá trình suy nghĩ', 'thinking', 'thought'}))
+            104 SET_UPDATE               1
+            106 STORE_NAME              10 (_THINKING_KEYWORDS)
+
+ 73         108 BUILD_SET                0
+            110 LOAD_CONST               9 (frozenset({'content', 'lời kể', 'sau đây là lời kể', 'result', 'sau đây là kịch bản', 'script', 'dưới đây là kịch bản', 'output', 'đây là kịch bản', 'narration', 'dưới đây là lời kể', 'kịch bản', 'final script'}))
+            112 SET_UPDATE               1
+            114 STORE_NAME              11 (_SCRIPT_START_KEYWORDS)
+
+ 80         116 LOAD_CONST              19 (('text', 'str', 'return', 'str'))
+            118 LOAD_CONST              10 (<code object strip_thinking_blocks at 0x28e567b0, file "app\core\text.py", line 80>)
+            120 MAKE_FUNCTION            4 (annotations)
+            122 STORE_NAME              12 (strip_thinking_blocks)
+
+153         124 PUSH_NULL
+            126 LOAD_NAME                6 (re)
+            128 LOAD_ATTR               14 (compile)
+
+154         148 LOAD_CONST              11 ('^(?:script|kịch bản|hook|sentence\\s*\\d+|for sentence\\s*\\d+|line\\s*\\d+|beat\\s*\\d+|scene\\s*\\d+|narration|body(?:\\s*sentence\\s*\\d+)?|outro|conclusion|intro)\\s*[:\\-–—]\\s*')
+
+155         150 LOAD_NAME                6 (re)
+            152 LOAD_ATTR               16 (IGNORECASE)
+
+153         172 CALL                     2
+            180 STORE_NAME              13 (_SCRIPT_LABEL_RE)
+
+159         182 PUSH_NULL
+            184 LOAD_NAME                6 (re)
+            186 LOAD_ATTR               14 (compile)
+
+160         206 LOAD_CONST              12 ('^(?:\\[?\\d{1,2}:\\d{2}(?::\\d{2})?\\]?|\\(\\d{1,2}:\\d{2}(?::\\d{2})?\\))\\s*')
+
+159         208 CALL                     1
+            216 STORE_NAME              14 (_TIMESTAMP_PREFIX_RE)
+
+164         218 PUSH_NULL
+            220 LOAD_NAME                6 (re)
+            222 LOAD_ATTR               14 (compile)
+
+165         242 LOAD_CONST              13 ('^(?:\\d+[\\.\\)]|[\\*\\-_#•>\\s]+)\\s*')
+
+164         244 CALL                     1
+            252 STORE_NAME              15 (_BULLET_PREFIX_RE)
+
+169         254 PUSH_NULL
+            256 LOAD_NAME                6 (re)
+            258 LOAD_ATTR               14 (compile)
+
+170         278 LOAD_CONST              14 ('^(?:\\[|\\()(?:visual|scene|sound|music|audio|camera|note|action)\\s*[:\\-–—].*?(?:\\]|\\))$')
+
+171         280 LOAD_NAME                6 (re)
+            282 LOAD_ATTR               16 (IGNORECASE)
+
+169         302 CALL                     2
+            310 STORE_NAME              16 (_STAGE_DIRECTION_RE)
+
+175         312 PUSH_NULL
+            314 LOAD_NAME                6 (re)
+            316 LOAD_ATTR               14 (compile)
+
+176         336 LOAD_CONST              15 ('^\\s*::+:?[\\w\\-\\.\\_]*(\\{.*?\\})?\\s*$')
+
+177         338 LOAD_NAME                6 (re)
+            340 LOAD_ATTR               16 (IGNORECASE)
+
+175         360 CALL                     2
+            368 STORE_NAME              17 (_CONTAINER_DIRECTIVE_RE)
+
+181         370 PUSH_NULL
+            372 LOAD_NAME                6 (re)
+            374 LOAD_ATTR               14 (compile)
+
+182         394 LOAD_CONST              16 ('^\\s*</?(?:canvas|artifact|document|script|code|output|response|writing|storyboard|narration|task)(?:\\s+[^>]*)?>\\s*$')
+
+183         396 LOAD_NAME                6 (re)
+            398 LOAD_ATTR               16 (IGNORECASE)
+
+181         418 CALL                     2
+            426 STORE_NAME              18 (_XML_CONTAINER_TAG_RE)
+
+187         428 LOAD_CONST              19 (('text', 'str', 'return', 'str'))
+            430 LOAD_CONST              17 (<code object clean_llm_script at 0x28b71730, file "app\core\text.py", line 187>)
+            432 MAKE_FUNCTION            4 (annotations)
+            434 STORE_NAME              19 (clean_llm_script)
+            436 RETURN_CONST             6 (None)
+
+Disassembly of <code object ensure_terminal_punct at 0x28b7ba80, file "app\core\text.py", line 16>:
+ 16           0 RESUME                   0
+
+ 27           2 LOAD_FAST                0 (s)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 LOAD_CONST               1 ('')
+        >>   12 LOAD_ATTR                1 (NULL|self + rstrip)
+             32 CALL                     0
+             40 STORE_FAST               0 (s)
+
+ 28          42 LOAD_FAST                0 (s)
+             44 POP_JUMP_IF_TRUE         2 (to 50)
+
+ 29          46 LOAD_FAST                0 (s)
+             48 RETURN_VALUE
+
+ 30     >>   50 LOAD_FAST                0 (s)
+             52 LOAD_CONST               2 (-1)
+             54 BINARY_SUBSCR
+             58 LOAD_GLOBAL              2 (_TERMINAL_PUNCT)
+             68 CONTAINS_OP              0
+             70 POP_JUMP_IF_FALSE        2 (to 76)
+
+ 31          72 LOAD_FAST                0 (s)
+             74 RETURN_VALUE
+
+ 32     >>   76 LOAD_FAST                0 (s)
+             78 LOAD_CONST               2 (-1)
+             80 BINARY_SUBSCR
+             84 LOAD_GLOBAL              4 (_CLOSERS)
+             94 CONTAINS_OP              0
+             96 POP_JUMP_IF_FALSE       95 (to 288)
+
+ 33          98 LOAD_FAST                0 (s)
+            100 LOAD_ATTR                1 (NULL|self + rstrip)
+            120 LOAD_GLOBAL              4 (_CLOSERS)
+            130 CALL                     1
+            138 LOAD_ATTR                1 (NULL|self + rstrip)
+            158 CALL                     0
+            166 STORE_FAST               1 (core)
+
+ 34         168 LOAD_FAST                0 (s)
+            170 LOAD_GLOBAL              7 (NULL + len)
+            180 LOAD_FAST                1 (core)
+            182 CALL                     1
+            190 LOAD_CONST               3 (None)
+            192 BINARY_SLICE
+            194 STORE_FAST               2 (closers)
+
+ 35         196 LOAD_FAST                1 (core)
+            198 POP_JUMP_IF_FALSE       39 (to 278)
+            200 LOAD_FAST                1 (core)
+            202 LOAD_CONST               2 (-1)
+            204 BINARY_SUBSCR
+            208 LOAD_GLOBAL              2 (_TERMINAL_PUNCT)
+            218 CONTAINS_OP              0
+            220 POP_JUMP_IF_FALSE       28 (to 278)
+
+ 36         222 LOAD_FAST                1 (core)
+            224 LOAD_CONST               3 (None)
+            226 LOAD_CONST               2 (-1)
+            228 BINARY_SLICE
+            230 LOAD_ATTR                1 (NULL|self + rstrip)
+            250 CALL                     0
+            258 LOAD_FAST                2 (closers)
+            260 BINARY_OP                0 (+)
+            264 LOAD_FAST                1 (core)
+            266 LOAD_CONST               2 (-1)
+            268 BINARY_SUBSCR
+            272 BINARY_OP                0 (+)
+            276 RETURN_VALUE
+
+ 37     >>  278 LOAD_FAST                0 (s)
+            280 LOAD_CONST               4 ('.')
+            282 BINARY_OP                0 (+)
+            286 RETURN_VALUE
+
+ 38     >>  288 LOAD_FAST                0 (s)
+            290 LOAD_CONST               2 (-1)
+            292 BINARY_SUBSCR
+            296 LOAD_ATTR                9 (NULL|self + isalnum)
+            316 CALL                     0
+            324 POP_JUMP_IF_FALSE        5 (to 336)
+
+ 39         326 LOAD_FAST                0 (s)
+            328 LOAD_CONST               4 ('.')
+            330 BINARY_OP                0 (+)
+            334 RETURN_VALUE
+
+ 40     >>  336 LOAD_FAST                0 (s)
+            338 RETURN_VALUE
+
+Disassembly of <code object strip_thinking_blocks at 0x28e567b0, file "app\core\text.py", line 80>:
+ 80           0 RESUME                   0
+
+ 87           2 LOAD_FAST                0 (text)
+              4 POP_JUMP_IF_TRUE         1 (to 8)
+
+ 88           6 RETURN_CONST             1 ('')
+
+ 90     >>    8 LOAD_CONST               2 ('think|thinking|thought|reasoning|reflection|internal_monologue|analysis|scratchpad|chain_of_thought|plan|planning')
+             10 STORE_FAST               1 (tags)
+
+ 91          12 LOAD_GLOBAL              1 (NULL + re)
+             22 LOAD_ATTR                2 (sub)
+             42 LOAD_CONST               3 ('<(?:')
+             44 LOAD_FAST                1 (tags)
+             46 FORMAT_VALUE             0
+             48 LOAD_CONST               4 (')\\b[^>]*>.*?</(?:')
+             50 LOAD_FAST                1 (tags)
+             52 FORMAT_VALUE             0
+             54 LOAD_CONST               5 (')>')
+             56 BUILD_STRING             5
+             58 LOAD_CONST               1 ('')
+             60 LOAD_FAST                0 (text)
+             62 LOAD_GLOBAL              0 (re)
+             72 LOAD_ATTR                4 (DOTALL)
+             92 LOAD_GLOBAL              0 (re)
+            102 LOAD_ATTR                6 (IGNORECASE)
+            122 BINARY_OP                7 (|)
+            126 KW_NAMES                 6 (('flags',))
+            128 CALL                     4
+            136 STORE_FAST               0 (text)
+
+ 92         138 LOAD_GLOBAL              1 (NULL + re)
+            148 LOAD_ATTR                2 (sub)
+            168 LOAD_CONST               7 ('\\[(?:')
+            170 LOAD_FAST                1 (tags)
+            172 FORMAT_VALUE             0
+            174 LOAD_CONST               8 (')\\].*?\\[/(?:')
+            176 LOAD_FAST                1 (tags)
+            178 FORMAT_VALUE             0
+            180 LOAD_CONST               9 (')\\]')
+            182 BUILD_STRING             5
+            184 LOAD_CONST               1 ('')
+            186 LOAD_FAST                0 (text)
+            188 LOAD_GLOBAL              0 (re)
+            198 LOAD_ATTR                4 (DOTALL)
+            218 LOAD_GLOBAL              0 (re)
+            228 LOAD_ATTR                6 (IGNORECASE)
+            248 BINARY_OP                7 (|)
+            252 KW_NAMES                 6 (('flags',))
+            254 CALL                     4
+            262 STORE_FAST               0 (text)
+
+ 93         264 LOAD_GLOBAL              1 (NULL + re)
+            274 LOAD_ATTR                2 (sub)
+            294 LOAD_CONST              10 ('<!--\\s*(?:')
+            296 LOAD_FAST                1 (tags)
+            298 FORMAT_VALUE             0
+            300 LOAD_CONST              11 (')\\s*-->.*?<!--\\s*/(?:')
+            302 LOAD_FAST                1 (tags)
+            304 FORMAT_VALUE             0
+            306 LOAD_CONST              12 (')\\s*-->')
+            308 BUILD_STRING             5
+            310 LOAD_CONST               1 ('')
+            312 LOAD_FAST                0 (text)
+            314 LOAD_GLOBAL              0 (re)
+            324 LOAD_ATTR                4 (DOTALL)
+            344 LOAD_GLOBAL              0 (re)
+            354 LOAD_ATTR                6 (IGNORECASE)
+            374 BINARY_OP                7 (|)
+            378 KW_NAMES                 6 (('flags',))
+            380 CALL                     4
+            388 STORE_FAST               0 (text)
+
+ 95         390 LOAD_GLOBAL              1 (NULL + re)
+            400 LOAD_ATTR                8 (search)
+            420 LOAD_CONST               3 ('<(?:')
+            422 LOAD_FAST                1 (tags)
+            424 FORMAT_VALUE             0
+            426 LOAD_CONST              13 (')\\b[^>]*>')
+            428 BUILD_STRING             3
+            430 LOAD_FAST                0 (text)
+            432 LOAD_GLOBAL              0 (re)
+            442 LOAD_ATTR                6 (IGNORECASE)
+            462 KW_NAMES                 6 (('flags',))
+            464 CALL                     3
+            472 STORE_FAST               2 (unclosed_match)
+
+ 96         474 LOAD_FAST                2 (unclosed_match)
+            476 EXTENDED_ARG             1
+            478 POP_JUMP_IF_FALSE      351 (to 1182)
+
+ 97         480 LOAD_FAST                2 (unclosed_match)
+            482 LOAD_ATTR               11 (NULL|self + start)
+            502 CALL                     0
+            510 STORE_FAST               3 (start_idx)
+
+ 98         512 LOAD_FAST                0 (text)
+            514 LOAD_FAST                3 (start_idx)
+            516 LOAD_CONST              14 (None)
+            518 BINARY_SLICE
+            520 STORE_FAST               4 (rest)
+
+ 99         522 LOAD_GLOBAL              1 (NULL + re)
+            532 LOAD_ATTR                8 (search)
+            552 LOAD_CONST              15 ('</(?:')
+            554 LOAD_FAST                1 (tags)
+            556 FORMAT_VALUE             0
+            558 LOAD_CONST               5 (')>')
+            560 BUILD_STRING             3
+            562 LOAD_FAST                4 (rest)
+            564 LOAD_GLOBAL              0 (re)
+            574 LOAD_ATTR                6 (IGNORECASE)
+            594 KW_NAMES                 6 (('flags',))
+            596 CALL                     3
+            604 STORE_FAST               5 (closing_match)
+
+100         606 LOAD_FAST                5 (closing_match)
+            608 POP_JUMP_IF_FALSE       27 (to 664)
+
+101         610 LOAD_FAST                0 (text)
+            612 LOAD_CONST              14 (None)
+            614 LOAD_FAST                3 (start_idx)
+            616 BINARY_SLICE
+            618 LOAD_FAST                4 (rest)
+            620 LOAD_FAST                5 (closing_match)
+            622 LOAD_ATTR               13 (NULL|self + end)
+            642 CALL                     0
+            650 LOAD_CONST              14 (None)
+            652 BINARY_SLICE
+            654 BINARY_OP                0 (+)
+            658 STORE_FAST               0 (text)
+            660 EXTENDED_ARG             1
+            662 JUMP_FORWARD           259 (to 1182)
+
+103     >>  664 LOAD_FAST                4 (rest)
+            666 LOAD_ATTR               15 (NULL|self + split)
+            686 LOAD_CONST              16 ('\n')
+            688 CALL                     1
+            696 STORE_FAST               6 (rest_lines)
+
+104         698 LOAD_CONST              17 (0)
+            700 STORE_FAST               7 (non_thinking_idx)
+
+105         702 LOAD_GLOBAL             17 (NULL + enumerate)
+            712 LOAD_FAST                6 (rest_lines)
+            714 CALL                     1
+            722 GET_ITER
+        >>  724 FOR_ITER               189 (to 1106)
+            728 UNPACK_SEQUENCE          2
+            732 STORE_FAST               8 (i)
+            734 STORE_FAST               9 (rline)
+
+106         736 LOAD_FAST                9 (rline)
+            738 LOAD_ATTR               19 (NULL|self + strip)
+            758 CALL                     0
+            766 STORE_FAST              10 (rstripped)
+
+107         768 LOAD_FAST               10 (rstripped)
+            770 POP_JUMP_IF_TRUE         1 (to 774)
+
+108         772 JUMP_BACKWARD           25 (to 724)
+
+109     >>  774 LOAD_GLOBAL              1 (NULL + re)
+            784 LOAD_ATTR               20 (match)
+            804 LOAD_CONST              18 ('^\\s*<(?:')
+            806 LOAD_FAST                1 (tags)
+            808 FORMAT_VALUE             0
+            810 LOAD_CONST              19 (')\\b[^>]*>\\s*$')
+            812 BUILD_STRING             3
+            814 LOAD_FAST               10 (rstripped)
+            816 LOAD_GLOBAL              0 (re)
+            826 LOAD_ATTR                6 (IGNORECASE)
+            846 CALL                     3
+            854 POP_JUMP_IF_FALSE        1 (to 858)
+
+110         856 JUMP_BACKWARD           67 (to 724)
+
+111     >>  858 LOAD_FAST               10 (rstripped)
+            860 LOAD_ATTR               19 (NULL|self + strip)
+            880 LOAD_CONST              20 ('*_#:- ')
+            882 CALL                     1
+            890 LOAD_ATTR               23 (NULL|self + lower)
+            910 CALL                     0
+            918 STORE_FAST              11 (rnorm)
+
+113         920 LOAD_GLOBAL             24 (_META_PREFIX_RE)
+            930 LOAD_ATTR                9 (NULL|self + search)
+            950 LOAD_FAST               11 (rnorm)
+            952 CALL                     1
+            960 POP_JUMP_IF_TRUE        67 (to 1096)
+
+114         962 LOAD_FAST               11 (rnorm)
+            964 LOAD_GLOBAL             26 (_THINKING_KEYWORDS)
+            974 CONTAINS_OP              0
+            976 POP_JUMP_IF_TRUE        59 (to 1096)
+
+115         978 LOAD_GLOBAL              1 (NULL + re)
+            988 LOAD_ATTR               20 (match)
+           1008 LOAD_CONST              21 ('^(?:[\\*\\-\\•]|\\d+[\\.\\)])')
+           1010 LOAD_FAST               10 (rstripped)
+           1012 CALL                     2
+           1020 POP_JUMP_IF_TRUE        37 (to 1096)
+
+116        1022 LOAD_GLOBAL              1 (NULL + re)
+           1032 LOAD_ATTR               20 (match)
+           1052 LOAD_CONST              22 ('^(?:step|phase|stage|sentence\\s*\\d|line\\s*\\d|beat\\s*\\d|scene\\s*\\d|analyze|check|verify|ensure|first|second|i\\b|we\\b)')
+           1054 LOAD_FAST               11 (rnorm)
+           1056 LOAD_GLOBAL              0 (re)
+           1066 LOAD_ATTR                6 (IGNORECASE)
+           1086 CALL                     3
+           1094 POP_JUMP_IF_FALSE        1 (to 1098)
+
+118     >> 1096 JUMP_BACKWARD          187 (to 724)
+
+119     >> 1098 LOAD_FAST                8 (i)
+           1100 STORE_FAST               7 (non_thinking_idx)
+
+120        1102 POP_TOP
+           1104 JUMP_FORWARD             1 (to 1108)
+
+105     >> 1106 END_FOR
+
+122     >> 1108 LOAD_FAST                7 (non_thinking_idx)
+           1110 LOAD_CONST              17 (0)
+           1112 COMPARE_OP              68 (>)
+           1116 POP_JUMP_IF_FALSE       27 (to 1172)
+
+123        1118 LOAD_FAST                0 (text)
+           1120 LOAD_CONST              14 (None)
+           1122 LOAD_FAST                3 (start_idx)
+           1124 BINARY_SLICE
+           1126 LOAD_CONST              16 ('\n')
+           1128 LOAD_ATTR               29 (NULL|self + join)
+           1148 LOAD_FAST                6 (rest_lines)
+           1150 LOAD_FAST                7 (non_thinking_idx)
+           1152 LOAD_CONST              14 (None)
+           1154 BINARY_SLICE
+           1156 CALL                     1
+           1164 BINARY_OP                0 (+)
+           1168 STORE_FAST               0 (text)
+           1170 JUMP_FORWARD             5 (to 1182)
+
+125     >> 1172 LOAD_FAST                0 (text)
+           1174 LOAD_CONST              14 (None)
+           1176 LOAD_FAST                3 (start_idx)
+           1178 BINARY_SLICE
+           1180 STORE_FAST               0 (text)
+
+127     >> 1182 LOAD_FAST                0 (text)
+           1184 LOAD_ATTR               31 (NULL|self + replace)
+           1204 LOAD_CONST              23 ('\r')
+           1206 LOAD_CONST              16 ('\n')
+           1208 CALL                     2
+           1216 LOAD_ATTR               15 (NULL|self + split)
+           1236 LOAD_CONST              16 ('\n')
+           1238 CALL                     1
+           1246 STORE_FAST              12 (lines)
+
+128        1248 BUILD_LIST               0
+           1250 STORE_FAST              13 (filtered_lines)
+
+129        1252 LOAD_CONST              24 (False)
+           1254 STORE_FAST              14 (in_thinking_block)
+
+131        1256 LOAD_FAST               12 (lines)
+           1258 GET_ITER
+        >> 1260 FOR_ITER               133 (to 1530)
+           1264 STORE_FAST              15 (line)
+
+132        1266 LOAD_FAST               15 (line)
+           1268 LOAD_ATTR               19 (NULL|self + strip)
+           1288 CALL                     0
+           1296 STORE_FAST              16 (stripped)
+
+133        1298 LOAD_FAST               16 (stripped)
+           1300 LOAD_ATTR               19 (NULL|self + strip)
+           1320 LOAD_CONST              20 ('*_#:- ')
+           1322 CALL                     1
+           1330 LOAD_ATTR               23 (NULL|self + lower)
+           1350 CALL                     0
+           1358 STORE_FAST              17 (normalized)
+
+135        1360 LOAD_FAST               14 (in_thinking_block)
+           1362 POP_JUMP_IF_FALSE       54 (to 1472)
+
+136        1364 LOAD_FAST               17 (normalized)
+           1366 LOAD_GLOBAL             32 (_SCRIPT_START_KEYWORDS)
+           1376 CONTAINS_OP              0
+           1378 POP_JUMP_IF_TRUE        17 (to 1414)
+           1380 LOAD_FAST               16 (stripped)
+           1382 LOAD_ATTR               35 (NULL|self + startswith)
+           1402 LOAD_CONST              25 (('{', '[', ':::', '```'))
+           1404 CALL                     1
+           1412 POP_JUMP_IF_FALSE       28 (to 1470)
+
+137     >> 1414 LOAD_CONST              24 (False)
+           1416 STORE_FAST              14 (in_thinking_block)
+
+138        1418 LOAD_FAST               17 (normalized)
+           1420 LOAD_GLOBAL             32 (_SCRIPT_START_KEYWORDS)
+           1430 CONTAINS_OP              1
+           1432 POP_JUMP_IF_FALSE       17 (to 1468)
+
+139        1434 LOAD_FAST               13 (filtered_lines)
+           1436 LOAD_ATTR               37 (NULL|self + append)
+           1456 LOAD_FAST               15 (line)
+           1458 CALL                     1
+           1466 POP_TOP
+
+140     >> 1468 JUMP_BACKWARD          105 (to 1260)
+
+141     >> 1470 JUMP_BACKWARD          106 (to 1260)
+
+143     >> 1472 LOAD_FAST               17 (normalized)
+           1474 LOAD_GLOBAL             26 (_THINKING_KEYWORDS)
+           1484 CONTAINS_OP              0
+           1486 POP_JUMP_IF_FALSE        3 (to 1494)
+
+144        1488 LOAD_CONST              26 (True)
+           1490 STORE_FAST              14 (in_thinking_block)
+
+145        1492 JUMP_BACKWARD          117 (to 1260)
+
+147     >> 1494 LOAD_FAST               13 (filtered_lines)
+           1496 LOAD_ATTR               37 (NULL|self + append)
+           1516 LOAD_FAST               15 (line)
+           1518 CALL                     1
+           1526 POP_TOP
+           1528 JUMP_BACKWARD          135 (to 1260)
+
+131     >> 1530 END_FOR
+
+149        1532 LOAD_CONST              16 ('\n')
+           1534 LOAD_ATTR               29 (NULL|self + join)
+           1554 LOAD_FAST               13 (filtered_lines)
+           1556 CALL                     1
+           1564 RETURN_VALUE
+
+Disassembly of <code object clean_llm_script at 0x28b71730, file "app\core\text.py", line 187>:
+187           0 RESUME                   0
+
+198           2 LOAD_FAST                0 (text)
+              4 POP_JUMP_IF_TRUE         1 (to 8)
+
+199           6 RETURN_CONST             1 ('')
+
+201     >>    8 LOAD_GLOBAL              1 (NULL + strip_thinking_blocks)
+             18 LOAD_FAST                0 (text)
+             20 CALL                     1
+             28 STORE_FAST               0 (text)
+
+204          30 LOAD_GLOBAL              3 (NULL + re)
+             40 LOAD_ATTR                4 (sub)
+
+205          60 LOAD_CONST               2 ('<(think|thinking|thought|reasoning|reflection|internal_monologue)>.*?</\\1>')
+
+206          62 LOAD_CONST               1 ('')
+
+207          64 LOAD_FAST                0 (text)
+
+208          66 LOAD_GLOBAL              2 (re)
+             76 LOAD_ATTR                6 (DOTALL)
+             96 LOAD_GLOBAL              2 (re)
+            106 LOAD_ATTR                8 (IGNORECASE)
+            126 BINARY_OP                7 (|)
+
+204         130 KW_NAMES                 3 (('flags',))
+            132 CALL                     4
+            140 STORE_FAST               0 (text)
+
+210         142 LOAD_GLOBAL              3 (NULL + re)
+            152 LOAD_ATTR                4 (sub)
+
+211         172 LOAD_CONST               4 ('\\[(think|thinking|thought|reasoning|reflection)\\].*?\\[/\\1\\]')
+
+212         174 LOAD_CONST               1 ('')
+
+213         176 LOAD_FAST                0 (text)
+
+214         178 LOAD_GLOBAL              2 (re)
+            188 LOAD_ATTR                6 (DOTALL)
+            208 LOAD_GLOBAL              2 (re)
+            218 LOAD_ATTR                8 (IGNORECASE)
+            238 BINARY_OP                7 (|)
+
+210         242 KW_NAMES                 3 (('flags',))
+            244 CALL                     4
+            252 STORE_FAST               0 (text)
+
+216         254 LOAD_GLOBAL              3 (NULL + re)
+            264 LOAD_ATTR                4 (sub)
+
+217         284 LOAD_CONST               5 ('<!--\\s*(think|thinking|thought|reasoning)\\s*-->.*?<!--\\s*/\\1\\s*-->')
+
+218         286 LOAD_CONST               1 ('')
+
+219         288 LOAD_FAST                0 (text)
+
+220         290 LOAD_GLOBAL              2 (re)
+            300 LOAD_ATTR                6 (DOTALL)
+            320 LOAD_GLOBAL              2 (re)
+            330 LOAD_ATTR                8 (IGNORECASE)
+            350 BINARY_OP                7 (|)
+
+216         354 KW_NAMES                 3 (('flags',))
+            356 CALL                     4
+            364 STORE_FAST               0 (text)
+
+222         366 LOAD_GLOBAL              3 (NULL + re)
+            376 LOAD_ATTR                4 (sub)
+
+223         396 LOAD_CONST               6 ('</?(?:think|thinking|thought|reasoning|reflection|internal_monologue)>')
+
+224         398 LOAD_CONST               1 ('')
+
+225         400 LOAD_FAST                0 (text)
+
+226         402 LOAD_GLOBAL              2 (re)
+            412 LOAD_ATTR                8 (IGNORECASE)
+
+222         432 KW_NAMES                 3 (('flags',))
+            434 CALL                     4
+            442 STORE_FAST               0 (text)
+
+228         444 LOAD_GLOBAL              3 (NULL + re)
+            454 LOAD_ATTR                4 (sub)
+
+229         474 LOAD_CONST               7 ('\\[/?(?:think|thinking|thought|reasoning|reflection)\\]')
+
+230         476 LOAD_CONST               1 ('')
+
+231         478 LOAD_FAST                0 (text)
+
+232         480 LOAD_GLOBAL              2 (re)
+            490 LOAD_ATTR                8 (IGNORECASE)
+
+228         510 KW_NAMES                 3 (('flags',))
+            512 CALL                     4
+            520 STORE_FAST               0 (text)
+
+235         522 LOAD_GLOBAL              3 (NULL + re)
+            532 LOAD_ATTR                4 (sub)
+
+236         552 LOAD_CONST               8 ('^(?:thinking process|thought process|internal monologue|thinking|reasoning):\\s*')
+
+237         554 LOAD_CONST               1 ('')
+
+238         556 LOAD_FAST                0 (text)
+            558 LOAD_ATTR               11 (NULL|self + strip)
+            578 CALL                     0
+
+239         586 LOAD_GLOBAL              2 (re)
+            596 LOAD_ATTR                8 (IGNORECASE)
+
+235         616 KW_NAMES                 3 (('flags',))
+            618 CALL                     4
+            626 STORE_FAST               0 (text)
+
+243         628 BUILD_LIST               0
+            630 STORE_FAST               1 (cleaned_lines)
+
+244         632 LOAD_FAST                0 (text)
+            634 LOAD_ATTR               13 (NULL|self + replace)
+            654 LOAD_CONST               9 ('\r')
+            656 LOAD_CONST              10 ('\n')
+            658 CALL                     2
+            666 LOAD_ATTR               15 (NULL|self + split)
+            686 LOAD_CONST              10 ('\n')
+            688 CALL                     1
+            696 GET_ITER
+        >>  698 EXTENDED_ARG             2
+            700 FOR_ITER               629 (to 1962)
+            704 STORE_FAST               2 (line)
+
+245         706 LOAD_FAST                2 (line)
+            708 LOAD_ATTR               11 (NULL|self + strip)
+            728 CALL                     0
+            736 STORE_FAST               3 (line_str)
+
+246         738 LOAD_FAST                3 (line_str)
+            740 POP_JUMP_IF_TRUE         1 (to 744)
+
+247         742 JUMP_BACKWARD           23 (to 698)
+
+250     >>  744 LOAD_FAST                3 (line_str)
+            746 LOAD_ATTR               17 (NULL|self + startswith)
+            766 LOAD_CONST              11 ('#')
+            768 CALL                     1
+            776 POP_JUMP_IF_FALSE        1 (to 780)
+
+251         778 JUMP_BACKWARD           41 (to 698)
+
+254     >>  780 LOAD_FAST                3 (line_str)
+            782 LOAD_ATTR               17 (NULL|self + startswith)
+            802 LOAD_CONST              12 ('**')
+            804 CALL                     1
+            812 POP_JUMP_IF_FALSE       32 (to 878)
+            814 LOAD_FAST                3 (line_str)
+            816 LOAD_ATTR               19 (NULL|self + endswith)
+            836 LOAD_CONST              12 ('**')
+            838 CALL                     1
+            846 POP_JUMP_IF_FALSE       15 (to 878)
+            848 LOAD_GLOBAL             21 (NULL + len)
+            858 LOAD_FAST                3 (line_str)
+            860 CALL                     1
+            868 LOAD_CONST              13 (60)
+            870 COMPARE_OP               2 (<)
+            874 POP_JUMP_IF_FALSE        1 (to 878)
+
+255         876 JUMP_BACKWARD           90 (to 698)
+
+258     >>  878 LOAD_FAST                3 (line_str)
+            880 LOAD_ATTR               17 (NULL|self + startswith)
+            900 LOAD_CONST              14 (':::')
+            902 CALL                     1
+            910 POP_JUMP_IF_TRUE        38 (to 988)
+            912 LOAD_FAST                3 (line_str)
+            914 LOAD_ATTR               17 (NULL|self + startswith)
+            934 LOAD_CONST              15 ('::')
+            936 CALL                     1
+            944 POP_JUMP_IF_TRUE        21 (to 988)
+            946 LOAD_GLOBAL             22 (_CONTAINER_DIRECTIVE_RE)
+            956 LOAD_ATTR               25 (NULL|self + match)
+            976 LOAD_FAST                3 (line_str)
+            978 CALL                     1
+            986 POP_JUMP_IF_FALSE        1 (to 990)
+
+259     >>  988 JUMP_BACKWARD          146 (to 698)
+
+262     >>  990 LOAD_GLOBAL             26 (_XML_CONTAINER_TAG_RE)
+           1000 LOAD_ATTR               25 (NULL|self + match)
+           1020 LOAD_FAST                3 (line_str)
+           1022 CALL                     1
+           1030 POP_JUMP_IF_FALSE        1 (to 1034)
+
+263        1032 JUMP_BACKWARD          168 (to 698)
+
+266     >> 1034 LOAD_FAST                3 (line_str)
+           1036 LOAD_ATTR               17 (NULL|self + startswith)
+           1056 LOAD_CONST              16 ('```')
+           1058 CALL                     1
+           1066 POP_JUMP_IF_FALSE        1 (to 1070)
+
+267        1068 JUMP_BACKWARD          186 (to 698)
+
+270     >> 1070 LOAD_GLOBAL             28 (_STAGE_DIRECTION_RE)
+           1080 LOAD_ATTR               25 (NULL|self + match)
+           1100 LOAD_FAST                3 (line_str)
+           1102 CALL                     1
+           1110 POP_JUMP_IF_FALSE        1 (to 1114)
+
+271        1112 JUMP_BACKWARD          208 (to 698)
+
+274     >> 1114 LOAD_GLOBAL             30 (_TIMESTAMP_PREFIX_RE)
+           1124 LOAD_ATTR                5 (NULL|self + sub)
+           1144 LOAD_CONST               1 ('')
+           1146 LOAD_FAST                3 (line_str)
+           1148 CALL                     2
+           1156 LOAD_ATTR               11 (NULL|self + strip)
+           1176 CALL                     0
+           1184 STORE_FAST               3 (line_str)
+
+275        1186 LOAD_FAST                3 (line_str)
+           1188 POP_JUMP_IF_TRUE         1 (to 1192)
+
+276        1190 JUMP_BACKWARD          247 (to 698)
+
+279     >> 1192 LOAD_FAST                3 (line_str)
+           1194 LOAD_ATTR               17 (NULL|self + startswith)
+           1214 LOAD_CONST              14 (':::')
+           1216 CALL                     1
+           1224 POP_JUMP_IF_TRUE        76 (to 1378)
+           1226 LOAD_FAST                3 (line_str)
+           1228 LOAD_ATTR               17 (NULL|self + startswith)
+           1248 LOAD_CONST              15 ('::')
+           1250 CALL                     1
+           1258 POP_JUMP_IF_TRUE        59 (to 1378)
+           1260 LOAD_GLOBAL             22 (_CONTAINER_DIRECTIVE_RE)
+           1270 LOAD_ATTR               25 (NULL|self + match)
+           1290 LOAD_FAST                3 (line_str)
+           1292 CALL                     1
+           1300 POP_JUMP_IF_TRUE        38 (to 1378)
+           1302 LOAD_GLOBAL             26 (_XML_CONTAINER_TAG_RE)
+           1312 LOAD_ATTR               25 (NULL|self + match)
+           1332 LOAD_FAST                3 (line_str)
+           1334 CALL                     1
+           1342 POP_JUMP_IF_TRUE        17 (to 1378)
+           1344 LOAD_FAST                3 (line_str)
+           1346 LOAD_ATTR               17 (NULL|self + startswith)
+           1366 LOAD_CONST              16 ('```')
+           1368 CALL                     1
+           1376 POP_JUMP_IF_FALSE        2 (to 1382)
+
+280     >> 1378 EXTENDED_ARG             1
+           1380 JUMP_BACKWARD          342 (to 698)
+
+283     >> 1382 LOAD_GLOBAL             32 (_BULLET_PREFIX_RE)
+           1392 LOAD_ATTR                5 (NULL|self + sub)
+           1412 LOAD_CONST               1 ('')
+           1414 LOAD_FAST                3 (line_str)
+           1416 CALL                     2
+           1424 LOAD_ATTR               11 (NULL|self + strip)
+           1444 CALL                     0
+           1452 STORE_FAST               3 (line_str)
+
+284        1454 LOAD_FAST                3 (line_str)
+           1456 POP_JUMP_IF_TRUE         2 (to 1462)
+
+285        1458 EXTENDED_ARG             1
+           1460 JUMP_BACKWARD          382 (to 698)
+
+288     >> 1462 LOAD_GLOBAL             34 (_SCRIPT_LABEL_RE)
+           1472 LOAD_ATTR                5 (NULL|self + sub)
+           1492 LOAD_CONST               1 ('')
+           1494 LOAD_FAST                3 (line_str)
+           1496 CALL                     2
+           1504 LOAD_ATTR               11 (NULL|self + strip)
+           1524 CALL                     0
+           1532 STORE_FAST               3 (line_str)
+
+289        1534 LOAD_FAST                3 (line_str)
+           1536 POP_JUMP_IF_TRUE         2 (to 1542)
+
+290        1538 EXTENDED_ARG             1
+           1540 JUMP_BACKWARD          422 (to 698)
+
+293     >> 1542 LOAD_FAST                3 (line_str)
+           1544 LOAD_ATTR               37 (NULL|self + lower)
+           1564 CALL                     0
+           1572 LOAD_ATTR               11 (NULL|self + strip)
+           1592 LOAD_CONST              17 ('*_#"\' ')
+           1594 CALL                     1
+           1602 STORE_FAST               4 (lower_line)
+
+294        1604 LOAD_GLOBAL             38 (_META_PREFIX_RE)
+           1614 LOAD_ATTR               41 (NULL|self + search)
+           1634 LOAD_FAST                4 (lower_line)
+           1636 CALL                     1
+           1644 POP_JUMP_IF_FALSE        2 (to 1650)
+
+295        1646 EXTENDED_ARG             1
+           1648 JUMP_BACKWARD          476 (to 698)
+
+298     >> 1650 LOAD_FAST                3 (line_str)
+           1652 LOAD_ATTR               17 (NULL|self + startswith)
+           1672 LOAD_CONST              18 ('"')
+           1674 CALL                     1
+           1682 POP_JUMP_IF_FALSE       17 (to 1718)
+           1684 LOAD_FAST                3 (line_str)
+           1686 LOAD_ATTR               19 (NULL|self + endswith)
+           1706 LOAD_CONST              18 ('"')
+           1708 CALL                     1
+           1716 POP_JUMP_IF_TRUE        34 (to 1786)
+        >> 1718 LOAD_FAST                3 (line_str)
+           1720 LOAD_ATTR               17 (NULL|self + startswith)
+           1740 LOAD_CONST              19 ('“')
+           1742 CALL                     1
+           1750 POP_JUMP_IF_FALSE       36 (to 1824)
+           1752 LOAD_FAST                3 (line_str)
+           1754 LOAD_ATTR               19 (NULL|self + endswith)
+           1774 LOAD_CONST              20 ('”')
+           1776 CALL                     1
+           1784 POP_JUMP_IF_FALSE       19 (to 1824)
+
+299     >> 1786 LOAD_FAST                3 (line_str)
+           1788 LOAD_CONST              21 (1)
+           1790 LOAD_CONST              22 (-1)
+           1792 BINARY_SLICE
+           1794 LOAD_ATTR               11 (NULL|self + strip)
+           1814 CALL                     0
+           1822 STORE_FAST               3 (line_str)
+
+302     >> 1824 LOAD_GLOBAL              3 (NULL + re)
+           1834 LOAD_ATTR                4 (sub)
+           1854 LOAD_CONST              23 ('^\\*\\*(.*?)\\*\\*$')
+           1856 LOAD_CONST              24 ('\\1')
+           1858 LOAD_FAST                3 (line_str)
+           1860 CALL                     3
+           1868 STORE_FAST               3 (line_str)
+
+303        1870 LOAD_GLOBAL              3 (NULL + re)
+           1880 LOAD_ATTR                4 (sub)
+           1900 LOAD_CONST              25 ('^\\*(.*?)\\*$')
+           1902 LOAD_CONST              24 ('\\1')
+           1904 LOAD_FAST                3 (line_str)
+           1906 CALL                     3
+           1914 STORE_FAST               3 (line_str)
+
+305        1916 LOAD_FAST                3 (line_str)
+           1918 POP_JUMP_IF_TRUE         2 (to 1924)
+           1920 EXTENDED_ARG             2
+           1922 JUMP_BACKWARD          613 (to 698)
+
+306     >> 1924 LOAD_FAST                1 (cleaned_lines)
+           1926 LOAD_ATTR               43 (NULL|self + append)
+           1946 LOAD_FAST                3 (line_str)
+           1948 CALL                     1
+           1956 POP_TOP
+           1958 EXTENDED_ARG             2
+           1960 JUMP_BACKWARD          632 (to 698)
+
+244     >> 1962 END_FOR
+
+309        1964 LOAD_FAST                1 (cleaned_lines)
+           1966 POP_JUMP_IF_TRUE        93 (to 2154)
+
+310        1968 LOAD_GLOBAL              3 (NULL + re)
+           1978 LOAD_ATTR               44 (findall)
+
+311        1998 LOAD_CONST              26 ('(?:sentence\\s*\\d+|for sentence\\s*\\d+|finally|sentence).*?["“](.*?)["”]')
+
+312        2000 LOAD_FAST                0 (text)
+
+313        2002 LOAD_GLOBAL              2 (re)
+           2012 LOAD_ATTR                8 (IGNORECASE)
+           2032 LOAD_GLOBAL              2 (re)
+           2042 LOAD_ATTR                6 (DOTALL)
+           2062 BINARY_OP                7 (|)
+
+310        2066 KW_NAMES                 3 (('flags',))
+           2068 CALL                     3
+           2076 STORE_FAST               5 (quoted_matches)
+
+315        2078 LOAD_GLOBAL             21 (NULL + len)
+           2088 LOAD_FAST                5 (quoted_matches)
+           2090 CALL                     1
+           2098 LOAD_CONST              27 (3)
+           2100 COMPARE_OP              92 (>=)
+           2104 POP_JUMP_IF_FALSE       24 (to 2154)
+
+316        2106 LOAD_CONST              10 ('\n')
+           2108 LOAD_ATTR               47 (NULL|self + join)
+           2128 LOAD_CONST              28 (<code object <genexpr> at 0x7f6c81b7f870, file "app\core\text.py", line 316>)
+           2130 MAKE_FUNCTION            0
+           2132 LOAD_FAST                5 (quoted_matches)
+           2134 GET_ITER
+           2136 CALL                     0
+           2144 CALL                     1
+           2152 RETURN_VALUE
+
+318     >> 2154 LOAD_CONST              10 ('\n')
+           2156 LOAD_ATTR               47 (NULL|self + join)
+           2176 LOAD_FAST                1 (cleaned_lines)
+           2178 CALL                     1
+           2186 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c81b7f870, file "app\core\text.py", line 316>:
+316           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                37 (to 86)
+             12 STORE_FAST               1 (m)
+             14 LOAD_FAST                1 (m)
+             16 LOAD_ATTR                1 (NULL|self + strip)
+             36 CALL                     0
+             44 POP_JUMP_IF_TRUE         1 (to 48)
+             46 JUMP_BACKWARD           20 (to 8)
+        >>   48 LOAD_FAST                1 (m)
+             50 LOAD_ATTR                1 (NULL|self + strip)
+             70 CALL                     0
+             78 YIELD_VALUE              1
+             80 RESUME                   1
+             82 POP_TOP
+             84 JUMP_BACKWARD           39 (to 8)
+        >>   86 END_FOR
+             88 RETURN_CONST             0 (None)
+        >>   90 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             92 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 90 [0] lasti
+  48 to 88 -> 90 [0] lasti

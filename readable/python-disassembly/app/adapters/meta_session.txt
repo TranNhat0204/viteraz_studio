@@ -1,0 +1,1262 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Meta AI adapter — tạo ảnh/video không cần API key, IN-PROCESS (không bridge).\n\nProvider thứ 2 cho ảnh/video — TÁCH HẲN khỏi Flow. Mã lỗi META_*.\n\nLỊCH SỬ: trước đây backend gọi 1 "bridge" HTTP do Electron mở, và Electron điều\nkhiển UI trình duyệt (gõ prompt + bấm gửi). Nay backend nói CHUYỆN TRỰC TIẾP với\nmeta.ai bằng SDK thuần Python (app.adapters.metaai) — port từ vendor/metaai-go —\nqua clippy WebSocket + GraphQL, dùng cookie trình duyệt của user (do Electron\nlưu khi đăng nhập, xem app.adapters.meta_credentials).\n\nMetaSessionClient GIỮ NGUYÊN interface cũ (available/get_status/generate_image/\ngenerate_video/download_asset) để meta_generate.py + meta_failover.py không phải\nđổi. Mọi lỗi ném StudioError mã META_* (báo rõ cho user).\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 15           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 17          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('Path',))
+             22 IMPORT_NAME              3 (pathlib)
+             24 IMPORT_FROM              4 (Path)
+             26 STORE_NAME               4 (Path)
+             28 POP_TOP
+
+ 18          30 LOAD_CONST               1 (0)
+             32 LOAD_CONST               4 (None)
+             34 IMPORT_NAME              5 (asyncio)
+             36 STORE_NAME               5 (asyncio)
+
+ 20          38 LOAD_CONST               1 (0)
+             40 LOAD_CONST               5 (('StudioError', 'make_error', 'E'))
+             42 IMPORT_NAME              6 (app.core.errors)
+             44 IMPORT_FROM              7 (StudioError)
+             46 STORE_NAME               7 (StudioError)
+             48 IMPORT_FROM              8 (make_error)
+             50 STORE_NAME               8 (make_error)
+             52 IMPORT_FROM              9 (E)
+             54 STORE_NAME               9 (E)
+             56 POP_TOP
+
+ 21          58 LOAD_CONST               1 (0)
+             60 LOAD_CONST               6 (('meta_credentials',))
+             62 IMPORT_NAME             10 (app.adapters)
+             64 IMPORT_FROM             11 (meta_credentials)
+             66 STORE_NAME              11 (meta_credentials)
+             68 POP_TOP
+
+ 22          70 LOAD_CONST               1 (0)
+             72 LOAD_CONST               7 (('MetaAIClient', 'ErrAccessTokenMissing', 'ErrGraphQLValidation', 'ErrNotAuthenticated', 'ErrQuotaExceeded', 'ErrRateLimited', 'ErrRegionBlocked', 'ErrTimeout', 'ErrCancelled', 'ErrNetwork', 'ErrBadResponse', 'MetaAIError'))
+             74 IMPORT_NAME             12 (app.adapters.metaai)
+             76 IMPORT_FROM             13 (MetaAIClient)
+             78 STORE_NAME              13 (MetaAIClient)
+             80 IMPORT_FROM             14 (ErrAccessTokenMissing)
+             82 STORE_NAME              14 (ErrAccessTokenMissing)
+             84 IMPORT_FROM             15 (ErrGraphQLValidation)
+             86 STORE_NAME              15 (ErrGraphQLValidation)
+             88 IMPORT_FROM             16 (ErrNotAuthenticated)
+             90 STORE_NAME              16 (ErrNotAuthenticated)
+             92 IMPORT_FROM             17 (ErrQuotaExceeded)
+             94 STORE_NAME              17 (ErrQuotaExceeded)
+             96 IMPORT_FROM             18 (ErrRateLimited)
+             98 STORE_NAME              18 (ErrRateLimited)
+            100 IMPORT_FROM             19 (ErrRegionBlocked)
+            102 STORE_NAME              19 (ErrRegionBlocked)
+            104 IMPORT_FROM             20 (ErrTimeout)
+            106 STORE_NAME              20 (ErrTimeout)
+            108 IMPORT_FROM             21 (ErrCancelled)
+            110 STORE_NAME              21 (ErrCancelled)
+            112 IMPORT_FROM             22 (ErrNetwork)
+            114 STORE_NAME              22 (ErrNetwork)
+            116 IMPORT_FROM             23 (ErrBadResponse)
+            118 STORE_NAME              23 (ErrBadResponse)
+            120 IMPORT_FROM             24 (MetaAIError)
+            122 STORE_NAME              24 (MetaAIError)
+            124 POP_TOP
+
+ 36         126 LOAD_CONST               1 (0)
+            128 LOAD_CONST               8 (('get_ffmpeg_path',))
+            130 IMPORT_NAME             25 (app.adapters.ffmpeg)
+            132 IMPORT_FROM             26 (get_ffmpeg_path)
+            134 STORE_NAME              26 (get_ffmpeg_path)
+            136 POP_TOP
+
+ 37         138 LOAD_CONST               1 (0)
+            140 LOAD_CONST               9 (('no_window_kwargs', 'safe_communicate_proc'))
+            142 IMPORT_NAME             27 (app.core.proc)
+            144 IMPORT_FROM             28 (no_window_kwargs)
+            146 STORE_NAME              28 (no_window_kwargs)
+            148 IMPORT_FROM             29 (safe_communicate_proc)
+            150 STORE_NAME              29 (safe_communicate_proc)
+            152 POP_TOP
+
+ 40         154 LOAD_CONST              13 (('e', 'Exception', 'return', 'StudioError'))
+            156 LOAD_CONST              10 (<code object _map_error at 0x2907ca70, file "app\adapters\meta_session.py", line 40>)
+            158 MAKE_FUNCTION            4 (annotations)
+            160 STORE_NAME              30 (_map_error)
+
+ 67         162 PUSH_NULL
+            164 LOAD_BUILD_CLASS
+            166 LOAD_CONST              11 (<code object MetaSessionClient at 0x7f6c93288bb0, file "app\adapters\meta_session.py", line 67>)
+            168 MAKE_FUNCTION            0
+            170 LOAD_CONST              12 ('MetaSessionClient')
+            172 CALL                     2
+            180 STORE_NAME              31 (MetaSessionClient)
+            182 RETURN_CONST             4 (None)
+
+Disassembly of <code object _map_error at 0x2907ca70, file "app\adapters\meta_session.py", line 40>:
+ 40           0 RESUME                   0
+
+ 46           2 LOAD_GLOBAL              1 (NULL + isinstance)
+             12 LOAD_FAST                0 (e)
+             14 LOAD_GLOBAL              2 (StudioError)
+             24 CALL                     2
+             32 POP_JUMP_IF_FALSE        2 (to 38)
+
+ 47          34 LOAD_FAST                0 (e)
+             36 RETURN_VALUE
+
+ 48     >>   38 LOAD_GLOBAL              1 (NULL + isinstance)
+             48 LOAD_FAST                0 (e)
+             50 LOAD_GLOBAL              4 (ErrNotAuthenticated)
+             60 LOAD_GLOBAL              6 (ErrAccessTokenMissing)
+             70 LOAD_GLOBAL              8 (ErrRegionBlocked)
+             80 BUILD_TUPLE              3
+             82 CALL                     2
+             90 POP_JUMP_IF_FALSE       35 (to 162)
+
+ 49          92 LOAD_GLOBAL             11 (NULL + make_error)
+            102 LOAD_GLOBAL             12 (E)
+            112 LOAD_ATTR               14 (META_AUTH)
+            132 LOAD_GLOBAL             17 (NULL + str)
+            142 LOAD_FAST                0 (e)
+            144 CALL                     1
+            152 CALL                     2
+            160 RETURN_VALUE
+
+ 50     >>  162 LOAD_GLOBAL              1 (NULL + isinstance)
+            172 LOAD_FAST                0 (e)
+            174 LOAD_GLOBAL             18 (ErrRateLimited)
+            184 CALL                     2
+            192 POP_JUMP_IF_FALSE       35 (to 264)
+
+ 51         194 LOAD_GLOBAL             11 (NULL + make_error)
+            204 LOAD_GLOBAL             12 (E)
+            214 LOAD_ATTR               20 (META_RATE_LIMIT)
+            234 LOAD_GLOBAL             17 (NULL + str)
+            244 LOAD_FAST                0 (e)
+            246 CALL                     1
+            254 CALL                     2
+            262 RETURN_VALUE
+
+ 52     >>  264 LOAD_GLOBAL              1 (NULL + isinstance)
+            274 LOAD_FAST                0 (e)
+            276 LOAD_GLOBAL             22 (ErrQuotaExceeded)
+            286 CALL                     2
+            294 POP_JUMP_IF_FALSE       35 (to 366)
+
+ 53         296 LOAD_GLOBAL             11 (NULL + make_error)
+            306 LOAD_GLOBAL             12 (E)
+            316 LOAD_ATTR               24 (META_QUOTA)
+            336 LOAD_GLOBAL             17 (NULL + str)
+            346 LOAD_FAST                0 (e)
+            348 CALL                     1
+            356 CALL                     2
+            364 RETURN_VALUE
+
+ 54     >>  366 LOAD_GLOBAL              1 (NULL + isinstance)
+            376 LOAD_FAST                0 (e)
+            378 LOAD_GLOBAL             26 (ErrTimeout)
+            388 CALL                     2
+            396 POP_JUMP_IF_FALSE       35 (to 468)
+
+ 55         398 LOAD_GLOBAL             11 (NULL + make_error)
+            408 LOAD_GLOBAL             12 (E)
+            418 LOAD_ATTR               28 (META_TIMEOUT)
+            438 LOAD_GLOBAL             17 (NULL + str)
+            448 LOAD_FAST                0 (e)
+            450 CALL                     1
+            458 CALL                     2
+            466 RETURN_VALUE
+
+ 56     >>  468 LOAD_GLOBAL              1 (NULL + isinstance)
+            478 LOAD_FAST                0 (e)
+            480 LOAD_GLOBAL             30 (ErrCancelled)
+            490 CALL                     2
+            498 POP_JUMP_IF_FALSE       26 (to 552)
+
+ 57         500 LOAD_GLOBAL             11 (NULL + make_error)
+            510 LOAD_GLOBAL             12 (E)
+            520 LOAD_ATTR               32 (CANCELLED)
+            540 LOAD_CONST               1 ('Đã huỷ khi Meta AI đang tạo nội dung.')
+            542 CALL                     2
+            550 RETURN_VALUE
+
+ 58     >>  552 LOAD_GLOBAL              1 (NULL + isinstance)
+            562 LOAD_FAST                0 (e)
+            564 LOAD_GLOBAL             34 (ErrGraphQLValidation)
+            574 LOAD_GLOBAL             36 (ErrBadResponse)
+            584 BUILD_TUPLE              2
+            586 CALL                     2
+            594 POP_JUMP_IF_FALSE       35 (to 666)
+
+ 59         596 LOAD_GLOBAL             11 (NULL + make_error)
+            606 LOAD_GLOBAL             12 (E)
+            616 LOAD_ATTR               38 (META_BAD_RESPONSE)
+            636 LOAD_GLOBAL             17 (NULL + str)
+            646 LOAD_FAST                0 (e)
+            648 CALL                     1
+            656 CALL                     2
+            664 RETURN_VALUE
+
+ 60     >>  666 LOAD_GLOBAL              1 (NULL + isinstance)
+            676 LOAD_FAST                0 (e)
+            678 LOAD_GLOBAL             40 (ErrNetwork)
+            688 CALL                     2
+            696 POP_JUMP_IF_FALSE       35 (to 768)
+
+ 61         698 LOAD_GLOBAL             11 (NULL + make_error)
+            708 LOAD_GLOBAL             12 (E)
+            718 LOAD_ATTR               42 (META_NETWORK)
+            738 LOAD_GLOBAL             17 (NULL + str)
+            748 LOAD_FAST                0 (e)
+            750 CALL                     1
+            758 CALL                     2
+            766 RETURN_VALUE
+
+ 62     >>  768 LOAD_GLOBAL              1 (NULL + isinstance)
+            778 LOAD_FAST                0 (e)
+            780 LOAD_GLOBAL             44 (MetaAIError)
+            790 CALL                     2
+            798 POP_JUMP_IF_FALSE       35 (to 870)
+
+ 63         800 LOAD_GLOBAL             11 (NULL + make_error)
+            810 LOAD_GLOBAL             12 (E)
+            820 LOAD_ATTR               42 (META_NETWORK)
+            840 LOAD_GLOBAL             17 (NULL + str)
+            850 LOAD_FAST                0 (e)
+            852 CALL                     1
+            860 CALL                     2
+            868 RETURN_VALUE
+
+ 64     >>  870 LOAD_GLOBAL             11 (NULL + make_error)
+            880 LOAD_GLOBAL             12 (E)
+            890 LOAD_ATTR               42 (META_NETWORK)
+            910 LOAD_GLOBAL             17 (NULL + str)
+            920 LOAD_FAST                0 (e)
+            922 CALL                     1
+            930 CALL                     2
+            938 RETURN_VALUE
+
+Disassembly of <code object MetaSessionClient at 0x7f6c93288bb0, file "app\adapters\meta_session.py", line 67>:
+ 67           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('MetaSessionClient')
+              8 STORE_NAME               2 (__qualname__)
+
+ 68          10 NOP
+
+ 69          12 NOP
+
+ 68          14 LOAD_CONST              20 ((None, None, None, None))
+
+ 69          16 NOP
+
+ 68          18 NOP
+
+ 69          20 NOP
+
+ 68          22 LOAD_CONST              21 (('bridge_url', 'str | None', 'token', 'str | None', 'account_id', 'str | None', 'project_key', 'str | None'))
+             24 LOAD_CONST               2 (<code object __init__ at 0x7f6c92969b30, file "app\adapters\meta_session.py", line 68>)
+             26 MAKE_FUNCTION            5 (defaults, annotations)
+             28 STORE_NAME               3 (__init__)
+
+ 79          30 LOAD_NAME                4 (property)
+
+ 80          32 LOAD_CONST              22 (('return', 'bool'))
+             34 LOAD_CONST               3 (<code object available at 0x7f6c9327de90, file "app\adapters\meta_session.py", line 79>)
+             36 MAKE_FUNCTION            4 (annotations)
+
+ 79          38 CALL                     0
+
+ 80          46 STORE_NAME               5 (available)
+
+ 84          48 LOAD_CONST              23 (('return', 'MetaAIClient'))
+             50 LOAD_CONST               4 (<code object _client at 0x7f6c93271bb0, file "app\adapters\meta_session.py", line 84>)
+             52 MAKE_FUNCTION            4 (annotations)
+             54 STORE_NAME               6 (_client)
+
+ 93          56 LOAD_CONST              24 (('return', 'dict'))
+             58 LOAD_CONST               5 (<code object get_status at 0x269d13a0, file "app\adapters\meta_session.py", line 93>)
+             60 MAKE_FUNCTION            4 (annotations)
+             62 STORE_NAME               7 (get_status)
+
+108          64 LOAD_CONST               6 ('16:9')
+
+109          66 LOAD_CONST               7 (180.0)
+             68 LOAD_CONST               8 (4.0)
+
+110          70 LOAD_CONST               1 (None)
+
+108          72 LOAD_CONST               9 (('aspect', 'max_wait', 'poll_every', 'cancel_check'))
+             74 BUILD_CONST_KEY_MAP      4
+
+109          76 NOP
+
+108          78 NOP
+
+109          80 NOP
+
+108          82 NOP
+
+110          84 NOP
+
+108          86 LOAD_CONST              25 (('prompt', 'str', 'out_path', 'Path', 'aspect', 'str', 'max_wait', 'float', 'poll_every', 'float', 'return', 'Path'))
+             88 LOAD_CONST              10 (<code object generate_image at 0x290e9d00, file "app\adapters\meta_session.py", line 108>)
+             90 MAKE_FUNCTION            6 (kwdefaults, annotations)
+             92 STORE_NAME               8 (generate_image)
+
+125          94 LOAD_CONST              26 (('path', 'Path', 'aspect', 'str', 'return', 'Path'))
+             96 LOAD_CONST              11 (<code object _normalize_aspect at 0x29060850, file "app\adapters\meta_session.py", line 125>)
+             98 MAKE_FUNCTION            4 (annotations)
+            100 STORE_NAME               9 (_normalize_aspect)
+
+144         102 LOAD_CONST              12 (8)
+
+145         104 LOAD_CONST               6 ('16:9')
+            106 LOAD_CONST              13 ('')
+
+146         108 LOAD_CONST              14 (900.0)
+            110 LOAD_CONST              15 (8.0)
+
+147         112 LOAD_CONST               1 (None)
+            114 LOAD_CONST               1 (None)
+
+144         116 LOAD_CONST              16 (('duration_sec', 'aspect', 'start_image', 'max_wait', 'poll_every', 'cancel_check', 'progress_cb'))
+            118 BUILD_CONST_KEY_MAP      7
+
+145         120 NOP
+
+144         122 NOP
+
+145         124 NOP
+
+144         126 NOP
+
+146         128 NOP
+
+144         130 NOP
+
+146         132 NOP
+
+144         134 NOP
+
+147         136 NOP
+
+144         138 LOAD_CONST              27 (('prompt', 'str', 'out_path', 'Path', 'duration_sec', 'int', 'aspect', 'str', 'start_image', 'str', 'max_wait', 'float', 'poll_every', 'float', 'return', 'Path'))
+            140 LOAD_CONST              17 (<code object generate_video at 0x29091630, file "app\adapters\meta_session.py", line 144>)
+            142 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            144 STORE_NAME              10 (generate_video)
+
+165         146 LOAD_CONST              28 (('out_path', 'Path', 'kind', 'str', 'return', 'Path'))
+            148 LOAD_CONST              18 (<code object _download_first at 0x7f6c933d92c0, file "app\adapters\meta_session.py", line 165>)
+            150 MAKE_FUNCTION            4 (annotations)
+            152 STORE_NAME              11 (_download_first)
+
+171         154 LOAD_CONST              29 (('url', 'str', 'out_path', 'Path', 'return', 'Path'))
+            156 LOAD_CONST              19 (<code object download_asset at 0x29077730, file "app\adapters\meta_session.py", line 171>)
+            158 MAKE_FUNCTION            4 (annotations)
+            160 STORE_NAME              12 (download_asset)
+            162 RETURN_CONST             1 (None)
+
+Disassembly of <code object __init__ at 0x7f6c92969b30, file "app\adapters\meta_session.py", line 68>:
+ 68           0 RESUME                   0
+
+ 71           2 LOAD_FAST                3 (account_id)
+              4 LOAD_FAST                0 (self)
+              6 STORE_ATTR               0 (account_id)
+
+ 72          16 LOAD_FAST                4 (project_key)
+             18 LOAD_FAST                0 (self)
+             20 STORE_ATTR               1 (project_key)
+
+ 73          30 LOAD_GLOBAL              5 (NULL + meta_credentials)
+             40 LOAD_ATTR                6 (get_credentials)
+             60 LOAD_FAST                3 (account_id)
+             62 CALL                     1
+             70 STORE_FAST               5 (creds)
+
+ 74          72 LOAD_FAST                5 (creds)
+             74 LOAD_CONST               1 ('cookies')
+             76 BINARY_SUBSCR
+             80 LOAD_FAST                0 (self)
+             82 STORE_ATTR               4 (_cookies)
+
+ 75          92 LOAD_FAST                5 (creds)
+             94 LOAD_CONST               2 ('access_token')
+             96 BINARY_SUBSCR
+            100 LOAD_FAST                0 (self)
+            102 STORE_ATTR               5 (_access_token)
+
+ 76         112 LOAD_FAST                5 (creds)
+            114 LOAD_ATTR               13 (NULL|self + get)
+            134 LOAD_CONST               3 ('user_agent')
+            136 CALL                     1
+            144 COPY                     1
+            146 POP_JUMP_IF_TRUE         2 (to 152)
+            148 POP_TOP
+            150 LOAD_CONST               4 ('')
+        >>  152 LOAD_FAST                0 (self)
+            154 STORE_ATTR               7 (_user_agent)
+
+ 77         164 LOAD_CONST               0 (None)
+            166 LOAD_FAST                0 (self)
+            168 STORE_ATTR               8 (_sdk)
+            178 RETURN_CONST             0 (None)
+
+Disassembly of <code object available at 0x7f6c9327de90, file "app\adapters\meta_session.py", line 79>:
+ 79           0 RESUME                   0
+
+ 82           2 LOAD_GLOBAL              1 (NULL + bool)
+             12 LOAD_FAST                0 (self)
+             14 LOAD_ATTR                2 (_cookies)
+             34 CALL                     1
+             42 COPY                     1
+             44 POP_JUMP_IF_TRUE        21 (to 88)
+             46 POP_TOP
+             48 LOAD_GLOBAL              1 (NULL + bool)
+             58 LOAD_FAST                0 (self)
+             60 LOAD_ATTR                4 (_access_token)
+             80 CALL                     1
+        >>   88 RETURN_VALUE
+
+Disassembly of <code object _client at 0x7f6c93271bb0, file "app\adapters\meta_session.py", line 84>:
+ 84           0 RESUME                   0
+
+ 85           2 LOAD_FAST                0 (self)
+              4 LOAD_ATTR                0 (_sdk)
+             24 POP_JUMP_IF_NOT_NONE    49 (to 124)
+
+ 86          26 LOAD_GLOBAL              3 (NULL + MetaAIClient)
+
+ 87          36 LOAD_FAST                0 (self)
+             38 LOAD_ATTR                4 (_cookies)
+
+ 88          58 LOAD_FAST                0 (self)
+             60 LOAD_ATTR                6 (_access_token)
+
+ 89          80 LOAD_FAST                0 (self)
+             82 LOAD_ATTR                8 (_user_agent)
+
+ 86         102 KW_NAMES                 1 (('cookies', 'access_token', 'user_agent'))
+            104 CALL                     3
+            112 LOAD_FAST                0 (self)
+            114 STORE_ATTR               0 (_sdk)
+
+ 91     >>  124 LOAD_FAST                0 (self)
+            126 LOAD_ATTR                0 (_sdk)
+            146 RETURN_VALUE
+
+Disassembly of <code object get_status at 0x269d13a0, file "app\adapters\meta_session.py", line 93>:
+ 93           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 94           6 LOAD_FAST                0 (self)
+              8 LOAD_ATTR                0 (available)
+             28 POP_JUMP_IF_TRUE        34 (to 98)
+
+ 95          30 LOAD_CONST               1 (False)
+             32 LOAD_CONST               2 ('NO_CREDENTIALS')
+
+ 96          34 LOAD_FAST                0 (self)
+             36 LOAD_ATTR                2 (account_id)
+             56 COPY                     1
+             58 POP_JUMP_IF_TRUE        16 (to 92)
+             60 POP_TOP
+             62 LOAD_GLOBAL              4 (meta_credentials)
+             72 LOAD_ATTR                6 (DEFAULT_ACCOUNT)
+
+ 95     >>   92 LOAD_CONST               3 (('connected', 'reason', 'account_id'))
+             94 BUILD_CONST_KEY_MAP      3
+             96 RETURN_VALUE
+
+ 97     >>   98 NOP
+
+ 98         100 LOAD_FAST                0 (self)
+            102 LOAD_ATTR                9 (NULL|self + _client)
+            122 CALL                     0
+            130 LOAD_ATTR               11 (NULL|self + get_status)
+            150 CALL                     0
+            158 GET_AWAITABLE            0
+            160 LOAD_CONST               0 (None)
+        >>  162 SEND                     3 (to 172)
+            166 YIELD_VALUE              3
+            168 RESUME                   3
+            170 JUMP_BACKWARD_NO_INTERRUPT     5 (to 162)
+        >>  172 END_SEND
+            174 STORE_FAST               1 (st)
+
+ 99         176 LOAD_GLOBAL             13 (NULL + bool)
+            186 LOAD_FAST                1 (st)
+            188 LOAD_ATTR               15 (NULL|self + get)
+            208 LOAD_CONST               4 ('connected')
+            210 CALL                     1
+            218 CALL                     1
+
+100         226 LOAD_CONST               0 (None)
+            228 LOAD_FAST                1 (st)
+            230 LOAD_ATTR               15 (NULL|self + get)
+            250 LOAD_CONST               4 ('connected')
+            252 CALL                     1
+            260 POP_JUMP_IF_FALSE        2 (to 266)
+            262 LOAD_CONST               5 ('Meta AI')
+            264 JUMP_FORWARD             1 (to 268)
+        >>  266 LOAD_CONST               0 (None)
+
+101     >>  268 LOAD_FAST                1 (st)
+            270 LOAD_ATTR               15 (NULL|self + get)
+            290 LOAD_CONST               4 ('connected')
+            292 CALL                     1
+            300 POP_JUMP_IF_FALSE        2 (to 306)
+            302 LOAD_CONST               0 (None)
+            304 JUMP_FORWARD            20 (to 346)
+        >>  306 LOAD_FAST                1 (st)
+            308 LOAD_ATTR               15 (NULL|self + get)
+            328 LOAD_CONST               6 ('reason')
+            330 CALL                     1
+            338 COPY                     1
+            340 POP_JUMP_IF_TRUE         2 (to 346)
+            342 POP_TOP
+            344 LOAD_CONST               7 ('SESSION_REJECTED')
+
+102     >>  346 LOAD_FAST                0 (self)
+            348 LOAD_ATTR                2 (account_id)
+            368 COPY                     1
+            370 POP_JUMP_IF_TRUE        16 (to 404)
+            372 POP_TOP
+            374 LOAD_GLOBAL              4 (meta_credentials)
+            384 LOAD_ATTR                6 (DEFAULT_ACCOUNT)
+
+ 99     >>  404 LOAD_CONST               8 (('connected', 'email', 'plan', 'reason', 'account_id'))
+            406 BUILD_CONST_KEY_MAP      5
+            408 RETURN_VALUE
+
+ 98     >>  410 CLEANUP_THROW
+            412 JUMP_BACKWARD          121 (to 172)
+        >>  414 PUSH_EXC_INFO
+
+103         416 LOAD_GLOBAL             16 (Exception)
+            426 CHECK_EXC_MATCH
+            428 POP_JUMP_IF_FALSE       66 (to 562)
+            430 STORE_FAST               2 (e)
+
+104         432 LOAD_CONST               1 (False)
+            434 LOAD_CONST               9 ('STATUS_ERROR: ')
+            436 LOAD_GLOBAL             19 (NULL + type)
+            446 LOAD_FAST                2 (e)
+            448 CALL                     1
+            456 LOAD_ATTR               20 (__name__)
+            476 FORMAT_VALUE             0
+            478 BUILD_STRING             2
+
+105         480 LOAD_FAST                0 (self)
+            482 LOAD_ATTR                2 (account_id)
+            502 COPY                     1
+            504 POP_JUMP_IF_TRUE        16 (to 538)
+            506 POP_TOP
+            508 LOAD_GLOBAL              4 (meta_credentials)
+            518 LOAD_ATTR                6 (DEFAULT_ACCOUNT)
+
+104     >>  538 LOAD_CONST               3 (('connected', 'reason', 'account_id'))
+            540 BUILD_CONST_KEY_MAP      3
+            542 SWAP                     2
+            544 POP_EXCEPT
+            546 LOAD_CONST               0 (None)
+            548 STORE_FAST               2 (e)
+            550 DELETE_FAST              2 (e)
+            552 RETURN_VALUE
+        >>  554 LOAD_CONST               0 (None)
+            556 STORE_FAST               2 (e)
+            558 DELETE_FAST              2 (e)
+            560 RERAISE                  1
+
+103     >>  562 RERAISE                  0
+        >>  564 COPY                     3
+            566 POP_EXCEPT
+            568 RERAISE                  1
+        >>  570 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            572 RERAISE                  1
+ExceptionTable:
+  4 to 96 -> 570 [0] lasti
+  100 to 164 -> 414 [0]
+  166 to 166 -> 410 [2]
+  168 to 406 -> 414 [0]
+  408 to 408 -> 570 [0] lasti
+  410 to 410 -> 414 [0]
+  414 to 430 -> 564 [1] lasti
+  432 to 540 -> 554 [1] lasti
+  542 to 542 -> 564 [1] lasti
+  544 to 552 -> 570 [0] lasti
+  554 to 562 -> 564 [1] lasti
+  564 to 568 -> 570 [0] lasti
+
+Disassembly of <code object generate_image at 0x290e9d00, file "app\adapters\meta_session.py", line 108>:
+108           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+114           6 LOAD_FAST                6 (cancel_check)
+              8 POP_JUMP_IF_FALSE       33 (to 76)
+             10 PUSH_NULL
+             12 LOAD_FAST                6 (cancel_check)
+             14 CALL                     0
+             22 POP_JUMP_IF_FALSE       26 (to 76)
+
+115          24 LOAD_GLOBAL              1 (NULL + make_error)
+             34 LOAD_GLOBAL              2 (E)
+             44 LOAD_ATTR                4 (CANCELLED)
+             64 LOAD_CONST               1 ('Đã huỷ trước khi gọi Meta.')
+             66 CALL                     2
+             74 RAISE_VARARGS            1
+
+116     >>   76 NOP
+
+117          78 LOAD_FAST                0 (self)
+             80 LOAD_ATTR                7 (NULL|self + _client)
+            100 CALL                     0
+            108 LOAD_ATTR                9 (NULL|self + generate_image)
+
+118         128 LOAD_FAST                1 (prompt)
+            130 LOAD_FAST                4 (max_wait)
+            132 LOAD_FAST                6 (cancel_check)
+
+117         134 KW_NAMES                 2 (('max_wait', 'cancel_check'))
+            136 CALL                     3
+            144 GET_AWAITABLE            0
+            146 LOAD_CONST               0 (None)
+        >>  148 SEND                     3 (to 158)
+            152 YIELD_VALUE              3
+            154 RESUME                   3
+            156 JUMP_BACKWARD_NO_INTERRUPT     5 (to 148)
+        >>  158 END_SEND
+            160 STORE_FAST               7 (res)
+
+122         162 LOAD_FAST                0 (self)
+            164 LOAD_ATTR               15 (NULL|self + _download_first)
+            184 LOAD_FAST                7 (res)
+            186 LOAD_FAST                2 (out_path)
+            188 LOAD_CONST               3 ('image')
+            190 KW_NAMES                 4 (('kind',))
+            192 CALL                     3
+            200 GET_AWAITABLE            0
+            202 LOAD_CONST               0 (None)
+        >>  204 SEND                     3 (to 214)
+            208 YIELD_VALUE              2
+            210 RESUME                   3
+            212 JUMP_BACKWARD_NO_INTERRUPT     5 (to 204)
+        >>  214 END_SEND
+            216 STORE_FAST               9 (result)
+
+123         218 LOAD_FAST                0 (self)
+            220 LOAD_ATTR               17 (NULL|self + _normalize_aspect)
+            240 LOAD_FAST                9 (result)
+            242 LOAD_FAST                3 (aspect)
+            244 CALL                     2
+            252 GET_AWAITABLE            0
+            254 LOAD_CONST               0 (None)
+        >>  256 SEND                     3 (to 266)
+            260 YIELD_VALUE              2
+            262 RESUME                   3
+            264 JUMP_BACKWARD_NO_INTERRUPT     5 (to 256)
+        >>  266 END_SEND
+            268 RETURN_VALUE
+
+117     >>  270 CLEANUP_THROW
+            272 JUMP_BACKWARD           58 (to 158)
+        >>  274 PUSH_EXC_INFO
+
+120         276 LOAD_GLOBAL             10 (Exception)
+            286 CHECK_EXC_MATCH
+            288 POP_JUMP_IF_FALSE       16 (to 322)
+            290 STORE_FAST               8 (e)
+
+121         292 LOAD_GLOBAL             13 (NULL + _map_error)
+            302 LOAD_FAST                8 (e)
+            304 CALL                     1
+            312 RAISE_VARARGS            1
+        >>  314 LOAD_CONST               0 (None)
+            316 STORE_FAST               8 (e)
+            318 DELETE_FAST              8 (e)
+            320 RERAISE                  1
+
+120     >>  322 RERAISE                  0
+        >>  324 COPY                     3
+            326 POP_EXCEPT
+            328 RERAISE                  1
+
+122     >>  330 CLEANUP_THROW
+            332 JUMP_BACKWARD           60 (to 214)
+
+123     >>  334 CLEANUP_THROW
+            336 JUMP_BACKWARD           36 (to 266)
+        >>  338 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            340 RERAISE                  1
+ExceptionTable:
+  4 to 74 -> 338 [0] lasti
+  78 to 150 -> 274 [0]
+  152 to 152 -> 270 [2]
+  154 to 160 -> 274 [0]
+  162 to 206 -> 338 [0] lasti
+  208 to 208 -> 330 [2]
+  210 to 258 -> 338 [0] lasti
+  260 to 260 -> 334 [2]
+  262 to 268 -> 338 [0] lasti
+  270 to 270 -> 274 [0]
+  274 to 290 -> 324 [1] lasti
+  292 to 312 -> 314 [1] lasti
+  314 to 322 -> 324 [1] lasti
+  324 to 330 -> 338 [0] lasti
+  334 to 334 -> 338 [0] lasti
+
+Disassembly of <code object _normalize_aspect at 0x29060850, file "app\adapters\meta_session.py", line 125>:
+125           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+127           6 LOAD_CONST               1 ((1920, 1080))
+              8 LOAD_CONST               2 ((1080, 1920))
+             10 LOAD_CONST               3 ((1080, 1080))
+             12 LOAD_CONST               4 ((1080, 1350))
+             14 LOAD_CONST               5 (('16:9', '9:16', '1:1', '4:5'))
+             16 BUILD_CONST_KEY_MAP      4
+             18 STORE_FAST               3 (dims)
+
+128          20 LOAD_FAST                3 (dims)
+             22 LOAD_ATTR                1 (NULL|self + get)
+             42 LOAD_FAST                2 (aspect)
+             44 COPY                     1
+             46 POP_JUMP_IF_TRUE         2 (to 52)
+             48 POP_TOP
+             50 LOAD_CONST               6 ('16:9')
+        >>   52 LOAD_ATTR                3 (NULL|self + strip)
+             72 CALL                     0
+             80 LOAD_FAST                3 (dims)
+             82 LOAD_CONST               6 ('16:9')
+             84 BINARY_SUBSCR
+             88 CALL                     2
+             96 UNPACK_SEQUENCE          2
+            100 STORE_FAST               4 (w)
+            102 STORE_FAST               5 (h)
+
+129         104 LOAD_FAST                1 (path)
+            106 LOAD_ATTR                5 (NULL|self + with_name)
+            126 LOAD_FAST                1 (path)
+            128 LOAD_ATTR                6 (stem)
+            148 LOAD_CONST               7 ('_aspect_tmp')
+            150 BINARY_OP                0 (+)
+            154 LOAD_FAST                1 (path)
+            156 LOAD_ATTR                8 (suffix)
+            176 BINARY_OP                0 (+)
+            180 CALL                     1
+            188 STORE_FAST               6 (tmp)
+
+130         190 LOAD_GLOBAL             11 (NULL + asyncio)
+            200 LOAD_ATTR               12 (create_subprocess_exec)
+
+131         220 LOAD_GLOBAL             15 (NULL + get_ffmpeg_path)
+            230 CALL                     0
+            238 LOAD_CONST               8 ('-y')
+            240 LOAD_CONST               9 ('-i')
+            242 LOAD_GLOBAL             17 (NULL + str)
+            252 LOAD_FAST                1 (path)
+            254 CALL                     1
+
+132         262 LOAD_CONST              10 ('-vf')
+            264 LOAD_CONST              11 ('scale=')
+            266 LOAD_FAST                4 (w)
+            268 FORMAT_VALUE             0
+            270 LOAD_CONST              12 (':')
+            272 LOAD_FAST                5 (h)
+            274 FORMAT_VALUE             0
+            276 LOAD_CONST              13 (':force_original_aspect_ratio=increase,crop=')
+            278 LOAD_FAST                4 (w)
+            280 FORMAT_VALUE             0
+            282 LOAD_CONST              12 (':')
+            284 LOAD_FAST                5 (h)
+            286 FORMAT_VALUE             0
+            288 LOAD_CONST              14 (',setsar=1')
+            290 BUILD_STRING             9
+
+133         292 LOAD_CONST              15 ('-frames:v')
+            294 LOAD_CONST              16 ('1')
+            296 LOAD_CONST              17 ('-q:v')
+            298 LOAD_CONST              18 ('2')
+            300 LOAD_GLOBAL             17 (NULL + str)
+            310 LOAD_FAST                6 (tmp)
+            312 CALL                     1
+
+130         320 BUILD_TUPLE             11
+
+134         322 LOAD_GLOBAL             10 (asyncio)
+            332 LOAD_ATTR               18 (subprocess)
+            352 LOAD_ATTR               20 (DEVNULL)
+            372 LOAD_GLOBAL             10 (asyncio)
+            382 LOAD_ATTR               18 (subprocess)
+            402 LOAD_ATTR               22 (PIPE)
+
+130         422 LOAD_CONST              19 (('stdout', 'stderr'))
+            424 BUILD_CONST_KEY_MAP      2
+
+135         426 LOAD_GLOBAL             25 (NULL + no_window_kwargs)
+            436 CALL                     0
+
+130         444 DICT_MERGE               1
+            446 CALL_FUNCTION_EX         1
+            448 GET_AWAITABLE            0
+            450 LOAD_CONST              20 (None)
+        >>  452 SEND                     3 (to 462)
+            456 YIELD_VALUE              2
+            458 RESUME                   3
+            460 JUMP_BACKWARD_NO_INTERRUPT     5 (to 452)
+        >>  462 END_SEND
+            464 STORE_FAST               7 (proc)
+
+137         466 LOAD_GLOBAL             27 (NULL + safe_communicate_proc)
+            476 LOAD_FAST                7 (proc)
+            478 CALL                     1
+            486 GET_AWAITABLE            0
+            488 LOAD_CONST              20 (None)
+        >>  490 SEND                     3 (to 500)
+            494 YIELD_VALUE              2
+            496 RESUME                   3
+            498 JUMP_BACKWARD_NO_INTERRUPT     5 (to 490)
+        >>  500 END_SEND
+            502 UNPACK_SEQUENCE          2
+            506 STORE_FAST               8 (_)
+            508 STORE_FAST               9 (err)
+
+138         510 LOAD_FAST                7 (proc)
+            512 LOAD_ATTR               28 (returncode)
+            532 LOAD_CONST              21 (0)
+            534 COMPARE_OP              55 (!=)
+            538 POP_JUMP_IF_TRUE        16 (to 572)
+            540 LOAD_FAST                6 (tmp)
+            542 LOAD_ATTR               31 (NULL|self + exists)
+            562 CALL                     0
+            570 POP_JUMP_IF_TRUE        51 (to 674)
+
+139     >>  572 LOAD_GLOBAL             33 (NULL + make_error)
+            582 LOAD_GLOBAL             34 (E)
+            592 LOAD_ATTR               36 (META_BAD_RESPONSE)
+
+140         612 LOAD_CONST              22 ('Chuẩn hoá ảnh Meta về ')
+            614 LOAD_FAST                2 (aspect)
+            616 FORMAT_VALUE             0
+            618 LOAD_CONST              23 (' thất bại: ')
+            620 LOAD_FAST                9 (err)
+            622 LOAD_ATTR               39 (NULL|self + decode)
+            642 LOAD_CONST              24 ('utf-8')
+            644 LOAD_CONST              25 ('ignore')
+            646 CALL                     2
+            654 LOAD_CONST              26 (-240)
+            656 LOAD_CONST              20 (None)
+            658 BINARY_SLICE
+            660 FORMAT_VALUE             0
+            662 BUILD_STRING             4
+
+139         664 CALL                     2
+            672 RAISE_VARARGS            1
+
+141     >>  674 LOAD_FAST                6 (tmp)
+            676 LOAD_ATTR               41 (NULL|self + replace)
+            696 LOAD_FAST                1 (path)
+            698 CALL                     1
+            706 POP_TOP
+
+142         708 LOAD_FAST                1 (path)
+            710 RETURN_VALUE
+
+130     >>  712 CLEANUP_THROW
+            714 JUMP_BACKWARD          127 (to 462)
+
+137     >>  716 CLEANUP_THROW
+            718 JUMP_BACKWARD          110 (to 500)
+        >>  720 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            722 RERAISE                  1
+ExceptionTable:
+  4 to 454 -> 720 [0] lasti
+  456 to 456 -> 712 [2]
+  458 to 492 -> 720 [0] lasti
+  494 to 494 -> 716 [2]
+  496 to 712 -> 720 [0] lasti
+  716 to 716 -> 720 [0] lasti
+
+Disassembly of <code object generate_video at 0x29091630, file "app\adapters\meta_session.py", line 144>:
+144           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+148           6 LOAD_FAST                8 (cancel_check)
+              8 POP_JUMP_IF_FALSE       33 (to 76)
+             10 PUSH_NULL
+             12 LOAD_FAST                8 (cancel_check)
+             14 CALL                     0
+             22 POP_JUMP_IF_FALSE       26 (to 76)
+
+149          24 LOAD_GLOBAL              1 (NULL + make_error)
+             34 LOAD_GLOBAL              2 (E)
+             44 LOAD_ATTR                4 (CANCELLED)
+             64 LOAD_CONST               1 ('Đã huỷ trước khi gọi Meta.')
+             66 CALL                     2
+             74 RAISE_VARARGS            1
+
+150     >>   76 LOAD_FAST                5 (start_image)
+             78 POP_JUMP_IF_FALSE       26 (to 132)
+
+153          80 LOAD_GLOBAL              1 (NULL + make_error)
+
+154          90 LOAD_GLOBAL              2 (E)
+            100 LOAD_ATTR                6 (META_BAD_RESPONSE)
+
+155         120 LOAD_CONST               2 ('Meta AI API hiện chưa hỗ trợ image-to-video trong provider này; hãy dùng text-to-video.')
+
+153         122 CALL                     2
+            130 RAISE_VARARGS            1
+
+157     >>  132 NOP
+
+158         134 LOAD_FAST                0 (self)
+            136 LOAD_ATTR                9 (NULL|self + _client)
+            156 CALL                     0
+            164 LOAD_ATTR               11 (NULL|self + generate_video)
+
+159         184 LOAD_FAST                1 (prompt)
+            186 LOAD_FAST                6 (max_wait)
+            188 LOAD_FAST                8 (cancel_check)
+            190 LOAD_FAST                9 (progress_cb)
+
+158         192 KW_NAMES                 3 (('max_wait', 'cancel_check', 'progress_cb'))
+            194 CALL                     4
+            202 GET_AWAITABLE            0
+            204 LOAD_CONST               0 (None)
+        >>  206 SEND                     3 (to 216)
+            210 YIELD_VALUE              3
+            212 RESUME                   3
+            214 JUMP_BACKWARD_NO_INTERRUPT     5 (to 206)
+        >>  216 END_SEND
+            218 STORE_FAST              10 (res)
+
+163         220 LOAD_FAST                0 (self)
+            222 LOAD_ATTR               17 (NULL|self + _download_first)
+            242 LOAD_FAST               10 (res)
+            244 LOAD_FAST                2 (out_path)
+            246 LOAD_CONST               4 ('video')
+            248 KW_NAMES                 5 (('kind',))
+            250 CALL                     3
+            258 GET_AWAITABLE            0
+            260 LOAD_CONST               0 (None)
+        >>  262 SEND                     3 (to 272)
+            266 YIELD_VALUE              2
+            268 RESUME                   3
+            270 JUMP_BACKWARD_NO_INTERRUPT     5 (to 262)
+        >>  272 END_SEND
+            274 RETURN_VALUE
+
+158     >>  276 CLEANUP_THROW
+            278 JUMP_BACKWARD           32 (to 216)
+        >>  280 PUSH_EXC_INFO
+
+161         282 LOAD_GLOBAL             12 (Exception)
+            292 CHECK_EXC_MATCH
+            294 POP_JUMP_IF_FALSE       16 (to 328)
+            296 STORE_FAST              11 (e)
+
+162         298 LOAD_GLOBAL             15 (NULL + _map_error)
+            308 LOAD_FAST               11 (e)
+            310 CALL                     1
+            318 RAISE_VARARGS            1
+        >>  320 LOAD_CONST               0 (None)
+            322 STORE_FAST              11 (e)
+            324 DELETE_FAST             11 (e)
+            326 RERAISE                  1
+
+161     >>  328 RERAISE                  0
+        >>  330 COPY                     3
+            332 POP_EXCEPT
+            334 RERAISE                  1
+
+163     >>  336 CLEANUP_THROW
+            338 JUMP_BACKWARD           34 (to 272)
+        >>  340 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            342 RERAISE                  1
+ExceptionTable:
+  4 to 130 -> 340 [0] lasti
+  134 to 208 -> 280 [0]
+  210 to 210 -> 276 [2]
+  212 to 218 -> 280 [0]
+  220 to 264 -> 340 [0] lasti
+  266 to 266 -> 336 [2]
+  268 to 274 -> 340 [0] lasti
+  276 to 276 -> 280 [0]
+  280 to 296 -> 330 [1] lasti
+  298 to 318 -> 320 [1] lasti
+  320 to 328 -> 330 [1] lasti
+  330 to 336 -> 340 [0] lasti
+
+Disassembly of <code object _download_first at 0x7f6c933d92c0, file "app\adapters\meta_session.py", line 165>:
+165           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+166           6 LOAD_FAST                1 (res)
+              8 LOAD_ATTR                0 (success)
+             28 POP_JUMP_IF_FALSE       12 (to 54)
+             30 LOAD_FAST                1 (res)
+             32 LOAD_ATTR                2 (urls)
+             52 POP_JUMP_IF_TRUE        46 (to 146)
+
+167     >>   54 LOAD_GLOBAL              5 (NULL + make_error)
+             64 LOAD_GLOBAL              6 (E)
+             74 LOAD_ATTR                8 (META_BAD_RESPONSE)
+
+168          94 LOAD_CONST               1 ('Meta không trả URL ')
+             96 LOAD_FAST                3 (kind)
+             98 FORMAT_VALUE             0
+            100 LOAD_CONST               2 (': ')
+            102 LOAD_FAST                1 (res)
+            104 LOAD_ATTR               10 (error)
+            124 COPY                     1
+            126 POP_JUMP_IF_TRUE         2 (to 132)
+            128 POP_TOP
+            130 LOAD_CONST               3 ('không rõ')
+        >>  132 FORMAT_VALUE             0
+            134 BUILD_STRING             4
+
+167         136 CALL                     2
+            144 RAISE_VARARGS            1
+
+169     >>  146 LOAD_FAST                0 (self)
+            148 LOAD_ATTR               13 (NULL|self + download_asset)
+            168 LOAD_FAST                1 (res)
+            170 LOAD_ATTR                2 (urls)
+            190 LOAD_CONST               4 (0)
+            192 BINARY_SUBSCR
+            196 LOAD_FAST                2 (out_path)
+            198 CALL                     2
+            206 GET_AWAITABLE            0
+            208 LOAD_CONST               0 (None)
+        >>  210 SEND                     3 (to 220)
+            214 YIELD_VALUE              2
+            216 RESUME                   3
+            218 JUMP_BACKWARD_NO_INTERRUPT     5 (to 210)
+        >>  220 END_SEND
+            222 RETURN_VALUE
+        >>  224 CLEANUP_THROW
+            226 JUMP_BACKWARD            4 (to 220)
+        >>  228 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            230 RERAISE                  1
+ExceptionTable:
+  4 to 212 -> 228 [0] lasti
+  214 to 214 -> 224 [2]
+  216 to 224 -> 228 [0] lasti
+
+Disassembly of <code object download_asset at 0x29077730, file "app\adapters\meta_session.py", line 171>:
+171           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+173           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (None)
+             10 IMPORT_NAME              0 (httpx)
+             12 STORE_FAST               3 (httpx)
+
+174          14 LOAD_FAST                0 (self)
+             16 LOAD_ATTR                3 (NULL|self + _client)
+             36 CALL                     0
+             44 STORE_FAST               4 (client)
+
+176          46 LOAD_FAST                4 (client)
+             48 LOAD_ATTR                4 (user_agent)
+
+177          68 LOAD_FAST                4 (client)
+             70 LOAD_ATTR                7 (NULL|self + cookie_header)
+             90 CALL                     0
+
+178          98 LOAD_CONST               3 ('https://www.meta.ai/')
+
+179         100 LOAD_CONST               4 ('image/avif,image/webp,image/apng,image/*,*/*;q=0.8')
+
+175         102 LOAD_CONST               5 (('User-Agent', 'Cookie', 'Referer', 'Accept'))
+            104 BUILD_CONST_KEY_MAP      4
+            106 STORE_FAST               5 (headers)
+
+181         108 NOP
+
+182         110 LOAD_FAST                3 (httpx)
+            112 LOAD_ATTR                9 (NULL|self + AsyncClient)
+            132 LOAD_CONST               6 (120.0)
+            134 LOAD_CONST               7 (True)
+            136 KW_NAMES                 8 (('timeout', 'follow_redirects'))
+            138 CALL                     2
+            146 BEFORE_ASYNC_WITH
+            148 GET_AWAITABLE            1
+            150 LOAD_CONST               2 (None)
+        >>  152 SEND                     3 (to 162)
+            156 YIELD_VALUE              3
+            158 RESUME                   3
+            160 JUMP_BACKWARD_NO_INTERRUPT     5 (to 152)
+        >>  162 END_SEND
+            164 STORE_FAST               6 (c)
+
+183         166 LOAD_FAST                6 (c)
+            168 LOAD_ATTR               11 (NULL|self + get)
+            188 LOAD_FAST                1 (url)
+            190 LOAD_FAST                5 (headers)
+            192 KW_NAMES                 9 (('headers',))
+            194 CALL                     2
+            202 GET_AWAITABLE            0
+            204 LOAD_CONST               2 (None)
+        >>  206 SEND                     3 (to 216)
+            210 YIELD_VALUE              4
+            212 RESUME                   3
+            214 JUMP_BACKWARD_NO_INTERRUPT     5 (to 206)
+        >>  216 END_SEND
+            218 STORE_FAST               7 (r)
+
+182         220 LOAD_CONST               2 (None)
+            222 LOAD_CONST               2 (None)
+            224 LOAD_CONST               2 (None)
+            226 CALL                     2
+            234 GET_AWAITABLE            2
+            236 LOAD_CONST               2 (None)
+        >>  238 SEND                     3 (to 248)
+            242 YIELD_VALUE              3
+            244 RESUME                   3
+            246 JUMP_BACKWARD_NO_INTERRUPT     5 (to 238)
+        >>  248 END_SEND
+            250 POP_TOP
+
+186     >>  252 LOAD_FAST_CHECK          7 (r)
+            254 LOAD_ATTR               20 (status_code)
+            274 LOAD_CONST              11 (200)
+            276 COMPARE_OP              55 (!=)
+            280 POP_JUMP_IF_FALSE       40 (to 362)
+
+187         282 LOAD_GLOBAL             15 (NULL + make_error)
+            292 LOAD_GLOBAL             16 (E)
+            302 LOAD_ATTR               18 (META_NETWORK)
+            322 LOAD_CONST              12 ('Tải asset HTTP ')
+            324 LOAD_FAST                7 (r)
+            326 LOAD_ATTR               20 (status_code)
+            346 FORMAT_VALUE             0
+            348 LOAD_CONST              13 (' (URL Meta hết hạn hoặc bị chặn)')
+            350 BUILD_STRING             3
+            352 CALL                     2
+            360 RAISE_VARARGS            1
+
+188     >>  362 LOAD_FAST                7 (r)
+            364 LOAD_ATTR               22 (content)
+            384 POP_JUMP_IF_TRUE        26 (to 438)
+
+189         386 LOAD_GLOBAL             15 (NULL + make_error)
+            396 LOAD_GLOBAL             16 (E)
+            406 LOAD_ATTR               24 (META_BAD_RESPONSE)
+            426 LOAD_CONST              14 ('Meta trả asset rỗng')
+            428 CALL                     2
+            436 RAISE_VARARGS            1
+
+190     >>  438 LOAD_FAST                2 (out_path)
+            440 LOAD_ATTR               26 (parent)
+            460 LOAD_ATTR               29 (NULL|self + mkdir)
+            480 LOAD_CONST               7 (True)
+            482 LOAD_CONST               7 (True)
+            484 KW_NAMES                15 (('parents', 'exist_ok'))
+            486 CALL                     2
+            494 POP_TOP
+
+191         496 LOAD_FAST                2 (out_path)
+            498 LOAD_ATTR               31 (NULL|self + write_bytes)
+            518 LOAD_FAST                7 (r)
+            520 LOAD_ATTR               22 (content)
+            540 CALL                     1
+            548 POP_TOP
+
+192         550 LOAD_FAST                2 (out_path)
+            552 RETURN_VALUE
+
+182     >>  554 CLEANUP_THROW
+            556 JUMP_BACKWARD          198 (to 162)
+
+183     >>  558 CLEANUP_THROW
+            560 JUMP_BACKWARD          173 (to 216)
+
+182     >>  562 CLEANUP_THROW
+            564 JUMP_BACKWARD          159 (to 248)
+        >>  566 PUSH_EXC_INFO
+            568 WITH_EXCEPT_START
+            570 GET_AWAITABLE            2
+            572 LOAD_CONST               2 (None)
+        >>  574 SEND                     4 (to 586)
+            578 YIELD_VALUE              4
+            580 RESUME                   3
+            582 JUMP_BACKWARD_NO_INTERRUPT     5 (to 574)
+        >>  584 CLEANUP_THROW
+        >>  586 END_SEND
+            588 POP_JUMP_IF_TRUE         1 (to 592)
+            590 RERAISE                  2
+        >>  592 POP_TOP
+            594 POP_EXCEPT
+            596 POP_TOP
+            598 POP_TOP
+            600 JUMP_BACKWARD          175 (to 252)
+        >>  602 COPY                     3
+            604 POP_EXCEPT
+            606 RERAISE                  1
+        >>  608 PUSH_EXC_INFO
+
+184         610 LOAD_FAST                3 (httpx)
+            612 LOAD_ATTR               12 (HTTPError)
+            632 CHECK_EXC_MATCH
+            634 POP_JUMP_IF_FALSE       34 (to 704)
+            636 STORE_FAST               8 (e)
+
+185         638 LOAD_GLOBAL             15 (NULL + make_error)
+            648 LOAD_GLOBAL             16 (E)
+            658 LOAD_ATTR               18 (META_NETWORK)
+            678 LOAD_CONST              10 ('Tải asset lỗi: ')
+            680 LOAD_FAST                8 (e)
+            682 FORMAT_VALUE             0
+            684 BUILD_STRING             2
+            686 CALL                     2
+            694 RAISE_VARARGS            1
+        >>  696 LOAD_CONST               2 (None)
+            698 STORE_FAST               8 (e)
+            700 DELETE_FAST              8 (e)
+            702 RERAISE                  1
+
+184     >>  704 RERAISE                  0
+        >>  706 COPY                     3
+            708 POP_EXCEPT
+            710 RERAISE                  1
+        >>  712 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            714 RERAISE                  1
+ExceptionTable:
+  4 to 106 -> 712 [0] lasti
+  110 to 154 -> 608 [0]
+  156 to 156 -> 554 [3]
+  158 to 162 -> 608 [0]
+  164 to 208 -> 566 [1] lasti
+  210 to 210 -> 558 [3]
+  212 to 218 -> 566 [1] lasti
+  220 to 240 -> 608 [0]
+  242 to 242 -> 562 [2]
+  244 to 250 -> 608 [0]
+  252 to 552 -> 712 [0] lasti
+  554 to 554 -> 608 [0]
+  558 to 558 -> 566 [1] lasti
+  562 to 562 -> 608 [0]
+  566 to 576 -> 602 [3] lasti
+  578 to 578 -> 584 [6]
+  580 to 592 -> 602 [3] lasti
+  594 to 606 -> 608 [0]
+  608 to 636 -> 706 [1] lasti
+  638 to 694 -> 696 [1] lasti
+  696 to 704 -> 706 [1] lasti
+  706 to 710 -> 712 [0] lasti

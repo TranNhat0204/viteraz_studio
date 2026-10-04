@@ -1,0 +1,523 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Helper range_stream để phân mảnh file phục vụ phát/tua video trong HTML5.')
+              4 STORE_NAME               0 (__doc__)
+
+  2           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+  4          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('Path',))
+             22 IMPORT_NAME              3 (pathlib)
+             24 IMPORT_FROM              4 (Path)
+             26 STORE_NAME               4 (Path)
+             28 POP_TOP
+
+  5          30 LOAD_CONST               1 (0)
+             32 LOAD_CONST               4 (('Generator',))
+             34 IMPORT_NAME              5 (typing)
+             36 IMPORT_FROM              6 (Generator)
+             38 STORE_NAME               6 (Generator)
+             40 POP_TOP
+
+  6          42 LOAD_CONST               1 (0)
+             44 LOAD_CONST               5 (('HTTPException', 'Response'))
+             46 IMPORT_NAME              7 (fastapi)
+             48 IMPORT_FROM              8 (HTTPException)
+             50 STORE_NAME               8 (HTTPException)
+             52 IMPORT_FROM              9 (Response)
+             54 STORE_NAME               9 (Response)
+             56 POP_TOP
+
+  7          58 LOAD_CONST               1 (0)
+             60 LOAD_CONST               6 (('StreamingResponse',))
+             62 IMPORT_NAME             10 (fastapi.responses)
+             64 IMPORT_FROM             11 (StreamingResponse)
+             66 STORE_NAME              11 (StreamingResponse)
+             68 POP_TOP
+
+ 12          70 NOP
+
+ 13          72 NOP
+
+ 10          74 LOAD_CONST               9 ((None, 1048576))
+
+ 11          76 NOP
+
+ 10          78 NOP
+
+ 12          80 NOP
+
+ 10          82 NOP
+
+ 13          84 NOP
+
+ 10          86 NOP
+
+ 14          88 NOP
+
+ 10          90 LOAD_CONST              10 (('file_path', 'Path', 'range_header', 'str | None', 'chunk_size', 'int', 'return', 'Response'))
+             92 LOAD_CONST               8 (<code object range_stream at 0x26a1aa40, file "app\core\range_stream.py", line 10>)
+             94 MAKE_FUNCTION            5 (defaults, annotations)
+             96 STORE_NAME              12 (range_stream)
+             98 RETURN_CONST             7 (None)
+
+Disassembly of <code object range_stream at 0x26a1aa40, file "app\core\range_stream.py", line 10>:
+              0 MAKE_CELL                0 (file_path)
+              2 MAKE_CELL                2 (chunk_size)
+
+ 10           4 RESUME                   0
+
+ 15           6 LOAD_DEREF               0 (file_path)
+              8 LOAD_ATTR                1 (NULL|self + exists)
+             28 CALL                     0
+             36 POP_JUMP_IF_FALSE       16 (to 70)
+             38 LOAD_DEREF               0 (file_path)
+             40 LOAD_ATTR                3 (NULL|self + is_file)
+             60 CALL                     0
+             68 POP_JUMP_IF_TRUE        13 (to 96)
+
+ 16     >>   70 LOAD_GLOBAL              5 (NULL + HTTPException)
+             80 LOAD_CONST               1 (404)
+             82 LOAD_CONST               2 ('File not found')
+             84 KW_NAMES                 3 (('status_code', 'detail'))
+             86 CALL                     2
+             94 RAISE_VARARGS            1
+
+ 18     >>   96 LOAD_DEREF               0 (file_path)
+             98 LOAD_ATTR                7 (NULL|self + stat)
+            118 CALL                     0
+            126 LOAD_ATTR                8 (st_size)
+            146 STORE_FAST               3 (file_size)
+
+ 23         148 LOAD_CONST               4 ('video/mp4')
+            150 STORE_FAST               4 (mime_type)
+
+ 24         152 LOAD_DEREF               0 (file_path)
+            154 LOAD_ATTR               10 (suffix)
+            174 LOAD_ATTR               13 (NULL|self + lower)
+            194 CALL                     0
+            202 STORE_FAST               5 (suffix)
+
+ 25         204 LOAD_FAST                5 (suffix)
+            206 LOAD_CONST               5 (('.wav', '.mp3', '.ogg'))
+            208 CONTAINS_OP              0
+            210 POP_JUMP_IF_FALSE       10 (to 232)
+
+ 26         212 LOAD_FAST                5 (suffix)
+            214 LOAD_CONST               6 ('.wav')
+            216 COMPARE_OP              40 (==)
+            220 POP_JUMP_IF_FALSE        2 (to 226)
+            222 LOAD_CONST               7 ('audio/wav')
+            224 JUMP_FORWARD             1 (to 228)
+        >>  226 LOAD_CONST               8 ('audio/mpeg')
+        >>  228 STORE_FAST               4 (mime_type)
+            230 JUMP_FORWARD            26 (to 284)
+
+ 27     >>  232 LOAD_FAST                5 (suffix)
+            234 LOAD_CONST               9 (('.jpg', '.jpeg'))
+            236 CONTAINS_OP              0
+            238 POP_JUMP_IF_FALSE        3 (to 246)
+
+ 28         240 LOAD_CONST              10 ('image/jpeg')
+            242 STORE_FAST               4 (mime_type)
+            244 JUMP_FORWARD            19 (to 284)
+
+ 29     >>  246 LOAD_FAST                5 (suffix)
+            248 LOAD_CONST              11 (('.png', '.webp', '.gif', '.bmp'))
+            250 CONTAINS_OP              0
+            252 POP_JUMP_IF_FALSE        9 (to 272)
+
+ 30         254 LOAD_CONST              12 ('image/')
+            256 LOAD_FAST                5 (suffix)
+            258 LOAD_CONST              13 (1)
+            260 LOAD_CONST               0 (None)
+            262 BINARY_SLICE
+            264 FORMAT_VALUE             0
+            266 BUILD_STRING             2
+            268 STORE_FAST               4 (mime_type)
+            270 JUMP_FORWARD             6 (to 284)
+
+ 31     >>  272 LOAD_FAST                5 (suffix)
+            274 LOAD_CONST              14 (('.srt', '.vtt'))
+            276 CONTAINS_OP              0
+            278 POP_JUMP_IF_FALSE        2 (to 284)
+
+ 32         280 LOAD_CONST              15 ('text/plain')
+            282 STORE_FAST               4 (mime_type)
+
+ 35     >>  284 LOAD_CONST              16 ('bytes')
+
+ 36         286 LOAD_FAST                4 (mime_type)
+
+ 34         288 LOAD_CONST              17 (('Accept-Ranges', 'Content-Type'))
+            290 BUILD_CONST_KEY_MAP      2
+            292 STORE_FAST               6 (headers)
+
+ 39         294 LOAD_FAST                1 (range_header)
+            296 POP_JUMP_IF_TRUE        40 (to 378)
+
+ 40         298 LOAD_GLOBAL             15 (NULL + str)
+            308 LOAD_FAST                3 (file_size)
+            310 CALL                     1
+            318 LOAD_FAST                6 (headers)
+            320 LOAD_CONST              18 ('Content-Length')
+            322 STORE_SUBSCR
+
+ 41         326 LOAD_CONST              37 (('return', 'Generator[bytes, None, None]'))
+            328 LOAD_CLOSURE             2 (chunk_size)
+            330 LOAD_CLOSURE             0 (file_path)
+            332 BUILD_TUPLE              2
+            334 LOAD_CONST              19 (<code object file_generator at 0x7f6c929f1000, file "app\core\range_stream.py", line 41>)
+            336 MAKE_FUNCTION           12 (annotations, closure)
+            338 STORE_FAST               7 (file_generator)
+
+ 45         340 LOAD_GLOBAL             17 (NULL + StreamingResponse)
+            350 PUSH_NULL
+            352 LOAD_FAST                7 (file_generator)
+            354 CALL                     0
+            362 LOAD_FAST                6 (headers)
+            364 LOAD_FAST                4 (mime_type)
+            366 KW_NAMES                20 (('headers', 'media_type'))
+            368 CALL                     3
+            376 RETURN_VALUE
+
+ 47     >>  378 NOP
+
+ 49         380 LOAD_FAST                1 (range_header)
+            382 LOAD_ATTR               19 (NULL|self + replace)
+            402 LOAD_CONST              21 ('bytes=')
+            404 LOAD_CONST              22 ('')
+            406 CALL                     2
+            414 LOAD_ATTR               21 (NULL|self + strip)
+            434 CALL                     0
+            442 STORE_FAST               8 (range_str)
+
+ 50         444 LOAD_FAST                8 (range_str)
+            446 LOAD_ATTR               23 (NULL|self + split)
+            466 LOAD_CONST              23 ('-')
+            468 CALL                     1
+            476 STORE_FAST               9 (parts)
+
+ 51         478 LOAD_FAST                9 (parts)
+            480 LOAD_CONST              24 (0)
+            482 BINARY_SUBSCR
+            486 POP_JUMP_IF_FALSE       14 (to 516)
+            488 LOAD_GLOBAL             25 (NULL + int)
+            498 LOAD_FAST                9 (parts)
+            500 LOAD_CONST              24 (0)
+            502 BINARY_SUBSCR
+            506 CALL                     1
+            514 JUMP_FORWARD             1 (to 518)
+        >>  516 LOAD_CONST              24 (0)
+        >>  518 STORE_FAST              10 (start)
+
+ 52         520 LOAD_GLOBAL             27 (NULL + len)
+            530 LOAD_FAST                9 (parts)
+            532 CALL                     1
+            540 LOAD_CONST              13 (1)
+            542 COMPARE_OP              68 (>)
+            546 POP_JUMP_IF_FALSE       19 (to 586)
+            548 LOAD_FAST                9 (parts)
+            550 LOAD_CONST              13 (1)
+            552 BINARY_SUBSCR
+            556 POP_JUMP_IF_FALSE       14 (to 586)
+            558 LOAD_GLOBAL             25 (NULL + int)
+            568 LOAD_FAST                9 (parts)
+            570 LOAD_CONST              13 (1)
+            572 BINARY_SUBSCR
+            576 CALL                     1
+            584 JUMP_FORWARD             4 (to 594)
+        >>  586 LOAD_FAST                3 (file_size)
+            588 LOAD_CONST              13 (1)
+            590 BINARY_OP               10 (-)
+        >>  594 STORE_FAST              11 (end)
+
+ 56         596 LOAD_FAST               10 (start)
+            598 LOAD_FAST                3 (file_size)
+            600 COMPARE_OP              92 (>=)
+            604 POP_JUMP_IF_TRUE        10 (to 626)
+            606 LOAD_FAST               11 (end)
+            608 LOAD_FAST                3 (file_size)
+            610 COMPARE_OP              92 (>=)
+            614 POP_JUMP_IF_TRUE         5 (to 626)
+            616 LOAD_FAST               10 (start)
+            618 LOAD_FAST               11 (end)
+            620 COMPARE_OP              68 (>)
+            624 POP_JUMP_IF_FALSE       28 (to 682)
+
+ 57     >>  626 LOAD_GLOBAL              5 (NULL + HTTPException)
+
+ 58         636 LOAD_CONST              27 (416)
+
+ 59         638 LOAD_CONST              28 ('Requested range not satisfiable: ')
+            640 LOAD_FAST               10 (start)
+            642 FORMAT_VALUE             0
+            644 LOAD_CONST              23 ('-')
+            646 LOAD_FAST               11 (end)
+            648 FORMAT_VALUE             0
+            650 LOAD_CONST              29 ('/')
+            652 LOAD_FAST                3 (file_size)
+            654 FORMAT_VALUE             0
+            656 BUILD_STRING             6
+
+ 60         658 LOAD_CONST              30 ('Content-Range')
+            660 LOAD_CONST              31 ('bytes */')
+            662 LOAD_FAST                3 (file_size)
+            664 FORMAT_VALUE             0
+            666 BUILD_STRING             2
+            668 BUILD_MAP                1
+
+ 57         670 KW_NAMES                32 (('status_code', 'detail', 'headers'))
+            672 CALL                     3
+            680 RAISE_VARARGS            1
+
+ 64     >>  682 LOAD_FAST               11 (end)
+            684 LOAD_FAST               10 (start)
+            686 BINARY_OP               10 (-)
+            690 LOAD_CONST              13 (1)
+            692 BINARY_OP                0 (+)
+            696 STORE_FAST              12 (length)
+
+ 65         698 LOAD_FAST               12 (length)
+            700 LOAD_DEREF               2 (chunk_size)
+            702 COMPARE_OP              68 (>)
+            706 POP_JUMP_IF_FALSE       16 (to 740)
+
+ 66         708 LOAD_FAST               10 (start)
+            710 LOAD_DEREF               2 (chunk_size)
+            712 BINARY_OP                0 (+)
+            716 LOAD_CONST              13 (1)
+            718 BINARY_OP               10 (-)
+            722 STORE_FAST              11 (end)
+
+ 67         724 LOAD_FAST               11 (end)
+            726 LOAD_FAST               10 (start)
+            728 BINARY_OP               10 (-)
+            732 LOAD_CONST              13 (1)
+            734 BINARY_OP                0 (+)
+            738 STORE_FAST              12 (length)
+
+ 69     >>  740 LOAD_CONST              33 ('bytes ')
+            742 LOAD_FAST               10 (start)
+            744 FORMAT_VALUE             0
+            746 LOAD_CONST              23 ('-')
+            748 LOAD_FAST               11 (end)
+            750 FORMAT_VALUE             0
+            752 LOAD_CONST              29 ('/')
+            754 LOAD_FAST                3 (file_size)
+            756 FORMAT_VALUE             0
+            758 BUILD_STRING             6
+            760 LOAD_FAST                6 (headers)
+            762 LOAD_CONST              30 ('Content-Range')
+            764 STORE_SUBSCR
+
+ 70         768 LOAD_GLOBAL             15 (NULL + str)
+            778 LOAD_FAST               12 (length)
+            780 CALL                     1
+            788 LOAD_FAST                6 (headers)
+            790 LOAD_CONST              18 ('Content-Length')
+            792 STORE_SUBSCR
+
+ 72         796 LOAD_CONST              38 (('start_pos', 'int', 'length_to_read', 'int', 'return', 'Generator[bytes, None, None]'))
+            798 LOAD_CLOSURE             0 (file_path)
+            800 BUILD_TUPLE              1
+            802 LOAD_CONST              34 (<code object range_generator at 0x7f6c92bdc390, file "app\core\range_stream.py", line 72>)
+            804 MAKE_FUNCTION           12 (annotations, closure)
+            806 STORE_FAST              13 (range_generator)
+
+ 84         808 LOAD_GLOBAL             17 (NULL + StreamingResponse)
+
+ 85         818 PUSH_NULL
+            820 LOAD_FAST               13 (range_generator)
+            822 LOAD_FAST               10 (start)
+            824 LOAD_FAST               12 (length)
+            826 CALL                     2
+
+ 86         834 LOAD_CONST              35 (206)
+
+ 87         836 LOAD_FAST                6 (headers)
+
+ 88         838 LOAD_FAST                4 (mime_type)
+
+ 84         840 KW_NAMES                36 (('status_code', 'headers', 'media_type'))
+            842 CALL                     4
+            850 RETURN_VALUE
+        >>  852 PUSH_EXC_INFO
+
+ 53         854 LOAD_GLOBAL             28 (ValueError)
+            864 CHECK_EXC_MATCH
+            866 POP_JUMP_IF_FALSE       14 (to 896)
+            868 POP_TOP
+
+ 54         870 LOAD_GLOBAL              5 (NULL + HTTPException)
+            880 LOAD_CONST              25 (400)
+            882 LOAD_CONST              26 ('Invalid Range header format')
+            884 KW_NAMES                 3 (('status_code', 'detail'))
+            886 CALL                     2
+            894 RAISE_VARARGS            1
+
+ 53     >>  896 RERAISE                  0
+        >>  898 COPY                     3
+            900 POP_EXCEPT
+            902 RERAISE                  1
+ExceptionTable:
+  380 to 594 -> 852 [0]
+  852 to 896 -> 898 [1] lasti
+
+Disassembly of <code object file_generator at 0x7f6c929f1000, file "app\core\range_stream.py", line 41>:
+              0 COPY_FREE_VARS           2
+
+ 41           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+ 42           8 LOAD_GLOBAL              1 (NULL + open)
+             18 LOAD_DEREF               3 (file_path)
+             20 LOAD_CONST               1 ('rb')
+             22 CALL                     2
+             30 BEFORE_WITH
+             32 STORE_FAST               0 (f)
+
+ 43          34 LOAD_FAST                0 (f)
+             36 LOAD_ATTR                3 (NULL|self + read)
+             56 LOAD_DEREF               2 (chunk_size)
+             58 CALL                     1
+             66 COPY                     1
+             68 STORE_FAST               1 (chunk)
+             70 POP_JUMP_IF_FALSE       24 (to 120)
+
+ 44     >>   72 LOAD_FAST                1 (chunk)
+             74 YIELD_VALUE              2
+             76 RESUME                   1
+             78 POP_TOP
+
+ 43          80 LOAD_FAST                0 (f)
+             82 LOAD_ATTR                3 (NULL|self + read)
+            102 LOAD_DEREF               2 (chunk_size)
+            104 CALL                     1
+            112 COPY                     1
+            114 STORE_FAST               1 (chunk)
+            116 POP_JUMP_IF_FALSE        1 (to 120)
+            118 JUMP_BACKWARD           24 (to 72)
+
+ 42     >>  120 LOAD_CONST               0 (None)
+            122 LOAD_CONST               0 (None)
+            124 LOAD_CONST               0 (None)
+            126 CALL                     2
+            134 POP_TOP
+            136 RETURN_CONST             0 (None)
+        >>  138 PUSH_EXC_INFO
+            140 WITH_EXCEPT_START
+            142 POP_JUMP_IF_TRUE         1 (to 146)
+            144 RERAISE                  2
+        >>  146 POP_TOP
+            148 POP_EXCEPT
+            150 POP_TOP
+            152 POP_TOP
+            154 RETURN_CONST             0 (None)
+        >>  156 COPY                     3
+            158 POP_EXCEPT
+            160 RERAISE                  1
+        >>  162 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            164 RERAISE                  1
+ExceptionTable:
+  6 to 30 -> 162 [0] lasti
+  32 to 116 -> 138 [1] lasti
+  120 to 136 -> 162 [0] lasti
+  138 to 146 -> 156 [3] lasti
+  148 to 160 -> 162 [0] lasti
+
+Disassembly of <code object range_generator at 0x7f6c92bdc390, file "app\core\range_stream.py", line 72>:
+              0 COPY_FREE_VARS           1
+
+ 72           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+ 73           8 LOAD_FAST                1 (length_to_read)
+             10 STORE_FAST               2 (bytes_left)
+
+ 74          12 LOAD_GLOBAL              1 (NULL + open)
+             22 LOAD_DEREF               6 (file_path)
+             24 LOAD_CONST               1 ('rb')
+             26 CALL                     2
+             34 BEFORE_WITH
+             36 STORE_FAST               3 (f)
+
+ 75          38 LOAD_FAST                3 (f)
+             40 LOAD_ATTR                3 (NULL|self + seek)
+             60 LOAD_FAST                0 (start_pos)
+             62 CALL                     1
+             70 POP_TOP
+
+ 76          72 LOAD_FAST                2 (bytes_left)
+             74 LOAD_CONST               2 (0)
+             76 COMPARE_OP              68 (>)
+             80 POP_JUMP_IF_FALSE       56 (to 194)
+
+ 77     >>   82 LOAD_GLOBAL              5 (NULL + min)
+             92 LOAD_CONST               3 (65536)
+             94 LOAD_FAST                2 (bytes_left)
+             96 CALL                     2
+            104 STORE_FAST               4 (chunk_to_read)
+
+ 78         106 LOAD_FAST                3 (f)
+            108 LOAD_ATTR                7 (NULL|self + read)
+            128 LOAD_FAST                4 (chunk_to_read)
+            130 CALL                     1
+            138 STORE_FAST               5 (data)
+
+ 79         140 LOAD_FAST                5 (data)
+            142 POP_JUMP_IF_TRUE         1 (to 146)
+
+ 80         144 JUMP_FORWARD            24 (to 194)
+
+ 81     >>  146 LOAD_FAST                2 (bytes_left)
+            148 LOAD_GLOBAL              9 (NULL + len)
+            158 LOAD_FAST                5 (data)
+            160 CALL                     1
+            168 BINARY_OP               23 (-=)
+            172 STORE_FAST               2 (bytes_left)
+
+ 82         174 LOAD_FAST                5 (data)
+            176 YIELD_VALUE              2
+            178 RESUME                   1
+            180 POP_TOP
+
+ 76         182 LOAD_FAST                2 (bytes_left)
+            184 LOAD_CONST               2 (0)
+            186 COMPARE_OP              68 (>)
+            190 POP_JUMP_IF_FALSE        1 (to 194)
+            192 JUMP_BACKWARD           56 (to 82)
+
+ 74     >>  194 LOAD_CONST               0 (None)
+            196 LOAD_CONST               0 (None)
+            198 LOAD_CONST               0 (None)
+            200 CALL                     2
+            208 POP_TOP
+            210 RETURN_CONST             0 (None)
+        >>  212 PUSH_EXC_INFO
+            214 WITH_EXCEPT_START
+            216 POP_JUMP_IF_TRUE         1 (to 220)
+            218 RERAISE                  2
+        >>  220 POP_TOP
+            222 POP_EXCEPT
+            224 POP_TOP
+            226 POP_TOP
+            228 RETURN_CONST             0 (None)
+        >>  230 COPY                     3
+            232 POP_EXCEPT
+            234 RERAISE                  1
+        >>  236 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            238 RERAISE                  1
+ExceptionTable:
+  6 to 34 -> 236 [0] lasti
+  36 to 190 -> 212 [1] lasti
+  194 to 210 -> 236 [0] lasti
+  212 to 220 -> 230 [3] lasti
+  222 to 234 -> 236 [0] lasti

@@ -1,0 +1,2287 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Kho endpoint LLM do user tự thêm — đọc/ghi bảng `llm_endpoints`, key luôn mã hoá.\n\nQuy tắc của module này:\n\n  1. **Key không bao giờ rời khỏi đây dưới dạng plaintext trừ khi người gọi hỏi thẳng**\n     (`api_key_of`). Hàm liệt kê (`list_public`) chỉ trả `has_key` + 4 ký tự cuối. Bài test\n     `test_llm_providers_never_leaks_api_key` đã tồn tại cho tầng cũ; tầng này giữ đúng chuẩn đó.\n  2. **Giải mã hỏng KHÔNG làm chết app.** `fb_secret.key` nằm trong data_dir; user chuyển máy hoặc\n     xoá thư mục là mọi key thành rác. Lúc đó phải nói "nhập lại key", không phải ném traceback ra\n     giữa lượt dựng video.\n  3. **Xác thực base_url tại đây**, không ở tầng API — mọi đường ghi đều đi qua `create`/`update`.\n\nXem docs/plan-custom-llm-api.md §3.1, §3.7.\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 15           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 17          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (json)
+             24 STORE_NAME               3 (json)
+
+ 18          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               4 (('urlparse',))
+             30 IMPORT_NAME              4 (urllib.parse)
+             32 IMPORT_FROM              5 (urlparse)
+             34 STORE_NAME               5 (urlparse)
+             36 POP_TOP
+
+ 20          38 LOAD_CONST               1 (0)
+             40 LOAD_CONST               5 (('make_error', 'E'))
+             42 IMPORT_NAME              6 (app.core.errors)
+             44 IMPORT_FROM              7 (make_error)
+             46 STORE_NAME               7 (make_error)
+             48 IMPORT_FROM              8 (E)
+             50 STORE_NAME               8 (E)
+             52 POP_TOP
+
+ 21          54 LOAD_CONST               1 (0)
+             56 LOAD_CONST               6 (('log',))
+             58 IMPORT_NAME              9 (app.core.logging)
+             60 IMPORT_FROM             10 (log)
+             62 STORE_NAME              10 (log)
+             64 POP_TOP
+
+ 22          66 LOAD_CONST               1 (0)
+             68 LOAD_CONST               7 (('LlmEndpoint',))
+             70 IMPORT_NAME             11 (app.db.models)
+             72 IMPORT_FROM             12 (LlmEndpoint)
+             74 STORE_NAME              12 (LlmEndpoint)
+             76 POP_TOP
+
+ 23          78 LOAD_CONST               1 (0)
+             80 LOAD_CONST               8 (('SessionLocal',))
+             82 IMPORT_NAME             13 (app.db.session)
+             84 IMPORT_FROM             14 (SessionLocal)
+             86 STORE_NAME              14 (SessionLocal)
+             88 POP_TOP
+
+ 24          90 LOAD_CONST               1 (0)
+             92 LOAD_CONST               9 (('encrypt_secret', 'decrypt_secret'))
+             94 IMPORT_NAME             15 (app.services.fb_crypto)
+             96 IMPORT_FROM             16 (encrypt_secret)
+             98 STORE_NAME              16 (encrypt_secret)
+            100 IMPORT_FROM             17 (decrypt_secret)
+            102 STORE_NAME              17 (decrypt_secret)
+            104 POP_TOP
+
+ 27         106 LOAD_CONST              10 (('openai_chat', 'anthropic_messages'))
+            108 STORE_NAME              18 (DIALECTS)
+
+ 28         110 LOAD_CONST              11 ('openai_chat')
+            112 STORE_NAME              19 (DEFAULT_DIALECT)
+
+ 30         114 LOAD_CONST              12 (50)
+            116 STORE_NAME              20 (MAX_ENDPOINTS)
+
+ 31         118 LOAD_CONST              13 (10)
+            120 STORE_NAME              21 (MIN_TIMEOUT_S)
+
+ 32         122 LOAD_CONST              14 (1800)
+            124 STORE_NAME              22 (MAX_TIMEOUT_S)
+
+ 37         126 LOAD_CONST              42 (('raw', 'str', 'return', 'str'))
+            128 LOAD_CONST              15 (<code object _clean_base_url at 0x28c4d390, file "app\services\llm_endpoint_store.py", line 37>)
+            130 MAKE_FUNCTION            4 (annotations)
+            132 STORE_NAME              23 (_clean_base_url)
+
+ 58         134 LOAD_CONST              42 (('raw', 'str', 'return', 'str'))
+            136 LOAD_CONST              16 (<code object clean_base_url at 0x7f6c92390650, file "app\services\llm_endpoint_store.py", line 58>)
+            138 MAKE_FUNCTION            4 (annotations)
+            140 STORE_NAME              24 (clean_base_url)
+
+ 63         142 LOAD_CONST              43 (('url', 'str', 'return', 'bool'))
+            144 LOAD_CONST              17 (<code object is_local_url at 0x28ad59e0, file "app\services\llm_endpoint_store.py", line 63>)
+            146 MAKE_FUNCTION            4 (annotations)
+            148 STORE_NAME              25 (is_local_url)
+
+ 77         150 LOAD_CONST              42 (('raw', 'str', 'return', 'str'))
+            152 LOAD_CONST              18 (<code object _clean_dialect at 0x7f6c92456730, file "app\services\llm_endpoint_store.py", line 77>)
+            154 MAKE_FUNCTION            4 (annotations)
+            156 STORE_NAME              26 (_clean_dialect)
+
+ 86         158 LOAD_CONST              44 (('default', 'int', 'return', 'int'))
+            160 LOAD_CONST              19 (<code object _pos_int at 0x7f6c922b5590, file "app\services\llm_endpoint_store.py", line 86>)
+            162 MAKE_FUNCTION            4 (annotations)
+            164 STORE_NAME              27 (_pos_int)
+
+ 94         166 LOAD_CONST              45 (('default', 'float', 'return', 'float'))
+            168 LOAD_CONST              20 (<code object _non_neg_float at 0x7f6c922b5e90, file "app\services\llm_endpoint_store.py", line 94>)
+            170 MAKE_FUNCTION            4 (annotations)
+            172 STORE_NAME              28 (_non_neg_float)
+
+102         174 LOAD_CONST              46 (('return', 'list[dict]'))
+            176 LOAD_CONST              21 (<code object _clean_models at 0x28c52630, file "app\services\llm_endpoint_store.py", line 102>)
+            178 MAKE_FUNCTION            4 (annotations)
+            180 STORE_NAME              29 (_clean_models)
+
+138         182 LOAD_CONST              47 (('return', 'dict[str, str]'))
+            184 LOAD_CONST              22 (<code object _clean_headers at 0x28e50220, file "app\services\llm_endpoint_store.py", line 138>)
+            186 MAKE_FUNCTION            4 (annotations)
+            188 STORE_NAME              30 (_clean_headers)
+
+166         190 LOAD_CONST              48 (('row', 'LlmEndpoint', 'return', 'list[dict]'))
+            192 LOAD_CONST              23 (<code object _models_of at 0x7f6c92358540, file "app\services\llm_endpoint_store.py", line 166>)
+            194 MAKE_FUNCTION            4 (annotations)
+            196 STORE_NAME              31 (_models_of)
+
+175         198 LOAD_CONST              49 (('row', 'LlmEndpoint', 'return', 'str'))
+            200 LOAD_CONST              24 (<code object _key_tail at 0x7f6c921508f0, file "app\services\llm_endpoint_store.py", line 175>)
+            202 MAKE_FUNCTION            4 (annotations)
+            204 STORE_NAME              32 (_key_tail)
+
+184         206 LOAD_CONST              50 (('row', 'LlmEndpoint', 'return', 'dict'))
+            208 LOAD_CONST              25 (<code object to_public at 0x28be9100, file "app\services\llm_endpoint_store.py", line 184>)
+            210 MAKE_FUNCTION            4 (annotations)
+            212 STORE_NAME              33 (to_public)
+
+202         214 LOAD_CONST              26 (False)
+            216 LOAD_CONST              27 (('enabled_only',))
+            218 BUILD_CONST_KEY_MAP      1
+            220 LOAD_CONST              51 (('enabled_only', 'bool', 'return', 'list[dict]'))
+            222 LOAD_CONST              28 (<code object list_public at 0x28c04560, file "app\services\llm_endpoint_store.py", line 202>)
+            224 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            226 STORE_NAME              34 (list_public)
+
+211         228 LOAD_CONST              52 (('endpoint_id', 'str', 'return', 'dict | None'))
+            230 LOAD_CONST              29 (<code object get at 0x7f6c928fca40, file "app\services\llm_endpoint_store.py", line 211>)
+            232 MAKE_FUNCTION            4 (annotations)
+            234 STORE_NAME              35 (get)
+
+218         236 LOAD_CONST              53 (('endpoint_id', 'str', 'return', 'str'))
+            238 LOAD_CONST              30 (<code object api_key_of at 0x28d47c10, file "app\services\llm_endpoint_store.py", line 218>)
+            240 MAKE_FUNCTION            4 (annotations)
+            242 STORE_NAME              36 (api_key_of)
+
+243         244 LOAD_CONST              54 (('endpoint_id', 'str', 'return', 'dict[str, str]'))
+            246 LOAD_CONST              31 (<code object headers_of at 0x28bd45f0, file "app\services\llm_endpoint_store.py", line 243>)
+            248 MAKE_FUNCTION            4 (annotations)
+            250 STORE_NAME              37 (headers_of)
+
+260         252 LOAD_CONST              55 (('return', 'str | None'))
+            254 LOAD_CONST              32 (<code object _encode_headers at 0x7f6c922b61f0, file "app\services\llm_endpoint_store.py", line 260>)
+            256 MAKE_FUNCTION            4 (annotations)
+            258 STORE_NAME              38 (_encode_headers)
+
+267         260 LOAD_CONST              56 (('wanted', 'str | None', 'models', 'list[dict]', 'return', 'str | None'))
+            262 LOAD_CONST              33 (<code object _pick_default at 0x7f6c921517f0, file "app\services\llm_endpoint_store.py", line 267>)
+            264 MAKE_FUNCTION            4 (annotations)
+            266 STORE_NAME              39 (_pick_default)
+
+275         268 LOAD_NAME               19 (DEFAULT_DIALECT)
+
+276         270 LOAD_CONST              34 ('')
+            272 LOAD_CONST               3 (None)
+            274 LOAD_CONST               3 (None)
+
+277         276 LOAD_CONST               3 (None)
+            278 LOAD_CONST               3 (None)
+
+278         280 LOAD_CONST              35 (300)
+            282 LOAD_CONST              36 (True)
+
+275         284 LOAD_CONST              37 (('dialect', 'api_key', 'models', 'default_model', 'preset_key', 'headers', 'timeout_s', 'enabled'))
+            286 BUILD_CONST_KEY_MAP      8
+
+276         288 NOP
+
+275         290 NOP
+
+276         292 NOP
+
+275         294 NOP
+
+277         296 NOP
+
+275         298 NOP
+
+278         300 NOP
+
+275         302 NOP
+
+278         304 NOP
+
+275         306 NOP
+
+278         308 NOP
+
+275         310 LOAD_CONST              57 (('name', 'str', 'base_url', 'str', 'dialect', 'str', 'api_key', 'str', 'default_model', 'str | None', 'preset_key', 'str | None', 'timeout_s', 'int', 'enabled', 'bool', 'return', 'dict'))
+            312 LOAD_CONST              38 (<code object create at 0x28d46a60, file "app\services\llm_endpoint_store.py", line 275>)
+            314 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            316 STORE_NAME              40 (create)
+
+308         318 LOAD_CONST              58 (('endpoint_id', 'str', 'return', 'dict'))
+            320 LOAD_CONST              39 (<code object update at 0x28c4baa0, file "app\services\llm_endpoint_store.py", line 308>)
+            322 MAKE_FUNCTION            4 (annotations)
+            324 STORE_NAME              41 (update)
+
+354         326 LOAD_CONST              59 (('endpoint_id', 'str', 'return', 'bool'))
+            328 LOAD_CONST              40 (<code object delete at 0x7f6c9269a1f0, file "app\services\llm_endpoint_store.py", line 354>)
+            330 MAKE_FUNCTION            4 (annotations)
+            332 STORE_NAME              42 (delete)
+
+367         334 LOAD_CONST              60 (('endpoint_id', 'str', 'return', 'list[dict]'))
+            336 LOAD_CONST              41 (<code object usages_of at 0x26a192d0, file "app\services\llm_endpoint_store.py", line 367>)
+            338 MAKE_FUNCTION            4 (annotations)
+            340 STORE_NAME              43 (usages_of)
+            342 RETURN_CONST             3 (None)
+
+Disassembly of <code object _clean_base_url at 0x28c4d390, file "app\services\llm_endpoint_store.py", line 37>:
+ 37           0 RESUME                   0
+
+ 44           2 LOAD_FAST                0 (raw)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 LOAD_CONST               1 ('')
+        >>   12 LOAD_ATTR                1 (NULL|self + strip)
+             32 CALL                     0
+             40 LOAD_ATTR                3 (NULL|self + rstrip)
+             60 LOAD_CONST               2 ('/')
+             62 CALL                     1
+             70 STORE_FAST               1 (url)
+
+ 45          72 LOAD_FAST                1 (url)
+             74 POP_JUMP_IF_TRUE        28 (to 132)
+
+ 46          76 LOAD_GLOBAL              5 (NULL + make_error)
+             86 LOAD_GLOBAL              6 (E)
+             96 LOAD_ATTR                8 (PRECONDITION_MISSING)
+            116 LOAD_CONST               3 ('Thiếu Base URL của endpoint AI.')
+            118 LOAD_CONST               4 (422)
+            120 KW_NAMES                 5 (('status_code',))
+            122 CALL                     3
+            130 RAISE_VARARGS            1
+
+ 47     >>  132 LOAD_GLOBAL             11 (NULL + urlparse)
+            142 LOAD_FAST                1 (url)
+            144 CALL                     1
+            152 STORE_FAST               2 (parsed)
+
+ 48         154 LOAD_FAST                2 (parsed)
+            156 LOAD_ATTR               12 (scheme)
+            176 LOAD_CONST               6 (('http', 'https'))
+            178 CONTAINS_OP              1
+            180 POP_JUMP_IF_FALSE       32 (to 246)
+
+ 49         182 LOAD_GLOBAL              5 (NULL + make_error)
+            192 LOAD_GLOBAL              6 (E)
+            202 LOAD_ATTR                8 (PRECONDITION_MISSING)
+
+ 50         222 LOAD_CONST               7 ('Base URL phải bắt đầu bằng http:// hoặc https:// (nhận: ')
+            224 LOAD_FAST                0 (raw)
+            226 FORMAT_VALUE             2 (repr)
+            228 LOAD_CONST               8 (').')
+            230 BUILD_STRING             3
+
+ 51         232 LOAD_CONST               4 (422)
+
+ 49         234 KW_NAMES                 5 (('status_code',))
+            236 CALL                     3
+            244 RAISE_VARARGS            1
+
+ 52     >>  246 LOAD_FAST                2 (parsed)
+            248 LOAD_ATTR               14 (netloc)
+            268 POP_JUMP_IF_TRUE        31 (to 332)
+
+ 53         270 LOAD_GLOBAL              5 (NULL + make_error)
+            280 LOAD_GLOBAL              6 (E)
+            290 LOAD_ATTR                8 (PRECONDITION_MISSING)
+            310 LOAD_CONST               9 ('Base URL thiếu tên miền: ')
+            312 LOAD_FAST                0 (raw)
+            314 FORMAT_VALUE             2 (repr)
+            316 BUILD_STRING             2
+
+ 54         318 LOAD_CONST               4 (422)
+
+ 53         320 KW_NAMES                 5 (('status_code',))
+            322 CALL                     3
+            330 RAISE_VARARGS            1
+
+ 55     >>  332 LOAD_FAST                1 (url)
+            334 RETURN_VALUE
+
+Disassembly of <code object clean_base_url at 0x7f6c92390650, file "app\services\llm_endpoint_store.py", line 58>:
+ 58           0 RESUME                   0
+
+ 60           2 LOAD_GLOBAL              1 (NULL + _clean_base_url)
+             12 LOAD_FAST                0 (raw)
+             14 CALL                     1
+             22 RETURN_VALUE
+
+Disassembly of <code object is_local_url at 0x28ad59e0, file "app\services\llm_endpoint_store.py", line 63>:
+ 63           0 RESUME                   0
+
+ 65           2 LOAD_GLOBAL              1 (NULL + urlparse)
+             12 LOAD_FAST                0 (url)
+             14 CALL                     1
+             22 LOAD_ATTR                2 (hostname)
+             42 COPY                     1
+             44 POP_JUMP_IF_TRUE         2 (to 50)
+             46 POP_TOP
+             48 LOAD_CONST               1 ('')
+        >>   50 LOAD_ATTR                5 (NULL|self + lower)
+             70 CALL                     0
+             78 STORE_FAST               1 (host)
+
+ 66          80 LOAD_FAST                1 (host)
+             82 LOAD_CONST               2 (('localhost', '127.0.0.1', '::1', '0.0.0.0'))
+             84 CONTAINS_OP              0
+             86 POP_JUMP_IF_FALSE        1 (to 90)
+
+ 67          88 RETURN_CONST             3 (True)
+
+ 68     >>   90 LOAD_FAST                1 (host)
+             92 LOAD_ATTR                7 (NULL|self + endswith)
+            112 LOAD_CONST               4 ('.local')
+            114 CALL                     1
+            122 POP_JUMP_IF_FALSE        1 (to 126)
+
+ 69         124 RETURN_CONST             3 (True)
+
+ 70     >>  126 LOAD_FAST                1 (host)
+            128 LOAD_ATTR                9 (NULL|self + split)
+            148 LOAD_CONST               5 ('.')
+            150 CALL                     1
+            158 STORE_FAST               2 (parts)
+
+ 71         160 LOAD_GLOBAL             11 (NULL + len)
+            170 LOAD_FAST                2 (parts)
+            172 CALL                     1
+            180 LOAD_CONST               6 (4)
+            182 COMPARE_OP              40 (==)
+            186 POP_JUMP_IF_FALSE       90 (to 368)
+            188 LOAD_GLOBAL             13 (NULL + all)
+            198 LOAD_CONST               7 (<code object <genexpr> at 0x7f6c927e2d30, file "app\services\llm_endpoint_store.py", line 71>)
+            200 MAKE_FUNCTION            0
+            202 LOAD_FAST                2 (parts)
+            204 GET_ITER
+            206 CALL                     0
+            214 CALL                     1
+            222 POP_JUMP_IF_FALSE       72 (to 368)
+
+ 72         224 LOAD_GLOBAL             15 (NULL + int)
+            234 LOAD_FAST                2 (parts)
+            236 LOAD_CONST               8 (0)
+            238 BINARY_SUBSCR
+            242 CALL                     1
+            250 LOAD_GLOBAL             15 (NULL + int)
+            260 LOAD_FAST                2 (parts)
+            262 LOAD_CONST               9 (1)
+            264 BINARY_SUBSCR
+            268 CALL                     1
+            276 STORE_FAST               4 (b)
+            278 STORE_FAST               3 (a)
+
+ 73         280 LOAD_FAST                3 (a)
+            282 LOAD_CONST              10 (10)
+            284 COMPARE_OP              40 (==)
+            288 COPY                     1
+            290 POP_JUMP_IF_TRUE        37 (to 366)
+            292 POP_TOP
+            294 LOAD_FAST                3 (a)
+            296 LOAD_CONST              11 (172)
+            298 COMPARE_OP              40 (==)
+            302 COPY                     1
+            304 POP_JUMP_IF_FALSE       16 (to 338)
+            306 POP_TOP
+            308 LOAD_CONST              12 (16)
+            310 LOAD_FAST                4 (b)
+            312 SWAP                     2
+            314 COPY                     2
+            316 COMPARE_OP              26 (<=)
+            320 COPY                     1
+            322 POP_JUMP_IF_FALSE        5 (to 334)
+            324 POP_TOP
+            326 LOAD_CONST              13 (31)
+            328 COMPARE_OP              26 (<=)
+            332 JUMP_FORWARD             2 (to 338)
+        >>  334 SWAP                     2
+            336 POP_TOP
+        >>  338 COPY                     1
+            340 POP_JUMP_IF_TRUE        12 (to 366)
+            342 POP_TOP
+            344 LOAD_FAST                3 (a)
+            346 LOAD_CONST              14 (192)
+            348 COMPARE_OP              40 (==)
+            352 COPY                     1
+            354 POP_JUMP_IF_FALSE        5 (to 366)
+            356 POP_TOP
+            358 LOAD_FAST                4 (b)
+            360 LOAD_CONST              15 (168)
+            362 COMPARE_OP              40 (==)
+        >>  366 RETURN_VALUE
+
+ 74     >>  368 RETURN_CONST            16 (False)
+
+Disassembly of <code object <genexpr> at 0x7f6c927e2d30, file "app\services\llm_endpoint_store.py", line 71>:
+ 71           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                20 (to 52)
+             12 STORE_FAST               1 (p)
+             14 LOAD_FAST                1 (p)
+             16 LOAD_ATTR                1 (NULL|self + isdigit)
+             36 CALL                     0
+             44 YIELD_VALUE              1
+             46 RESUME                   1
+             48 POP_TOP
+             50 JUMP_BACKWARD           22 (to 8)
+        >>   52 END_FOR
+             54 RETURN_CONST             0 (None)
+        >>   56 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             58 RERAISE                  1
+ExceptionTable:
+  4 to 54 -> 56 [0] lasti
+
+Disassembly of <code object _clean_dialect at 0x7f6c92456730, file "app\services\llm_endpoint_store.py", line 77>:
+ 77           0 RESUME                   0
+
+ 78           2 LOAD_FAST                0 (raw)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 LOAD_CONST               1 ('')
+        >>   12 LOAD_ATTR                1 (NULL|self + strip)
+             32 CALL                     0
+             40 COPY                     1
+             42 POP_JUMP_IF_TRUE         6 (to 56)
+             44 POP_TOP
+             46 LOAD_GLOBAL              2 (DEFAULT_DIALECT)
+        >>   56 STORE_FAST               1 (value)
+
+ 79          58 LOAD_FAST                1 (value)
+             60 LOAD_GLOBAL              4 (DIALECTS)
+             70 CONTAINS_OP              1
+             72 POP_JUMP_IF_FALSE       54 (to 182)
+
+ 80          74 LOAD_GLOBAL              7 (NULL + make_error)
+             84 LOAD_GLOBAL              8 (E)
+             94 LOAD_ATTR               10 (PRECONDITION_MISSING)
+
+ 81         114 LOAD_CONST               2 ('Định dạng API ')
+            116 LOAD_FAST                1 (value)
+            118 FORMAT_VALUE             2 (repr)
+            120 LOAD_CONST               3 (' chưa hỗ trợ. Đang có: ')
+            122 LOAD_CONST               4 (', ')
+            124 LOAD_ATTR               13 (NULL|self + join)
+            144 LOAD_GLOBAL              4 (DIALECTS)
+            154 CALL                     1
+            162 FORMAT_VALUE             0
+            164 LOAD_CONST               5 ('.')
+            166 BUILD_STRING             5
+
+ 82         168 LOAD_CONST               6 (422)
+
+ 80         170 KW_NAMES                 7 (('status_code',))
+            172 CALL                     3
+            180 RAISE_VARARGS            1
+
+ 83     >>  182 LOAD_FAST                1 (value)
+            184 RETURN_VALUE
+
+Disassembly of <code object _pos_int at 0x7f6c922b5590, file "app\services\llm_endpoint_store.py", line 86>:
+ 86           0 RESUME                   0
+
+ 87           2 NOP
+
+ 88           4 LOAD_GLOBAL              1 (NULL + int)
+             14 LOAD_FAST                0 (value)
+             16 CALL                     1
+             24 STORE_FAST               2 (num)
+
+ 91          26 LOAD_FAST                2 (num)
+             28 LOAD_CONST               1 (0)
+             30 COMPARE_OP              68 (>)
+             34 POP_JUMP_IF_FALSE        2 (to 40)
+             36 LOAD_FAST                2 (num)
+             38 RETURN_VALUE
+        >>   40 LOAD_FAST                1 (default)
+             42 RETURN_VALUE
+        >>   44 PUSH_EXC_INFO
+
+ 89          46 LOAD_GLOBAL              2 (TypeError)
+             56 LOAD_GLOBAL              4 (ValueError)
+             66 BUILD_TUPLE              2
+             68 CHECK_EXC_MATCH
+             70 POP_JUMP_IF_FALSE        5 (to 82)
+             72 POP_TOP
+
+ 90          74 LOAD_FAST                1 (default)
+             76 SWAP                     2
+             78 POP_EXCEPT
+             80 RETURN_VALUE
+
+ 89     >>   82 RERAISE                  0
+        >>   84 COPY                     3
+             86 POP_EXCEPT
+             88 RERAISE                  1
+ExceptionTable:
+  4 to 24 -> 44 [0]
+  44 to 76 -> 84 [1] lasti
+  82 to 82 -> 84 [1] lasti
+
+Disassembly of <code object _non_neg_float at 0x7f6c922b5e90, file "app\services\llm_endpoint_store.py", line 94>:
+ 94           0 RESUME                   0
+
+ 95           2 NOP
+
+ 96           4 LOAD_GLOBAL              1 (NULL + float)
+             14 LOAD_FAST                0 (value)
+             16 CALL                     1
+             24 STORE_FAST               2 (num)
+
+ 99          26 LOAD_FAST                2 (num)
+             28 LOAD_CONST               1 (0)
+             30 COMPARE_OP              92 (>=)
+             34 POP_JUMP_IF_FALSE        2 (to 40)
+             36 LOAD_FAST                2 (num)
+             38 RETURN_VALUE
+        >>   40 LOAD_FAST                1 (default)
+             42 RETURN_VALUE
+        >>   44 PUSH_EXC_INFO
+
+ 97          46 LOAD_GLOBAL              2 (TypeError)
+             56 LOAD_GLOBAL              4 (ValueError)
+             66 BUILD_TUPLE              2
+             68 CHECK_EXC_MATCH
+             70 POP_JUMP_IF_FALSE        5 (to 82)
+             72 POP_TOP
+
+ 98          74 LOAD_FAST                1 (default)
+             76 SWAP                     2
+             78 POP_EXCEPT
+             80 RETURN_VALUE
+
+ 97     >>   82 RERAISE                  0
+        >>   84 COPY                     3
+             86 POP_EXCEPT
+             88 RERAISE                  1
+ExceptionTable:
+  4 to 24 -> 44 [0]
+  44 to 76 -> 84 [1] lasti
+  82 to 82 -> 84 [1] lasti
+
+Disassembly of <code object _clean_models at 0x28c52630, file "app\services\llm_endpoint_store.py", line 102>:
+102           0 RESUME                   0
+
+109           2 BUILD_LIST               0
+              4 STORE_FAST               1 (out)
+
+110           6 LOAD_GLOBAL              1 (NULL + set)
+             16 CALL                     0
+             24 STORE_FAST               2 (seen)
+
+111          26 LOAD_FAST                0 (raw)
+             28 COPY                     1
+             30 POP_JUMP_IF_TRUE         2 (to 36)
+             32 POP_TOP
+             34 BUILD_LIST               0
+        >>   36 GET_ITER
+        >>   38 EXTENDED_ARG             1
+             40 FOR_ITER               352 (to 748)
+             44 STORE_FAST               3 (item)
+
+112          46 LOAD_GLOBAL              3 (NULL + isinstance)
+             56 LOAD_FAST                3 (item)
+             58 LOAD_GLOBAL              4 (str)
+             68 CALL                     2
+             76 POP_JUMP_IF_FALSE        4 (to 86)
+
+113          78 LOAD_CONST               1 ('id')
+             80 LOAD_FAST                3 (item)
+             82 BUILD_MAP                1
+             84 STORE_FAST               3 (item)
+
+114     >>   86 LOAD_GLOBAL              3 (NULL + isinstance)
+             96 LOAD_FAST                3 (item)
+             98 LOAD_GLOBAL              6 (dict)
+            108 CALL                     2
+            116 POP_JUMP_IF_TRUE         1 (to 120)
+
+115         118 JUMP_BACKWARD           41 (to 38)
+
+116     >>  120 LOAD_GLOBAL              5 (NULL + str)
+            130 LOAD_FAST                3 (item)
+            132 LOAD_ATTR                9 (NULL|self + get)
+            152 LOAD_CONST               1 ('id')
+            154 CALL                     1
+            162 COPY                     1
+            164 POP_JUMP_IF_TRUE         2 (to 170)
+            166 POP_TOP
+            168 LOAD_CONST               2 ('')
+        >>  170 CALL                     1
+            178 LOAD_ATTR               11 (NULL|self + strip)
+            198 CALL                     0
+            206 STORE_FAST               4 (model_id)
+
+117         208 LOAD_FAST                4 (model_id)
+            210 POP_JUMP_IF_FALSE        4 (to 220)
+            212 LOAD_FAST                4 (model_id)
+            214 LOAD_FAST                2 (seen)
+            216 CONTAINS_OP              0
+            218 POP_JUMP_IF_FALSE        1 (to 222)
+
+118     >>  220 JUMP_BACKWARD           92 (to 38)
+
+119     >>  222 LOAD_FAST                2 (seen)
+            224 LOAD_ATTR               13 (NULL|self + add)
+            244 LOAD_FAST                4 (model_id)
+            246 CALL                     1
+            254 POP_TOP
+
+120         256 LOAD_FAST                1 (out)
+            258 LOAD_ATTR               15 (NULL|self + append)
+
+121         278 LOAD_FAST                4 (model_id)
+
+122         280 LOAD_GLOBAL              5 (NULL + str)
+            290 LOAD_FAST                3 (item)
+            292 LOAD_ATTR                9 (NULL|self + get)
+            312 LOAD_CONST               3 ('label')
+            314 CALL                     1
+            322 COPY                     1
+            324 POP_JUMP_IF_TRUE         2 (to 330)
+            326 POP_TOP
+            328 LOAD_FAST                4 (model_id)
+        >>  330 CALL                     1
+            338 LOAD_ATTR               11 (NULL|self + strip)
+            358 CALL                     0
+
+123         366 LOAD_GLOBAL             17 (NULL + _pos_int)
+            376 LOAD_FAST                3 (item)
+            378 LOAD_ATTR                9 (NULL|self + get)
+            398 LOAD_CONST               4 ('max_input_tokens')
+            400 CALL                     1
+            408 LOAD_CONST               5 (128000)
+            410 CALL                     2
+
+124         418 LOAD_GLOBAL             17 (NULL + _pos_int)
+            428 LOAD_FAST                3 (item)
+            430 LOAD_ATTR                9 (NULL|self + get)
+            450 LOAD_CONST               6 ('max_output_tokens')
+            452 CALL                     1
+            460 LOAD_CONST               7 (8192)
+            462 CALL                     2
+
+125         470 LOAD_GLOBAL             19 (NULL + _non_neg_float)
+            480 LOAD_FAST                3 (item)
+            482 LOAD_ATTR                9 (NULL|self + get)
+            502 LOAD_CONST               8 ('price_in')
+            504 CALL                     1
+            512 LOAD_CONST               9 (0.0)
+            514 CALL                     2
+
+126         522 LOAD_GLOBAL             19 (NULL + _non_neg_float)
+            532 LOAD_FAST                3 (item)
+            534 LOAD_ATTR                9 (NULL|self + get)
+            554 LOAD_CONST              10 ('price_out')
+            556 CALL                     1
+            564 LOAD_CONST               9 (0.0)
+            566 CALL                     2
+
+127         574 LOAD_GLOBAL             19 (NULL + _non_neg_float)
+            584 LOAD_FAST                3 (item)
+            586 LOAD_ATTR                9 (NULL|self + get)
+            606 LOAD_CONST              11 ('price_cache_in')
+            608 CALL                     1
+            616 LOAD_CONST               9 (0.0)
+            618 CALL                     2
+
+128         626 LOAD_GLOBAL             21 (NULL + bool)
+            636 LOAD_FAST                3 (item)
+            638 LOAD_ATTR                9 (NULL|self + get)
+            658 LOAD_CONST              12 ('supports_reasoning_effort')
+            660 LOAD_CONST              13 (False)
+            662 CALL                     2
+            670 CALL                     1
+
+129         678 LOAD_GLOBAL             21 (NULL + bool)
+            688 LOAD_FAST                3 (item)
+            690 LOAD_ATTR                9 (NULL|self + get)
+            710 LOAD_CONST              14 ('honors_temperature')
+            712 LOAD_CONST              15 (True)
+            714 CALL                     2
+            722 CALL                     1
+
+120         730 LOAD_CONST              16 (('id', 'label', 'max_input_tokens', 'max_output_tokens', 'price_in', 'price_out', 'price_cache_in', 'supports_reasoning_effort', 'honors_temperature'))
+            732 BUILD_CONST_KEY_MAP      9
+            734 CALL                     1
+            742 POP_TOP
+            744 EXTENDED_ARG             1
+            746 JUMP_BACKWARD          355 (to 38)
+
+111     >>  748 END_FOR
+
+131         750 LOAD_FAST                1 (out)
+            752 POP_JUMP_IF_TRUE        28 (to 810)
+
+132         754 LOAD_GLOBAL             23 (NULL + make_error)
+            764 LOAD_GLOBAL             24 (E)
+            774 LOAD_ATTR               26 (PRECONDITION_MISSING)
+
+133         794 LOAD_CONST              17 ("Endpoint phải có ít nhất một model. Bấm 'Lấy danh sách' hoặc thêm tay.")
+
+134         796 LOAD_CONST              18 (422)
+
+132         798 KW_NAMES                19 (('status_code',))
+            800 CALL                     3
+            808 RAISE_VARARGS            1
+
+135     >>  810 LOAD_FAST                1 (out)
+            812 RETURN_VALUE
+
+Disassembly of <code object _clean_headers at 0x28e50220, file "app\services\llm_endpoint_store.py", line 138>:
+138           0 RESUME                   0
+
+144           2 LOAD_FAST                0 (raw)
+              4 POP_JUMP_IF_TRUE         2 (to 10)
+
+145           6 BUILD_MAP                0
+              8 RETURN_VALUE
+
+146     >>   10 LOAD_GLOBAL              1 (NULL + isinstance)
+             20 LOAD_FAST                0 (raw)
+             22 LOAD_GLOBAL              2 (dict)
+             32 CALL                     2
+             40 POP_JUMP_IF_TRUE        28 (to 98)
+
+147          42 LOAD_GLOBAL              5 (NULL + make_error)
+             52 LOAD_GLOBAL              6 (E)
+             62 LOAD_ATTR                8 (PRECONDITION_MISSING)
+             82 LOAD_CONST               1 ('Header thêm phải là cặp tên và giá trị.')
+
+148          84 LOAD_CONST               2 (422)
+
+147          86 KW_NAMES                 3 (('status_code',))
+             88 CALL                     3
+             96 RAISE_VARARGS            1
+
+149     >>   98 BUILD_SET                0
+            100 LOAD_CONST               4 (frozenset({'x-api-key', 'content-type', 'authorization'}))
+            102 SET_UPDATE               1
+            104 STORE_FAST               1 (reserved)
+
+150         106 BUILD_MAP                0
+            108 STORE_FAST               2 (out)
+
+151         110 LOAD_FAST                0 (raw)
+            112 LOAD_ATTR               11 (NULL|self + items)
+            132 CALL                     0
+            140 GET_ITER
+        >>  142 FOR_ITER                97 (to 340)
+            146 UNPACK_SEQUENCE          2
+            150 STORE_FAST               3 (key)
+            152 STORE_FAST               4 (value)
+
+152         154 LOAD_GLOBAL             13 (NULL + str)
+            164 LOAD_FAST                3 (key)
+            166 CALL                     1
+            174 LOAD_ATTR               15 (NULL|self + strip)
+            194 CALL                     0
+            202 STORE_FAST               5 (name)
+
+153         204 LOAD_FAST                5 (name)
+            206 POP_JUMP_IF_TRUE         1 (to 210)
+
+154         208 JUMP_BACKWARD           34 (to 142)
+
+155     >>  210 LOAD_FAST                5 (name)
+            212 LOAD_ATTR               17 (NULL|self + lower)
+            232 CALL                     0
+            240 LOAD_FAST                1 (reserved)
+            242 CONTAINS_OP              0
+            244 POP_JUMP_IF_FALSE       32 (to 310)
+
+156         246 LOAD_GLOBAL              5 (NULL + make_error)
+
+157         256 LOAD_GLOBAL              6 (E)
+            266 LOAD_ATTR                8 (PRECONDITION_MISSING)
+
+158         286 LOAD_CONST               5 ('Header ')
+            288 LOAD_FAST                5 (name)
+            290 FORMAT_VALUE             2 (repr)
+            292 LOAD_CONST               6 (" do hệ thống tự đặt từ API key — bỏ nó khỏi 'Header thêm'.")
+            294 BUILD_STRING             3
+
+159         296 LOAD_CONST               2 (422)
+
+156         298 KW_NAMES                 3 (('status_code',))
+            300 CALL                     3
+            308 RAISE_VARARGS            1
+
+160     >>  310 LOAD_GLOBAL             13 (NULL + str)
+            320 LOAD_FAST                4 (value)
+            322 CALL                     1
+            330 LOAD_FAST                2 (out)
+            332 LOAD_FAST                5 (name)
+            334 STORE_SUBSCR
+            338 JUMP_BACKWARD           99 (to 142)
+
+151     >>  340 END_FOR
+
+161         342 LOAD_FAST                2 (out)
+            344 RETURN_VALUE
+
+Disassembly of <code object _models_of at 0x7f6c92358540, file "app\services\llm_endpoint_store.py", line 166>:
+166           0 RESUME                   0
+
+167           2 NOP
+
+168           4 LOAD_GLOBAL              1 (NULL + json)
+             14 LOAD_ATTR                2 (loads)
+             34 LOAD_FAST                0 (row)
+             36 LOAD_ATTR                4 (models_json)
+             56 COPY                     1
+             58 POP_JUMP_IF_TRUE         2 (to 64)
+             60 POP_TOP
+             62 LOAD_CONST               1 ('[]')
+        >>   64 CALL                     1
+             72 STORE_FAST               1 (parsed)
+
+169          74 LOAD_GLOBAL              7 (NULL + isinstance)
+             84 LOAD_FAST                1 (parsed)
+             86 LOAD_GLOBAL              8 (list)
+             96 CALL                     2
+            104 POP_JUMP_IF_FALSE        2 (to 110)
+            106 LOAD_FAST                1 (parsed)
+            108 RETURN_VALUE
+        >>  110 BUILD_LIST               0
+            112 RETURN_VALUE
+        >>  114 PUSH_EXC_INFO
+
+170         116 LOAD_GLOBAL             10 (TypeError)
+            126 LOAD_GLOBAL             12 (ValueError)
+            136 BUILD_TUPLE              2
+            138 CHECK_EXC_MATCH
+            140 POP_JUMP_IF_FALSE       40 (to 222)
+            142 POP_TOP
+
+171         144 LOAD_GLOBAL             15 (NULL + log)
+            154 LOAD_ATTR               16 (warning)
+            174 LOAD_CONST               2 ('[llm_endpoint] ')
+            176 LOAD_FAST                0 (row)
+            178 LOAD_ATTR               18 (id)
+            198 FORMAT_VALUE             0
+            200 LOAD_CONST               3 (': models_json hỏng, coi như rỗng')
+            202 BUILD_STRING             3
+            204 CALL                     1
+            212 POP_TOP
+
+172         214 BUILD_LIST               0
+            216 SWAP                     2
+            218 POP_EXCEPT
+            220 RETURN_VALUE
+
+170     >>  222 RERAISE                  0
+        >>  224 COPY                     3
+            226 POP_EXCEPT
+            228 RERAISE                  1
+ExceptionTable:
+  4 to 106 -> 114 [0]
+  110 to 110 -> 114 [0]
+  114 to 216 -> 224 [1] lasti
+  222 to 222 -> 224 [1] lasti
+
+Disassembly of <code object _key_tail at 0x7f6c921508f0, file "app\services\llm_endpoint_store.py", line 175>:
+175           0 RESUME                   0
+
+177           2 NOP
+
+178           4 LOAD_GLOBAL              1 (NULL + decrypt_secret)
+             14 LOAD_FAST                0 (row)
+             16 LOAD_ATTR                2 (api_key_enc)
+             36 COPY                     1
+             38 POP_JUMP_IF_TRUE         2 (to 44)
+             40 POP_TOP
+             42 LOAD_CONST               1 ('')
+        >>   44 CALL                     1
+             52 STORE_FAST               1 (plain)
+
+181          54 LOAD_GLOBAL              7 (NULL + len)
+             64 LOAD_FAST                1 (plain)
+             66 CALL                     1
+             74 LOAD_CONST               2 (8)
+             76 COMPARE_OP              92 (>=)
+             80 POP_JUMP_IF_FALSE        5 (to 92)
+             82 LOAD_FAST                1 (plain)
+             84 LOAD_CONST               3 (-4)
+             86 LOAD_CONST               4 (None)
+             88 BINARY_SLICE
+             90 RETURN_VALUE
+        >>   92 LOAD_CONST               1 ('')
+             94 RETURN_VALUE
+        >>   96 PUSH_EXC_INFO
+
+179          98 LOAD_GLOBAL              4 (ValueError)
+            108 CHECK_EXC_MATCH
+            110 POP_JUMP_IF_FALSE        3 (to 118)
+            112 POP_TOP
+
+180         114 POP_EXCEPT
+            116 RETURN_CONST             1 ('')
+
+179     >>  118 RERAISE                  0
+        >>  120 COPY                     3
+            122 POP_EXCEPT
+            124 RERAISE                  1
+ExceptionTable:
+  4 to 52 -> 96 [0]
+  96 to 112 -> 120 [1] lasti
+  118 to 118 -> 120 [1] lasti
+
+Disassembly of <code object to_public at 0x28be9100, file "app\services\llm_endpoint_store.py", line 184>:
+184           0 RESUME                   0
+
+187           2 LOAD_FAST                0 (row)
+              4 LOAD_ATTR                0 (id)
+
+188          24 LOAD_FAST                0 (row)
+             26 LOAD_ATTR                2 (name)
+
+189          46 LOAD_FAST                0 (row)
+             48 LOAD_ATTR                4 (preset_key)
+
+190          68 LOAD_FAST                0 (row)
+             70 LOAD_ATTR                6 (dialect)
+
+191          90 LOAD_FAST                0 (row)
+             92 LOAD_ATTR                8 (base_url)
+
+192         112 LOAD_GLOBAL             11 (NULL + bool)
+            122 LOAD_FAST                0 (row)
+            124 LOAD_ATTR               12 (api_key_enc)
+            144 CALL                     1
+
+193         152 LOAD_GLOBAL             15 (NULL + _key_tail)
+            162 LOAD_FAST                0 (row)
+            164 CALL                     1
+
+194         172 LOAD_GLOBAL             17 (NULL + _models_of)
+            182 LOAD_FAST                0 (row)
+            184 CALL                     1
+
+195         192 LOAD_FAST                0 (row)
+            194 LOAD_ATTR               18 (default_model)
+
+196         214 LOAD_FAST                0 (row)
+            216 LOAD_ATTR               20 (timeout_s)
+
+197         236 LOAD_GLOBAL             11 (NULL + bool)
+            246 LOAD_FAST                0 (row)
+            248 LOAD_ATTR               22 (enabled)
+            268 CALL                     1
+
+198         276 LOAD_GLOBAL             25 (NULL + is_local_url)
+            286 LOAD_FAST                0 (row)
+            288 LOAD_ATTR                8 (base_url)
+            308 CALL                     1
+
+186         316 LOAD_CONST               1 (('id', 'name', 'preset_key', 'dialect', 'base_url', 'has_key', 'key_tail', 'models', 'default_model', 'timeout_s', 'enabled', 'is_local'))
+            318 BUILD_CONST_KEY_MAP     12
+            320 RETURN_VALUE
+
+Disassembly of <code object list_public at 0x28c04560, file "app\services\llm_endpoint_store.py", line 202>:
+202           0 RESUME                   0
+
+203           2 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             12 CALL                     0
+             20 BEFORE_WITH
+             22 STORE_FAST               1 (db)
+
+204          24 LOAD_FAST                1 (db)
+             26 LOAD_ATTR                3 (NULL|self + query)
+             46 LOAD_GLOBAL              4 (LlmEndpoint)
+             56 CALL                     1
+             64 STORE_FAST               2 (query)
+
+205          66 LOAD_FAST                0 (enabled_only)
+             68 POP_JUMP_IF_FALSE       34 (to 138)
+
+206          70 LOAD_FAST                2 (query)
+             72 LOAD_ATTR                7 (NULL|self + filter)
+             92 LOAD_GLOBAL              4 (LlmEndpoint)
+            102 LOAD_ATTR                8 (enabled)
+            122 LOAD_CONST               1 (1)
+            124 COMPARE_OP              40 (==)
+            128 CALL                     1
+            136 STORE_FAST               2 (query)
+
+207     >>  138 LOAD_FAST                2 (query)
+            140 LOAD_ATTR               11 (NULL|self + order_by)
+            160 LOAD_GLOBAL              4 (LlmEndpoint)
+            170 LOAD_ATTR               12 (created_at)
+            190 LOAD_ATTR               15 (NULL|self + asc)
+            210 CALL                     0
+            218 CALL                     1
+            226 LOAD_ATTR               17 (NULL|self + all)
+            246 CALL                     0
+            254 STORE_FAST               3 (rows)
+
+208         256 LOAD_FAST                3 (rows)
+            258 GET_ITER
+            260 LOAD_FAST_AND_CLEAR      4 (r)
+            262 SWAP                     2
+            264 BUILD_LIST               0
+            266 SWAP                     2
+        >>  268 FOR_ITER                13 (to 298)
+            272 STORE_FAST               4 (r)
+            274 LOAD_GLOBAL             19 (NULL + to_public)
+            284 LOAD_FAST                4 (r)
+            286 CALL                     1
+            294 LIST_APPEND              2
+            296 JUMP_BACKWARD           15 (to 268)
+        >>  298 END_FOR
+            300 SWAP                     2
+            302 STORE_FAST               4 (r)
+
+203         304 SWAP                     2
+            306 LOAD_CONST               0 (None)
+            308 LOAD_CONST               0 (None)
+            310 LOAD_CONST               0 (None)
+            312 CALL                     2
+            320 POP_TOP
+            322 RETURN_VALUE
+        >>  324 SWAP                     2
+            326 POP_TOP
+
+208         328 SWAP                     2
+            330 STORE_FAST               4 (r)
+            332 RERAISE                  0
+
+203     >>  334 PUSH_EXC_INFO
+            336 WITH_EXCEPT_START
+            338 POP_JUMP_IF_TRUE         1 (to 342)
+            340 RERAISE                  2
+        >>  342 POP_TOP
+            344 POP_EXCEPT
+            346 POP_TOP
+            348 POP_TOP
+            350 RETURN_CONST             0 (None)
+        >>  352 COPY                     3
+            354 POP_EXCEPT
+            356 RERAISE                  1
+ExceptionTable:
+  22 to 262 -> 334 [1] lasti
+  264 to 298 -> 324 [3]
+  300 to 302 -> 334 [1] lasti
+  324 to 332 -> 334 [1] lasti
+  334 to 342 -> 352 [3] lasti
+
+Disassembly of <code object get at 0x7f6c928fca40, file "app\services\llm_endpoint_store.py", line 211>:
+211           0 RESUME                   0
+
+213           2 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             12 CALL                     0
+             20 BEFORE_WITH
+             22 STORE_FAST               1 (db)
+
+214          24 LOAD_FAST                1 (db)
+             26 LOAD_ATTR                3 (NULL|self + get)
+             46 LOAD_GLOBAL              4 (LlmEndpoint)
+             56 LOAD_FAST                0 (endpoint_id)
+             58 COPY                     1
+             60 POP_JUMP_IF_TRUE         2 (to 66)
+             62 POP_TOP
+             64 LOAD_CONST               1 ('')
+        >>   66 LOAD_ATTR                7 (NULL|self + strip)
+             86 CALL                     0
+             94 CALL                     2
+            102 STORE_FAST               2 (row)
+
+215         104 LOAD_FAST                2 (row)
+            106 POP_JUMP_IF_FALSE       11 (to 130)
+            108 LOAD_GLOBAL              9 (NULL + to_public)
+            118 LOAD_FAST                2 (row)
+            120 CALL                     1
+            128 JUMP_FORWARD             1 (to 132)
+        >>  130 LOAD_CONST               2 (None)
+
+213     >>  132 SWAP                     2
+            134 LOAD_CONST               2 (None)
+            136 LOAD_CONST               2 (None)
+            138 LOAD_CONST               2 (None)
+            140 CALL                     2
+            148 POP_TOP
+            150 RETURN_VALUE
+        >>  152 PUSH_EXC_INFO
+            154 WITH_EXCEPT_START
+            156 POP_JUMP_IF_TRUE         1 (to 160)
+            158 RERAISE                  2
+        >>  160 POP_TOP
+            162 POP_EXCEPT
+            164 POP_TOP
+            166 POP_TOP
+            168 RETURN_CONST             2 (None)
+        >>  170 COPY                     3
+            172 POP_EXCEPT
+            174 RERAISE                  1
+ExceptionTable:
+  22 to 130 -> 152 [1] lasti
+  152 to 160 -> 170 [3] lasti
+
+Disassembly of <code object api_key_of at 0x28d47c10, file "app\services\llm_endpoint_store.py", line 218>:
+218           0 RESUME                   0
+
+224           2 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             12 CALL                     0
+             20 BEFORE_WITH
+             22 STORE_FAST               1 (db)
+
+225          24 LOAD_FAST                1 (db)
+             26 LOAD_ATTR                3 (NULL|self + get)
+             46 LOAD_GLOBAL              4 (LlmEndpoint)
+             56 LOAD_FAST                0 (endpoint_id)
+             58 COPY                     1
+             60 POP_JUMP_IF_TRUE         2 (to 66)
+             62 POP_TOP
+             64 LOAD_CONST               1 ('')
+        >>   66 LOAD_ATTR                7 (NULL|self + strip)
+             86 CALL                     0
+             94 CALL                     2
+            102 STORE_FAST               2 (row)
+
+226         104 LOAD_FAST                2 (row)
+            106 POP_JUMP_IF_NOT_NONE    30 (to 168)
+
+227         108 LOAD_GLOBAL              9 (NULL + make_error)
+            118 LOAD_GLOBAL             10 (E)
+            128 LOAD_ATTR               12 (LLM_API_ENDPOINT_MISSING)
+
+228         148 LOAD_CONST               3 ('Endpoint AI ')
+            150 LOAD_FAST                0 (endpoint_id)
+            152 FORMAT_VALUE             2 (repr)
+            154 LOAD_CONST               4 (' không còn tồn tại.')
+            156 BUILD_STRING             3
+
+227         158 CALL                     2
+            166 RAISE_VARARGS            1
+
+229     >>  168 LOAD_FAST                2 (row)
+            170 LOAD_ATTR               14 (api_key_enc)
+            190 COPY                     1
+            192 POP_JUMP_IF_TRUE         2 (to 198)
+            194 POP_TOP
+            196 LOAD_CONST               1 ('')
+        >>  198 STORE_FAST               3 (cipher)
+
+230         200 LOAD_FAST                2 (row)
+            202 LOAD_ATTR               16 (name)
+            222 STORE_FAST               4 (name)
+
+224         224 LOAD_CONST               2 (None)
+            226 LOAD_CONST               2 (None)
+            228 LOAD_CONST               2 (None)
+            230 CALL                     2
+            238 POP_TOP
+
+231     >>  240 LOAD_FAST_CHECK          3 (cipher)
+            242 POP_JUMP_IF_TRUE         1 (to 246)
+
+232         244 RETURN_CONST             1 ('')
+
+233     >>  246 NOP
+
+234         248 LOAD_GLOBAL             19 (NULL + decrypt_secret)
+            258 LOAD_FAST                3 (cipher)
+            260 CALL                     1
+            268 RETURN_VALUE
+
+224     >>  270 PUSH_EXC_INFO
+            272 WITH_EXCEPT_START
+            274 POP_JUMP_IF_TRUE         1 (to 278)
+            276 RERAISE                  2
+        >>  278 POP_TOP
+            280 POP_EXCEPT
+            282 POP_TOP
+            284 POP_TOP
+            286 JUMP_BACKWARD           24 (to 240)
+        >>  288 COPY                     3
+            290 POP_EXCEPT
+            292 RERAISE                  1
+        >>  294 PUSH_EXC_INFO
+
+235         296 LOAD_GLOBAL             20 (ValueError)
+            306 CHECK_EXC_MATCH
+            308 POP_JUMP_IF_FALSE       34 (to 378)
+            310 POP_TOP
+
+236         312 LOAD_GLOBAL              9 (NULL + make_error)
+
+237         322 LOAD_GLOBAL             10 (E)
+            332 LOAD_ATTR               22 (LLM_API_AUTH)
+
+238         352 LOAD_CONST               5 ('Không giải mã được API key của ')
+            354 LOAD_FAST_CHECK          4 (name)
+            356 FORMAT_VALUE             2 (repr)
+            358 LOAD_CONST               6 (' (khoá mã hoá của máy đã đổi).')
+            360 BUILD_STRING             3
+
+239         362 LOAD_CONST               7 ('Mở Cài đặt → API tuỳ chỉnh và nhập lại API key cho endpoint này.')
+
+236         364 KW_NAMES                 8 (('hint',))
+            366 CALL                     3
+
+240         374 LOAD_CONST               2 (None)
+
+236         376 RAISE_VARARGS            2
+
+235     >>  378 RERAISE                  0
+        >>  380 COPY                     3
+            382 POP_EXCEPT
+            384 RERAISE                  1
+ExceptionTable:
+  22 to 222 -> 270 [1] lasti
+  248 to 266 -> 294 [0]
+  270 to 278 -> 288 [3] lasti
+  294 to 378 -> 380 [1] lasti
+
+Disassembly of <code object headers_of at 0x28bd45f0, file "app\services\llm_endpoint_store.py", line 243>:
+243           0 RESUME                   0
+
+245           2 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             12 CALL                     0
+             20 BEFORE_WITH
+             22 STORE_FAST               1 (db)
+
+246          24 LOAD_FAST                1 (db)
+             26 LOAD_ATTR                3 (NULL|self + get)
+             46 LOAD_GLOBAL              4 (LlmEndpoint)
+             56 LOAD_FAST                0 (endpoint_id)
+             58 COPY                     1
+             60 POP_JUMP_IF_TRUE         2 (to 66)
+             62 POP_TOP
+             64 LOAD_CONST               1 ('')
+        >>   66 LOAD_ATTR                7 (NULL|self + strip)
+             86 CALL                     0
+             94 CALL                     2
+            102 STORE_FAST               2 (row)
+
+247         104 LOAD_FAST                2 (row)
+            106 POP_JUMP_IF_FALSE       16 (to 140)
+            108 LOAD_FAST                2 (row)
+            110 LOAD_ATTR                8 (headers_enc)
+            130 COPY                     1
+            132 POP_JUMP_IF_TRUE         4 (to 142)
+            134 POP_TOP
+            136 LOAD_CONST               1 ('')
+            138 JUMP_FORWARD             1 (to 142)
+        >>  140 LOAD_CONST               1 ('')
+        >>  142 STORE_FAST               3 (cipher)
+
+245         144 LOAD_CONST               2 (None)
+            146 LOAD_CONST               2 (None)
+            148 LOAD_CONST               2 (None)
+            150 CALL                     2
+            158 POP_TOP
+
+248     >>  160 LOAD_FAST_CHECK          3 (cipher)
+            162 POP_JUMP_IF_TRUE         2 (to 168)
+
+249         164 BUILD_MAP                0
+            166 RETURN_VALUE
+
+250     >>  168 NOP
+
+251         170 LOAD_GLOBAL             11 (NULL + json)
+            180 LOAD_ATTR               12 (loads)
+            200 LOAD_GLOBAL             15 (NULL + decrypt_secret)
+            210 LOAD_FAST                3 (cipher)
+            212 CALL                     1
+            220 CALL                     1
+            228 STORE_FAST               4 (parsed)
+
+252         230 LOAD_GLOBAL             17 (NULL + isinstance)
+            240 LOAD_FAST                4 (parsed)
+            242 LOAD_GLOBAL             18 (dict)
+            252 CALL                     2
+            260 POP_JUMP_IF_FALSE       54 (to 370)
+            262 LOAD_FAST                4 (parsed)
+            264 LOAD_ATTR               21 (NULL|self + items)
+            284 CALL                     0
+            292 GET_ITER
+            294 LOAD_FAST_AND_CLEAR      5 (k)
+            296 LOAD_FAST_AND_CLEAR      6 (v)
+            298 SWAP                     3
+            300 BUILD_MAP                0
+            302 SWAP                     2
+        >>  304 FOR_ITER                26 (to 360)
+            308 UNPACK_SEQUENCE          2
+            312 STORE_FAST               5 (k)
+            314 STORE_FAST               6 (v)
+            316 LOAD_GLOBAL             23 (NULL + str)
+            326 LOAD_FAST                5 (k)
+            328 CALL                     1
+            336 LOAD_GLOBAL             23 (NULL + str)
+            346 LOAD_FAST                6 (v)
+            348 CALL                     1
+            356 MAP_ADD                  2
+            358 JUMP_BACKWARD           28 (to 304)
+        >>  360 END_FOR
+            362 SWAP                     3
+            364 STORE_FAST               6 (v)
+            366 STORE_FAST               5 (k)
+            368 RETURN_VALUE
+        >>  370 BUILD_MAP                0
+            372 RETURN_VALUE
+
+245     >>  374 PUSH_EXC_INFO
+            376 WITH_EXCEPT_START
+            378 POP_JUMP_IF_TRUE         1 (to 382)
+            380 RERAISE                  2
+        >>  382 POP_TOP
+            384 POP_EXCEPT
+            386 POP_TOP
+            388 POP_TOP
+            390 JUMP_BACKWARD          116 (to 160)
+        >>  392 COPY                     3
+            394 POP_EXCEPT
+            396 RERAISE                  1
+        >>  398 SWAP                     2
+            400 POP_TOP
+
+252         402 SWAP                     3
+            404 STORE_FAST               6 (v)
+            406 STORE_FAST               5 (k)
+            408 RERAISE                  0
+        >>  410 PUSH_EXC_INFO
+
+253         412 LOAD_GLOBAL             24 (ValueError)
+            422 LOAD_GLOBAL             26 (TypeError)
+            432 BUILD_TUPLE              2
+            434 CHECK_EXC_MATCH
+            436 POP_JUMP_IF_FALSE       30 (to 498)
+            438 POP_TOP
+
+254         440 LOAD_GLOBAL             29 (NULL + log)
+            450 LOAD_ATTR               30 (warning)
+            470 LOAD_CONST               3 ('[llm_endpoint] ')
+            472 LOAD_FAST                0 (endpoint_id)
+            474 FORMAT_VALUE             0
+            476 LOAD_CONST               4 (': headers_enc không đọc được, bỏ qua')
+            478 BUILD_STRING             3
+            480 CALL                     1
+            488 POP_TOP
+
+255         490 BUILD_MAP                0
+            492 SWAP                     2
+            494 POP_EXCEPT
+            496 RETURN_VALUE
+
+253     >>  498 RERAISE                  0
+        >>  500 COPY                     3
+            502 POP_EXCEPT
+            504 RERAISE                  1
+ExceptionTable:
+  22 to 142 -> 374 [1] lasti
+  170 to 298 -> 410 [0]
+  300 to 360 -> 398 [3]
+  362 to 366 -> 410 [0]
+  370 to 370 -> 410 [0]
+  374 to 382 -> 392 [3] lasti
+  398 to 408 -> 410 [0]
+  410 to 492 -> 500 [1] lasti
+  498 to 498 -> 500 [1] lasti
+
+Disassembly of <code object _encode_headers at 0x7f6c922b61f0, file "app\services\llm_endpoint_store.py", line 260>:
+260           0 RESUME                   0
+
+261           2 LOAD_GLOBAL              1 (NULL + _clean_headers)
+             12 LOAD_FAST                0 (headers)
+             14 CALL                     1
+             22 STORE_FAST               1 (clean)
+
+262          24 LOAD_FAST                1 (clean)
+             26 POP_JUMP_IF_TRUE         1 (to 30)
+
+263          28 RETURN_CONST             0 (None)
+
+264     >>   30 LOAD_GLOBAL              3 (NULL + encrypt_secret)
+             40 LOAD_GLOBAL              5 (NULL + json)
+             50 LOAD_ATTR                6 (dumps)
+             70 LOAD_FAST                1 (clean)
+             72 LOAD_CONST               1 (False)
+             74 KW_NAMES                 2 (('ensure_ascii',))
+             76 CALL                     2
+             84 CALL                     1
+             92 RETURN_VALUE
+
+Disassembly of <code object _pick_default at 0x7f6c921517f0, file "app\services\llm_endpoint_store.py", line 267>:
+267           0 RESUME                   0
+
+268           2 LOAD_FAST                0 (wanted)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 LOAD_CONST               1 ('')
+        >>   12 LOAD_ATTR                1 (NULL|self + strip)
+             32 CALL                     0
+             40 STORE_FAST               0 (wanted)
+
+269          42 LOAD_FAST                1 (models)
+             44 GET_ITER
+             46 LOAD_FAST_AND_CLEAR      2 (m)
+             48 SWAP                     2
+             50 BUILD_LIST               0
+             52 SWAP                     2
+        >>   54 FOR_ITER                 7 (to 72)
+             58 STORE_FAST               2 (m)
+             60 LOAD_FAST                2 (m)
+             62 LOAD_CONST               2 ('id')
+             64 BINARY_SUBSCR
+             68 LIST_APPEND              2
+             70 JUMP_BACKWARD            9 (to 54)
+        >>   72 END_FOR
+             74 STORE_FAST               3 (ids)
+             76 STORE_FAST               2 (m)
+
+270          78 LOAD_FAST                0 (wanted)
+             80 POP_JUMP_IF_FALSE        6 (to 94)
+             82 LOAD_FAST                0 (wanted)
+             84 LOAD_FAST                3 (ids)
+             86 CONTAINS_OP              0
+             88 POP_JUMP_IF_FALSE        2 (to 94)
+
+271          90 LOAD_FAST                0 (wanted)
+             92 RETURN_VALUE
+
+272     >>   94 LOAD_FAST                3 (ids)
+             96 POP_JUMP_IF_FALSE        5 (to 108)
+             98 LOAD_FAST                3 (ids)
+            100 LOAD_CONST               3 (0)
+            102 BINARY_SUBSCR
+            106 RETURN_VALUE
+        >>  108 LOAD_CONST               0 (None)
+            110 RETURN_VALUE
+        >>  112 SWAP                     2
+            114 POP_TOP
+
+269         116 SWAP                     2
+            118 STORE_FAST               2 (m)
+            120 RERAISE                  0
+ExceptionTable:
+  50 to 72 -> 112 [2]
+
+Disassembly of <code object create at 0x28d46a60, file "app\services\llm_endpoint_store.py", line 275>:
+275           0 RESUME                   0
+
+279           2 LOAD_FAST                0 (name)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 LOAD_CONST               1 ('')
+        >>   12 LOAD_ATTR                1 (NULL|self + strip)
+             32 CALL                     0
+             40 STORE_FAST               0 (name)
+
+280          42 LOAD_FAST                0 (name)
+             44 POP_JUMP_IF_TRUE        28 (to 102)
+
+281          46 LOAD_GLOBAL              3 (NULL + make_error)
+             56 LOAD_GLOBAL              4 (E)
+             66 LOAD_ATTR                6 (PRECONDITION_MISSING)
+             86 LOAD_CONST               2 ('Endpoint AI phải có tên.')
+             88 LOAD_CONST               3 (422)
+             90 KW_NAMES                 4 (('status_code',))
+             92 CALL                     3
+            100 RAISE_VARARGS            1
+
+282     >>  102 LOAD_GLOBAL              9 (NULL + _clean_models)
+            112 LOAD_FAST                4 (models)
+            114 CALL                     1
+            122 STORE_FAST              10 (clean_models)
+
+283         124 LOAD_GLOBAL             11 (NULL + LlmEndpoint)
+
+284         134 LOAD_FAST                0 (name)
+
+285         136 LOAD_FAST                6 (preset_key)
+            138 COPY                     1
+            140 POP_JUMP_IF_TRUE         2 (to 146)
+            142 POP_TOP
+            144 LOAD_CONST               1 ('')
+        >>  146 LOAD_ATTR                1 (NULL|self + strip)
+            166 CALL                     0
+            174 COPY                     1
+            176 POP_JUMP_IF_TRUE         2 (to 182)
+            178 POP_TOP
+            180 LOAD_CONST               0 (None)
+
+286     >>  182 LOAD_GLOBAL             13 (NULL + _clean_dialect)
+            192 LOAD_FAST                2 (dialect)
+            194 CALL                     1
+
+287         202 LOAD_GLOBAL             15 (NULL + _clean_base_url)
+            212 LOAD_FAST                1 (base_url)
+            214 CALL                     1
+
+288         222 LOAD_FAST                3 (api_key)
+            224 COPY                     1
+            226 POP_JUMP_IF_TRUE         2 (to 232)
+            228 POP_TOP
+            230 LOAD_CONST               1 ('')
+        >>  232 LOAD_ATTR                1 (NULL|self + strip)
+            252 CALL                     0
+            260 POP_JUMP_IF_FALSE       25 (to 312)
+            262 LOAD_GLOBAL             17 (NULL + encrypt_secret)
+            272 LOAD_FAST                3 (api_key)
+            274 LOAD_ATTR                1 (NULL|self + strip)
+            294 CALL                     0
+            302 CALL                     1
+            310 JUMP_FORWARD             1 (to 314)
+        >>  312 LOAD_CONST               0 (None)
+
+289     >>  314 LOAD_GLOBAL             19 (NULL + _encode_headers)
+            324 LOAD_FAST                7 (headers)
+            326 CALL                     1
+
+290         334 LOAD_GLOBAL             21 (NULL + json)
+            344 LOAD_ATTR               22 (dumps)
+            364 LOAD_FAST               10 (clean_models)
+            366 LOAD_CONST               5 (False)
+            368 KW_NAMES                 6 (('ensure_ascii',))
+            370 CALL                     2
+
+291         378 LOAD_GLOBAL             25 (NULL + _pick_default)
+            388 LOAD_FAST                5 (default_model)
+            390 LOAD_FAST               10 (clean_models)
+            392 CALL                     2
+
+292         400 LOAD_GLOBAL             27 (NULL + max)
+            410 LOAD_GLOBAL             28 (MIN_TIMEOUT_S)
+            420 LOAD_GLOBAL             31 (NULL + min)
+            430 LOAD_GLOBAL             32 (MAX_TIMEOUT_S)
+            440 LOAD_GLOBAL             35 (NULL + _pos_int)
+            450 LOAD_FAST                8 (timeout_s)
+            452 LOAD_CONST               7 (300)
+            454 CALL                     2
+            462 CALL                     2
+            470 CALL                     2
+
+293         478 LOAD_FAST                9 (enabled)
+            480 POP_JUMP_IF_FALSE        2 (to 486)
+            482 LOAD_CONST               8 (1)
+            484 JUMP_FORWARD             1 (to 488)
+        >>  486 LOAD_CONST               9 (0)
+
+283     >>  488 KW_NAMES                10 (('name', 'preset_key', 'dialect', 'base_url', 'api_key_enc', 'headers_enc', 'models_json', 'default_model', 'timeout_s', 'enabled'))
+            490 CALL                    10
+            498 STORE_FAST              11 (row)
+
+295         500 LOAD_GLOBAL             37 (NULL + SessionLocal)
+            510 CALL                     0
+            518 BEFORE_WITH
+            520 STORE_FAST              12 (db)
+
+296         522 LOAD_FAST               12 (db)
+            524 LOAD_ATTR               39 (NULL|self + query)
+            544 LOAD_GLOBAL             10 (LlmEndpoint)
+            554 CALL                     1
+            562 LOAD_ATTR               41 (NULL|self + count)
+            582 CALL                     0
+            590 LOAD_GLOBAL             42 (MAX_ENDPOINTS)
+            600 COMPARE_OP              92 (>=)
+            604 POP_JUMP_IF_FALSE       36 (to 678)
+
+297         606 LOAD_GLOBAL              3 (NULL + make_error)
+            616 LOAD_GLOBAL              4 (E)
+            626 LOAD_ATTR                6 (PRECONDITION_MISSING)
+
+298         646 LOAD_CONST              11 ('Đã đạt trần ')
+            648 LOAD_GLOBAL             42 (MAX_ENDPOINTS)
+            658 FORMAT_VALUE             0
+            660 LOAD_CONST              12 (' endpoint AI. Xoá bớt cái không dùng.')
+            662 BUILD_STRING             3
+
+299         664 LOAD_CONST               3 (422)
+
+297         666 KW_NAMES                 4 (('status_code',))
+            668 CALL                     3
+            676 RAISE_VARARGS            1
+
+300     >>  678 LOAD_FAST               12 (db)
+            680 LOAD_ATTR               45 (NULL|self + add)
+            700 LOAD_FAST               11 (row)
+            702 CALL                     1
+            710 POP_TOP
+
+301         712 LOAD_FAST               12 (db)
+            714 LOAD_ATTR               47 (NULL|self + commit)
+            734 CALL                     0
+            742 POP_TOP
+
+302         744 LOAD_FAST               12 (db)
+            746 LOAD_ATTR               49 (NULL|self + refresh)
+            766 LOAD_FAST               11 (row)
+            768 CALL                     1
+            776 POP_TOP
+
+303         778 LOAD_GLOBAL             51 (NULL + to_public)
+            788 LOAD_FAST               11 (row)
+            790 CALL                     1
+            798 STORE_FAST              13 (out)
+
+295         800 LOAD_CONST               0 (None)
+            802 LOAD_CONST               0 (None)
+            804 LOAD_CONST               0 (None)
+            806 CALL                     2
+            814 POP_TOP
+
+304     >>  816 LOAD_GLOBAL             53 (NULL + log)
+            826 LOAD_ATTR               54 (info)
+            846 LOAD_CONST              13 ('[llm_endpoint] tạo ')
+            848 LOAD_FAST_CHECK         13 (out)
+            850 LOAD_CONST              14 ('id')
+            852 BINARY_SUBSCR
+            856 FORMAT_VALUE             0
+            858 LOAD_CONST              15 (' — ')
+            860 LOAD_FAST                0 (name)
+            862 FORMAT_VALUE             0
+            864 LOAD_CONST              16 (' (')
+            866 LOAD_FAST               13 (out)
+            868 LOAD_CONST              17 ('dialect')
+            870 BINARY_SUBSCR
+            874 FORMAT_VALUE             0
+            876 LOAD_CONST              18 (')')
+            878 BUILD_STRING             7
+            880 CALL                     1
+            888 POP_TOP
+
+305         890 LOAD_FAST               13 (out)
+            892 RETURN_VALUE
+
+295     >>  894 PUSH_EXC_INFO
+            896 WITH_EXCEPT_START
+            898 POP_JUMP_IF_TRUE         1 (to 902)
+            900 RERAISE                  2
+        >>  902 POP_TOP
+            904 POP_EXCEPT
+            906 POP_TOP
+            908 POP_TOP
+            910 JUMP_BACKWARD           48 (to 816)
+        >>  912 COPY                     3
+            914 POP_EXCEPT
+            916 RERAISE                  1
+ExceptionTable:
+  520 to 798 -> 894 [1] lasti
+  894 to 902 -> 912 [3] lasti
+
+Disassembly of <code object update at 0x28c4baa0, file "app\services\llm_endpoint_store.py", line 308>:
+308           0 RESUME                   0
+
+314           2 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             12 CALL                     0
+             20 BEFORE_WITH
+             22 STORE_FAST               2 (db)
+
+315          24 LOAD_FAST                2 (db)
+             26 LOAD_ATTR                3 (NULL|self + get)
+             46 LOAD_GLOBAL              4 (LlmEndpoint)
+             56 LOAD_FAST                0 (endpoint_id)
+             58 COPY                     1
+             60 POP_JUMP_IF_TRUE         2 (to 66)
+             62 POP_TOP
+             64 LOAD_CONST               1 ('')
+        >>   66 LOAD_ATTR                7 (NULL|self + strip)
+             86 CALL                     0
+             94 CALL                     2
+            102 STORE_FAST               3 (row)
+
+316         104 LOAD_FAST                3 (row)
+            106 POP_JUMP_IF_NOT_NONE    32 (to 172)
+
+317         108 LOAD_GLOBAL              9 (NULL + make_error)
+            118 LOAD_GLOBAL             10 (E)
+            128 LOAD_ATTR               12 (LLM_API_ENDPOINT_MISSING)
+
+318         148 LOAD_CONST               3 ('Endpoint AI ')
+            150 LOAD_FAST                0 (endpoint_id)
+            152 FORMAT_VALUE             2 (repr)
+            154 LOAD_CONST               4 (' không còn tồn tại.')
+            156 BUILD_STRING             3
+            158 LOAD_CONST               5 (404)
+
+317         160 KW_NAMES                 6 (('status_code',))
+            162 CALL                     3
+            170 RAISE_VARARGS            1
+
+320     >>  172 LOAD_CONST               7 ('name')
+            174 LOAD_FAST                1 (fields)
+            176 CONTAINS_OP              0
+            178 POP_JUMP_IF_FALSE       47 (to 274)
+            180 LOAD_FAST                1 (fields)
+            182 LOAD_CONST               7 ('name')
+            184 BINARY_SUBSCR
+            188 COPY                     1
+            190 POP_JUMP_IF_TRUE         2 (to 196)
+            192 POP_TOP
+            194 LOAD_CONST               1 ('')
+        >>  196 LOAD_ATTR                7 (NULL|self + strip)
+            216 CALL                     0
+            224 POP_JUMP_IF_FALSE       24 (to 274)
+
+321         226 LOAD_FAST                1 (fields)
+            228 LOAD_CONST               7 ('name')
+            230 BINARY_SUBSCR
+            234 LOAD_ATTR                7 (NULL|self + strip)
+            254 CALL                     0
+            262 LOAD_FAST                3 (row)
+            264 STORE_ATTR               7 (name)
+
+322     >>  274 LOAD_CONST               8 ('dialect')
+            276 LOAD_FAST                1 (fields)
+            278 CONTAINS_OP              0
+            280 POP_JUMP_IF_FALSE       24 (to 330)
+            282 LOAD_FAST                1 (fields)
+            284 LOAD_CONST               8 ('dialect')
+            286 BINARY_SUBSCR
+            290 POP_JUMP_IF_FALSE       19 (to 330)
+
+323         292 LOAD_GLOBAL             17 (NULL + _clean_dialect)
+            302 LOAD_FAST                1 (fields)
+            304 LOAD_CONST               8 ('dialect')
+            306 BINARY_SUBSCR
+            310 CALL                     1
+            318 LOAD_FAST                3 (row)
+            320 STORE_ATTR               9 (dialect)
+
+324     >>  330 LOAD_CONST               9 ('base_url')
+            332 LOAD_FAST                1 (fields)
+            334 CONTAINS_OP              0
+            336 POP_JUMP_IF_FALSE       24 (to 386)
+            338 LOAD_FAST                1 (fields)
+            340 LOAD_CONST               9 ('base_url')
+            342 BINARY_SUBSCR
+            346 POP_JUMP_IF_FALSE       19 (to 386)
+
+325         348 LOAD_GLOBAL             21 (NULL + _clean_base_url)
+            358 LOAD_FAST                1 (fields)
+            360 LOAD_CONST               9 ('base_url')
+            362 BINARY_SUBSCR
+            366 CALL                     1
+            374 LOAD_FAST                3 (row)
+            376 STORE_ATTR              11 (base_url)
+
+326     >>  386 LOAD_CONST              10 ('preset_key')
+            388 LOAD_FAST                1 (fields)
+            390 CONTAINS_OP              0
+            392 POP_JUMP_IF_FALSE       32 (to 458)
+
+327         394 LOAD_FAST                1 (fields)
+            396 LOAD_CONST              10 ('preset_key')
+            398 BINARY_SUBSCR
+            402 COPY                     1
+            404 POP_JUMP_IF_TRUE         2 (to 410)
+            406 POP_TOP
+            408 LOAD_CONST               1 ('')
+        >>  410 LOAD_ATTR                7 (NULL|self + strip)
+            430 CALL                     0
+            438 COPY                     1
+            440 POP_JUMP_IF_TRUE         2 (to 446)
+            442 POP_TOP
+            444 LOAD_CONST               2 (None)
+        >>  446 LOAD_FAST                3 (row)
+            448 STORE_ATTR              12 (preset_key)
+
+328     >>  458 LOAD_FAST                1 (fields)
+            460 LOAD_ATTR                3 (NULL|self + get)
+            480 LOAD_CONST              11 ('clear_key')
+            482 CALL                     1
+            490 POP_JUMP_IF_FALSE        8 (to 508)
+
+329         492 LOAD_CONST               2 (None)
+            494 LOAD_FAST                3 (row)
+            496 STORE_ATTR              13 (api_key_enc)
+            506 JUMP_FORWARD            68 (to 644)
+
+330     >>  508 LOAD_FAST                1 (fields)
+            510 LOAD_ATTR                3 (NULL|self + get)
+            530 LOAD_CONST              12 ('api_key')
+            532 CALL                     1
+            540 COPY                     1
+            542 POP_JUMP_IF_TRUE         2 (to 548)
+            544 POP_TOP
+            546 LOAD_CONST               1 ('')
+        >>  548 LOAD_ATTR                7 (NULL|self + strip)
+            568 CALL                     0
+            576 POP_JUMP_IF_FALSE       33 (to 644)
+
+331         578 LOAD_GLOBAL             29 (NULL + encrypt_secret)
+            588 LOAD_FAST                1 (fields)
+            590 LOAD_CONST              12 ('api_key')
+            592 BINARY_SUBSCR
+            596 LOAD_ATTR                7 (NULL|self + strip)
+            616 CALL                     0
+            624 CALL                     1
+            632 LOAD_FAST                3 (row)
+            634 STORE_ATTR              13 (api_key_enc)
+
+332     >>  644 LOAD_CONST              13 ('headers')
+            646 LOAD_FAST                1 (fields)
+            648 CONTAINS_OP              0
+            650 POP_JUMP_IF_FALSE       19 (to 690)
+
+333         652 LOAD_GLOBAL             31 (NULL + _encode_headers)
+            662 LOAD_FAST                1 (fields)
+            664 LOAD_CONST              13 ('headers')
+            666 BINARY_SUBSCR
+            670 CALL                     1
+            678 LOAD_FAST                3 (row)
+            680 STORE_ATTR              16 (headers_enc)
+
+334     >>  690 LOAD_FAST                1 (fields)
+            692 LOAD_ATTR                3 (NULL|self + get)
+            712 LOAD_CONST              14 ('models')
+            714 CALL                     1
+            722 POP_JUMP_IF_NONE        89 (to 902)
+
+335         724 LOAD_GLOBAL             35 (NULL + _clean_models)
+            734 LOAD_FAST                1 (fields)
+            736 LOAD_CONST              14 ('models')
+            738 BINARY_SUBSCR
+            742 CALL                     1
+            750 STORE_FAST               4 (clean_models)
+
+336         752 LOAD_GLOBAL             37 (NULL + json)
+            762 LOAD_ATTR               38 (dumps)
+            782 LOAD_FAST                4 (clean_models)
+            784 LOAD_CONST              15 (False)
+            786 KW_NAMES                16 (('ensure_ascii',))
+            788 CALL                     2
+            796 LOAD_FAST                3 (row)
+            798 STORE_ATTR              20 (models_json)
+
+339         808 LOAD_GLOBAL             43 (NULL + _pick_default)
+
+340         818 LOAD_FAST                1 (fields)
+            820 LOAD_ATTR                3 (NULL|self + get)
+            840 LOAD_CONST              17 ('default_model')
+            842 CALL                     1
+            850 COPY                     1
+            852 POP_JUMP_IF_TRUE        12 (to 878)
+            854 POP_TOP
+            856 LOAD_FAST                3 (row)
+            858 LOAD_ATTR               44 (default_model)
+        >>  878 LOAD_FAST                4 (clean_models)
+
+339         880 CALL                     2
+            888 LOAD_FAST                3 (row)
+            890 STORE_ATTR              22 (default_model)
+            900 JUMP_FORWARD            46 (to 994)
+
+341     >>  902 LOAD_FAST                1 (fields)
+            904 LOAD_ATTR                3 (NULL|self + get)
+            924 LOAD_CONST              17 ('default_model')
+            926 CALL                     1
+            934 POP_JUMP_IF_FALSE       29 (to 994)
+
+342         936 LOAD_GLOBAL             43 (NULL + _pick_default)
+            946 LOAD_FAST                1 (fields)
+            948 LOAD_CONST              17 ('default_model')
+            950 BINARY_SUBSCR
+            954 LOAD_GLOBAL             47 (NULL + _models_of)
+            964 LOAD_FAST                3 (row)
+            966 CALL                     1
+            974 CALL                     2
+            982 LOAD_FAST                3 (row)
+            984 STORE_ATTR              22 (default_model)
+
+343     >>  994 LOAD_FAST                1 (fields)
+            996 LOAD_ATTR                3 (NULL|self + get)
+           1016 LOAD_CONST              18 ('timeout_s')
+           1018 CALL                     1
+           1026 POP_JUMP_IF_NONE        48 (to 1124)
+
+344        1028 LOAD_GLOBAL             49 (NULL + max)
+           1038 LOAD_GLOBAL             50 (MIN_TIMEOUT_S)
+
+345        1048 LOAD_GLOBAL             53 (NULL + min)
+           1058 LOAD_GLOBAL             54 (MAX_TIMEOUT_S)
+           1068 LOAD_GLOBAL             57 (NULL + _pos_int)
+           1078 LOAD_FAST                1 (fields)
+           1080 LOAD_CONST              18 ('timeout_s')
+           1082 BINARY_SUBSCR
+           1086 LOAD_CONST              19 (300)
+           1088 CALL                     2
+           1096 CALL                     2
+
+344        1104 CALL                     2
+           1112 LOAD_FAST                3 (row)
+           1114 STORE_ATTR              29 (timeout_s)
+
+346     >> 1124 LOAD_FAST                1 (fields)
+           1126 LOAD_ATTR                3 (NULL|self + get)
+           1146 LOAD_CONST              20 ('enabled')
+           1148 CALL                     1
+           1156 POP_JUMP_IF_NONE        14 (to 1186)
+
+347        1158 LOAD_FAST                1 (fields)
+           1160 LOAD_CONST              20 ('enabled')
+           1162 BINARY_SUBSCR
+           1166 POP_JUMP_IF_FALSE        2 (to 1172)
+           1168 LOAD_CONST              21 (1)
+           1170 JUMP_FORWARD             1 (to 1174)
+        >> 1172 LOAD_CONST              22 (0)
+        >> 1174 LOAD_FAST                3 (row)
+           1176 STORE_ATTR              30 (enabled)
+
+349     >> 1186 LOAD_FAST                2 (db)
+           1188 LOAD_ATTR               63 (NULL|self + commit)
+           1208 CALL                     0
+           1216 POP_TOP
+
+350        1218 LOAD_FAST                2 (db)
+           1220 LOAD_ATTR               65 (NULL|self + refresh)
+           1240 LOAD_FAST                3 (row)
+           1242 CALL                     1
+           1250 POP_TOP
+
+351        1252 LOAD_GLOBAL             67 (NULL + to_public)
+           1262 LOAD_FAST                3 (row)
+           1264 CALL                     1
+
+314        1272 SWAP                     2
+           1274 LOAD_CONST               2 (None)
+           1276 LOAD_CONST               2 (None)
+           1278 LOAD_CONST               2 (None)
+           1280 CALL                     2
+           1288 POP_TOP
+           1290 RETURN_VALUE
+        >> 1292 PUSH_EXC_INFO
+           1294 WITH_EXCEPT_START
+           1296 POP_JUMP_IF_TRUE         1 (to 1300)
+           1298 RERAISE                  2
+        >> 1300 POP_TOP
+           1302 POP_EXCEPT
+           1304 POP_TOP
+           1306 POP_TOP
+           1308 RETURN_CONST             2 (None)
+        >> 1310 COPY                     3
+           1312 POP_EXCEPT
+           1314 RERAISE                  1
+ExceptionTable:
+  22 to 1270 -> 1292 [1] lasti
+  1292 to 1300 -> 1310 [3] lasti
+
+Disassembly of <code object delete at 0x7f6c9269a1f0, file "app\services\llm_endpoint_store.py", line 354>:
+354           0 RESUME                   0
+
+355           2 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             12 CALL                     0
+             20 BEFORE_WITH
+             22 STORE_FAST               1 (db)
+
+356          24 LOAD_FAST                1 (db)
+             26 LOAD_ATTR                3 (NULL|self + get)
+             46 LOAD_GLOBAL              4 (LlmEndpoint)
+             56 LOAD_FAST                0 (endpoint_id)
+             58 COPY                     1
+             60 POP_JUMP_IF_TRUE         2 (to 66)
+             62 POP_TOP
+             64 LOAD_CONST               1 ('')
+        >>   66 LOAD_ATTR                7 (NULL|self + strip)
+             86 CALL                     0
+             94 CALL                     2
+            102 STORE_FAST               2 (row)
+
+357         104 LOAD_FAST                2 (row)
+            106 POP_JUMP_IF_NOT_NONE    10 (to 128)
+
+358         108 NOP
+
+355         110 LOAD_CONST               0 (None)
+            112 LOAD_CONST               0 (None)
+            114 LOAD_CONST               0 (None)
+            116 CALL                     2
+            124 POP_TOP
+            126 RETURN_CONST             2 (False)
+
+359     >>  128 LOAD_FAST                1 (db)
+            130 LOAD_ATTR                9 (NULL|self + delete)
+            150 LOAD_FAST                2 (row)
+            152 CALL                     1
+            160 POP_TOP
+
+360         162 LOAD_FAST                1 (db)
+            164 LOAD_ATTR               11 (NULL|self + commit)
+            184 CALL                     0
+            192 POP_TOP
+
+355         194 LOAD_CONST               0 (None)
+            196 LOAD_CONST               0 (None)
+            198 LOAD_CONST               0 (None)
+            200 CALL                     2
+            208 POP_TOP
+
+361     >>  210 LOAD_GLOBAL             13 (NULL + log)
+            220 LOAD_ATTR               14 (info)
+            240 LOAD_CONST               3 ('[llm_endpoint] xoá ')
+            242 LOAD_FAST                0 (endpoint_id)
+            244 FORMAT_VALUE             0
+            246 BUILD_STRING             2
+            248 CALL                     1
+            256 POP_TOP
+
+362         258 RETURN_CONST             4 (True)
+
+355     >>  260 PUSH_EXC_INFO
+            262 WITH_EXCEPT_START
+            264 POP_JUMP_IF_TRUE         1 (to 268)
+            266 RERAISE                  2
+        >>  268 POP_TOP
+            270 POP_EXCEPT
+            272 POP_TOP
+            274 POP_TOP
+            276 JUMP_BACKWARD           34 (to 210)
+        >>  278 COPY                     3
+            280 POP_EXCEPT
+            282 RERAISE                  1
+ExceptionTable:
+  22 to 108 -> 260 [1] lasti
+  128 to 192 -> 260 [1] lasti
+  260 to 268 -> 278 [3] lasti
+
+Disassembly of <code object usages_of at 0x26a192d0, file "app\services\llm_endpoint_store.py", line 367>:
+              0 MAKE_CELL               15 (prefix)
+
+367           2 RESUME                   0
+
+374           4 LOAD_CONST               1 (0)
+              6 LOAD_CONST               2 (('Project', 'ScheduleConfig', 'Setting'))
+              8 IMPORT_NAME              0 (app.db.models)
+             10 IMPORT_FROM              1 (Project)
+             12 STORE_FAST               1 (Project)
+             14 IMPORT_FROM              2 (ScheduleConfig)
+             16 STORE_FAST               2 (ScheduleConfig)
+             18 IMPORT_FROM              3 (Setting)
+             20 STORE_FAST               3 (Setting)
+             22 POP_TOP
+
+376          24 LOAD_CONST               3 ('api:')
+             26 LOAD_FAST                0 (endpoint_id)
+             28 COPY                     1
+             30 POP_JUMP_IF_TRUE         2 (to 36)
+             32 POP_TOP
+             34 LOAD_CONST               4 ('')
+        >>   36 LOAD_ATTR                9 (NULL|self + strip)
+             56 CALL                     0
+             64 FORMAT_VALUE             0
+             66 BUILD_STRING             2
+             68 STORE_DEREF             15 (prefix)
+
+378          70 LOAD_CONST              12 (('return', 'bool'))
+             72 LOAD_CLOSURE            15 (prefix)
+             74 BUILD_TUPLE              1
+             76 LOAD_CONST               5 (<code object _hits at 0x7f6c92151f70, file "app\services\llm_endpoint_store.py", line 378>)
+             78 MAKE_FUNCTION           12 (annotations, closure)
+             80 STORE_FAST               4 (_hits)
+
+382          82 BUILD_LIST               0
+             84 STORE_FAST               5 (out)
+
+383          86 LOAD_GLOBAL             11 (NULL + SessionLocal)
+             96 CALL                     0
+            104 BEFORE_WITH
+            106 STORE_FAST               6 (db)
+
+384         108 LOAD_CONST               6 ((('translate_provider', 'Cài đặt chung — AI dịch/ý tưởng'), ('competitor_llm_provider', 'Phân tích đối thủ')))
+            110 GET_ITER
+        >>  112 FOR_ITER                65 (to 246)
+            116 UNPACK_SEQUENCE          2
+            120 STORE_FAST               7 (key)
+            122 STORE_FAST               8 (where)
+
+386         124 LOAD_FAST                6 (db)
+            126 LOAD_ATTR               13 (NULL|self + get)
+            146 LOAD_FAST                3 (Setting)
+            148 LOAD_FAST                7 (key)
+            150 CALL                     2
+            158 STORE_FAST               9 (row)
+
+387         160 LOAD_FAST                9 (row)
+            162 POP_JUMP_IF_TRUE         1 (to 166)
+            164 JUMP_BACKWARD           27 (to 112)
+        >>  166 PUSH_NULL
+            168 LOAD_FAST                4 (_hits)
+            170 LOAD_FAST                9 (row)
+            172 LOAD_ATTR               14 (value)
+            192 CALL                     1
+            200 POP_JUMP_IF_TRUE         1 (to 204)
+            202 JUMP_BACKWARD           46 (to 112)
+
+388     >>  204 LOAD_FAST                5 (out)
+            206 LOAD_ATTR               17 (NULL|self + append)
+            226 LOAD_FAST                8 (where)
+            228 LOAD_FAST                7 (key)
+            230 LOAD_CONST               7 (('where', 'setting'))
+            232 BUILD_CONST_KEY_MAP      2
+            234 CALL                     1
+            242 POP_TOP
+            244 JUMP_BACKWARD           67 (to 112)
+
+384     >>  246 END_FOR
+
+390         248 LOAD_FAST                6 (db)
+            250 LOAD_ATTR               19 (NULL|self + query)
+            270 LOAD_FAST                2 (ScheduleConfig)
+            272 LOAD_FAST                1 (Project)
+            274 LOAD_ATTR               20 (name)
+            294 CALL                     2
+
+391         302 LOAD_ATTR               23 (NULL|self + join)
+            322 LOAD_FAST                1 (Project)
+            324 LOAD_FAST                1 (Project)
+            326 LOAD_ATTR               24 (id)
+            346 LOAD_FAST                2 (ScheduleConfig)
+            348 LOAD_ATTR               26 (project_id)
+            368 COMPARE_OP              40 (==)
+            372 CALL                     2
+            380 LOAD_ATTR               29 (NULL|self + all)
+            400 CALL                     0
+
+390         408 STORE_FAST              10 (rows)
+
+392         410 LOAD_FAST               10 (rows)
+            412 GET_ITER
+        >>  414 FOR_ITER               124 (to 666)
+            418 UNPACK_SEQUENCE          2
+            422 STORE_FAST              11 (sched)
+            424 STORE_FAST              12 (project_name)
+
+393         426 NOP
+
+394         428 LOAD_GLOBAL             31 (NULL + json)
+            438 LOAD_ATTR               32 (loads)
+            458 LOAD_FAST               11 (sched)
+            460 LOAD_ATTR               34 (channel_profile_json)
+            480 COPY                     1
+            482 POP_JUMP_IF_TRUE         2 (to 488)
+            484 POP_TOP
+            486 LOAD_CONST               8 ('{}')
+        >>  488 CALL                     1
+            496 STORE_FAST              13 (profile)
+
+397         498 LOAD_GLOBAL             41 (NULL + isinstance)
+            508 LOAD_FAST               13 (profile)
+            510 LOAD_GLOBAL             42 (dict)
+            520 CALL                     2
+            528 POP_JUMP_IF_TRUE         1 (to 532)
+
+398         530 JUMP_BACKWARD           59 (to 414)
+
+399     >>  532 LOAD_CONST               9 ((('provider', 'AI viết nội dung của kênh'), ('script_audit_provider', 'AI chấm điểm kịch bản của kênh')))
+            534 GET_ITER
+        >>  536 FOR_ITER                61 (to 662)
+            540 UNPACK_SEQUENCE          2
+            544 STORE_FAST              14 (field)
+            546 STORE_FAST               8 (where)
+
+401         548 PUSH_NULL
+            550 LOAD_FAST                4 (_hits)
+            552 LOAD_FAST               13 (profile)
+            554 LOAD_ATTR               13 (NULL|self + get)
+            574 LOAD_FAST               14 (field)
+            576 CALL                     1
+            584 CALL                     1
+            592 POP_JUMP_IF_TRUE         1 (to 596)
+            594 JUMP_BACKWARD           30 (to 536)
+
+402     >>  596 LOAD_FAST                5 (out)
+            598 LOAD_ATTR               17 (NULL|self + append)
+            618 LOAD_FAST                8 (where)
+            620 LOAD_FAST               11 (sched)
+            622 LOAD_ATTR               26 (project_id)
+
+403         642 LOAD_FAST               12 (project_name)
+            644 LOAD_FAST               14 (field)
+
+402         646 LOAD_CONST              10 (('where', 'project_id', 'project_name', 'field'))
+            648 BUILD_CONST_KEY_MAP      4
+            650 CALL                     1
+            658 POP_TOP
+            660 JUMP_BACKWARD           63 (to 536)
+
+399     >>  662 END_FOR
+            664 JUMP_BACKWARD          126 (to 414)
+
+392     >>  666 END_FOR
+            668 NOP
+
+383         670 LOAD_CONST              11 (None)
+            672 LOAD_CONST              11 (None)
+            674 LOAD_CONST              11 (None)
+            676 CALL                     2
+            684 POP_TOP
+
+404         686 LOAD_FAST                5 (out)
+            688 RETURN_VALUE
+        >>  690 PUSH_EXC_INFO
+
+395         692 LOAD_GLOBAL             36 (TypeError)
+            702 LOAD_GLOBAL             38 (ValueError)
+            712 BUILD_TUPLE              2
+            714 CHECK_EXC_MATCH
+            716 POP_JUMP_IF_FALSE        3 (to 724)
+            718 POP_TOP
+
+396         720 POP_EXCEPT
+            722 JUMP_BACKWARD          155 (to 414)
+
+395     >>  724 RERAISE                  0
+        >>  726 COPY                     3
+            728 POP_EXCEPT
+            730 RERAISE                  1
+
+383     >>  732 PUSH_EXC_INFO
+            734 WITH_EXCEPT_START
+            736 POP_JUMP_IF_TRUE         1 (to 740)
+            738 RERAISE                  2
+        >>  740 POP_TOP
+            742 POP_EXCEPT
+            744 POP_TOP
+            746 POP_TOP
+
+404         748 LOAD_FAST                5 (out)
+            750 RETURN_VALUE
+        >>  752 COPY                     3
+            754 POP_EXCEPT
+            756 RERAISE                  1
+ExceptionTable:
+  106 to 162 -> 732 [1] lasti
+  166 to 200 -> 732 [1] lasti
+  204 to 424 -> 732 [1] lasti
+  428 to 496 -> 690 [2]
+  498 to 592 -> 732 [1] lasti
+  596 to 666 -> 732 [1] lasti
+  690 to 718 -> 726 [3] lasti
+  720 to 722 -> 732 [1] lasti
+  724 to 724 -> 726 [3] lasti
+  726 to 730 -> 732 [1] lasti
+  732 to 740 -> 752 [3] lasti
+
+Disassembly of <code object _hits at 0x7f6c92151f70, file "app\services\llm_endpoint_store.py", line 378>:
+              0 COPY_FREE_VARS           1
+
+378           2 RESUME                   0
+
+379           4 LOAD_GLOBAL              1 (NULL + str)
+             14 LOAD_FAST                0 (value)
+             16 COPY                     1
+             18 POP_JUMP_IF_TRUE         2 (to 24)
+             20 POP_TOP
+             22 LOAD_CONST               1 ('')
+        >>   24 CALL                     1
+             32 LOAD_ATTR                3 (NULL|self + strip)
+             52 CALL                     0
+             60 STORE_FAST               1 (text)
+
+380          62 LOAD_FAST                1 (text)
+             64 LOAD_DEREF               2 (prefix)
+             66 COMPARE_OP              40 (==)
+             70 COPY                     1
+             72 POP_JUMP_IF_TRUE        20 (to 114)
+             74 POP_TOP
+             76 LOAD_FAST                1 (text)
+             78 LOAD_ATTR                5 (NULL|self + startswith)
+             98 LOAD_DEREF               2 (prefix)
+            100 LOAD_CONST               2 ('/')
+            102 BINARY_OP                0 (+)
+            106 CALL                     1
+        >>  114 RETURN_VALUE

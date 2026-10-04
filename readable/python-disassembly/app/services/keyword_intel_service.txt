@@ -1,0 +1,4442 @@
+  0           0 RESUME                   0
+
+  1           2 SETUP_ANNOTATIONS
+              4 LOAD_CONST               0 ('Key Ngon — Keyword Intelligence: từ khóa → search → GOM CỤM ngách → đo cầu/cạnh tranh/cơ hội.\n\nLuồng (plan v2 §4): user dán N từ khóa (hoặc nở rộng bằng autocomplete) → mỗi keyword search top-M\nvideo (yt-dlp free — mặc định; Data API khi bật "chính xác") → 1 LLM call gom cụm → metric mỗi cụm\ntính LOCAL (pure function, test được):\n  - avg/median views          → CẦU của ngách\n  - competition (dominance)   → 1 kênh chiếm bao nhiêu % video top → ngách bị thống trị chưa\n  - opportunity 0..100        → cầu cao + chưa bị thống trị = ngách mở\n\nChạy như background task bền trong Queue (step_name="keyword_scan") — nhiều keyword là việc dài,\nuser rời trang tiến trình vẫn chạy, kết quả lưu bảng `keyword_scans` (mở lại từ lịch sử).\n')
+              6 STORE_NAME               0 (__doc__)
+
+ 13           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('annotations',))
+             12 IMPORT_NAME              1 (__future__)
+             14 IMPORT_FROM              2 (annotations)
+             16 STORE_NAME               2 (annotations)
+             18 POP_TOP
+
+ 15          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               3 (None)
+             24 IMPORT_NAME              3 (asyncio)
+             26 STORE_NAME               3 (asyncio)
+
+ 16          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               3 (None)
+             32 IMPORT_NAME              4 (json)
+             34 STORE_NAME               4 (json)
+
+ 17          36 LOAD_CONST               1 (0)
+             38 LOAD_CONST               3 (None)
+             40 IMPORT_NAME              5 (math)
+             42 STORE_NAME               5 (math)
+
+ 18          44 LOAD_CONST               1 (0)
+             46 LOAD_CONST               4 (('Counter',))
+             48 IMPORT_NAME              6 (collections)
+             50 IMPORT_FROM              7 (Counter)
+             52 STORE_NAME               7 (Counter)
+             54 POP_TOP
+
+ 19          56 LOAD_CONST               1 (0)
+             58 LOAD_CONST               5 (('Callable',))
+             60 IMPORT_NAME              8 (typing)
+             62 IMPORT_FROM              9 (Callable)
+             64 STORE_NAME               9 (Callable)
+             66 POP_TOP
+
+ 21          68 LOAD_CONST               1 (0)
+             70 LOAD_CONST               6 (('Session',))
+             72 IMPORT_NAME             10 (sqlalchemy.orm)
+             74 IMPORT_FROM             11 (Session)
+             76 STORE_NAME              11 (Session)
+             78 POP_TOP
+
+ 23          80 LOAD_CONST               1 (0)
+             82 LOAD_CONST               7 (('youtube_search',))
+             84 IMPORT_NAME             12 (app.adapters)
+             86 IMPORT_FROM             13 (youtube_search)
+             88 STORE_NAME              13 (youtube_search)
+             90 POP_TOP
+
+ 24          92 LOAD_CONST               1 (0)
+             94 LOAD_CONST               8 (('youtube_data_api',))
+             96 IMPORT_NAME             12 (app.adapters)
+             98 IMPORT_FROM             14 (youtube_data_api)
+            100 STORE_NAME              15 (data_api)
+            102 POP_TOP
+
+ 25         104 LOAD_CONST               1 (0)
+            106 LOAD_CONST               9 (('complete_text',))
+            108 IMPORT_NAME             16 (app.adapters.ai_provider)
+            110 IMPORT_FROM             17 (complete_text)
+            112 STORE_NAME              17 (complete_text)
+            114 POP_TOP
+
+ 26         116 LOAD_CONST               1 (0)
+            118 LOAD_CONST              10 (('make_error', 'E', 'StudioError'))
+            120 IMPORT_NAME             18 (app.core.errors)
+            122 IMPORT_FROM             19 (make_error)
+            124 STORE_NAME              19 (make_error)
+            126 IMPORT_FROM             20 (E)
+            128 STORE_NAME              20 (E)
+            130 IMPORT_FROM             21 (StudioError)
+            132 STORE_NAME              21 (StudioError)
+            134 POP_TOP
+
+ 27         136 LOAD_CONST               1 (0)
+            138 LOAD_CONST              11 (('log',))
+            140 IMPORT_NAME             22 (app.core.logging)
+            142 IMPORT_FROM             23 (log)
+            144 STORE_NAME              23 (log)
+            146 POP_TOP
+
+ 28         148 LOAD_CONST               1 (0)
+            150 LOAD_CONST              12 (('Job', 'KeywordScan'))
+            152 IMPORT_NAME             24 (app.db.models)
+            154 IMPORT_FROM             25 (Job)
+            156 STORE_NAME              25 (Job)
+            158 IMPORT_FROM             26 (KeywordScan)
+            160 STORE_NAME              26 (KeywordScan)
+            162 POP_TOP
+
+ 29         164 LOAD_CONST               1 (0)
+            166 LOAD_CONST              13 (('SessionLocal',))
+            168 IMPORT_NAME             27 (app.db.session)
+            170 IMPORT_FROM             28 (SessionLocal)
+            172 STORE_NAME              28 (SessionLocal)
+            174 POP_TOP
+
+ 30         176 LOAD_CONST               1 (0)
+            178 LOAD_CONST              14 (('ideation_service',))
+            180 IMPORT_NAME             29 (app.services)
+            182 IMPORT_FROM             30 (ideation_service)
+            184 STORE_NAME              30 (ideation_service)
+            186 POP_TOP
+
+ 32         188 LOAD_CONST              15 (2)
+            190 STORE_NAME              31 (_SEARCH_CONCURRENCY)
+
+ 33         192 LOAD_CONST              16 (40)
+            194 STORE_NAME              32 (_MAX_KEYWORDS)
+
+ 34         196 LOAD_CONST              17 (8)
+            198 STORE_NAME              33 (_CLUSTER_VIDEO_SAMPLE)
+
+ 35         200 LOAD_CONST              18 (6)
+            202 STORE_NAME              34 (_CLUSTER_CHANNEL_SAMPLE)
+
+ 38         204 LOAD_CONST              19 ((2, 5))
+            206 LOAD_CONST              20 ((3, 8))
+            208 LOAD_CONST              21 ((5, 14))
+            210 LOAD_CONST              22 (('light', 'medium', 'deep'))
+            212 BUILD_CONST_KEY_MAP      3
+            214 STORE_NAME              35 (_DEPTHS)
+
+ 43         216 LOAD_CONST              71 (('values', 'list[float]', 'return', 'float'))
+            218 LOAD_CONST              23 (<code object _median at 0x7f6c9234e4f0, file "app\services\keyword_intel_service.py", line 43>)
+            220 MAKE_FUNCTION            4 (annotations)
+            222 STORE_NAME              36 (_median)
+
+ 52         224 LOAD_CONST              72 (('videos', 'list[dict]', 'return', 'dict'))
+            226 LOAD_CONST              24 (<code object keyword_stats at 0x28c50010, file "app\services\keyword_intel_service.py", line 52>)
+            228 MAKE_FUNCTION            4 (annotations)
+            230 STORE_NAME              37 (keyword_stats)
+
+ 69         232 LOAD_CONST              25 (0.4)
+            234 STORE_NAME              38 (_W_DEMAND)
+
+ 70         236 LOAD_CONST              26 (0.25)
+            238 STORE_NAME              39 (_W_OPENNESS)
+
+ 71         240 LOAD_CONST              27 (0.2)
+            242 STORE_NAME              40 (_W_SMALLWIN)
+
+ 72         244 LOAD_CONST              28 (0.15)
+            246 STORE_NAME              41 (_W_FRESHNESS)
+
+ 73         248 LOAD_CONST              29 (1000000)
+            250 STORE_NAME              42 (_DEMAND_SATURATION_VIEWS)
+
+ 76         252 LOAD_CONST              30 (5)
+            254 STORE_NAME              43 (_MIN_CONFIDENT_VIDEOS)
+
+ 78         256 LOAD_CONST              31 (1.0)
+            258 STORE_NAME              44 (_SMALLWIN_VPS)
+
+ 79         260 LOAD_CONST              32 (50000)
+            262 STORE_NAME              45 (_SMALL_CHANNEL_SUBS)
+
+ 80         264 LOAD_CONST              33 (365)
+            266 STORE_NAME              46 (_RECENT_DAYS)
+
+ 81         268 LOAD_CONST              26 (0.25)
+            270 STORE_NAME              47 (_DORMANT_RECENT_SHARE)
+
+ 83         272 LOAD_CONST              34 ('Khác')
+            274 LOAD_CONST              35 ('Other')
+            276 LOAD_CONST              36 (('vi', 'en'))
+            278 BUILD_CONST_KEY_MAP      2
+            280 STORE_NAME              48 (_LEFTOVER_NAME)
+
+ 86         282 LOAD_CONST              73 (('counts', 'list[int]', 'return', 'float'))
+            284 LOAD_CONST              37 (<code object _hhi at 0x7f6c926fb660, file "app\services\keyword_intel_service.py", line 86>)
+            286 MAKE_FUNCTION            4 (annotations)
+            288 STORE_NAME              49 (_hhi)
+
+ 98         290 LOAD_CONST              74 (('video', 'dict', 'now_ts', 'float', 'return', 'float | None'))
+            292 LOAD_CONST              38 (<code object _age_days at 0x7f6c92151bb0, file "app\services\keyword_intel_service.py", line 98>)
+            294 MAKE_FUNCTION            4 (annotations)
+            296 STORE_NAME              50 (_age_days)
+
+108         298 LOAD_CONST              39 (('view_count', 'like_count', 'comment_count', 'duration', 'timestamp', 'channel_id', 'is_short'))
+            300 STORE_NAME              51 (_ENRICH_FIELDS)
+
+111         302 LOAD_CONST              40 (('view_count', 'timestamp'))
+            304 STORE_NAME              52 (_ENRICH_REQUIRED)
+
+114         306 LOAD_CONST              75 (('kw_videos', 'dict[str, list[dict]]', 'return', 'list[str]'))
+            308 LOAD_CONST              41 (<code object ids_needing_enrichment at 0x7f6c9269a790, file "app\services\keyword_intel_service.py", line 114>)
+            310 MAKE_FUNCTION            4 (annotations)
+            312 STORE_NAME              53 (ids_needing_enrichment)
+
+133         314 LOAD_CONST              76 (('kw_videos', 'dict[str, list[dict]]', 'metas', 'list[dict]', 'return', 'None'))
+            316 LOAD_CONST              42 (<code object apply_video_metas at 0x28c4b870, file "app\services\keyword_intel_service.py", line 133>)
+            318 MAKE_FUNCTION            4 (annotations)
+            320 STORE_NAME              54 (apply_video_metas)
+
+146         322 LOAD_CONST              77 (('video', 'dict', 'return', 'float | None'))
+            324 LOAD_CONST              43 (<code object _views_per_sub at 0x7f6c92456430, file "app\services\keyword_intel_service.py", line 146>)
+            326 MAKE_FUNCTION            4 (annotations)
+            328 STORE_NAME              55 (_views_per_sub)
+
+157         330 LOAD_CONST               3 (None)
+            332 LOAD_CONST              44 ('vi')
+
+156         334 LOAD_CONST              45 (('now_ts', 'language'))
+            336 BUILD_CONST_KEY_MAP      2
+
+157         338 NOP
+
+156         340 NOP
+
+157         342 NOP
+
+156         344 NOP
+
+157         346 NOP
+
+156         348 LOAD_CONST              78 (('assignments', 'list[dict]', 'kw_videos', 'dict[str, list[dict]]', 'now_ts', 'float | None', 'language', 'str', 'return', 'dict'))
+            350 LOAD_CONST              46 (<code object cluster_report at 0x28c58c60, file "app\services\keyword_intel_service.py", line 156>)
+            352 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            354 STORE_NAME              56 (cluster_report)
+
+257         356 LOAD_CONST              79 (('v', 'dict', 'return', 'dict'))
+            358 LOAD_CONST              47 (<code object _slim_video at 0x7f6c926fb990, file "app\services\keyword_intel_service.py", line 257>)
+            360 MAKE_FUNCTION            4 (annotations)
+            362 STORE_NAME              57 (_slim_video)
+
+265         364 LOAD_CONST              80 (('kw_data', 'list[dict]', 'depth', 'str', 'language', 'str', 'return', 'tuple[str, str]'))
+            366 LOAD_CONST              48 (<code object _cluster_messages at 0x28bd2400, file "app\services\keyword_intel_service.py", line 265>)
+            368 MAKE_FUNCTION            4 (annotations)
+            370 STORE_NAME              58 (_cluster_messages)
+
+290         372 LOAD_CONST              44 ('vi')
+
+291         374 LOAD_CONST              49 (15)
+
+290         376 LOAD_CONST              50 (('language', 'limit'))
+            378 BUILD_CONST_KEY_MAP      2
+
+291         380 NOP
+
+290         382 NOP
+
+291         384 NOP
+
+290         386 LOAD_CONST              81 (('profile', 'dict | None', 'language', 'str', 'limit', 'int', 'return', 'dict'))
+            388 LOAD_CONST              51 (<code object seed_keywords_from_channel at 0x28c522e0, file "app\services\keyword_intel_service.py", line 290>)
+            390 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            392 STORE_NAME              59 (seed_keywords_from_channel)
+
+332         394 NOP
+
+333         396 NOP
+
+332         398 NOP
+
+333         400 NOP
+
+332         402 LOAD_CONST              82 (('kw_data', 'list[dict]', 'depth', 'str', 'language', 'str', 'provider', 'str | None', 'return', 'list[dict]'))
+            404 LOAD_CONST              52 (<code object _cluster_with_llm at 0x28c4f9a0, file "app\services\keyword_intel_service.py", line 332>)
+            406 MAKE_FUNCTION            4 (annotations)
+            408 STORE_NAME              60 (_cluster_with_llm)
+
+347         410 LOAD_CONST              53 ('VN')
+            412 LOAD_CONST              30 (5)
+
+348         414 LOAD_CONST              54 ('medium')
+            416 LOAD_CONST               3 (None)
+            418 LOAD_CONST              55 (False)
+
+349         420 LOAD_CONST              44 ('vi')
+            422 LOAD_CONST               3 (None)
+
+347         424 LOAD_CONST              56 (('region', 'per_keyword', 'depth', 'period', 'precise', 'language', 'provider'))
+            426 BUILD_CONST_KEY_MAP      7
+
+348         428 NOP
+
+347         430 NOP
+
+348         432 NOP
+
+347         434 NOP
+
+348         436 NOP
+
+347         438 NOP
+
+349         440 NOP
+
+347         442 NOP
+
+349         444 NOP
+
+347         446 NOP
+
+349         448 NOP
+
+347         450 LOAD_CONST              83 (('db', 'Session', 'keywords', 'list[str]', 'region', 'str', 'per_keyword', 'int', 'depth', 'str', 'period', 'str | None', 'precise', 'bool', 'language', 'str', 'provider', 'str | None', 'return', 'dict'))
+            452 LOAD_CONST              57 (<code object start_scan at 0x28c51e30, file "app\services\keyword_intel_service.py", line 347>)
+            454 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            456 STORE_NAME              61 (start_scan)
+
+383         458 PUSH_NULL
+            460 LOAD_NAME               62 (set)
+            462 CALL                     0
+            470 STORE_NAME              63 (_PENDING_ENQUEUES)
+            472 LOAD_CONST              58 ('set')
+            474 LOAD_NAME               64 (__annotations__)
+            476 LOAD_CONST              59 ('_PENDING_ENQUEUES')
+            478 STORE_SUBSCR
+
+386         482 LOAD_CONST               3 (None)
+
+387         484 LOAD_CONST               3 (None)
+
+386         486 LOAD_CONST              60 (('progress', 'cancel_check'))
+            488 BUILD_CONST_KEY_MAP      2
+
+387         490 NOP
+
+386         492 NOP
+
+387         494 NOP
+
+386         496 LOAD_CONST              84 (('config', 'dict', 'progress', 'Callable[[float], None] | None', 'cancel_check', 'Callable[[], bool] | None', 'return', 'None'))
+            498 LOAD_CONST              61 (<code object run_scan_job at 0x28d5a730, file "app\services\keyword_intel_service.py", line 386>)
+            500 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            502 STORE_NAME              65 (run_scan_job)
+
+501         504 LOAD_CONST              62 (True)
+            506 LOAD_CONST              63 (('include_result',))
+            508 BUILD_CONST_KEY_MAP      1
+            510 LOAD_CONST              85 (('row', 'KeywordScan', 'include_result', 'bool', 'return', 'dict'))
+            512 LOAD_CONST              64 (<code object scan_to_dict at 0x28aedd90, file "app\services\keyword_intel_service.py", line 501>)
+            514 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            516 STORE_NAME              66 (scan_to_dict)
+
+517         518 LOAD_CONST              86 (('db', 'Session', 'return', 'list[dict]'))
+            520 LOAD_CONST              65 (<code object list_scans at 0x7f6c926839f0, file "app\services\keyword_intel_service.py", line 517>)
+            522 MAKE_FUNCTION            4 (annotations)
+            524 STORE_NAME              67 (list_scans)
+
+522         526 LOAD_CONST              87 (('db', 'Session', 'scan_id', 'str', 'return', 'dict'))
+            528 LOAD_CONST              66 (<code object get_scan at 0x7f6c92151e30, file "app\services\keyword_intel_service.py", line 522>)
+            530 MAKE_FUNCTION            4 (annotations)
+            532 STORE_NAME              68 (get_scan)
+
+529         534 LOAD_CONST              88 (('db', 'Session', 'scan_id', 'str', 'return', 'None'))
+            536 LOAD_CONST              67 (<code object delete_scan at 0x7f6c928fd730, file "app\services\keyword_intel_service.py", line 529>)
+            538 MAKE_FUNCTION            4 (annotations)
+            540 STORE_NAME              69 (delete_scan)
+
+537         542 LOAD_CONST              89 (('db', 'Session', 'job', 'Job', 'return', 'dict'))
+            544 LOAD_CONST              68 (<code object scan_job_to_dict at 0x2905f300, file "app\services\keyword_intel_service.py", line 537>)
+            546 MAKE_FUNCTION            4 (annotations)
+            548 STORE_NAME              70 (scan_job_to_dict)
+
+561         550 LOAD_CONST              55 (False)
+            552 LOAD_CONST              69 (('active_only',))
+            554 BUILD_CONST_KEY_MAP      1
+            556 LOAD_CONST              90 (('db', 'Session', 'active_only', 'bool', 'return', 'list[dict]'))
+            558 LOAD_CONST              70 (<code object list_scan_jobs at 0x28c0ab00, file "app\services\keyword_intel_service.py", line 561>)
+            560 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            562 STORE_NAME              71 (list_scan_jobs)
+            564 RETURN_CONST             3 (None)
+
+Disassembly of <code object _median at 0x7f6c9234e4f0, file "app\services\keyword_intel_service.py", line 43>:
+ 43           0 RESUME                   0
+
+ 44           2 LOAD_GLOBAL              1 (NULL + sorted)
+             12 LOAD_CONST               1 (<code object <genexpr> at 0x7f6c922b57d0, file "app\services\keyword_intel_service.py", line 44>)
+             14 MAKE_FUNCTION            0
+             16 LOAD_FAST                0 (values)
+             18 GET_ITER
+             20 CALL                     0
+             28 CALL                     1
+             36 STORE_FAST               1 (xs)
+
+ 45          38 LOAD_FAST                1 (xs)
+             40 POP_JUMP_IF_TRUE         1 (to 44)
+
+ 46          42 RETURN_CONST             2 (0.0)
+
+ 47     >>   44 LOAD_GLOBAL              3 (NULL + len)
+             54 LOAD_FAST                1 (xs)
+             56 CALL                     1
+             64 STORE_FAST               2 (n)
+
+ 48          66 LOAD_FAST                2 (n)
+             68 LOAD_CONST               3 (2)
+             70 BINARY_OP                2 (//)
+             74 STORE_FAST               3 (mid)
+
+ 49          76 LOAD_FAST                2 (n)
+             78 LOAD_CONST               3 (2)
+             80 BINARY_OP                6 (%)
+             84 POP_JUMP_IF_FALSE        5 (to 96)
+             86 LOAD_FAST                1 (xs)
+             88 LOAD_FAST                3 (mid)
+             90 BINARY_SUBSCR
+             94 RETURN_VALUE
+        >>   96 LOAD_FAST                1 (xs)
+             98 LOAD_FAST                3 (mid)
+            100 LOAD_CONST               4 (1)
+            102 BINARY_OP               10 (-)
+            106 BINARY_SUBSCR
+            110 LOAD_FAST                1 (xs)
+            112 LOAD_FAST                3 (mid)
+            114 BINARY_SUBSCR
+            118 BINARY_OP                0 (+)
+            122 LOAD_CONST               5 (2.0)
+            124 BINARY_OP               11 (/)
+            128 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c922b57d0, file "app\services\keyword_intel_service.py", line 44>:
+ 44           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                35 (to 82)
+             12 STORE_FAST               1 (v)
+             14 LOAD_GLOBAL              1 (NULL + isinstance)
+             24 LOAD_FAST                1 (v)
+             26 LOAD_GLOBAL              2 (int)
+             36 LOAD_GLOBAL              4 (float)
+             46 BUILD_TUPLE              2
+             48 CALL                     2
+             56 POP_JUMP_IF_TRUE         1 (to 60)
+             58 JUMP_BACKWARD           26 (to 8)
+        >>   60 LOAD_FAST                1 (v)
+             62 LOAD_CONST               0 (0)
+             64 COMPARE_OP              68 (>)
+             68 POP_JUMP_IF_TRUE         1 (to 72)
+             70 JUMP_BACKWARD           32 (to 8)
+        >>   72 LOAD_FAST                1 (v)
+             74 YIELD_VALUE              1
+             76 RESUME                   1
+             78 POP_TOP
+             80 JUMP_BACKWARD           37 (to 8)
+        >>   82 END_FOR
+             84 RETURN_CONST             1 (None)
+        >>   86 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             88 RERAISE                  1
+ExceptionTable:
+  4 to 56 -> 86 [0] lasti
+  60 to 68 -> 86 [0] lasti
+  72 to 84 -> 86 [0] lasti
+
+Disassembly of <code object keyword_stats at 0x28c50010, file "app\services\keyword_intel_service.py", line 52>:
+ 52           0 RESUME                   0
+
+ 54           2 LOAD_FAST                0 (videos)
+              4 GET_ITER
+              6 LOAD_FAST_AND_CLEAR      1 (v)
+              8 SWAP                     2
+             10 BUILD_LIST               0
+             12 SWAP                     2
+        >>   14 FOR_ITER                57 (to 132)
+             18 STORE_FAST               1 (v)
+             20 LOAD_GLOBAL              1 (NULL + isinstance)
+             30 LOAD_FAST                1 (v)
+             32 LOAD_ATTR                3 (NULL|self + get)
+             52 LOAD_CONST               1 ('view_count')
+             54 CALL                     1
+             62 LOAD_GLOBAL              4 (int)
+             72 LOAD_GLOBAL              6 (float)
+             82 BUILD_TUPLE              2
+             84 CALL                     2
+             92 POP_JUMP_IF_TRUE         1 (to 96)
+             94 JUMP_BACKWARD           41 (to 14)
+        >>   96 LOAD_FAST                1 (v)
+             98 LOAD_ATTR                3 (NULL|self + get)
+            118 LOAD_CONST               1 ('view_count')
+            120 CALL                     1
+            128 LIST_APPEND              2
+            130 JUMP_BACKWARD           59 (to 14)
+        >>  132 END_FOR
+            134 STORE_FAST               2 (views)
+            136 STORE_FAST               1 (v)
+
+ 55         138 LOAD_GLOBAL              9 (NULL + Counter)
+            148 LOAD_CONST               2 (<code object <genexpr> at 0x7f6c922b5c50, file "app\services\keyword_intel_service.py", line 55>)
+            150 MAKE_FUNCTION            0
+            152 LOAD_FAST                0 (videos)
+            154 GET_ITER
+            156 CALL                     0
+            164 CALL                     1
+            172 STORE_FAST               3 (channels)
+
+ 57         174 LOAD_GLOBAL             11 (NULL + len)
+            184 LOAD_FAST                0 (videos)
+            186 CALL                     1
+
+ 58         194 LOAD_FAST                2 (views)
+            196 POP_JUMP_IF_FALSE       32 (to 262)
+            198 LOAD_GLOBAL             13 (NULL + round)
+            208 LOAD_GLOBAL             15 (NULL + sum)
+            218 LOAD_FAST                2 (views)
+            220 CALL                     1
+            228 LOAD_GLOBAL             11 (NULL + len)
+            238 LOAD_FAST                2 (views)
+            240 CALL                     1
+            248 BINARY_OP               11 (/)
+            252 CALL                     1
+            260 JUMP_FORWARD             1 (to 264)
+        >>  262 LOAD_CONST               3 (None)
+
+ 59     >>  264 LOAD_FAST                2 (views)
+            266 POP_JUMP_IF_FALSE       20 (to 308)
+            268 LOAD_GLOBAL             13 (NULL + round)
+            278 LOAD_GLOBAL             17 (NULL + _median)
+            288 LOAD_FAST                2 (views)
+            290 CALL                     1
+            298 CALL                     1
+            306 JUMP_FORWARD             1 (to 310)
+        >>  308 LOAD_CONST               3 (None)
+
+ 60     >>  310 LOAD_FAST                3 (channels)
+            312 LOAD_ATTR               19 (NULL|self + most_common)
+            332 LOAD_CONST               4 (5)
+            334 CALL                     1
+            342 GET_ITER
+            344 LOAD_FAST_AND_CLEAR      4 (name)
+            346 LOAD_FAST_AND_CLEAR      5 (count)
+            348 SWAP                     3
+            350 BUILD_LIST               0
+            352 SWAP                     2
+        >>  354 FOR_ITER                10 (to 378)
+            358 UNPACK_SEQUENCE          2
+            362 STORE_FAST               4 (name)
+            364 STORE_FAST               5 (count)
+            366 LOAD_FAST                4 (name)
+            368 LOAD_FAST                5 (count)
+            370 LOAD_CONST               5 (('name', 'count'))
+            372 BUILD_CONST_KEY_MAP      2
+            374 LIST_APPEND              2
+            376 JUMP_BACKWARD           12 (to 354)
+        >>  378 END_FOR
+            380 SWAP                     3
+            382 STORE_FAST               5 (count)
+            384 STORE_FAST               4 (name)
+
+ 56         386 LOAD_CONST               6 (('video_count', 'avg_views', 'median_views', 'channels'))
+            388 BUILD_CONST_KEY_MAP      4
+            390 RETURN_VALUE
+        >>  392 SWAP                     2
+            394 POP_TOP
+
+ 54         396 SWAP                     2
+            398 STORE_FAST               1 (v)
+            400 RERAISE                  0
+        >>  402 SWAP                     2
+            404 POP_TOP
+
+ 60         406 SWAP                     3
+            408 STORE_FAST               5 (count)
+            410 STORE_FAST               4 (name)
+            412 RERAISE                  0
+ExceptionTable:
+  10 to 92 -> 392 [2]
+  96 to 132 -> 392 [2]
+  350 to 378 -> 402 [6]
+
+Disassembly of <code object <genexpr> at 0x7f6c922b5c50, file "app\services\keyword_intel_service.py", line 55>:
+ 55           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                34 (to 80)
+             12 STORE_FAST               1 (v)
+             14 LOAD_GLOBAL              1 (NULL + str)
+             24 LOAD_FAST                1 (v)
+             26 LOAD_ATTR                3 (NULL|self + get)
+             46 LOAD_CONST               0 ('channel')
+             48 CALL                     1
+             56 COPY                     1
+             58 POP_JUMP_IF_TRUE         2 (to 64)
+             60 POP_TOP
+             62 LOAD_CONST               1 ('?')
+        >>   64 CALL                     1
+             72 YIELD_VALUE              1
+             74 RESUME                   1
+             76 POP_TOP
+             78 JUMP_BACKWARD           36 (to 8)
+        >>   80 END_FOR
+             82 RETURN_CONST             2 (None)
+        >>   84 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             86 RERAISE                  1
+ExceptionTable:
+  4 to 82 -> 84 [0] lasti
+
+Disassembly of <code object _hhi at 0x7f6c926fb660, file "app\services\keyword_intel_service.py", line 86>:
+              0 MAKE_CELL                1 (total)
+
+ 86           2 RESUME                   0
+
+ 92           4 LOAD_GLOBAL              1 (NULL + sum)
+             14 LOAD_FAST                0 (counts)
+             16 CALL                     1
+             24 STORE_DEREF              1 (total)
+
+ 93          26 LOAD_DEREF               1 (total)
+             28 LOAD_CONST               1 (0)
+             30 COMPARE_OP              26 (<=)
+             34 POP_JUMP_IF_FALSE        1 (to 38)
+
+ 94          36 RETURN_CONST             2 (0.0)
+
+ 95     >>   38 LOAD_GLOBAL              1 (NULL + sum)
+             48 LOAD_CLOSURE             1 (total)
+             50 BUILD_TUPLE              1
+             52 LOAD_CONST               3 (<code object <genexpr> at 0x7f6c926972d0, file "app\services\keyword_intel_service.py", line 95>)
+             54 MAKE_FUNCTION            8 (closure)
+             56 LOAD_FAST                0 (counts)
+             58 GET_ITER
+             60 CALL                     0
+             68 CALL                     1
+             76 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c926972d0, file "app\services\keyword_intel_service.py", line 95>:
+              0 COPY_FREE_VARS           1
+
+ 95           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                12 (to 38)
+             14 STORE_FAST               1 (c)
+             16 LOAD_FAST                1 (c)
+             18 LOAD_DEREF               2 (total)
+             20 BINARY_OP               11 (/)
+             24 LOAD_CONST               0 (2)
+             26 BINARY_OP                8 (**)
+             30 YIELD_VALUE              1
+             32 RESUME                   1
+             34 POP_TOP
+             36 JUMP_BACKWARD           14 (to 10)
+        >>   38 END_FOR
+             40 RETURN_CONST             1 (None)
+        >>   42 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             44 RERAISE                  1
+ExceptionTable:
+  6 to 40 -> 42 [0] lasti
+
+Disassembly of <code object _age_days at 0x7f6c92151bb0, file "app\services\keyword_intel_service.py", line 98>:
+ 98           0 RESUME                   0
+
+ 99           2 LOAD_FAST                0 (video)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_CONST               1 ('timestamp')
+             26 CALL                     1
+             34 STORE_FAST               2 (ts)
+
+100          36 LOAD_GLOBAL              3 (NULL + isinstance)
+             46 LOAD_FAST                2 (ts)
+             48 LOAD_GLOBAL              4 (int)
+             58 LOAD_GLOBAL              6 (float)
+             68 BUILD_TUPLE              2
+             70 CALL                     2
+             78 POP_JUMP_IF_FALSE       23 (to 126)
+             80 LOAD_FAST                2 (ts)
+             82 LOAD_CONST               2 (0)
+             84 COMPARE_OP              68 (>)
+             88 POP_JUMP_IF_FALSE       18 (to 126)
+
+101          90 LOAD_GLOBAL              9 (NULL + max)
+            100 LOAD_CONST               3 (0.0)
+            102 LOAD_FAST                1 (now_ts)
+            104 LOAD_FAST                2 (ts)
+            106 BINARY_OP               10 (-)
+            110 LOAD_CONST               4 (86400.0)
+            112 BINARY_OP               11 (/)
+            116 CALL                     2
+            124 RETURN_VALUE
+
+102     >>  126 RETURN_CONST             0 (None)
+
+Disassembly of <code object ids_needing_enrichment at 0x7f6c9269a790, file "app\services\keyword_intel_service.py", line 114>:
+              0 MAKE_CELL                5 (v)
+
+114           2 RESUME                   0
+
+120           4 BUILD_LIST               0
+              6 STORE_FAST               1 (out)
+
+121           8 LOAD_GLOBAL              1 (NULL + set)
+             18 CALL                     0
+             26 STORE_FAST               2 (seen)
+
+122          28 LOAD_FAST                0 (kw_videos)
+             30 LOAD_ATTR                3 (NULL|self + values)
+             50 CALL                     0
+             58 GET_ITER
+        >>   60 FOR_ITER               105 (to 274)
+             64 STORE_FAST               3 (videos)
+
+123          66 LOAD_FAST                3 (videos)
+             68 GET_ITER
+        >>   70 FOR_ITER                98 (to 270)
+             74 STORE_DEREF              5 (v)
+
+124          76 LOAD_GLOBAL              5 (NULL + str)
+             86 LOAD_DEREF               5 (v)
+             88 LOAD_ATTR                7 (NULL|self + get)
+            108 LOAD_CONST               1 ('id')
+            110 CALL                     1
+            118 COPY                     1
+            120 POP_JUMP_IF_TRUE         2 (to 126)
+            122 POP_TOP
+            124 LOAD_CONST               2 ('')
+        >>  126 CALL                     1
+            134 STORE_FAST               4 (vid)
+
+125         136 LOAD_FAST                4 (vid)
+            138 POP_JUMP_IF_FALSE        4 (to 148)
+            140 LOAD_FAST                4 (vid)
+            142 LOAD_FAST                2 (seen)
+            144 CONTAINS_OP              0
+            146 POP_JUMP_IF_FALSE        1 (to 150)
+
+126     >>  148 JUMP_BACKWARD           40 (to 70)
+
+127     >>  150 LOAD_GLOBAL              9 (NULL + any)
+            160 LOAD_CLOSURE             5 (v)
+            162 BUILD_TUPLE              1
+            164 LOAD_CONST               3 (<code object <genexpr> at 0x7f6c926fb770, file "app\services\keyword_intel_service.py", line 127>)
+            166 MAKE_FUNCTION            8 (closure)
+            168 LOAD_GLOBAL             10 (_ENRICH_REQUIRED)
+            178 GET_ITER
+            180 CALL                     0
+            188 CALL                     1
+            196 POP_JUMP_IF_TRUE         1 (to 200)
+            198 JUMP_BACKWARD           65 (to 70)
+
+128     >>  200 LOAD_FAST                2 (seen)
+            202 LOAD_ATTR               13 (NULL|self + add)
+            222 LOAD_FAST                4 (vid)
+            224 CALL                     1
+            232 POP_TOP
+
+129         234 LOAD_FAST                1 (out)
+            236 LOAD_ATTR               15 (NULL|self + append)
+            256 LOAD_FAST                4 (vid)
+            258 CALL                     1
+            266 POP_TOP
+            268 JUMP_BACKWARD          100 (to 70)
+
+123     >>  270 END_FOR
+            272 JUMP_BACKWARD          107 (to 60)
+
+122     >>  274 END_FOR
+
+130         276 LOAD_FAST                1 (out)
+            278 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c926fb770, file "app\services\keyword_intel_service.py", line 127>:
+              0 COPY_FREE_VARS           1
+
+127           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                23 (to 60)
+             14 STORE_FAST               1 (field)
+             16 LOAD_DEREF               2 (v)
+             18 LOAD_ATTR                1 (NULL|self + get)
+             38 LOAD_FAST                1 (field)
+             40 CALL                     1
+             48 LOAD_CONST               0 (None)
+             50 IS_OP                    0
+             52 YIELD_VALUE              1
+             54 RESUME                   1
+             56 POP_TOP
+             58 JUMP_BACKWARD           25 (to 10)
+        >>   60 END_FOR
+             62 RETURN_CONST             0 (None)
+        >>   64 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             66 RERAISE                  1
+ExceptionTable:
+  6 to 62 -> 64 [0] lasti
+
+Disassembly of <code object apply_video_metas at 0x28c4b870, file "app\services\keyword_intel_service.py", line 133>:
+133           0 RESUME                   0
+
+135           2 LOAD_FAST                1 (metas)
+              4 GET_ITER
+              6 LOAD_FAST_AND_CLEAR      2 (m)
+              8 SWAP                     2
+             10 BUILD_MAP                0
+             12 SWAP                     2
+        >>   14 FOR_ITER                47 (to 112)
+             18 STORE_FAST               2 (m)
+             20 LOAD_FAST                2 (m)
+             22 LOAD_ATTR                1 (NULL|self + get)
+             42 LOAD_CONST               1 ('id')
+             44 CALL                     1
+             52 POP_JUMP_IF_TRUE         1 (to 56)
+             54 JUMP_BACKWARD           21 (to 14)
+        >>   56 LOAD_GLOBAL              3 (NULL + str)
+             66 LOAD_FAST                2 (m)
+             68 LOAD_ATTR                1 (NULL|self + get)
+             88 LOAD_CONST               1 ('id')
+             90 CALL                     1
+             98 CALL                     1
+            106 LOAD_FAST                2 (m)
+            108 MAP_ADD                  2
+            110 JUMP_BACKWARD           49 (to 14)
+        >>  112 END_FOR
+            114 STORE_FAST               3 (by_id)
+            116 STORE_FAST               2 (m)
+
+136         118 LOAD_FAST                0 (kw_videos)
+            120 LOAD_ATTR                5 (NULL|self + values)
+            140 CALL                     0
+            148 GET_ITER
+        >>  150 FOR_ITER                94 (to 342)
+            154 STORE_FAST               4 (videos)
+
+137         156 LOAD_FAST                4 (videos)
+            158 GET_ITER
+        >>  160 FOR_ITER                87 (to 338)
+            164 STORE_FAST               5 (v)
+
+138         166 LOAD_FAST                3 (by_id)
+            168 LOAD_ATTR                1 (NULL|self + get)
+            188 LOAD_GLOBAL              3 (NULL + str)
+            198 LOAD_FAST                5 (v)
+            200 LOAD_ATTR                1 (NULL|self + get)
+            220 LOAD_CONST               1 ('id')
+            222 CALL                     1
+            230 COPY                     1
+            232 POP_JUMP_IF_TRUE         2 (to 238)
+            234 POP_TOP
+            236 LOAD_CONST               2 ('')
+        >>  238 CALL                     1
+            246 CALL                     1
+            254 STORE_FAST               6 (meta)
+
+139         256 LOAD_FAST                6 (meta)
+            258 POP_JUMP_IF_TRUE         1 (to 262)
+
+140         260 JUMP_BACKWARD           51 (to 160)
+
+141     >>  262 LOAD_GLOBAL              6 (_ENRICH_FIELDS)
+            272 GET_ITER
+        >>  274 FOR_ITER                28 (to 334)
+            278 STORE_FAST               7 (field)
+
+142         280 LOAD_FAST                6 (meta)
+            282 LOAD_ATTR                1 (NULL|self + get)
+            302 LOAD_FAST                7 (field)
+            304 CALL                     1
+            312 POP_JUMP_IF_NOT_NONE     1 (to 316)
+            314 JUMP_BACKWARD           21 (to 274)
+
+143     >>  316 LOAD_FAST                6 (meta)
+            318 LOAD_FAST                7 (field)
+            320 BINARY_SUBSCR
+            324 LOAD_FAST                5 (v)
+            326 LOAD_FAST                7 (field)
+            328 STORE_SUBSCR
+            332 JUMP_BACKWARD           30 (to 274)
+
+141     >>  334 END_FOR
+            336 JUMP_BACKWARD           89 (to 160)
+
+137     >>  338 END_FOR
+            340 JUMP_BACKWARD           96 (to 150)
+
+136     >>  342 END_FOR
+            344 RETURN_CONST             3 (None)
+        >>  346 SWAP                     2
+            348 POP_TOP
+
+135         350 SWAP                     2
+            352 STORE_FAST               2 (m)
+            354 RERAISE                  0
+ExceptionTable:
+  10 to 52 -> 346 [2]
+  56 to 112 -> 346 [2]
+
+Disassembly of <code object _views_per_sub at 0x7f6c92456430, file "app\services\keyword_intel_service.py", line 146>:
+146           0 RESUME                   0
+
+147           2 LOAD_FAST                0 (video)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_CONST               1 ('channel_subs')
+             26 CALL                     1
+             34 STORE_FAST               1 (subs)
+
+148          36 LOAD_FAST                0 (video)
+             38 LOAD_ATTR                1 (NULL|self + get)
+             58 LOAD_CONST               2 ('view_count')
+             60 CALL                     1
+             68 STORE_FAST               2 (views)
+
+149          70 LOAD_GLOBAL              3 (NULL + isinstance)
+             80 LOAD_FAST                1 (subs)
+             82 LOAD_GLOBAL              4 (int)
+             92 LOAD_GLOBAL              6 (float)
+            102 BUILD_TUPLE              2
+            104 CALL                     2
+            112 POP_JUMP_IF_FALSE        5 (to 124)
+            114 LOAD_FAST                1 (subs)
+            116 LOAD_CONST               3 (0)
+            118 COMPARE_OP              26 (<=)
+            122 POP_JUMP_IF_FALSE        1 (to 126)
+
+150     >>  124 RETURN_CONST             0 (None)
+
+151     >>  126 LOAD_GLOBAL              3 (NULL + isinstance)
+            136 LOAD_FAST                2 (views)
+            138 LOAD_GLOBAL              4 (int)
+            148 LOAD_GLOBAL              6 (float)
+            158 BUILD_TUPLE              2
+            160 CALL                     2
+            168 POP_JUMP_IF_TRUE         1 (to 172)
+
+152         170 RETURN_CONST             0 (None)
+
+153     >>  172 LOAD_FAST                2 (views)
+            174 LOAD_FAST                1 (subs)
+            176 BINARY_OP               11 (/)
+            180 RETURN_VALUE
+
+Disassembly of <code object cluster_report at 0x28c58c60, file "app\services\keyword_intel_service.py", line 156>:
+              0 MAKE_CELL               36 (now)
+
+156           2 RESUME                   0
+
+160           4 LOAD_CONST               1 (0)
+              6 LOAD_CONST               2 (None)
+              8 IMPORT_NAME              0 (time)
+             10 STORE_FAST               4 (time)
+
+162          12 LOAD_FAST                2 (now_ts)
+             14 POP_JUMP_IF_NONE         2 (to 20)
+             16 LOAD_FAST                2 (now_ts)
+             18 JUMP_FORWARD            15 (to 50)
+        >>   20 LOAD_FAST                4 (time)
+             22 LOAD_ATTR                1 (NULL|self + time)
+             42 CALL                     0
+        >>   50 STORE_DEREF             36 (now)
+
+163          52 LOAD_GLOBAL              3 (NULL + set)
+             62 CALL                     0
+             70 STORE_FAST               5 (assigned)
+
+164          72 BUILD_LIST               0
+             74 STORE_FAST               6 (clusters)
+
+165          76 LOAD_FAST                0 (assignments)
+             78 GET_ITER
+        >>   80 FOR_ITER                89 (to 262)
+             84 STORE_FAST               7 (cl)
+
+166          86 LOAD_FAST                7 (cl)
+             88 LOAD_ATTR                5 (NULL|self + get)
+            108 LOAD_CONST               3 ('keywords')
+            110 CALL                     1
+            118 COPY                     1
+            120 POP_JUMP_IF_TRUE         2 (to 126)
+            122 POP_TOP
+            124 BUILD_LIST               0
+        >>  126 GET_ITER
+            128 LOAD_FAST_AND_CLEAR      8 (k)
+            130 SWAP                     2
+            132 BUILD_LIST               0
+            134 SWAP                     2
+        >>  136 FOR_ITER                14 (to 168)
+            140 STORE_FAST               8 (k)
+            142 LOAD_FAST                8 (k)
+            144 LOAD_FAST                1 (kw_videos)
+            146 CONTAINS_OP              0
+            148 POP_JUMP_IF_TRUE         1 (to 152)
+            150 JUMP_BACKWARD            8 (to 136)
+        >>  152 LOAD_FAST                8 (k)
+            154 LOAD_FAST                5 (assigned)
+            156 CONTAINS_OP              1
+            158 POP_JUMP_IF_TRUE         1 (to 162)
+            160 JUMP_BACKWARD           13 (to 136)
+        >>  162 LOAD_FAST                8 (k)
+            164 LIST_APPEND              2
+            166 JUMP_BACKWARD           16 (to 136)
+        >>  168 END_FOR
+            170 STORE_FAST               9 (kws)
+            172 STORE_FAST               8 (k)
+
+167         174 LOAD_FAST                9 (kws)
+            176 POP_JUMP_IF_TRUE         1 (to 180)
+
+168         178 JUMP_BACKWARD           50 (to 80)
+
+169     >>  180 LOAD_FAST                5 (assigned)
+            182 LOAD_ATTR                7 (NULL|self + update)
+            202 LOAD_FAST                9 (kws)
+            204 CALL                     1
+            212 POP_TOP
+
+170         214 LOAD_FAST                6 (clusters)
+            216 LOAD_ATTR                9 (NULL|self + append)
+            236 BUILD_MAP                0
+            238 LOAD_FAST                7 (cl)
+            240 DICT_UPDATE              1
+            242 LOAD_CONST               3 ('keywords')
+            244 LOAD_FAST                9 (kws)
+            246 BUILD_MAP                1
+            248 DICT_UPDATE              1
+            250 CALL                     1
+            258 POP_TOP
+            260 JUMP_BACKWARD           91 (to 80)
+
+165     >>  262 END_FOR
+
+171         264 LOAD_FAST                1 (kw_videos)
+            266 GET_ITER
+            268 LOAD_FAST_AND_CLEAR      8 (k)
+            270 SWAP                     2
+            272 BUILD_LIST               0
+            274 SWAP                     2
+        >>  276 FOR_ITER                 9 (to 298)
+            280 STORE_FAST               8 (k)
+            282 LOAD_FAST                8 (k)
+            284 LOAD_FAST                5 (assigned)
+            286 CONTAINS_OP              1
+            288 POP_JUMP_IF_TRUE         1 (to 292)
+            290 JUMP_BACKWARD            8 (to 276)
+        >>  292 LOAD_FAST                8 (k)
+            294 LIST_APPEND              2
+            296 JUMP_BACKWARD           11 (to 276)
+        >>  298 END_FOR
+            300 STORE_FAST              10 (leftover)
+            302 STORE_FAST               8 (k)
+
+172         304 LOAD_FAST               10 (leftover)
+            306 POP_JUMP_IF_FALSE       50 (to 408)
+
+173         308 LOAD_FAST                6 (clusters)
+            310 LOAD_ATTR                9 (NULL|self + append)
+            330 LOAD_GLOBAL             10 (_LEFTOVER_NAME)
+            340 LOAD_ATTR                5 (NULL|self + get)
+            360 LOAD_FAST                3 (language)
+            362 LOAD_GLOBAL             10 (_LEFTOVER_NAME)
+            372 LOAD_CONST               4 ('en')
+            374 BINARY_SUBSCR
+            378 CALL                     2
+
+174         386 LOAD_FAST               10 (leftover)
+            388 LOAD_CONST               5 ('General')
+
+175         390 LOAD_CONST               6 ('Từ khóa chưa xếp được vào cụm nào rõ ràng.')
+            392 LOAD_CONST               7 ('')
+
+173         394 LOAD_CONST               8 (('name', 'keywords', 'category', 'why', 'fresh_angle'))
+            396 BUILD_CONST_KEY_MAP      5
+            398 CALL                     1
+            406 POP_TOP
+
+177     >>  408 BUILD_LIST               0
+            410 STORE_FAST              11 (out)
+
+178         412 LOAD_FAST                6 (clusters)
+            414 GET_ITER
+        >>  416 EXTENDED_ARG             4
+            418 FOR_ITER              1062 (to 2546)
+            422 STORE_FAST               7 (cl)
+
+179         424 BUILD_MAP                0
+            426 STORE_FAST              12 (seen)
+
+180         428 LOAD_FAST                7 (cl)
+            430 LOAD_CONST               3 ('keywords')
+            432 BINARY_SUBSCR
+            436 GET_ITER
+        >>  438 FOR_ITER                85 (to 612)
+            442 STORE_FAST               8 (k)
+
+181         444 LOAD_FAST                1 (kw_videos)
+            446 LOAD_ATTR                5 (NULL|self + get)
+            466 LOAD_FAST                8 (k)
+            468 CALL                     1
+            476 COPY                     1
+            478 POP_JUMP_IF_TRUE         2 (to 484)
+            480 POP_TOP
+            482 BUILD_LIST               0
+        >>  484 GET_ITER
+        >>  486 FOR_ITER                59 (to 608)
+            490 STORE_FAST              13 (v)
+
+183         492 LOAD_FAST               13 (v)
+            494 LOAD_ATTR                5 (NULL|self + get)
+            514 LOAD_CONST               9 ('id')
+            516 CALL                     1
+            524 POP_JUMP_IF_TRUE         1 (to 528)
+            526 JUMP_BACKWARD           21 (to 486)
+        >>  528 LOAD_FAST               13 (v)
+            530 LOAD_ATTR                5 (NULL|self + get)
+            550 LOAD_CONST              10 ('is_live')
+            552 CALL                     1
+            560 POP_JUMP_IF_FALSE        1 (to 564)
+            562 JUMP_BACKWARD           39 (to 486)
+
+184     >>  564 LOAD_FAST               12 (seen)
+            566 LOAD_ATTR               13 (NULL|self + setdefault)
+            586 LOAD_FAST               13 (v)
+            588 LOAD_CONST               9 ('id')
+            590 BINARY_SUBSCR
+            594 LOAD_FAST               13 (v)
+            596 CALL                     2
+            604 POP_TOP
+            606 JUMP_BACKWARD           61 (to 486)
+
+181     >>  608 END_FOR
+            610 JUMP_BACKWARD           87 (to 438)
+
+180     >>  612 END_FOR
+
+185         614 LOAD_GLOBAL             15 (NULL + sorted)
+            624 LOAD_FAST               12 (seen)
+            626 LOAD_ATTR               17 (NULL|self + values)
+            646 CALL                     0
+
+186         654 LOAD_CONST              11 (<code object <lambda> at 0x7f6c922b56b0, file "app\services\keyword_intel_service.py", line 186>)
+            656 MAKE_FUNCTION            0
+
+187         658 LOAD_CONST              12 (True)
+
+185         660 KW_NAMES                13 (('key', 'reverse'))
+            662 CALL                     3
+            670 STORE_FAST              14 (videos)
+
+188         672 LOAD_FAST               14 (videos)
+            674 POP_JUMP_IF_TRUE         1 (to 678)
+
+189         676 JUMP_BACKWARD          131 (to 416)
+
+192     >>  678 LOAD_FAST               14 (videos)
+            680 GET_ITER
+            682 LOAD_FAST_AND_CLEAR     13 (v)
+            684 SWAP                     2
+            686 BUILD_LIST               0
+            688 SWAP                     2
+        >>  690 FOR_ITER                22 (to 738)
+            694 STORE_FAST              13 (v)
+            696 LOAD_FAST               13 (v)
+            698 LOAD_ATTR                5 (NULL|self + get)
+            718 LOAD_CONST              14 ('is_short')
+            720 CALL                     1
+            728 POP_JUMP_IF_TRUE         1 (to 732)
+            730 JUMP_BACKWARD           21 (to 690)
+        >>  732 LOAD_FAST               13 (v)
+            734 LIST_APPEND              2
+            736 JUMP_BACKWARD           24 (to 690)
+        >>  738 END_FOR
+            740 STORE_FAST              15 (shorts)
+            742 STORE_FAST              13 (v)
+
+193         744 LOAD_FAST               14 (videos)
+            746 GET_ITER
+            748 LOAD_FAST_AND_CLEAR     13 (v)
+            750 SWAP                     2
+            752 BUILD_LIST               0
+            754 SWAP                     2
+        >>  756 FOR_ITER                22 (to 804)
+            760 STORE_FAST              13 (v)
+            762 LOAD_FAST               13 (v)
+            764 LOAD_ATTR                5 (NULL|self + get)
+            784 LOAD_CONST              14 ('is_short')
+            786 CALL                     1
+            794 POP_JUMP_IF_FALSE        1 (to 798)
+            796 JUMP_BACKWARD           21 (to 756)
+        >>  798 LOAD_FAST               13 (v)
+            800 LIST_APPEND              2
+            802 JUMP_BACKWARD           24 (to 756)
+        >>  804 END_FOR
+            806 STORE_FAST              16 (longs)
+            808 STORE_FAST              13 (v)
+
+194         810 LOAD_FAST               15 (shorts)
+            812 GET_ITER
+            814 LOAD_FAST_AND_CLEAR     13 (v)
+            816 SWAP                     2
+            818 BUILD_LIST               0
+            820 SWAP                     2
+        >>  822 FOR_ITER                45 (to 916)
+            826 STORE_FAST              13 (v)
+            828 LOAD_GLOBAL             19 (NULL + isinstance)
+            838 LOAD_FAST               13 (v)
+            840 LOAD_ATTR                5 (NULL|self + get)
+            860 LOAD_CONST              15 ('view_count')
+            862 CALL                     1
+            870 LOAD_GLOBAL             20 (int)
+            880 LOAD_GLOBAL             22 (float)
+            890 BUILD_TUPLE              2
+            892 CALL                     2
+            900 POP_JUMP_IF_TRUE         1 (to 904)
+            902 JUMP_BACKWARD           41 (to 822)
+        >>  904 LOAD_FAST               13 (v)
+            906 LOAD_CONST              15 ('view_count')
+            908 BINARY_SUBSCR
+            912 LIST_APPEND              2
+            914 JUMP_BACKWARD           47 (to 822)
+        >>  916 END_FOR
+            918 STORE_FAST              17 (short_views)
+            920 STORE_FAST              13 (v)
+
+195         922 LOAD_FAST               16 (longs)
+            924 GET_ITER
+            926 LOAD_FAST_AND_CLEAR     13 (v)
+            928 SWAP                     2
+            930 BUILD_LIST               0
+            932 SWAP                     2
+        >>  934 FOR_ITER                45 (to 1028)
+            938 STORE_FAST              13 (v)
+            940 LOAD_GLOBAL             19 (NULL + isinstance)
+            950 LOAD_FAST               13 (v)
+            952 LOAD_ATTR                5 (NULL|self + get)
+            972 LOAD_CONST              15 ('view_count')
+            974 CALL                     1
+            982 LOAD_GLOBAL             20 (int)
+            992 LOAD_GLOBAL             22 (float)
+           1002 BUILD_TUPLE              2
+           1004 CALL                     2
+           1012 POP_JUMP_IF_TRUE         1 (to 1016)
+           1014 JUMP_BACKWARD           41 (to 934)
+        >> 1016 LOAD_FAST               13 (v)
+           1018 LOAD_CONST              15 ('view_count')
+           1020 BINARY_SUBSCR
+           1024 LIST_APPEND              2
+           1026 JUMP_BACKWARD           47 (to 934)
+        >> 1028 END_FOR
+           1030 STORE_FAST              18 (long_views)
+           1032 STORE_FAST              13 (v)
+
+197        1034 LOAD_GLOBAL             25 (NULL + len)
+           1044 LOAD_FAST               16 (longs)
+           1046 CALL                     1
+           1054 LOAD_GLOBAL             25 (NULL + len)
+           1064 LOAD_FAST               15 (shorts)
+           1066 CALL                     1
+           1074 COMPARE_OP              92 (>=)
+           1078 POP_JUMP_IF_FALSE        2 (to 1084)
+           1080 LOAD_FAST               18 (long_views)
+           1082 JUMP_FORWARD             1 (to 1086)
+        >> 1084 LOAD_FAST               17 (short_views)
+        >> 1086 STORE_FAST              19 (main_views)
+
+198        1088 LOAD_FAST               14 (videos)
+           1090 GET_ITER
+           1092 LOAD_FAST_AND_CLEAR     13 (v)
+           1094 SWAP                     2
+           1096 BUILD_LIST               0
+           1098 SWAP                     2
+        >> 1100 FOR_ITER                45 (to 1194)
+           1104 STORE_FAST              13 (v)
+           1106 LOAD_GLOBAL             19 (NULL + isinstance)
+           1116 LOAD_FAST               13 (v)
+           1118 LOAD_ATTR                5 (NULL|self + get)
+           1138 LOAD_CONST              15 ('view_count')
+           1140 CALL                     1
+           1148 LOAD_GLOBAL             20 (int)
+           1158 LOAD_GLOBAL             22 (float)
+           1168 BUILD_TUPLE              2
+           1170 CALL                     2
+           1178 POP_JUMP_IF_TRUE         1 (to 1182)
+           1180 JUMP_BACKWARD           41 (to 1100)
+        >> 1182 LOAD_FAST               13 (v)
+           1184 LOAD_CONST              15 ('view_count')
+           1186 BINARY_SUBSCR
+           1190 LIST_APPEND              2
+           1192 JUMP_BACKWARD           47 (to 1100)
+        >> 1194 END_FOR
+           1196 STORE_FAST              20 (views)
+           1198 STORE_FAST              13 (v)
+
+200        1200 LOAD_GLOBAL             27 (NULL + Counter)
+           1210 LOAD_CONST              16 (<code object <genexpr> at 0x7f6c922b5b30, file "app\services\keyword_intel_service.py", line 200>)
+           1212 MAKE_FUNCTION            0
+           1214 LOAD_FAST               14 (videos)
+           1216 GET_ITER
+           1218 CALL                     0
+           1226 CALL                     1
+           1234 STORE_FAST              21 (channels)
+
+201        1236 LOAD_GLOBAL             25 (NULL + len)
+           1246 LOAD_FAST               14 (videos)
+           1248 CALL                     1
+           1256 STORE_FAST              22 (total)
+
+202        1258 LOAD_FAST               19 (main_views)
+           1260 POP_JUMP_IF_FALSE       20 (to 1302)
+           1262 LOAD_GLOBAL             29 (NULL + round)
+           1272 LOAD_GLOBAL             31 (NULL + _median)
+           1282 LOAD_FAST               19 (main_views)
+           1284 CALL                     1
+           1292 CALL                     1
+           1300 JUMP_FORWARD             1 (to 1304)
+        >> 1302 LOAD_CONST               1 (0)
+        >> 1304 STORE_FAST              23 (median_views)
+
+204        1306 LOAD_CLOSURE            36 (now)
+           1308 BUILD_TUPLE              1
+           1310 LOAD_CONST              17 (<code object <genexpr> at 0x7f6c92407e30, file "app\services\keyword_intel_service.py", line 204>)
+           1312 MAKE_FUNCTION            8 (closure)
+           1314 LOAD_FAST               14 (videos)
+           1316 GET_ITER
+           1318 CALL                     0
+           1326 GET_ITER
+           1328 LOAD_FAST_AND_CLEAR     24 (a)
+           1330 SWAP                     2
+           1332 BUILD_LIST               0
+           1334 SWAP                     2
+        >> 1336 FOR_ITER                 7 (to 1354)
+           1340 STORE_FAST              24 (a)
+           1342 LOAD_FAST               24 (a)
+           1344 POP_JUMP_IF_NOT_NONE     1 (to 1348)
+           1346 JUMP_BACKWARD            6 (to 1336)
+        >> 1348 LOAD_FAST               24 (a)
+           1350 LIST_APPEND              2
+           1352 JUMP_BACKWARD            9 (to 1336)
+        >> 1354 END_FOR
+           1356 STORE_FAST              25 (ages)
+           1358 STORE_FAST              24 (a)
+
+205        1360 LOAD_FAST               25 (ages)
+           1362 POP_JUMP_IF_FALSE       30 (to 1424)
+           1364 LOAD_GLOBAL             33 (NULL + sum)
+           1374 LOAD_CONST              18 (<code object <genexpr> at 0x7f6c927e0130, file "app\services\keyword_intel_service.py", line 205>)
+           1376 MAKE_FUNCTION            0
+           1378 LOAD_FAST               25 (ages)
+           1380 GET_ITER
+           1382 CALL                     0
+           1390 CALL                     1
+           1398 LOAD_GLOBAL             25 (NULL + len)
+           1408 LOAD_FAST               25 (ages)
+           1410 CALL                     1
+           1418 BINARY_OP               11 (/)
+           1422 JUMP_FORWARD             1 (to 1426)
+        >> 1424 LOAD_CONST              19 (0.0)
+        >> 1426 STORE_FAST              26 (recent_share)
+
+207        1428 LOAD_CONST              20 (<code object <genexpr> at 0x7f6c927e2930, file "app\services\keyword_intel_service.py", line 207>)
+           1430 MAKE_FUNCTION            0
+           1432 LOAD_FAST               14 (videos)
+           1434 GET_ITER
+           1436 CALL                     0
+           1444 GET_ITER
+           1446 LOAD_FAST_AND_CLEAR     27 (p)
+           1448 SWAP                     2
+           1450 BUILD_LIST               0
+           1452 SWAP                     2
+        >> 1454 FOR_ITER                 7 (to 1472)
+           1458 STORE_FAST              27 (p)
+           1460 LOAD_FAST               27 (p)
+           1462 POP_JUMP_IF_NOT_NONE     1 (to 1466)
+           1464 JUMP_BACKWARD            6 (to 1454)
+        >> 1466 LOAD_FAST               27 (p)
+           1468 LIST_APPEND              2
+           1470 JUMP_BACKWARD            9 (to 1454)
+        >> 1472 END_FOR
+           1474 STORE_FAST              28 (vps)
+           1476 STORE_FAST              27 (p)
+
+208        1478 LOAD_GLOBAL             33 (NULL + sum)
+           1488 LOAD_CONST              21 (<code object <genexpr> at 0x7f6c928fd5c0, file "app\services\keyword_intel_service.py", line 208>)
+           1490 MAKE_FUNCTION            0
+
+209        1492 LOAD_FAST               14 (videos)
+           1494 GET_ITER
+
+208        1496 CALL                     0
+           1504 CALL                     1
+           1512 STORE_FAST              29 (smallwin_hits)
+
+214        1514 LOAD_FAST               22 (total)
+           1516 POP_JUMP_IF_FALSE        5 (to 1528)
+           1518 LOAD_FAST               29 (smallwin_hits)
+           1520 LOAD_FAST               22 (total)
+           1522 BINARY_OP               11 (/)
+           1526 JUMP_FORWARD             1 (to 1530)
+        >> 1528 LOAD_CONST              19 (0.0)
+        >> 1530 STORE_FAST              30 (smallwin)
+
+216        1532 LOAD_FAST               11 (out)
+           1534 LOAD_ATTR                9 (NULL|self + append)
+           1554 BUILD_MAP                0
+
+217        1556 LOAD_CONST              22 ('name')
+           1558 LOAD_GLOBAL             35 (NULL + str)
+           1568 LOAD_FAST                7 (cl)
+           1570 LOAD_ATTR                5 (NULL|self + get)
+           1590 LOAD_CONST              22 ('name')
+           1592 CALL                     1
+           1600 COPY                     1
+           1602 POP_JUMP_IF_TRUE         2 (to 1608)
+           1604 POP_TOP
+           1606 LOAD_CONST              23 ('?')
+        >> 1608 CALL                     1
+
+216        1616 MAP_ADD                  1
+
+218        1618 LOAD_CONST              24 ('category')
+           1620 LOAD_GLOBAL             35 (NULL + str)
+           1630 LOAD_FAST                7 (cl)
+           1632 LOAD_ATTR                5 (NULL|self + get)
+           1652 LOAD_CONST              24 ('category')
+           1654 CALL                     1
+           1662 COPY                     1
+           1664 POP_JUMP_IF_TRUE         2 (to 1670)
+           1666 POP_TOP
+           1668 LOAD_CONST               5 ('General')
+        >> 1670 CALL                     1
+
+216        1678 MAP_ADD                  1
+
+219        1680 LOAD_CONST              25 ('why')
+           1682 LOAD_GLOBAL             35 (NULL + str)
+           1692 LOAD_FAST                7 (cl)
+           1694 LOAD_ATTR                5 (NULL|self + get)
+           1714 LOAD_CONST              25 ('why')
+           1716 CALL                     1
+           1724 COPY                     1
+           1726 POP_JUMP_IF_TRUE         2 (to 1732)
+           1728 POP_TOP
+           1730 LOAD_CONST               7 ('')
+        >> 1732 CALL                     1
+
+216        1740 MAP_ADD                  1
+
+220        1742 LOAD_CONST              26 ('fresh_angle')
+           1744 LOAD_GLOBAL             35 (NULL + str)
+           1754 LOAD_FAST                7 (cl)
+           1756 LOAD_ATTR                5 (NULL|self + get)
+           1776 LOAD_CONST              26 ('fresh_angle')
+           1778 CALL                     1
+           1786 COPY                     1
+           1788 POP_JUMP_IF_TRUE         2 (to 1794)
+           1790 POP_TOP
+           1792 LOAD_CONST               7 ('')
+        >> 1794 CALL                     1
+
+216        1802 MAP_ADD                  1
+
+221        1804 LOAD_CONST               3 ('keywords')
+           1806 LOAD_FAST                7 (cl)
+           1808 LOAD_CONST               3 ('keywords')
+           1810 BINARY_SUBSCR
+
+216        1814 MAP_ADD                  1
+
+222        1816 LOAD_CONST              27 ('video_count')
+           1818 LOAD_FAST               22 (total)
+
+216        1820 MAP_ADD                  1
+
+223        1822 LOAD_CONST              28 ('avg_views')
+           1824 LOAD_FAST               20 (views)
+           1826 POP_JUMP_IF_FALSE       32 (to 1892)
+           1828 LOAD_GLOBAL             29 (NULL + round)
+           1838 LOAD_GLOBAL             33 (NULL + sum)
+           1848 LOAD_FAST               20 (views)
+           1850 CALL                     1
+           1858 LOAD_GLOBAL             25 (NULL + len)
+           1868 LOAD_FAST               20 (views)
+           1870 CALL                     1
+           1878 BINARY_OP               11 (/)
+           1882 CALL                     1
+           1890 JUMP_FORWARD             1 (to 1894)
+        >> 1892 LOAD_CONST               2 (None)
+
+216     >> 1894 MAP_ADD                  1
+
+224        1896 LOAD_CONST              29 ('median_views')
+           1898 LOAD_FAST               23 (median_views)
+           1900 COPY                     1
+           1902 POP_JUMP_IF_TRUE         2 (to 1908)
+           1904 POP_TOP
+           1906 LOAD_CONST               2 (None)
+
+216     >> 1908 MAP_ADD                  1
+
+225        1910 LOAD_CONST              30 ('short_count')
+           1912 LOAD_GLOBAL             25 (NULL + len)
+           1922 LOAD_FAST               15 (shorts)
+           1924 CALL                     1
+
+216        1932 MAP_ADD                  1
+
+226        1934 LOAD_CONST              31 ('long_count')
+           1936 LOAD_GLOBAL             25 (NULL + len)
+           1946 LOAD_FAST               16 (longs)
+           1948 CALL                     1
+
+216        1956 MAP_ADD                  1
+
+227        1958 LOAD_CONST              32 ('short_median_views')
+           1960 LOAD_FAST               17 (short_views)
+           1962 POP_JUMP_IF_FALSE       20 (to 2004)
+           1964 LOAD_GLOBAL             29 (NULL + round)
+           1974 LOAD_GLOBAL             31 (NULL + _median)
+           1984 LOAD_FAST               17 (short_views)
+           1986 CALL                     1
+           1994 CALL                     1
+           2002 JUMP_FORWARD             1 (to 2006)
+        >> 2004 LOAD_CONST               2 (None)
+
+216     >> 2006 MAP_ADD                  1
+
+228        2008 LOAD_CONST              33 ('long_median_views')
+           2010 LOAD_FAST               18 (long_views)
+           2012 POP_JUMP_IF_FALSE       20 (to 2054)
+           2014 LOAD_GLOBAL             29 (NULL + round)
+           2024 LOAD_GLOBAL             31 (NULL + _median)
+           2034 LOAD_FAST               18 (long_views)
+           2036 CALL                     1
+           2044 CALL                     1
+           2052 JUMP_FORWARD             1 (to 2056)
+        >> 2054 LOAD_CONST               2 (None)
+
+216     >> 2056 MAP_ADD                  1
+
+229        2058 LOAD_CONST              34 ('channel_count')
+           2060 LOAD_GLOBAL             25 (NULL + len)
+           2070 LOAD_FAST               21 (channels)
+           2072 CALL                     1
+
+216        2080 MAP_ADD                  1
+
+230        2082 LOAD_CONST              35 ('competition')
+           2084 LOAD_GLOBAL             29 (NULL + round)
+           2094 LOAD_GLOBAL             37 (NULL + _hhi)
+           2104 LOAD_GLOBAL             39 (NULL + list)
+           2114 LOAD_FAST               21 (channels)
+           2116 LOAD_ATTR               17 (NULL|self + values)
+           2136 CALL                     0
+           2144 CALL                     1
+           2152 CALL                     1
+           2160 LOAD_CONST              36 (2)
+           2162 CALL                     2
+
+216        2170 MAP_ADD                  1
+
+231        2172 LOAD_CONST              37 ('recent_share')
+           2174 LOAD_GLOBAL             29 (NULL + round)
+           2184 LOAD_FAST               26 (recent_share)
+           2186 LOAD_CONST              36 (2)
+           2188 CALL                     2
+
+216        2196 MAP_ADD                  1
+
+232        2198 LOAD_CONST              38 ('median_age_days')
+           2200 LOAD_FAST               25 (ages)
+           2202 POP_JUMP_IF_FALSE       20 (to 2244)
+           2204 LOAD_GLOBAL             29 (NULL + round)
+           2214 LOAD_GLOBAL             31 (NULL + _median)
+           2224 LOAD_FAST               25 (ages)
+           2226 CALL                     1
+           2234 CALL                     1
+           2242 JUMP_FORWARD             1 (to 2246)
+        >> 2244 LOAD_CONST               2 (None)
+
+216     >> 2246 MAP_ADD                  1
+
+233        2248 LOAD_CONST              39 ('dormant')
+           2250 LOAD_GLOBAL             41 (NULL + bool)
+           2260 LOAD_FAST               25 (ages)
+           2262 CALL                     1
+           2270 COPY                     1
+           2272 POP_JUMP_IF_FALSE        9 (to 2292)
+           2274 POP_TOP
+           2276 LOAD_FAST               26 (recent_share)
+           2278 LOAD_GLOBAL             42 (_DORMANT_RECENT_SHARE)
+           2288 COMPARE_OP               2 (<)
+
+216     >> 2292 MAP_ADD                  1
+
+234        2294 LOAD_GLOBAL             29 (NULL + round)
+           2304 LOAD_FAST               30 (smallwin)
+           2306 LOAD_CONST              36 (2)
+           2308 CALL                     2
+
+235        2316 LOAD_FAST               28 (vps)
+           2318 POP_JUMP_IF_FALSE       21 (to 2362)
+           2320 LOAD_GLOBAL             29 (NULL + round)
+           2330 LOAD_GLOBAL             31 (NULL + _median)
+           2340 LOAD_FAST               28 (vps)
+           2342 CALL                     1
+           2350 LOAD_CONST              36 (2)
+           2352 CALL                     2
+           2360 JUMP_FORWARD             1 (to 2364)
+        >> 2362 LOAD_CONST               2 (None)
+
+236     >> 2364 LOAD_FAST               22 (total)
+           2366 LOAD_GLOBAL             44 (_MIN_CONFIDENT_VIDEOS)
+           2376 COMPARE_OP               2 (<)
+
+237        2380 LOAD_FAST               21 (channels)
+           2382 LOAD_ATTR               47 (NULL|self + most_common)
+           2402 LOAD_GLOBAL             48 (_CLUSTER_CHANNEL_SAMPLE)
+           2412 CALL                     1
+           2420 GET_ITER
+           2422 LOAD_FAST_AND_CLEAR     31 (n)
+           2424 LOAD_FAST_AND_CLEAR     32 (c)
+           2426 SWAP                     3
+           2428 BUILD_LIST               0
+           2430 SWAP                     2
+        >> 2432 FOR_ITER                10 (to 2456)
+           2436 UNPACK_SEQUENCE          2
+           2440 STORE_FAST              31 (n)
+           2442 STORE_FAST              32 (c)
+           2444 LOAD_FAST               31 (n)
+           2446 LOAD_FAST               32 (c)
+           2448 LOAD_CONST              40 (('name', 'count'))
+           2450 BUILD_CONST_KEY_MAP      2
+           2452 LIST_APPEND              2
+           2454 JUMP_BACKWARD           12 (to 2432)
+        >> 2456 END_FOR
+           2458 SWAP                     3
+           2460 STORE_FAST              32 (c)
+           2462 STORE_FAST              31 (n)
+
+238        2464 LOAD_FAST               14 (videos)
+           2466 LOAD_CONST               2 (None)
+           2468 LOAD_GLOBAL             50 (_CLUSTER_VIDEO_SAMPLE)
+           2478 BINARY_SLICE
+           2480 GET_ITER
+           2482 LOAD_FAST_AND_CLEAR     13 (v)
+           2484 SWAP                     2
+           2486 BUILD_LIST               0
+           2488 SWAP                     2
+        >> 2490 FOR_ITER                13 (to 2520)
+           2494 STORE_FAST              13 (v)
+           2496 LOAD_GLOBAL             53 (NULL + _slim_video)
+           2506 LOAD_FAST               13 (v)
+           2508 CALL                     1
+           2516 LIST_APPEND              2
+           2518 JUMP_BACKWARD           15 (to 2490)
+        >> 2520 END_FOR
+           2522 SWAP                     2
+           2524 STORE_FAST              13 (v)
+
+216        2526 LOAD_CONST              41 (('smallwin', 'views_per_sub_median', 'low_confidence', 'channels', 'videos'))
+           2528 BUILD_CONST_KEY_MAP      5
+           2530 DICT_UPDATE              1
+           2532 CALL                     1
+           2540 POP_TOP
+           2542 EXTENDED_ARG             4
+           2544 JUMP_BACKWARD         1065 (to 416)
+
+178     >> 2546 END_FOR
+
+241        2548 LOAD_FAST               11 (out)
+           2550 GET_ITER
+        >> 2552 FOR_ITER               152 (to 2860)
+           2556 STORE_FAST               7 (cl)
+
+242        2558 LOAD_FAST                7 (cl)
+           2560 LOAD_CONST              29 ('median_views')
+           2562 BINARY_SUBSCR
+           2566 COPY                     1
+           2568 POP_JUMP_IF_TRUE         2 (to 2574)
+           2570 POP_TOP
+           2572 LOAD_CONST               1 (0)
+        >> 2574 STORE_FAST              33 (med)
+
+245        2576 LOAD_FAST               33 (med)
+           2578 LOAD_CONST              42 (1)
+           2580 COMPARE_OP              68 (>)
+           2584 POP_JUMP_IF_FALSE       57 (to 2700)
+
+244        2586 LOAD_GLOBAL             55 (NULL + min)
+           2596 LOAD_CONST              43 (1.0)
+           2598 LOAD_GLOBAL             57 (NULL + math)
+           2608 LOAD_ATTR               58 (log10)
+           2628 LOAD_FAST               33 (med)
+           2630 CALL                     1
+           2638 LOAD_GLOBAL             57 (NULL + math)
+           2648 LOAD_ATTR               58 (log10)
+           2668 LOAD_GLOBAL             60 (_DEMAND_SATURATION_VIEWS)
+           2678 CALL                     1
+           2686 BINARY_OP               11 (/)
+           2690 CALL                     2
+           2698 JUMP_FORWARD             1 (to 2702)
+
+245     >> 2700 LOAD_CONST              19 (0.0)
+
+244     >> 2702 STORE_FAST              34 (demand)
+
+246        2704 LOAD_CONST              43 (1.0)
+           2706 LOAD_FAST                7 (cl)
+           2708 LOAD_CONST              35 ('competition')
+           2710 BINARY_SUBSCR
+           2714 BINARY_OP               10 (-)
+           2718 STORE_FAST              35 (openness)
+
+247        2720 LOAD_GLOBAL             21 (NULL + int)
+           2730 LOAD_GLOBAL             29 (NULL + round)
+           2740 LOAD_CONST              44 (100)
+
+248        2742 LOAD_GLOBAL             62 (_W_DEMAND)
+           2752 LOAD_FAST               34 (demand)
+           2754 BINARY_OP                5 (*)
+
+249        2758 LOAD_GLOBAL             64 (_W_OPENNESS)
+           2768 LOAD_FAST               35 (openness)
+           2770 BINARY_OP                5 (*)
+
+248        2774 BINARY_OP                0 (+)
+
+250        2778 LOAD_GLOBAL             66 (_W_SMALLWIN)
+           2788 LOAD_FAST                7 (cl)
+           2790 LOAD_CONST              45 ('smallwin')
+           2792 BINARY_SUBSCR
+           2796 BINARY_OP                5 (*)
+
+248        2800 BINARY_OP                0 (+)
+
+251        2804 LOAD_GLOBAL             68 (_W_FRESHNESS)
+           2814 LOAD_FAST                7 (cl)
+           2816 LOAD_CONST              37 ('recent_share')
+           2818 BINARY_SUBSCR
+           2822 BINARY_OP                5 (*)
+
+248        2826 BINARY_OP                0 (+)
+
+247        2830 BINARY_OP                5 (*)
+           2834 CALL                     1
+           2842 CALL                     1
+           2850 LOAD_FAST                7 (cl)
+           2852 LOAD_CONST              46 ('opportunity')
+           2854 STORE_SUBSCR
+           2858 JUMP_BACKWARD          154 (to 2552)
+
+241     >> 2860 END_FOR
+
+253        2862 LOAD_FAST               11 (out)
+           2864 LOAD_ATTR               71 (NULL|self + sort)
+           2884 LOAD_CONST              47 (<code object <lambda> at 0x7f6c9250cb90, file "app\services\keyword_intel_service.py", line 253>)
+           2886 MAKE_FUNCTION            0
+           2888 LOAD_CONST              12 (True)
+           2890 KW_NAMES                13 (('key', 'reverse'))
+           2892 CALL                     2
+           2900 POP_TOP
+
+254        2902 LOAD_CONST              48 ('clusters')
+           2904 LOAD_FAST               11 (out)
+           2906 BUILD_MAP                1
+           2908 RETURN_VALUE
+        >> 2910 SWAP                     2
+           2912 POP_TOP
+
+166        2914 SWAP                     2
+           2916 STORE_FAST               8 (k)
+           2918 RERAISE                  0
+        >> 2920 SWAP                     2
+           2922 POP_TOP
+
+171        2924 SWAP                     2
+           2926 STORE_FAST               8 (k)
+           2928 RERAISE                  0
+        >> 2930 SWAP                     2
+           2932 POP_TOP
+
+192        2934 SWAP                     2
+           2936 STORE_FAST              13 (v)
+           2938 RERAISE                  0
+        >> 2940 SWAP                     2
+           2942 POP_TOP
+
+193        2944 SWAP                     2
+           2946 STORE_FAST              13 (v)
+           2948 RERAISE                  0
+        >> 2950 SWAP                     2
+           2952 POP_TOP
+
+194        2954 SWAP                     2
+           2956 STORE_FAST              13 (v)
+           2958 RERAISE                  0
+        >> 2960 SWAP                     2
+           2962 POP_TOP
+
+195        2964 SWAP                     2
+           2966 STORE_FAST              13 (v)
+           2968 RERAISE                  0
+        >> 2970 SWAP                     2
+           2972 POP_TOP
+
+198        2974 SWAP                     2
+           2976 STORE_FAST              13 (v)
+           2978 RERAISE                  0
+        >> 2980 SWAP                     2
+           2982 POP_TOP
+
+204        2984 SWAP                     2
+           2986 STORE_FAST              24 (a)
+           2988 RERAISE                  0
+        >> 2990 SWAP                     2
+           2992 POP_TOP
+
+207        2994 SWAP                     2
+           2996 STORE_FAST              27 (p)
+           2998 RERAISE                  0
+        >> 3000 SWAP                     2
+           3002 POP_TOP
+
+237        3004 SWAP                     3
+           3006 STORE_FAST              32 (c)
+           3008 STORE_FAST              31 (n)
+           3010 RERAISE                  0
+        >> 3012 SWAP                     2
+           3014 POP_TOP
+
+238        3016 SWAP                     2
+           3018 STORE_FAST              13 (v)
+           3020 RERAISE                  0
+ExceptionTable:
+  132 to 148 -> 2910 [3]
+  152 to 158 -> 2910 [3]
+  162 to 168 -> 2910 [3]
+  272 to 288 -> 2920 [2]
+  292 to 298 -> 2920 [2]
+  686 to 728 -> 2930 [3]
+  732 to 738 -> 2930 [3]
+  752 to 794 -> 2940 [3]
+  798 to 804 -> 2940 [3]
+  818 to 900 -> 2950 [3]
+  904 to 916 -> 2950 [3]
+  930 to 1012 -> 2960 [3]
+  1016 to 1028 -> 2960 [3]
+  1096 to 1178 -> 2970 [3]
+  1182 to 1194 -> 2970 [3]
+  1332 to 1344 -> 2980 [3]
+  1348 to 1354 -> 2980 [3]
+  1450 to 1462 -> 2990 [3]
+  1466 to 1472 -> 2990 [3]
+  2428 to 2456 -> 3000 [10]
+  2486 to 2520 -> 3012 [10]
+
+Disassembly of <code object <lambda> at 0x7f6c922b56b0, file "app\services\keyword_intel_service.py", line 186>:
+186           0 RESUME                   0
+              2 LOAD_FAST                0 (v)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_CONST               1 ('view_count')
+             26 CALL                     1
+             34 LOAD_CONST               0 (None)
+             36 IS_OP                    1
+             38 LOAD_FAST                0 (v)
+             40 LOAD_ATTR                1 (NULL|self + get)
+             60 LOAD_CONST               1 ('view_count')
+             62 CALL                     1
+             70 COPY                     1
+             72 POP_JUMP_IF_TRUE         2 (to 78)
+             74 POP_TOP
+             76 LOAD_CONST               2 (0)
+        >>   78 BUILD_TUPLE              2
+             80 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c922b5b30, file "app\services\keyword_intel_service.py", line 200>:
+200           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                34 (to 80)
+             12 STORE_FAST               1 (v)
+             14 LOAD_GLOBAL              1 (NULL + str)
+             24 LOAD_FAST                1 (v)
+             26 LOAD_ATTR                3 (NULL|self + get)
+             46 LOAD_CONST               0 ('channel')
+             48 CALL                     1
+             56 COPY                     1
+             58 POP_JUMP_IF_TRUE         2 (to 64)
+             60 POP_TOP
+             62 LOAD_CONST               1 ('?')
+        >>   64 CALL                     1
+             72 YIELD_VALUE              1
+             74 RESUME                   1
+             76 POP_TOP
+             78 JUMP_BACKWARD           36 (to 8)
+        >>   80 END_FOR
+             82 RETURN_CONST             2 (None)
+        >>   84 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             86 RERAISE                  1
+ExceptionTable:
+  4 to 82 -> 84 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c92407e30, file "app\services\keyword_intel_service.py", line 204>:
+              0 COPY_FREE_VARS           1
+
+204           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                16 (to 46)
+             14 STORE_FAST               1 (v)
+             16 LOAD_GLOBAL              1 (NULL + _age_days)
+             26 LOAD_FAST                1 (v)
+             28 LOAD_DEREF               2 (now)
+             30 CALL                     2
+             38 YIELD_VALUE              1
+             40 RESUME                   1
+             42 POP_TOP
+             44 JUMP_BACKWARD           18 (to 10)
+        >>   46 END_FOR
+             48 RETURN_CONST             0 (None)
+        >>   50 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             52 RERAISE                  1
+ExceptionTable:
+  6 to 48 -> 50 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c927e0130, file "app\services\keyword_intel_service.py", line 205>:
+205           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                16 (to 44)
+             12 STORE_FAST               1 (a)
+             14 LOAD_FAST                1 (a)
+             16 LOAD_GLOBAL              0 (_RECENT_DAYS)
+             26 COMPARE_OP              26 (<=)
+             30 POP_JUMP_IF_TRUE         1 (to 34)
+             32 JUMP_BACKWARD           13 (to 8)
+        >>   34 LOAD_CONST               0 (1)
+             36 YIELD_VALUE              1
+             38 RESUME                   1
+             40 POP_TOP
+             42 JUMP_BACKWARD           18 (to 8)
+        >>   44 END_FOR
+             46 RETURN_CONST             1 (None)
+        >>   48 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             50 RERAISE                  1
+ExceptionTable:
+  4 to 30 -> 48 [0] lasti
+  34 to 46 -> 48 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c927e2930, file "app\services\keyword_intel_service.py", line 207>:
+207           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                15 (to 42)
+             12 STORE_FAST               1 (v)
+             14 LOAD_GLOBAL              1 (NULL + _views_per_sub)
+             24 LOAD_FAST                1 (v)
+             26 CALL                     1
+             34 YIELD_VALUE              1
+             36 RESUME                   1
+             38 POP_TOP
+             40 JUMP_BACKWARD           17 (to 8)
+        >>   42 END_FOR
+             44 RETURN_CONST             0 (None)
+        >>   46 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             48 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 46 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c928fd5c0, file "app\services\keyword_intel_service.py", line 208>:
+208           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+
+209     >>    8 FOR_ITER                77 (to 166)
+             12 STORE_FAST               1 (v)
+
+210          14 LOAD_GLOBAL              1 (NULL + _views_per_sub)
+             24 LOAD_FAST                1 (v)
+             26 CALL                     1
+             34 COPY                     1
+             36 POP_JUMP_IF_TRUE         2 (to 42)
+             38 POP_TOP
+             40 LOAD_CONST               0 (0)
+        >>   42 LOAD_GLOBAL              2 (_SMALLWIN_VPS)
+             52 COMPARE_OP              92 (>=)
+             56 POP_JUMP_IF_FALSE       53 (to 164)
+
+211          58 LOAD_GLOBAL              5 (NULL + isinstance)
+             68 LOAD_FAST                1 (v)
+             70 LOAD_ATTR                7 (NULL|self + get)
+             90 LOAD_CONST               1 ('channel_subs')
+             92 CALL                     1
+            100 LOAD_GLOBAL              8 (int)
+            110 LOAD_GLOBAL             10 (float)
+            120 BUILD_TUPLE              2
+            122 CALL                     2
+            130 POP_JUMP_IF_FALSE       16 (to 164)
+
+212         132 LOAD_FAST                1 (v)
+            134 LOAD_CONST               1 ('channel_subs')
+            136 BINARY_SUBSCR
+            140 LOAD_GLOBAL             12 (_SMALL_CHANNEL_SUBS)
+            150 COMPARE_OP              26 (<=)
+            154 POP_JUMP_IF_FALSE        4 (to 164)
+
+209         156 LOAD_CONST               2 (1)
+            158 YIELD_VALUE              1
+            160 RESUME                   1
+            162 POP_TOP
+        >>  164 JUMP_BACKWARD           79 (to 8)
+        >>  166 END_FOR
+            168 RETURN_CONST             3 (None)
+        >>  170 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            172 RERAISE                  1
+ExceptionTable:
+  4 to 168 -> 170 [0] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c9250cb90, file "app\services\keyword_intel_service.py", line 253>:
+253           0 RESUME                   0
+              2 LOAD_FAST                0 (c)
+              4 LOAD_CONST               1 ('opportunity')
+              6 BINARY_SUBSCR
+             10 RETURN_VALUE
+
+Disassembly of <code object _slim_video at 0x7f6c926fb990, file "app\services\keyword_intel_service.py", line 257>:
+257           0 RESUME                   0
+
+258           2 LOAD_CONST               1 (('id', 'title', 'view_count', 'concurrent_viewers', 'is_live', 'duration', 'channel', 'channel_id', 'channel_url', 'timestamp', 'thumbnail', 'webpage_url', 'is_short', 'channel_subs'))
+              4 GET_ITER
+              6 LOAD_FAST_AND_CLEAR      1 (k)
+              8 SWAP                     2
+             10 BUILD_MAP                0
+             12 SWAP                     2
+        >>   14 FOR_ITER                20 (to 58)
+             18 STORE_FAST               1 (k)
+             20 LOAD_FAST                1 (k)
+             22 LOAD_FAST                0 (v)
+             24 LOAD_ATTR                1 (NULL|self + get)
+             44 LOAD_FAST                1 (k)
+             46 CALL                     1
+             54 MAP_ADD                  2
+             56 JUMP_BACKWARD           22 (to 14)
+        >>   58 END_FOR
+             60 SWAP                     2
+             62 STORE_FAST               1 (k)
+             64 RETURN_VALUE
+        >>   66 SWAP                     2
+             68 POP_TOP
+             70 SWAP                     2
+             72 STORE_FAST               1 (k)
+             74 RERAISE                  0
+ExceptionTable:
+  10 to 58 -> 66 [2]
+
+Disassembly of <code object _cluster_messages at 0x28bd2400, file "app\services\keyword_intel_service.py", line 265>:
+265           0 RESUME                   0
+
+266           2 LOAD_GLOBAL              0 (_DEPTHS)
+             12 LOAD_ATTR                3 (NULL|self + get)
+             32 LOAD_FAST                1 (depth)
+             34 LOAD_GLOBAL              0 (_DEPTHS)
+             44 LOAD_CONST               1 ('medium')
+             46 BINARY_SUBSCR
+             50 CALL                     2
+             58 UNPACK_SEQUENCE          2
+             62 STORE_FAST               3 (lo)
+             64 STORE_FAST               4 (hi)
+
+267          66 BUILD_LIST               0
+             68 STORE_FAST               5 (lines)
+
+268          70 LOAD_FAST                0 (kw_data)
+             72 GET_ITER
+        >>   74 FOR_ITER                83 (to 244)
+             78 STORE_FAST               6 (item)
+
+269          80 LOAD_CONST               2 (' | ')
+             82 LOAD_ATTR                5 (NULL|self + join)
+            102 LOAD_CONST               3 (<code object <genexpr> at 0x7f6c926fb880, file "app\services\keyword_intel_service.py", line 269>)
+            104 MAKE_FUNCTION            0
+            106 LOAD_FAST                6 (item)
+            108 LOAD_CONST               4 ('videos')
+            110 BINARY_SUBSCR
+            114 LOAD_CONST               0 (None)
+            116 LOAD_CONST               5 (5)
+            118 BINARY_SLICE
+            120 GET_ITER
+            122 CALL                     0
+            130 CALL                     1
+            138 STORE_FAST               7 (titles)
+
+270         140 LOAD_FAST                5 (lines)
+            142 LOAD_ATTR                7 (NULL|self + append)
+            162 LOAD_CONST               6 ('- KEYWORD: ')
+            164 LOAD_FAST                6 (item)
+            166 LOAD_CONST               7 ('keyword')
+            168 BINARY_SUBSCR
+            172 FORMAT_VALUE             0
+            174 LOAD_CONST               8 (' · median ')
+            176 LOAD_FAST                6 (item)
+            178 LOAD_CONST               9 ('stats')
+            180 BINARY_SUBSCR
+            184 LOAD_ATTR                3 (NULL|self + get)
+            204 LOAD_CONST              10 ('median_views')
+            206 CALL                     1
+            214 COPY                     1
+            216 POP_JUMP_IF_TRUE         2 (to 222)
+            218 POP_TOP
+            220 LOAD_CONST              11 (0)
+        >>  222 FORMAT_VALUE             0
+            224 LOAD_CONST              12 (' views · sample titles: ')
+
+271         226 LOAD_FAST                7 (titles)
+            228 FORMAT_VALUE             0
+
+270         230 BUILD_STRING             6
+            232 CALL                     1
+            240 POP_TOP
+            242 JUMP_BACKWARD           85 (to 74)
+
+268     >>  244 END_FOR
+
+273         246 LOAD_CONST              13 ('You are a YouTube niche analyst. You group SEARCH KEYWORDS into distinct content-niche clusters based on what the top results actually are (not surface word similarity). Every input keyword must be assigned to exactly one cluster. Return strict JSON only.')
+
+272         248 STORE_FAST               8 (system)
+
+278         250 LOAD_CONST              14 ('INPUT KEYWORDS with their top YouTube results:\n')
+            252 LOAD_CONST              15 ('\n')
+            254 LOAD_ATTR                5 (NULL|self + join)
+            274 LOAD_FAST                5 (lines)
+            276 CALL                     1
+            284 BINARY_OP                0 (+)
+            288 LOAD_CONST              16 ('\n\nTASK: group these keywords into ')
+
+279         290 LOAD_FAST                3 (lo)
+            292 FORMAT_VALUE             0
+            294 LOAD_CONST              17 ('–')
+            296 LOAD_FAST                4 (hi)
+            298 FORMAT_VALUE             0
+            300 LOAD_CONST              18 (" clusters of the SAME content niche/audience. For each cluster give: name (short, in language '")
+
+278         302 BUILD_STRING             5
+            304 BINARY_OP                0 (+)
+
+280         308 LOAD_FAST                2 (language)
+            310 COPY                     1
+            312 POP_JUMP_IF_TRUE         2 (to 318)
+            314 POP_TOP
+            316 LOAD_CONST              19 ('vi')
+
+278     >>  318 BINARY_OP                0 (+)
+
+280         322 LOAD_CONST              20 ('\'), category (one of: General, Commercial/Review, Kids, News, Music, Gaming, Education, Entertainment, Sports, Tech), why (1 câu: điểm chung của cụm + vì sao đáng chú ý), fresh_angle (1 góc content GỐC một creator mới có thể làm trong cụm này).\nReturn ONLY: {"clusters": [{"name": "...", "keywords": ["..."], "category": "...", "why": "...", "fresh_angle": "..."}]}')
+
+278         324 BINARY_OP                0 (+)
+
+277         328 STORE_FAST               9 (user)
+
+287         330 LOAD_FAST                8 (system)
+            332 LOAD_FAST                9 (user)
+            334 BUILD_TUPLE              2
+            336 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c926fb880, file "app\services\keyword_intel_service.py", line 269>:
+269           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                28 (to 68)
+             12 STORE_FAST               1 (v)
+             14 LOAD_FAST                1 (v)
+             16 LOAD_ATTR                1 (NULL|self + get)
+             36 LOAD_CONST               0 ('title')
+             38 CALL                     1
+             46 COPY                     1
+             48 POP_JUMP_IF_TRUE         2 (to 54)
+             50 POP_TOP
+             52 LOAD_CONST               1 ('')
+        >>   54 LOAD_CONST               2 (None)
+             56 LOAD_CONST               3 (70)
+             58 BINARY_SLICE
+             60 YIELD_VALUE              1
+             62 RESUME                   1
+             64 POP_TOP
+             66 JUMP_BACKWARD           30 (to 8)
+        >>   68 END_FOR
+             70 RETURN_CONST             2 (None)
+        >>   72 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             74 RERAISE                  1
+ExceptionTable:
+  4 to 70 -> 72 [0] lasti
+
+Disassembly of <code object seed_keywords_from_channel at 0x28c522e0, file "app\services\keyword_intel_service.py", line 290>:
+              0 MAKE_CELL               13 (prof)
+
+290           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+298           8 LOAD_FAST                0 (profile)
+             10 COPY                     1
+             12 POP_JUMP_IF_TRUE         2 (to 18)
+             14 POP_TOP
+             16 BUILD_MAP                0
+        >>   18 STORE_DEREF             13 (prof)
+
+299          20 LOAD_CONST               1 ('\n')
+             22 LOAD_ATTR                1 (NULL|self + join)
+             42 LOAD_CLOSURE            13 (prof)
+             44 BUILD_TUPLE              1
+             46 LOAD_CONST               2 (<code object <genexpr> at 0x7f6c927a4d30, file "app\services\keyword_intel_service.py", line 299>)
+             48 MAKE_FUNCTION            8 (closure)
+
+301          50 LOAD_CONST               3 ((('niche', 'Ngách'), ('niche_angle', 'Góc trong ngách'), ('channel_brief', 'Mô tả kênh'), ('channel_orientation', 'Định hướng')))
+             52 GET_ITER
+
+299          54 CALL                     0
+             62 CALL                     1
+             70 STORE_FAST               3 (identity)
+
+305          72 LOAD_FAST                3 (identity)
+             74 POP_JUMP_IF_TRUE        26 (to 128)
+
+306          76 LOAD_GLOBAL              3 (NULL + make_error)
+             86 LOAD_GLOBAL              4 (E)
+             96 LOAD_ATTR                6 (PRECONDITION_MISSING)
+
+307         116 LOAD_CONST               4 ('Kênh chưa có ngách/mô tả/định hướng để gợi ý từ khoá. Điền phần mô tả kênh trong AI Studio trước.')
+
+306         118 CALL                     2
+            126 RAISE_VARARGS            1
+
+310     >>  128 LOAD_CONST               5 ("You turn a channel's identity into YouTube SEARCH KEYWORDS that its real audience actually types. Return strict JSON only.")
+            130 STORE_FAST               4 (system)
+
+313         132 LOAD_CONST               6 ('CHANNEL IDENTITY:\n')
+            134 LOAD_FAST                3 (identity)
+            136 FORMAT_VALUE             0
+            138 LOAD_CONST               7 ('\n\nTASK: propose ')
+
+314         140 LOAD_FAST                2 (limit)
+            142 FORMAT_VALUE             0
+            144 LOAD_CONST               8 (" search keywords this channel should investigate. Mix head terms and long-tail phrasings; write them the way a viewer would type them, in language code '")
+
+316         146 LOAD_FAST                1 (language)
+            148 FORMAT_VALUE             0
+            150 LOAD_CONST               9 ('\'. No hashtags, no quotes, no channel names.\nReturn ONLY: {"keywords": ["...", "..."]}')
+
+313         152 BUILD_STRING             7
+
+312         154 STORE_FAST               5 (user)
+
+319         156 LOAD_GLOBAL              9 (NULL + complete_text)
+            166 LOAD_FAST                4 (system)
+            168 LOAD_FAST                5 (user)
+            170 LOAD_CONST              10 (0.6)
+            172 KW_NAMES                11 (('temperature',))
+            174 CALL                     3
+            182 GET_AWAITABLE            0
+            184 LOAD_CONST              12 (None)
+        >>  186 SEND                     3 (to 196)
+            190 YIELD_VALUE              2
+            192 RESUME                   3
+            194 JUMP_BACKWARD_NO_INTERRUPT     5 (to 186)
+        >>  196 END_SEND
+            198 STORE_FAST               6 (raw)
+
+320         200 NOP
+
+321         202 LOAD_GLOBAL             11 (NULL + ideation_service)
+            212 LOAD_ATTR               12 (extract_json_object)
+            232 LOAD_FAST                6 (raw)
+            234 CALL                     1
+            242 STORE_FAST               7 (obj)
+
+324         244 BUILD_LIST               0
+            246 STORE_FAST               9 (seen)
+
+325         248 LOAD_FAST                7 (obj)
+            250 LOAD_ATTR               19 (NULL|self + get)
+            270 LOAD_CONST              14 ('keywords')
+            272 CALL                     1
+            280 COPY                     1
+            282 POP_JUMP_IF_TRUE         2 (to 288)
+            284 POP_TOP
+            286 BUILD_LIST               0
+        >>  288 GET_ITER
+        >>  290 FOR_ITER               113 (to 520)
+            294 STORE_FAST              10 (item)
+
+326         296 LOAD_GLOBAL             21 (NULL + str)
+            306 LOAD_FAST               10 (item)
+            308 COPY                     1
+            310 POP_JUMP_IF_TRUE         2 (to 316)
+            312 POP_TOP
+            314 LOAD_CONST              15 ('')
+        >>  316 CALL                     1
+            324 LOAD_ATTR               23 (NULL|self + strip)
+            344 CALL                     0
+            352 LOAD_ATTR               23 (NULL|self + strip)
+            372 LOAD_CONST              16 ('"#')
+            374 CALL                     1
+            382 STORE_FAST              11 (text)
+
+327         384 LOAD_FAST               11 (text)
+            386 POP_JUMP_IF_TRUE         1 (to 390)
+            388 JUMP_BACKWARD           50 (to 290)
+        >>  390 LOAD_FAST               11 (text)
+            392 LOAD_ATTR               25 (NULL|self + lower)
+            412 CALL                     0
+            420 LOAD_FAST                9 (seen)
+            422 GET_ITER
+            424 LOAD_FAST_AND_CLEAR     12 (s)
+            426 SWAP                     2
+            428 BUILD_SET                0
+            430 SWAP                     2
+        >>  432 FOR_ITER                18 (to 472)
+            436 STORE_FAST              12 (s)
+            438 LOAD_FAST               12 (s)
+            440 LOAD_ATTR               25 (NULL|self + lower)
+            460 CALL                     0
+            468 SET_ADD                  2
+            470 JUMP_BACKWARD           20 (to 432)
+        >>  472 END_FOR
+            474 SWAP                     2
+            476 STORE_FAST              12 (s)
+            478 CONTAINS_OP              1
+            480 POP_JUMP_IF_TRUE         1 (to 484)
+            482 JUMP_BACKWARD           97 (to 290)
+
+328     >>  484 LOAD_FAST                9 (seen)
+            486 LOAD_ATTR               27 (NULL|self + append)
+            506 LOAD_FAST               11 (text)
+            508 CALL                     1
+            516 POP_TOP
+            518 JUMP_BACKWARD          115 (to 290)
+
+325     >>  520 END_FOR
+
+329         522 LOAD_CONST              14 ('keywords')
+            524 LOAD_FAST                9 (seen)
+            526 LOAD_CONST              12 (None)
+            528 LOAD_FAST                2 (limit)
+            530 BINARY_SLICE
+            532 BUILD_MAP                1
+            534 RETURN_VALUE
+
+319     >>  536 CLEANUP_THROW
+            538 JUMP_BACKWARD          172 (to 196)
+        >>  540 PUSH_EXC_INFO
+
+322         542 LOAD_GLOBAL             14 (ValueError)
+            552 CHECK_EXC_MATCH
+            554 POP_JUMP_IF_FALSE       34 (to 624)
+            556 STORE_FAST               8 (exc)
+
+323         558 LOAD_GLOBAL              3 (NULL + make_error)
+            568 LOAD_GLOBAL              4 (E)
+            578 LOAD_ATTR               16 (UNKNOWN)
+            598 LOAD_CONST              13 ('AI trả danh sách từ khoá sai định dạng: ')
+            600 LOAD_FAST                8 (exc)
+            602 FORMAT_VALUE             0
+            604 BUILD_STRING             2
+            606 CALL                     2
+            614 RAISE_VARARGS            1
+        >>  616 LOAD_CONST              12 (None)
+            618 STORE_FAST               8 (exc)
+            620 DELETE_FAST              8 (exc)
+            622 RERAISE                  1
+
+322     >>  624 RERAISE                  0
+        >>  626 COPY                     3
+            628 POP_EXCEPT
+            630 RERAISE                  1
+        >>  632 SWAP                     2
+            634 POP_TOP
+
+327         636 SWAP                     2
+            638 STORE_FAST              12 (s)
+            640 RERAISE                  0
+        >>  642 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            644 RERAISE                  1
+ExceptionTable:
+  6 to 188 -> 642 [0] lasti
+  190 to 190 -> 536 [2]
+  192 to 198 -> 642 [0] lasti
+  202 to 242 -> 540 [0]
+  244 to 386 -> 642 [0] lasti
+  390 to 426 -> 642 [0] lasti
+  428 to 472 -> 632 [4]
+  474 to 480 -> 642 [0] lasti
+  484 to 536 -> 642 [0] lasti
+  540 to 556 -> 626 [1] lasti
+  558 to 614 -> 616 [1] lasti
+  616 to 624 -> 626 [1] lasti
+  626 to 640 -> 642 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c927a4d30, file "app\services\keyword_intel_service.py", line 299>:
+              0 COPY_FREE_VARS           1
+
+299           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+
+301     >>   10 FOR_ITER               101 (to 216)
+             14 UNPACK_SEQUENCE          2
+             18 STORE_FAST               1 (key)
+             20 STORE_FAST               2 (label)
+
+303          22 LOAD_GLOBAL              1 (NULL + str)
+             32 LOAD_DEREF               3 (prof)
+             34 LOAD_ATTR                3 (NULL|self + get)
+             54 LOAD_FAST                1 (key)
+             56 CALL                     1
+             64 COPY                     1
+             66 POP_JUMP_IF_TRUE         2 (to 72)
+             68 POP_TOP
+             70 LOAD_CONST               0 ('')
+        >>   72 CALL                     1
+             80 LOAD_ATTR                5 (NULL|self + strip)
+            100 CALL                     0
+            108 POP_JUMP_IF_FALSE       52 (to 214)
+
+300         110 LOAD_CONST               1 ('- ')
+            112 LOAD_FAST                2 (label)
+            114 FORMAT_VALUE             0
+            116 LOAD_CONST               2 (': ')
+            118 LOAD_GLOBAL              1 (NULL + str)
+            128 LOAD_DEREF               3 (prof)
+            130 LOAD_ATTR                3 (NULL|self + get)
+            150 LOAD_FAST                1 (key)
+            152 CALL                     1
+            160 COPY                     1
+            162 POP_JUMP_IF_TRUE         2 (to 168)
+            164 POP_TOP
+            166 LOAD_CONST               0 ('')
+        >>  168 CALL                     1
+            176 LOAD_ATTR                5 (NULL|self + strip)
+            196 CALL                     0
+            204 FORMAT_VALUE             0
+            206 BUILD_STRING             4
+            208 YIELD_VALUE              1
+            210 RESUME                   1
+            212 POP_TOP
+        >>  214 JUMP_BACKWARD          103 (to 10)
+
+301     >>  216 END_FOR
+            218 RETURN_CONST             3 (None)
+        >>  220 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            222 RERAISE                  1
+ExceptionTable:
+  6 to 218 -> 220 [0] lasti
+
+Disassembly of <code object _cluster_with_llm at 0x28c4f9a0, file "app\services\keyword_intel_service.py", line 332>:
+332           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+334           6 LOAD_GLOBAL              1 (NULL + _cluster_messages)
+             16 LOAD_FAST                0 (kw_data)
+             18 LOAD_FAST                1 (depth)
+             20 LOAD_FAST                2 (language)
+             22 KW_NAMES                 1 (('depth', 'language'))
+             24 CALL                     3
+             32 UNPACK_SEQUENCE          2
+             36 STORE_FAST               4 (system)
+             38 STORE_FAST               5 (user)
+
+335          40 LOAD_GLOBAL              3 (NULL + complete_text)
+             50 LOAD_FAST                4 (system)
+             52 LOAD_FAST                5 (user)
+             54 LOAD_CONST               2 (0.4)
+             56 LOAD_FAST                3 (provider)
+             58 KW_NAMES                 3 (('temperature', 'provider'))
+             60 CALL                     4
+             68 GET_AWAITABLE            0
+             70 LOAD_CONST               0 (None)
+        >>   72 SEND                     3 (to 82)
+             76 YIELD_VALUE              2
+             78 RESUME                   3
+             80 JUMP_BACKWARD_NO_INTERRUPT     5 (to 72)
+        >>   82 END_SEND
+             84 STORE_FAST               6 (raw)
+
+336          86 NOP
+
+337          88 LOAD_GLOBAL              5 (NULL + ideation_service)
+             98 LOAD_ATTR                6 (extract_json_object)
+            118 LOAD_FAST                6 (raw)
+            120 CALL                     1
+            128 STORE_FAST               7 (obj)
+
+341         130 LOAD_GLOBAL             21 (NULL + isinstance)
+            140 LOAD_FAST                7 (obj)
+            142 LOAD_GLOBAL             22 (dict)
+            152 CALL                     2
+            160 POP_JUMP_IF_FALSE       17 (to 196)
+            162 LOAD_FAST                7 (obj)
+            164 LOAD_ATTR               25 (NULL|self + get)
+            184 LOAD_CONST               8 ('clusters')
+            186 CALL                     1
+            194 JUMP_FORWARD             1 (to 198)
+        >>  196 LOAD_CONST               0 (None)
+        >>  198 STORE_FAST               9 (clusters)
+
+342         200 LOAD_GLOBAL             21 (NULL + isinstance)
+            210 LOAD_FAST                9 (clusters)
+            212 LOAD_GLOBAL             26 (list)
+            222 CALL                     2
+            230 POP_JUMP_IF_FALSE        2 (to 236)
+            232 LOAD_FAST                9 (clusters)
+            234 RETURN_VALUE
+        >>  236 BUILD_LIST               0
+            238 RETURN_VALUE
+
+335     >>  240 CLEANUP_THROW
+            242 JUMP_BACKWARD           81 (to 82)
+        >>  244 PUSH_EXC_INFO
+
+338         246 LOAD_GLOBAL              8 (ValueError)
+            256 CHECK_EXC_MATCH
+            258 POP_JUMP_IF_FALSE       64 (to 388)
+            260 STORE_FAST               8 (exc)
+
+339         262 LOAD_GLOBAL             11 (NULL + log)
+            272 LOAD_ATTR               12 (warning)
+            292 LOAD_CONST               4 ('[keyword_intel] parse cụm lỗi: ')
+            294 LOAD_FAST                8 (exc)
+            296 FORMAT_VALUE             0
+            298 LOAD_CONST               5 (' · raw[:200]=')
+            300 LOAD_FAST                6 (raw)
+            302 LOAD_CONST               0 (None)
+            304 LOAD_CONST               6 (200)
+            306 BINARY_SLICE
+            308 FORMAT_VALUE             2 (repr)
+            310 BUILD_STRING             4
+            312 CALL                     1
+            320 POP_TOP
+
+340         322 LOAD_GLOBAL             15 (NULL + make_error)
+            332 LOAD_GLOBAL             16 (E)
+            342 LOAD_ATTR               18 (UNKNOWN)
+            362 LOAD_CONST               7 ('AI trả nhóm từ khóa sai định dạng JSON: ')
+            364 LOAD_FAST                8 (exc)
+            366 FORMAT_VALUE             0
+            368 BUILD_STRING             2
+            370 CALL                     2
+            378 RAISE_VARARGS            1
+        >>  380 LOAD_CONST               0 (None)
+            382 STORE_FAST               8 (exc)
+            384 DELETE_FAST              8 (exc)
+            386 RERAISE                  1
+
+338     >>  388 RERAISE                  0
+        >>  390 COPY                     3
+            392 POP_EXCEPT
+            394 RERAISE                  1
+        >>  396 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            398 RERAISE                  1
+ExceptionTable:
+  4 to 74 -> 396 [0] lasti
+  76 to 76 -> 240 [2]
+  78 to 84 -> 396 [0] lasti
+  88 to 128 -> 244 [0]
+  130 to 240 -> 396 [0] lasti
+  244 to 260 -> 390 [1] lasti
+  262 to 378 -> 380 [1] lasti
+  380 to 388 -> 390 [1] lasti
+  390 to 394 -> 396 [0] lasti
+
+Disassembly of <code object start_scan at 0x28c51e30, file "app\services\keyword_intel_service.py", line 347>:
+              0 MAKE_CELL               13 (clean)
+              2 MAKE_CELL               14 (job_queue)
+              4 MAKE_CELL               15 (row)
+
+347           6 RESUME                   0
+
+351           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('job_queue',))
+             12 IMPORT_NAME              0 (app.pipeline.queue)
+             14 IMPORT_FROM              1 (job_queue)
+             16 STORE_DEREF             14 (job_queue)
+             18 POP_TOP
+
+353          20 LOAD_GLOBAL              5 (NULL + list)
+             30 LOAD_GLOBAL              6 (dict)
+             40 LOAD_ATTR                9 (NULL|self + fromkeys)
+             60 LOAD_CONST               3 (<code object <genexpr> at 0x7f6c926ff5a0, file "app\services\keyword_intel_service.py", line 353>)
+             62 MAKE_FUNCTION            0
+             64 LOAD_FAST                1 (keywords)
+             66 GET_ITER
+             68 CALL                     0
+             76 CALL                     1
+             84 CALL                     1
+             92 STORE_DEREF             13 (clean)
+
+354          94 LOAD_DEREF              13 (clean)
+             96 POP_JUMP_IF_TRUE        28 (to 154)
+
+355          98 LOAD_GLOBAL             11 (NULL + StudioError)
+            108 LOAD_GLOBAL             12 (E)
+            118 LOAD_ATTR               14 (UNKNOWN)
+            138 LOAD_CONST               4 ('Chưa nhập từ khóa nào.')
+            140 LOAD_CONST               5 (422)
+            142 KW_NAMES                 6 (('status_code',))
+            144 CALL                     3
+            152 RAISE_VARARGS            1
+
+356     >>  154 LOAD_GLOBAL             17 (NULL + len)
+            164 LOAD_DEREF              13 (clean)
+            166 CALL                     1
+            174 LOAD_GLOBAL             18 (_MAX_KEYWORDS)
+            184 COMPARE_OP              68 (>)
+            188 POP_JUMP_IF_FALSE       36 (to 262)
+
+357         190 LOAD_GLOBAL             11 (NULL + StudioError)
+            200 LOAD_GLOBAL             12 (E)
+            210 LOAD_ATTR               14 (UNKNOWN)
+            230 LOAD_CONST               7 ('Tối đa ')
+            232 LOAD_GLOBAL             18 (_MAX_KEYWORDS)
+            242 FORMAT_VALUE             0
+            244 LOAD_CONST               8 (' từ khóa mỗi lượt.')
+            246 BUILD_STRING             3
+            248 LOAD_CONST               5 (422)
+            250 KW_NAMES                 6 (('status_code',))
+            252 CALL                     3
+            260 RAISE_VARARGS            1
+
+358     >>  262 LOAD_GLOBAL             21 (NULL + max)
+            272 LOAD_CONST               9 (3)
+            274 LOAD_GLOBAL             23 (NULL + min)
+            284 LOAD_CONST              10 (20)
+            286 LOAD_GLOBAL             25 (NULL + int)
+            296 LOAD_FAST                3 (per_keyword)
+            298 COPY                     1
+            300 POP_JUMP_IF_TRUE         2 (to 306)
+            302 POP_TOP
+            304 LOAD_CONST              11 (5)
+        >>  306 CALL                     1
+            314 CALL                     2
+            322 CALL                     2
+
+359         330 LOAD_FAST                4 (depth)
+            332 LOAD_GLOBAL             26 (_DEPTHS)
+            342 CONTAINS_OP              0
+            344 POP_JUMP_IF_FALSE        2 (to 350)
+            346 LOAD_FAST                4 (depth)
+            348 JUMP_FORWARD             1 (to 352)
+        >>  350 LOAD_CONST              12 ('medium')
+
+360     >>  352 LOAD_FAST                5 (period)
+            354 COPY                     1
+            356 POP_JUMP_IF_TRUE         2 (to 362)
+            358 POP_TOP
+            360 LOAD_CONST              13 (None)
+        >>  362 LOAD_GLOBAL             29 (NULL + bool)
+            372 LOAD_FAST                6 (precise)
+            374 CALL                     1
+
+361         382 LOAD_FAST                7 (language)
+            384 COPY                     1
+            386 POP_JUMP_IF_TRUE         2 (to 392)
+            388 POP_TOP
+            390 LOAD_CONST              14 ('vi')
+        >>  392 LOAD_FAST                8 (provider)
+
+358         394 LOAD_CONST              15 (('per_keyword', 'depth', 'period', 'precise', 'language', 'provider'))
+            396 BUILD_CONST_KEY_MAP      6
+            398 STORE_FAST               9 (config)
+
+362         400 LOAD_GLOBAL             31 (NULL + KeywordScan)
+            410 LOAD_GLOBAL             33 (NULL + json)
+            420 LOAD_ATTR               34 (dumps)
+            440 LOAD_DEREF              13 (clean)
+            442 LOAD_CONST              16 (False)
+            444 KW_NAMES                17 (('ensure_ascii',))
+            446 CALL                     2
+
+363         454 LOAD_FAST                2 (region)
+            456 COPY                     1
+            458 POP_JUMP_IF_TRUE         2 (to 464)
+            460 POP_TOP
+            462 LOAD_CONST              18 ('VN')
+        >>  464 LOAD_ATTR               37 (NULL|self + upper)
+            484 CALL                     0
+
+364         492 LOAD_GLOBAL             33 (NULL + json)
+            502 LOAD_ATTR               34 (dumps)
+            522 LOAD_FAST                9 (config)
+            524 LOAD_CONST              16 (False)
+            526 KW_NAMES                17 (('ensure_ascii',))
+            528 CALL                     2
+            536 LOAD_CONST              19 ('running')
+
+362         538 KW_NAMES                20 (('keywords_json', 'region', 'config_json', 'status'))
+            540 CALL                     4
+            548 STORE_DEREF             15 (row)
+
+365         550 LOAD_FAST                0 (db)
+            552 LOAD_ATTR               39 (NULL|self + add)
+            572 LOAD_DEREF              15 (row)
+            574 CALL                     1
+            582 POP_TOP
+
+366         584 LOAD_FAST                0 (db)
+            586 LOAD_ATTR               41 (NULL|self + commit)
+            606 CALL                     0
+            614 POP_TOP
+
+367         616 LOAD_FAST                0 (db)
+            618 LOAD_ATTR               43 (NULL|self + refresh)
+            638 LOAD_DEREF              15 (row)
+            640 CALL                     1
+            648 POP_TOP
+
+369         650 LOAD_CONST              23 (('return', 'str'))
+            652 LOAD_CLOSURE            13 (clean)
+            654 LOAD_CLOSURE            14 (job_queue)
+            656 LOAD_CLOSURE            15 (row)
+            658 BUILD_TUPLE              3
+            660 LOAD_CONST              21 (<code object _enqueue at 0x7f6c9240a740, file "app\services\keyword_intel_service.py", line 369>)
+            662 MAKE_FUNCTION           12 (annotations, closure)
+            664 STORE_FAST              10 (_enqueue)
+
+375         666 LOAD_GLOBAL             45 (NULL + asyncio)
+            676 LOAD_ATTR               46 (get_running_loop)
+            696 CALL                     0
+            704 STORE_FAST              11 (loop)
+
+376         706 LOAD_FAST               11 (loop)
+            708 LOAD_ATTR               49 (NULL|self + create_task)
+            728 PUSH_NULL
+            730 LOAD_FAST               10 (_enqueue)
+            732 CALL                     0
+            740 CALL                     1
+            748 STORE_FAST              12 (task)
+
+377         750 LOAD_GLOBAL             50 (_PENDING_ENQUEUES)
+            760 LOAD_ATTR               39 (NULL|self + add)
+            780 LOAD_FAST               12 (task)
+            782 CALL                     1
+            790 POP_TOP
+
+378         792 LOAD_FAST               12 (task)
+            794 LOAD_ATTR               53 (NULL|self + add_done_callback)
+            814 LOAD_GLOBAL             50 (_PENDING_ENQUEUES)
+            824 LOAD_ATTR               54 (discard)
+            844 CALL                     1
+            852 POP_TOP
+
+379         854 LOAD_DEREF              15 (row)
+            856 LOAD_ATTR               56 (id)
+            876 LOAD_CONST              19 ('running')
+            878 LOAD_DEREF              13 (clean)
+            880 LOAD_DEREF              15 (row)
+            882 LOAD_ATTR               58 (region)
+
+380         902 LOAD_FAST                9 (config)
+
+379         904 LOAD_CONST              22 (('scan_id', 'status', 'keywords', 'region', 'config'))
+            906 BUILD_CONST_KEY_MAP      5
+            908 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c926ff5a0, file "app\services\keyword_intel_service.py", line 353>:
+353           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                41 (to 94)
+             12 STORE_FAST               1 (k)
+             14 LOAD_FAST                1 (k)
+             16 COPY                     1
+             18 POP_JUMP_IF_TRUE         2 (to 24)
+             20 POP_TOP
+             22 LOAD_CONST               0 ('')
+        >>   24 LOAD_ATTR                1 (NULL|self + strip)
+             44 CALL                     0
+             52 POP_JUMP_IF_TRUE         1 (to 56)
+             54 JUMP_BACKWARD           24 (to 8)
+        >>   56 LOAD_FAST                1 (k)
+             58 LOAD_ATTR                1 (NULL|self + strip)
+             78 CALL                     0
+             86 YIELD_VALUE              1
+             88 RESUME                   1
+             90 POP_TOP
+             92 JUMP_BACKWARD           43 (to 8)
+        >>   94 END_FOR
+             96 RETURN_CONST             1 (None)
+        >>   98 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            100 RERAISE                  1
+ExceptionTable:
+  4 to 52 -> 98 [0] lasti
+  56 to 96 -> 98 [0] lasti
+
+Disassembly of <code object _enqueue at 0x7f6c9240a740, file "app\services\keyword_intel_service.py", line 369>:
+              0 COPY_FREE_VARS           3
+
+369           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+370           8 LOAD_DEREF               1 (job_queue)
+             10 LOAD_ATTR                1 (NULL|self + enqueue_background_task)
+
+371          30 LOAD_CONST               1 ('keyword_scan')
+             32 LOAD_DEREF               2 (row)
+             34 LOAD_ATTR                2 (id)
+             54 LOAD_CONST               2 (', ')
+             56 LOAD_ATTR                5 (NULL|self + join)
+             76 LOAD_DEREF               0 (clean)
+             78 LOAD_CONST               0 (None)
+             80 LOAD_CONST               3 (3)
+             82 BINARY_SLICE
+             84 CALL                     1
+             92 LOAD_GLOBAL              7 (NULL + len)
+            102 LOAD_DEREF               0 (clean)
+            104 CALL                     1
+            112 LOAD_CONST               3 (3)
+            114 COMPARE_OP              68 (>)
+            118 POP_JUMP_IF_FALSE        2 (to 124)
+            120 LOAD_CONST               4 ('…')
+            122 JUMP_FORWARD             1 (to 126)
+        >>  124 LOAD_CONST               5 ('')
+        >>  126 BINARY_OP                0 (+)
+            130 LOAD_CONST               6 (('scan_id', 'label'))
+            132 BUILD_CONST_KEY_MAP      2
+
+372         134 LOAD_CONST               7 ('keyword_scan:')
+            136 LOAD_DEREF               2 (row)
+            138 LOAD_ATTR                2 (id)
+            158 FORMAT_VALUE             0
+            160 BUILD_STRING             2
+
+370         162 KW_NAMES                 8 (('dedupe_key',))
+            164 CALL                     3
+            172 GET_AWAITABLE            0
+            174 LOAD_CONST               0 (None)
+        >>  176 SEND                     3 (to 186)
+            180 YIELD_VALUE              2
+            182 RESUME                   3
+            184 JUMP_BACKWARD_NO_INTERRUPT     5 (to 176)
+        >>  186 END_SEND
+            188 RETURN_VALUE
+        >>  190 CLEANUP_THROW
+            192 JUMP_BACKWARD            4 (to 186)
+        >>  194 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            196 RERAISE                  1
+ExceptionTable:
+  6 to 178 -> 194 [0] lasti
+  180 to 180 -> 190 [2]
+  182 to 190 -> 194 [0] lasti
+
+Disassembly of <code object run_scan_job at 0x28d5a730, file "app\services\keyword_intel_service.py", line 386>:
+              0 MAKE_CELL                1 (progress)
+              2 MAKE_CELL                2 (cancel_check)
+              4 MAKE_CELL               23 (cancelled)
+              6 MAKE_CELL               24 (cfg)
+              8 MAKE_CELL               25 (done_count)
+             10 MAKE_CELL               26 (emit)
+             12 MAKE_CELL               27 (keywords)
+             14 MAKE_CELL               28 (kw_videos)
+             16 MAKE_CELL               29 (one)
+             18 MAKE_CELL               30 (region)
+             20 MAKE_CELL               31 (sem)
+
+386          22 RETURN_GENERATOR
+             24 POP_TOP
+             26 RESUME                   0
+
+389          28 LOAD_GLOBAL              1 (NULL + str)
+             38 LOAD_FAST                0 (config)
+             40 LOAD_ATTR                3 (NULL|self + get)
+             60 LOAD_CONST               1 ('scan_id')
+             62 CALL                     1
+             70 COPY                     1
+             72 POP_JUMP_IF_TRUE         2 (to 78)
+             74 POP_TOP
+             76 LOAD_CONST               2 ('')
+        >>   78 CALL                     1
+             86 STORE_FAST               3 (scan_id)
+
+391          88 LOAD_CONST              49 (('v', 'float', 'return', 'None'))
+             90 LOAD_CLOSURE             1 (progress)
+             92 BUILD_TUPLE              1
+             94 LOAD_CONST               3 (<code object emit at 0x7f6c92390730, file "app\services\keyword_intel_service.py", line 391>)
+             96 MAKE_FUNCTION           12 (annotations, closure)
+             98 STORE_DEREF             26 (emit)
+
+395         100 LOAD_CONST              50 (('return', 'bool'))
+            102 LOAD_CLOSURE             2 (cancel_check)
+            104 BUILD_TUPLE              1
+            106 LOAD_CONST               4 (<code object cancelled at 0x7f6c927d72d0, file "app\services\keyword_intel_service.py", line 395>)
+            108 MAKE_FUNCTION           12 (annotations, closure)
+            110 STORE_DEREF             23 (cancelled)
+
+398         112 LOAD_GLOBAL              5 (NULL + SessionLocal)
+            122 CALL                     0
+            130 BEFORE_WITH
+            132 STORE_FAST               4 (db)
+
+399         134 LOAD_FAST                4 (db)
+            136 LOAD_ATTR                3 (NULL|self + get)
+            156 LOAD_GLOBAL              6 (KeywordScan)
+            166 LOAD_FAST                3 (scan_id)
+            168 CALL                     2
+            176 STORE_FAST               5 (row)
+
+400         178 LOAD_FAST                5 (row)
+            180 POP_JUMP_IF_NOT_NONE    30 (to 242)
+
+401         182 LOAD_GLOBAL              9 (NULL + make_error)
+            192 LOAD_GLOBAL             10 (E)
+            202 LOAD_ATTR               12 (UNKNOWN)
+            222 LOAD_CONST               6 ('KeywordScan ')
+            224 LOAD_FAST                3 (scan_id)
+            226 FORMAT_VALUE             0
+            228 LOAD_CONST               7 (' không tồn tại')
+            230 BUILD_STRING             3
+            232 CALL                     2
+            240 RAISE_VARARGS            1
+
+402     >>  242 LOAD_GLOBAL             15 (NULL + json)
+            252 LOAD_ATTR               16 (loads)
+            272 LOAD_FAST                5 (row)
+            274 LOAD_ATTR               18 (keywords_json)
+            294 COPY                     1
+            296 POP_JUMP_IF_TRUE         2 (to 302)
+            298 POP_TOP
+            300 LOAD_CONST               8 ('[]')
+        >>  302 CALL                     1
+            310 STORE_DEREF             27 (keywords)
+
+403         312 LOAD_GLOBAL             15 (NULL + json)
+            322 LOAD_ATTR               16 (loads)
+            342 LOAD_FAST                5 (row)
+            344 LOAD_ATTR               20 (config_json)
+            364 COPY                     1
+            366 POP_JUMP_IF_TRUE         2 (to 372)
+            368 POP_TOP
+            370 LOAD_CONST               9 ('{}')
+        >>  372 CALL                     1
+            380 STORE_DEREF             24 (cfg)
+
+404         382 LOAD_FAST                5 (row)
+            384 LOAD_ATTR               22 (region)
+            404 COPY                     1
+            406 POP_JUMP_IF_TRUE         2 (to 412)
+            408 POP_TOP
+            410 LOAD_CONST              10 ('VN')
+        >>  412 STORE_DEREF             30 (region)
+
+398         414 LOAD_CONST               5 (None)
+            416 LOAD_CONST               5 (None)
+            418 LOAD_CONST               5 (None)
+            420 CALL                     2
+            428 POP_TOP
+
+406     >>  430 NOP
+
+407         432 PUSH_NULL
+            434 LOAD_DEREF              26 (emit)
+            436 LOAD_CONST              11 (5)
+            438 CALL                     1
+            446 POP_TOP
+
+408         448 LOAD_GLOBAL             25 (NULL + asyncio)
+            458 LOAD_ATTR               26 (Semaphore)
+            478 LOAD_GLOBAL             28 (_SEARCH_CONCURRENCY)
+            488 CALL                     1
+            496 STORE_DEREF             31 (sem)
+
+409         498 LOAD_CONST              12 (0)
+            500 STORE_DEREF             25 (done_count)
+
+410         502 BUILD_MAP                0
+            504 STORE_DEREF             28 (kw_videos)
+
+412         506 LOAD_CONST              51 (('kw', 'str', 'return', 'None'))
+            508 LOAD_CLOSURE            23 (cancelled)
+            510 LOAD_CLOSURE            24 (cfg)
+            512 LOAD_CLOSURE            25 (done_count)
+            514 LOAD_CLOSURE            26 (emit)
+            516 LOAD_CLOSURE            27 (keywords)
+            518 LOAD_CLOSURE            28 (kw_videos)
+            520 LOAD_CLOSURE            30 (region)
+            522 LOAD_CLOSURE            31 (sem)
+            524 BUILD_TUPLE              8
+            526 LOAD_CONST              13 (<code object one at 0x29091100, file "app\services\keyword_intel_service.py", line 412>)
+            528 MAKE_FUNCTION           12 (annotations, closure)
+            530 STORE_DEREF             29 (one)
+
+427         532 LOAD_GLOBAL             25 (NULL + asyncio)
+            542 LOAD_ATTR               30 (gather)
+            562 LOAD_CLOSURE            29 (one)
+            564 BUILD_TUPLE              1
+            566 LOAD_CONST              14 (<code object <genexpr> at 0x7f6c927d44e0, file "app\services\keyword_intel_service.py", line 427>)
+            568 MAKE_FUNCTION            8 (closure)
+            570 LOAD_DEREF              27 (keywords)
+            572 GET_ITER
+            574 CALL                     0
+            582 CALL_FUNCTION_EX         0
+            584 GET_AWAITABLE            0
+            586 LOAD_CONST               5 (None)
+        >>  588 SEND                     3 (to 598)
+            592 YIELD_VALUE              3
+            594 RESUME                   3
+            596 JUMP_BACKWARD_NO_INTERRUPT     5 (to 588)
+        >>  598 END_SEND
+            600 POP_TOP
+
+428         602 PUSH_NULL
+            604 LOAD_DEREF              23 (cancelled)
+            606 CALL                     0
+            614 POP_JUMP_IF_FALSE       26 (to 668)
+
+429         616 LOAD_GLOBAL              9 (NULL + make_error)
+            626 LOAD_GLOBAL             10 (E)
+            636 LOAD_ATTR               32 (CANCELLED)
+            656 LOAD_CONST              15 ('Đã huỷ quét từ khóa.')
+            658 CALL                     2
+            666 RAISE_VARARGS            1
+
+433     >>  668 LOAD_GLOBAL             35 (NULL + data_api)
+            678 LOAD_ATTR               36 (is_configured)
+            698 CALL                     0
+            706 EXTENDED_ARG             1
+            708 POP_JUMP_IF_FALSE      321 (to 1352)
+
+434         710 LOAD_GLOBAL             39 (NULL + ids_needing_enrichment)
+            720 LOAD_DEREF              28 (kw_videos)
+            722 CALL                     1
+            730 STORE_FAST               6 (missing)
+
+435         732 LOAD_FAST                6 (missing)
+            734 POP_JUMP_IF_FALSE      106 (to 948)
+
+436         736 NOP
+
+437         738 LOAD_GLOBAL             35 (NULL + data_api)
+            748 LOAD_ATTR               40 (fetch_videos_meta)
+            768 LOAD_FAST                6 (missing)
+            770 CALL                     1
+            778 GET_AWAITABLE            0
+            780 LOAD_CONST               5 (None)
+        >>  782 SEND                     3 (to 792)
+            786 YIELD_VALUE              4
+            788 RESUME                   3
+            790 JUMP_BACKWARD_NO_INTERRUPT     5 (to 782)
+        >>  792 END_SEND
+            794 STORE_FAST               7 (metas)
+
+438         796 LOAD_GLOBAL             43 (NULL + apply_video_metas)
+            806 LOAD_DEREF              28 (kw_videos)
+            808 LOAD_FAST                7 (metas)
+            810 CALL                     2
+            818 POP_TOP
+
+439         820 LOAD_GLOBAL             45 (NULL + log)
+            830 LOAD_ATTR               46 (info)
+            850 LOAD_CONST              16 ('[keyword_intel] làm giàu ')
+            852 LOAD_GLOBAL             49 (NULL + len)
+            862 LOAD_FAST                7 (metas)
+            864 CALL                     1
+            872 FORMAT_VALUE             0
+            874 LOAD_CONST              17 ('/')
+            876 LOAD_GLOBAL             49 (NULL + len)
+            886 LOAD_FAST                6 (missing)
+            888 CALL                     1
+            896 FORMAT_VALUE             0
+            898 LOAD_CONST              18 (' video qua Data API (')
+
+440         900 LOAD_GLOBAL             49 (NULL + len)
+            910 LOAD_FAST                6 (missing)
+            912 CALL                     1
+            920 LOAD_CONST              19 (49)
+            922 BINARY_OP                0 (+)
+            926 LOAD_CONST              20 (50)
+            928 BINARY_OP                2 (//)
+            932 FORMAT_VALUE             0
+            934 LOAD_CONST              21 (' đơn vị quota)')
+
+439         936 BUILD_STRING             7
+            938 CALL                     1
+            946 POP_TOP
+
+447     >>  948 LOAD_DEREF              28 (kw_videos)
+            950 LOAD_ATTR               55 (NULL|self + values)
+            970 CALL                     0
+            978 GET_ITER
+            980 LOAD_FAST_AND_CLEAR      9 (vids)
+            982 LOAD_FAST_AND_CLEAR     10 (v)
+            984 SWAP                     3
+            986 BUILD_LIST               0
+            988 SWAP                     2
+        >>  990 FOR_ITER                26 (to 1046)
+            994 STORE_FAST               9 (vids)
+            996 LOAD_FAST                9 (vids)
+            998 GET_ITER
+        >> 1000 FOR_ITER                19 (to 1042)
+           1004 STORE_FAST              10 (v)
+           1006 LOAD_FAST               10 (v)
+           1008 LOAD_ATTR                3 (NULL|self + get)
+           1028 LOAD_CONST              23 ('channel_id')
+           1030 CALL                     1
+           1038 LIST_APPEND              3
+           1040 JUMP_BACKWARD           21 (to 1000)
+        >> 1042 END_FOR
+           1044 JUMP_BACKWARD           28 (to 990)
+        >> 1046 END_FOR
+           1048 STORE_FAST              11 (channel_ids)
+           1050 STORE_FAST               9 (vids)
+           1052 STORE_FAST              10 (v)
+
+448        1054 NOP
+
+449        1056 LOAD_GLOBAL             35 (NULL + data_api)
+           1066 LOAD_ATTR               56 (fetch_channels_stats)
+           1086 LOAD_FAST               11 (channel_ids)
+           1088 GET_ITER
+           1090 LOAD_FAST_AND_CLEAR     12 (c)
+           1092 SWAP                     2
+           1094 BUILD_LIST               0
+           1096 SWAP                     2
+        >> 1098 FOR_ITER                 7 (to 1116)
+           1102 STORE_FAST              12 (c)
+           1104 LOAD_FAST               12 (c)
+           1106 POP_JUMP_IF_TRUE         1 (to 1110)
+           1108 JUMP_BACKWARD            6 (to 1098)
+        >> 1110 LOAD_FAST               12 (c)
+           1112 LIST_APPEND              2
+           1114 JUMP_BACKWARD            9 (to 1098)
+        >> 1116 END_FOR
+           1118 SWAP                     2
+           1120 STORE_FAST              12 (c)
+           1122 CALL                     1
+           1130 GET_AWAITABLE            0
+           1132 LOAD_CONST               5 (None)
+        >> 1134 SEND                     3 (to 1144)
+           1138 YIELD_VALUE              4
+           1140 RESUME                   3
+           1142 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1134)
+        >> 1144 END_SEND
+           1146 STORE_FAST              13 (stats)
+
+453     >> 1148 LOAD_DEREF              28 (kw_videos)
+           1150 LOAD_ATTR               55 (NULL|self + values)
+           1170 CALL                     0
+           1178 GET_ITER
+        >> 1180 FOR_ITER                83 (to 1350)
+           1184 STORE_FAST               9 (vids)
+
+454        1186 LOAD_FAST                9 (vids)
+           1188 GET_ITER
+        >> 1190 FOR_ITER                76 (to 1346)
+           1194 STORE_FAST              10 (v)
+
+455        1196 LOAD_FAST               13 (stats)
+           1198 LOAD_ATTR                3 (NULL|self + get)
+           1218 LOAD_GLOBAL              1 (NULL + str)
+           1228 LOAD_FAST               10 (v)
+           1230 LOAD_ATTR                3 (NULL|self + get)
+           1250 LOAD_CONST              23 ('channel_id')
+           1252 CALL                     1
+           1260 COPY                     1
+           1262 POP_JUMP_IF_TRUE         2 (to 1268)
+           1264 POP_TOP
+           1266 LOAD_CONST               2 ('')
+        >> 1268 CALL                     1
+           1276 CALL                     1
+           1284 STORE_FAST              14 (info)
+
+456        1286 LOAD_FAST               14 (info)
+           1288 POP_JUMP_IF_TRUE         1 (to 1292)
+           1290 JUMP_BACKWARD           51 (to 1190)
+        >> 1292 LOAD_FAST               14 (info)
+           1294 LOAD_ATTR                3 (NULL|self + get)
+           1314 LOAD_CONST              25 ('subs')
+           1316 CALL                     1
+           1324 POP_JUMP_IF_TRUE         1 (to 1328)
+           1326 JUMP_BACKWARD           69 (to 1190)
+
+457     >> 1328 LOAD_FAST               14 (info)
+           1330 LOAD_CONST              25 ('subs')
+           1332 BINARY_SUBSCR
+           1336 LOAD_FAST               10 (v)
+           1338 LOAD_CONST              26 ('channel_subs')
+           1340 STORE_SUBSCR
+           1344 JUMP_BACKWARD           78 (to 1190)
+
+454     >> 1346 END_FOR
+           1348 JUMP_BACKWARD           85 (to 1180)
+
+453     >> 1350 END_FOR
+
+458     >> 1352 PUSH_NULL
+           1354 LOAD_DEREF              26 (emit)
+           1356 LOAD_CONST              27 (72)
+           1358 CALL                     1
+           1366 POP_TOP
+
+461        1368 LOAD_DEREF              28 (kw_videos)
+           1370 LOAD_ATTR               59 (NULL|self + items)
+           1390 CALL                     0
+           1398 GET_ITER
+
+460        1400 LOAD_FAST_AND_CLEAR     15 (k)
+           1402 LOAD_FAST_AND_CLEAR     10 (v)
+           1404 SWAP                     3
+           1406 BUILD_LIST               0
+           1408 SWAP                     2
+
+461     >> 1410 FOR_ITER                20 (to 1454)
+           1414 UNPACK_SEQUENCE          2
+           1418 STORE_FAST              15 (k)
+           1420 STORE_FAST              10 (v)
+
+460        1422 LOAD_FAST               15 (k)
+           1424 LOAD_FAST               10 (v)
+           1426 LOAD_GLOBAL             61 (NULL + keyword_stats)
+           1436 LOAD_FAST               10 (v)
+           1438 CALL                     1
+           1446 LOAD_CONST              28 (('keyword', 'videos', 'stats'))
+           1448 BUILD_CONST_KEY_MAP      3
+           1450 LIST_APPEND              2
+           1452 JUMP_BACKWARD           22 (to 1410)
+
+461     >> 1454 END_FOR
+
+460        1456 STORE_FAST              16 (kw_data)
+           1458 STORE_FAST              15 (k)
+           1460 STORE_FAST              10 (v)
+
+462        1462 LOAD_FAST               16 (kw_data)
+           1464 GET_ITER
+           1466 LOAD_FAST_AND_CLEAR     17 (item)
+           1468 SWAP                     2
+           1470 BUILD_LIST               0
+           1472 SWAP                     2
+        >> 1474 FOR_ITER                10 (to 1498)
+           1478 STORE_FAST              17 (item)
+           1480 LOAD_FAST               17 (item)
+           1482 LOAD_CONST              29 ('videos')
+           1484 BINARY_SUBSCR
+           1488 POP_JUMP_IF_TRUE         1 (to 1492)
+           1490 JUMP_BACKWARD            9 (to 1474)
+        >> 1492 LOAD_FAST               17 (item)
+           1494 LIST_APPEND              2
+           1496 JUMP_BACKWARD           12 (to 1474)
+        >> 1498 END_FOR
+           1500 STORE_FAST              18 (with_results)
+           1502 STORE_FAST              17 (item)
+
+463        1504 LOAD_FAST               18 (with_results)
+           1506 POP_JUMP_IF_TRUE        26 (to 1560)
+
+464        1508 LOAD_GLOBAL              9 (NULL + make_error)
+           1518 LOAD_GLOBAL             10 (E)
+           1528 LOAD_ATTR               12 (UNKNOWN)
+           1548 LOAD_CONST              30 ('Không search được video cho từ khóa nào (mạng/anti-bot?).')
+           1550 CALL                     2
+           1558 RAISE_VARARGS            1
+
+466     >> 1560 LOAD_GLOBAL             63 (NULL + _cluster_with_llm)
+           1570 LOAD_FAST               18 (with_results)
+           1572 LOAD_GLOBAL              1 (NULL + str)
+           1582 LOAD_DEREF              24 (cfg)
+           1584 LOAD_ATTR                3 (NULL|self + get)
+           1604 LOAD_CONST              31 ('depth')
+           1606 CALL                     1
+           1614 COPY                     1
+           1616 POP_JUMP_IF_TRUE         2 (to 1622)
+           1618 POP_TOP
+           1620 LOAD_CONST              32 ('medium')
+        >> 1622 CALL                     1
+
+467        1630 LOAD_GLOBAL              1 (NULL + str)
+           1640 LOAD_DEREF              24 (cfg)
+           1642 LOAD_ATTR                3 (NULL|self + get)
+           1662 LOAD_CONST              33 ('language')
+           1664 CALL                     1
+           1672 COPY                     1
+           1674 POP_JUMP_IF_TRUE         2 (to 1680)
+           1676 POP_TOP
+           1678 LOAD_CONST              34 ('vi')
+        >> 1680 CALL                     1
+
+468        1688 LOAD_DEREF              24 (cfg)
+           1690 LOAD_ATTR                3 (NULL|self + get)
+           1710 LOAD_CONST              35 ('provider')
+           1712 CALL                     1
+
+466        1720 KW_NAMES                36 (('depth', 'language', 'provider'))
+           1722 CALL                     4
+           1730 GET_AWAITABLE            0
+           1732 LOAD_CONST               5 (None)
+        >> 1734 SEND                     3 (to 1744)
+           1738 YIELD_VALUE              3
+           1740 RESUME                   3
+           1742 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1734)
+        >> 1744 END_SEND
+           1746 STORE_FAST              19 (assignments)
+
+469        1748 PUSH_NULL
+           1750 LOAD_DEREF              26 (emit)
+           1752 LOAD_CONST              37 (90)
+           1754 CALL                     1
+           1762 POP_TOP
+
+470        1764 LOAD_GLOBAL             65 (NULL + cluster_report)
+           1774 LOAD_FAST               19 (assignments)
+           1776 LOAD_FAST               18 (with_results)
+           1778 GET_ITER
+           1780 LOAD_FAST_AND_CLEAR     20 (i)
+           1782 SWAP                     2
+           1784 BUILD_MAP                0
+           1786 SWAP                     2
+        >> 1788 FOR_ITER                11 (to 1814)
+           1792 STORE_FAST              20 (i)
+           1794 LOAD_FAST               20 (i)
+           1796 LOAD_CONST              38 ('keyword')
+           1798 BINARY_SUBSCR
+           1802 LOAD_FAST               20 (i)
+           1804 LOAD_CONST              29 ('videos')
+           1806 BINARY_SUBSCR
+           1810 MAP_ADD                  2
+           1812 JUMP_BACKWARD           13 (to 1788)
+        >> 1814 END_FOR
+           1816 SWAP                     2
+           1818 STORE_FAST              20 (i)
+
+471        1820 LOAD_GLOBAL              1 (NULL + str)
+           1830 LOAD_DEREF              24 (cfg)
+           1832 LOAD_ATTR                3 (NULL|self + get)
+           1852 LOAD_CONST              33 ('language')
+           1854 CALL                     1
+           1862 COPY                     1
+           1864 POP_JUMP_IF_TRUE         2 (to 1870)
+           1866 POP_TOP
+           1868 LOAD_CONST              34 ('vi')
+        >> 1870 CALL                     1
+
+470        1878 KW_NAMES                39 (('language',))
+           1880 CALL                     3
+           1888 STORE_FAST              21 (report)
+
+472        1890 BUILD_MAP                0
+
+473        1892 LOAD_FAST               21 (report)
+
+472        1894 DICT_UPDATE              1
+
+474        1896 LOAD_FAST               16 (kw_data)
+           1898 GET_ITER
+           1900 LOAD_FAST_AND_CLEAR     20 (i)
+           1902 SWAP                     2
+           1904 BUILD_LIST               0
+           1906 SWAP                     2
+        >> 1908 FOR_ITER                14 (to 1940)
+           1912 STORE_FAST              20 (i)
+           1914 LOAD_CONST              38 ('keyword')
+           1916 LOAD_FAST               20 (i)
+           1918 LOAD_CONST              38 ('keyword')
+           1920 BINARY_SUBSCR
+           1924 BUILD_MAP                1
+           1926 LOAD_FAST               20 (i)
+           1928 LOAD_CONST              40 ('stats')
+           1930 BINARY_SUBSCR
+           1934 DICT_UPDATE              1
+           1936 LIST_APPEND              2
+           1938 JUMP_BACKWARD           16 (to 1908)
+        >> 1940 END_FOR
+           1942 SWAP                     2
+           1944 STORE_FAST              20 (i)
+
+476        1946 LOAD_GLOBAL             49 (NULL + len)
+           1956 LOAD_DEREF              27 (keywords)
+           1958 CALL                     1
+
+477        1966 LOAD_GLOBAL             49 (NULL + len)
+           1976 LOAD_FAST               18 (with_results)
+           1978 CALL                     1
+
+478        1986 LOAD_GLOBAL             49 (NULL + len)
+           1996 LOAD_FAST               18 (with_results)
+           1998 GET_ITER
+           2000 LOAD_FAST_AND_CLEAR     20 (i)
+           2002 LOAD_FAST_AND_CLEAR     10 (v)
+           2004 SWAP                     3
+           2006 BUILD_SET                0
+           2008 SWAP                     2
+        >> 2010 FOR_ITER                35 (to 2084)
+           2014 STORE_FAST              20 (i)
+           2016 LOAD_FAST               20 (i)
+           2018 LOAD_CONST              29 ('videos')
+           2020 BINARY_SUBSCR
+           2024 GET_ITER
+        >> 2026 FOR_ITER                25 (to 2080)
+           2030 STORE_FAST              10 (v)
+           2032 LOAD_FAST               10 (v)
+           2034 LOAD_ATTR                3 (NULL|self + get)
+           2054 LOAD_CONST              41 ('id')
+           2056 CALL                     1
+           2064 POP_JUMP_IF_TRUE         1 (to 2068)
+           2066 JUMP_BACKWARD           21 (to 2026)
+        >> 2068 LOAD_FAST               10 (v)
+           2070 LOAD_CONST              41 ('id')
+           2072 BINARY_SUBSCR
+           2076 SET_ADD                  3
+           2078 JUMP_BACKWARD           27 (to 2026)
+        >> 2080 END_FOR
+           2082 JUMP_BACKWARD           37 (to 2010)
+        >> 2084 END_FOR
+           2086 SWAP                     3
+           2088 STORE_FAST              10 (v)
+           2090 STORE_FAST              20 (i)
+           2092 CALL                     1
+
+475        2100 LOAD_CONST              42 (('keyword_count', 'keyword_with_results', 'video_count'))
+           2102 BUILD_CONST_KEY_MAP      3
+
+472        2104 LOAD_CONST              43 (('keywords', 'totals'))
+           2106 BUILD_CONST_KEY_MAP      2
+           2108 DICT_UPDATE              1
+           2110 STORE_FAST              22 (result)
+
+481        2112 LOAD_GLOBAL              5 (NULL + SessionLocal)
+           2122 CALL                     0
+           2130 BEFORE_WITH
+           2132 STORE_FAST               4 (db)
+
+482        2134 LOAD_FAST                4 (db)
+           2136 LOAD_ATTR                3 (NULL|self + get)
+           2156 LOAD_GLOBAL              6 (KeywordScan)
+           2166 LOAD_FAST                3 (scan_id)
+           2168 CALL                     2
+           2176 STORE_FAST               5 (row)
+
+483        2178 LOAD_FAST                5 (row)
+           2180 POP_JUMP_IF_FALSE       58 (to 2298)
+
+484        2182 LOAD_GLOBAL             15 (NULL + json)
+           2192 LOAD_ATTR               66 (dumps)
+           2212 LOAD_FAST               22 (result)
+           2214 LOAD_CONST              44 (False)
+           2216 KW_NAMES                45 (('ensure_ascii',))
+           2218 CALL                     2
+           2226 LOAD_FAST                5 (row)
+           2228 STORE_ATTR              34 (clusters_json)
+
+485        2238 LOAD_CONST              46 ('done')
+           2240 LOAD_FAST                5 (row)
+           2242 STORE_ATTR              35 (status)
+
+486        2252 LOAD_CONST               5 (None)
+           2254 LOAD_FAST                5 (row)
+           2256 STORE_ATTR              36 (error)
+
+487        2266 LOAD_FAST                4 (db)
+           2268 LOAD_ATTR               75 (NULL|self + commit)
+           2288 CALL                     0
+           2296 POP_TOP
+
+481     >> 2298 LOAD_CONST               5 (None)
+           2300 LOAD_CONST               5 (None)
+           2302 LOAD_CONST               5 (None)
+           2304 CALL                     2
+           2312 POP_TOP
+
+488     >> 2314 PUSH_NULL
+           2316 LOAD_DEREF              26 (emit)
+           2318 LOAD_CONST              47 (100)
+           2320 CALL                     1
+           2328 POP_TOP
+           2330 RETURN_CONST             5 (None)
+
+398     >> 2332 PUSH_EXC_INFO
+           2334 WITH_EXCEPT_START
+           2336 POP_JUMP_IF_TRUE         1 (to 2340)
+           2338 RERAISE                  2
+        >> 2340 POP_TOP
+           2342 POP_EXCEPT
+           2344 POP_TOP
+           2346 POP_TOP
+           2348 EXTENDED_ARG             3
+           2350 JUMP_BACKWARD          961 (to 430)
+        >> 2352 COPY                     3
+           2354 POP_EXCEPT
+           2356 RERAISE                  1
+
+427     >> 2358 CLEANUP_THROW
+           2360 EXTENDED_ARG             3
+           2362 JUMP_BACKWARD          883 (to 598)
+
+437     >> 2364 CLEANUP_THROW
+           2366 EXTENDED_ARG             3
+           2368 JUMP_BACKWARD          789 (to 792)
+        >> 2370 PUSH_EXC_INFO
+
+441        2372 LOAD_GLOBAL             50 (StudioError)
+           2382 CHECK_EXC_MATCH
+           2384 POP_JUMP_IF_FALSE       45 (to 2476)
+           2386 STORE_FAST               8 (exc)
+
+442        2388 LOAD_GLOBAL             45 (NULL + log)
+           2398 LOAD_ATTR               46 (info)
+           2418 LOAD_CONST              22 ('[keyword_intel] enrich Data API bỏ qua: ')
+           2420 LOAD_FAST                8 (exc)
+           2422 LOAD_ATTR               52 (message)
+           2442 FORMAT_VALUE             0
+           2444 BUILD_STRING             2
+           2446 CALL                     1
+           2454 POP_TOP
+           2456 POP_EXCEPT
+           2458 LOAD_CONST               5 (None)
+           2460 STORE_FAST               8 (exc)
+           2462 DELETE_FAST              8 (exc)
+           2464 EXTENDED_ARG             2
+           2466 JUMP_BACKWARD          760 (to 948)
+        >> 2468 LOAD_CONST               5 (None)
+           2470 STORE_FAST               8 (exc)
+           2472 DELETE_FAST              8 (exc)
+           2474 RERAISE                  1
+
+441     >> 2476 RERAISE                  0
+        >> 2478 COPY                     3
+           2480 POP_EXCEPT
+           2482 RERAISE                  1
+        >> 2484 SWAP                     2
+           2486 POP_TOP
+
+447        2488 SWAP                     3
+           2490 STORE_FAST              10 (v)
+           2492 STORE_FAST               9 (vids)
+           2494 RERAISE                  0
+        >> 2496 SWAP                     2
+           2498 POP_TOP
+
+449        2500 SWAP                     2
+           2502 STORE_FAST              12 (c)
+           2504 RERAISE                  0
+        >> 2506 CLEANUP_THROW
+           2508 EXTENDED_ARG             2
+           2510 JUMP_BACKWARD          684 (to 1144)
+        >> 2512 PUSH_EXC_INFO
+
+450        2514 LOAD_GLOBAL             50 (StudioError)
+           2524 CHECK_EXC_MATCH
+           2526 POP_JUMP_IF_FALSE       47 (to 2622)
+           2528 STORE_FAST               8 (exc)
+
+451        2530 LOAD_GLOBAL             45 (NULL + log)
+           2540 LOAD_ATTR               46 (info)
+           2560 LOAD_CONST              24 ('[keyword_intel] không lấy được số sub: ')
+           2562 LOAD_FAST                8 (exc)
+           2564 LOAD_ATTR               52 (message)
+           2584 FORMAT_VALUE             0
+           2586 BUILD_STRING             2
+           2588 CALL                     1
+           2596 POP_TOP
+
+452        2598 BUILD_MAP                0
+           2600 STORE_FAST              13 (stats)
+           2602 POP_EXCEPT
+           2604 LOAD_CONST               5 (None)
+           2606 STORE_FAST               8 (exc)
+           2608 DELETE_FAST              8 (exc)
+           2610 EXTENDED_ARG             2
+           2612 JUMP_BACKWARD          733 (to 1148)
+        >> 2614 LOAD_CONST               5 (None)
+           2616 STORE_FAST               8 (exc)
+           2618 DELETE_FAST              8 (exc)
+           2620 RERAISE                  1
+
+450     >> 2622 RERAISE                  0
+        >> 2624 COPY                     3
+           2626 POP_EXCEPT
+           2628 RERAISE                  1
+        >> 2630 SWAP                     2
+           2632 POP_TOP
+
+460        2634 SWAP                     3
+           2636 STORE_FAST              10 (v)
+           2638 STORE_FAST              15 (k)
+           2640 RERAISE                  0
+        >> 2642 SWAP                     2
+           2644 POP_TOP
+
+462        2646 SWAP                     2
+           2648 STORE_FAST              17 (item)
+           2650 RERAISE                  0
+
+466     >> 2652 CLEANUP_THROW
+           2654 EXTENDED_ARG             1
+           2656 JUMP_BACKWARD          457 (to 1744)
+        >> 2658 SWAP                     2
+           2660 POP_TOP
+
+470        2662 SWAP                     2
+           2664 STORE_FAST              20 (i)
+           2666 RERAISE                  0
+        >> 2668 SWAP                     2
+           2670 POP_TOP
+
+474        2672 SWAP                     2
+           2674 STORE_FAST              20 (i)
+           2676 RERAISE                  0
+        >> 2678 SWAP                     2
+           2680 POP_TOP
+
+478        2682 SWAP                     3
+           2684 STORE_FAST              10 (v)
+           2686 STORE_FAST              20 (i)
+           2688 RERAISE                  0
+
+481     >> 2690 PUSH_EXC_INFO
+           2692 WITH_EXCEPT_START
+           2694 POP_JUMP_IF_TRUE         1 (to 2698)
+           2696 RERAISE                  2
+        >> 2698 POP_TOP
+           2700 POP_EXCEPT
+           2702 POP_TOP
+           2704 POP_TOP
+           2706 JUMP_BACKWARD          197 (to 2314)
+        >> 2708 COPY                     3
+           2710 POP_EXCEPT
+           2712 RERAISE                  1
+        >> 2714 PUSH_EXC_INFO
+
+489        2716 LOAD_GLOBAL             76 (Exception)
+           2726 CHECK_EXC_MATCH
+           2728 POP_JUMP_IF_FALSE      100 (to 2930)
+           2730 STORE_FAST               8 (exc)
+
+490        2732 LOAD_GLOBAL              5 (NULL + SessionLocal)
+           2742 CALL                     0
+           2750 BEFORE_WITH
+           2752 STORE_FAST               4 (db)
+
+491        2754 LOAD_FAST                4 (db)
+           2756 LOAD_ATTR                3 (NULL|self + get)
+           2776 LOAD_GLOBAL              6 (KeywordScan)
+           2786 LOAD_FAST                3 (scan_id)
+           2788 CALL                     2
+           2796 STORE_FAST               5 (row)
+
+492        2798 LOAD_FAST                5 (row)
+           2800 POP_JUMP_IF_FALSE       39 (to 2880)
+
+493        2802 LOAD_CONST              48 ('error')
+           2804 LOAD_FAST                5 (row)
+           2806 STORE_ATTR              35 (status)
+
+494        2816 LOAD_GLOBAL              1 (NULL + str)
+           2826 LOAD_FAST                8 (exc)
+           2828 CALL                     1
+           2836 LOAD_FAST                5 (row)
+           2838 STORE_ATTR              36 (error)
+
+495        2848 LOAD_FAST                4 (db)
+           2850 LOAD_ATTR               75 (NULL|self + commit)
+           2870 CALL                     0
+           2878 POP_TOP
+
+490     >> 2880 LOAD_CONST               5 (None)
+           2882 LOAD_CONST               5 (None)
+           2884 LOAD_CONST               5 (None)
+           2886 CALL                     2
+           2894 POP_TOP
+
+496        2896 RAISE_VARARGS            0
+
+490     >> 2898 PUSH_EXC_INFO
+           2900 WITH_EXCEPT_START
+           2902 POP_JUMP_IF_TRUE         1 (to 2906)
+           2904 RERAISE                  2
+        >> 2906 POP_TOP
+           2908 POP_EXCEPT
+           2910 POP_TOP
+           2912 POP_TOP
+
+496        2914 RAISE_VARARGS            0
+        >> 2916 COPY                     3
+           2918 POP_EXCEPT
+           2920 RERAISE                  1
+        >> 2922 LOAD_CONST               5 (None)
+           2924 STORE_FAST               8 (exc)
+           2926 DELETE_FAST              8 (exc)
+           2928 RERAISE                  1
+
+489     >> 2930 RERAISE                  0
+        >> 2932 COPY                     3
+           2934 POP_EXCEPT
+           2936 RERAISE                  1
+        >> 2938 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           2940 RERAISE                  1
+ExceptionTable:
+  26 to 130 -> 2938 [0] lasti
+  132 to 412 -> 2332 [1] lasti
+  414 to 428 -> 2938 [0] lasti
+  432 to 590 -> 2714 [0]
+  592 to 592 -> 2358 [2]
+  594 to 734 -> 2714 [0]
+  738 to 784 -> 2370 [0]
+  786 to 786 -> 2364 [2]
+  788 to 946 -> 2370 [0]
+  948 to 984 -> 2714 [0]
+  986 to 1046 -> 2484 [3]
+  1048 to 1052 -> 2714 [0]
+  1056 to 1092 -> 2512 [0]
+  1094 to 1106 -> 2496 [4]
+  1110 to 1116 -> 2496 [4]
+  1118 to 1136 -> 2512 [0]
+  1138 to 1138 -> 2506 [2]
+  1140 to 1146 -> 2512 [0]
+  1148 to 1288 -> 2714 [0]
+  1292 to 1324 -> 2714 [0]
+  1328 to 1404 -> 2714 [0]
+  1406 to 1454 -> 2630 [3]
+  1456 to 1468 -> 2714 [0]
+  1470 to 1488 -> 2642 [2]
+  1492 to 1498 -> 2642 [2]
+  1500 to 1736 -> 2714 [0]
+  1738 to 1738 -> 2652 [2]
+  1740 to 1782 -> 2714 [0]
+  1784 to 1814 -> 2658 [5]
+  1816 to 1902 -> 2714 [0]
+  1904 to 1940 -> 2668 [3]
+  1942 to 2004 -> 2714 [0]
+  2006 to 2064 -> 2678 [9]
+  2068 to 2084 -> 2678 [9]
+  2086 to 2130 -> 2714 [0]
+  2132 to 2296 -> 2690 [1] lasti
+  2298 to 2328 -> 2714 [0]
+  2330 to 2330 -> 2938 [0] lasti
+  2332 to 2340 -> 2352 [3] lasti
+  2342 to 2356 -> 2938 [0] lasti
+  2358 to 2358 -> 2714 [0]
+  2364 to 2364 -> 2370 [0]
+  2370 to 2386 -> 2478 [1] lasti
+  2388 to 2454 -> 2468 [1] lasti
+  2456 to 2466 -> 2714 [0]
+  2468 to 2476 -> 2478 [1] lasti
+  2478 to 2494 -> 2714 [0]
+  2496 to 2506 -> 2512 [0]
+  2512 to 2528 -> 2624 [1] lasti
+  2530 to 2600 -> 2614 [1] lasti
+  2602 to 2612 -> 2714 [0]
+  2614 to 2622 -> 2624 [1] lasti
+  2624 to 2652 -> 2714 [0]
+  2658 to 2688 -> 2714 [0]
+  2690 to 2698 -> 2708 [3] lasti
+  2700 to 2712 -> 2714 [0]
+  2714 to 2730 -> 2932 [1] lasti
+  2732 to 2750 -> 2922 [1] lasti
+  2752 to 2878 -> 2898 [2] lasti
+  2880 to 2896 -> 2922 [1] lasti
+  2898 to 2906 -> 2916 [4] lasti
+  2908 to 2920 -> 2922 [1] lasti
+  2922 to 2930 -> 2932 [1] lasti
+  2932 to 2936 -> 2938 [0] lasti
+
+Disassembly of <code object emit at 0x7f6c92390730, file "app\services\keyword_intel_service.py", line 391>:
+              0 COPY_FREE_VARS           1
+
+391           2 RESUME                   0
+
+392           4 LOAD_DEREF               1 (progress)
+              6 POP_JUMP_IF_FALSE        9 (to 26)
+
+393           8 PUSH_NULL
+             10 LOAD_DEREF               1 (progress)
+             12 LOAD_FAST                0 (v)
+             14 CALL                     1
+             22 POP_TOP
+             24 RETURN_CONST             0 (None)
+
+392     >>   26 RETURN_CONST             0 (None)
+
+Disassembly of <code object cancelled at 0x7f6c927d72d0, file "app\services\keyword_intel_service.py", line 395>:
+              0 COPY_FREE_VARS           1
+
+395           2 RESUME                   0
+
+396           4 LOAD_GLOBAL              1 (NULL + bool)
+             14 LOAD_DEREF               0 (cancel_check)
+             16 COPY                     1
+             18 POP_JUMP_IF_FALSE        7 (to 34)
+             20 POP_TOP
+             22 PUSH_NULL
+             24 LOAD_DEREF               0 (cancel_check)
+             26 CALL                     0
+        >>   34 CALL                     1
+             42 RETURN_VALUE
+
+Disassembly of <code object one at 0x29091100, file "app\services\keyword_intel_service.py", line 412>:
+              0 COPY_FREE_VARS           8
+
+412           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+414           8 LOAD_DEREF               9 (sem)
+             10 BEFORE_ASYNC_WITH
+             12 GET_AWAITABLE            1
+             14 LOAD_CONST               0 (None)
+        >>   16 SEND                     3 (to 26)
+             20 YIELD_VALUE              2
+             22 RESUME                   3
+             24 JUMP_BACKWARD_NO_INTERRUPT     5 (to 16)
+        >>   26 END_SEND
+             28 POP_TOP
+
+415          30 PUSH_NULL
+             32 LOAD_DEREF               2 (cancelled)
+             34 CALL                     0
+             42 POP_JUMP_IF_FALSE       18 (to 80)
+
+416          44 NOP
+
+414          46 LOAD_CONST               0 (None)
+             48 LOAD_CONST               0 (None)
+             50 LOAD_CONST               0 (None)
+             52 CALL                     2
+             60 GET_AWAITABLE            2
+             62 LOAD_CONST               0 (None)
+        >>   64 SEND                     3 (to 74)
+             68 YIELD_VALUE              2
+             70 RESUME                   3
+             72 JUMP_BACKWARD_NO_INTERRUPT     5 (to 64)
+        >>   74 END_SEND
+             76 POP_TOP
+             78 RETURN_CONST             0 (None)
+
+417     >>   80 NOP
+
+418          82 LOAD_GLOBAL              1 (NULL + youtube_search)
+             92 LOAD_ATTR                2 (search_videos)
+
+419         112 LOAD_FAST                0 (kw)
+            114 LOAD_DEREF               8 (region)
+            116 LOAD_DEREF               3 (cfg)
+            118 LOAD_ATTR                5 (NULL|self + get)
+            138 LOAD_CONST               1 ('period')
+            140 CALL                     1
+            148 LOAD_CONST               2 ('views')
+
+420         150 LOAD_GLOBAL              7 (NULL + int)
+            160 LOAD_DEREF               3 (cfg)
+            162 LOAD_ATTR                5 (NULL|self + get)
+            182 LOAD_CONST               3 ('per_keyword')
+            184 CALL                     1
+            192 COPY                     1
+            194 POP_JUMP_IF_TRUE         2 (to 200)
+            196 POP_TOP
+            198 LOAD_CONST               4 (5)
+        >>  200 CALL                     1
+            208 LOAD_GLOBAL              9 (NULL + bool)
+            218 LOAD_DEREF               3 (cfg)
+            220 LOAD_ATTR                5 (NULL|self + get)
+            240 LOAD_CONST               5 ('precise')
+            242 CALL                     1
+            250 CALL                     1
+
+418         258 KW_NAMES                 6 (('region', 'period', 'sort', 'limit', 'precise'))
+            260 CALL                     6
+            268 GET_AWAITABLE            0
+            270 LOAD_CONST               0 (None)
+        >>  272 SEND                     3 (to 282)
+            276 YIELD_VALUE              4
+            278 RESUME                   3
+            280 JUMP_BACKWARD_NO_INTERRUPT     5 (to 272)
+        >>  282 END_SEND
+            284 LOAD_DEREF               7 (kw_videos)
+            286 LOAD_FAST                0 (kw)
+            288 STORE_SUBSCR
+
+424     >>  292 LOAD_DEREF               4 (done_count)
+            294 LOAD_CONST               9 (1)
+            296 BINARY_OP               13 (+=)
+            300 STORE_DEREF              4 (done_count)
+
+425         302 PUSH_NULL
+            304 LOAD_DEREF               5 (emit)
+            306 LOAD_CONST               4 (5)
+            308 LOAD_CONST              10 (60.0)
+            310 LOAD_DEREF               4 (done_count)
+            312 BINARY_OP                5 (*)
+            316 LOAD_GLOBAL             17 (NULL + max)
+            326 LOAD_CONST               9 (1)
+            328 LOAD_GLOBAL             19 (NULL + len)
+            338 LOAD_DEREF               6 (keywords)
+            340 CALL                     1
+            348 CALL                     2
+            356 BINARY_OP               11 (/)
+            360 BINARY_OP                0 (+)
+            364 CALL                     1
+            372 POP_TOP
+
+414         374 LOAD_CONST               0 (None)
+            376 LOAD_CONST               0 (None)
+            378 LOAD_CONST               0 (None)
+            380 CALL                     2
+            388 GET_AWAITABLE            2
+            390 LOAD_CONST               0 (None)
+        >>  392 SEND                     3 (to 402)
+            396 YIELD_VALUE              2
+            398 RESUME                   3
+            400 JUMP_BACKWARD_NO_INTERRUPT     5 (to 392)
+        >>  402 END_SEND
+            404 POP_TOP
+            406 RETURN_CONST             0 (None)
+        >>  408 CLEANUP_THROW
+            410 JUMP_BACKWARD          193 (to 26)
+        >>  412 CLEANUP_THROW
+            414 JUMP_BACKWARD          171 (to 74)
+
+418     >>  416 CLEANUP_THROW
+            418 JUMP_BACKWARD           69 (to 282)
+        >>  420 PUSH_EXC_INFO
+
+421         422 LOAD_GLOBAL             10 (Exception)
+            432 CHECK_EXC_MATCH
+            434 POP_JUMP_IF_FALSE       42 (to 520)
+            436 STORE_FAST               1 (exc)
+
+422         438 LOAD_GLOBAL             13 (NULL + log)
+            448 LOAD_ATTR               14 (info)
+            468 LOAD_CONST               7 ('[keyword_intel] keyword ')
+            470 LOAD_FAST                0 (kw)
+            472 FORMAT_VALUE             2 (repr)
+            474 LOAD_CONST               8 (' lỗi: ')
+            476 LOAD_FAST                1 (exc)
+            478 FORMAT_VALUE             0
+            480 BUILD_STRING             4
+            482 CALL                     1
+            490 POP_TOP
+
+423         492 BUILD_LIST               0
+            494 LOAD_DEREF               7 (kw_videos)
+            496 LOAD_FAST                0 (kw)
+            498 STORE_SUBSCR
+            502 POP_EXCEPT
+            504 LOAD_CONST               0 (None)
+            506 STORE_FAST               1 (exc)
+            508 DELETE_FAST              1 (exc)
+            510 JUMP_BACKWARD          110 (to 292)
+        >>  512 LOAD_CONST               0 (None)
+            514 STORE_FAST               1 (exc)
+            516 DELETE_FAST              1 (exc)
+            518 RERAISE                  1
+
+421     >>  520 RERAISE                  0
+        >>  522 COPY                     3
+            524 POP_EXCEPT
+            526 RERAISE                  1
+
+414     >>  528 CLEANUP_THROW
+            530 JUMP_BACKWARD           65 (to 402)
+        >>  532 PUSH_EXC_INFO
+            534 WITH_EXCEPT_START
+            536 GET_AWAITABLE            2
+            538 LOAD_CONST               0 (None)
+        >>  540 SEND                     4 (to 552)
+            544 YIELD_VALUE              3
+            546 RESUME                   3
+            548 JUMP_BACKWARD_NO_INTERRUPT     5 (to 540)
+        >>  550 CLEANUP_THROW
+        >>  552 END_SEND
+            554 POP_JUMP_IF_TRUE         1 (to 558)
+            556 RERAISE                  2
+        >>  558 POP_TOP
+            560 POP_EXCEPT
+            562 POP_TOP
+            564 POP_TOP
+            566 RETURN_CONST             0 (None)
+        >>  568 COPY                     3
+            570 POP_EXCEPT
+            572 RERAISE                  1
+        >>  574 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            576 RERAISE                  1
+ExceptionTable:
+  6 to 18 -> 574 [0] lasti
+  20 to 20 -> 408 [3]
+  22 to 26 -> 574 [0] lasti
+  28 to 44 -> 532 [1] lasti
+  46 to 66 -> 574 [0] lasti
+  68 to 68 -> 412 [2]
+  70 to 78 -> 574 [0] lasti
+  82 to 274 -> 420 [1]
+  276 to 276 -> 416 [3]
+  278 to 290 -> 420 [1]
+  292 to 372 -> 532 [1] lasti
+  374 to 394 -> 574 [0] lasti
+  396 to 396 -> 528 [2]
+  398 to 408 -> 574 [0] lasti
+  412 to 412 -> 574 [0] lasti
+  416 to 416 -> 420 [1]
+  420 to 436 -> 522 [2] lasti
+  438 to 500 -> 512 [2] lasti
+  502 to 510 -> 532 [1] lasti
+  512 to 520 -> 522 [2] lasti
+  522 to 526 -> 532 [1] lasti
+  528 to 528 -> 574 [0] lasti
+  532 to 542 -> 568 [3] lasti
+  544 to 544 -> 550 [6]
+  546 to 558 -> 568 [3] lasti
+  560 to 572 -> 574 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c927d44e0, file "app\services\keyword_intel_service.py", line 427>:
+              0 COPY_FREE_VARS           1
+
+427           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                12 (to 38)
+             14 STORE_FAST               1 (k)
+             16 PUSH_NULL
+             18 LOAD_DEREF               2 (one)
+             20 LOAD_FAST                1 (k)
+             22 CALL                     1
+             30 YIELD_VALUE              1
+             32 RESUME                   1
+             34 POP_TOP
+             36 JUMP_BACKWARD           14 (to 10)
+        >>   38 END_FOR
+             40 RETURN_CONST             0 (None)
+        >>   42 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             44 RERAISE                  1
+ExceptionTable:
+  6 to 40 -> 42 [0] lasti
+
+Disassembly of <code object scan_to_dict at 0x28aedd90, file "app\services\keyword_intel_service.py", line 501>:
+501           0 RESUME                   0
+
+503           2 LOAD_FAST                0 (row)
+              4 LOAD_ATTR                0 (id)
+
+504          24 LOAD_GLOBAL              3 (NULL + json)
+             34 LOAD_ATTR                4 (loads)
+             54 LOAD_FAST                0 (row)
+             56 LOAD_ATTR                6 (keywords_json)
+             76 COPY                     1
+             78 POP_JUMP_IF_TRUE         2 (to 84)
+             80 POP_TOP
+             82 LOAD_CONST               1 ('[]')
+        >>   84 CALL                     1
+
+505          92 LOAD_FAST                0 (row)
+             94 LOAD_ATTR                8 (region)
+
+506         114 LOAD_GLOBAL              3 (NULL + json)
+            124 LOAD_ATTR                4 (loads)
+            144 LOAD_FAST                0 (row)
+            146 LOAD_ATTR               10 (config_json)
+            166 COPY                     1
+            168 POP_JUMP_IF_TRUE         2 (to 174)
+            170 POP_TOP
+            172 LOAD_CONST               2 ('{}')
+        >>  174 CALL                     1
+
+507         182 LOAD_FAST                0 (row)
+            184 LOAD_ATTR               12 (status)
+
+508         204 LOAD_FAST                0 (row)
+            206 LOAD_ATTR               14 (error)
+
+509         226 LOAD_FAST                0 (row)
+            228 LOAD_ATTR               16 (created_at)
+            248 POP_JUMP_IF_FALSE       26 (to 302)
+            250 LOAD_FAST                0 (row)
+            252 LOAD_ATTR               16 (created_at)
+            272 LOAD_ATTR               19 (NULL|self + isoformat)
+            292 CALL                     0
+            300 JUMP_FORWARD             1 (to 304)
+        >>  302 LOAD_CONST               0 (None)
+
+510     >>  304 LOAD_FAST                0 (row)
+            306 LOAD_ATTR               20 (updated_at)
+            326 POP_JUMP_IF_FALSE       26 (to 380)
+            328 LOAD_FAST                0 (row)
+            330 LOAD_ATTR               20 (updated_at)
+            350 LOAD_ATTR               19 (NULL|self + isoformat)
+            370 CALL                     0
+            378 JUMP_FORWARD             1 (to 382)
+        >>  380 LOAD_CONST               0 (None)
+
+502     >>  382 LOAD_CONST               3 (('id', 'keywords', 'region', 'config', 'status', 'error', 'created_at', 'updated_at'))
+            384 BUILD_CONST_KEY_MAP      8
+            386 STORE_FAST               2 (out)
+
+512         388 LOAD_FAST                1 (include_result)
+            390 POP_JUMP_IF_FALSE       48 (to 488)
+
+513         392 LOAD_FAST                0 (row)
+            394 LOAD_ATTR               22 (clusters_json)
+            414 POP_JUMP_IF_FALSE       31 (to 478)
+            416 LOAD_GLOBAL              3 (NULL + json)
+            426 LOAD_ATTR                4 (loads)
+            446 LOAD_FAST                0 (row)
+            448 LOAD_ATTR               22 (clusters_json)
+            468 CALL                     1
+            476 JUMP_FORWARD             1 (to 480)
+        >>  478 LOAD_CONST               0 (None)
+        >>  480 LOAD_FAST                2 (out)
+            482 LOAD_CONST               4 ('result')
+            484 STORE_SUBSCR
+
+514     >>  488 LOAD_FAST                2 (out)
+            490 RETURN_VALUE
+
+Disassembly of <code object list_scans at 0x7f6c926839f0, file "app\services\keyword_intel_service.py", line 517>:
+517           0 RESUME                   0
+
+518           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + query)
+             24 LOAD_GLOBAL              2 (KeywordScan)
+             34 CALL                     1
+             42 LOAD_ATTR                5 (NULL|self + order_by)
+             62 LOAD_GLOBAL              2 (KeywordScan)
+             72 LOAD_ATTR                6 (created_at)
+             92 LOAD_ATTR                9 (NULL|self + desc)
+            112 CALL                     0
+            120 CALL                     1
+            128 LOAD_ATTR               11 (NULL|self + limit)
+            148 LOAD_CONST               1 (50)
+            150 CALL                     1
+            158 LOAD_ATTR               13 (NULL|self + all)
+            178 CALL                     0
+            186 STORE_FAST               1 (rows)
+
+519         188 LOAD_FAST                1 (rows)
+            190 GET_ITER
+            192 LOAD_FAST_AND_CLEAR      2 (r)
+            194 SWAP                     2
+            196 BUILD_LIST               0
+            198 SWAP                     2
+        >>  200 FOR_ITER                15 (to 234)
+            204 STORE_FAST               2 (r)
+            206 LOAD_GLOBAL             15 (NULL + scan_to_dict)
+            216 LOAD_FAST                2 (r)
+            218 LOAD_CONST               2 (False)
+            220 KW_NAMES                 3 (('include_result',))
+            222 CALL                     2
+            230 LIST_APPEND              2
+            232 JUMP_BACKWARD           17 (to 200)
+        >>  234 END_FOR
+            236 SWAP                     2
+            238 STORE_FAST               2 (r)
+            240 RETURN_VALUE
+        >>  242 SWAP                     2
+            244 POP_TOP
+            246 SWAP                     2
+            248 STORE_FAST               2 (r)
+            250 RERAISE                  0
+ExceptionTable:
+  196 to 234 -> 242 [2]
+
+Disassembly of <code object get_scan at 0x7f6c92151e30, file "app\services\keyword_intel_service.py", line 522>:
+522           0 RESUME                   0
+
+523           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_GLOBAL              2 (KeywordScan)
+             34 LOAD_FAST                1 (scan_id)
+             36 CALL                     2
+             44 STORE_FAST               2 (row)
+
+524          46 LOAD_FAST                2 (row)
+             48 POP_JUMP_IF_NOT_NONE    28 (to 106)
+
+525          50 LOAD_GLOBAL              5 (NULL + StudioError)
+             60 LOAD_GLOBAL              6 (E)
+             70 LOAD_ATTR                8 (UNKNOWN)
+             90 LOAD_CONST               1 ('Lượt quét từ khóa không tồn tại')
+             92 LOAD_CONST               2 (404)
+             94 KW_NAMES                 3 (('status_code',))
+             96 CALL                     3
+            104 RAISE_VARARGS            1
+
+526     >>  106 LOAD_GLOBAL             11 (NULL + scan_to_dict)
+            116 LOAD_FAST                2 (row)
+            118 CALL                     1
+            126 RETURN_VALUE
+
+Disassembly of <code object delete_scan at 0x7f6c928fd730, file "app\services\keyword_intel_service.py", line 529>:
+529           0 RESUME                   0
+
+530           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_GLOBAL              2 (KeywordScan)
+             34 LOAD_FAST                1 (scan_id)
+             36 CALL                     2
+             44 STORE_FAST               2 (row)
+
+531          46 LOAD_FAST                2 (row)
+             48 POP_JUMP_IF_NOT_NONE    28 (to 106)
+
+532          50 LOAD_GLOBAL              5 (NULL + StudioError)
+             60 LOAD_GLOBAL              6 (E)
+             70 LOAD_ATTR                8 (UNKNOWN)
+             90 LOAD_CONST               1 ('Lượt quét từ khóa không tồn tại')
+             92 LOAD_CONST               2 (404)
+             94 KW_NAMES                 3 (('status_code',))
+             96 CALL                     3
+            104 RAISE_VARARGS            1
+
+533     >>  106 LOAD_FAST                0 (db)
+            108 LOAD_ATTR               11 (NULL|self + delete)
+            128 LOAD_FAST                2 (row)
+            130 CALL                     1
+            138 POP_TOP
+
+534         140 LOAD_FAST                0 (db)
+            142 LOAD_ATTR               13 (NULL|self + commit)
+            162 CALL                     0
+            170 POP_TOP
+            172 RETURN_CONST             0 (None)
+
+Disassembly of <code object scan_job_to_dict at 0x2905f300, file "app\services\keyword_intel_service.py", line 537>:
+537           0 RESUME                   0
+
+539           2 NOP
+
+540           4 LOAD_GLOBAL              1 (NULL + json)
+             14 LOAD_ATTR                2 (loads)
+             34 LOAD_FAST                1 (job)
+             36 LOAD_ATTR                4 (config_json)
+             56 COPY                     1
+             58 POP_JUMP_IF_TRUE         2 (to 64)
+             60 POP_TOP
+             62 LOAD_CONST               1 ('{}')
+        >>   64 CALL                     1
+             72 STORE_FAST               2 (cfg)
+
+543     >>   74 LOAD_GLOBAL             11 (NULL + str)
+             84 LOAD_FAST                2 (cfg)
+             86 LOAD_ATTR               13 (NULL|self + get)
+            106 LOAD_CONST               2 ('scan_id')
+            108 CALL                     1
+            116 COPY                     1
+            118 POP_JUMP_IF_TRUE         2 (to 124)
+            120 POP_TOP
+            122 LOAD_CONST               3 ('')
+        >>  124 CALL                     1
+            132 STORE_FAST               3 (scan_id)
+
+544         134 LOAD_FAST                3 (scan_id)
+            136 POP_JUMP_IF_FALSE       22 (to 182)
+            138 LOAD_FAST                0 (db)
+            140 LOAD_ATTR               13 (NULL|self + get)
+            160 LOAD_GLOBAL             14 (KeywordScan)
+            170 LOAD_FAST                3 (scan_id)
+            172 CALL                     2
+            180 JUMP_FORWARD             1 (to 184)
+        >>  182 LOAD_CONST               4 (None)
+        >>  184 STORE_FAST               4 (row)
+
+545         186 LOAD_FAST                2 (cfg)
+            188 LOAD_ATTR               13 (NULL|self + get)
+            208 LOAD_CONST               5 ('_progress')
+            210 LOAD_CONST               6 (0)
+            212 CALL                     2
+            220 STORE_FAST               5 (progress)
+
+546         222 LOAD_FAST                1 (job)
+            224 LOAD_ATTR               16 (status)
+            244 LOAD_CONST               7 ('done')
+            246 COMPARE_OP              40 (==)
+            250 POP_JUMP_IF_FALSE        2 (to 256)
+
+547         252 LOAD_CONST               8 (100)
+            254 STORE_FAST               5 (progress)
+
+549     >>  256 LOAD_FAST                1 (job)
+            258 LOAD_ATTR               18 (id)
+
+550         278 LOAD_FAST                3 (scan_id)
+
+551         280 LOAD_FAST                2 (cfg)
+            282 LOAD_ATTR               13 (NULL|self + get)
+            302 LOAD_CONST               9 ('label')
+            304 CALL                     1
+            312 COPY                     1
+            314 POP_JUMP_IF_TRUE         2 (to 320)
+            316 POP_TOP
+            318 LOAD_FAST                3 (scan_id)
+
+552     >>  320 LOAD_FAST                1 (job)
+            322 LOAD_ATTR               16 (status)
+
+553         342 LOAD_FAST                4 (row)
+            344 POP_JUMP_IF_FALSE       12 (to 370)
+            346 LOAD_FAST                4 (row)
+            348 LOAD_ATTR               16 (status)
+            368 JUMP_FORWARD             1 (to 372)
+        >>  370 LOAD_CONST               4 (None)
+
+554     >>  372 LOAD_GLOBAL             21 (NULL + float)
+            382 LOAD_FAST                5 (progress)
+            384 COPY                     1
+            386 POP_JUMP_IF_TRUE         2 (to 392)
+            388 POP_TOP
+            390 LOAD_CONST               6 (0)
+        >>  392 CALL                     1
+
+555         400 LOAD_FAST                2 (cfg)
+            402 LOAD_ATTR               13 (NULL|self + get)
+            422 LOAD_CONST              10 ('_error')
+            424 CALL                     1
+            432 COPY                     1
+            434 POP_JUMP_IF_TRUE        20 (to 476)
+            436 POP_TOP
+            438 LOAD_FAST                4 (row)
+            440 POP_JUMP_IF_FALSE       12 (to 466)
+            442 LOAD_FAST                4 (row)
+            444 LOAD_ATTR               22 (error)
+            464 JUMP_FORWARD             1 (to 468)
+        >>  466 LOAD_CONST               4 (None)
+        >>  468 COPY                     1
+            470 POP_JUMP_IF_TRUE         2 (to 476)
+            472 POP_TOP
+            474 LOAD_CONST               4 (None)
+
+556     >>  476 LOAD_FAST                1 (job)
+            478 LOAD_ATTR               24 (created_at)
+            498 POP_JUMP_IF_FALSE       26 (to 552)
+            500 LOAD_FAST                1 (job)
+            502 LOAD_ATTR               24 (created_at)
+            522 LOAD_ATTR               27 (NULL|self + isoformat)
+            542 CALL                     0
+            550 JUMP_FORWARD             1 (to 554)
+        >>  552 LOAD_CONST               4 (None)
+
+557     >>  554 LOAD_FAST                1 (job)
+            556 LOAD_ATTR               28 (finished_at)
+            576 POP_JUMP_IF_FALSE       28 (to 634)
+            578 LOAD_FAST                1 (job)
+            580 LOAD_ATTR               28 (finished_at)
+            600 LOAD_ATTR               27 (NULL|self + isoformat)
+            620 CALL                     0
+
+548         628 LOAD_CONST              11 (('job_id', 'scan_id', 'label', 'status', 'scan_status', 'progress', 'error', 'created_at', 'finished_at'))
+            630 BUILD_CONST_KEY_MAP      9
+            632 RETURN_VALUE
+
+557     >>  634 LOAD_CONST               4 (None)
+
+548         636 LOAD_CONST              11 (('job_id', 'scan_id', 'label', 'status', 'scan_status', 'progress', 'error', 'created_at', 'finished_at'))
+            638 BUILD_CONST_KEY_MAP      9
+            640 RETURN_VALUE
+        >>  642 PUSH_EXC_INFO
+
+541         644 LOAD_GLOBAL              6 (TypeError)
+            654 LOAD_GLOBAL              8 (ValueError)
+            664 BUILD_TUPLE              2
+            666 CHECK_EXC_MATCH
+            668 POP_JUMP_IF_FALSE        6 (to 682)
+            670 POP_TOP
+
+542         672 BUILD_MAP                0
+            674 STORE_FAST               2 (cfg)
+            676 POP_EXCEPT
+            678 EXTENDED_ARG             1
+            680 JUMP_BACKWARD          304 (to 74)
+
+541     >>  682 RERAISE                  0
+        >>  684 COPY                     3
+            686 POP_EXCEPT
+            688 RERAISE                  1
+ExceptionTable:
+  4 to 72 -> 642 [0]
+  642 to 674 -> 684 [1] lasti
+  682 to 682 -> 684 [1] lasti
+
+Disassembly of <code object list_scan_jobs at 0x28c0ab00, file "app\services\keyword_intel_service.py", line 561>:
+561           0 RESUME                   0
+
+562           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + query)
+             24 LOAD_GLOBAL              2 (Job)
+             34 CALL                     1
+             42 LOAD_ATTR                5 (NULL|self + filter)
+             62 LOAD_GLOBAL              2 (Job)
+             72 LOAD_ATTR                6 (job_type)
+             92 LOAD_CONST               1 ('background_task')
+             94 COMPARE_OP              40 (==)
+             98 LOAD_GLOBAL              2 (Job)
+            108 LOAD_ATTR                8 (step_name)
+            128 LOAD_CONST               2 ('keyword_scan')
+            130 COMPARE_OP              40 (==)
+            134 CALL                     2
+            142 STORE_FAST               2 (query)
+
+563         144 LOAD_FAST                1 (active_only)
+            146 POP_JUMP_IF_FALSE       46 (to 240)
+
+564         148 LOAD_FAST                2 (query)
+            150 LOAD_ATTR                5 (NULL|self + filter)
+            170 LOAD_GLOBAL              2 (Job)
+            180 LOAD_ATTR               10 (status)
+            200 LOAD_ATTR               13 (NULL|self + in_)
+            220 LOAD_CONST               3 (('queued', 'running'))
+            222 CALL                     1
+            230 CALL                     1
+            238 STORE_FAST               2 (query)
+
+565     >>  240 LOAD_FAST                2 (query)
+            242 LOAD_ATTR               15 (NULL|self + order_by)
+            262 LOAD_GLOBAL              2 (Job)
+            272 LOAD_ATTR               16 (created_at)
+            292 LOAD_ATTR               19 (NULL|self + desc)
+            312 CALL                     0
+            320 CALL                     1
+            328 LOAD_ATTR               21 (NULL|self + limit)
+            348 LOAD_CONST               4 (20)
+            350 CALL                     1
+            358 LOAD_ATTR               23 (NULL|self + all)
+            378 CALL                     0
+            386 STORE_FAST               3 (rows)
+
+566         388 LOAD_FAST                3 (rows)
+            390 GET_ITER
+            392 LOAD_FAST_AND_CLEAR      4 (r)
+            394 SWAP                     2
+            396 BUILD_LIST               0
+            398 SWAP                     2
+        >>  400 FOR_ITER                14 (to 432)
+            404 STORE_FAST               4 (r)
+            406 LOAD_GLOBAL             25 (NULL + scan_job_to_dict)
+            416 LOAD_FAST                0 (db)
+            418 LOAD_FAST                4 (r)
+            420 CALL                     2
+            428 LIST_APPEND              2
+            430 JUMP_BACKWARD           16 (to 400)
+        >>  432 END_FOR
+            434 SWAP                     2
+            436 STORE_FAST               4 (r)
+            438 RETURN_VALUE
+        >>  440 SWAP                     2
+            442 POP_TOP
+            444 SWAP                     2
+            446 STORE_FAST               4 (r)
+            448 RERAISE                  0
+ExceptionTable:
+  396 to 432 -> 440 [2]

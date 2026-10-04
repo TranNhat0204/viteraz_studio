@@ -1,0 +1,637 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Device identity xoay vòng cho provider `capcut-tts`.\n\nCapCut common_task ký mọi request theo `device_id` + `tdid`. Xài mãi 1 cặp dễ bị anti-abuse\nchặn, nên ta giữ MỘT dòng CapcutDevice `active=1` và thỉnh thoảng xoay:\n\n  - theo tuổi   : quá `CAPCUT_DEVICE_MAX_AGE_HOURS` giờ kể từ khi tạo  → xoay\n  - theo lần dùng: `use_count` vượt `CAPCUT_DEVICE_MAX_USES`          → xoay\n  - ép xoay      : khi request bị từ chối (anti-abuse) — gọi force_rotate()\n\nChỉ `device_id`/`tdid` đổi; các field tĩnh (aid, app_name, iid…) lấy từ DEFAULT_DEVICE của client\nvendored. Dòng cũ giữ lại `active=0` để debug lịch sử.\n\nCấu hình (đọc từ bảng Setting, có mặc định an toàn):\n  - capcut_device_max_age_hours  (mặc định 24)\n  - capcut_device_max_uses       (mặc định 200)\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 17           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 19          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (secrets)
+             24 STORE_NAME               3 (secrets)
+
+ 20          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               4 (('datetime', 'timedelta'))
+             30 IMPORT_NAME              4 (datetime)
+             32 IMPORT_FROM              4 (datetime)
+             34 STORE_NAME               4 (datetime)
+             36 IMPORT_FROM              5 (timedelta)
+             38 STORE_NAME               5 (timedelta)
+             40 POP_TOP
+
+ 22          42 LOAD_CONST               1 (0)
+             44 LOAD_CONST               5 (('log',))
+             46 IMPORT_NAME              6 (app.core.logging)
+             48 IMPORT_FROM              7 (log)
+             50 STORE_NAME               7 (log)
+             52 POP_TOP
+
+ 23          54 LOAD_CONST               1 (0)
+             56 LOAD_CONST               6 (('CapcutDevice', 'Setting'))
+             58 IMPORT_NAME              8 (app.db.models)
+             60 IMPORT_FROM              9 (CapcutDevice)
+             62 STORE_NAME               9 (CapcutDevice)
+             64 IMPORT_FROM             10 (Setting)
+             66 STORE_NAME              10 (Setting)
+             68 POP_TOP
+
+ 24          70 LOAD_CONST               1 (0)
+             72 LOAD_CONST               7 (('SessionLocal',))
+             74 IMPORT_NAME             11 (app.db.session)
+             76 IMPORT_FROM             12 (SessionLocal)
+             78 STORE_NAME              12 (SessionLocal)
+             80 POP_TOP
+
+ 27          82 LOAD_CONST               8 (24)
+             84 STORE_NAME              13 (_DEFAULT_MAX_AGE_HOURS)
+
+ 28          86 LOAD_CONST               9 (200)
+             88 STORE_NAME              14 (_DEFAULT_MAX_USES)
+
+ 33          90 LOAD_CONST              10 (19)
+             92 STORE_NAME              15 (_DEVICE_ID_DIGITS)
+
+ 36          94 LOAD_CONST              18 (('key', 'str', 'default', 'int', 'return', 'int'))
+             96 LOAD_CONST              11 (<code object _read_int_setting at 0x7f6c933da8b0, file "app\adapters\tts\capcut_device.py", line 36>)
+             98 MAKE_FUNCTION            4 (annotations)
+            100 STORE_NAME              16 (_read_int_setting)
+
+ 47         102 LOAD_NAME               15 (_DEVICE_ID_DIGITS)
+            104 BUILD_TUPLE              1
+            106 LOAD_CONST              19 (('digits', 'int', 'return', 'str'))
+            108 LOAD_CONST              12 (<code object _gen_numeric_id at 0x7f6c93272970, file "app\adapters\tts\capcut_device.py", line 47>)
+            110 MAKE_FUNCTION            5 (defaults, annotations)
+            112 STORE_NAME              17 (_gen_numeric_id)
+
+ 54         114 LOAD_CONST              20 ((None,))
+            116 LOAD_CONST              21 (('reason', 'str', 'default_iid', 'str | None', 'return', 'CapcutDevice'))
+            118 LOAD_CONST              13 (<code object _new_device_row at 0x7f6c92a39f00, file "app\adapters\tts\capcut_device.py", line 54>)
+            120 MAKE_FUNCTION            5 (defaults, annotations)
+            122 STORE_NAME              18 (_new_device_row)
+
+ 65         124 LOAD_CONST              22 (('return', 'str | None'))
+            126 LOAD_CONST              14 (<code object _default_iid at 0x7f6c92a3a340, file "app\adapters\tts\capcut_device.py", line 65>)
+            128 MAKE_FUNCTION            4 (annotations)
+            130 STORE_NAME              19 (_default_iid)
+
+ 74         132 LOAD_CONST              23 (('dev', 'CapcutDevice', 'max_age_hours', 'int', 'max_uses', 'int', 'return', 'str | None'))
+            134 LOAD_CONST              15 (<code object _should_rotate at 0x7f6c93289cf0, file "app\adapters\tts\capcut_device.py", line 74>)
+            136 MAKE_FUNCTION            4 (annotations)
+            138 STORE_NAME              20 (_should_rotate)
+
+ 85         140 LOAD_CONST              24 (('return', 'dict'))
+            142 LOAD_CONST              16 (<code object get_active_device at 0x28e4a380, file "app\adapters\tts\capcut_device.py", line 85>)
+            144 MAKE_FUNCTION            4 (annotations)
+            146 STORE_NAME              21 (get_active_device)
+
+125         148 LOAD_CONST              25 (('rejected',))
+            150 LOAD_CONST              26 (('reason', 'str', 'return', 'dict'))
+            152 LOAD_CONST              17 (<code object force_rotate at 0x2905efd0, file "app\adapters\tts\capcut_device.py", line 125>)
+            154 MAKE_FUNCTION            5 (defaults, annotations)
+            156 STORE_NAME              22 (force_rotate)
+            158 RETURN_CONST             3 (None)
+
+Disassembly of <code object _read_int_setting at 0x7f6c933da8b0, file "app\adapters\tts\capcut_device.py", line 36>:
+ 36           0 RESUME                   0
+
+ 37           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_GLOBAL              2 (Setting)
+             34 LOAD_FAST                1 (key)
+             36 CALL                     2
+             44 STORE_FAST               3 (row)
+
+ 38          46 LOAD_FAST                3 (row)
+             48 POP_JUMP_IF_FALSE       12 (to 74)
+             50 LOAD_FAST                3 (row)
+             52 LOAD_ATTR                4 (value)
+             72 POP_JUMP_IF_TRUE         2 (to 78)
+
+ 39     >>   74 LOAD_FAST                2 (default)
+             76 RETURN_VALUE
+
+ 40     >>   78 NOP
+
+ 41          80 LOAD_GLOBAL              7 (NULL + int)
+             90 LOAD_GLOBAL              9 (NULL + str)
+            100 LOAD_FAST                3 (row)
+            102 LOAD_ATTR                4 (value)
+            122 CALL                     1
+            130 LOAD_ATTR               11 (NULL|self + strip)
+            150 CALL                     0
+            158 CALL                     1
+            166 STORE_FAST               4 (v)
+
+ 42         168 LOAD_FAST                4 (v)
+            170 LOAD_CONST               1 (0)
+            172 COMPARE_OP              68 (>)
+            176 POP_JUMP_IF_FALSE        2 (to 182)
+            178 LOAD_FAST                4 (v)
+            180 RETURN_VALUE
+        >>  182 LOAD_FAST                2 (default)
+            184 RETURN_VALUE
+        >>  186 PUSH_EXC_INFO
+
+ 43         188 LOAD_GLOBAL             12 (TypeError)
+            198 LOAD_GLOBAL             14 (ValueError)
+            208 BUILD_TUPLE              2
+            210 CHECK_EXC_MATCH
+            212 POP_JUMP_IF_FALSE        5 (to 224)
+            214 POP_TOP
+
+ 44         216 LOAD_FAST                2 (default)
+            218 SWAP                     2
+            220 POP_EXCEPT
+            222 RETURN_VALUE
+
+ 43     >>  224 RERAISE                  0
+        >>  226 COPY                     3
+            228 POP_EXCEPT
+            230 RERAISE                  1
+ExceptionTable:
+  80 to 178 -> 186 [0]
+  182 to 182 -> 186 [0]
+  186 to 218 -> 226 [1] lasti
+  224 to 224 -> 226 [1] lasti
+
+Disassembly of <code object _gen_numeric_id at 0x7f6c93272970, file "app\adapters\tts\capcut_device.py", line 47>:
+ 47           0 RESUME                   0
+
+ 49           2 LOAD_GLOBAL              1 (NULL + str)
+             12 LOAD_GLOBAL              3 (NULL + secrets)
+             22 LOAD_ATTR                4 (randbelow)
+             42 LOAD_CONST               1 (9)
+             44 CALL                     1
+             52 LOAD_CONST               2 (1)
+             54 BINARY_OP                0 (+)
+             58 CALL                     1
+             66 STORE_FAST               1 (first)
+
+ 50          68 LOAD_CONST               3 ('')
+             70 LOAD_ATTR                7 (NULL|self + join)
+             90 LOAD_CONST               4 (<code object <genexpr> at 0x7f6c9327f090, file "app\adapters\tts\capcut_device.py", line 50>)
+             92 MAKE_FUNCTION            0
+             94 LOAD_GLOBAL              9 (NULL + range)
+            104 LOAD_FAST                0 (digits)
+            106 LOAD_CONST               2 (1)
+            108 BINARY_OP               10 (-)
+            112 CALL                     1
+            120 GET_ITER
+            122 CALL                     0
+            130 CALL                     1
+            138 STORE_FAST               2 (rest)
+
+ 51         140 LOAD_FAST                1 (first)
+            142 LOAD_FAST                2 (rest)
+            144 BINARY_OP                0 (+)
+            148 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c9327f090, file "app\adapters\tts\capcut_device.py", line 50>:
+ 50           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                34 (to 80)
+             12 STORE_FAST               1 (_)
+             14 LOAD_GLOBAL              1 (NULL + str)
+             24 LOAD_GLOBAL              3 (NULL + secrets)
+             34 LOAD_ATTR                4 (randbelow)
+             54 LOAD_CONST               0 (10)
+             56 CALL                     1
+             64 CALL                     1
+             72 YIELD_VALUE              1
+             74 RESUME                   1
+             76 POP_TOP
+             78 JUMP_BACKWARD           36 (to 8)
+        >>   80 END_FOR
+             82 RETURN_CONST             1 (None)
+        >>   84 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             86 RERAISE                  1
+ExceptionTable:
+  4 to 82 -> 84 [0] lasti
+
+Disassembly of <code object _new_device_row at 0x7f6c92a39f00, file "app\adapters\tts\capcut_device.py", line 54>:
+ 54           0 RESUME                   0
+
+ 55           2 LOAD_GLOBAL              1 (NULL + CapcutDevice)
+
+ 56          12 LOAD_GLOBAL              3 (NULL + _gen_numeric_id)
+             22 CALL                     0
+
+ 57          30 LOAD_GLOBAL              3 (NULL + _gen_numeric_id)
+             40 CALL                     0
+
+ 58          48 LOAD_FAST                1 (default_iid)
+
+ 59          50 LOAD_CONST               1 (1)
+
+ 60          52 LOAD_CONST               2 (0)
+
+ 61          54 LOAD_FAST                0 (reason)
+
+ 55          56 KW_NAMES                 3 (('device_id', 'tdid', 'iid', 'active', 'use_count', 'rotated_reason'))
+             58 CALL                     6
+             66 RETURN_VALUE
+
+Disassembly of <code object _default_iid at 0x7f6c92a3a340, file "app\adapters\tts\capcut_device.py", line 65>:
+ 65           0 RESUME                   0
+
+ 67           2 NOP
+
+ 68           4 LOAD_CONST               1 (0)
+              6 LOAD_CONST               2 (('DEFAULT_DEVICE',))
+              8 IMPORT_NAME              0 (app.adapters.tts.capcut_client)
+             10 IMPORT_FROM              1 (DEFAULT_DEVICE)
+             12 STORE_FAST               0 (DEFAULT_DEVICE)
+             14 POP_TOP
+
+ 69          16 LOAD_FAST                0 (DEFAULT_DEVICE)
+             18 LOAD_ATTR                5 (NULL|self + get)
+             38 LOAD_CONST               3 ('iid')
+             40 CALL                     1
+             48 RETURN_VALUE
+        >>   50 PUSH_EXC_INFO
+
+ 70          52 LOAD_GLOBAL              6 (Exception)
+             62 CHECK_EXC_MATCH
+             64 POP_JUMP_IF_FALSE        3 (to 72)
+             66 POP_TOP
+
+ 71          68 POP_EXCEPT
+             70 RETURN_CONST             4 (None)
+
+ 70     >>   72 RERAISE                  0
+        >>   74 COPY                     3
+             76 POP_EXCEPT
+             78 RERAISE                  1
+ExceptionTable:
+  4 to 46 -> 50 [0]
+  50 to 66 -> 74 [1] lasti
+  72 to 72 -> 74 [1] lasti
+
+Disassembly of <code object _should_rotate at 0x7f6c93289cf0, file "app\adapters\tts\capcut_device.py", line 74>:
+ 74           0 RESUME                   0
+
+ 76           2 LOAD_FAST                0 (dev)
+              4 LOAD_ATTR                0 (use_count)
+             24 POP_JUMP_IF_NONE        16 (to 58)
+             26 LOAD_FAST                0 (dev)
+             28 LOAD_ATTR                0 (use_count)
+             48 LOAD_FAST                2 (max_uses)
+             50 COMPARE_OP              92 (>=)
+             54 POP_JUMP_IF_FALSE        1 (to 58)
+
+ 77          56 RETURN_CONST             2 ('usage')
+
+ 78     >>   58 LOAD_FAST                0 (dev)
+             60 LOAD_ATTR                2 (created_at)
+             80 STORE_FAST               3 (created)
+
+ 79          82 LOAD_FAST                3 (created)
+             84 POP_JUMP_IF_NONE        37 (to 160)
+
+ 80          86 LOAD_GLOBAL              5 (NULL + datetime)
+             96 LOAD_ATTR                6 (utcnow)
+            116 CALL                     0
+            124 LOAD_FAST                3 (created)
+            126 BINARY_OP               10 (-)
+            130 LOAD_GLOBAL              9 (NULL + timedelta)
+            140 LOAD_FAST                1 (max_age_hours)
+            142 KW_NAMES                 3 (('hours',))
+            144 CALL                     1
+            152 COMPARE_OP              92 (>=)
+            156 POP_JUMP_IF_FALSE        1 (to 160)
+
+ 81         158 RETURN_CONST             4 ('age')
+
+ 82     >>  160 RETURN_CONST             1 (None)
+
+Disassembly of <code object get_active_device at 0x28e4a380, file "app\adapters\tts\capcut_device.py", line 85>:
+ 85           0 RESUME                   0
+
+ 90           2 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             12 CALL                     0
+             20 BEFORE_WITH
+             22 STORE_FAST               0 (db)
+
+ 91          24 LOAD_GLOBAL              3 (NULL + _read_int_setting)
+             34 LOAD_FAST                0 (db)
+             36 LOAD_CONST               1 ('capcut_device_max_age_hours')
+             38 LOAD_GLOBAL              4 (_DEFAULT_MAX_AGE_HOURS)
+             48 CALL                     3
+             56 STORE_FAST               1 (max_age)
+
+ 92          58 LOAD_GLOBAL              3 (NULL + _read_int_setting)
+             68 LOAD_FAST                0 (db)
+             70 LOAD_CONST               2 ('capcut_device_max_uses')
+             72 LOAD_GLOBAL              6 (_DEFAULT_MAX_USES)
+             82 CALL                     3
+             90 STORE_FAST               2 (max_uses)
+
+ 95          92 LOAD_FAST                0 (db)
+             94 LOAD_ATTR                9 (NULL|self + query)
+            114 LOAD_GLOBAL             10 (CapcutDevice)
+            124 CALL                     1
+
+ 96         132 LOAD_ATTR               13 (NULL|self + filter)
+            152 LOAD_GLOBAL             10 (CapcutDevice)
+            162 LOAD_ATTR               14 (active)
+            182 LOAD_CONST               3 (1)
+            184 COMPARE_OP              40 (==)
+            188 CALL                     1
+
+ 97         196 LOAD_ATTR               17 (NULL|self + order_by)
+            216 LOAD_GLOBAL             10 (CapcutDevice)
+            226 LOAD_ATTR               18 (created_at)
+            246 LOAD_ATTR               21 (NULL|self + desc)
+            266 CALL                     0
+            274 CALL                     1
+
+ 98         282 LOAD_ATTR               23 (NULL|self + first)
+            302 CALL                     0
+
+ 94         310 STORE_FAST               3 (dev)
+
+101         312 LOAD_FAST                3 (dev)
+            314 POP_JUMP_IF_NOT_NONE    92 (to 500)
+
+102         316 LOAD_GLOBAL             25 (NULL + _new_device_row)
+            326 LOAD_CONST               5 ('init')
+            328 LOAD_GLOBAL             27 (NULL + _default_iid)
+            338 CALL                     0
+            346 CALL                     2
+            354 STORE_FAST               3 (dev)
+
+103         356 LOAD_FAST                0 (db)
+            358 LOAD_ATTR               29 (NULL|self + add)
+            378 LOAD_FAST                3 (dev)
+            380 CALL                     1
+            388 POP_TOP
+
+104         390 LOAD_FAST                0 (db)
+            392 LOAD_ATTR               31 (NULL|self + flush)
+            412 CALL                     0
+            420 POP_TOP
+
+105         422 LOAD_GLOBAL             33 (NULL + log)
+            432 LOAD_ATTR               34 (info)
+            452 LOAD_CONST               6 ('capcut-tts: created first device (')
+            454 LOAD_FAST                3 (dev)
+            456 LOAD_ATTR               36 (device_id)
+            476 LOAD_CONST               4 (None)
+            478 LOAD_CONST               7 (6)
+            480 BINARY_SLICE
+            482 FORMAT_VALUE             0
+            484 LOAD_CONST               8 ('...)')
+            486 BUILD_STRING             3
+            488 CALL                     1
+            496 POP_TOP
+            498 JUMP_FORWARD           148 (to 796)
+
+107     >>  500 LOAD_GLOBAL             39 (NULL + _should_rotate)
+            510 LOAD_FAST                3 (dev)
+            512 LOAD_FAST                1 (max_age)
+            514 LOAD_FAST                2 (max_uses)
+            516 CALL                     3
+            524 STORE_FAST               4 (reason)
+
+108         526 LOAD_FAST                4 (reason)
+            528 POP_JUMP_IF_FALSE      133 (to 796)
+
+109         530 LOAD_CONST               9 (0)
+            532 LOAD_FAST                3 (dev)
+            534 STORE_ATTR               7 (active)
+
+110         544 LOAD_GLOBAL             25 (NULL + _new_device_row)
+            554 LOAD_FAST                4 (reason)
+            556 LOAD_FAST                3 (dev)
+            558 LOAD_ATTR               40 (iid)
+            578 COPY                     1
+            580 POP_JUMP_IF_TRUE        10 (to 602)
+            582 POP_TOP
+            584 LOAD_GLOBAL             27 (NULL + _default_iid)
+            594 CALL                     0
+        >>  602 CALL                     2
+            610 STORE_FAST               5 (new)
+
+111         612 LOAD_FAST                0 (db)
+            614 LOAD_ATTR               29 (NULL|self + add)
+            634 LOAD_FAST                5 (new)
+            636 CALL                     1
+            644 POP_TOP
+
+112         646 LOAD_FAST                0 (db)
+            648 LOAD_ATTR               31 (NULL|self + flush)
+            668 CALL                     0
+            676 POP_TOP
+
+113         678 LOAD_GLOBAL             33 (NULL + log)
+            688 LOAD_ATTR               34 (info)
+            708 LOAD_CONST              10 ('capcut-tts: rotated device (')
+            710 LOAD_FAST                4 (reason)
+            712 FORMAT_VALUE             0
+            714 LOAD_CONST              11 (') ')
+            716 LOAD_FAST                3 (dev)
+            718 LOAD_ATTR               36 (device_id)
+            738 LOAD_CONST               4 (None)
+            740 LOAD_CONST               7 (6)
+            742 BINARY_SLICE
+            744 FORMAT_VALUE             0
+            746 LOAD_CONST              12 ('... -> ')
+            748 LOAD_FAST                5 (new)
+            750 LOAD_ATTR               36 (device_id)
+            770 LOAD_CONST               4 (None)
+            772 LOAD_CONST               7 (6)
+            774 BINARY_SLICE
+            776 FORMAT_VALUE             0
+            778 LOAD_CONST              13 ('...')
+            780 BUILD_STRING             7
+            782 CALL                     1
+            790 POP_TOP
+
+114         792 LOAD_FAST                5 (new)
+            794 STORE_FAST               3 (dev)
+
+116     >>  796 LOAD_FAST                3 (dev)
+            798 LOAD_ATTR               42 (use_count)
+            818 COPY                     1
+            820 POP_JUMP_IF_TRUE         2 (to 826)
+            822 POP_TOP
+            824 LOAD_CONST               9 (0)
+        >>  826 LOAD_CONST               3 (1)
+            828 BINARY_OP                0 (+)
+            832 LOAD_FAST                3 (dev)
+            834 STORE_ATTR              21 (use_count)
+
+117         844 LOAD_GLOBAL             45 (NULL + datetime)
+            854 LOAD_ATTR               46 (utcnow)
+            874 CALL                     0
+            882 LOAD_FAST                3 (dev)
+            884 STORE_ATTR              24 (last_used_at)
+
+118         894 LOAD_FAST                3 (dev)
+            896 LOAD_ATTR               36 (device_id)
+            916 LOAD_FAST                3 (dev)
+            918 LOAD_ATTR               50 (tdid)
+            938 LOAD_CONST              14 (('device_id', 'tdid'))
+            940 BUILD_CONST_KEY_MAP      2
+            942 STORE_FAST               6 (override)
+
+119         944 LOAD_FAST                3 (dev)
+            946 LOAD_ATTR               40 (iid)
+            966 POP_JUMP_IF_FALSE       15 (to 998)
+
+120         968 LOAD_FAST                3 (dev)
+            970 LOAD_ATTR               40 (iid)
+            990 LOAD_FAST                6 (override)
+            992 LOAD_CONST              15 ('iid')
+            994 STORE_SUBSCR
+
+121     >>  998 LOAD_FAST                0 (db)
+           1000 LOAD_ATTR               53 (NULL|self + commit)
+           1020 CALL                     0
+           1028 POP_TOP
+
+122        1030 LOAD_FAST                6 (override)
+
+ 90        1032 SWAP                     2
+           1034 LOAD_CONST               4 (None)
+           1036 LOAD_CONST               4 (None)
+           1038 LOAD_CONST               4 (None)
+           1040 CALL                     2
+           1048 POP_TOP
+           1050 RETURN_VALUE
+        >> 1052 PUSH_EXC_INFO
+           1054 WITH_EXCEPT_START
+           1056 POP_JUMP_IF_TRUE         1 (to 1060)
+           1058 RERAISE                  2
+        >> 1060 POP_TOP
+           1062 POP_EXCEPT
+           1064 POP_TOP
+           1066 POP_TOP
+           1068 RETURN_CONST             4 (None)
+        >> 1070 COPY                     3
+           1072 POP_EXCEPT
+           1074 RERAISE                  1
+ExceptionTable:
+  22 to 1030 -> 1052 [1] lasti
+  1052 to 1060 -> 1070 [3] lasti
+
+Disassembly of <code object force_rotate at 0x2905efd0, file "app\adapters\tts\capcut_device.py", line 125>:
+125           0 RESUME                   0
+
+127           2 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             12 CALL                     0
+             20 BEFORE_WITH
+             22 STORE_FAST               1 (db)
+
+128          24 LOAD_FAST                1 (db)
+             26 LOAD_ATTR                3 (NULL|self + query)
+             46 LOAD_GLOBAL              4 (CapcutDevice)
+             56 CALL                     1
+             64 LOAD_ATTR                7 (NULL|self + filter)
+             84 LOAD_GLOBAL              4 (CapcutDevice)
+             94 LOAD_ATTR                8 (active)
+            114 LOAD_CONST               1 (1)
+            116 COMPARE_OP              40 (==)
+            120 CALL                     1
+            128 LOAD_ATTR               11 (NULL|self + all)
+            148 CALL                     0
+            156 GET_ITER
+        >>  158 FOR_ITER                 9 (to 180)
+            162 STORE_FAST               2 (row)
+
+129         164 LOAD_CONST               2 (0)
+            166 LOAD_FAST                2 (row)
+            168 STORE_ATTR               4 (active)
+            178 JUMP_BACKWARD           11 (to 158)
+
+128     >>  180 END_FOR
+
+130         182 LOAD_GLOBAL             13 (NULL + _new_device_row)
+            192 LOAD_FAST                0 (reason)
+            194 LOAD_GLOBAL             15 (NULL + _default_iid)
+            204 CALL                     0
+            212 CALL                     2
+            220 STORE_FAST               3 (new)
+
+131         222 LOAD_FAST                1 (db)
+            224 LOAD_ATTR               17 (NULL|self + add)
+            244 LOAD_FAST                3 (new)
+            246 CALL                     1
+            254 POP_TOP
+
+132         256 LOAD_FAST                1 (db)
+            258 LOAD_ATTR               19 (NULL|self + flush)
+            278 CALL                     0
+            286 POP_TOP
+
+133         288 LOAD_FAST                3 (new)
+            290 LOAD_ATTR               20 (device_id)
+            310 LOAD_FAST                3 (new)
+            312 LOAD_ATTR               22 (tdid)
+            332 LOAD_CONST               3 (('device_id', 'tdid'))
+            334 BUILD_CONST_KEY_MAP      2
+            336 STORE_FAST               4 (override)
+
+134         338 LOAD_FAST                3 (new)
+            340 LOAD_ATTR               24 (iid)
+            360 POP_JUMP_IF_FALSE       15 (to 392)
+
+135         362 LOAD_FAST                3 (new)
+            364 LOAD_ATTR               24 (iid)
+            384 LOAD_FAST                4 (override)
+            386 LOAD_CONST               4 ('iid')
+            388 STORE_SUBSCR
+
+136     >>  392 LOAD_FAST                1 (db)
+            394 LOAD_ATTR               27 (NULL|self + commit)
+            414 CALL                     0
+            422 POP_TOP
+
+137         424 LOAD_GLOBAL             29 (NULL + log)
+            434 LOAD_ATTR               30 (info)
+            454 LOAD_CONST               5 ('capcut-tts: forced device rotation (')
+            456 LOAD_FAST                0 (reason)
+            458 FORMAT_VALUE             0
+            460 LOAD_CONST               6 (') -> ')
+            462 LOAD_FAST                3 (new)
+            464 LOAD_ATTR               20 (device_id)
+            484 LOAD_CONST               7 (None)
+            486 LOAD_CONST               8 (6)
+            488 BINARY_SLICE
+            490 FORMAT_VALUE             0
+            492 LOAD_CONST               9 ('...')
+            494 BUILD_STRING             5
+            496 CALL                     1
+            504 POP_TOP
+
+138         506 LOAD_FAST                4 (override)
+
+127         508 SWAP                     2
+            510 LOAD_CONST               7 (None)
+            512 LOAD_CONST               7 (None)
+            514 LOAD_CONST               7 (None)
+            516 CALL                     2
+            524 POP_TOP
+            526 RETURN_VALUE
+        >>  528 PUSH_EXC_INFO
+            530 WITH_EXCEPT_START
+            532 POP_JUMP_IF_TRUE         1 (to 536)
+            534 RERAISE                  2
+        >>  536 POP_TOP
+            538 POP_EXCEPT
+            540 POP_TOP
+            542 POP_TOP
+            544 RETURN_CONST             7 (None)
+        >>  546 COPY                     3
+            548 POP_EXCEPT
+            550 RERAISE                  1
+ExceptionTable:
+  22 to 506 -> 528 [1] lasti
+  528 to 536 -> 546 [3] lasti

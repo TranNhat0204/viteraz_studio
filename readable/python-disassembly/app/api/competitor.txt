@@ -1,0 +1,3022 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Router "Phân tích đối thủ" — phân tích kênh YouTube đối thủ → key video → sườn content.\n\nLuồng frontend (xem docs/competitor-analysis-plan.md):\n  POST /analyze  → bảng key video (outlier/velocity/key_score), KHÔNG gọi LLM.\n  POST /skeleton → bóc 1 "sườn content" (payload IdeaCard) từ 1 video (gọi LLM). Nếu kèm project_id,\n                   sườn được điều chỉnh theo profile + provider của kênh đích.\n  Import vào kênh: POST /api/v1/ai-studio/channels/{project_id}/ideas:import (xem ai_studio.py).\n')
+              4 STORE_NAME               0 (__doc__)
+
+  9           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 11          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('APIRouter', 'Depends'))
+             22 IMPORT_NAME              3 (fastapi)
+             24 IMPORT_FROM              4 (APIRouter)
+             26 STORE_NAME               4 (APIRouter)
+             28 IMPORT_FROM              5 (Depends)
+             30 STORE_NAME               5 (Depends)
+             32 POP_TOP
+
+ 12          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               4 (('BaseModel',))
+             38 IMPORT_NAME              6 (pydantic)
+             40 IMPORT_FROM              7 (BaseModel)
+             42 STORE_NAME               7 (BaseModel)
+             44 POP_TOP
+
+ 13          46 LOAD_CONST               1 (0)
+             48 LOAD_CONST               5 (('Session',))
+             50 IMPORT_NAME              8 (sqlalchemy.orm)
+             52 IMPORT_FROM              9 (Session)
+             54 STORE_NAME               9 (Session)
+             56 POP_TOP
+
+ 15          58 LOAD_CONST               1 (0)
+             60 LOAD_CONST               6 (('verify_token', 'get_session'))
+             62 IMPORT_NAME             10 (app.deps)
+             64 IMPORT_FROM             11 (verify_token)
+             66 STORE_NAME              11 (verify_token)
+             68 IMPORT_FROM             12 (get_session)
+             70 STORE_NAME              12 (get_session)
+             72 POP_TOP
+
+ 16          74 LOAD_CONST               1 (0)
+             76 LOAD_CONST               7 (('StudioError', 'E'))
+             78 IMPORT_NAME             13 (app.core.errors)
+             80 IMPORT_FROM             14 (StudioError)
+             82 STORE_NAME              14 (StudioError)
+             84 IMPORT_FROM             15 (E)
+             86 STORE_NAME              15 (E)
+             88 POP_TOP
+
+ 17          90 LOAD_CONST               1 (0)
+             92 LOAD_CONST               8 (('competitor_analysis_service', 'ai_studio_service'))
+             94 IMPORT_NAME             16 (app.services)
+             96 IMPORT_FROM             17 (competitor_analysis_service)
+             98 STORE_NAME              18 (svc)
+            100 IMPORT_FROM             19 (ai_studio_service)
+            102 STORE_NAME              19 (ai_studio_service)
+            104 POP_TOP
+
+ 18         106 LOAD_CONST               1 (0)
+            108 LOAD_CONST               9 (('keyword_intel_service',))
+            110 IMPORT_NAME             16 (app.services)
+            112 IMPORT_FROM             20 (keyword_intel_service)
+            114 STORE_NAME              20 (keyword_intel_service)
+            116 POP_TOP
+
+ 19         118 LOAD_CONST               1 (0)
+            120 LOAD_CONST              10 (('competitor_settings',))
+            122 IMPORT_NAME             16 (app.services)
+            124 IMPORT_FROM             21 (competitor_settings)
+            126 STORE_NAME              22 (competitor_settings_svc)
+            128 POP_TOP
+
+ 20         130 LOAD_CONST               1 (0)
+            132 LOAD_CONST              11 (('architect_job',))
+            134 IMPORT_NAME             23 (app.services.agents)
+            136 IMPORT_FROM             24 (architect_job)
+            138 STORE_NAME              24 (architect_job)
+            140 POP_TOP
+
+ 21         142 LOAD_CONST               1 (0)
+            144 LOAD_CONST              12 (('youtube_search', 'youtube_data_api', 'llm_api'))
+            146 IMPORT_NAME             25 (app.adapters)
+            148 IMPORT_FROM             26 (youtube_search)
+            150 STORE_NAME              26 (youtube_search)
+            152 IMPORT_FROM             27 (youtube_data_api)
+            154 STORE_NAME              27 (youtube_data_api)
+            156 IMPORT_FROM             28 (llm_api)
+            158 STORE_NAME              28 (llm_api)
+            160 POP_TOP
+
+ 22         162 LOAD_CONST               1 (0)
+            164 LOAD_CONST              13 (('YtDlpClient',))
+            166 IMPORT_NAME             29 (app.adapters.ytdlp_client)
+            168 IMPORT_FROM             30 (YtDlpClient)
+            170 STORE_NAME              30 (YtDlpClient)
+            172 POP_TOP
+
+ 23         174 LOAD_CONST               1 (0)
+            176 LOAD_CONST              14 (('job_queue',))
+            178 IMPORT_NAME             31 (app.pipeline.queue)
+            180 IMPORT_FROM             32 (job_queue)
+            182 STORE_NAME              32 (job_queue)
+            184 POP_TOP
+
+ 25         186 PUSH_NULL
+            188 LOAD_NAME                4 (APIRouter)
+            190 LOAD_CONST              15 ('/api/v1/competitor')
+            192 LOAD_CONST              16 ('competitor')
+            194 BUILD_LIST               1
+
+ 26         196 PUSH_NULL
+            198 LOAD_NAME                5 (Depends)
+            200 LOAD_NAME               11 (verify_token)
+            202 CALL                     1
+            210 BUILD_LIST               1
+
+ 25         212 KW_NAMES                17 (('prefix', 'tags', 'dependencies'))
+            214 CALL                     3
+            222 STORE_NAME              33 (router)
+
+ 29         224 PUSH_NULL
+            226 LOAD_BUILD_CLASS
+            228 LOAD_CONST              18 (<code object AnalyzeBody at 0x7f6c93322130, file "app\api\competitor.py", line 29>)
+            230 MAKE_FUNCTION            0
+            232 LOAD_CONST              19 ('AnalyzeBody')
+            234 LOAD_NAME                7 (BaseModel)
+            236 CALL                     3
+            244 STORE_NAME              34 (AnalyzeBody)
+
+ 35         246 LOAD_NAME               33 (router)
+            248 LOAD_ATTR               71 (NULL|self + post)
+            268 LOAD_CONST              20 ('/analyze')
+            270 CALL                     1
+
+ 36         278 PUSH_NULL
+            280 LOAD_NAME                5 (Depends)
+            282 LOAD_NAME               12 (get_session)
+            284 CALL                     1
+            292 BUILD_TUPLE              1
+            294 LOAD_CONST             115 (('body', 'AnalyzeBody', 'db', 'Session'))
+            296 LOAD_CONST              21 (<code object analyze at 0x7f6c9324f130, file "app\api\competitor.py", line 35>)
+            298 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 35         300 CALL                     0
+
+ 36         308 STORE_NAME              36 (analyze)
+
+ 54         310 LOAD_NAME               33 (router)
+            312 LOAD_ATTR               75 (NULL|self + get)
+            332 LOAD_CONST              22 ('/analyses')
+            334 CALL                     1
+
+ 55         342 PUSH_NULL
+            344 LOAD_NAME                5 (Depends)
+            346 LOAD_NAME               12 (get_session)
+            348 CALL                     1
+            356 BUILD_TUPLE              1
+            358 LOAD_CONST             116 (('db', 'Session'))
+            360 LOAD_CONST              23 (<code object list_analyses at 0x7f6c93320230, file "app\api\competitor.py", line 54>)
+            362 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 54         364 CALL                     0
+
+ 55         372 STORE_NAME              38 (list_analyses)
+
+ 60         374 LOAD_NAME               33 (router)
+            376 LOAD_ATTR               75 (NULL|self + get)
+            396 LOAD_CONST              24 ('/analyses/{analysis_id}')
+            398 CALL                     1
+
+ 61         406 PUSH_NULL
+            408 LOAD_NAME                5 (Depends)
+            410 LOAD_NAME               12 (get_session)
+            412 CALL                     1
+            420 BUILD_TUPLE              1
+            422 LOAD_CONST             117 (('analysis_id', 'str', 'db', 'Session'))
+            424 LOAD_CONST              25 (<code object get_analysis at 0x7f6c93320e30, file "app\api\competitor.py", line 60>)
+            426 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 60         428 CALL                     0
+
+ 61         436 STORE_NAME              39 (get_analysis)
+
+ 66         438 LOAD_NAME               33 (router)
+            440 LOAD_ATTR               81 (NULL|self + delete)
+            460 LOAD_CONST              24 ('/analyses/{analysis_id}')
+            462 CALL                     1
+
+ 67         470 PUSH_NULL
+            472 LOAD_NAME                5 (Depends)
+            474 LOAD_NAME               12 (get_session)
+            476 CALL                     1
+            484 BUILD_TUPLE              1
+            486 LOAD_CONST             117 (('analysis_id', 'str', 'db', 'Session'))
+            488 LOAD_CONST              26 (<code object delete_analysis at 0x7f6c93322430, file "app\api\competitor.py", line 66>)
+            490 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 66         492 CALL                     0
+
+ 67         500 STORE_NAME              41 (delete_analysis)
+
+ 72         502 PUSH_NULL
+            504 LOAD_BUILD_CLASS
+            506 LOAD_CONST              27 (<code object SkeletonBody at 0x7f6c81c20ae0, file "app\api\competitor.py", line 72>)
+            508 MAKE_FUNCTION            0
+            510 LOAD_CONST              28 ('SkeletonBody')
+            512 LOAD_NAME                7 (BaseModel)
+            514 CALL                     3
+            522 STORE_NAME              42 (SkeletonBody)
+
+ 85         524 LOAD_NAME               33 (router)
+            526 LOAD_ATTR               71 (NULL|self + post)
+            546 LOAD_CONST              29 ('/skeleton')
+            548 CALL                     1
+
+ 86         556 PUSH_NULL
+            558 LOAD_NAME                5 (Depends)
+            560 LOAD_NAME               12 (get_session)
+            562 CALL                     1
+            570 BUILD_TUPLE              1
+            572 LOAD_CONST             118 (('body', 'SkeletonBody', 'db', 'Session'))
+            574 LOAD_CONST              30 (<code object skeleton at 0x26a3a7d0, file "app\api\competitor.py", line 85>)
+            576 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 85         578 CALL                     0
+
+ 86         586 STORE_NAME              43 (skeleton)
+
+122         588 PUSH_NULL
+            590 LOAD_BUILD_CLASS
+            592 LOAD_CONST              31 (<code object ChannelDnaBody at 0x7f6c92a3baa0, file "app\api\competitor.py", line 122>)
+            594 MAKE_FUNCTION            0
+            596 LOAD_CONST              32 ('ChannelDnaBody')
+            598 LOAD_NAME                7 (BaseModel)
+            600 CALL                     3
+            608 STORE_NAME              44 (ChannelDnaBody)
+
+130         610 LOAD_NAME               33 (router)
+            612 LOAD_ATTR               71 (NULL|self + post)
+            632 LOAD_CONST              33 ('/channel-dna')
+            634 LOAD_CONST              34 (202)
+            636 KW_NAMES                35 (('status_code',))
+            638 CALL                     2
+
+131         646 PUSH_NULL
+            648 LOAD_NAME                5 (Depends)
+            650 LOAD_NAME               12 (get_session)
+            652 CALL                     1
+            660 BUILD_TUPLE              1
+            662 LOAD_CONST             119 (('body', 'ChannelDnaBody', 'db', 'Session'))
+            664 LOAD_CONST              36 (<code object channel_dna at 0x290939f0, file "app\api\competitor.py", line 130>)
+            666 MAKE_FUNCTION            5 (defaults, annotations)
+
+130         668 CALL                     0
+
+131         676 STORE_NAME              45 (channel_dna)
+
+151         678 LOAD_NAME               33 (router)
+            680 LOAD_ATTR               75 (NULL|self + get)
+            700 LOAD_CONST              37 ('/channel-dna/jobs')
+            702 CALL                     1
+
+152         710 LOAD_CONST              38 (None)
+            712 LOAD_CONST              39 (False)
+
+153         714 PUSH_NULL
+            716 LOAD_NAME                5 (Depends)
+            718 LOAD_NAME               12 (get_session)
+            720 CALL                     1
+
+152         728 BUILD_TUPLE              3
+
+153         730 NOP
+
+152         732 LOAD_CONST             120 (('channel_url', 'str | None', 'active_only', 'bool', 'db', 'Session'))
+            734 LOAD_CONST              40 (<code object list_channel_dna_jobs at 0x7f6c93322030, file "app\api\competitor.py", line 151>)
+            736 MAKE_FUNCTION            5 (defaults, annotations)
+
+151         738 CALL                     0
+
+152         746 STORE_NAME              46 (list_channel_dna_jobs)
+
+158         748 LOAD_NAME               33 (router)
+            750 LOAD_ATTR               75 (NULL|self + get)
+            770 LOAD_CONST              41 ('/channel-dna/jobs/{job_id}')
+            772 CALL                     1
+
+159         780 PUSH_NULL
+            782 LOAD_NAME                5 (Depends)
+            784 LOAD_NAME               12 (get_session)
+            786 CALL                     1
+            794 BUILD_TUPLE              1
+            796 LOAD_CONST             121 (('job_id', 'str', 'db', 'Session'))
+            798 LOAD_CONST              42 (<code object get_channel_dna_job at 0x7f6c93320c30, file "app\api\competitor.py", line 158>)
+            800 MAKE_FUNCTION            5 (defaults, annotations)
+
+158         802 CALL                     0
+
+159         810 STORE_NAME              47 (get_channel_dna_job)
+
+163         812 PUSH_NULL
+            814 LOAD_BUILD_CLASS
+            816 LOAD_CONST              43 (<code object ApplyDnaBody at 0x7f6c92a3bcc0, file "app\api\competitor.py", line 163>)
+            818 MAKE_FUNCTION            0
+            820 LOAD_CONST              44 ('ApplyDnaBody')
+            822 LOAD_NAME                7 (BaseModel)
+            824 CALL                     3
+            832 STORE_NAME              48 (ApplyDnaBody)
+
+171         834 LOAD_NAME               33 (router)
+            836 LOAD_ATTR               71 (NULL|self + post)
+            856 LOAD_CONST              45 ('/apply-channel-dna')
+            858 CALL                     1
+
+172         866 PUSH_NULL
+            868 LOAD_NAME                5 (Depends)
+            870 LOAD_NAME               12 (get_session)
+            872 CALL                     1
+            880 BUILD_TUPLE              1
+            882 LOAD_CONST             122 (('body', 'ApplyDnaBody', 'db', 'Session'))
+            884 LOAD_CONST              46 (<code object apply_channel_dna at 0x7f6c9328ae30, file "app\api\competitor.py", line 171>)
+            886 MAKE_FUNCTION            5 (defaults, annotations)
+
+171         888 CALL                     0
+
+172         896 STORE_NAME              49 (apply_channel_dna)
+
+182         898 PUSH_NULL
+            900 LOAD_BUILD_CLASS
+            902 LOAD_CONST              47 (<code object CloneChannelBody at 0x7f6c81c20c10, file "app\api\competitor.py", line 182>)
+            904 MAKE_FUNCTION            0
+            906 LOAD_CONST              48 ('CloneChannelBody')
+            908 LOAD_NAME                7 (BaseModel)
+            910 CALL                     3
+            918 STORE_NAME              50 (CloneChannelBody)
+
+193         920 LOAD_NAME               33 (router)
+            922 LOAD_ATTR               71 (NULL|self + post)
+            942 LOAD_CONST              49 ('/clone-channel')
+            944 LOAD_CONST              50 (201)
+            946 KW_NAMES                35 (('status_code',))
+            948 CALL                     2
+
+194         956 PUSH_NULL
+            958 LOAD_NAME                5 (Depends)
+            960 LOAD_NAME               12 (get_session)
+            962 CALL                     1
+            970 BUILD_TUPLE              1
+            972 LOAD_CONST             123 (('body', 'CloneChannelBody', 'db', 'Session'))
+            974 LOAD_CONST              51 (<code object clone_channel at 0x7f6c933db480, file "app\api\competitor.py", line 193>)
+            976 MAKE_FUNCTION            5 (defaults, annotations)
+
+193         978 CALL                     0
+
+194         986 STORE_NAME              51 (clone_channel)
+
+205         988 PUSH_NULL
+            990 LOAD_BUILD_CLASS
+            992 LOAD_CONST              52 (<code object ImportBatchItem at 0x7f6c93321530, file "app\api\competitor.py", line 205>)
+            994 MAKE_FUNCTION            0
+            996 LOAD_CONST              53 ('ImportBatchItem')
+            998 LOAD_NAME                7 (BaseModel)
+           1000 CALL                     3
+           1008 STORE_NAME              52 (ImportBatchItem)
+
+211        1010 PUSH_NULL
+           1012 LOAD_BUILD_CLASS
+           1014 LOAD_CONST              54 (<code object ImportBatchBody at 0x7f6c81c20fa0, file "app\api\competitor.py", line 211>)
+           1016 MAKE_FUNCTION            0
+           1018 LOAD_CONST              55 ('ImportBatchBody')
+           1020 LOAD_NAME                7 (BaseModel)
+           1022 CALL                     3
+           1030 STORE_NAME              53 (ImportBatchBody)
+
+222        1032 LOAD_NAME               33 (router)
+           1034 LOAD_ATTR               71 (NULL|self + post)
+           1054 LOAD_CONST              56 ('/import-batch')
+           1056 CALL                     1
+
+223        1064 LOAD_CONST             124 (('body', 'ImportBatchBody'))
+           1066 LOAD_CONST              57 (<code object import_batch at 0x2909eb90, file "app\api\competitor.py", line 222>)
+           1068 MAKE_FUNCTION            4 (annotations)
+
+222        1070 CALL                     0
+
+223        1078 STORE_NAME              54 (import_batch)
+
+241        1080 LOAD_NAME               33 (router)
+           1082 LOAD_ATTR               75 (NULL|self + get)
+           1102 LOAD_CONST              58 ('/import-jobs')
+           1104 CALL                     1
+
+242        1112 LOAD_CONST             125 ((None, False))
+           1114 LOAD_CONST             126 (('project_id', 'str | None', 'running_only', 'bool'))
+           1116 LOAD_CONST              59 (<code object list_import_jobs at 0x7f6c92e4ca30, file "app\api\competitor.py", line 241>)
+           1118 MAKE_FUNCTION            5 (defaults, annotations)
+
+241        1120 CALL                     0
+
+242        1128 STORE_NAME              55 (list_import_jobs)
+
+247        1130 LOAD_NAME               33 (router)
+           1132 LOAD_ATTR               75 (NULL|self + get)
+           1152 LOAD_CONST              60 ('/import-jobs/{job_id}')
+           1154 CALL                     1
+
+248        1162 LOAD_CONST             127 (('job_id', 'str'))
+           1164 LOAD_CONST              61 (<code object get_import_job at 0x7f6c92ea4f30, file "app\api\competitor.py", line 247>)
+           1166 MAKE_FUNCTION            4 (annotations)
+
+247        1168 CALL                     0
+
+248        1176 STORE_NAME              56 (get_import_job)
+
+258        1178 PUSH_NULL
+           1180 LOAD_BUILD_CLASS
+           1182 LOAD_CONST              62 (<code object TrendRadarBody at 0x7f6c92a3bdd0, file "app\api\competitor.py", line 258>)
+           1184 MAKE_FUNCTION            0
+           1186 LOAD_CONST              63 ('TrendRadarBody')
+           1188 LOAD_NAME                7 (BaseModel)
+           1190 CALL                     3
+           1198 STORE_NAME              57 (TrendRadarBody)
+
+267        1200 LOAD_NAME               33 (router)
+           1202 LOAD_ATTR               71 (NULL|self + post)
+           1222 LOAD_CONST              64 ('/trend-radar')
+           1224 CALL                     1
+
+268        1232 PUSH_NULL
+           1234 LOAD_NAME                5 (Depends)
+           1236 LOAD_NAME               12 (get_session)
+           1238 CALL                     1
+           1246 BUILD_TUPLE              1
+           1248 LOAD_CONST             128 (('body', 'TrendRadarBody', 'db', 'Session'))
+           1250 LOAD_CONST              65 (<code object trend_radar at 0x269d13a0, file "app\api\competitor.py", line 267>)
+           1252 MAKE_FUNCTION            5 (defaults, annotations)
+
+267        1254 CALL                     0
+
+268        1262 STORE_NAME              58 (trend_radar)
+
+282        1264 PUSH_NULL
+           1266 LOAD_BUILD_CLASS
+           1268 LOAD_CONST              66 (<code object ClusterBody at 0x7f6c92e4ef30, file "app\api\competitor.py", line 282>)
+           1270 MAKE_FUNCTION            0
+           1272 LOAD_CONST              67 ('ClusterBody')
+           1274 LOAD_NAME                7 (BaseModel)
+           1276 CALL                     3
+           1284 STORE_NAME              59 (ClusterBody)
+
+288        1286 LOAD_NAME               33 (router)
+           1288 LOAD_ATTR               71 (NULL|self + post)
+           1308 LOAD_CONST              68 ('/cluster-topics')
+           1310 CALL                     1
+
+289        1318 LOAD_CONST             129 (('body', 'ClusterBody'))
+           1320 LOAD_CONST              69 (<code object cluster_topics at 0x7f6c93272d90, file "app\api\competitor.py", line 288>)
+           1322 MAKE_FUNCTION            4 (annotations)
+
+288        1324 CALL                     0
+
+289        1332 STORE_NAME              60 (cluster_topics)
+
+297        1334 LOAD_NAME               33 (router)
+           1336 LOAD_ATTR               75 (NULL|self + get)
+           1356 LOAD_CONST              70 ('/source-status')
+           1358 CALL                     1
+
+298        1366 LOAD_CONST              71 (<code object source_status at 0x7f6c81b7da10, file "app\api\competitor.py", line 297>)
+           1368 MAKE_FUNCTION            0
+
+297        1370 CALL                     0
+
+298        1378 STORE_NAME              61 (source_status)
+
+306        1380 LOAD_NAME               33 (router)
+           1382 LOAD_ATTR               71 (NULL|self + post)
+           1402 LOAD_CONST              72 ('/test-youtube-key')
+           1404 CALL                     1
+
+307        1412 LOAD_CONST              73 (<code object test_youtube_key at 0x7f6c92a3a230, file "app\api\competitor.py", line 306>)
+           1414 MAKE_FUNCTION            0
+
+306        1416 CALL                     0
+
+307        1424 STORE_NAME              62 (test_youtube_key)
+
+312        1426 LOAD_NAME               33 (router)
+           1428 LOAD_ATTR               75 (NULL|self + get)
+           1448 LOAD_CONST              74 ('/settings')
+           1450 CALL                     1
+
+313        1458 LOAD_CONST              75 (<code object competitor_settings at 0x7f6c92e4db30, file "app\api\competitor.py", line 312>)
+           1460 MAKE_FUNCTION            0
+
+312        1462 CALL                     0
+
+313        1470 STORE_NAME              21 (competitor_settings)
+
+322        1472 LOAD_NAME               33 (router)
+           1474 LOAD_ATTR               71 (NULL|self + post)
+           1494 LOAD_CONST              76 ('/test-llm')
+           1496 CALL                     1
+
+323        1504 LOAD_CONST              77 (<code object test_llm at 0x28e5b4a0, file "app\api\competitor.py", line 322>)
+           1506 MAKE_FUNCTION            0
+
+322        1508 CALL                     0
+
+323        1516 STORE_NAME              63 (test_llm)
+
+348        1518 PUSH_NULL
+           1520 LOAD_BUILD_CLASS
+           1522 LOAD_CONST              78 (<code object TrendingBody at 0x7f6c81b7db30, file "app\api\competitor.py", line 348>)
+           1524 MAKE_FUNCTION            0
+           1526 LOAD_CONST              79 ('TrendingBody')
+           1528 LOAD_NAME                7 (BaseModel)
+           1530 CALL                     3
+           1538 STORE_NAME              64 (TrendingBody)
+
+356        1540 LOAD_NAME               33 (router)
+           1542 LOAD_ATTR               71 (NULL|self + post)
+           1562 LOAD_CONST              80 ('/trending')
+           1564 CALL                     1
+
+357        1572 LOAD_CONST             130 (('body', 'TrendingBody'))
+           1574 LOAD_CONST              81 (<code object trending at 0x7f6c93426e30, file "app\api\competitor.py", line 356>)
+           1576 MAKE_FUNCTION            4 (annotations)
+
+356        1578 CALL                     0
+
+357        1586 STORE_NAME              65 (trending)
+
+369        1588 PUSH_NULL
+           1590 LOAD_BUILD_CLASS
+           1592 LOAD_CONST              82 (<code object KeywordScanBody at 0x7f6c92ea57f0, file "app\api\competitor.py", line 369>)
+           1594 MAKE_FUNCTION            0
+           1596 LOAD_CONST              83 ('KeywordScanBody')
+           1598 LOAD_NAME                7 (BaseModel)
+           1600 CALL                     3
+           1608 STORE_NAME              66 (KeywordScanBody)
+
+380        1610 LOAD_NAME               33 (router)
+           1612 LOAD_ATTR               71 (NULL|self + post)
+           1632 LOAD_CONST              84 ('/keyword-scan')
+           1634 LOAD_CONST              34 (202)
+           1636 KW_NAMES                35 (('status_code',))
+           1638 CALL                     2
+
+381        1646 PUSH_NULL
+           1648 LOAD_NAME                5 (Depends)
+           1650 LOAD_NAME               12 (get_session)
+           1652 CALL                     1
+           1660 BUILD_TUPLE              1
+           1662 LOAD_CONST             131 (('body', 'KeywordScanBody', 'db', 'Session'))
+           1664 LOAD_CONST              85 (<code object keyword_scan at 0x269e46b0, file "app\api\competitor.py", line 380>)
+           1666 MAKE_FUNCTION            5 (defaults, annotations)
+
+380        1668 CALL                     0
+
+381        1676 STORE_NAME              67 (keyword_scan)
+
+400        1678 PUSH_NULL
+           1680 LOAD_BUILD_CLASS
+           1682 LOAD_CONST              86 (<code object ArchitectBody at 0x7f6c81a44030, file "app\api\competitor.py", line 400>)
+           1684 MAKE_FUNCTION            0
+           1686 LOAD_CONST              87 ('ArchitectBody')
+           1688 LOAD_NAME                7 (BaseModel)
+           1690 CALL                     3
+           1698 STORE_NAME              68 (ArchitectBody)
+
+408        1700 LOAD_NAME               33 (router)
+           1702 LOAD_ATTR               71 (NULL|self + post)
+           1722 LOAD_CONST              88 ('/architect')
+           1724 LOAD_CONST              34 (202)
+           1726 KW_NAMES                35 (('status_code',))
+           1728 CALL                     2
+
+409        1736 PUSH_NULL
+           1738 LOAD_NAME                5 (Depends)
+           1740 LOAD_NAME               12 (get_session)
+           1742 CALL                     1
+           1750 BUILD_TUPLE              1
+           1752 LOAD_CONST             132 (('body', 'ArchitectBody', 'db', 'Session'))
+           1754 LOAD_CONST              89 (<code object architect at 0x269fea00, file "app\api\competitor.py", line 408>)
+           1756 MAKE_FUNCTION            5 (defaults, annotations)
+
+408        1758 CALL                     0
+
+409        1766 STORE_NAME              69 (architect)
+
+428        1768 LOAD_NAME               33 (router)
+           1770 LOAD_ATTR               75 (NULL|self + get)
+           1790 LOAD_CONST              90 ('/architect/jobs')
+           1792 CALL                     1
+
+429        1800 LOAD_CONST              39 (False)
+           1802 PUSH_NULL
+           1804 LOAD_NAME                5 (Depends)
+           1806 LOAD_NAME               12 (get_session)
+           1808 CALL                     1
+           1816 BUILD_TUPLE              2
+           1818 LOAD_CONST             133 (('active_only', 'bool', 'db', 'Session'))
+           1820 LOAD_CONST              91 (<code object architect_jobs at 0x7f6c92e4ec30, file "app\api\competitor.py", line 428>)
+           1822 MAKE_FUNCTION            5 (defaults, annotations)
+
+428        1824 CALL                     0
+
+429        1832 STORE_NAME              70 (architect_jobs)
+
+433        1834 LOAD_NAME               33 (router)
+           1836 LOAD_ATTR               75 (NULL|self + get)
+           1856 LOAD_CONST              92 ('/architect/jobs/{job_id}')
+           1858 CALL                     1
+
+434        1866 PUSH_NULL
+           1868 LOAD_NAME                5 (Depends)
+           1870 LOAD_NAME               12 (get_session)
+           1872 CALL                     1
+           1880 BUILD_TUPLE              1
+           1882 LOAD_CONST             121 (('job_id', 'str', 'db', 'Session'))
+           1884 LOAD_CONST              93 (<code object architect_job_detail at 0x7f6c92e4e030, file "app\api\competitor.py", line 433>)
+           1886 MAKE_FUNCTION            5 (defaults, annotations)
+
+433        1888 CALL                     0
+
+434        1896 STORE_NAME              71 (architect_job_detail)
+
+438        1898 LOAD_NAME               33 (router)
+           1900 LOAD_ATTR               75 (NULL|self + get)
+           1920 LOAD_CONST              94 ('/architect/state')
+           1922 CALL                     1
+
+439        1930 PUSH_NULL
+           1932 LOAD_NAME                5 (Depends)
+           1934 LOAD_NAME               12 (get_session)
+           1936 CALL                     1
+           1944 BUILD_TUPLE              1
+           1946 LOAD_CONST             134 (('channel_url', 'str', 'db', 'Session'))
+           1948 LOAD_CONST              95 (<code object architect_state at 0x7f6c81c210d0, file "app\api\competitor.py", line 438>)
+           1950 MAKE_FUNCTION            5 (defaults, annotations)
+
+438        1952 CALL                     0
+
+439        1960 STORE_NAME              72 (architect_state)
+
+444        1962 PUSH_NULL
+           1964 LOAD_BUILD_CLASS
+           1966 LOAD_CONST              96 (<code object ArchitectCommitBody at 0x7f6c81b7dc50, file "app\api\competitor.py", line 444>)
+           1968 MAKE_FUNCTION            0
+           1970 LOAD_CONST              97 ('ArchitectCommitBody')
+           1972 LOAD_NAME                7 (BaseModel)
+           1974 CALL                     3
+           1982 STORE_NAME              73 (ArchitectCommitBody)
+
+453        1984 LOAD_NAME               33 (router)
+           1986 LOAD_ATTR               71 (NULL|self + post)
+           2006 LOAD_CONST              98 ('/architect/commit')
+           2008 CALL                     1
+
+454        2016 PUSH_NULL
+           2018 LOAD_NAME                5 (Depends)
+           2020 LOAD_NAME               12 (get_session)
+           2022 CALL                     1
+           2030 BUILD_TUPLE              1
+           2032 LOAD_CONST             135 (('body', 'ArchitectCommitBody', 'db', 'Session'))
+           2034 LOAD_CONST              99 (<code object architect_commit at 0x28e57490, file "app\api\competitor.py", line 453>)
+           2036 MAKE_FUNCTION            5 (defaults, annotations)
+
+453        2038 CALL                     0
+
+454        2046 STORE_NAME              74 (architect_commit)
+
+469        2048 PUSH_NULL
+           2050 LOAD_BUILD_CLASS
+           2052 LOAD_CONST             100 (<code object SeedKeywordsBody at 0x7f6c92ee86c0, file "app\api\competitor.py", line 469>)
+           2054 MAKE_FUNCTION            0
+           2056 LOAD_CONST             101 ('SeedKeywordsBody')
+           2058 LOAD_NAME                7 (BaseModel)
+           2060 CALL                     3
+           2068 STORE_NAME              75 (SeedKeywordsBody)
+
+474        2070 LOAD_NAME               33 (router)
+           2072 LOAD_ATTR               71 (NULL|self + post)
+           2092 LOAD_CONST             102 ('/keyword-seed')
+           2094 CALL                     1
+
+475        2102 PUSH_NULL
+           2104 LOAD_NAME                5 (Depends)
+           2106 LOAD_NAME               12 (get_session)
+           2108 CALL                     1
+           2116 BUILD_TUPLE              1
+           2118 LOAD_CONST             136 (('body', 'SeedKeywordsBody', 'db', 'Session'))
+           2120 LOAD_CONST             103 (<code object keyword_seed at 0x7f6c9343bc40, file "app\api\competitor.py", line 474>)
+           2122 MAKE_FUNCTION            5 (defaults, annotations)
+
+474        2124 CALL                     0
+
+475        2132 STORE_NAME              76 (keyword_seed)
+
+489        2134 LOAD_NAME               33 (router)
+           2136 LOAD_ATTR               75 (NULL|self + get)
+           2156 LOAD_CONST             104 ('/keyword-scan/jobs')
+           2158 CALL                     1
+
+490        2166 LOAD_CONST              39 (False)
+           2168 PUSH_NULL
+           2170 LOAD_NAME                5 (Depends)
+           2172 LOAD_NAME               12 (get_session)
+           2174 CALL                     1
+           2182 BUILD_TUPLE              2
+           2184 LOAD_CONST             133 (('active_only', 'bool', 'db', 'Session'))
+           2186 LOAD_CONST             105 (<code object keyword_scan_jobs at 0x7f6c92e4dd30, file "app\api\competitor.py", line 489>)
+           2188 MAKE_FUNCTION            5 (defaults, annotations)
+
+489        2190 CALL                     0
+
+490        2198 STORE_NAME              77 (keyword_scan_jobs)
+
+494        2200 LOAD_NAME               33 (router)
+           2202 LOAD_ATTR               75 (NULL|self + get)
+           2222 LOAD_CONST             106 ('/keyword-scans')
+           2224 CALL                     1
+
+495        2232 PUSH_NULL
+           2234 LOAD_NAME                5 (Depends)
+           2236 LOAD_NAME               12 (get_session)
+           2238 CALL                     1
+           2246 BUILD_TUPLE              1
+           2248 LOAD_CONST             116 (('db', 'Session'))
+           2250 LOAD_CONST             107 (<code object list_keyword_scans at 0x7f6c92e4c530, file "app\api\competitor.py", line 494>)
+           2252 MAKE_FUNCTION            5 (defaults, annotations)
+
+494        2254 CALL                     0
+
+495        2262 STORE_NAME              78 (list_keyword_scans)
+
+500        2264 LOAD_NAME               33 (router)
+           2266 LOAD_ATTR               75 (NULL|self + get)
+           2286 LOAD_CONST             108 ('/keyword-scans/{scan_id}')
+           2288 CALL                     1
+
+501        2296 PUSH_NULL
+           2298 LOAD_NAME                5 (Depends)
+           2300 LOAD_NAME               12 (get_session)
+           2302 CALL                     1
+           2310 BUILD_TUPLE              1
+           2312 LOAD_CONST             137 (('scan_id', 'str', 'db', 'Session'))
+           2314 LOAD_CONST             109 (<code object get_keyword_scan at 0x7f6c92e4c030, file "app\api\competitor.py", line 500>)
+           2316 MAKE_FUNCTION            5 (defaults, annotations)
+
+500        2318 CALL                     0
+
+501        2326 STORE_NAME              79 (get_keyword_scan)
+
+505        2328 LOAD_NAME               33 (router)
+           2330 LOAD_ATTR               81 (NULL|self + delete)
+           2350 LOAD_CONST             108 ('/keyword-scans/{scan_id}')
+           2352 CALL                     1
+
+506        2360 PUSH_NULL
+           2362 LOAD_NAME                5 (Depends)
+           2364 LOAD_NAME               12 (get_session)
+           2366 CALL                     1
+           2374 BUILD_TUPLE              1
+           2376 LOAD_CONST             137 (('scan_id', 'str', 'db', 'Session'))
+           2378 LOAD_CONST             110 (<code object delete_keyword_scan at 0x7f6c92e4c630, file "app\api\competitor.py", line 505>)
+           2380 MAKE_FUNCTION            5 (defaults, annotations)
+
+505        2382 CALL                     0
+
+506        2390 STORE_NAME              80 (delete_keyword_scan)
+
+511        2392 PUSH_NULL
+           2394 LOAD_BUILD_CLASS
+           2396 LOAD_CONST             111 (<code object SuggestBody at 0x7f6c92e4c830, file "app\api\competitor.py", line 511>)
+           2398 MAKE_FUNCTION            0
+           2400 LOAD_CONST             112 ('SuggestBody')
+           2402 LOAD_NAME                7 (BaseModel)
+           2404 CALL                     3
+           2412 STORE_NAME              81 (SuggestBody)
+
+517        2414 LOAD_NAME               33 (router)
+           2416 LOAD_ATTR               71 (NULL|self + post)
+           2436 LOAD_CONST             113 ('/keyword-suggest')
+           2438 CALL                     1
+
+518        2446 LOAD_CONST             138 (('body', 'SuggestBody'))
+           2448 LOAD_CONST             114 (<code object keyword_suggest at 0x7f6c93273470, file "app\api\competitor.py", line 517>)
+           2450 MAKE_FUNCTION            4 (annotations)
+
+517        2452 CALL                     0
+
+518        2460 STORE_NAME              82 (keyword_suggest)
+           2462 RETURN_CONST            38 (None)
+
+Disassembly of <code object AnalyzeBody at 0x7f6c93322130, file "app\api\competitor.py", line 29>:
+ 29           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('AnalyzeBody')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 30          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('channel_url')
+             18 STORE_SUBSCR
+
+ 31          22 LOAD_CONST               3 (None)
+             24 STORE_NAME               4 (max_videos)
+             26 LOAD_CONST               4 ('int | None')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('max_videos')
+             32 STORE_SUBSCR
+
+ 32          36 LOAD_CONST               3 (None)
+             38 STORE_NAME               5 (force)
+             40 LOAD_CONST               6 ('bool | None')
+             42 LOAD_NAME                3 (__annotations__)
+             44 LOAD_CONST               7 ('force')
+             46 STORE_SUBSCR
+             50 RETURN_CONST             3 (None)
+
+Disassembly of <code object analyze at 0x7f6c9324f130, file "app\api\competitor.py", line 35>:
+ 35           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 46           6 LOAD_FAST                0 (body)
+              8 LOAD_ATTR                0 (max_videos)
+             28 COPY                     1
+             30 POP_JUMP_IF_TRUE        23 (to 78)
+             32 POP_TOP
+             34 LOAD_GLOBAL              3 (NULL + competitor_settings_svc)
+             44 LOAD_ATTR                4 (get_config)
+             64 CALL                     0
+             72 LOAD_CONST               1 ('max_videos')
+             74 BINARY_SUBSCR
+        >>   78 STORE_FAST               2 (n)
+
+ 47          80 LOAD_GLOBAL              7 (NULL + max)
+             90 LOAD_CONST               2 (10)
+             92 LOAD_GLOBAL              9 (NULL + min)
+            102 LOAD_CONST               3 (200)
+            104 LOAD_FAST                2 (n)
+            106 CALL                     2
+            114 CALL                     2
+            122 STORE_FAST               2 (n)
+
+ 48         124 LOAD_GLOBAL             11 (NULL + svc)
+            134 LOAD_ATTR               12 (analyze_channel_cached)
+            154 LOAD_FAST                1 (db)
+            156 LOAD_FAST                0 (body)
+            158 LOAD_ATTR               14 (channel_url)
+            178 LOAD_FAST                2 (n)
+
+ 49         180 LOAD_GLOBAL             17 (NULL + bool)
+            190 LOAD_FAST                0 (body)
+            192 LOAD_ATTR               18 (force)
+            212 CALL                     1
+
+ 48         220 KW_NAMES                 4 (('max_videos', 'force'))
+            222 CALL                     4
+            230 GET_AWAITABLE            0
+            232 LOAD_CONST               5 (None)
+        >>  234 SEND                     3 (to 244)
+            238 YIELD_VALUE              2
+            240 RESUME                   3
+            242 JUMP_BACKWARD_NO_INTERRUPT     5 (to 234)
+        >>  244 END_SEND
+            246 RETURN_VALUE
+        >>  248 CLEANUP_THROW
+            250 JUMP_BACKWARD            4 (to 244)
+        >>  252 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            254 RERAISE                  1
+ExceptionTable:
+  4 to 236 -> 252 [0] lasti
+  238 to 238 -> 248 [2]
+  240 to 248 -> 252 [0] lasti
+
+Disassembly of <code object list_analyses at 0x7f6c93320230, file "app\api\competitor.py", line 54>:
+ 54           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 57           6 LOAD_CONST               1 ('analyses')
+              8 LOAD_GLOBAL              1 (NULL + svc)
+             18 LOAD_ATTR                2 (list_analyses)
+             38 LOAD_FAST                0 (db)
+             40 CALL                     1
+             48 BUILD_MAP                1
+             50 RETURN_VALUE
+        >>   52 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             54 RERAISE                  1
+ExceptionTable:
+  4 to 50 -> 52 [0] lasti
+
+Disassembly of <code object get_analysis at 0x7f6c93320e30, file "app\api\competitor.py", line 60>:
+ 60           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 63           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (get_analysis)
+             36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (analysis_id)
+             40 CALL                     2
+             48 RETURN_VALUE
+        >>   50 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             52 RERAISE                  1
+ExceptionTable:
+  4 to 48 -> 50 [0] lasti
+
+Disassembly of <code object delete_analysis at 0x7f6c93322430, file "app\api\competitor.py", line 66>:
+ 66           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 68           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (delete_analysis)
+             36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (analysis_id)
+             40 CALL                     2
+             48 POP_TOP
+
+ 69          50 LOAD_CONST               1 ('ok')
+             52 LOAD_CONST               2 (True)
+             54 BUILD_MAP                1
+             56 RETURN_VALUE
+        >>   58 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             60 RERAISE                  1
+ExceptionTable:
+  4 to 56 -> 58 [0] lasti
+
+Disassembly of <code object SkeletonBody at 0x7f6c81c20ae0, file "app\api\competitor.py", line 72>:
+ 72           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('SkeletonBody')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 73          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('video_url')
+             18 STORE_SUBSCR
+
+ 74          22 LOAD_CONST               3 (None)
+             24 STORE_NAME               4 (project_id)
+             26 LOAD_CONST               4 ('str | None')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('project_id')
+             32 STORE_SUBSCR
+
+ 75          36 LOAD_CONST               3 (None)
+             38 STORE_NAME               5 (language)
+             40 LOAD_CONST               4 ('str | None')
+             42 LOAD_NAME                3 (__annotations__)
+             44 LOAD_CONST               6 ('language')
+             46 STORE_SUBSCR
+
+ 76          50 LOAD_CONST               3 (None)
+             52 STORE_NAME               6 (provider)
+             54 LOAD_CONST               4 ('str | None')
+             56 LOAD_NAME                3 (__annotations__)
+             58 LOAD_CONST               7 ('provider')
+             60 STORE_SUBSCR
+
+ 77          64 LOAD_CONST               3 (None)
+             66 STORE_NAME               7 (format)
+             68 LOAD_CONST               4 ('str | None')
+             70 LOAD_NAME                3 (__annotations__)
+             72 LOAD_CONST               8 ('format')
+             74 STORE_SUBSCR
+
+ 80          78 LOAD_CONST               3 (None)
+             80 STORE_NAME               8 (mode)
+             82 LOAD_CONST               4 ('str | None')
+             84 LOAD_NAME                3 (__annotations__)
+             86 LOAD_CONST               9 ('mode')
+             88 STORE_SUBSCR
+
+ 82          92 LOAD_CONST               3 (None)
+             94 STORE_NAME               9 (meta)
+             96 LOAD_CONST              10 ('dict | None')
+             98 LOAD_NAME                3 (__annotations__)
+            100 LOAD_CONST              11 ('meta')
+            102 STORE_SUBSCR
+            106 RETURN_CONST             3 (None)
+
+Disassembly of <code object skeleton at 0x26a3a7d0, file "app\api\competitor.py", line 85>:
+ 85           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 96           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('channel_engines', 'video_format'))
+             10 IMPORT_NAME              0 (app.services)
+             12 IMPORT_FROM              1 (channel_engines)
+             14 STORE_FAST               2 (channel_engines)
+             16 IMPORT_FROM              2 (video_format)
+             18 STORE_FAST               3 (vfmt)
+             20 POP_TOP
+
+ 98          22 LOAD_FAST                0 (body)
+             24 LOAD_ATTR                6 (language)
+             44 STORE_FAST               4 (language)
+
+ 99          46 LOAD_FAST                0 (body)
+             48 LOAD_ATTR                8 (provider)
+             68 STORE_FAST               5 (provider)
+
+100          70 LOAD_CONST               3 (None)
+             72 STORE_FAST               6 (channel_profile)
+
+101          74 LOAD_CONST               3 (None)
+             76 STORE_FAST               7 (engine)
+
+102          78 BUILD_LIST               0
+             80 STORE_FAST               8 (existing_titles)
+
+103          82 LOAD_FAST                0 (body)
+             84 LOAD_ATTR               10 (project_id)
+            104 POP_JUMP_IF_FALSE      184 (to 474)
+
+104         106 LOAD_GLOBAL             13 (NULL + ai_studio_service)
+            116 LOAD_ATTR               14 (get_or_create_config)
+            136 LOAD_FAST                1 (db)
+            138 LOAD_FAST                0 (body)
+            140 LOAD_ATTR               10 (project_id)
+            160 CALL                     2
+            168 STORE_FAST               9 (cfg)
+
+105         170 LOAD_GLOBAL             13 (NULL + ai_studio_service)
+            180 LOAD_ATTR               16 (_loads)
+            200 LOAD_FAST                9 (cfg)
+            202 LOAD_ATTR               18 (channel_profile_json)
+            222 BUILD_MAP                0
+            224 CALL                     2
+            232 STORE_FAST              10 (profile)
+
+106         234 LOAD_FAST               10 (profile)
+            236 COPY                     1
+            238 POP_JUMP_IF_TRUE         2 (to 244)
+            240 POP_TOP
+            242 LOAD_CONST               3 (None)
+        >>  244 STORE_FAST               6 (channel_profile)
+
+107         246 LOAD_FAST                4 (language)
+            248 COPY                     1
+            250 POP_JUMP_IF_TRUE        12 (to 276)
+            252 POP_TOP
+            254 LOAD_FAST                9 (cfg)
+            256 LOAD_ATTR                6 (language)
+        >>  276 STORE_FAST               4 (language)
+
+108         278 LOAD_FAST                5 (provider)
+            280 COPY                     1
+            282 POP_JUMP_IF_TRUE        21 (to 326)
+            284 POP_TOP
+            286 LOAD_FAST               10 (profile)
+            288 LOAD_ATTR               21 (NULL|self + get)
+            308 LOAD_CONST               4 ('provider')
+            310 CALL                     1
+            318 COPY                     1
+            320 POP_JUMP_IF_TRUE         2 (to 326)
+            322 POP_TOP
+            324 LOAD_CONST               3 (None)
+        >>  326 STORE_FAST               5 (provider)
+
+109         328 LOAD_FAST                9 (cfg)
+            330 LOAD_ATTR               22 (engine_id)
+            350 POP_JUMP_IF_FALSE       27 (to 406)
+            352 LOAD_FAST                2 (channel_engines)
+            354 LOAD_ATTR               25 (NULL|self + get_engine)
+            374 LOAD_FAST                9 (cfg)
+            376 LOAD_ATTR               22 (engine_id)
+            396 CALL                     1
+            404 JUMP_FORWARD             1 (to 408)
+        >>  406 LOAD_CONST               3 (None)
+        >>  408 STORE_FAST               7 (engine)
+
+110         410 LOAD_GLOBAL             27 (NULL + svc)
+            420 LOAD_ATTR               28 (_all_idea_titles)
+            440 LOAD_FAST                1 (db)
+            442 LOAD_FAST                0 (body)
+            444 LOAD_ATTR               10 (project_id)
+            464 CALL                     2
+            472 STORE_FAST               8 (existing_titles)
+
+111     >>  474 LOAD_FAST                3 (vfmt)
+            476 LOAD_ATTR               31 (NULL|self + resolve)
+            496 LOAD_FAST                0 (body)
+            498 LOAD_ATTR               32 (format)
+            518 COPY                     1
+            520 POP_JUMP_IF_TRUE        39 (to 600)
+            522 POP_TOP
+            524 LOAD_FAST                0 (body)
+            526 LOAD_ATTR               34 (meta)
+            546 COPY                     1
+            548 POP_JUMP_IF_TRUE         2 (to 554)
+            550 POP_TOP
+            552 BUILD_MAP                0
+        >>  554 LOAD_ATTR               21 (NULL|self + get)
+            574 LOAD_CONST               5 ('is_short')
+            576 CALL                     1
+            584 COPY                     1
+            586 POP_JUMP_IF_FALSE        2 (to 592)
+            588 POP_TOP
+            590 LOAD_CONST               6 ('short')
+        >>  592 COPY                     1
+            594 POP_JUMP_IF_TRUE         2 (to 600)
+            596 POP_TOP
+            598 LOAD_CONST               7 ('long')
+        >>  600 CALL                     1
+            608 STORE_FAST              11 (fmt)
+
+112         610 LOAD_GLOBAL             27 (NULL + svc)
+            620 LOAD_ATTR               36 (extract_skeleton)
+
+113         640 LOAD_FAST                0 (body)
+            642 LOAD_ATTR               38 (video_url)
+            662 LOAD_FAST                4 (language)
+            664 COPY                     1
+            666 POP_JUMP_IF_TRUE         2 (to 672)
+            668 POP_TOP
+            670 LOAD_CONST               8 ('vi')
+        >>  672 LOAD_FAST                5 (provider)
+
+114         674 LOAD_FAST                6 (channel_profile)
+            676 LOAD_FAST                0 (body)
+            678 LOAD_ATTR               34 (meta)
+
+115         698 LOAD_FAST                7 (engine)
+            700 LOAD_FAST               11 (fmt)
+            702 LOAD_FAST                8 (existing_titles)
+
+116         704 LOAD_FAST                0 (body)
+            706 LOAD_ATTR               40 (mode)
+            726 COPY                     1
+            728 POP_JUMP_IF_TRUE        16 (to 762)
+            730 POP_TOP
+            732 LOAD_GLOBAL             26 (svc)
+            742 LOAD_ATTR               42 (DEFAULT_SKELETON_MODE)
+
+112     >>  762 KW_NAMES                 9 (('language', 'provider', 'channel_profile', 'meta', 'engine', 'video_format', 'existing_titles', 'mode'))
+            764 CALL                     9
+            772 GET_AWAITABLE            0
+            774 LOAD_CONST               3 (None)
+        >>  776 SEND                     3 (to 786)
+            780 YIELD_VALUE              2
+            782 RESUME                   3
+            784 JUMP_BACKWARD_NO_INTERRUPT     5 (to 776)
+        >>  786 END_SEND
+            788 RETURN_VALUE
+        >>  790 CLEANUP_THROW
+            792 JUMP_BACKWARD            4 (to 786)
+        >>  794 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            796 RERAISE                  1
+ExceptionTable:
+  4 to 778 -> 794 [0] lasti
+  780 to 780 -> 790 [2]
+  782 to 790 -> 794 [0] lasti
+
+Disassembly of <code object ChannelDnaBody at 0x7f6c92a3baa0, file "app\api\competitor.py", line 122>:
+122           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('ChannelDnaBody')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+123          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('channel_url')
+             18 STORE_SUBSCR
+
+124          22 LOAD_CONST               3 (None)
+             24 STORE_NAME               4 (force)
+             26 LOAD_CONST               4 ('bool | None')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('force')
+             32 STORE_SUBSCR
+
+125          36 LOAD_CONST               3 (None)
+             38 STORE_NAME               5 (recent_only)
+             40 LOAD_CONST               4 ('bool | None')
+             42 LOAD_NAME                3 (__annotations__)
+             44 LOAD_CONST               6 ('recent_only')
+             46 STORE_SUBSCR
+
+126          50 LOAD_CONST               3 (None)
+             52 STORE_NAME               6 (language)
+             54 LOAD_CONST               7 ('str | None')
+             56 LOAD_NAME                3 (__annotations__)
+             58 LOAD_CONST               8 ('language')
+             60 STORE_SUBSCR
+
+127          64 LOAD_CONST               3 (None)
+             66 STORE_NAME               7 (provider)
+             68 LOAD_CONST               7 ('str | None')
+             70 LOAD_NAME                3 (__annotations__)
+             72 LOAD_CONST               9 ('provider')
+             74 STORE_SUBSCR
+             78 RETURN_CONST             3 (None)
+
+Disassembly of <code object channel_dna at 0x290939f0, file "app\api\competitor.py", line 130>:
+130           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+133           6 LOAD_GLOBAL              0 (svc)
+             16 LOAD_ATTR                2 (yt)
+             36 LOAD_ATTR                5 (NULL|self + normalize_channel_url)
+             56 LOAD_FAST                0 (body)
+             58 LOAD_ATTR                6 (channel_url)
+             78 CALL                     1
+             86 STORE_FAST               2 (normalized)
+
+134          88 LOAD_GLOBAL              1 (NULL + svc)
+             98 LOAD_ATTR                8 (get_cached)
+            118 LOAD_FAST                1 (db)
+            120 LOAD_FAST                2 (normalized)
+            122 CALL                     2
+            130 STORE_FAST               3 (cached)
+
+135         132 LOAD_FAST                3 (cached)
+            134 POP_JUMP_IF_FALSE       12 (to 160)
+            136 LOAD_FAST                3 (cached)
+            138 LOAD_ATTR               10 (channel_title)
+            158 JUMP_FORWARD             1 (to 162)
+        >>  160 LOAD_CONST               1 (None)
+        >>  162 COPY                     1
+            164 POP_JUMP_IF_TRUE         2 (to 170)
+            166 POP_TOP
+            168 LOAD_FAST                2 (normalized)
+        >>  170 STORE_FAST               4 (label)
+
+136         172 LOAD_GLOBAL             13 (NULL + job_queue)
+            182 LOAD_ATTR               14 (enqueue_background_task)
+
+137         202 LOAD_CONST               2 ('competitor_dna')
+
+139         204 LOAD_FAST                2 (normalized)
+
+140         206 LOAD_FAST                4 (label)
+
+141         208 LOAD_FAST                0 (body)
+            210 LOAD_ATTR               16 (language)
+            230 COPY                     1
+            232 POP_JUMP_IF_TRUE         2 (to 238)
+            234 POP_TOP
+            236 LOAD_CONST               3 ('vi')
+
+142     >>  238 LOAD_FAST                0 (body)
+            240 LOAD_ATTR               18 (provider)
+
+143         260 LOAD_GLOBAL             21 (NULL + bool)
+            270 LOAD_FAST                0 (body)
+            272 LOAD_ATTR               22 (force)
+            292 CALL                     1
+
+144         300 LOAD_GLOBAL             21 (NULL + bool)
+            310 LOAD_FAST                0 (body)
+            312 LOAD_ATTR               24 (recent_only)
+            332 CALL                     1
+
+138         340 LOAD_CONST               4 (('channel_url', 'label', 'language', 'provider', 'force', 'recent_only'))
+            342 BUILD_CONST_KEY_MAP      6
+
+146         344 LOAD_FAST                2 (normalized)
+            346 FORMAT_VALUE             0
+            348 LOAD_CONST               5 ('|recent=')
+            350 LOAD_GLOBAL             21 (NULL + bool)
+            360 LOAD_FAST                0 (body)
+            362 LOAD_ATTR               24 (recent_only)
+            382 CALL                     1
+            390 FORMAT_VALUE             0
+            392 BUILD_STRING             3
+
+136         394 KW_NAMES                 6 (('dedupe_key',))
+            396 CALL                     3
+            404 GET_AWAITABLE            0
+            406 LOAD_CONST               1 (None)
+        >>  408 SEND                     3 (to 418)
+            412 YIELD_VALUE              2
+            414 RESUME                   3
+            416 JUMP_BACKWARD_NO_INTERRUPT     5 (to 408)
+        >>  418 END_SEND
+            420 STORE_FAST               5 (job_id)
+
+148         422 LOAD_GLOBAL              1 (NULL + svc)
+            432 LOAD_ATTR               26 (get_channel_dna_job)
+            452 LOAD_FAST                1 (db)
+            454 LOAD_FAST                5 (job_id)
+            456 CALL                     2
+            464 RETURN_VALUE
+
+136     >>  466 CLEANUP_THROW
+            468 JUMP_BACKWARD           26 (to 418)
+        >>  470 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            472 RERAISE                  1
+ExceptionTable:
+  4 to 410 -> 470 [0] lasti
+  412 to 412 -> 466 [2]
+  414 to 466 -> 470 [0] lasti
+
+Disassembly of <code object list_channel_dna_jobs at 0x7f6c93322030, file "app\api\competitor.py", line 151>:
+151           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+155           6 LOAD_CONST               1 ('jobs')
+              8 LOAD_GLOBAL              1 (NULL + svc)
+             18 LOAD_ATTR                2 (list_channel_dna_jobs)
+             38 LOAD_FAST                2 (db)
+             40 LOAD_FAST                0 (channel_url)
+             42 LOAD_FAST                1 (active_only)
+             44 KW_NAMES                 2 (('channel_url', 'active_only'))
+             46 CALL                     3
+             54 BUILD_MAP                1
+             56 RETURN_VALUE
+        >>   58 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             60 RERAISE                  1
+ExceptionTable:
+  4 to 56 -> 58 [0] lasti
+
+Disassembly of <code object get_channel_dna_job at 0x7f6c93320c30, file "app\api\competitor.py", line 158>:
+158           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+160           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (get_channel_dna_job)
+             36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (job_id)
+             40 CALL                     2
+             48 RETURN_VALUE
+        >>   50 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             52 RERAISE                  1
+ExceptionTable:
+  4 to 48 -> 50 [0] lasti
+
+Disassembly of <code object ApplyDnaBody at 0x7f6c92a3bcc0, file "app\api\competitor.py", line 163>:
+163           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('ApplyDnaBody')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+164          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('project_id')
+             18 STORE_SUBSCR
+
+165          22 LOAD_CONST               3 ('dict')
+             24 LOAD_NAME                3 (__annotations__)
+             26 LOAD_CONST               4 ('dna')
+             28 STORE_SUBSCR
+
+166          32 LOAD_CONST               5 (None)
+             34 STORE_NAME               4 (language)
+             36 LOAD_CONST               6 ('str | None')
+             38 LOAD_NAME                3 (__annotations__)
+             40 LOAD_CONST               7 ('language')
+             42 STORE_SUBSCR
+
+167          46 LOAD_CONST               5 (None)
+             48 STORE_NAME               5 (long_target_sec)
+             50 LOAD_CONST               8 ('int | None')
+             52 LOAD_NAME                3 (__annotations__)
+             54 LOAD_CONST               9 ('long_target_sec')
+             56 STORE_SUBSCR
+
+168          60 LOAD_CONST               5 (None)
+             62 STORE_NAME               6 (short_target_sec)
+             64 LOAD_CONST               8 ('int | None')
+             66 LOAD_NAME                3 (__annotations__)
+             68 LOAD_CONST              10 ('short_target_sec')
+             70 STORE_SUBSCR
+             74 RETURN_CONST             5 (None)
+
+Disassembly of <code object apply_channel_dna at 0x7f6c9328ae30, file "app\api\competitor.py", line 171>:
+171           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+174           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (apply_channel_dna)
+
+175          36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (body)
+             40 LOAD_ATTR                4 (project_id)
+             60 LOAD_FAST                0 (body)
+             62 LOAD_ATTR                6 (dna)
+             82 COPY                     1
+             84 POP_JUMP_IF_TRUE         2 (to 90)
+             86 POP_TOP
+             88 BUILD_MAP                0
+
+176     >>   90 LOAD_FAST                0 (body)
+             92 LOAD_ATTR                8 (language)
+
+177         112 LOAD_FAST                0 (body)
+            114 LOAD_ATTR               10 (long_target_sec)
+
+178         134 LOAD_FAST                0 (body)
+            136 LOAD_ATTR               12 (short_target_sec)
+
+174         156 KW_NAMES                 1 (('language', 'long_target_sec', 'short_target_sec'))
+            158 CALL                     6
+            166 RETURN_VALUE
+        >>  168 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            170 RERAISE                  1
+ExceptionTable:
+  4 to 166 -> 168 [0] lasti
+
+Disassembly of <code object CloneChannelBody at 0x7f6c81c20c10, file "app\api\competitor.py", line 182>:
+182           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('CloneChannelBody')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+183          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('channel_url')
+             18 STORE_SUBSCR
+
+184          22 LOAD_CONST               3 ('dict')
+             24 LOAD_NAME                3 (__annotations__)
+             26 LOAD_CONST               4 ('dna')
+             28 STORE_SUBSCR
+
+185          32 LOAD_CONST               1 ('str')
+             34 LOAD_NAME                3 (__annotations__)
+             36 LOAD_CONST               5 ('name')
+             38 STORE_SUBSCR
+
+186          42 LOAD_CONST               1 ('str')
+             44 LOAD_NAME                3 (__annotations__)
+             46 LOAD_CONST               6 ('engine_id')
+             48 STORE_SUBSCR
+
+187          52 LOAD_CONST               1 ('str')
+             54 LOAD_NAME                3 (__annotations__)
+             56 LOAD_CONST               7 ('output_folder')
+             58 STORE_SUBSCR
+
+188          62 LOAD_CONST               8 (None)
+             64 STORE_NAME               4 (language)
+             66 LOAD_CONST               9 ('str | None')
+             68 LOAD_NAME                3 (__annotations__)
+             70 LOAD_CONST              10 ('language')
+             72 STORE_SUBSCR
+
+189          76 LOAD_CONST               8 (None)
+             78 STORE_NAME               5 (long_target_sec)
+             80 LOAD_CONST              11 ('int | None')
+             82 LOAD_NAME                3 (__annotations__)
+             84 LOAD_CONST              12 ('long_target_sec')
+             86 STORE_SUBSCR
+
+190          90 LOAD_CONST               8 (None)
+             92 STORE_NAME               6 (short_target_sec)
+             94 LOAD_CONST              11 ('int | None')
+             96 LOAD_NAME                3 (__annotations__)
+             98 LOAD_CONST              13 ('short_target_sec')
+            100 STORE_SUBSCR
+            104 RETURN_CONST             8 (None)
+
+Disassembly of <code object clone_channel at 0x7f6c933db480, file "app\api\competitor.py", line 193>:
+193           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+196           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (clone_channel_from_dna)
+
+197          36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (body)
+             40 LOAD_ATTR                4 (channel_url)
+             60 LOAD_FAST                0 (body)
+             62 LOAD_ATTR                6 (dna)
+             82 COPY                     1
+             84 POP_JUMP_IF_TRUE         2 (to 90)
+             86 POP_TOP
+             88 BUILD_MAP                0
+        >>   90 LOAD_FAST                0 (body)
+             92 LOAD_ATTR                8 (name)
+
+198         112 LOAD_FAST                0 (body)
+            114 LOAD_ATTR               10 (engine_id)
+            134 LOAD_FAST                0 (body)
+            136 LOAD_ATTR               12 (output_folder)
+
+199         156 LOAD_FAST                0 (body)
+            158 LOAD_ATTR               14 (language)
+
+200         178 LOAD_FAST                0 (body)
+            180 LOAD_ATTR               16 (long_target_sec)
+
+201         200 LOAD_FAST                0 (body)
+            202 LOAD_ATTR               18 (short_target_sec)
+
+196         222 KW_NAMES                 1 (('channel_url', 'dna', 'name', 'engine_id', 'output_folder', 'language', 'long_target_sec', 'short_target_sec'))
+            224 CALL                     9
+            232 RETURN_VALUE
+        >>  234 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            236 RERAISE                  1
+ExceptionTable:
+  4 to 232 -> 234 [0] lasti
+
+Disassembly of <code object ImportBatchItem at 0x7f6c93321530, file "app\api\competitor.py", line 205>:
+205           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('ImportBatchItem')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+206          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('video_url')
+             18 STORE_SUBSCR
+
+207          22 LOAD_CONST               3 (None)
+             24 STORE_NAME               4 (meta)
+             26 LOAD_CONST               4 ('dict | None')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('meta')
+             32 STORE_SUBSCR
+
+208          36 LOAD_CONST               3 (None)
+             38 STORE_NAME               5 (format)
+             40 LOAD_CONST               6 ('str | None')
+             42 LOAD_NAME                3 (__annotations__)
+             44 LOAD_CONST               7 ('format')
+             46 STORE_SUBSCR
+             50 RETURN_CONST             3 (None)
+
+Disassembly of <code object ImportBatchBody at 0x7f6c81c20fa0, file "app\api\competitor.py", line 211>:
+211           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('ImportBatchBody')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+212          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('project_id')
+             18 STORE_SUBSCR
+
+213          22 LOAD_CONST               3 ('list[ImportBatchItem]')
+             24 LOAD_NAME                3 (__annotations__)
+             26 LOAD_CONST               4 ('videos')
+             28 STORE_SUBSCR
+
+214          32 LOAD_CONST               5 (None)
+             34 STORE_NAME               4 (language)
+             36 LOAD_CONST               6 ('str | None')
+             38 LOAD_NAME                3 (__annotations__)
+             40 LOAD_CONST               7 ('language')
+             42 STORE_SUBSCR
+
+215          46 LOAD_CONST               5 (None)
+             48 STORE_NAME               5 (provider)
+             50 LOAD_CONST               6 ('str | None')
+             52 LOAD_NAME                3 (__annotations__)
+             54 LOAD_CONST               8 ('provider')
+             56 STORE_SUBSCR
+
+216          60 LOAD_CONST               5 (None)
+             62 STORE_NAME               6 (format)
+             64 LOAD_CONST               6 ('str | None')
+             66 LOAD_NAME                3 (__annotations__)
+             68 LOAD_CONST               9 ('format')
+             70 STORE_SUBSCR
+
+217          74 LOAD_CONST               5 (None)
+             76 STORE_NAME               7 (mode)
+             78 LOAD_CONST               6 ('str | None')
+             80 LOAD_NAME                3 (__annotations__)
+             82 LOAD_CONST              10 ('mode')
+             84 STORE_SUBSCR
+
+219          88 LOAD_CONST               5 (None)
+             90 STORE_NAME               8 (auto_approve)
+             92 LOAD_CONST              11 ('bool | None')
+             94 LOAD_NAME                3 (__annotations__)
+             96 LOAD_CONST              12 ('auto_approve')
+             98 STORE_SUBSCR
+            102 RETURN_CONST             5 (None)
+
+Disassembly of <code object import_batch at 0x2909eb90, file "app\api\competitor.py", line 222>:
+222           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+229           6 LOAD_FAST                0 (body)
+              8 LOAD_ATTR                0 (videos)
+             28 POP_JUMP_IF_TRUE        28 (to 86)
+
+230          30 LOAD_GLOBAL              3 (NULL + StudioError)
+             40 LOAD_GLOBAL              4 (E)
+             50 LOAD_ATTR                6 (UNKNOWN)
+             70 LOAD_CONST               1 ('Chưa chọn video nào để import.')
+             72 LOAD_CONST               2 (422)
+             74 KW_NAMES                 3 (('status_code',))
+             76 CALL                     3
+             84 RAISE_VARARGS            1
+
+231     >>   86 LOAD_GLOBAL              9 (NULL + len)
+             96 LOAD_FAST                0 (body)
+             98 LOAD_ATTR                0 (videos)
+            118 CALL                     1
+            126 LOAD_CONST               4 (20)
+            128 COMPARE_OP              68 (>)
+            132 POP_JUMP_IF_FALSE       28 (to 190)
+
+232         134 LOAD_GLOBAL              3 (NULL + StudioError)
+            144 LOAD_GLOBAL              4 (E)
+            154 LOAD_ATTR                6 (UNKNOWN)
+            174 LOAD_CONST               5 ('Tối đa 20 video mỗi lượt import.')
+            176 LOAD_CONST               2 (422)
+            178 KW_NAMES                 3 (('status_code',))
+            180 CALL                     3
+            188 RAISE_VARARGS            1
+
+233     >>  190 LOAD_FAST                0 (body)
+            192 LOAD_ATTR                0 (videos)
+            212 GET_ITER
+            214 LOAD_FAST_AND_CLEAR      1 (v)
+            216 SWAP                     2
+            218 BUILD_LIST               0
+            220 SWAP                     2
+        >>  222 FOR_ITER                38 (to 302)
+            226 STORE_FAST               1 (v)
+            228 LOAD_FAST                1 (v)
+            230 LOAD_ATTR               10 (video_url)
+            250 LOAD_FAST                1 (v)
+            252 LOAD_ATTR               12 (meta)
+            272 LOAD_FAST                1 (v)
+            274 LOAD_ATTR               14 (format)
+            294 LOAD_CONST               6 (('video_url', 'meta', 'format'))
+            296 BUILD_CONST_KEY_MAP      3
+            298 LIST_APPEND              2
+            300 JUMP_BACKWARD           40 (to 222)
+        >>  302 END_FOR
+            304 STORE_FAST               2 (items)
+            306 STORE_FAST               1 (v)
+
+234         308 LOAD_GLOBAL             17 (NULL + svc)
+            318 LOAD_ATTR               18 (start_batch_import)
+            338 LOAD_FAST                0 (body)
+            340 LOAD_ATTR               20 (project_id)
+            360 LOAD_FAST                2 (items)
+
+235         362 LOAD_FAST                0 (body)
+            364 LOAD_ATTR               22 (language)
+            384 LOAD_FAST                0 (body)
+            386 LOAD_ATTR               24 (provider)
+
+236         406 LOAD_FAST                0 (body)
+            408 LOAD_ATTR               14 (format)
+
+237         428 LOAD_FAST                0 (body)
+            430 LOAD_ATTR               26 (mode)
+            450 COPY                     1
+            452 POP_JUMP_IF_TRUE        16 (to 486)
+            454 POP_TOP
+            456 LOAD_GLOBAL             16 (svc)
+            466 LOAD_ATTR               28 (DEFAULT_SKELETON_MODE)
+
+238     >>  486 LOAD_GLOBAL             31 (NULL + bool)
+            496 LOAD_FAST                0 (body)
+            498 LOAD_ATTR               32 (auto_approve)
+            518 CALL                     1
+
+234         526 KW_NAMES                 7 (('language', 'provider', 'video_format', 'mode', 'auto_approve'))
+            528 CALL                     7
+            536 RETURN_VALUE
+        >>  538 SWAP                     2
+            540 POP_TOP
+
+233         542 SWAP                     2
+            544 STORE_FAST               1 (v)
+            546 RERAISE                  0
+        >>  548 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            550 RERAISE                  1
+ExceptionTable:
+  4 to 216 -> 548 [0] lasti
+  218 to 302 -> 538 [2]
+  304 to 546 -> 548 [0] lasti
+
+Disassembly of <code object list_import_jobs at 0x7f6c92e4ca30, file "app\api\competitor.py", line 241>:
+241           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+244           6 LOAD_CONST               1 ('jobs')
+              8 LOAD_GLOBAL              1 (NULL + svc)
+             18 LOAD_ATTR                2 (list_batch_jobs)
+             38 LOAD_FAST                0 (project_id)
+             40 LOAD_FAST                1 (running_only)
+             42 KW_NAMES                 2 (('running_only',))
+             44 CALL                     2
+             52 BUILD_MAP                1
+             54 RETURN_VALUE
+        >>   56 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             58 RERAISE                  1
+ExceptionTable:
+  4 to 54 -> 56 [0] lasti
+
+Disassembly of <code object get_import_job at 0x7f6c92ea4f30, file "app\api\competitor.py", line 247>:
+247           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+250           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (get_batch_job)
+             36 LOAD_FAST                0 (job_id)
+             38 CALL                     1
+             46 STORE_FAST               1 (job)
+
+251          48 LOAD_FAST                1 (job)
+             50 POP_JUMP_IF_NOT_NONE    28 (to 108)
+
+252          52 LOAD_GLOBAL              5 (NULL + StudioError)
+             62 LOAD_GLOBAL              6 (E)
+             72 LOAD_ATTR                8 (UNKNOWN)
+             92 LOAD_CONST               1 ('Job không tồn tại hoặc đã hết hạn.')
+             94 LOAD_CONST               2 (404)
+             96 KW_NAMES                 3 (('status_code',))
+             98 CALL                     3
+            106 RAISE_VARARGS            1
+
+253     >>  108 LOAD_FAST                1 (job)
+            110 RETURN_VALUE
+        >>  112 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            114 RERAISE                  1
+ExceptionTable:
+  4 to 110 -> 112 [0] lasti
+
+Disassembly of <code object TrendRadarBody at 0x7f6c92a3bdd0, file "app\api\competitor.py", line 258>:
+258           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('TrendRadarBody')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+259          12 LOAD_CONST               1 ('list[str]')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('channel_urls')
+             18 STORE_SUBSCR
+
+260          22 LOAD_CONST               3 (None)
+             24 STORE_NAME               4 (max_videos)
+             26 LOAD_CONST               4 ('int | None')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('max_videos')
+             32 STORE_SUBSCR
+
+261          36 LOAD_CONST               3 (None)
+             38 STORE_NAME               5 (top_n)
+             40 LOAD_CONST               4 ('int | None')
+             42 LOAD_NAME                3 (__annotations__)
+             44 LOAD_CONST               6 ('top_n')
+             46 STORE_SUBSCR
+
+262          50 LOAD_CONST               3 (None)
+             52 STORE_NAME               6 (force)
+             54 LOAD_CONST               7 ('bool | None')
+             56 LOAD_NAME                3 (__annotations__)
+             58 LOAD_CONST               8 ('force')
+             60 STORE_SUBSCR
+
+264          64 LOAD_CONST               3 (None)
+             66 STORE_NAME               7 (rank_mode)
+             68 LOAD_CONST               9 ('str | None')
+             70 LOAD_NAME                3 (__annotations__)
+             72 LOAD_CONST              10 ('rank_mode')
+             74 STORE_SUBSCR
+             78 RETURN_CONST             3 (None)
+
+Disassembly of <code object trend_radar at 0x269d13a0, file "app\api\competitor.py", line 267>:
+267           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+270           6 LOAD_FAST                0 (body)
+              8 LOAD_ATTR                0 (channel_urls)
+             28 COPY                     1
+             30 POP_JUMP_IF_TRUE         2 (to 36)
+             32 POP_TOP
+             34 BUILD_LIST               0
+        >>   36 GET_ITER
+             38 LOAD_FAST_AND_CLEAR      2 (u)
+             40 SWAP                     2
+             42 BUILD_LIST               0
+             44 SWAP                     2
+        >>   46 FOR_ITER                25 (to 100)
+             50 STORE_FAST               2 (u)
+             52 LOAD_FAST                2 (u)
+             54 COPY                     1
+             56 POP_JUMP_IF_TRUE         2 (to 62)
+             58 POP_TOP
+             60 LOAD_CONST               1 ('')
+        >>   62 LOAD_ATTR                3 (NULL|self + strip)
+             82 CALL                     0
+             90 POP_JUMP_IF_TRUE         1 (to 94)
+             92 JUMP_BACKWARD           24 (to 46)
+        >>   94 LOAD_FAST                2 (u)
+             96 LIST_APPEND              2
+             98 JUMP_BACKWARD           27 (to 46)
+        >>  100 END_FOR
+            102 STORE_FAST               3 (urls)
+            104 STORE_FAST               2 (u)
+
+271         106 LOAD_FAST                3 (urls)
+            108 POP_JUMP_IF_TRUE        28 (to 166)
+
+272         110 LOAD_GLOBAL              5 (NULL + StudioError)
+            120 LOAD_GLOBAL              6 (E)
+            130 LOAD_ATTR                8 (UNKNOWN)
+            150 LOAD_CONST               2 ('Chưa nhập kênh nào để quét.')
+            152 LOAD_CONST               3 (422)
+            154 KW_NAMES                 4 (('status_code',))
+            156 CALL                     3
+            164 RAISE_VARARGS            1
+
+273     >>  166 LOAD_GLOBAL             11 (NULL + len)
+            176 LOAD_FAST                3 (urls)
+            178 CALL                     1
+            186 LOAD_CONST               5 (12)
+            188 COMPARE_OP              68 (>)
+            192 POP_JUMP_IF_FALSE       28 (to 250)
+
+274         194 LOAD_GLOBAL              5 (NULL + StudioError)
+            204 LOAD_GLOBAL              6 (E)
+            214 LOAD_ATTR                8 (UNKNOWN)
+            234 LOAD_CONST               6 ('Tối đa 12 kênh mỗi lượt quét.')
+            236 LOAD_CONST               3 (422)
+            238 KW_NAMES                 4 (('status_code',))
+            240 CALL                     3
+            248 RAISE_VARARGS            1
+
+275     >>  250 LOAD_GLOBAL             13 (NULL + max)
+            260 LOAD_CONST               7 (10)
+            262 LOAD_GLOBAL             15 (NULL + min)
+            272 LOAD_CONST               8 (50)
+            274 LOAD_FAST                0 (body)
+            276 LOAD_ATTR               16 (max_videos)
+            296 COPY                     1
+            298 POP_JUMP_IF_TRUE         2 (to 304)
+            300 POP_TOP
+            302 LOAD_CONST               9 (30)
+        >>  304 CALL                     2
+            312 CALL                     2
+            320 STORE_FAST               4 (n)
+
+276         322 LOAD_GLOBAL             13 (NULL + max)
+            332 LOAD_CONST               7 (10)
+            334 LOAD_GLOBAL             15 (NULL + min)
+            344 LOAD_CONST              10 (80)
+            346 LOAD_FAST                0 (body)
+            348 LOAD_ATTR               18 (top_n)
+            368 COPY                     1
+            370 POP_JUMP_IF_TRUE         2 (to 376)
+            372 POP_TOP
+            374 LOAD_CONST              11 (40)
+        >>  376 CALL                     2
+            384 CALL                     2
+            392 STORE_FAST               5 (top_n)
+
+277         394 LOAD_FAST                0 (body)
+            396 LOAD_ATTR               20 (rank_mode)
+            416 LOAD_CONST              12 (('outlier', 'reach'))
+            418 CONTAINS_OP              0
+            420 POP_JUMP_IF_FALSE       12 (to 446)
+            422 LOAD_FAST                0 (body)
+            424 LOAD_ATTR               20 (rank_mode)
+            444 JUMP_FORWARD             1 (to 448)
+        >>  446 LOAD_CONST              13 ('outlier')
+        >>  448 STORE_FAST               6 (mode)
+
+278         450 LOAD_GLOBAL             23 (NULL + svc)
+            460 LOAD_ATTR               24 (trend_radar)
+            480 LOAD_FAST                1 (db)
+            482 LOAD_FAST                3 (urls)
+            484 LOAD_FAST                4 (n)
+            486 LOAD_FAST                5 (top_n)
+            488 LOAD_GLOBAL             27 (NULL + bool)
+            498 LOAD_FAST                0 (body)
+            500 LOAD_ATTR               28 (force)
+            520 CALL                     1
+
+279         528 LOAD_FAST                6 (mode)
+
+278         530 KW_NAMES                14 (('max_videos', 'top_n', 'force', 'rank_mode'))
+            532 CALL                     6
+            540 GET_AWAITABLE            0
+            542 LOAD_CONST              15 (None)
+        >>  544 SEND                     3 (to 554)
+            548 YIELD_VALUE              2
+            550 RESUME                   3
+            552 JUMP_BACKWARD_NO_INTERRUPT     5 (to 544)
+        >>  554 END_SEND
+            556 RETURN_VALUE
+        >>  558 SWAP                     2
+            560 POP_TOP
+
+270         562 SWAP                     2
+            564 STORE_FAST               2 (u)
+            566 RERAISE                  0
+
+278     >>  568 CLEANUP_THROW
+            570 JUMP_BACKWARD            9 (to 554)
+        >>  572 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            574 RERAISE                  1
+ExceptionTable:
+  4 to 40 -> 572 [0] lasti
+  42 to 90 -> 558 [2]
+  94 to 100 -> 558 [2]
+  102 to 546 -> 572 [0] lasti
+  548 to 548 -> 568 [2]
+  550 to 568 -> 572 [0] lasti
+
+Disassembly of <code object ClusterBody at 0x7f6c92e4ef30, file "app\api\competitor.py", line 282>:
+282           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('ClusterBody')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+283          12 LOAD_CONST               1 ('list[dict]')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('videos')
+             18 STORE_SUBSCR
+
+284          22 LOAD_CONST               3 (None)
+             24 STORE_NAME               4 (language)
+             26 LOAD_CONST               4 ('str | None')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('language')
+             32 STORE_SUBSCR
+
+285          36 LOAD_CONST               3 (None)
+             38 STORE_NAME               5 (provider)
+             40 LOAD_CONST               4 ('str | None')
+             42 LOAD_NAME                3 (__annotations__)
+             44 LOAD_CONST               6 ('provider')
+             46 STORE_SUBSCR
+             50 RETURN_CONST             3 (None)
+
+Disassembly of <code object cluster_topics at 0x7f6c93272d90, file "app\api\competitor.py", line 288>:
+288           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+291           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (cluster_topics)
+             36 LOAD_FAST                0 (body)
+             38 LOAD_ATTR                4 (videos)
+             58 COPY                     1
+             60 POP_JUMP_IF_TRUE         2 (to 66)
+             62 POP_TOP
+             64 BUILD_LIST               0
+        >>   66 LOAD_FAST                0 (body)
+             68 LOAD_ATTR                6 (language)
+             88 COPY                     1
+             90 POP_JUMP_IF_TRUE         2 (to 96)
+             92 POP_TOP
+             94 LOAD_CONST               1 ('vi')
+
+292     >>   96 LOAD_FAST                0 (body)
+             98 LOAD_ATTR                8 (provider)
+
+291         118 KW_NAMES                 2 (('language', 'provider'))
+            120 CALL                     3
+            128 GET_AWAITABLE            0
+            130 LOAD_CONST               3 (None)
+        >>  132 SEND                     3 (to 142)
+            136 YIELD_VALUE              2
+            138 RESUME                   3
+            140 JUMP_BACKWARD_NO_INTERRUPT     5 (to 132)
+        >>  142 END_SEND
+            144 RETURN_VALUE
+        >>  146 CLEANUP_THROW
+            148 JUMP_BACKWARD            4 (to 142)
+        >>  150 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            152 RERAISE                  1
+ExceptionTable:
+  4 to 134 -> 150 [0] lasti
+  136 to 136 -> 146 [2]
+  138 to 146 -> 150 [0] lasti
+
+Disassembly of <code object source_status at 0x7f6c81b7da10, file "app\api\competitor.py", line 297>:
+297           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+301           6 LOAD_GLOBAL              1 (NULL + youtube_data_api)
+             16 LOAD_ATTR                2 (is_configured)
+             36 CALL                     0
+
+302          44 LOAD_GLOBAL              5 (NULL + YtDlpClient)
+             54 LOAD_ATTR                6 (is_available)
+             74 CALL                     0
+
+300          82 LOAD_CONST               1 (('data_api', 'ytdlp'))
+             84 BUILD_CONST_KEY_MAP      2
+             86 RETURN_VALUE
+        >>   88 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             90 RERAISE                  1
+ExceptionTable:
+  4 to 86 -> 88 [0] lasti
+
+Disassembly of <code object test_youtube_key at 0x7f6c92a3a230, file "app\api\competitor.py", line 306>:
+306           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+309           6 LOAD_GLOBAL              1 (NULL + youtube_data_api)
+             16 LOAD_ATTR                2 (test_key)
+             36 CALL                     0
+             44 GET_AWAITABLE            0
+             46 LOAD_CONST               1 (None)
+        >>   48 SEND                     3 (to 58)
+             52 YIELD_VALUE              2
+             54 RESUME                   3
+             56 JUMP_BACKWARD_NO_INTERRUPT     5 (to 48)
+        >>   58 END_SEND
+             60 RETURN_VALUE
+        >>   62 CLEANUP_THROW
+             64 JUMP_BACKWARD            4 (to 58)
+        >>   66 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             68 RERAISE                  1
+ExceptionTable:
+  4 to 50 -> 66 [0] lasti
+  52 to 52 -> 62 [2]
+  54 to 62 -> 66 [0] lasti
+
+Disassembly of <code object competitor_settings at 0x7f6c92e4db30, file "app\api\competitor.py", line 312>:
+312           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+319           6 LOAD_GLOBAL              1 (NULL + competitor_settings_svc)
+             16 LOAD_ATTR                2 (get_config)
+             36 CALL                     0
+             44 RETURN_VALUE
+        >>   46 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             48 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 46 [0] lasti
+
+Disassembly of <code object test_llm at 0x28e5b4a0, file "app\api\competitor.py", line 322>:
+322           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+329           6 NOP
+
+330           8 LOAD_GLOBAL              1 (NULL + llm_api)
+             18 LOAD_ATTR                2 (resolve)
+             38 CALL                     0
+             46 STORE_FAST               0 (client)
+
+336          48 NOP
+
+337          50 LOAD_FAST                0 (client)
+             52 LOAD_ATTR               15 (NULL|self + complete)
+             72 LOAD_CONST               5 ('user')
+             74 LOAD_CONST               6 ('ping')
+             76 LOAD_CONST               7 (('role', 'content'))
+             78 BUILD_CONST_KEY_MAP      2
+             80 BUILD_LIST               1
+             82 LOAD_CONST               8 (5)
+             84 KW_NAMES                 9 (('max_tokens',))
+             86 CALL                     2
+             94 GET_AWAITABLE            0
+             96 LOAD_CONST               3 (None)
+        >>   98 SEND                     3 (to 108)
+            102 YIELD_VALUE              3
+            104 RESUME                   3
+            106 JUMP_BACKWARD_NO_INTERRUPT     5 (to 98)
+        >>  108 END_SEND
+            110 STORE_FAST               2 (out)
+
+341         112 LOAD_CONST              11 (True)
+            114 LOAD_FAST                0 (client)
+            116 LOAD_ATTR               16 (provider)
+            136 LOAD_ATTR               18 (key)
+            156 LOAD_FAST                0 (client)
+            158 LOAD_ATTR               20 (model)
+            178 LOAD_ATTR               22 (id)
+
+342         198 LOAD_FAST                0 (client)
+            200 LOAD_ATTR               16 (provider)
+            220 LOAD_ATTR               24 (label)
+            240 FORMAT_VALUE             0
+            242 LOAD_CONST              12 (' · ')
+            244 LOAD_FAST                0 (client)
+            246 LOAD_ATTR               20 (model)
+            266 LOAD_ATTR               22 (id)
+            286 FORMAT_VALUE             0
+            288 LOAD_CONST              13 (' phản hồi được.')
+            290 BUILD_STRING             4
+
+343         292 LOAD_GLOBAL             27 (NULL + round)
+            302 LOAD_FAST                2 (out)
+            304 LOAD_ATTR               28 (cost_usd)
+            324 LOAD_CONST              14 (6)
+            326 CALL                     2
+
+341         334 LOAD_CONST              15 (('ok', 'provider', 'model', 'message', 'cost_usd'))
+            336 BUILD_CONST_KEY_MAP      5
+            338 RETURN_VALUE
+        >>  340 PUSH_EXC_INFO
+
+331         342 LOAD_GLOBAL              4 (StudioError)
+            352 CHECK_EXC_MATCH
+            354 POP_JUMP_IF_FALSE       59 (to 474)
+            356 STORE_FAST               1 (exc)
+
+334         358 LOAD_CONST               1 (False)
+            360 LOAD_GLOBAL              7 (NULL + competitor_settings_svc)
+            370 LOAD_ATTR                8 (get_config)
+            390 CALL                     0
+            398 LOAD_CONST               2 ('llm_provider')
+            400 BINARY_SUBSCR
+
+335         404 LOAD_CONST               3 (None)
+            406 LOAD_FAST                1 (exc)
+            408 LOAD_ATTR               10 (message)
+            428 LOAD_FAST                1 (exc)
+            430 LOAD_ATTR               12 (hint)
+
+334         450 LOAD_CONST               4 (('ok', 'provider', 'model', 'message', 'hint'))
+            452 BUILD_CONST_KEY_MAP      5
+            454 SWAP                     2
+            456 POP_EXCEPT
+            458 LOAD_CONST               3 (None)
+            460 STORE_FAST               1 (exc)
+            462 DELETE_FAST              1 (exc)
+            464 RETURN_VALUE
+        >>  466 LOAD_CONST               3 (None)
+            468 STORE_FAST               1 (exc)
+            470 DELETE_FAST              1 (exc)
+            472 RERAISE                  1
+
+331     >>  474 RERAISE                  0
+        >>  476 COPY                     3
+            478 POP_EXCEPT
+            480 RERAISE                  1
+
+337     >>  482 CLEANUP_THROW
+            484 JUMP_BACKWARD          189 (to 108)
+        >>  486 PUSH_EXC_INFO
+
+338         488 LOAD_GLOBAL              4 (StudioError)
+            498 CHECK_EXC_MATCH
+            500 POP_JUMP_IF_FALSE       67 (to 636)
+            502 STORE_FAST               1 (exc)
+
+339         504 LOAD_CONST               1 (False)
+            506 LOAD_FAST                0 (client)
+            508 LOAD_ATTR               16 (provider)
+            528 LOAD_ATTR               18 (key)
+            548 LOAD_FAST                0 (client)
+            550 LOAD_ATTR               20 (model)
+            570 LOAD_ATTR               22 (id)
+
+340         590 LOAD_FAST                1 (exc)
+            592 LOAD_ATTR               10 (message)
+
+339         612 LOAD_CONST              10 (('ok', 'provider', 'model', 'message'))
+            614 BUILD_CONST_KEY_MAP      4
+            616 SWAP                     2
+            618 POP_EXCEPT
+            620 LOAD_CONST               3 (None)
+            622 STORE_FAST               1 (exc)
+            624 DELETE_FAST              1 (exc)
+            626 RETURN_VALUE
+        >>  628 LOAD_CONST               3 (None)
+            630 STORE_FAST               1 (exc)
+            632 DELETE_FAST              1 (exc)
+            634 RERAISE                  1
+
+338     >>  636 RERAISE                  0
+        >>  638 COPY                     3
+            640 POP_EXCEPT
+            642 RERAISE                  1
+        >>  644 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            646 RERAISE                  1
+ExceptionTable:
+  4 to 4 -> 644 [0] lasti
+  8 to 46 -> 340 [0]
+  50 to 100 -> 486 [0]
+  102 to 102 -> 482 [2]
+  104 to 110 -> 486 [0]
+  112 to 338 -> 644 [0] lasti
+  340 to 356 -> 476 [1] lasti
+  358 to 452 -> 466 [1] lasti
+  454 to 454 -> 476 [1] lasti
+  456 to 464 -> 644 [0] lasti
+  466 to 474 -> 476 [1] lasti
+  476 to 480 -> 644 [0] lasti
+  482 to 482 -> 486 [0]
+  486 to 502 -> 638 [1] lasti
+  504 to 614 -> 628 [1] lasti
+  616 to 616 -> 638 [1] lasti
+  618 to 626 -> 644 [0] lasti
+  628 to 636 -> 638 [1] lasti
+  638 to 642 -> 644 [0] lasti
+
+Disassembly of <code object TrendingBody at 0x7f6c81b7db30, file "app\api\competitor.py", line 348>:
+348           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('TrendingBody')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+349          12 LOAD_CONST               1 (None)
+             14 STORE_NAME               3 (keyword)
+             16 LOAD_CONST               2 ('str | None')
+             18 LOAD_NAME                4 (__annotations__)
+             20 LOAD_CONST               3 ('keyword')
+             22 STORE_SUBSCR
+
+350          26 LOAD_CONST               1 (None)
+             28 STORE_NAME               5 (region)
+             30 LOAD_CONST               2 ('str | None')
+             32 LOAD_NAME                4 (__annotations__)
+             34 LOAD_CONST               4 ('region')
+             36 STORE_SUBSCR
+
+351          40 LOAD_CONST               1 (None)
+             42 STORE_NAME               6 (period)
+             44 LOAD_CONST               2 ('str | None')
+             46 LOAD_NAME                4 (__annotations__)
+             48 LOAD_CONST               5 ('period')
+             50 STORE_SUBSCR
+
+352          54 LOAD_CONST               1 (None)
+             56 STORE_NAME               7 (limit)
+             58 LOAD_CONST               6 ('int | None')
+             60 LOAD_NAME                4 (__annotations__)
+             62 LOAD_CONST               7 ('limit')
+             64 STORE_SUBSCR
+
+353          68 LOAD_CONST               1 (None)
+             70 STORE_NAME               8 (precise)
+             72 LOAD_CONST               8 ('bool | None')
+             74 LOAD_NAME                4 (__annotations__)
+             76 LOAD_CONST               9 ('precise')
+             78 STORE_SUBSCR
+             82 RETURN_CONST             1 (None)
+
+Disassembly of <code object trending at 0x7f6c93426e30, file "app\api\competitor.py", line 356>:
+356           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+360           6 LOAD_FAST                0 (body)
+              8 LOAD_ATTR                0 (period)
+             28 LOAD_GLOBAL              2 (youtube_search)
+             38 LOAD_ATTR                4 (PERIODS)
+             58 CONTAINS_OP              0
+             60 POP_JUMP_IF_FALSE       12 (to 86)
+             62 LOAD_FAST                0 (body)
+             64 LOAD_ATTR                0 (period)
+             84 JUMP_FORWARD             1 (to 88)
+        >>   86 LOAD_CONST               1 ('today')
+        >>   88 STORE_FAST               1 (period)
+
+361          90 LOAD_GLOBAL              3 (NULL + youtube_search)
+            100 LOAD_ATTR                6 (trending)
+
+362         120 LOAD_FAST                0 (body)
+            122 LOAD_ATTR                8 (keyword)
+            142 LOAD_FAST                0 (body)
+            144 LOAD_ATTR               10 (region)
+            164 COPY                     1
+            166 POP_JUMP_IF_TRUE         2 (to 172)
+            168 POP_TOP
+            170 LOAD_CONST               2 ('VN')
+        >>  172 LOAD_FAST                1 (period)
+
+363         174 LOAD_GLOBAL             13 (NULL + max)
+            184 LOAD_CONST               3 (5)
+            186 LOAD_GLOBAL             15 (NULL + min)
+            196 LOAD_CONST               4 (50)
+            198 LOAD_FAST                0 (body)
+            200 LOAD_ATTR               16 (limit)
+            220 COPY                     1
+            222 POP_JUMP_IF_TRUE         2 (to 228)
+            224 POP_TOP
+            226 LOAD_CONST               5 (20)
+        >>  228 CALL                     2
+            236 CALL                     2
+            244 LOAD_GLOBAL             19 (NULL + bool)
+            254 LOAD_FAST                0 (body)
+            256 LOAD_ATTR               20 (precise)
+            276 CALL                     1
+
+361         284 KW_NAMES                 6 (('keyword', 'region', 'period', 'limit', 'precise'))
+            286 CALL                     5
+            294 GET_AWAITABLE            0
+            296 LOAD_CONST               7 (None)
+        >>  298 SEND                     3 (to 308)
+            302 YIELD_VALUE              2
+            304 RESUME                   3
+            306 JUMP_BACKWARD_NO_INTERRUPT     5 (to 298)
+        >>  308 END_SEND
+            310 RETURN_VALUE
+        >>  312 CLEANUP_THROW
+            314 JUMP_BACKWARD            4 (to 308)
+        >>  316 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            318 RERAISE                  1
+ExceptionTable:
+  4 to 300 -> 316 [0] lasti
+  302 to 302 -> 312 [2]
+  304 to 312 -> 316 [0] lasti
+
+Disassembly of <code object KeywordScanBody at 0x7f6c92ea57f0, file "app\api\competitor.py", line 369>:
+369           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('KeywordScanBody')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+370          12 LOAD_CONST               1 ('list[str]')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('keywords')
+             18 STORE_SUBSCR
+
+371          22 LOAD_CONST               3 (None)
+             24 STORE_NAME               4 (region)
+             26 LOAD_CONST               4 ('str | None')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('region')
+             32 STORE_SUBSCR
+
+372          36 LOAD_CONST               3 (None)
+             38 STORE_NAME               5 (per_keyword)
+             40 LOAD_CONST               6 ('int | None')
+             42 LOAD_NAME                3 (__annotations__)
+             44 LOAD_CONST               7 ('per_keyword')
+             46 STORE_SUBSCR
+
+373          50 LOAD_CONST               3 (None)
+             52 STORE_NAME               6 (depth)
+             54 LOAD_CONST               4 ('str | None')
+             56 LOAD_NAME                3 (__annotations__)
+             58 LOAD_CONST               8 ('depth')
+             60 STORE_SUBSCR
+
+374          64 LOAD_CONST               3 (None)
+             66 STORE_NAME               7 (period)
+             68 LOAD_CONST               4 ('str | None')
+             70 LOAD_NAME                3 (__annotations__)
+             72 LOAD_CONST               9 ('period')
+             74 STORE_SUBSCR
+
+375          78 LOAD_CONST               3 (None)
+             80 STORE_NAME               8 (precise)
+             82 LOAD_CONST              10 ('bool | None')
+             84 LOAD_NAME                3 (__annotations__)
+             86 LOAD_CONST              11 ('precise')
+             88 STORE_SUBSCR
+
+376          92 LOAD_CONST               3 (None)
+             94 STORE_NAME               9 (language)
+             96 LOAD_CONST               4 ('str | None')
+             98 LOAD_NAME                3 (__annotations__)
+            100 LOAD_CONST              12 ('language')
+            102 STORE_SUBSCR
+
+377         106 LOAD_CONST               3 (None)
+            108 STORE_NAME              10 (provider)
+            110 LOAD_CONST               4 ('str | None')
+            112 LOAD_NAME                3 (__annotations__)
+            114 LOAD_CONST              13 ('provider')
+            116 STORE_SUBSCR
+            120 RETURN_CONST             3 (None)
+
+Disassembly of <code object keyword_scan at 0x269e46b0, file "app\api\competitor.py", line 380>:
+380           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+384           6 LOAD_GLOBAL              1 (NULL + competitor_settings_svc)
+             16 LOAD_ATTR                2 (get_config)
+             36 CALL                     0
+             44 STORE_FAST               2 (cfg)
+
+387          46 LOAD_FAST                0 (body)
+             48 LOAD_ATTR                4 (period)
+             68 LOAD_GLOBAL              6 (youtube_search)
+             78 LOAD_ATTR                8 (PERIODS)
+             98 CONTAINS_OP              0
+            100 POP_JUMP_IF_FALSE       12 (to 126)
+            102 LOAD_FAST                0 (body)
+            104 LOAD_ATTR                4 (period)
+            124 JUMP_FORWARD             1 (to 128)
+        >>  126 LOAD_CONST               1 (None)
+        >>  128 STORE_FAST               3 (period)
+
+388         130 LOAD_FAST                3 (period)
+            132 POP_JUMP_IF_NOT_NONE    43 (to 220)
+            134 LOAD_FAST                0 (body)
+            136 LOAD_ATTR                4 (period)
+            156 LOAD_CONST               2 ('all')
+            158 COMPARE_OP              55 (!=)
+            162 POP_JUMP_IF_FALSE       28 (to 220)
+
+389         164 LOAD_FAST                2 (cfg)
+            166 LOAD_CONST               3 ('period')
+            168 BINARY_SUBSCR
+            172 LOAD_GLOBAL              6 (youtube_search)
+            182 LOAD_ATTR                8 (PERIODS)
+            202 CONTAINS_OP              0
+            204 POP_JUMP_IF_FALSE        5 (to 216)
+            206 LOAD_FAST                2 (cfg)
+            208 LOAD_CONST               3 ('period')
+            210 BINARY_SUBSCR
+            214 JUMP_FORWARD             1 (to 218)
+        >>  216 LOAD_CONST               1 (None)
+        >>  218 STORE_FAST               3 (period)
+
+390     >>  220 LOAD_GLOBAL             11 (NULL + keyword_intel_service)
+            230 LOAD_ATTR               12 (start_scan)
+
+391         250 LOAD_FAST                1 (db)
+            252 LOAD_FAST                0 (body)
+            254 LOAD_ATTR               14 (keywords)
+            274 COPY                     1
+            276 POP_JUMP_IF_TRUE         2 (to 282)
+            278 POP_TOP
+            280 BUILD_LIST               0
+        >>  282 LOAD_FAST                0 (body)
+            284 LOAD_ATTR               16 (region)
+            304 COPY                     1
+            306 POP_JUMP_IF_TRUE         5 (to 318)
+            308 POP_TOP
+            310 LOAD_FAST                2 (cfg)
+            312 LOAD_CONST               4 ('region')
+            314 BINARY_SUBSCR
+
+392     >>  318 LOAD_FAST                0 (body)
+            320 LOAD_ATTR               18 (per_keyword)
+            340 COPY                     1
+            342 POP_JUMP_IF_TRUE         2 (to 348)
+            344 POP_TOP
+            346 LOAD_CONST               5 (5)
+        >>  348 LOAD_FAST                0 (body)
+            350 LOAD_ATTR               20 (depth)
+            370 COPY                     1
+            372 POP_JUMP_IF_TRUE         2 (to 378)
+            374 POP_TOP
+            376 LOAD_CONST               6 ('medium')
+
+393     >>  378 LOAD_FAST                3 (period)
+
+394         380 LOAD_GLOBAL             23 (NULL + bool)
+            390 LOAD_FAST                0 (body)
+            392 LOAD_ATTR               24 (precise)
+            412 CALL                     1
+            420 LOAD_FAST                0 (body)
+            422 LOAD_ATTR               26 (language)
+            442 COPY                     1
+            444 POP_JUMP_IF_TRUE         2 (to 450)
+            446 POP_TOP
+            448 LOAD_CONST               7 ('vi')
+        >>  450 LOAD_FAST                0 (body)
+            452 LOAD_ATTR               28 (provider)
+
+390         472 KW_NAMES                 8 (('region', 'per_keyword', 'depth', 'period', 'precise', 'language', 'provider'))
+            474 CALL                     9
+            482 RETURN_VALUE
+        >>  484 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            486 RERAISE                  1
+ExceptionTable:
+  4 to 482 -> 484 [0] lasti
+
+Disassembly of <code object ArchitectBody at 0x7f6c81a44030, file "app\api\competitor.py", line 400>:
+400           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('ArchitectBody')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+401          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('channel_url')
+             18 STORE_SUBSCR
+
+402          22 LOAD_CONST               3 (None)
+             24 STORE_NAME               4 (language)
+             26 LOAD_CONST               4 ('str | None')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('language')
+             32 STORE_SUBSCR
+
+403          36 LOAD_CONST               3 (None)
+             38 STORE_NAME               5 (channel_name)
+             40 LOAD_CONST               4 ('str | None')
+             42 LOAD_NAME                3 (__annotations__)
+             44 LOAD_CONST               6 ('channel_name')
+             46 STORE_SUBSCR
+
+404          50 LOAD_CONST               3 (None)
+             52 STORE_NAME               6 (recent_only)
+             54 LOAD_CONST               7 ('bool | None')
+             56 LOAD_NAME                3 (__annotations__)
+             58 LOAD_CONST               8 ('recent_only')
+             60 STORE_SUBSCR
+
+405          64 LOAD_CONST               3 (None)
+             66 STORE_NAME               7 (force)
+             68 LOAD_CONST               7 ('bool | None')
+             70 LOAD_NAME                3 (__annotations__)
+             72 LOAD_CONST               9 ('force')
+             74 STORE_SUBSCR
+             78 RETURN_CONST             3 (None)
+
+Disassembly of <code object architect at 0x269fea00, file "app\api\competitor.py", line 408>:
+408           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+416           6 LOAD_GLOBAL              1 (NULL + llm_api)
+             16 LOAD_ATTR                2 (resolve)
+             36 CALL                     0
+             44 POP_TOP
+
+417          46 LOAD_GLOBAL              4 (svc)
+             56 LOAD_ATTR                6 (yt)
+             76 LOAD_ATTR                9 (NULL|self + normalize_channel_url)
+             96 LOAD_FAST                0 (body)
+             98 LOAD_ATTR               10 (channel_url)
+            118 CALL                     1
+            126 STORE_FAST               2 (normalized)
+
+418         128 LOAD_GLOBAL             13 (NULL + job_queue)
+            138 LOAD_ATTR               14 (enqueue_background_task)
+
+419         158 LOAD_CONST               1 ('channel_architect')
+
+420         160 LOAD_FAST                2 (normalized)
+            162 LOAD_FAST                0 (body)
+            164 LOAD_ATTR               16 (language)
+
+421         184 LOAD_FAST                0 (body)
+            186 LOAD_ATTR               18 (channel_name)
+            206 LOAD_GLOBAL             21 (NULL + bool)
+            216 LOAD_FAST                0 (body)
+            218 LOAD_ATTR               22 (recent_only)
+            238 CALL                     1
+
+422         246 LOAD_GLOBAL             21 (NULL + bool)
+            256 LOAD_FAST                0 (body)
+            258 LOAD_ATTR               24 (force)
+            278 CALL                     1
+            286 LOAD_FAST                2 (normalized)
+
+420         288 LOAD_CONST               2 (('channel_url', 'language', 'channel_name', 'recent_only', 'force', 'label'))
+            290 BUILD_CONST_KEY_MAP      6
+
+423         292 LOAD_CONST               3 ('architect:')
+            294 LOAD_FAST                2 (normalized)
+            296 FORMAT_VALUE             0
+            298 BUILD_STRING             2
+
+418         300 KW_NAMES                 4 (('dedupe_key',))
+            302 CALL                     3
+            310 GET_AWAITABLE            0
+            312 LOAD_CONST               5 (None)
+        >>  314 SEND                     3 (to 324)
+            318 YIELD_VALUE              2
+            320 RESUME                   3
+            322 JUMP_BACKWARD_NO_INTERRUPT     5 (to 314)
+        >>  324 END_SEND
+            326 STORE_FAST               3 (job_id)
+
+425         328 LOAD_GLOBAL             27 (NULL + architect_job)
+            338 LOAD_ATTR               28 (get_job)
+            358 LOAD_FAST                1 (db)
+            360 LOAD_FAST                3 (job_id)
+            362 CALL                     2
+            370 RETURN_VALUE
+
+418     >>  372 CLEANUP_THROW
+            374 JUMP_BACKWARD           26 (to 324)
+        >>  376 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            378 RERAISE                  1
+ExceptionTable:
+  4 to 316 -> 376 [0] lasti
+  318 to 318 -> 372 [2]
+  320 to 372 -> 376 [0] lasti
+
+Disassembly of <code object architect_jobs at 0x7f6c92e4ec30, file "app\api\competitor.py", line 428>:
+428           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+430           6 LOAD_CONST               1 ('jobs')
+              8 LOAD_GLOBAL              1 (NULL + architect_job)
+             18 LOAD_ATTR                2 (list_jobs)
+             38 LOAD_FAST                1 (db)
+             40 LOAD_FAST                0 (active_only)
+             42 KW_NAMES                 2 (('active_only',))
+             44 CALL                     2
+             52 BUILD_MAP                1
+             54 RETURN_VALUE
+        >>   56 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             58 RERAISE                  1
+ExceptionTable:
+  4 to 54 -> 56 [0] lasti
+
+Disassembly of <code object architect_job_detail at 0x7f6c92e4e030, file "app\api\competitor.py", line 433>:
+433           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+435           6 LOAD_GLOBAL              1 (NULL + architect_job)
+             16 LOAD_ATTR                2 (get_job)
+             36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (job_id)
+             40 CALL                     2
+             48 RETURN_VALUE
+        >>   50 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             52 RERAISE                  1
+ExceptionTable:
+  4 to 48 -> 50 [0] lasti
+
+Disassembly of <code object architect_state at 0x7f6c81c210d0, file "app\api\competitor.py", line 438>:
+438           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+441           6 LOAD_GLOBAL              1 (NULL + architect_job)
+             16 LOAD_ATTR                2 (public_state)
+             36 LOAD_FAST                1 (db)
+             38 LOAD_GLOBAL              4 (svc)
+             48 LOAD_ATTR                6 (yt)
+             68 LOAD_ATTR                9 (NULL|self + normalize_channel_url)
+             88 LOAD_FAST                0 (channel_url)
+             90 CALL                     1
+             98 CALL                     2
+            106 RETURN_VALUE
+        >>  108 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            110 RERAISE                  1
+ExceptionTable:
+  4 to 106 -> 108 [0] lasti
+
+Disassembly of <code object ArchitectCommitBody at 0x7f6c81b7dc50, file "app\api\competitor.py", line 444>:
+444           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('ArchitectCommitBody')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+445          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('channel_url')
+             18 STORE_SUBSCR
+
+446          22 LOAD_CONST               3 (None)
+             24 STORE_NAME               4 (name)
+             26 LOAD_CONST               4 ('str | None')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('name')
+             32 STORE_SUBSCR
+
+447          36 LOAD_CONST               3 (None)
+             38 STORE_NAME               5 (output_folder)
+             40 LOAD_CONST               4 ('str | None')
+             42 LOAD_NAME                3 (__annotations__)
+             44 LOAD_CONST               6 ('output_folder')
+             46 STORE_SUBSCR
+
+448          50 LOAD_CONST               3 (None)
+             52 STORE_NAME               6 (engine_id)
+             54 LOAD_CONST               4 ('str | None')
+             56 LOAD_NAME                3 (__annotations__)
+             58 LOAD_CONST               7 ('engine_id')
+             60 STORE_SUBSCR
+
+449          64 LOAD_CONST               3 (None)
+             66 STORE_NAME               7 (project_id)
+             68 LOAD_CONST               4 ('str | None')
+             70 LOAD_NAME                3 (__annotations__)
+             72 LOAD_CONST               8 ('project_id')
+             74 STORE_SUBSCR
+
+450          78 LOAD_CONST               3 (None)
+             80 STORE_NAME               8 (overwrite_master_prompt)
+             82 LOAD_CONST               9 ('bool | None')
+             84 LOAD_NAME                3 (__annotations__)
+             86 LOAD_CONST              10 ('overwrite_master_prompt')
+             88 STORE_SUBSCR
+             92 RETURN_CONST             3 (None)
+
+Disassembly of <code object architect_commit at 0x28e57490, file "app\api\competitor.py", line 453>:
+453           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+459           6 LOAD_FAST                0 (body)
+              8 LOAD_ATTR                0 (project_id)
+             28 POP_JUMP_IF_TRUE        58 (to 146)
+             30 LOAD_FAST                0 (body)
+             32 LOAD_ATTR                2 (name)
+             52 COPY                     1
+             54 POP_JUMP_IF_TRUE         2 (to 60)
+             56 POP_TOP
+             58 LOAD_CONST               1 ('')
+        >>   60 LOAD_ATTR                5 (NULL|self + strip)
+             80 CALL                     0
+             88 POP_JUMP_IF_TRUE        28 (to 146)
+
+460          90 LOAD_GLOBAL              7 (NULL + StudioError)
+            100 LOAD_GLOBAL              8 (E)
+            110 LOAD_ATTR               10 (UNKNOWN)
+            130 LOAD_CONST               2 ('Thiếu tên cho kênh mới.')
+            132 LOAD_CONST               3 (422)
+            134 KW_NAMES                 4 (('status_code',))
+            136 CALL                     3
+            144 RAISE_VARARGS            1
+
+461     >>  146 LOAD_GLOBAL             13 (NULL + architect_job)
+            156 LOAD_ATTR               14 (commit)
+
+462         176 LOAD_FAST                1 (db)
+            178 LOAD_GLOBAL             16 (svc)
+            188 LOAD_ATTR               18 (yt)
+            208 LOAD_ATTR               21 (NULL|self + normalize_channel_url)
+            228 LOAD_FAST                0 (body)
+            230 LOAD_ATTR               22 (channel_url)
+            250 CALL                     1
+
+463         258 LOAD_FAST                0 (body)
+            260 LOAD_ATTR                2 (name)
+            280 COPY                     1
+            282 POP_JUMP_IF_TRUE         2 (to 288)
+            284 POP_TOP
+            286 LOAD_CONST               1 ('')
+        >>  288 LOAD_ATTR                5 (NULL|self + strip)
+            308 CALL                     0
+            316 LOAD_FAST                0 (body)
+            318 LOAD_ATTR               24 (output_folder)
+            338 COPY                     1
+            340 POP_JUMP_IF_TRUE         2 (to 346)
+            342 POP_TOP
+            344 LOAD_CONST               1 ('')
+        >>  346 LOAD_ATTR                5 (NULL|self + strip)
+            366 CALL                     0
+
+464         374 LOAD_FAST                0 (body)
+            376 LOAD_ATTR               26 (engine_id)
+            396 LOAD_FAST                0 (body)
+            398 LOAD_ATTR                0 (project_id)
+
+465         418 LOAD_GLOBAL             29 (NULL + bool)
+            428 LOAD_FAST                0 (body)
+            430 LOAD_ATTR               30 (overwrite_master_prompt)
+            450 CALL                     1
+
+461         458 KW_NAMES                 5 (('channel_url', 'name', 'output_folder', 'engine_id', 'project_id', 'overwrite_master_prompt'))
+            460 CALL                     7
+            468 RETURN_VALUE
+        >>  470 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            472 RERAISE                  1
+ExceptionTable:
+  4 to 468 -> 470 [0] lasti
+
+Disassembly of <code object SeedKeywordsBody at 0x7f6c92ee86c0, file "app\api\competitor.py", line 469>:
+469           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('SeedKeywordsBody')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+470          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('project_id')
+             18 STORE_SUBSCR
+
+471          22 LOAD_CONST               3 (None)
+             24 STORE_NAME               4 (limit)
+             26 LOAD_CONST               4 ('int | None')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('limit')
+             32 STORE_SUBSCR
+             36 RETURN_CONST             3 (None)
+
+Disassembly of <code object keyword_seed at 0x7f6c9343bc40, file "app\api\competitor.py", line 474>:
+474           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+481           6 LOAD_GLOBAL              1 (NULL + ai_studio_service)
+             16 LOAD_ATTR                2 (get_or_create_config)
+             36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (body)
+             40 LOAD_ATTR                4 (project_id)
+             60 CALL                     2
+             68 STORE_FAST               2 (cfg)
+
+482          70 LOAD_GLOBAL              1 (NULL + ai_studio_service)
+             80 LOAD_ATTR                6 (_loads)
+            100 LOAD_FAST                2 (cfg)
+            102 LOAD_ATTR                8 (channel_profile_json)
+            122 BUILD_MAP                0
+            124 CALL                     2
+            132 STORE_FAST               3 (profile)
+
+483         134 LOAD_GLOBAL             11 (NULL + keyword_intel_service)
+            144 LOAD_ATTR               12 (seed_keywords_from_channel)
+
+484         164 LOAD_FAST                3 (profile)
+            166 LOAD_FAST                2 (cfg)
+            168 LOAD_ATTR               14 (language)
+            188 COPY                     1
+            190 POP_JUMP_IF_TRUE         2 (to 196)
+            192 POP_TOP
+            194 LOAD_CONST               1 ('vi')
+
+485     >>  196 LOAD_GLOBAL             17 (NULL + max)
+            206 LOAD_CONST               2 (5)
+            208 LOAD_GLOBAL             19 (NULL + min)
+            218 LOAD_CONST               3 (30)
+            220 LOAD_FAST                0 (body)
+            222 LOAD_ATTR               20 (limit)
+            242 COPY                     1
+            244 POP_JUMP_IF_TRUE         2 (to 250)
+            246 POP_TOP
+            248 LOAD_CONST               4 (15)
+        >>  250 CALL                     2
+            258 CALL                     2
+
+483         266 KW_NAMES                 5 (('language', 'limit'))
+            268 CALL                     3
+            276 GET_AWAITABLE            0
+            278 LOAD_CONST               6 (None)
+        >>  280 SEND                     3 (to 290)
+            284 YIELD_VALUE              2
+            286 RESUME                   3
+            288 JUMP_BACKWARD_NO_INTERRUPT     5 (to 280)
+        >>  290 END_SEND
+            292 RETURN_VALUE
+        >>  294 CLEANUP_THROW
+            296 JUMP_BACKWARD            4 (to 290)
+        >>  298 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            300 RERAISE                  1
+ExceptionTable:
+  4 to 282 -> 298 [0] lasti
+  284 to 284 -> 294 [2]
+  286 to 294 -> 298 [0] lasti
+
+Disassembly of <code object keyword_scan_jobs at 0x7f6c92e4dd30, file "app\api\competitor.py", line 489>:
+489           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+491           6 LOAD_CONST               1 ('jobs')
+              8 LOAD_GLOBAL              1 (NULL + keyword_intel_service)
+             18 LOAD_ATTR                2 (list_scan_jobs)
+             38 LOAD_FAST                1 (db)
+             40 LOAD_FAST                0 (active_only)
+             42 KW_NAMES                 2 (('active_only',))
+             44 CALL                     2
+             52 BUILD_MAP                1
+             54 RETURN_VALUE
+        >>   56 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             58 RERAISE                  1
+ExceptionTable:
+  4 to 54 -> 56 [0] lasti
+
+Disassembly of <code object list_keyword_scans at 0x7f6c92e4c530, file "app\api\competitor.py", line 494>:
+494           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+497           6 LOAD_CONST               1 ('scans')
+              8 LOAD_GLOBAL              1 (NULL + keyword_intel_service)
+             18 LOAD_ATTR                2 (list_scans)
+             38 LOAD_FAST                0 (db)
+             40 CALL                     1
+             48 BUILD_MAP                1
+             50 RETURN_VALUE
+        >>   52 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             54 RERAISE                  1
+ExceptionTable:
+  4 to 50 -> 52 [0] lasti
+
+Disassembly of <code object get_keyword_scan at 0x7f6c92e4c030, file "app\api\competitor.py", line 500>:
+500           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+502           6 LOAD_GLOBAL              1 (NULL + keyword_intel_service)
+             16 LOAD_ATTR                2 (get_scan)
+             36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (scan_id)
+             40 CALL                     2
+             48 RETURN_VALUE
+        >>   50 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             52 RERAISE                  1
+ExceptionTable:
+  4 to 48 -> 50 [0] lasti
+
+Disassembly of <code object delete_keyword_scan at 0x7f6c92e4c630, file "app\api\competitor.py", line 505>:
+505           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+507           6 LOAD_GLOBAL              1 (NULL + keyword_intel_service)
+             16 LOAD_ATTR                2 (delete_scan)
+             36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (scan_id)
+             40 CALL                     2
+             48 POP_TOP
+
+508          50 LOAD_CONST               1 ('ok')
+             52 LOAD_CONST               2 (True)
+             54 BUILD_MAP                1
+             56 RETURN_VALUE
+        >>   58 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             60 RERAISE                  1
+ExceptionTable:
+  4 to 56 -> 58 [0] lasti
+
+Disassembly of <code object SuggestBody at 0x7f6c92e4c830, file "app\api\competitor.py", line 511>:
+511           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('SuggestBody')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+512          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('seed')
+             18 STORE_SUBSCR
+
+513          22 LOAD_CONST               3 (None)
+             24 STORE_NAME               4 (region)
+             26 LOAD_CONST               4 ('str | None')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('region')
+             32 STORE_SUBSCR
+
+514          36 LOAD_CONST               3 (None)
+             38 STORE_NAME               5 (language)
+             40 LOAD_CONST               4 ('str | None')
+             42 LOAD_NAME                3 (__annotations__)
+             44 LOAD_CONST               6 ('language')
+             46 STORE_SUBSCR
+             50 RETURN_CONST             3 (None)
+
+Disassembly of <code object keyword_suggest at 0x7f6c93273470, file "app\api\competitor.py", line 517>:
+517           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+520           6 LOAD_CONST               1 ('suggestions')
+              8 LOAD_GLOBAL              1 (NULL + youtube_search)
+             18 LOAD_ATTR                2 (suggest_keywords)
+
+521          38 LOAD_FAST                0 (body)
+             40 LOAD_ATTR                4 (seed)
+             60 LOAD_FAST                0 (body)
+             62 LOAD_ATTR                6 (region)
+             82 COPY                     1
+             84 POP_JUMP_IF_TRUE         2 (to 90)
+             86 POP_TOP
+             88 LOAD_CONST               2 ('VN')
+        >>   90 LOAD_FAST                0 (body)
+             92 LOAD_ATTR                8 (language)
+            112 COPY                     1
+            114 POP_JUMP_IF_TRUE         2 (to 120)
+            116 POP_TOP
+            118 LOAD_CONST               3 ('vi')
+
+520     >>  120 KW_NAMES                 4 (('region', 'language'))
+            122 CALL                     3
+            130 GET_AWAITABLE            0
+            132 LOAD_CONST               5 (None)
+        >>  134 SEND                     3 (to 144)
+            138 YIELD_VALUE              2
+            140 RESUME                   3
+            142 JUMP_BACKWARD_NO_INTERRUPT     5 (to 134)
+        >>  144 END_SEND
+            146 BUILD_MAP                1
+            148 RETURN_VALUE
+        >>  150 CLEANUP_THROW
+            152 JUMP_BACKWARD            5 (to 144)
+        >>  154 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            156 RERAISE                  1
+ExceptionTable:
+  4 to 136 -> 154 [0] lasti
+  138 to 138 -> 150 [3]
+  140 to 150 -> 154 [0] lasti

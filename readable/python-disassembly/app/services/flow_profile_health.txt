@@ -1,0 +1,682 @@
+  0           0 RESUME                   0
+
+  1           2 SETUP_ANNOTATIONS
+              4 LOAD_CONST               0 ('Sổ đen RAM: profile Flow vừa hỏng thì TẠM NGỪNG nhận cảnh (mặc định 30 phút).\n\nVì sao cần thêm lớp này khi đã có `flow_accounts.cooldown_until`: cooldown DB chỉ ghi khi Flow\nthrottle (429 / "hoạt động bất thường"). Mọi kiểu hỏng KHÁC — Chrome của profile chết, mất đăng nhập,\nthư mục profile bị xoá khỏi đĩa, N cảnh liên tiếp thất bại — chỉ sống trong RAM CỦA STEP\n(`wstates[...]["sick"]`, `qstates`, `FlowFailover.tried`) nên hết step là mất sạch. Bấm "Tải lại cảnh\nthiếu" là job MỚI ⇒ profile vừa hỏng lại hợp lệ, lại đứng đầu hàng theo `order_index`, lại ôm cảnh và\nlại hỏng. Đó là vòng lặp người dùng báo: "xoá/khoá profile rồi mà cảnh vẫn ăn đúng profile đã lỗi".\n\nVì sao RAM chứ không DB: khác cooldown throttle (cờ nằm ở SERVER Google, phải sống qua restart), "ốm"\nở đây là suy đoán từ lỗi CỤC BỘ trên máy mình. Restart app thường là lúc những thứ đó được sửa, nên\nquên sạch là hành vi đúng — và không cần cột mới/migration, không có rủi ro khoá nhầm vĩnh viễn.\n\nFAIL-OPEN là bắt buộc: sổ đen chỉ có tác dụng khi CÒN profile khoẻ khác để chuyển sang. Lọc xong mà\nrỗng thì `drop_sick` trả lại nguyên danh sách — thà thử lại profile vừa lỗi còn hơn treo người dùng\n30 phút không lý do. Xem docs/plan-flow-chia-lai-phan-canh-profile-om.md §2.\n')
+              6 STORE_NAME               0 (__doc__)
+
+ 18           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('annotations',))
+             12 IMPORT_NAME              1 (__future__)
+             14 IMPORT_FROM              2 (annotations)
+             16 STORE_NAME               2 (annotations)
+             18 POP_TOP
+
+ 20          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               3 (None)
+             24 IMPORT_NAME              3 (time)
+             26 STORE_NAME               3 (time)
+
+ 21          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               4 (('dataclass',))
+             32 IMPORT_NAME              4 (dataclasses)
+             34 IMPORT_FROM              5 (dataclass)
+             36 STORE_NAME               5 (dataclass)
+             38 POP_TOP
+
+ 22          40 LOAD_CONST               1 (0)
+             42 LOAD_CONST               5 (('datetime', 'timedelta'))
+             44 IMPORT_NAME              6 (datetime)
+             46 IMPORT_FROM              6 (datetime)
+             48 STORE_NAME               6 (datetime)
+             50 IMPORT_FROM              7 (timedelta)
+             52 STORE_NAME               7 (timedelta)
+             54 POP_TOP
+
+ 23          56 LOAD_CONST               1 (0)
+             58 LOAD_CONST               6 (('Callable', 'Iterable', 'TypeVar'))
+             60 IMPORT_NAME              8 (typing)
+             62 IMPORT_FROM              9 (Callable)
+             64 STORE_NAME               9 (Callable)
+             66 IMPORT_FROM             10 (Iterable)
+             68 STORE_NAME              10 (Iterable)
+             70 IMPORT_FROM             11 (TypeVar)
+             72 STORE_NAME              11 (TypeVar)
+             74 POP_TOP
+
+ 25          76 LOAD_CONST               1 (0)
+             78 LOAD_CONST               7 (('log',))
+             80 IMPORT_NAME             12 (app.core.logging)
+             82 IMPORT_FROM             13 (log)
+             84 STORE_NAME              13 (log)
+             86 POP_TOP
+
+ 28          88 LOAD_CONST               8 (30)
+             90 STORE_NAME              14 (SICK_MINUTES)
+
+ 29          92 LOAD_CONST               9 ('flow_profile_sick_min')
+             94 STORE_NAME              15 (_SETTING_SICK_MIN)
+
+ 31          96 LOAD_CONST              10 (60.0)
+             98 STORE_NAME              16 (_CONF_TTL)
+
+ 33         100 PUSH_NULL
+            102 LOAD_NAME               11 (TypeVar)
+            104 LOAD_CONST              11 ('T')
+            106 CALL                     1
+            114 STORE_NAME              17 (T)
+
+ 36         116 PUSH_NULL
+            118 LOAD_NAME                5 (dataclass)
+            120 LOAD_CONST              12 (True)
+            122 KW_NAMES                13 (('frozen',))
+            124 CALL                     1
+
+ 37         132 PUSH_NULL
+            134 LOAD_BUILD_CLASS
+            136 LOAD_CONST              14 (<code object _Sick at 0x7f6c926962e0, file "app\services\flow_profile_health.py", line 36>)
+            138 MAKE_FUNCTION            0
+            140 LOAD_CONST              15 ('_Sick')
+            142 CALL                     2
+
+ 36         150 CALL                     0
+
+ 37         158 STORE_NAME              18 (_Sick)
+
+ 44         160 BUILD_MAP                0
+            162 STORE_NAME              19 (_SICK)
+            164 LOAD_CONST              16 ('dict[str, _Sick]')
+            166 LOAD_NAME               20 (__annotations__)
+            168 LOAD_CONST              17 ('_SICK')
+            170 STORE_SUBSCR
+
+ 45         174 LOAD_CONST               3 (None)
+            176 STORE_GLOBAL            21 (_conf)
+            178 LOAD_CONST              18 ('tuple[float, int] | None')
+            180 LOAD_NAME               20 (__annotations__)
+            182 LOAD_CONST              19 ('_conf')
+            184 STORE_SUBSCR
+
+ 46         188 LOAD_CONST              20 (0.0)
+            190 STORE_GLOBAL            22 (_last_failopen_log)
+
+ 49         192 LOAD_CONST              33 (('return', 'int'))
+            194 LOAD_CONST              21 (<code object _configured_minutes at 0x28c068e0, file "app\services\flow_profile_health.py", line 49>)
+            196 MAKE_FUNCTION            4 (annotations)
+            198 STORE_NAME              23 (_configured_minutes)
+
+ 70         200 LOAD_CONST              34 (('return', 'None'))
+            202 LOAD_CONST              22 (<code object reset_config_cache at 0x7f6c92158fa0, file "app\services\flow_profile_health.py", line 70>)
+            204 MAKE_FUNCTION            4 (annotations)
+            206 STORE_NAME              24 (reset_config_cache)
+
+ 76         208 LOAD_CONST               3 (None)
+            210 LOAD_CONST              23 (('minutes',))
+            212 BUILD_CONST_KEY_MAP      1
+            214 LOAD_CONST              35 (('partition_id', 'str | None', 'reason', 'str', 'minutes', 'int | None', 'return', 'datetime | None'))
+            216 LOAD_CONST              24 (<code object mark_sick at 0x28c0ccc0, file "app\services\flow_profile_health.py", line 76>)
+            218 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            220 STORE_NAME              25 (mark_sick)
+
+ 98         222 LOAD_CONST              36 (('partition_id', 'str | None', 'return', 'bool'))
+            224 LOAD_CONST              25 (<code object is_sick at 0x7f6c926af9b0, file "app\services\flow_profile_health.py", line 98>)
+            226 MAKE_FUNCTION            4 (annotations)
+            228 STORE_NAME              26 (is_sick)
+
+111         230 LOAD_CONST              37 (('partition_id', 'str | None', 'return', 'dict | None'))
+            232 LOAD_CONST              26 (<code object sick_info at 0x7f6c9247af50, file "app\services\flow_profile_health.py", line 111>)
+            234 MAKE_FUNCTION            4 (annotations)
+            236 STORE_NAME              27 (sick_info)
+
+123         238 LOAD_CONST              36 (('partition_id', 'str | None', 'return', 'bool'))
+            240 LOAD_CONST              27 (<code object clear_sick at 0x7f6c92406930, file "app\services\flow_profile_health.py", line 123>)
+            242 MAKE_FUNCTION            4 (annotations)
+            244 STORE_NAME              28 (clear_sick)
+
+130         246 LOAD_CONST              34 (('return', 'None'))
+            248 LOAD_CONST              28 (<code object clear_all at 0x7f6c92696e20, file "app\services\flow_profile_health.py", line 130>)
+            250 MAKE_FUNCTION            4 (annotations)
+            252 STORE_NAME              29 (clear_all)
+
+135         254 LOAD_CONST              38 (('return', 'dict[str, dict]'))
+            256 LOAD_CONST              29 (<code object sick_partitions at 0x7f6c926fe760, file "app\services\flow_profile_health.py", line 135>)
+            258 MAKE_FUNCTION            4 (annotations)
+            260 STORE_NAME              30 (sick_partitions)
+
+141         262 LOAD_CONST              30 ('')
+            264 LOAD_CONST              31 (('where',))
+            266 BUILD_CONST_KEY_MAP      1
+            268 LOAD_CONST              39 (('items', 'Iterable[T]', 'key', 'Callable[[T], str | None]', 'where', 'str', 'return', 'list[T]'))
+            270 LOAD_CONST              32 (<code object drop_sick at 0x7f6c926bea30, file "app\services\flow_profile_health.py", line 141>)
+            272 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            274 STORE_NAME              31 (drop_sick)
+            276 RETURN_CONST             3 (None)
+
+Disassembly of <code object _Sick at 0x7f6c926962e0, file "app\services\flow_profile_health.py", line 36>:
+ 36           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('_Sick')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 39          12 LOAD_CONST               1 ('float')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('until_mono')
+             18 STORE_SUBSCR
+
+ 40          22 LOAD_CONST               3 ('datetime')
+             24 LOAD_NAME                3 (__annotations__)
+             26 LOAD_CONST               4 ('until_wall')
+             28 STORE_SUBSCR
+
+ 41          32 LOAD_CONST               5 ('str')
+             34 LOAD_NAME                3 (__annotations__)
+             36 LOAD_CONST               6 ('reason')
+             38 STORE_SUBSCR
+             42 RETURN_CONST             7 (None)
+
+Disassembly of <code object _configured_minutes at 0x28c068e0, file "app\services\flow_profile_health.py", line 49>:
+ 49           0 RESUME                   0
+
+ 52           2 LOAD_GLOBAL              1 (NULL + time)
+             12 LOAD_ATTR                2 (monotonic)
+             32 CALL                     0
+             40 STORE_FAST               0 (now)
+
+ 53          42 LOAD_GLOBAL              4 (_conf)
+             52 POP_JUMP_IF_NONE        21 (to 96)
+             54 LOAD_FAST                0 (now)
+             56 LOAD_GLOBAL              4 (_conf)
+             66 LOAD_CONST               2 (0)
+             68 BINARY_SUBSCR
+             72 COMPARE_OP               2 (<)
+             76 POP_JUMP_IF_FALSE        9 (to 96)
+
+ 54          78 LOAD_GLOBAL              4 (_conf)
+             88 LOAD_CONST               3 (1)
+             90 BINARY_SUBSCR
+             94 RETURN_VALUE
+
+ 55     >>   96 LOAD_GLOBAL              6 (SICK_MINUTES)
+            106 STORE_FAST               1 (minutes)
+
+ 56         108 NOP
+
+ 57         110 LOAD_CONST               2 (0)
+            112 LOAD_CONST               4 (('Setting',))
+            114 IMPORT_NAME              4 (app.db.models)
+            116 IMPORT_FROM              5 (Setting)
+            118 STORE_FAST               2 (Setting)
+            120 POP_TOP
+
+ 58         122 LOAD_CONST               2 (0)
+            124 LOAD_CONST               5 (('SessionLocal',))
+            126 IMPORT_NAME              6 (app.db.session)
+            128 IMPORT_FROM              7 (SessionLocal)
+            130 STORE_FAST               3 (SessionLocal)
+            132 POP_TOP
+
+ 59         134 PUSH_NULL
+            136 LOAD_FAST                3 (SessionLocal)
+            138 CALL                     0
+            146 BEFORE_WITH
+            148 STORE_FAST               4 (db)
+
+ 60         150 LOAD_FAST                4 (db)
+            152 LOAD_ATTR               17 (NULL|self + get)
+            172 LOAD_FAST                2 (Setting)
+            174 LOAD_GLOBAL             18 (_SETTING_SICK_MIN)
+            184 CALL                     2
+            192 STORE_FAST               5 (row)
+
+ 61         194 LOAD_FAST                5 (row)
+            196 POP_JUMP_IF_NONE        12 (to 222)
+            198 LOAD_FAST                5 (row)
+            200 LOAD_ATTR               20 (value)
+            220 JUMP_FORWARD             1 (to 224)
+        >>  222 LOAD_CONST               1 (None)
+        >>  224 STORE_FAST               6 (raw)
+
+ 59         226 LOAD_CONST               1 (None)
+            228 LOAD_CONST               1 (None)
+            230 LOAD_CONST               1 (None)
+            232 CALL                     2
+            240 POP_TOP
+
+ 62     >>  242 LOAD_FAST_CHECK          6 (raw)
+            244 POP_JUMP_IF_NONE        31 (to 308)
+
+ 63         246 LOAD_GLOBAL             23 (NULL + max)
+            256 LOAD_CONST               2 (0)
+            258 LOAD_GLOBAL             25 (NULL + min)
+            268 LOAD_GLOBAL             27 (NULL + int)
+            278 LOAD_FAST                6 (raw)
+            280 CALL                     1
+            288 LOAD_CONST               6 (1440)
+            290 CALL                     2
+            298 CALL                     2
+            306 STORE_FAST               1 (minutes)
+
+ 66     >>  308 LOAD_FAST                0 (now)
+            310 LOAD_GLOBAL             30 (_CONF_TTL)
+            320 BINARY_OP                0 (+)
+            324 LOAD_FAST                1 (minutes)
+            326 BUILD_TUPLE              2
+            328 STORE_GLOBAL             2 (_conf)
+
+ 67         330 LOAD_FAST                1 (minutes)
+            332 RETURN_VALUE
+
+ 59     >>  334 PUSH_EXC_INFO
+            336 WITH_EXCEPT_START
+            338 POP_JUMP_IF_TRUE         1 (to 342)
+            340 RERAISE                  2
+        >>  342 POP_TOP
+            344 POP_EXCEPT
+            346 POP_TOP
+            348 POP_TOP
+            350 JUMP_BACKWARD           55 (to 242)
+        >>  352 COPY                     3
+            354 POP_EXCEPT
+            356 RERAISE                  1
+        >>  358 PUSH_EXC_INFO
+
+ 64         360 LOAD_GLOBAL             28 (Exception)
+            370 CHECK_EXC_MATCH
+            372 POP_JUMP_IF_FALSE        9 (to 392)
+            374 POP_TOP
+
+ 65         376 LOAD_GLOBAL              6 (SICK_MINUTES)
+            386 STORE_FAST               1 (minutes)
+            388 POP_EXCEPT
+            390 JUMP_BACKWARD           42 (to 308)
+
+ 64     >>  392 RERAISE                  0
+        >>  394 COPY                     3
+            396 POP_EXCEPT
+            398 RERAISE                  1
+ExceptionTable:
+  110 to 146 -> 358 [0]
+  148 to 224 -> 334 [1] lasti
+  226 to 306 -> 358 [0]
+  334 to 342 -> 352 [3] lasti
+  344 to 356 -> 358 [0]
+  358 to 386 -> 394 [1] lasti
+  392 to 392 -> 394 [1] lasti
+
+Disassembly of <code object reset_config_cache at 0x7f6c92158fa0, file "app\services\flow_profile_health.py", line 70>:
+ 70           0 RESUME                   0
+
+ 73           2 LOAD_CONST               1 (None)
+              4 STORE_GLOBAL             0 (_conf)
+              6 RETURN_CONST             1 (None)
+
+Disassembly of <code object mark_sick at 0x28c0ccc0, file "app\services\flow_profile_health.py", line 76>:
+ 76           0 RESUME                   0
+
+ 82           2 LOAD_FAST                0 (partition_id)
+              4 POP_JUMP_IF_TRUE         1 (to 8)
+
+ 83           6 RETURN_CONST             1 (None)
+
+ 84     >>    8 LOAD_FAST                2 (minutes)
+             10 POP_JUMP_IF_NOT_NONE    10 (to 32)
+             12 LOAD_GLOBAL              1 (NULL + _configured_minutes)
+             22 CALL                     0
+             30 JUMP_FORWARD            20 (to 72)
+        >>   32 LOAD_GLOBAL              3 (NULL + max)
+             42 LOAD_CONST               2 (0)
+             44 LOAD_GLOBAL              5 (NULL + int)
+             54 LOAD_FAST                2 (minutes)
+             56 CALL                     1
+             64 CALL                     2
+        >>   72 STORE_FAST               3 (mins)
+
+ 85          74 LOAD_FAST                3 (mins)
+             76 LOAD_CONST               2 (0)
+             78 COMPARE_OP              26 (<=)
+             82 POP_JUMP_IF_FALSE        1 (to 86)
+
+ 86          84 RETURN_CONST             1 (None)
+
+ 87     >>   86 LOAD_GLOBAL              7 (NULL + time)
+             96 LOAD_ATTR                8 (monotonic)
+            116 CALL                     0
+            124 LOAD_FAST                3 (mins)
+            126 LOAD_CONST               3 (60)
+            128 BINARY_OP                5 (*)
+            132 BINARY_OP                0 (+)
+            136 STORE_FAST               4 (until_mono)
+
+ 88         138 LOAD_GLOBAL             11 (NULL + datetime)
+            148 LOAD_ATTR               12 (now)
+            168 CALL                     0
+            176 LOAD_GLOBAL             15 (NULL + timedelta)
+            186 LOAD_FAST                3 (mins)
+            188 KW_NAMES                 4 (('minutes',))
+            190 CALL                     1
+            198 BINARY_OP                0 (+)
+            202 STORE_FAST               5 (until_wall)
+
+ 89         204 LOAD_GLOBAL             16 (_SICK)
+            214 LOAD_ATTR               19 (NULL|self + get)
+            234 LOAD_FAST                0 (partition_id)
+            236 CALL                     1
+            244 STORE_FAST               6 (cur)
+
+ 90         246 LOAD_FAST                6 (cur)
+            248 POP_JUMP_IF_NONE        27 (to 304)
+            250 LOAD_FAST                6 (cur)
+            252 LOAD_ATTR               20 (until_mono)
+            272 LOAD_FAST                4 (until_mono)
+            274 COMPARE_OP              68 (>)
+            278 POP_JUMP_IF_FALSE       12 (to 304)
+
+ 91         280 LOAD_FAST                6 (cur)
+            282 LOAD_ATTR               22 (until_wall)
+            302 RETURN_VALUE
+
+ 92     >>  304 LOAD_GLOBAL             25 (NULL + _Sick)
+            314 LOAD_FAST                4 (until_mono)
+            316 LOAD_FAST                5 (until_wall)
+            318 LOAD_FAST                1 (reason)
+            320 CALL                     3
+            328 LOAD_GLOBAL             16 (_SICK)
+            338 LOAD_FAST                0 (partition_id)
+            340 STORE_SUBSCR
+
+ 93         344 LOAD_GLOBAL             27 (NULL + log)
+            354 LOAD_ATTR               28 (info)
+            374 LOAD_CONST               5 ('[flow_health] ')
+            376 LOAD_FAST                0 (partition_id)
+            378 FORMAT_VALUE             0
+            380 LOAD_CONST               6 (': tạm ngừng nhận cảnh ')
+            382 LOAD_FAST                3 (mins)
+            384 FORMAT_VALUE             0
+            386 LOAD_CONST               7 (' phút (tới ')
+
+ 94         388 LOAD_FAST                5 (until_wall)
+            390 LOAD_CONST               8 ('%H:%M')
+            392 FORMAT_VALUE             4 (with format)
+            394 LOAD_CONST               9 (') — ')
+            396 LOAD_FAST                1 (reason)
+            398 FORMAT_VALUE             0
+            400 LOAD_CONST              10 ('.')
+
+ 93         402 BUILD_STRING             9
+            404 CALL                     1
+            412 POP_TOP
+
+ 95         414 LOAD_FAST                5 (until_wall)
+            416 RETURN_VALUE
+
+Disassembly of <code object is_sick at 0x7f6c926af9b0, file "app\services\flow_profile_health.py", line 98>:
+ 98           0 RESUME                   0
+
+100           2 LOAD_FAST                0 (partition_id)
+              4 POP_JUMP_IF_TRUE         1 (to 8)
+
+101           6 RETURN_CONST             1 (False)
+
+102     >>    8 LOAD_GLOBAL              0 (_SICK)
+             18 LOAD_ATTR                3 (NULL|self + get)
+             38 LOAD_FAST                0 (partition_id)
+             40 CALL                     1
+             48 STORE_FAST               1 (s)
+
+103          50 LOAD_FAST                1 (s)
+             52 POP_JUMP_IF_NOT_NONE     1 (to 56)
+
+104          54 RETURN_CONST             1 (False)
+
+105     >>   56 LOAD_GLOBAL              5 (NULL + time)
+             66 LOAD_ATTR                6 (monotonic)
+             86 CALL                     0
+             94 LOAD_FAST                1 (s)
+             96 LOAD_ATTR                8 (until_mono)
+            116 COMPARE_OP              92 (>=)
+            120 POP_JUMP_IF_FALSE       23 (to 168)
+
+106         122 LOAD_GLOBAL              0 (_SICK)
+            132 LOAD_ATTR               11 (NULL|self + pop)
+            152 LOAD_FAST                0 (partition_id)
+            154 LOAD_CONST               2 (None)
+            156 CALL                     2
+            164 POP_TOP
+
+107         166 RETURN_CONST             1 (False)
+
+108     >>  168 RETURN_CONST             3 (True)
+
+Disassembly of <code object sick_info at 0x7f6c9247af50, file "app\services\flow_profile_health.py", line 111>:
+111           0 RESUME                   0
+
+113           2 LOAD_GLOBAL              1 (NULL + is_sick)
+             12 LOAD_FAST                0 (partition_id)
+             14 CALL                     1
+             22 POP_JUMP_IF_TRUE         1 (to 26)
+
+114          24 RETURN_CONST             1 (None)
+
+115     >>   26 LOAD_GLOBAL              2 (_SICK)
+             36 LOAD_GLOBAL              5 (NULL + str)
+             46 LOAD_FAST                0 (partition_id)
+             48 CALL                     1
+             56 BINARY_SUBSCR
+             60 STORE_FAST               1 (s)
+
+117          62 LOAD_FAST                1 (s)
+             64 LOAD_ATTR                6 (until_wall)
+
+118          84 LOAD_FAST                1 (s)
+             86 LOAD_ATTR                8 (reason)
+
+119         106 LOAD_GLOBAL             11 (NULL + max)
+            116 LOAD_GLOBAL             13 (NULL + int)
+            126 LOAD_FAST                1 (s)
+            128 LOAD_ATTR               14 (until_mono)
+            148 LOAD_GLOBAL             17 (NULL + time)
+            158 LOAD_ATTR               18 (monotonic)
+            178 CALL                     0
+            186 BINARY_OP               10 (-)
+            190 CALL                     1
+            198 LOAD_CONST               2 (0)
+            200 CALL                     2
+
+116         208 LOAD_CONST               3 (('until', 'reason', 'seconds_left'))
+            210 BUILD_CONST_KEY_MAP      3
+            212 RETURN_VALUE
+
+Disassembly of <code object clear_sick at 0x7f6c92406930, file "app\services\flow_profile_health.py", line 123>:
+123           0 RESUME                   0
+
+125           2 LOAD_FAST                0 (partition_id)
+              4 POP_JUMP_IF_TRUE         1 (to 8)
+
+126           6 RETURN_CONST             1 (False)
+
+127     >>    8 LOAD_GLOBAL              0 (_SICK)
+             18 LOAD_ATTR                3 (NULL|self + pop)
+             38 LOAD_FAST                0 (partition_id)
+             40 LOAD_CONST               2 (None)
+             42 CALL                     2
+             50 LOAD_CONST               2 (None)
+             52 IS_OP                    1
+             54 RETURN_VALUE
+
+Disassembly of <code object clear_all at 0x7f6c92696e20, file "app\services\flow_profile_health.py", line 130>:
+130           0 RESUME                   0
+
+132           2 LOAD_GLOBAL              0 (_SICK)
+             12 LOAD_ATTR                3 (NULL|self + clear)
+             32 CALL                     0
+             40 POP_TOP
+             42 RETURN_CONST             1 (None)
+
+Disassembly of <code object sick_partitions at 0x7f6c926fe760, file "app\services\flow_profile_health.py", line 135>:
+135           0 RESUME                   0
+
+137           2 LOAD_GLOBAL              1 (NULL + list)
+             12 LOAD_GLOBAL              2 (_SICK)
+             22 CALL                     1
+             30 GET_ITER
+             32 LOAD_FAST_AND_CLEAR      0 (pid)
+             34 SWAP                     2
+             36 BUILD_MAP                0
+             38 SWAP                     2
+        >>   40 FOR_ITER                18 (to 80)
+             44 STORE_FAST               0 (pid)
+
+138          46 LOAD_GLOBAL              5 (NULL + sick_info)
+             56 LOAD_FAST                0 (pid)
+             58 CALL                     1
+             66 COPY                     1
+             68 STORE_FAST               1 (info)
+             70 POP_JUMP_IF_NONE         3 (to 78)
+
+137          72 LOAD_FAST                0 (pid)
+             74 LOAD_FAST                1 (info)
+             76 MAP_ADD                  2
+        >>   78 JUMP_BACKWARD           20 (to 40)
+        >>   80 END_FOR
+             82 SWAP                     2
+             84 STORE_FAST               0 (pid)
+             86 RETURN_VALUE
+        >>   88 SWAP                     2
+             90 POP_TOP
+             92 SWAP                     2
+             94 STORE_FAST               0 (pid)
+             96 RERAISE                  0
+ExceptionTable:
+  36 to 80 -> 88 [2]
+
+Disassembly of <code object drop_sick at 0x7f6c926bea30, file "app\services\flow_profile_health.py", line 141>:
+              0 MAKE_CELL                1 (key)
+
+141           2 RESUME                   0
+
+149           4 LOAD_GLOBAL              1 (NULL + list)
+             14 LOAD_FAST                0 (items)
+             16 CALL                     1
+             24 STORE_FAST               3 (rows)
+
+150          26 LOAD_FAST                3 (rows)
+             28 GET_ITER
+             30 LOAD_FAST_AND_CLEAR      4 (x)
+             32 SWAP                     2
+             34 BUILD_LIST               0
+             36 SWAP                     2
+        >>   38 FOR_ITER                22 (to 86)
+             42 STORE_FAST               4 (x)
+             44 LOAD_GLOBAL              3 (NULL + is_sick)
+             54 PUSH_NULL
+             56 LOAD_DEREF               1 (key)
+             58 LOAD_FAST                4 (x)
+             60 CALL                     1
+             68 CALL                     1
+             76 POP_JUMP_IF_FALSE        1 (to 80)
+             78 JUMP_BACKWARD           21 (to 38)
+        >>   80 LOAD_FAST                4 (x)
+             82 LIST_APPEND              2
+             84 JUMP_BACKWARD           24 (to 38)
+        >>   86 END_FOR
+             88 STORE_FAST               5 (healthy)
+             90 STORE_FAST               4 (x)
+
+151          92 LOAD_FAST                5 (healthy)
+             94 POP_JUMP_IF_TRUE         2 (to 100)
+             96 LOAD_FAST                3 (rows)
+             98 POP_JUMP_IF_TRUE         2 (to 104)
+
+152     >>  100 LOAD_FAST                5 (healthy)
+            102 RETURN_VALUE
+
+153     >>  104 LOAD_GLOBAL              5 (NULL + time)
+            114 LOAD_ATTR                6 (monotonic)
+            134 CALL                     0
+            142 STORE_FAST               6 (now)
+
+154         144 LOAD_FAST                6 (now)
+            146 LOAD_GLOBAL              8 (_last_failopen_log)
+            156 BINARY_OP               10 (-)
+            160 LOAD_CONST               1 (60)
+            162 COMPARE_OP              68 (>)
+            166 POP_JUMP_IF_FALSE       66 (to 300)
+
+155         168 LOAD_FAST                6 (now)
+            170 STORE_GLOBAL             4 (_last_failopen_log)
+
+156         172 LOAD_CONST               2 (', ')
+            174 LOAD_ATTR               11 (NULL|self + join)
+            194 LOAD_CLOSURE             1 (key)
+            196 BUILD_TUPLE              1
+            198 LOAD_CONST               3 (<code object <genexpr> at 0x7f6c92406830, file "app\services\flow_profile_health.py", line 156>)
+            200 MAKE_FUNCTION            8 (closure)
+            202 LOAD_FAST                3 (rows)
+            204 GET_ITER
+            206 CALL                     0
+            214 CALL                     1
+            222 STORE_FAST               7 (names)
+
+157         224 LOAD_GLOBAL             13 (NULL + log)
+            234 LOAD_ATTR               14 (warning)
+            254 LOAD_CONST               4 ('[flow_health] mọi profile đều vừa lỗi (')
+            256 LOAD_FAST                7 (names)
+            258 FORMAT_VALUE             0
+            260 LOAD_CONST               5 (') → vẫn dùng lại')
+            262 BUILD_STRING             3
+
+158         264 LOAD_FAST                2 (where)
+            266 POP_JUMP_IF_FALSE        5 (to 278)
+            268 LOAD_CONST               6 (' ở ')
+            270 LOAD_FAST                2 (where)
+            272 FORMAT_VALUE             0
+            274 BUILD_STRING             2
+            276 JUMP_FORWARD             1 (to 280)
+        >>  278 LOAD_CONST               7 ('')
+
+157     >>  280 BINARY_OP                0 (+)
+
+159         284 LOAD_CONST               8 (' vì không còn profile nào khác.')
+
+157         286 BINARY_OP                0 (+)
+            290 CALL                     1
+            298 POP_TOP
+
+160     >>  300 LOAD_FAST                3 (rows)
+            302 RETURN_VALUE
+        >>  304 SWAP                     2
+            306 POP_TOP
+
+150         308 SWAP                     2
+            310 STORE_FAST               4 (x)
+            312 RERAISE                  0
+ExceptionTable:
+  34 to 76 -> 304 [2]
+  80 to 86 -> 304 [2]
+
+Disassembly of <code object <genexpr> at 0x7f6c92406830, file "app\services\flow_profile_health.py", line 156>:
+              0 COPY_FREE_VARS           1
+
+156           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                21 (to 56)
+             14 STORE_FAST               1 (x)
+             16 LOAD_GLOBAL              1 (NULL + str)
+             26 PUSH_NULL
+             28 LOAD_DEREF               2 (key)
+             30 LOAD_FAST                1 (x)
+             32 CALL                     1
+             40 CALL                     1
+             48 YIELD_VALUE              1
+             50 RESUME                   1
+             52 POP_TOP
+             54 JUMP_BACKWARD           23 (to 10)
+        >>   56 END_FOR
+             58 RETURN_CONST             0 (None)
+        >>   60 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             62 RERAISE                  1
+ExceptionTable:
+  6 to 58 -> 60 [0] lasti

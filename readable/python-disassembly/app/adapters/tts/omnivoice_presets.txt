@@ -1,0 +1,689 @@
+  0           0 RESUME                   0
+
+  1           2 SETUP_ANNOTATIONS
+              4 LOAD_CONST               0 ('Giọng OmniVoice ship sẵn (preset) — dùng provider "omnivoice". Hai loại:\n\n1. VOICE DESIGN (10 giọng Việt): mô tả thuộc tính (giới tính/tuổi/cao độ) → model tự sinh chất\n   giọng. KHÔNG cần file nhị phân ship kèm, chỉ cần `design_json`.\n   Lưu ý upstream: voice design chỉ được huấn luyện trên tiếng Trung + Anh, nên với tiếng Việt nó\n   chạy được nhưng kém ổn định hơn clone thật.\n\n2. CLONE (5 giọng kể chuyện, lấy từ dự án RevoVoice): có audio mẫu thật ship kèm ở\n   `app/resources/omnivoice_voices/*.wav` + `ref_text` khớp đúng clip. Chất lượng và độ ổn định\n   cao hơn hẳn voice design. Seed sẽ chép clip sang `{data_dir}/resources/voice_clones/<id>.wav`\n   — đúng nơi provider tìm reference audio.\n\nLúc tổng hợp: giọng design ghép `design_json` thành chuỗi `instruct`; giọng clone dùng thẳng\n`ref_audio` + `ref_text`. `lang` quyết định NGÔN NGỮ ĐỌC.\n')
+              6 STORE_NAME               0 (__doc__)
+
+ 16           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('annotations',))
+             12 IMPORT_NAME              1 (__future__)
+             14 IMPORT_FROM              2 (annotations)
+             16 STORE_NAME               2 (annotations)
+             18 POP_TOP
+
+ 18          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               3 (None)
+             24 IMPORT_NAME              3 (json)
+             26 STORE_NAME               3 (json)
+
+ 19          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               3 (None)
+             32 IMPORT_NAME              4 (shutil)
+             34 STORE_NAME               4 (shutil)
+
+ 20          36 LOAD_CONST               1 (0)
+             38 LOAD_CONST               3 (None)
+             40 IMPORT_NAME              5 (sys)
+             42 STORE_NAME               5 (sys)
+
+ 21          44 LOAD_CONST               1 (0)
+             46 LOAD_CONST               4 (('Path',))
+             48 IMPORT_NAME              6 (pathlib)
+             50 IMPORT_FROM              7 (Path)
+             52 STORE_NAME               7 (Path)
+             54 POP_TOP
+
+ 23          56 LOAD_CONST               1 (0)
+             58 LOAD_CONST               5 (('log',))
+             60 IMPORT_NAME              8 (app.core.logging)
+             62 IMPORT_FROM              9 (log)
+             64 STORE_NAME               9 (log)
+             66 POP_TOP
+
+ 29          68 LOAD_CONST               6 ('omni-minh-quan')
+             70 LOAD_CONST               7 ('Omni-Minh Quân')
+             72 LOAD_CONST               8 ('Male')
+
+ 30          74 LOAD_CONST               9 ('male')
+             76 LOAD_CONST              10 ('middle-aged')
+             78 LOAD_CONST              11 ('low pitch')
+             80 LOAD_CONST              12 (('gender', 'age', 'pitch'))
+             82 BUILD_CONST_KEY_MAP      3
+
+ 29          84 LOAD_CONST              13 (('id', 'name', 'gender', 'spec'))
+             86 BUILD_CONST_KEY_MAP      4
+
+ 31          88 LOAD_CONST              14 ('omni-hoang-nam')
+             90 LOAD_CONST              15 ('Omni-Hoàng Nam')
+             92 LOAD_CONST               8 ('Male')
+
+ 32          94 LOAD_CONST               9 ('male')
+             96 LOAD_CONST              16 ('young adult')
+             98 LOAD_CONST              17 ('moderate pitch')
+            100 LOAD_CONST              12 (('gender', 'age', 'pitch'))
+            102 BUILD_CONST_KEY_MAP      3
+
+ 31         104 LOAD_CONST              13 (('id', 'name', 'gender', 'spec'))
+            106 BUILD_CONST_KEY_MAP      4
+
+ 33         108 LOAD_CONST              18 ('omni-gia-bao')
+            110 LOAD_CONST              19 ('Omni-Gia Bảo')
+            112 LOAD_CONST               8 ('Male')
+
+ 34         114 LOAD_CONST               9 ('male')
+            116 LOAD_CONST              16 ('young adult')
+            118 LOAD_CONST              20 ('high pitch')
+            120 LOAD_CONST              12 (('gender', 'age', 'pitch'))
+            122 BUILD_CONST_KEY_MAP      3
+
+ 33         124 LOAD_CONST              13 (('id', 'name', 'gender', 'spec'))
+            126 BUILD_CONST_KEY_MAP      4
+
+ 35         128 LOAD_CONST              21 ('omni-tuan-kiet')
+            130 LOAD_CONST              22 ('Omni-Tuấn Kiệt')
+            132 LOAD_CONST               8 ('Male')
+
+ 36         134 LOAD_CONST               9 ('male')
+            136 LOAD_CONST              23 ('elderly')
+            138 LOAD_CONST              24 ('very low pitch')
+            140 LOAD_CONST              12 (('gender', 'age', 'pitch'))
+            142 BUILD_CONST_KEY_MAP      3
+
+ 35         144 LOAD_CONST              13 (('id', 'name', 'gender', 'spec'))
+            146 BUILD_CONST_KEY_MAP      4
+
+ 37         148 LOAD_CONST              25 ('omni-anh-duc')
+            150 LOAD_CONST              26 ('Omni-Anh Đức')
+            152 LOAD_CONST               8 ('Male')
+
+ 38         154 LOAD_CONST               9 ('male')
+            156 LOAD_CONST              27 ('teenager')
+            158 LOAD_CONST              20 ('high pitch')
+            160 LOAD_CONST              12 (('gender', 'age', 'pitch'))
+            162 BUILD_CONST_KEY_MAP      3
+
+ 37         164 LOAD_CONST              13 (('id', 'name', 'gender', 'spec'))
+            166 BUILD_CONST_KEY_MAP      4
+
+ 40         168 LOAD_CONST              28 ('omni-thao-my')
+            170 LOAD_CONST              29 ('Omni-Thảo My')
+            172 LOAD_CONST              30 ('Female')
+
+ 41         174 LOAD_CONST              31 ('female')
+            176 LOAD_CONST              16 ('young adult')
+            178 LOAD_CONST              17 ('moderate pitch')
+            180 LOAD_CONST              12 (('gender', 'age', 'pitch'))
+            182 BUILD_CONST_KEY_MAP      3
+
+ 40         184 LOAD_CONST              13 (('id', 'name', 'gender', 'spec'))
+            186 BUILD_CONST_KEY_MAP      4
+
+ 42         188 LOAD_CONST              32 ('omni-lan-anh')
+            190 LOAD_CONST              33 ('Omni-Lan Anh')
+            192 LOAD_CONST              30 ('Female')
+
+ 43         194 LOAD_CONST              31 ('female')
+            196 LOAD_CONST              16 ('young adult')
+            198 LOAD_CONST              20 ('high pitch')
+            200 LOAD_CONST              12 (('gender', 'age', 'pitch'))
+            202 BUILD_CONST_KEY_MAP      3
+
+ 42         204 LOAD_CONST              13 (('id', 'name', 'gender', 'spec'))
+            206 BUILD_CONST_KEY_MAP      4
+
+ 44         208 LOAD_CONST              34 ('omni-ngoc-han')
+            210 LOAD_CONST              35 ('Omni-Ngọc Hân')
+            212 LOAD_CONST              30 ('Female')
+
+ 45         214 LOAD_CONST              31 ('female')
+            216 LOAD_CONST              27 ('teenager')
+            218 LOAD_CONST              36 ('very high pitch')
+            220 LOAD_CONST              12 (('gender', 'age', 'pitch'))
+            222 BUILD_CONST_KEY_MAP      3
+
+ 44         224 LOAD_CONST              13 (('id', 'name', 'gender', 'spec'))
+            226 BUILD_CONST_KEY_MAP      4
+
+ 46         228 LOAD_CONST              37 ('omni-bao-tran')
+            230 LOAD_CONST              38 ('Omni-Bảo Trân')
+            232 LOAD_CONST              30 ('Female')
+
+ 47         234 LOAD_CONST              31 ('female')
+            236 LOAD_CONST              10 ('middle-aged')
+            238 LOAD_CONST              11 ('low pitch')
+            240 LOAD_CONST              12 (('gender', 'age', 'pitch'))
+            242 BUILD_CONST_KEY_MAP      3
+
+ 46         244 LOAD_CONST              13 (('id', 'name', 'gender', 'spec'))
+            246 BUILD_CONST_KEY_MAP      4
+
+ 48         248 LOAD_CONST              39 ('omni-quynh-chi')
+            250 LOAD_CONST              40 ('Omni-Quỳnh Chi')
+            252 LOAD_CONST              30 ('Female')
+
+ 49         254 LOAD_CONST              31 ('female')
+            256 LOAD_CONST              16 ('young adult')
+            258 LOAD_CONST              36 ('very high pitch')
+            260 LOAD_CONST              12 (('gender', 'age', 'pitch'))
+            262 BUILD_CONST_KEY_MAP      3
+
+ 48         264 LOAD_CONST              13 (('id', 'name', 'gender', 'spec'))
+            266 BUILD_CONST_KEY_MAP      4
+
+ 28         268 BUILD_LIST              10
+            270 STORE_NAME              10 (OMNIVOICE_PRESETS)
+            272 LOAD_CONST              41 ('list[dict]')
+            274 LOAD_NAME               11 (__annotations__)
+            276 LOAD_CONST              42 ('OMNIVOICE_PRESETS')
+            278 STORE_SUBSCR
+
+ 66         282 LOAD_CONST              43 ('omni-clone-oakwood')
+            284 LOAD_CONST              44 ('k1.wav')
+            286 LOAD_CONST              45 ('Omni-Oakwood (kể chuyện)')
+
+ 67         288 LOAD_CONST               8 ('Male')
+            290 LOAD_CONST              46 ('en')
+
+ 68         292 LOAD_CONST              47 ('There is a table in my kitchen that seats six. I built it myself, three winters ago.')
+
+ 66         294 LOAD_CONST              48 (('id', 'file', 'name', 'gender', 'lang', 'ref_text'))
+            296 BUILD_CONST_KEY_MAP      6
+
+ 69         298 LOAD_CONST              49 ('omni-clone-boardroom')
+            300 LOAD_CONST              50 ('voice1.wav')
+            302 LOAD_CONST              51 ('Omni-Boardroom (điều hành)')
+
+ 70         304 LOAD_CONST               8 ('Male')
+            306 LOAD_CONST              46 ('en')
+
+ 71         308 LOAD_CONST              52 ('The moment Adrian Carter signed the voluntary resignation letter, Vanessa Brooks smiled.')
+
+ 69         310 LOAD_CONST              48 (('id', 'file', 'name', 'gender', 'lang', 'ref_text'))
+            312 BUILD_CONST_KEY_MAP      6
+
+ 72         314 LOAD_CONST              53 ('omni-clone-savannah')
+            316 LOAD_CONST              54 ('voice2.wav')
+            318 LOAD_CONST              55 ('Omni-Savannah (dinh thự)')
+
+ 73         320 LOAD_CONST               8 ('Male')
+            322 LOAD_CONST              46 ('en')
+
+ 74         324 LOAD_CONST              56 ('String lights hung between live oaks across the back lawn of the Winslow Estate, and the Savannah night was thick with voices and champagne.')
+
+ 72         326 LOAD_CONST              48 (('id', 'file', 'name', 'gender', 'lang', 'ref_text'))
+            328 BUILD_CONST_KEY_MAP      6
+
+ 76         330 LOAD_CONST              57 ('omni-clone-sterling')
+            332 LOAD_CONST              58 ('voice3.wav')
+            334 LOAD_CONST              59 ('Omni-Sterling Crest')
+
+ 77         336 LOAD_CONST               8 ('Male')
+            338 LOAD_CONST              46 ('en')
+
+ 78         340 LOAD_CONST              60 ('On the top floor of Sterling Crest Holdings, dozens of executives raised their glasses.')
+
+ 76         342 LOAD_CONST              48 (('id', 'file', 'name', 'gender', 'lang', 'ref_text'))
+            344 BUILD_CONST_KEY_MAP      6
+
+ 79         346 LOAD_CONST              61 ('omni-clone-afterhours')
+            348 LOAD_CONST              62 ('voiceok.wav')
+            350 LOAD_CONST              63 ('Omni-After Hours')
+
+ 80         352 LOAD_CONST               8 ('Male')
+            354 LOAD_CONST              46 ('en')
+
+ 81         356 LOAD_CONST              64 ("He wasn't working overtime for ambition or recognition. He was simply waiting for Madeline Cross to finish reviewing the quarterly reports because she'd asked him to stay.")
+
+ 79         358 LOAD_CONST              48 (('id', 'file', 'name', 'gender', 'lang', 'ref_text'))
+            360 BUILD_CONST_KEY_MAP      6
+
+ 65         362 BUILD_LIST               5
+            364 STORE_NAME              12 (OMNIVOICE_CLONE_PRESETS)
+            366 LOAD_CONST              41 ('list[dict]')
+            368 LOAD_NAME               11 (__annotations__)
+            370 LOAD_CONST              65 ('OMNIVOICE_CLONE_PRESETS')
+            372 STORE_SUBSCR
+
+ 86         376 LOAD_CONST              69 (('return', 'Path'))
+            378 LOAD_CONST              66 (<code object _bundled_voices_dir at 0x7f6c9331d2f0, file "app\adapters\tts\omnivoice_presets.py", line 86>)
+            380 MAKE_FUNCTION            4 (annotations)
+            382 STORE_NAME              13 (_bundled_voices_dir)
+
+ 93         384 LOAD_CONST              70 (('vid', 'str', 'filename', 'str', 'return', 'bool'))
+            386 LOAD_CONST              67 (<code object _install_clone_audio at 0x29082400, file "app\adapters\tts\omnivoice_presets.py", line 93>)
+            388 MAKE_FUNCTION            4 (annotations)
+            390 STORE_NAME              14 (_install_clone_audio)
+
+116         392 LOAD_CONST              71 (('return', 'int'))
+            394 LOAD_CONST              68 (<code object seed_presets at 0x26a16910, file "app\adapters\tts\omnivoice_presets.py", line 116>)
+            396 MAKE_FUNCTION            4 (annotations)
+            398 STORE_NAME              15 (seed_presets)
+            400 RETURN_CONST             3 (None)
+
+Disassembly of <code object _bundled_voices_dir at 0x7f6c9331d2f0, file "app\adapters\tts\omnivoice_presets.py", line 86>:
+ 86           0 RESUME                   0
+
+ 88           2 LOAD_GLOBAL              1 (NULL + getattr)
+             12 LOAD_GLOBAL              2 (sys)
+             22 LOAD_CONST               1 ('frozen')
+             24 LOAD_CONST               2 (False)
+             26 CALL                     3
+             34 POP_JUMP_IF_FALSE       35 (to 106)
+
+ 89          36 LOAD_GLOBAL              5 (NULL + Path)
+             46 LOAD_GLOBAL              1 (NULL + getattr)
+             56 LOAD_GLOBAL              2 (sys)
+             66 LOAD_CONST               3 ('_MEIPASS')
+             68 LOAD_CONST               4 ('.')
+             70 CALL                     3
+             78 CALL                     1
+             86 LOAD_CONST               5 ('app')
+             88 BINARY_OP               11 (/)
+             92 LOAD_CONST               6 ('resources')
+             94 BINARY_OP               11 (/)
+             98 LOAD_CONST               7 ('omnivoice_voices')
+            100 BINARY_OP               11 (/)
+            104 RETURN_VALUE
+
+ 90     >>  106 LOAD_GLOBAL              5 (NULL + Path)
+            116 LOAD_GLOBAL              6 (__file__)
+            126 CALL                     1
+            134 LOAD_ATTR                9 (NULL|self + resolve)
+            154 CALL                     0
+            162 LOAD_ATTR               10 (parents)
+            182 LOAD_CONST               8 (2)
+            184 BINARY_SUBSCR
+            188 LOAD_CONST               6 ('resources')
+            190 BINARY_OP               11 (/)
+            194 LOAD_CONST               7 ('omnivoice_voices')
+            196 BINARY_OP               11 (/)
+            200 RETURN_VALUE
+
+Disassembly of <code object _install_clone_audio at 0x29082400, file "app\adapters\tts\omnivoice_presets.py", line 93>:
+ 93           0 RESUME                   0
+
+ 99           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('voice_clones_dir',))
+              6 IMPORT_NAME              0 (app.adapters.tts.voice_clone)
+              8 IMPORT_FROM              1 (voice_clones_dir)
+             10 STORE_FAST               2 (voice_clones_dir)
+             12 POP_TOP
+
+101          14 LOAD_GLOBAL              5 (NULL + _bundled_voices_dir)
+             24 CALL                     0
+             32 LOAD_FAST                1 (filename)
+             34 BINARY_OP               11 (/)
+             38 STORE_FAST               3 (src)
+
+102          40 LOAD_FAST                3 (src)
+             42 LOAD_ATTR                7 (NULL|self + exists)
+             62 CALL                     0
+             70 POP_JUMP_IF_TRUE        28 (to 128)
+
+103          72 LOAD_GLOBAL              9 (NULL + log)
+             82 LOAD_ATTR               10 (warning)
+            102 LOAD_CONST               3 ('Thiếu clip mẫu ship kèm cho giọng ')
+            104 LOAD_FAST                0 (vid)
+            106 FORMAT_VALUE             0
+            108 LOAD_CONST               4 (': ')
+            110 LOAD_FAST                3 (src)
+            112 FORMAT_VALUE             0
+            114 BUILD_STRING             4
+            116 CALL                     1
+            124 POP_TOP
+
+104         126 RETURN_CONST             5 (False)
+
+105     >>  128 PUSH_NULL
+            130 LOAD_FAST                2 (voice_clones_dir)
+            132 CALL                     0
+            140 LOAD_FAST                0 (vid)
+            142 FORMAT_VALUE             0
+            144 LOAD_CONST               6 ('.wav')
+            146 BUILD_STRING             2
+            148 BINARY_OP               11 (/)
+            152 STORE_FAST               4 (dst)
+
+106         154 NOP
+
+107         156 LOAD_FAST                4 (dst)
+            158 LOAD_ATTR                7 (NULL|self + exists)
+            178 CALL                     0
+            186 POP_JUMP_IF_FALSE       54 (to 296)
+            188 LOAD_FAST                4 (dst)
+            190 LOAD_ATTR               13 (NULL|self + stat)
+            210 CALL                     0
+            218 LOAD_ATTR               14 (st_size)
+            238 LOAD_FAST                3 (src)
+            240 LOAD_ATTR               13 (NULL|self + stat)
+            260 CALL                     0
+            268 LOAD_ATTR               14 (st_size)
+            288 COMPARE_OP              40 (==)
+            292 POP_JUMP_IF_FALSE        1 (to 296)
+
+108         294 RETURN_CONST             7 (True)
+
+109     >>  296 LOAD_GLOBAL             17 (NULL + shutil)
+            306 LOAD_ATTR               18 (copy2)
+            326 LOAD_FAST                3 (src)
+            328 LOAD_FAST                4 (dst)
+            330 CALL                     2
+            338 POP_TOP
+
+110         340 RETURN_CONST             7 (True)
+        >>  342 PUSH_EXC_INFO
+
+111         344 LOAD_GLOBAL             20 (OSError)
+            354 CHECK_EXC_MATCH
+            356 POP_JUMP_IF_FALSE       37 (to 432)
+            358 STORE_FAST               5 (e)
+
+112         360 LOAD_GLOBAL              9 (NULL + log)
+            370 LOAD_ATTR               10 (warning)
+            390 LOAD_CONST               8 ('Không chép được clip mẫu cho giọng ')
+            392 LOAD_FAST                0 (vid)
+            394 FORMAT_VALUE             0
+            396 LOAD_CONST               4 (': ')
+            398 LOAD_FAST                5 (e)
+            400 FORMAT_VALUE             0
+            402 BUILD_STRING             4
+            404 CALL                     1
+            412 POP_TOP
+
+113         414 POP_EXCEPT
+            416 LOAD_CONST               9 (None)
+            418 STORE_FAST               5 (e)
+            420 DELETE_FAST              5 (e)
+            422 RETURN_CONST             5 (False)
+        >>  424 LOAD_CONST               9 (None)
+            426 STORE_FAST               5 (e)
+            428 DELETE_FAST              5 (e)
+            430 RERAISE                  1
+
+111     >>  432 RERAISE                  0
+        >>  434 COPY                     3
+            436 POP_EXCEPT
+            438 RERAISE                  1
+ExceptionTable:
+  156 to 292 -> 342 [0]
+  296 to 338 -> 342 [0]
+  342 to 358 -> 434 [1] lasti
+  360 to 412 -> 424 [1] lasti
+  424 to 432 -> 434 [1] lasti
+
+Disassembly of <code object seed_presets at 0x26a16910, file "app\adapters\tts\omnivoice_presets.py", line 116>:
+116           0 RESUME                   0
+
+122           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('SessionLocal',))
+              6 IMPORT_NAME              0 (app.db.session)
+              8 IMPORT_FROM              1 (SessionLocal)
+             10 STORE_FAST               0 (SessionLocal)
+             12 POP_TOP
+
+123          14 LOAD_CONST               1 (0)
+             16 LOAD_CONST               3 (('ClonedVoice',))
+             18 IMPORT_NAME              2 (app.db.models)
+             20 IMPORT_FROM              3 (ClonedVoice)
+             22 STORE_FAST               1 (ClonedVoice)
+             24 POP_TOP
+
+125          26 LOAD_CONST               1 (0)
+             28 STORE_FAST               2 (seeded)
+
+126          30 PUSH_NULL
+             32 LOAD_FAST                0 (SessionLocal)
+             34 CALL                     0
+             42 BEFORE_WITH
+             44 STORE_FAST               3 (db)
+
+127          46 LOAD_GLOBAL              8 (OMNIVOICE_PRESETS)
+             56 GET_ITER
+        >>   58 FOR_ITER               170 (to 402)
+             62 STORE_FAST               4 (v)
+
+128          64 LOAD_FAST                4 (v)
+             66 LOAD_CONST               4 ('id')
+             68 BINARY_SUBSCR
+             72 STORE_FAST               5 (vid)
+
+129          74 LOAD_GLOBAL             11 (NULL + json)
+             84 LOAD_ATTR               12 (dumps)
+            104 LOAD_FAST                4 (v)
+            106 LOAD_CONST               5 ('spec')
+            108 BINARY_SUBSCR
+            112 LOAD_CONST               6 (False)
+            114 KW_NAMES                 7 (('ensure_ascii',))
+            116 CALL                     2
+            124 STORE_FAST               6 (design)
+
+130         126 LOAD_FAST                3 (db)
+            128 LOAD_ATTR               15 (NULL|self + get)
+            148 LOAD_FAST                1 (ClonedVoice)
+            150 LOAD_FAST                5 (vid)
+            152 CALL                     2
+            160 STORE_FAST               7 (row)
+
+131         162 LOAD_FAST                7 (row)
+            164 POP_JUMP_IF_NOT_NONE    49 (to 264)
+
+132         166 LOAD_FAST                3 (db)
+            168 LOAD_ATTR               17 (NULL|self + add)
+            188 PUSH_NULL
+            190 LOAD_FAST                1 (ClonedVoice)
+            192 LOAD_FAST                5 (vid)
+            194 LOAD_FAST                4 (v)
+            196 LOAD_CONST               9 ('name')
+            198 BINARY_SUBSCR
+            202 LOAD_FAST                4 (v)
+            204 LOAD_ATTR               15 (NULL|self + get)
+            224 LOAD_CONST              10 ('gender')
+            226 CALL                     1
+
+133         234 LOAD_CONST              11 ('vi')
+            236 LOAD_CONST              12 ('omnivoice')
+            238 LOAD_FAST                6 (design)
+            240 LOAD_CONST              13 (1)
+
+132         242 KW_NAMES                14 (('id', 'name', 'gender', 'lang', 'engine', 'design_json', 'is_preset'))
+            244 CALL                     7
+            252 CALL                     1
+            260 POP_TOP
+            262 JUMP_FORWARD            63 (to 390)
+
+136     >>  264 LOAD_FAST                4 (v)
+            266 LOAD_CONST               9 ('name')
+            268 BINARY_SUBSCR
+            272 LOAD_FAST                4 (v)
+            274 LOAD_ATTR               15 (NULL|self + get)
+            294 LOAD_CONST              10 ('gender')
+            296 CALL                     1
+            304 LOAD_CONST              11 ('vi')
+            306 LOAD_CONST              12 ('omnivoice')
+            308 LOAD_FAST                6 (design)
+            310 LOAD_CONST              13 (1)
+
+135         312 BUILD_TUPLE              6
+            314 UNPACK_SEQUENCE          6
+            318 LOAD_FAST                7 (row)
+            320 STORE_ATTR               9 (name)
+            330 LOAD_FAST                7 (row)
+            332 STORE_ATTR              10 (gender)
+            342 LOAD_FAST                7 (row)
+            344 STORE_ATTR              11 (lang)
+            354 LOAD_FAST                7 (row)
+            356 STORE_ATTR              12 (engine)
+            366 LOAD_FAST                7 (row)
+            368 STORE_ATTR              13 (design_json)
+            378 LOAD_FAST                7 (row)
+            380 STORE_ATTR              14 (is_preset)
+
+137     >>  390 LOAD_FAST                2 (seeded)
+            392 LOAD_CONST              13 (1)
+            394 BINARY_OP               13 (+=)
+            398 STORE_FAST               2 (seeded)
+            400 JUMP_BACKWARD          172 (to 58)
+
+127     >>  402 END_FOR
+
+139         404 LOAD_GLOBAL             30 (OMNIVOICE_CLONE_PRESETS)
+            414 GET_ITER
+        >>  416 FOR_ITER               192 (to 804)
+            420 STORE_FAST               4 (v)
+
+140         422 LOAD_FAST                4 (v)
+            424 LOAD_CONST               4 ('id')
+            426 BINARY_SUBSCR
+            430 STORE_FAST               5 (vid)
+
+143         432 LOAD_GLOBAL             33 (NULL + _install_clone_audio)
+            442 LOAD_FAST                5 (vid)
+            444 LOAD_FAST                4 (v)
+            446 LOAD_CONST              15 ('file')
+            448 BINARY_SUBSCR
+            452 CALL                     2
+            460 POP_JUMP_IF_TRUE         1 (to 464)
+
+144         462 JUMP_BACKWARD           24 (to 416)
+
+145     >>  464 LOAD_FAST                3 (db)
+            466 LOAD_ATTR               15 (NULL|self + get)
+            486 LOAD_FAST                1 (ClonedVoice)
+            488 LOAD_FAST                5 (vid)
+            490 CALL                     2
+            498 STORE_FAST               7 (row)
+
+146         500 LOAD_FAST                7 (row)
+            502 POP_JUMP_IF_NOT_NONE    56 (to 616)
+
+147         504 LOAD_FAST                3 (db)
+            506 LOAD_ATTR               17 (NULL|self + add)
+            526 PUSH_NULL
+            528 LOAD_FAST                1 (ClonedVoice)
+            530 LOAD_FAST                5 (vid)
+            532 LOAD_FAST                4 (v)
+            534 LOAD_CONST               9 ('name')
+            536 BINARY_SUBSCR
+            540 LOAD_FAST                4 (v)
+            542 LOAD_ATTR               15 (NULL|self + get)
+            562 LOAD_CONST              10 ('gender')
+            564 CALL                     1
+
+148         572 LOAD_FAST                4 (v)
+            574 LOAD_CONST              16 ('lang')
+            576 BINARY_SUBSCR
+            580 LOAD_CONST              12 ('omnivoice')
+            582 LOAD_FAST                4 (v)
+            584 LOAD_CONST              17 ('ref_text')
+            586 BINARY_SUBSCR
+
+149         590 LOAD_CONST               8 (None)
+            592 LOAD_CONST              13 (1)
+
+147         594 KW_NAMES                18 (('id', 'name', 'gender', 'lang', 'engine', 'ref_text', 'design_json', 'is_preset'))
+            596 CALL                     8
+            604 CALL                     1
+            612 POP_TOP
+            614 JUMP_FORWARD            88 (to 792)
+
+154     >>  616 LOAD_FAST                4 (v)
+            618 LOAD_CONST               9 ('name')
+            620 BINARY_SUBSCR
+            624 LOAD_FAST                4 (v)
+            626 LOAD_ATTR               15 (NULL|self + get)
+            646 LOAD_CONST              10 ('gender')
+            648 CALL                     1
+            656 LOAD_CONST              12 ('omnivoice')
+            658 LOAD_FAST                4 (v)
+            660 LOAD_CONST              17 ('ref_text')
+            662 BINARY_SUBSCR
+            666 LOAD_CONST               8 (None)
+            668 LOAD_CONST              13 (1)
+
+153         670 BUILD_TUPLE              6
+            672 UNPACK_SEQUENCE          6
+            676 LOAD_FAST                7 (row)
+            678 STORE_ATTR               9 (name)
+            688 LOAD_FAST                7 (row)
+            690 STORE_ATTR              10 (gender)
+            700 LOAD_FAST                7 (row)
+            702 STORE_ATTR              12 (engine)
+            712 LOAD_FAST                7 (row)
+            714 STORE_ATTR              17 (ref_text)
+            724 LOAD_FAST                7 (row)
+            726 STORE_ATTR              13 (design_json)
+            736 LOAD_FAST                7 (row)
+            738 STORE_ATTR              14 (is_preset)
+
+155         748 LOAD_FAST                7 (row)
+            750 LOAD_ATTR               22 (lang)
+            770 POP_JUMP_IF_TRUE        10 (to 792)
+
+156         772 LOAD_FAST                4 (v)
+            774 LOAD_CONST              16 ('lang')
+            776 BINARY_SUBSCR
+            780 LOAD_FAST                7 (row)
+            782 STORE_ATTR              11 (lang)
+
+157     >>  792 LOAD_FAST                2 (seeded)
+            794 LOAD_CONST              13 (1)
+            796 BINARY_OP               13 (+=)
+            800 STORE_FAST               2 (seeded)
+            802 JUMP_BACKWARD          194 (to 416)
+
+139     >>  804 END_FOR
+
+158         806 LOAD_FAST                3 (db)
+            808 LOAD_ATTR               37 (NULL|self + commit)
+            828 CALL                     0
+            836 POP_TOP
+
+126         838 LOAD_CONST               8 (None)
+            840 LOAD_CONST               8 (None)
+            842 LOAD_CONST               8 (None)
+            844 CALL                     2
+            852 POP_TOP
+
+159     >>  854 LOAD_FAST                2 (seeded)
+            856 POP_JUMP_IF_FALSE       57 (to 972)
+
+160         858 LOAD_GLOBAL             39 (NULL + log)
+            868 LOAD_ATTR               40 (info)
+            888 LOAD_CONST              19 ('Seed ')
+            890 LOAD_FAST                2 (seeded)
+            892 FORMAT_VALUE             0
+            894 LOAD_CONST              20 (' giọng OmniVoice ship sẵn (')
+
+161         896 LOAD_GLOBAL             43 (NULL + len)
+            906 LOAD_GLOBAL              8 (OMNIVOICE_PRESETS)
+            916 CALL                     1
+            924 FORMAT_VALUE             0
+            926 LOAD_CONST              21 (' design + ')
+            928 LOAD_GLOBAL             43 (NULL + len)
+            938 LOAD_GLOBAL             30 (OMNIVOICE_CLONE_PRESETS)
+            948 CALL                     1
+            956 FORMAT_VALUE             0
+            958 LOAD_CONST              22 (' clone).')
+
+160         960 BUILD_STRING             7
+            962 CALL                     1
+            970 POP_TOP
+
+162     >>  972 LOAD_FAST                2 (seeded)
+            974 RETURN_VALUE
+
+126     >>  976 PUSH_EXC_INFO
+            978 WITH_EXCEPT_START
+            980 POP_JUMP_IF_TRUE         1 (to 984)
+            982 RERAISE                  2
+        >>  984 POP_TOP
+            986 POP_EXCEPT
+            988 POP_TOP
+            990 POP_TOP
+            992 JUMP_BACKWARD           70 (to 854)
+        >>  994 COPY                     3
+            996 POP_EXCEPT
+            998 RERAISE                  1
+ExceptionTable:
+  44 to 836 -> 976 [1] lasti
+  976 to 984 -> 994 [3] lasti

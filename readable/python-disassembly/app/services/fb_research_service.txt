@@ -1,0 +1,1701 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Research Hub (Đợt C) — đề xuất nội dung hằng ngày cho fanpage FB.\n\nNguyên tắc nghiệp vụ (đã chốt với chủ hệ thống): hệ thống chỉ ĐỀ XUẤT\n(IdeaCard cho video + PostCard cho bài viết); người duyệt bấm Duyệt thì\nhệ thống mới BẮT ĐẦU LÀM (video: approve_idea → pipeline studio; bài:\napprove_post → quality + enqueue FB). Làm xong → trạng thái cập nhật\n(producing → ready/published) — trang Nghiên cứu hiển thị.\n\nTận dụng toàn bộ máy có sẵn: ideation_service.generate_idea,\nai_studio_service.generate_next_idea/approve_idea, ai_post_service\n.generate_next_post/approve_post, fb_queue.enqueue_post_card.\nKhông migration mới (chạy trên bảng IdeaCard/PostCard/FbPage có sẵn).\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 14           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 16          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (json)
+             24 STORE_NAME               3 (json)
+
+ 17          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               4 (('defaultdict',))
+             30 IMPORT_NAME              4 (collections)
+             32 IMPORT_FROM              5 (defaultdict)
+             34 STORE_NAME               5 (defaultdict)
+             36 POP_TOP
+
+ 18          38 LOAD_CONST               1 (0)
+             40 LOAD_CONST               5 (('Any',))
+             42 IMPORT_NAME              6 (typing)
+             44 IMPORT_FROM              7 (Any)
+             46 STORE_NAME               7 (Any)
+             48 POP_TOP
+
+ 20          50 LOAD_CONST               1 (0)
+             52 LOAD_CONST               6 (('Session',))
+             54 IMPORT_NAME              8 (sqlalchemy.orm)
+             56 IMPORT_FROM              9 (Session)
+             58 STORE_NAME               9 (Session)
+             60 POP_TOP
+
+ 22          62 LOAD_CONST               1 (0)
+             64 LOAD_CONST               7 (('E', 'StudioError'))
+             66 IMPORT_NAME             10 (app.core.errors)
+             68 IMPORT_FROM             11 (E)
+             70 STORE_NAME              11 (E)
+             72 IMPORT_FROM             12 (StudioError)
+             74 STORE_NAME              12 (StudioError)
+             76 POP_TOP
+
+ 23          78 LOAD_CONST               1 (0)
+             80 LOAD_CONST               8 (('log',))
+             82 IMPORT_NAME             13 (app.core.logging)
+             84 IMPORT_FROM             14 (log)
+             86 STORE_NAME              14 (log)
+             88 POP_TOP
+
+ 24          90 LOAD_CONST               1 (0)
+             92 LOAD_CONST               9 (('FbPage', 'IdeaCard', 'PostCard', 'Project', 'ScheduleConfig'))
+             94 IMPORT_NAME             15 (app.db.models)
+             96 IMPORT_FROM             16 (FbPage)
+             98 STORE_NAME              16 (FbPage)
+            100 IMPORT_FROM             17 (IdeaCard)
+            102 STORE_NAME              17 (IdeaCard)
+            104 IMPORT_FROM             18 (PostCard)
+            106 STORE_NAME              18 (PostCard)
+            108 IMPORT_FROM             19 (Project)
+            110 STORE_NAME              19 (Project)
+            112 IMPORT_FROM             20 (ScheduleConfig)
+            114 STORE_NAME              20 (ScheduleConfig)
+            116 POP_TOP
+
+ 25         118 LOAD_CONST               1 (0)
+            120 LOAD_CONST              10 (('SessionLocal',))
+            122 IMPORT_NAME             21 (app.db.session)
+            124 IMPORT_FROM             22 (SessionLocal)
+            126 STORE_NAME              22 (SessionLocal)
+            128 POP_TOP
+
+ 26         130 LOAD_CONST               1 (0)
+            132 LOAD_CONST              11 (('ai_post_service',))
+            134 IMPORT_NAME             23 (app.services)
+            136 IMPORT_FROM             24 (ai_post_service)
+            138 STORE_NAME              25 (aipost)
+            140 POP_TOP
+
+ 27         142 LOAD_CONST               1 (0)
+            144 LOAD_CONST              12 (('ai_studio_service',))
+            146 IMPORT_NAME             23 (app.services)
+            148 IMPORT_FROM             26 (ai_studio_service)
+            150 STORE_NAME              27 (aistudio)
+            152 POP_TOP
+
+ 28         154 LOAD_CONST               1 (0)
+            156 LOAD_CONST              13 (('channel_engines',))
+            158 IMPORT_NAME             23 (app.services)
+            160 IMPORT_FROM             28 (channel_engines)
+            162 STORE_NAME              28 (channel_engines)
+            164 POP_TOP
+
+ 30         166 LOAD_CONST              14 (('proposed', 'approved', 'producing'))
+            168 STORE_NAME              29 (_IDEA_WAITING)
+
+ 31         170 LOAD_CONST              15 (('proposed', 'ready'))
+            172 STORE_NAME              30 (_POST_WAITING)
+
+ 34         174 LOAD_CONST              28 (('blob', 'str | None', 'default', 'dict', 'return', 'dict'))
+            176 LOAD_CONST              16 (<code object _loads at 0x7f6c926fda50, file "app\services\fb_research_service.py", line 34>)
+            178 MAKE_FUNCTION            4 (annotations)
+            180 STORE_NAME              31 (_loads)
+
+ 45         182 LOAD_CONST              29 (('db', 'Session', 'return', 'list[tuple[ScheduleConfig, FbPage]]'))
+            184 LOAD_CONST              17 (<code object _linked_pairs at 0x28c2cb20, file "app\services\fb_research_service.py", line 45>)
+            186 MAKE_FUNCTION            4 (annotations)
+            188 STORE_NAME              32 (_linked_pairs)
+
+ 54         190 LOAD_CONST              30 (('db', 'Session', 'return', 'list[dict[str, Any]]'))
+            192 LOAD_CONST              18 (<code object linked_channels at 0x28bf8da0, file "app\services\fb_research_service.py", line 54>)
+            194 MAKE_FUNCTION            4 (annotations)
+            196 STORE_NAME              33 (linked_channels)
+
+ 97         198 LOAD_CONST              31 (('idea', 'IdeaCard', 'return', 'dict[str, Any]'))
+            200 LOAD_CONST              19 (<code object idea_to_card at 0x7f6c926bdc30, file "app\services\fb_research_service.py", line 97>)
+            202 MAKE_FUNCTION            4 (annotations)
+            204 STORE_NAME              34 (idea_to_card)
+
+110         206 LOAD_CONST              32 (('post', 'PostCard', 'return', 'dict[str, Any]'))
+            208 LOAD_CONST              20 (<code object post_to_card at 0x28bab170, file "app\services\fb_research_service.py", line 110>)
+            210 MAKE_FUNCTION            4 (annotations)
+            212 STORE_NAME              35 (post_to_card)
+
+125         214 LOAD_CONST              33 (('project_id', 'str', 'return', 'dict[str, Any]'))
+            216 LOAD_CONST              21 (<code object suggest_for_channel at 0x28c04dc0, file "app\services\fb_research_service.py", line 125>)
+            218 MAKE_FUNCTION            4 (annotations)
+            220 STORE_NAME              36 (suggest_for_channel)
+
+183         222 LOAD_CONST              34 (('return', 'list[dict[str, Any]]'))
+            224 LOAD_CONST              22 (<code object suggest_all at 0x7f6c92682330, file "app\services\fb_research_service.py", line 183>)
+            226 MAKE_FUNCTION            4 (annotations)
+            228 STORE_NAME              37 (suggest_all)
+
+197         230 LOAD_CONST              35 (('idea_id', 'str', 'return', 'dict[str, Any]'))
+            232 LOAD_CONST              23 (<code object approve_video_idea at 0x7f6c92455cb0, file "app\services\fb_research_service.py", line 197>)
+            234 MAKE_FUNCTION            4 (annotations)
+            236 STORE_NAME              38 (approve_video_idea)
+
+206         238 LOAD_CONST              36 (('post_id', 'str', 'return', 'dict[str, Any]'))
+            240 LOAD_CONST              24 (<code object approve_post_card at 0x28c24db0, file "app\services\fb_research_service.py", line 206>)
+            242 MAKE_FUNCTION            4 (annotations)
+            244 STORE_NAME              39 (approve_post_card)
+
+224         246 LOAD_CONST              35 (('idea_id', 'str', 'return', 'dict[str, Any]'))
+            248 LOAD_CONST              25 (<code object reject_video_idea at 0x7f6c926bc430, file "app\services\fb_research_service.py", line 224>)
+            250 MAKE_FUNCTION            4 (annotations)
+            252 STORE_NAME              40 (reject_video_idea)
+
+236         254 LOAD_CONST              36 (('post_id', 'str', 'return', 'dict[str, Any]'))
+            256 LOAD_CONST              26 (<code object reject_post_card at 0x7f6c926bd830, file "app\services\fb_research_service.py", line 236>)
+            258 MAKE_FUNCTION            4 (annotations)
+            260 STORE_NAME              41 (reject_post_card)
+
+248         262 LOAD_CONST              37 (('db', 'Session', 'return', 'dict[str, Any]'))
+            264 LOAD_CONST              27 (<code object channel_status at 0x29071a00, file "app\services\fb_research_service.py", line 248>)
+            266 MAKE_FUNCTION            4 (annotations)
+            268 STORE_NAME              42 (channel_status)
+            270 RETURN_CONST             3 (None)
+
+Disassembly of <code object _loads at 0x7f6c926fda50, file "app\services\fb_research_service.py", line 34>:
+ 34           0 RESUME                   0
+
+ 35           2 LOAD_FAST                0 (blob)
+              4 POP_JUMP_IF_TRUE         2 (to 10)
+
+ 36           6 LOAD_FAST                1 (default)
+              8 RETURN_VALUE
+
+ 37     >>   10 NOP
+
+ 38          12 LOAD_GLOBAL              1 (NULL + json)
+             22 LOAD_ATTR                2 (loads)
+             42 LOAD_FAST                0 (blob)
+             44 CALL                     1
+             52 RETURN_VALUE
+        >>   54 PUSH_EXC_INFO
+
+ 39          56 LOAD_GLOBAL              4 (TypeError)
+             66 LOAD_GLOBAL              6 (ValueError)
+             76 BUILD_TUPLE              2
+             78 CHECK_EXC_MATCH
+             80 POP_JUMP_IF_FALSE        5 (to 92)
+             82 POP_TOP
+
+ 40          84 LOAD_FAST                1 (default)
+             86 SWAP                     2
+             88 POP_EXCEPT
+             90 RETURN_VALUE
+
+ 39     >>   92 RERAISE                  0
+        >>   94 COPY                     3
+             96 POP_EXCEPT
+             98 RERAISE                  1
+ExceptionTable:
+  12 to 50 -> 54 [0]
+  54 to 86 -> 94 [1] lasti
+  92 to 92 -> 94 [1] lasti
+
+Disassembly of <code object _linked_pairs at 0x28c2cb20, file "app\services\fb_research_service.py", line 45>:
+ 45           0 RESUME                   0
+
+ 47           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + query)
+             24 LOAD_GLOBAL              2 (ScheduleConfig)
+             34 LOAD_GLOBAL              4 (FbPage)
+             44 CALL                     2
+
+ 48          52 LOAD_ATTR                7 (NULL|self + join)
+             72 LOAD_GLOBAL              4 (FbPage)
+             82 LOAD_GLOBAL              4 (FbPage)
+             92 LOAD_ATTR                8 (id)
+            112 LOAD_GLOBAL              2 (ScheduleConfig)
+            122 LOAD_ATTR               10 (fb_page_id)
+            142 COMPARE_OP              40 (==)
+            146 CALL                     2
+
+ 49         154 LOAD_ATTR               13 (NULL|self + filter)
+            174 LOAD_GLOBAL              2 (ScheduleConfig)
+            184 LOAD_ATTR               10 (fb_page_id)
+            204 LOAD_ATTR               15 (NULL|self + isnot)
+            224 LOAD_CONST               1 (None)
+            226 CALL                     1
+            234 CALL                     1
+
+ 50         242 LOAD_ATTR               17 (NULL|self + order_by)
+            262 LOAD_GLOBAL              2 (ScheduleConfig)
+            272 LOAD_ATTR               18 (updated_at)
+            292 LOAD_ATTR               21 (NULL|self + desc)
+            312 CALL                     0
+            320 CALL                     1
+
+ 51         328 LOAD_ATTR               23 (NULL|self + all)
+            348 CALL                     0
+
+ 47         356 RETURN_VALUE
+
+Disassembly of <code object linked_channels at 0x28bf8da0, file "app\services\fb_research_service.py", line 54>:
+ 54           0 RESUME                   0
+
+ 56           2 LOAD_GLOBAL              1 (NULL + _linked_pairs)
+             12 LOAD_FAST                0 (db)
+             14 CALL                     1
+             22 STORE_FAST               1 (pairs)
+
+ 57          24 LOAD_FAST                1 (pairs)
+             26 GET_ITER
+             28 LOAD_FAST_AND_CLEAR      2 (cfg)
+             30 LOAD_FAST_AND_CLEAR      3 (_page)
+             32 SWAP                     3
+             34 BUILD_LIST               0
+             36 SWAP                     2
+        >>   38 FOR_ITER                17 (to 76)
+             42 UNPACK_SEQUENCE          2
+             46 STORE_FAST               2 (cfg)
+             48 STORE_FAST               3 (_page)
+             50 LOAD_FAST                2 (cfg)
+             52 LOAD_ATTR                2 (project_id)
+             72 LIST_APPEND              2
+             74 JUMP_BACKWARD           19 (to 38)
+        >>   76 END_FOR
+             78 STORE_FAST               4 (project_ids)
+             80 STORE_FAST               2 (cfg)
+             82 STORE_FAST               3 (_page)
+
+ 58          84 LOAD_FAST                4 (project_ids)
+             86 POP_JUMP_IF_FALSE      104 (to 296)
+             88 LOAD_FAST                0 (db)
+             90 LOAD_ATTR                5 (NULL|self + query)
+            110 LOAD_GLOBAL              6 (Project)
+            120 CALL                     1
+            128 LOAD_ATTR                9 (NULL|self + filter)
+            148 LOAD_GLOBAL              6 (Project)
+            158 LOAD_ATTR               10 (id)
+            178 LOAD_ATTR               13 (NULL|self + in_)
+            198 LOAD_FAST                4 (project_ids)
+            200 CALL                     1
+            208 CALL                     1
+            216 LOAD_ATTR               15 (NULL|self + all)
+            236 CALL                     0
+            244 GET_ITER
+            246 LOAD_FAST_AND_CLEAR      5 (row)
+            248 SWAP                     2
+            250 BUILD_MAP                0
+            252 SWAP                     2
+        >>  254 FOR_ITER                15 (to 288)
+            258 STORE_FAST               5 (row)
+            260 LOAD_FAST                5 (row)
+            262 LOAD_ATTR               10 (id)
+            282 LOAD_FAST                5 (row)
+            284 MAP_ADD                  2
+            286 JUMP_BACKWARD           17 (to 254)
+        >>  288 END_FOR
+            290 SWAP                     2
+            292 STORE_FAST               5 (row)
+            294 JUMP_FORWARD             1 (to 298)
+        >>  296 BUILD_MAP                0
+        >>  298 STORE_FAST               6 (projects)
+
+ 59         300 LOAD_GLOBAL             17 (NULL + defaultdict)
+            310 LOAD_GLOBAL             18 (list)
+            320 CALL                     1
+            328 STORE_FAST               7 (ideas_by_project)
+
+ 60         330 LOAD_GLOBAL             17 (NULL + defaultdict)
+            340 LOAD_GLOBAL             18 (list)
+            350 CALL                     1
+            358 STORE_FAST               8 (posts_by_project)
+
+ 61         360 LOAD_FAST                4 (project_ids)
+            362 EXTENDED_ARG             1
+            364 POP_JUMP_IF_FALSE      438 (to 1242)
+
+ 62         366 LOAD_FAST                0 (db)
+            368 LOAD_ATTR                5 (NULL|self + query)
+            388 LOAD_GLOBAL             20 (IdeaCard)
+            398 CALL                     1
+            406 LOAD_ATTR                9 (NULL|self + filter)
+
+ 63         426 LOAD_GLOBAL             20 (IdeaCard)
+            436 LOAD_ATTR                2 (project_id)
+            456 LOAD_ATTR               13 (NULL|self + in_)
+            476 LOAD_FAST                4 (project_ids)
+            478 CALL                     1
+            486 LOAD_GLOBAL             20 (IdeaCard)
+            496 LOAD_ATTR               22 (status)
+            516 LOAD_ATTR               13 (NULL|self + in_)
+            536 LOAD_GLOBAL             24 (_IDEA_WAITING)
+            546 CALL                     1
+
+ 62         554 CALL                     2
+
+ 64         562 LOAD_ATTR               27 (NULL|self + order_by)
+            582 LOAD_GLOBAL             20 (IdeaCard)
+            592 LOAD_ATTR               28 (created_at)
+            612 LOAD_ATTR               31 (NULL|self + desc)
+            632 CALL                     0
+            640 CALL                     1
+            648 LOAD_ATTR               15 (NULL|self + all)
+            668 CALL                     0
+
+ 62         676 GET_ITER
+        >>  678 FOR_ITER                60 (to 802)
+            682 STORE_FAST               5 (row)
+
+ 65         684 LOAD_GLOBAL             33 (NULL + len)
+            694 LOAD_FAST                7 (ideas_by_project)
+            696 LOAD_FAST                5 (row)
+            698 LOAD_ATTR                2 (project_id)
+            718 BINARY_SUBSCR
+            722 CALL                     1
+            730 LOAD_CONST               1 (3)
+            732 COMPARE_OP               2 (<)
+            736 POP_JUMP_IF_TRUE         1 (to 740)
+            738 JUMP_BACKWARD           31 (to 678)
+
+ 66     >>  740 LOAD_FAST                7 (ideas_by_project)
+            742 LOAD_FAST                5 (row)
+            744 LOAD_ATTR                2 (project_id)
+            764 BINARY_SUBSCR
+            768 LOAD_ATTR               35 (NULL|self + append)
+            788 LOAD_FAST                5 (row)
+            790 CALL                     1
+            798 POP_TOP
+            800 JUMP_BACKWARD           62 (to 678)
+
+ 62     >>  802 END_FOR
+
+ 67         804 LOAD_FAST                0 (db)
+            806 LOAD_ATTR                5 (NULL|self + query)
+            826 LOAD_GLOBAL             36 (PostCard)
+            836 CALL                     1
+            844 LOAD_ATTR                9 (NULL|self + filter)
+
+ 68         864 LOAD_GLOBAL             36 (PostCard)
+            874 LOAD_ATTR                2 (project_id)
+            894 LOAD_ATTR               13 (NULL|self + in_)
+            914 LOAD_FAST                4 (project_ids)
+            916 CALL                     1
+            924 LOAD_GLOBAL             36 (PostCard)
+            934 LOAD_ATTR               22 (status)
+            954 LOAD_ATTR               13 (NULL|self + in_)
+            974 LOAD_GLOBAL             38 (_POST_WAITING)
+            984 CALL                     1
+
+ 67         992 CALL                     2
+
+ 69        1000 LOAD_ATTR               27 (NULL|self + order_by)
+           1020 LOAD_GLOBAL             36 (PostCard)
+           1030 LOAD_ATTR               28 (created_at)
+           1050 LOAD_ATTR               31 (NULL|self + desc)
+           1070 CALL                     0
+           1078 CALL                     1
+           1086 LOAD_ATTR               15 (NULL|self + all)
+           1106 CALL                     0
+
+ 67        1114 GET_ITER
+        >> 1116 FOR_ITER                60 (to 1240)
+           1120 STORE_FAST               5 (row)
+
+ 70        1122 LOAD_GLOBAL             33 (NULL + len)
+           1132 LOAD_FAST                8 (posts_by_project)
+           1134 LOAD_FAST                5 (row)
+           1136 LOAD_ATTR                2 (project_id)
+           1156 BINARY_SUBSCR
+           1160 CALL                     1
+           1168 LOAD_CONST               1 (3)
+           1170 COMPARE_OP               2 (<)
+           1174 POP_JUMP_IF_TRUE         1 (to 1178)
+           1176 JUMP_BACKWARD           31 (to 1116)
+
+ 71     >> 1178 LOAD_FAST                8 (posts_by_project)
+           1180 LOAD_FAST                5 (row)
+           1182 LOAD_ATTR                2 (project_id)
+           1202 BINARY_SUBSCR
+           1206 LOAD_ATTR               35 (NULL|self + append)
+           1226 LOAD_FAST                5 (row)
+           1228 CALL                     1
+           1236 POP_TOP
+           1238 JUMP_BACKWARD           62 (to 1116)
+
+ 67     >> 1240 END_FOR
+
+ 72     >> 1242 BUILD_LIST               0
+           1244 STORE_FAST               9 (out)
+
+ 73        1246 LOAD_FAST                1 (pairs)
+           1248 GET_ITER
+        >> 1250 EXTENDED_ARG             1
+           1252 FOR_ITER               368 (to 1992)
+           1256 UNPACK_SEQUENCE          2
+           1260 STORE_FAST               2 (cfg)
+           1262 STORE_FAST              10 (page)
+
+ 74        1264 LOAD_FAST                2 (cfg)
+           1266 LOAD_ATTR               40 (engine_id)
+           1286 POP_JUMP_IF_FALSE       31 (to 1350)
+           1288 LOAD_GLOBAL             43 (NULL + channel_engines)
+           1298 LOAD_ATTR               44 (get_engine)
+           1318 LOAD_FAST                2 (cfg)
+           1320 LOAD_ATTR               40 (engine_id)
+           1340 CALL                     1
+           1348 JUMP_FORWARD             1 (to 1352)
+        >> 1350 LOAD_CONST               2 (None)
+        >> 1352 STORE_FAST              11 (engine)
+
+ 75        1354 LOAD_FAST                6 (projects)
+           1356 LOAD_ATTR               47 (NULL|self + get)
+           1376 LOAD_FAST                2 (cfg)
+           1378 LOAD_ATTR                2 (project_id)
+           1398 CALL                     1
+           1406 STORE_FAST              12 (project)
+
+ 76        1408 LOAD_FAST                7 (ideas_by_project)
+           1410 LOAD_ATTR               47 (NULL|self + get)
+           1430 LOAD_FAST                2 (cfg)
+           1432 LOAD_ATTR                2 (project_id)
+           1452 BUILD_LIST               0
+           1454 CALL                     2
+           1462 STORE_FAST              13 (ideas)
+
+ 77        1464 LOAD_FAST                8 (posts_by_project)
+           1466 LOAD_ATTR               47 (NULL|self + get)
+           1486 LOAD_FAST                2 (cfg)
+           1488 LOAD_ATTR                2 (project_id)
+           1508 BUILD_LIST               0
+           1510 CALL                     2
+           1518 STORE_FAST              14 (posts)
+
+ 78        1520 LOAD_FAST               10 (page)
+           1522 LOAD_ATTR               48 (avatar_url)
+           1542 STORE_FAST              15 (avatar)
+
+ 79        1544 LOAD_FAST               15 (avatar)
+           1546 POP_JUMP_IF_FALSE       29 (to 1606)
+           1548 LOAD_FAST               15 (avatar)
+           1550 LOAD_ATTR               51 (NULL|self + startswith)
+           1570 LOAD_CONST               3 ('http')
+           1572 CALL                     1
+           1580 POP_JUMP_IF_FALSE       12 (to 1606)
+           1582 LOAD_CONST               4 ('facebook.com/')
+           1584 LOAD_FAST               15 (avatar)
+           1586 CONTAINS_OP              0
+           1588 POP_JUMP_IF_FALSE       24 (to 1638)
+           1590 LOAD_CONST               5 ('/picture')
+           1592 LOAD_FAST               15 (avatar)
+           1594 CONTAINS_OP              1
+           1596 POP_JUMP_IF_FALSE       20 (to 1638)
+           1598 LOAD_CONST               6 ('fbcdn')
+           1600 LOAD_FAST               15 (avatar)
+           1602 CONTAINS_OP              1
+           1604 POP_JUMP_IF_FALSE       16 (to 1638)
+
+ 80     >> 1606 LOAD_CONST               7 ('/api/v1/fb/pages/')
+           1608 LOAD_FAST               10 (page)
+           1610 LOAD_ATTR               10 (id)
+           1630 FORMAT_VALUE             0
+           1632 LOAD_CONST               8 ('/avatar')
+           1634 BUILD_STRING             3
+           1636 STORE_FAST              15 (avatar)
+
+ 82     >> 1638 LOAD_FAST                9 (out)
+           1640 LOAD_ATTR               35 (NULL|self + append)
+
+ 83        1660 LOAD_FAST                2 (cfg)
+           1662 LOAD_ATTR                2 (project_id)
+
+ 84        1682 LOAD_FAST               12 (project)
+           1684 POP_JUMP_IF_FALSE       12 (to 1710)
+           1686 LOAD_FAST               12 (project)
+           1688 LOAD_ATTR               52 (name)
+           1708 JUMP_FORWARD             1 (to 1712)
+        >> 1710 LOAD_CONST               2 (None)
+
+ 85     >> 1712 LOAD_FAST               10 (page)
+           1714 LOAD_ATTR               10 (id)
+
+ 86        1734 LOAD_FAST               10 (page)
+           1736 LOAD_ATTR               52 (name)
+           1756 COPY                     1
+           1758 POP_JUMP_IF_TRUE        12 (to 1784)
+           1760 POP_TOP
+           1762 LOAD_FAST               10 (page)
+           1764 LOAD_ATTR               54 (page_id)
+
+ 87     >> 1784 LOAD_FAST               15 (avatar)
+
+ 88        1786 LOAD_FAST                2 (cfg)
+           1788 LOAD_ATTR               40 (engine_id)
+
+ 89        1808 LOAD_FAST               11 (engine)
+           1810 POP_JUMP_IF_FALSE       12 (to 1836)
+           1812 LOAD_FAST               11 (engine)
+           1814 LOAD_ATTR               52 (name)
+           1834 JUMP_FORWARD             1 (to 1838)
+        >> 1836 LOAD_CONST               2 (None)
+
+ 90     >> 1838 LOAD_GLOBAL             57 (NULL + bool)
+           1848 LOAD_FAST                2 (cfg)
+           1850 LOAD_ATTR               58 (post_enabled)
+           1870 CALL                     1
+
+ 91        1878 LOAD_FAST               13 (ideas)
+           1880 GET_ITER
+           1882 LOAD_FAST_AND_CLEAR     16 (i)
+           1884 SWAP                     2
+           1886 BUILD_LIST               0
+           1888 SWAP                     2
+        >> 1890 FOR_ITER                13 (to 1920)
+           1894 STORE_FAST              16 (i)
+           1896 LOAD_GLOBAL             61 (NULL + idea_to_card)
+           1906 LOAD_FAST               16 (i)
+           1908 CALL                     1
+           1916 LIST_APPEND              2
+           1918 JUMP_BACKWARD           15 (to 1890)
+        >> 1920 END_FOR
+           1922 SWAP                     2
+           1924 STORE_FAST              16 (i)
+
+ 92        1926 LOAD_FAST               14 (posts)
+           1928 GET_ITER
+           1930 LOAD_FAST_AND_CLEAR     17 (p)
+           1932 SWAP                     2
+           1934 BUILD_LIST               0
+           1936 SWAP                     2
+        >> 1938 FOR_ITER                13 (to 1968)
+           1942 STORE_FAST              17 (p)
+           1944 LOAD_GLOBAL             63 (NULL + post_to_card)
+           1954 LOAD_FAST               17 (p)
+           1956 CALL                     1
+           1964 LIST_APPEND              2
+           1966 JUMP_BACKWARD           15 (to 1938)
+        >> 1968 END_FOR
+           1970 SWAP                     2
+           1972 STORE_FAST              17 (p)
+
+ 82        1974 LOAD_CONST               9 (('project_id', 'project_name', 'fb_page_id', 'page_name', 'avatar_url', 'engine_id', 'engine_name', 'post_enabled', 'ideas', 'posts'))
+           1976 BUILD_CONST_KEY_MAP     10
+           1978 CALL                     1
+           1986 POP_TOP
+           1988 EXTENDED_ARG             1
+           1990 JUMP_BACKWARD          371 (to 1250)
+
+ 73     >> 1992 END_FOR
+
+ 94        1994 LOAD_FAST                9 (out)
+           1996 RETURN_VALUE
+        >> 1998 SWAP                     2
+           2000 POP_TOP
+
+ 57        2002 SWAP                     3
+           2004 STORE_FAST               3 (_page)
+           2006 STORE_FAST               2 (cfg)
+           2008 RERAISE                  0
+        >> 2010 SWAP                     2
+           2012 POP_TOP
+
+ 58        2014 SWAP                     2
+           2016 STORE_FAST               5 (row)
+           2018 RERAISE                  0
+        >> 2020 SWAP                     2
+           2022 POP_TOP
+
+ 91        2024 SWAP                     2
+           2026 STORE_FAST              16 (i)
+           2028 RERAISE                  0
+        >> 2030 SWAP                     2
+           2032 POP_TOP
+
+ 92        2034 SWAP                     2
+           2036 STORE_FAST              17 (p)
+           2038 RERAISE                  0
+ExceptionTable:
+  34 to 76 -> 1998 [3]
+  250 to 288 -> 2010 [2]
+  1886 to 1920 -> 2020 [13]
+  1934 to 1968 -> 2030 [14]
+
+Disassembly of <code object idea_to_card at 0x7f6c926bdc30, file "app\services\fb_research_service.py", line 97>:
+ 97           0 RESUME                   0
+
+ 98           2 LOAD_GLOBAL              1 (NULL + _loads)
+             12 LOAD_FAST                0 (idea)
+             14 LOAD_ATTR                2 (payload_json)
+             34 BUILD_MAP                0
+             36 CALL                     2
+             44 STORE_FAST               1 (pl)
+
+100          46 LOAD_FAST                0 (idea)
+             48 LOAD_ATTR                4 (id)
+
+101          68 LOAD_CONST               1 ('video')
+
+102          70 LOAD_FAST                1 (pl)
+             72 LOAD_ATTR                7 (NULL|self + get)
+             92 LOAD_CONST               2 ('title')
+             94 CALL                     1
+            102 COPY                     1
+            104 POP_JUMP_IF_TRUE         2 (to 110)
+            106 POP_TOP
+            108 LOAD_CONST               3 ('Untitled')
+
+103     >>  110 LOAD_FAST                1 (pl)
+            112 LOAD_ATTR                7 (NULL|self + get)
+            132 LOAD_CONST               4 ('hook')
+            134 CALL                     1
+            142 COPY                     1
+            144 POP_JUMP_IF_TRUE         2 (to 150)
+            146 POP_TOP
+            148 LOAD_CONST               5 ('')
+        >>  150 LOAD_CONST               0 (None)
+            152 LOAD_CONST               6 (160)
+            154 BINARY_SLICE
+
+104         156 LOAD_FAST                1 (pl)
+            158 LOAD_ATTR                7 (NULL|self + get)
+            178 LOAD_CONST               7 ('format')
+            180 CALL                     1
+            188 COPY                     1
+            190 POP_JUMP_IF_TRUE         2 (to 196)
+            192 POP_TOP
+            194 LOAD_CONST               0 (None)
+
+105     >>  196 LOAD_FAST                0 (idea)
+            198 LOAD_ATTR                8 (status)
+
+106         218 LOAD_FAST                0 (idea)
+            220 LOAD_ATTR               10 (created_at)
+            240 POP_JUMP_IF_FALSE       28 (to 298)
+            242 LOAD_FAST                0 (idea)
+            244 LOAD_ATTR               10 (created_at)
+            264 LOAD_ATTR               13 (NULL|self + isoformat)
+            284 CALL                     0
+
+ 99         292 LOAD_CONST               8 (('id', 'kind', 'title', 'hook', 'format', 'status', 'created_at'))
+            294 BUILD_CONST_KEY_MAP      7
+            296 RETURN_VALUE
+
+106     >>  298 LOAD_CONST               0 (None)
+
+ 99         300 LOAD_CONST               8 (('id', 'kind', 'title', 'hook', 'format', 'status', 'created_at'))
+            302 BUILD_CONST_KEY_MAP      7
+            304 RETURN_VALUE
+
+Disassembly of <code object post_to_card at 0x28bab170, file "app\services\fb_research_service.py", line 110>:
+110           0 RESUME                   0
+
+111           2 LOAD_GLOBAL              1 (NULL + _loads)
+             12 LOAD_FAST                0 (post)
+             14 LOAD_ATTR                2 (payload_json)
+             34 BUILD_MAP                0
+             36 CALL                     2
+             44 STORE_FAST               1 (pl)
+
+112          46 LOAD_FAST                1 (pl)
+             48 LOAD_ATTR                5 (NULL|self + get)
+             68 LOAD_CONST               1 ('caption')
+             70 CALL                     1
+             78 COPY                     1
+             80 POP_JUMP_IF_TRUE         2 (to 86)
+             82 POP_TOP
+             84 LOAD_CONST               2 ('')
+        >>   86 LOAD_ATTR                7 (NULL|self + split)
+            106 LOAD_CONST               3 ('\n')
+            108 LOAD_CONST               4 (1)
+            110 CALL                     2
+            118 LOAD_CONST               5 (0)
+            120 BINARY_SUBSCR
+            124 STORE_FAST               2 (caption)
+
+114         126 LOAD_FAST                0 (post)
+            128 LOAD_ATTR                8 (id)
+
+115         148 LOAD_CONST               6 ('post')
+
+116         150 LOAD_FAST                1 (pl)
+            152 LOAD_ATTR                5 (NULL|self + get)
+            172 LOAD_CONST               7 ('topic')
+            174 CALL                     1
+            182 COPY                     1
+            184 POP_JUMP_IF_TRUE        21 (to 228)
+            186 POP_TOP
+            188 LOAD_FAST                1 (pl)
+            190 LOAD_ATTR                5 (NULL|self + get)
+            210 LOAD_CONST               8 ('title')
+            212 CALL                     1
+            220 COPY                     1
+            222 POP_JUMP_IF_TRUE         2 (to 228)
+            224 POP_TOP
+            226 LOAD_CONST               9 ('Untitled')
+
+117     >>  228 LOAD_FAST                2 (caption)
+            230 LOAD_CONST               0 (None)
+            232 LOAD_CONST              10 (140)
+            234 BINARY_SLICE
+
+118         236 LOAD_FAST                0 (post)
+            238 LOAD_ATTR               10 (status)
+
+119         258 LOAD_FAST                0 (post)
+            260 LOAD_ATTR               12 (created_at)
+            280 POP_JUMP_IF_FALSE       28 (to 338)
+            282 LOAD_FAST                0 (post)
+            284 LOAD_ATTR               12 (created_at)
+            304 LOAD_ATTR               15 (NULL|self + isoformat)
+            324 CALL                     0
+
+113         332 LOAD_CONST              11 (('id', 'kind', 'topic', 'caption_preview', 'status', 'created_at'))
+            334 BUILD_CONST_KEY_MAP      6
+            336 RETURN_VALUE
+
+119     >>  338 LOAD_CONST               0 (None)
+
+113         340 LOAD_CONST              11 (('id', 'kind', 'topic', 'caption_preview', 'status', 'created_at'))
+            342 BUILD_CONST_KEY_MAP      6
+            344 RETURN_VALUE
+
+Disassembly of <code object suggest_for_channel at 0x28c04dc0, file "app\services\fb_research_service.py", line 125>:
+125           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+131           6 LOAD_FAST                0 (project_id)
+              8 LOAD_CONST               1 (None)
+             10 LOAD_CONST               2 (False)
+
+132          12 LOAD_CONST               1 (None)
+             14 LOAD_CONST               1 (None)
+             16 LOAD_CONST               2 (False)
+             18 LOAD_CONST               1 (None)
+
+131          20 LOAD_CONST               3 (('project_id', 'idea', 'idea_skipped', 'idea_error', 'post', 'post_skipped', 'post_error'))
+             22 BUILD_CONST_KEY_MAP      7
+             24 STORE_FAST               1 (result)
+
+134          26 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             36 CALL                     0
+             44 BEFORE_WITH
+             46 STORE_FAST               2 (db)
+
+135          48 LOAD_FAST                2 (db)
+             50 LOAD_ATTR                3 (NULL|self + query)
+             70 LOAD_GLOBAL              4 (ScheduleConfig)
+             80 CALL                     1
+
+136          88 LOAD_ATTR                7 (NULL|self + filter)
+            108 LOAD_GLOBAL              4 (ScheduleConfig)
+            118 LOAD_ATTR                8 (project_id)
+            138 LOAD_FAST                0 (project_id)
+            140 COMPARE_OP              40 (==)
+            144 CALL                     1
+            152 LOAD_ATTR               11 (NULL|self + first)
+            172 CALL                     0
+
+135         180 STORE_FAST               3 (cfg)
+
+137         182 LOAD_FAST                3 (cfg)
+            184 POP_JUMP_IF_NONE        12 (to 210)
+            186 LOAD_FAST                3 (cfg)
+            188 LOAD_ATTR               12 (fb_page_id)
+            208 POP_JUMP_IF_TRUE        16 (to 242)
+
+138     >>  210 LOAD_CONST               4 ('Kênh chưa liên kết fanpage (Cài đặt kênh → chọn page chính).')
+            212 LOAD_FAST                1 (result)
+            214 LOAD_CONST               5 ('error')
+            216 STORE_SUBSCR
+
+139         220 LOAD_FAST                1 (result)
+
+134         222 SWAP                     2
+            224 LOAD_CONST               1 (None)
+            226 LOAD_CONST               1 (None)
+            228 LOAD_CONST               1 (None)
+            230 CALL                     2
+            238 POP_TOP
+            240 RETURN_VALUE
+
+140     >>  242 LOAD_FAST                2 (db)
+            244 LOAD_ATTR                3 (NULL|self + query)
+            264 LOAD_GLOBAL             14 (IdeaCard)
+            274 CALL                     1
+
+141         282 LOAD_ATTR                7 (NULL|self + filter)
+            302 LOAD_GLOBAL             14 (IdeaCard)
+            312 LOAD_ATTR                8 (project_id)
+            332 LOAD_FAST                0 (project_id)
+            334 COMPARE_OP              40 (==)
+
+142         338 LOAD_GLOBAL             14 (IdeaCard)
+            348 LOAD_ATTR               16 (status)
+            368 LOAD_ATTR               19 (NULL|self + in_)
+            388 LOAD_GLOBAL             20 (_IDEA_WAITING)
+            398 CALL                     1
+
+141         406 CALL                     2
+
+143         414 LOAD_ATTR               11 (NULL|self + first)
+            434 CALL                     0
+            442 LOAD_CONST               1 (None)
+
+140         444 IS_OP                    1
+            446 STORE_FAST               4 (has_idea)
+
+144         448 LOAD_FAST                2 (db)
+            450 LOAD_ATTR                3 (NULL|self + query)
+            470 LOAD_GLOBAL             22 (PostCard)
+            480 CALL                     1
+
+145         488 LOAD_ATTR                7 (NULL|self + filter)
+            508 LOAD_GLOBAL             22 (PostCard)
+            518 LOAD_ATTR                8 (project_id)
+            538 LOAD_FAST                0 (project_id)
+            540 COMPARE_OP              40 (==)
+
+146         544 LOAD_GLOBAL             22 (PostCard)
+            554 LOAD_ATTR               16 (status)
+            574 LOAD_ATTR               19 (NULL|self + in_)
+            594 LOAD_CONST               6 (('proposed', 'ready'))
+            596 CALL                     1
+
+145         604 CALL                     2
+
+147         612 LOAD_ATTR               11 (NULL|self + first)
+            632 CALL                     0
+            640 LOAD_CONST               1 (None)
+
+144         642 IS_OP                    1
+            644 STORE_FAST               5 (has_post)
+
+134         646 LOAD_CONST               1 (None)
+            648 LOAD_CONST               1 (None)
+            650 LOAD_CONST               1 (None)
+            652 CALL                     2
+            660 POP_TOP
+
+149     >>  662 LOAD_FAST_CHECK          4 (has_idea)
+            664 POP_JUMP_IF_TRUE       206 (to 1078)
+
+150         666 NOP
+
+151         668 LOAD_GLOBAL             25 (NULL + aistudio)
+            678 LOAD_ATTR               26 (generate_next_idea)
+            698 LOAD_FAST                0 (project_id)
+            700 CALL                     1
+            708 GET_AWAITABLE            0
+            710 LOAD_CONST               1 (None)
+        >>  712 SEND                     3 (to 722)
+            716 YIELD_VALUE              3
+            718 RESUME                   3
+            720 JUMP_BACKWARD_NO_INTERRUPT     5 (to 712)
+        >>  722 END_SEND
+            724 STORE_FAST               6 (out)
+
+152         726 LOAD_GLOBAL             29 (NULL + isinstance)
+            736 LOAD_FAST                6 (out)
+            738 LOAD_GLOBAL             30 (dict)
+            748 CALL                     2
+            756 POP_JUMP_IF_FALSE       17 (to 792)
+            758 LOAD_FAST                6 (out)
+            760 LOAD_ATTR               33 (NULL|self + get)
+            780 LOAD_CONST               7 ('idea')
+            782 CALL                     1
+            790 JUMP_FORWARD             1 (to 794)
+        >>  792 LOAD_CONST               1 (None)
+        >>  794 STORE_FAST               7 (idea)
+
+154         796 LOAD_FAST                7 (idea)
+            798 POP_JUMP_IF_FALSE       17 (to 834)
+            800 LOAD_FAST                7 (idea)
+            802 LOAD_ATTR               33 (NULL|self + get)
+            822 LOAD_CONST               8 ('id')
+            824 CALL                     1
+            832 JUMP_FORWARD             1 (to 836)
+        >>  834 LOAD_CONST               1 (None)
+        >>  836 COPY                     1
+            838 POP_JUMP_IF_TRUE        17 (to 874)
+            840 POP_TOP
+            842 LOAD_FAST                6 (out)
+            844 LOAD_ATTR               33 (NULL|self + get)
+            864 LOAD_CONST               8 ('id')
+            866 CALL                     1
+
+155     >>  874 LOAD_FAST                7 (idea)
+            876 POP_JUMP_IF_FALSE       17 (to 912)
+            878 LOAD_FAST                7 (idea)
+            880 LOAD_ATTR               33 (NULL|self + get)
+            900 LOAD_CONST               9 ('title')
+            902 CALL                     1
+            910 JUMP_FORWARD             1 (to 914)
+        >>  912 LOAD_CONST               1 (None)
+        >>  914 COPY                     1
+            916 POP_JUMP_IF_TRUE        39 (to 996)
+            918 POP_TOP
+
+156         920 LOAD_GLOBAL             29 (NULL + isinstance)
+            930 LOAD_FAST                6 (out)
+            932 LOAD_GLOBAL             30 (dict)
+            942 CALL                     2
+            950 POP_JUMP_IF_FALSE       17 (to 986)
+            952 LOAD_FAST                6 (out)
+            954 LOAD_ATTR               33 (NULL|self + get)
+            974 LOAD_CONST               9 ('title')
+            976 CALL                     1
+            984 JUMP_FORWARD             1 (to 988)
+        >>  986 LOAD_CONST               1 (None)
+
+155     >>  988 COPY                     1
+            990 POP_JUMP_IF_TRUE         2 (to 996)
+            992 POP_TOP
+
+156         994 LOAD_CONST              10 ('')
+
+157     >>  996 LOAD_GLOBAL             29 (NULL + isinstance)
+           1006 LOAD_FAST                6 (out)
+           1008 LOAD_GLOBAL             30 (dict)
+           1018 CALL                     2
+           1026 POP_JUMP_IF_FALSE       17 (to 1062)
+           1028 LOAD_FAST                6 (out)
+           1030 LOAD_ATTR               33 (NULL|self + get)
+           1050 LOAD_CONST              11 ('status')
+           1052 CALL                     1
+           1060 JUMP_FORWARD             1 (to 1064)
+        >> 1062 LOAD_CONST              12 ('proposed')
+
+153     >> 1064 LOAD_CONST              13 (('id', 'title', 'status'))
+           1066 BUILD_CONST_KEY_MAP      3
+           1068 LOAD_FAST                1 (result)
+           1070 LOAD_CONST               7 ('idea')
+           1072 STORE_SUBSCR
+           1076 JUMP_FORWARD             5 (to 1088)
+
+163     >> 1078 LOAD_CONST              17 (True)
+           1080 LOAD_FAST                1 (result)
+           1082 LOAD_CONST              18 ('idea_skipped')
+           1084 STORE_SUBSCR
+
+165     >> 1088 LOAD_FAST_CHECK          5 (has_post)
+           1090 POP_JUMP_IF_TRUE       166 (to 1424)
+
+166        1092 NOP
+
+167        1094 LOAD_GLOBAL             43 (NULL + aipost)
+           1104 LOAD_ATTR               44 (generate_next_post)
+           1124 LOAD_FAST                0 (project_id)
+           1126 CALL                     1
+           1134 GET_AWAITABLE            0
+           1136 LOAD_CONST               1 (None)
+        >> 1138 SEND                     3 (to 1148)
+           1142 YIELD_VALUE              3
+           1144 RESUME                   3
+           1146 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1138)
+        >> 1148 END_SEND
+           1150 STORE_FAST               6 (out)
+
+169        1152 LOAD_GLOBAL             29 (NULL + isinstance)
+           1162 LOAD_FAST                6 (out)
+           1164 LOAD_GLOBAL             30 (dict)
+           1174 CALL                     2
+           1182 POP_JUMP_IF_FALSE       17 (to 1218)
+           1184 LOAD_FAST                6 (out)
+           1186 LOAD_ATTR               33 (NULL|self + get)
+           1206 LOAD_CONST               8 ('id')
+           1208 CALL                     1
+           1216 JUMP_FORWARD             1 (to 1220)
+        >> 1218 LOAD_CONST               1 (None)
+
+171     >> 1220 LOAD_GLOBAL             29 (NULL + isinstance)
+           1230 LOAD_FAST                6 (out)
+           1232 LOAD_GLOBAL             30 (dict)
+           1242 CALL                     2
+           1250 POP_JUMP_IF_FALSE       40 (to 1332)
+
+170        1252 LOAD_FAST                6 (out)
+           1254 LOAD_ATTR               33 (NULL|self + get)
+           1274 LOAD_CONST              19 ('topic')
+           1276 CALL                     1
+           1284 COPY                     1
+           1286 POP_JUMP_IF_TRUE        23 (to 1334)
+           1288 POP_TOP
+           1290 LOAD_FAST                6 (out)
+           1292 LOAD_ATTR               33 (NULL|self + get)
+           1312 LOAD_CONST              20 ('caption')
+           1314 CALL                     1
+           1322 COPY                     1
+           1324 POP_JUMP_IF_TRUE         4 (to 1334)
+           1326 POP_TOP
+           1328 LOAD_CONST              10 ('')
+           1330 JUMP_FORWARD             1 (to 1334)
+
+171     >> 1332 LOAD_CONST              10 ('')
+        >> 1334 LOAD_CONST               1 (None)
+           1336 LOAD_CONST              21 (120)
+
+170        1338 BINARY_SLICE
+
+172        1340 LOAD_GLOBAL             29 (NULL + isinstance)
+           1350 LOAD_FAST                6 (out)
+           1352 LOAD_GLOBAL             30 (dict)
+           1362 CALL                     2
+           1370 POP_JUMP_IF_FALSE       17 (to 1406)
+           1372 LOAD_FAST                6 (out)
+           1374 LOAD_ATTR               33 (NULL|self + get)
+           1394 LOAD_CONST              11 ('status')
+           1396 CALL                     1
+           1404 JUMP_FORWARD             1 (to 1408)
+        >> 1406 LOAD_CONST              12 ('proposed')
+
+168     >> 1408 LOAD_CONST              22 (('id', 'topic', 'status'))
+           1410 BUILD_CONST_KEY_MAP      3
+           1412 LOAD_FAST                1 (result)
+           1414 LOAD_CONST              23 ('post')
+           1416 STORE_SUBSCR
+
+180        1420 LOAD_FAST                1 (result)
+           1422 RETURN_VALUE
+
+178     >> 1424 LOAD_CONST              17 (True)
+           1426 LOAD_FAST                1 (result)
+           1428 LOAD_CONST              26 ('post_skipped')
+           1430 STORE_SUBSCR
+
+180        1434 LOAD_FAST                1 (result)
+           1436 RETURN_VALUE
+
+134     >> 1438 PUSH_EXC_INFO
+           1440 WITH_EXCEPT_START
+           1442 POP_JUMP_IF_TRUE         1 (to 1446)
+           1444 RERAISE                  2
+        >> 1446 POP_TOP
+           1448 POP_EXCEPT
+           1450 POP_TOP
+           1452 POP_TOP
+           1454 EXTENDED_ARG             1
+           1456 JUMP_BACKWARD          398 (to 662)
+        >> 1458 COPY                     3
+           1460 POP_EXCEPT
+           1462 RERAISE                  1
+
+151     >> 1464 CLEANUP_THROW
+           1466 EXTENDED_ARG             1
+           1468 JUMP_BACKWARD          374 (to 722)
+        >> 1470 PUSH_EXC_INFO
+
+159        1472 LOAD_GLOBAL             34 (Exception)
+           1482 CHECK_EXC_MATCH
+           1484 POP_JUMP_IF_FALSE       50 (to 1586)
+           1486 STORE_FAST               8 (exc)
+
+160        1488 LOAD_GLOBAL             37 (NULL + log)
+           1498 LOAD_ATTR               38 (warning)
+           1518 LOAD_CONST              14 ('[fb_research] sinh idea %s lỗi: %s')
+           1520 LOAD_FAST                0 (project_id)
+           1522 LOAD_FAST                8 (exc)
+           1524 CALL                     3
+           1532 POP_TOP
+
+161        1534 LOAD_GLOBAL             41 (NULL + str)
+           1544 LOAD_FAST                8 (exc)
+           1546 CALL                     1
+           1554 LOAD_CONST               1 (None)
+           1556 LOAD_CONST              15 (200)
+           1558 BINARY_SLICE
+           1560 LOAD_FAST                1 (result)
+           1562 LOAD_CONST              16 ('idea_error')
+           1564 STORE_SUBSCR
+           1568 POP_EXCEPT
+           1570 LOAD_CONST               1 (None)
+           1572 STORE_FAST               8 (exc)
+           1574 DELETE_FAST              8 (exc)
+           1576 JUMP_BACKWARD          245 (to 1088)
+        >> 1578 LOAD_CONST               1 (None)
+           1580 STORE_FAST               8 (exc)
+           1582 DELETE_FAST              8 (exc)
+           1584 RERAISE                  1
+
+159     >> 1586 RERAISE                  0
+        >> 1588 COPY                     3
+           1590 POP_EXCEPT
+           1592 RERAISE                  1
+
+167     >> 1594 CLEANUP_THROW
+           1596 JUMP_BACKWARD          225 (to 1148)
+        >> 1598 PUSH_EXC_INFO
+
+174        1600 LOAD_GLOBAL             34 (Exception)
+           1610 CHECK_EXC_MATCH
+           1612 POP_JUMP_IF_FALSE       51 (to 1716)
+           1614 STORE_FAST               8 (exc)
+
+175        1616 LOAD_GLOBAL             37 (NULL + log)
+           1626 LOAD_ATTR               38 (warning)
+           1646 LOAD_CONST              24 ('[fb_research] sinh post %s lỗi: %s')
+           1648 LOAD_FAST                0 (project_id)
+           1650 LOAD_FAST                8 (exc)
+           1652 CALL                     3
+           1660 POP_TOP
+
+176        1662 LOAD_GLOBAL             41 (NULL + str)
+           1672 LOAD_FAST                8 (exc)
+           1674 CALL                     1
+           1682 LOAD_CONST               1 (None)
+           1684 LOAD_CONST              15 (200)
+           1686 BINARY_SLICE
+           1688 LOAD_FAST                1 (result)
+           1690 LOAD_CONST              25 ('post_error')
+           1692 STORE_SUBSCR
+           1696 POP_EXCEPT
+           1698 LOAD_CONST               1 (None)
+           1700 STORE_FAST               8 (exc)
+           1702 DELETE_FAST              8 (exc)
+
+180        1704 LOAD_FAST                1 (result)
+           1706 RETURN_VALUE
+        >> 1708 LOAD_CONST               1 (None)
+           1710 STORE_FAST               8 (exc)
+           1712 DELETE_FAST              8 (exc)
+           1714 RERAISE                  1
+
+174     >> 1716 RERAISE                  0
+        >> 1718 COPY                     3
+           1720 POP_EXCEPT
+           1722 RERAISE                  1
+        >> 1724 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1726 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 1724 [0] lasti
+  46 to 220 -> 1438 [1] lasti
+  222 to 240 -> 1724 [0] lasti
+  242 to 644 -> 1438 [1] lasti
+  646 to 664 -> 1724 [0] lasti
+  668 to 714 -> 1470 [0]
+  716 to 716 -> 1464 [2]
+  718 to 1074 -> 1470 [0]
+  1076 to 1090 -> 1724 [0] lasti
+  1094 to 1140 -> 1598 [0]
+  1142 to 1142 -> 1594 [2]
+  1144 to 1418 -> 1598 [0]
+  1420 to 1436 -> 1724 [0] lasti
+  1438 to 1446 -> 1458 [3] lasti
+  1448 to 1462 -> 1724 [0] lasti
+  1464 to 1464 -> 1470 [0]
+  1470 to 1486 -> 1588 [1] lasti
+  1488 to 1566 -> 1578 [1] lasti
+  1568 to 1576 -> 1724 [0] lasti
+  1578 to 1586 -> 1588 [1] lasti
+  1588 to 1592 -> 1724 [0] lasti
+  1594 to 1594 -> 1598 [0]
+  1598 to 1614 -> 1718 [1] lasti
+  1616 to 1694 -> 1708 [1] lasti
+  1696 to 1706 -> 1724 [0] lasti
+  1708 to 1716 -> 1718 [1] lasti
+  1718 to 1722 -> 1724 [0] lasti
+
+Disassembly of <code object suggest_all at 0x7f6c92682330, file "app\services\fb_research_service.py", line 183>:
+183           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+185           6 BUILD_LIST               0
+              8 STORE_FAST               0 (results)
+
+186          10 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             20 CALL                     0
+             28 BEFORE_WITH
+             30 STORE_FAST               1 (db)
+
+187          32 LOAD_GLOBAL              3 (NULL + _linked_pairs)
+             42 LOAD_FAST                1 (db)
+             44 CALL                     1
+             52 STORE_FAST               2 (pairs)
+
+186          54 LOAD_CONST               1 (None)
+             56 LOAD_CONST               1 (None)
+             58 LOAD_CONST               1 (None)
+             60 CALL                     2
+             68 POP_TOP
+
+188     >>   70 LOAD_FAST_CHECK          2 (pairs)
+             72 GET_ITER
+        >>   74 FOR_ITER                66 (to 210)
+             78 UNPACK_SEQUENCE          2
+             82 STORE_FAST               3 (cfg)
+             84 STORE_FAST               4 (_page)
+
+189          86 LOAD_GLOBAL              5 (NULL + suggest_for_channel)
+             96 LOAD_FAST                3 (cfg)
+             98 LOAD_ATTR                6 (project_id)
+            118 CALL                     1
+            126 GET_AWAITABLE            0
+            128 LOAD_CONST               1 (None)
+        >>  130 SEND                     3 (to 140)
+            134 YIELD_VALUE              2
+            136 RESUME                   3
+            138 JUMP_BACKWARD_NO_INTERRUPT     5 (to 130)
+        >>  140 END_SEND
+            142 STORE_FAST               5 (r)
+
+190         144 LOAD_FAST                3 (cfg)
+            146 LOAD_ATTR                6 (project_id)
+            166 LOAD_FAST                5 (r)
+            168 LOAD_CONST               2 ('project_id')
+            170 STORE_SUBSCR
+
+191         174 LOAD_FAST                0 (results)
+            176 LOAD_ATTR                9 (NULL|self + append)
+            196 LOAD_FAST                5 (r)
+            198 CALL                     1
+            206 POP_TOP
+            208 JUMP_BACKWARD           68 (to 74)
+
+188     >>  210 END_FOR
+
+192         212 LOAD_FAST                0 (results)
+            214 RETURN_VALUE
+
+186     >>  216 PUSH_EXC_INFO
+            218 WITH_EXCEPT_START
+            220 POP_JUMP_IF_TRUE         1 (to 224)
+            222 RERAISE                  2
+        >>  224 POP_TOP
+            226 POP_EXCEPT
+            228 POP_TOP
+            230 POP_TOP
+            232 JUMP_BACKWARD           82 (to 70)
+        >>  234 COPY                     3
+            236 POP_EXCEPT
+            238 RERAISE                  1
+
+189     >>  240 CLEANUP_THROW
+            242 JUMP_BACKWARD           52 (to 140)
+        >>  244 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            246 RERAISE                  1
+ExceptionTable:
+  4 to 28 -> 244 [0] lasti
+  30 to 52 -> 216 [1] lasti
+  54 to 132 -> 244 [0] lasti
+  134 to 134 -> 240 [3]
+  136 to 214 -> 244 [0] lasti
+  216 to 224 -> 234 [3] lasti
+  226 to 240 -> 244 [0] lasti
+
+Disassembly of <code object approve_video_idea at 0x7f6c92455cb0, file "app\services\fb_research_service.py", line 197>:
+197           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+199           6 LOAD_GLOBAL              1 (NULL + aistudio)
+             16 LOAD_ATTR                2 (approve_idea)
+             36 LOAD_FAST                0 (idea_id)
+             38 CALL                     1
+             46 GET_AWAITABLE            0
+             48 LOAD_CONST               1 (None)
+        >>   50 SEND                     3 (to 60)
+             54 YIELD_VALUE              2
+             56 RESUME                   3
+             58 JUMP_BACKWARD_NO_INTERRUPT     5 (to 50)
+        >>   60 END_SEND
+             62 STORE_FAST               1 (out)
+
+200          64 LOAD_GLOBAL              5 (NULL + isinstance)
+             74 LOAD_FAST                1 (out)
+             76 LOAD_GLOBAL              6 (dict)
+             86 CALL                     2
+             94 POP_JUMP_IF_FALSE       38 (to 172)
+
+201          96 LOAD_FAST                0 (idea_id)
+             98 LOAD_FAST                1 (out)
+            100 LOAD_ATTR                9 (NULL|self + get)
+            120 LOAD_CONST               2 ('status')
+            122 LOAD_CONST               3 ('producing')
+            124 CALL                     2
+
+202         132 LOAD_FAST                1 (out)
+            134 LOAD_ATTR                9 (NULL|self + get)
+            154 LOAD_CONST               4 ('video_id')
+            156 CALL                     1
+            164 LOAD_CONST               5 ('Video đã vào sản xuất.')
+
+201         166 LOAD_CONST               6 (('idea_id', 'status', 'video_id', 'message'))
+            168 BUILD_CONST_KEY_MAP      4
+            170 RETURN_VALUE
+
+203     >>  172 LOAD_FAST                0 (idea_id)
+            174 LOAD_CONST               3 ('producing')
+            176 LOAD_CONST               5 ('Video đã vào sản xuất.')
+            178 LOAD_CONST               7 (('idea_id', 'status', 'message'))
+            180 BUILD_CONST_KEY_MAP      3
+            182 RETURN_VALUE
+
+199     >>  184 CLEANUP_THROW
+            186 JUMP_BACKWARD           64 (to 60)
+        >>  188 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            190 RERAISE                  1
+ExceptionTable:
+  4 to 52 -> 188 [0] lasti
+  54 to 54 -> 184 [2]
+  56 to 184 -> 188 [0] lasti
+
+Disassembly of <code object approve_post_card at 0x28c24db0, file "app\services\fb_research_service.py", line 206>:
+206           0 RESUME                   0
+
+208           2 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             12 CALL                     0
+             20 BEFORE_WITH
+             22 STORE_FAST               1 (db)
+
+209          24 LOAD_FAST                1 (db)
+             26 LOAD_ATTR                3 (NULL|self + get)
+             46 LOAD_GLOBAL              4 (PostCard)
+             56 LOAD_FAST                0 (post_id)
+             58 CALL                     2
+             66 STORE_FAST               2 (post)
+
+210          68 LOAD_FAST                2 (post)
+             70 POP_JUMP_IF_NOT_NONE    28 (to 128)
+
+211          72 LOAD_GLOBAL              7 (NULL + StudioError)
+             82 LOAD_GLOBAL              8 (E)
+             92 LOAD_ATTR               10 (UNKNOWN)
+            112 LOAD_CONST               2 ('Bài viết không tồn tại ở Research Hub')
+            114 LOAD_CONST               3 (404)
+            116 KW_NAMES                 4 (('status_code',))
+            118 CALL                     3
+            126 RAISE_VARARGS            1
+
+212     >>  128 LOAD_GLOBAL             13 (NULL + _loads)
+            138 LOAD_FAST                2 (post)
+            140 LOAD_ATTR               14 (payload_json)
+            160 BUILD_MAP                0
+            162 CALL                     2
+            170 STORE_FAST               3 (pl)
+
+213         172 LOAD_FAST                3 (pl)
+            174 LOAD_ATTR                3 (NULL|self + get)
+            194 LOAD_CONST               5 ('image_path')
+            196 CALL                     1
+            204 POP_JUMP_IF_TRUE        50 (to 306)
+            206 LOAD_GLOBAL             13 (NULL + _loads)
+            216 LOAD_FAST                2 (post)
+            218 LOAD_ATTR               16 (images_json)
+            238 BUILD_LIST               0
+            240 CALL                     2
+            248 POP_JUMP_IF_TRUE        28 (to 306)
+
+214         250 LOAD_GLOBAL              7 (NULL + StudioError)
+
+215         260 LOAD_GLOBAL              8 (E)
+            270 LOAD_ATTR               10 (UNKNOWN)
+
+216         290 LOAD_CONST               6 ('Bài chưa có ảnh bìa. Hãy mở trang Duyệt bài và bấm Sinh ảnh AI trước khi duyệt.')
+
+217         292 LOAD_CONST               7 (409)
+
+214         294 KW_NAMES                 4 (('status_code',))
+            296 CALL                     3
+            304 RAISE_VARARGS            1
+
+219     >>  306 LOAD_GLOBAL             19 (NULL + aipost)
+            316 LOAD_ATTR               20 (approve_post)
+            336 LOAD_FAST                1 (db)
+            338 LOAD_FAST                0 (post_id)
+            340 CALL                     2
+            348 STORE_FAST               4 (approved)
+
+220         350 LOAD_FAST                0 (post_id)
+            352 LOAD_FAST                4 (approved)
+            354 LOAD_ATTR               22 (status)
+
+221         374 LOAD_CONST               8 ('Bài đã vào hàng đợi đăng.')
+
+220         376 LOAD_CONST               9 (('post_id', 'status', 'message'))
+            378 BUILD_CONST_KEY_MAP      3
+
+208         380 SWAP                     2
+            382 LOAD_CONST               1 (None)
+            384 LOAD_CONST               1 (None)
+            386 LOAD_CONST               1 (None)
+            388 CALL                     2
+            396 POP_TOP
+            398 RETURN_VALUE
+        >>  400 PUSH_EXC_INFO
+            402 WITH_EXCEPT_START
+            404 POP_JUMP_IF_TRUE         1 (to 408)
+            406 RERAISE                  2
+        >>  408 POP_TOP
+            410 POP_EXCEPT
+            412 POP_TOP
+            414 POP_TOP
+            416 RETURN_CONST             1 (None)
+        >>  418 COPY                     3
+            420 POP_EXCEPT
+            422 RERAISE                  1
+ExceptionTable:
+  22 to 378 -> 400 [1] lasti
+  400 to 408 -> 418 [3] lasti
+
+Disassembly of <code object reject_video_idea at 0x7f6c926bc430, file "app\services\fb_research_service.py", line 224>:
+224           0 RESUME                   0
+
+225           2 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             12 CALL                     0
+             20 BEFORE_WITH
+             22 STORE_FAST               1 (db)
+
+226          24 LOAD_FAST                1 (db)
+             26 LOAD_ATTR                3 (NULL|self + get)
+             46 LOAD_GLOBAL              4 (IdeaCard)
+             56 LOAD_FAST                0 (idea_id)
+             58 CALL                     2
+             66 STORE_FAST               2 (idea)
+
+227          68 LOAD_FAST                2 (idea)
+             70 POP_JUMP_IF_NOT_NONE    28 (to 128)
+
+228          72 LOAD_GLOBAL              7 (NULL + StudioError)
+             82 LOAD_GLOBAL              8 (E)
+             92 LOAD_ATTR               10 (UNKNOWN)
+            112 LOAD_CONST               1 ('Ý tưởng không tồn tại')
+            114 LOAD_CONST               2 (404)
+            116 KW_NAMES                 3 (('status_code',))
+            118 CALL                     3
+            126 RAISE_VARARGS            1
+
+229     >>  128 LOAD_FAST                2 (idea)
+            130 LOAD_ATTR               12 (status)
+            150 LOAD_CONST               4 ('proposed')
+            152 COMPARE_OP              55 (!=)
+            156 POP_JUMP_IF_FALSE       28 (to 214)
+
+230         158 LOAD_GLOBAL              7 (NULL + StudioError)
+            168 LOAD_GLOBAL              8 (E)
+            178 LOAD_ATTR               10 (UNKNOWN)
+            198 LOAD_CONST               5 ('Ý tưởng đã xử lý, không còn loại được.')
+            200 LOAD_CONST               6 (409)
+            202 KW_NAMES                 3 (('status_code',))
+            204 CALL                     3
+            212 RAISE_VARARGS            1
+
+231     >>  214 LOAD_CONST               7 ('rejected')
+            216 LOAD_FAST                2 (idea)
+            218 STORE_ATTR               6 (status)
+
+232         228 LOAD_FAST                1 (db)
+            230 LOAD_ATTR               15 (NULL|self + commit)
+            250 CALL                     0
+            258 POP_TOP
+
+233         260 LOAD_FAST                0 (idea_id)
+            262 LOAD_CONST               7 ('rejected')
+            264 LOAD_CONST               8 (('idea_id', 'status'))
+            266 BUILD_CONST_KEY_MAP      2
+
+225         268 SWAP                     2
+            270 LOAD_CONST               0 (None)
+            272 LOAD_CONST               0 (None)
+            274 LOAD_CONST               0 (None)
+            276 CALL                     2
+            284 POP_TOP
+            286 RETURN_VALUE
+        >>  288 PUSH_EXC_INFO
+            290 WITH_EXCEPT_START
+            292 POP_JUMP_IF_TRUE         1 (to 296)
+            294 RERAISE                  2
+        >>  296 POP_TOP
+            298 POP_EXCEPT
+            300 POP_TOP
+            302 POP_TOP
+            304 RETURN_CONST             0 (None)
+        >>  306 COPY                     3
+            308 POP_EXCEPT
+            310 RERAISE                  1
+ExceptionTable:
+  22 to 266 -> 288 [1] lasti
+  288 to 296 -> 306 [3] lasti
+
+Disassembly of <code object reject_post_card at 0x7f6c926bd830, file "app\services\fb_research_service.py", line 236>:
+236           0 RESUME                   0
+
+237           2 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             12 CALL                     0
+             20 BEFORE_WITH
+             22 STORE_FAST               1 (db)
+
+238          24 LOAD_FAST                1 (db)
+             26 LOAD_ATTR                3 (NULL|self + get)
+             46 LOAD_GLOBAL              4 (PostCard)
+             56 LOAD_FAST                0 (post_id)
+             58 CALL                     2
+             66 STORE_FAST               2 (post)
+
+239          68 LOAD_FAST                2 (post)
+             70 POP_JUMP_IF_NOT_NONE    28 (to 128)
+
+240          72 LOAD_GLOBAL              7 (NULL + StudioError)
+             82 LOAD_GLOBAL              8 (E)
+             92 LOAD_ATTR               10 (UNKNOWN)
+            112 LOAD_CONST               1 ('Bài viết không tồn tại')
+            114 LOAD_CONST               2 (404)
+            116 KW_NAMES                 3 (('status_code',))
+            118 CALL                     3
+            126 RAISE_VARARGS            1
+
+241     >>  128 LOAD_FAST                2 (post)
+            130 LOAD_ATTR               12 (status)
+            150 LOAD_CONST               4 (frozenset({'proposed', 'ready'}))
+            152 CONTAINS_OP              1
+            154 POP_JUMP_IF_FALSE       28 (to 212)
+
+242         156 LOAD_GLOBAL              7 (NULL + StudioError)
+            166 LOAD_GLOBAL              8 (E)
+            176 LOAD_ATTR               10 (UNKNOWN)
+            196 LOAD_CONST               5 ('Bài viết đã xử lý, không còn loại được.')
+            198 LOAD_CONST               6 (409)
+            200 KW_NAMES                 3 (('status_code',))
+            202 CALL                     3
+            210 RAISE_VARARGS            1
+
+243     >>  212 LOAD_CONST               7 ('rejected')
+            214 LOAD_FAST                2 (post)
+            216 STORE_ATTR               6 (status)
+
+244         226 LOAD_FAST                1 (db)
+            228 LOAD_ATTR               15 (NULL|self + commit)
+            248 CALL                     0
+            256 POP_TOP
+
+245         258 LOAD_FAST                0 (post_id)
+            260 LOAD_CONST               7 ('rejected')
+            262 LOAD_CONST               8 (('post_id', 'status'))
+            264 BUILD_CONST_KEY_MAP      2
+
+237         266 SWAP                     2
+            268 LOAD_CONST               0 (None)
+            270 LOAD_CONST               0 (None)
+            272 LOAD_CONST               0 (None)
+            274 CALL                     2
+            282 POP_TOP
+            284 RETURN_VALUE
+        >>  286 PUSH_EXC_INFO
+            288 WITH_EXCEPT_START
+            290 POP_JUMP_IF_TRUE         1 (to 294)
+            292 RERAISE                  2
+        >>  294 POP_TOP
+            296 POP_EXCEPT
+            298 POP_TOP
+            300 POP_TOP
+            302 RETURN_CONST             0 (None)
+        >>  304 COPY                     3
+            306 POP_EXCEPT
+            308 RERAISE                  1
+ExceptionTable:
+  22 to 264 -> 286 [1] lasti
+  286 to 294 -> 304 [3] lasti
+
+Disassembly of <code object channel_status at 0x29071a00, file "app\services\fb_research_service.py", line 248>:
+248           0 RESUME                   0
+
+250           2 LOAD_GLOBAL              1 (NULL + _linked_pairs)
+             12 LOAD_FAST                0 (db)
+             14 CALL                     1
+             22 STORE_FAST               1 (pairs)
+
+251          24 LOAD_FAST                1 (pairs)
+             26 GET_ITER
+             28 LOAD_FAST_AND_CLEAR      2 (cfg)
+             30 LOAD_FAST_AND_CLEAR      3 (_page)
+             32 SWAP                     3
+             34 BUILD_LIST               0
+             36 SWAP                     2
+        >>   38 FOR_ITER                17 (to 76)
+             42 UNPACK_SEQUENCE          2
+             46 STORE_FAST               2 (cfg)
+             48 STORE_FAST               3 (_page)
+             50 LOAD_FAST                2 (cfg)
+             52 LOAD_ATTR                2 (project_id)
+             72 LIST_APPEND              2
+             74 JUMP_BACKWARD           19 (to 38)
+        >>   76 END_FOR
+             78 STORE_FAST               4 (project_ids)
+             80 STORE_FAST               2 (cfg)
+             82 STORE_FAST               3 (_page)
+
+254          84 LOAD_FAST                4 (project_ids)
+             86 POP_JUMP_IF_FALSE      113 (to 314)
+
+252          88 LOAD_FAST                0 (db)
+             90 LOAD_ATTR                5 (NULL|self + query)
+            110 LOAD_GLOBAL              6 (IdeaCard)
+            120 CALL                     1
+            128 LOAD_ATTR                9 (NULL|self + filter)
+
+253         148 LOAD_GLOBAL              6 (IdeaCard)
+            158 LOAD_ATTR                2 (project_id)
+            178 LOAD_ATTR               11 (NULL|self + in_)
+            198 LOAD_FAST                4 (project_ids)
+            200 CALL                     1
+            208 LOAD_GLOBAL              6 (IdeaCard)
+            218 LOAD_ATTR               12 (status)
+            238 LOAD_ATTR               11 (NULL|self + in_)
+            258 LOAD_GLOBAL             14 (_IDEA_WAITING)
+            268 CALL                     1
+
+252         276 CALL                     2
+
+254         284 LOAD_ATTR               17 (NULL|self + count)
+            304 CALL                     0
+            312 JUMP_FORWARD             1 (to 316)
+        >>  314 LOAD_CONST               1 (0)
+
+252     >>  316 STORE_FAST               5 (ideas_pending)
+
+257         318 LOAD_FAST                4 (project_ids)
+            320 POP_JUMP_IF_FALSE      113 (to 548)
+
+255         322 LOAD_FAST                0 (db)
+            324 LOAD_ATTR                5 (NULL|self + query)
+            344 LOAD_GLOBAL             18 (PostCard)
+            354 CALL                     1
+            362 LOAD_ATTR                9 (NULL|self + filter)
+
+256         382 LOAD_GLOBAL             18 (PostCard)
+            392 LOAD_ATTR                2 (project_id)
+            412 LOAD_ATTR               11 (NULL|self + in_)
+            432 LOAD_FAST                4 (project_ids)
+            434 CALL                     1
+            442 LOAD_GLOBAL             18 (PostCard)
+            452 LOAD_ATTR               12 (status)
+            472 LOAD_ATTR               11 (NULL|self + in_)
+            492 LOAD_GLOBAL             20 (_POST_WAITING)
+            502 CALL                     1
+
+255         510 CALL                     2
+
+257         518 LOAD_ATTR               17 (NULL|self + count)
+            538 CALL                     0
+            546 JUMP_FORWARD             1 (to 550)
+        >>  548 LOAD_CONST               1 (0)
+
+255     >>  550 STORE_FAST               6 (posts_pending)
+
+258         552 LOAD_GLOBAL             23 (NULL + len)
+            562 LOAD_FAST                1 (pairs)
+            564 CALL                     1
+            572 LOAD_FAST                5 (ideas_pending)
+            574 LOAD_FAST                6 (posts_pending)
+            576 LOAD_CONST               2 (('channels', 'ideas_pending', 'posts_pending'))
+            578 BUILD_CONST_KEY_MAP      3
+            580 RETURN_VALUE
+        >>  582 SWAP                     2
+            584 POP_TOP
+
+251         586 SWAP                     3
+            588 STORE_FAST               3 (_page)
+            590 STORE_FAST               2 (cfg)
+            592 RERAISE                  0
+ExceptionTable:
+  34 to 76 -> 582 [3]

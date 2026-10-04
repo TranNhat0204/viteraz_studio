@@ -1,0 +1,786 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Dialect Anthropic Messages — `POST {base}/messages`.\n\nBốn chỗ khác OpenAI Chat, và cả bốn đều làm hỏng lượt gọi nếu bỏ qua:\n\n  1. Xác thực bằng header `x-api-key`, KHÔNG phải `Authorization: Bearer`.\n  2. Bắt buộc header `anthropic-version`. Thiếu là HTTP 400, không phải 401.\n  3. `system` là THAM SỐ RIÊNG ở cấp cao nhất, không phải một message có role="system". Nhét system\n     vào mảng messages sẽ bị từ chối thẳng.\n  4. `max_tokens` là **bắt buộc**. Thiếu là 400. Đây chính là lỗ hổng §2.5 của kế hoạch: đường\n     `_call_api` cũ không gửi max_tokens bao giờ, nên Claude sẽ không bao giờ gọi được nếu client\n     không tự điền.\n\nUsage cũng nằm chỗ khác: `usage.input_tokens` / `output_tokens`, và token cache tách làm hai ô\n(`cache_read_input_tokens` là phần ĐỌC từ cache — cái duy nhất được giảm giá).\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 16           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 18          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('ParsedReply',))
+             22 IMPORT_NAME              3 (app.adapters.llm_api.dialects)
+             24 IMPORT_FROM              4 (ParsedReply)
+             26 STORE_NAME               4 (ParsedReply)
+             28 POP_TOP
+
+ 19          30 LOAD_CONST               1 (0)
+             32 LOAD_CONST               4 (('E',))
+             34 IMPORT_NAME              5 (app.core.errors)
+             36 IMPORT_FROM              6 (E)
+             38 STORE_NAME               6 (E)
+             40 POP_TOP
+
+ 21          42 LOAD_CONST               5 ('anthropic_messages')
+             44 STORE_NAME               7 (KEY)
+
+ 22          46 LOAD_CONST               6 ('Anthropic (Messages API)')
+             48 STORE_NAME               8 (LABEL)
+
+ 24          50 LOAD_CONST               7 ('2023-06-01')
+             52 STORE_NAME               9 (API_VERSION)
+
+ 28          54 LOAD_CONST               8 (4096)
+             56 STORE_NAME              10 (_FALLBACK_MAX_TOKENS)
+
+ 31          58 LOAD_CONST              22 (('base_url', 'str', 'return', 'str'))
+             60 LOAD_CONST               9 (<code object url at 0x7f6c9329e3d0, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 31>)
+             62 MAKE_FUNCTION            4 (annotations)
+             64 STORE_NAME              11 (url)
+
+ 35          66 LOAD_CONST              22 (('base_url', 'str', 'return', 'str'))
+             68 LOAD_CONST              10 (<code object models_url at 0x7f6c9329dd40, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 35>)
+             70 MAKE_FUNCTION            4 (annotations)
+             72 STORE_NAME              12 (models_url)
+
+ 39          74 LOAD_CONST              23 ((None,))
+             76 LOAD_CONST              24 (('api_key', 'str', 'extra', 'dict | None', 'return', 'dict'))
+             78 LOAD_CONST              12 (<code object headers at 0x7f6c9340f660, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 39>)
+             80 MAKE_FUNCTION            5 (defaults, annotations)
+             82 STORE_NAME              13 (headers)
+
+ 47          84 LOAD_CONST              25 (('messages', 'list[dict]', 'return', 'tuple[str, list[dict]]'))
+             86 LOAD_CONST              13 (<code object _split_system at 0x269918e0, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 47>)
+             88 MAKE_FUNCTION            4 (annotations)
+             90 STORE_NAME              14 (_split_system)
+
+ 72          92 PUSH_NULL
+             94 LOAD_NAME               15 (frozenset)
+             96 CALL                     0
+
+ 70         104 LOAD_CONST              14 (('drop',))
+            106 BUILD_CONST_KEY_MAP      1
+
+ 71         108 NOP
+
+ 70         110 NOP
+
+ 71         112 NOP
+
+ 70         114 NOP
+
+ 72         116 NOP
+
+ 70         118 NOP
+
+ 72         120 NOP
+
+ 70         122 LOAD_CONST              26 (('messages', 'list[dict]', 'temperature', 'float | None', 'max_tokens', 'int | None', 'reasoning_effort', 'str | None', 'drop', 'frozenset[str]', 'return', 'dict'))
+            124 LOAD_CONST              15 (<code object build_body at 0x7f6c9327ad80, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 70>)
+            126 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            128 STORE_NAME              16 (build_body)
+
+ 92         130 LOAD_CONST              27 (('return', 'str'))
+            132 LOAD_CONST              16 (<code object _content_to_text at 0x2908fe80, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 92>)
+            134 MAKE_FUNCTION            4 (annotations)
+            136 STORE_NAME              17 (_content_to_text)
+
+108         138 LOAD_CONST              28 (('data', 'dict', 'return', 'ParsedReply'))
+            140 LOAD_CONST              17 (<code object parse at 0x2906c9b0, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 108>)
+            142 MAKE_FUNCTION            4 (annotations)
+            144 STORE_NAME              18 (parse)
+
+132         146 LOAD_CONST              29 (('data', 'dict', 'return', 'list[str]'))
+            148 LOAD_CONST              18 (<code object parse_models at 0x7f6c93439f30, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 132>)
+            150 MAKE_FUNCTION            4 (annotations)
+            152 STORE_NAME              19 (parse_models)
+
+144         154 LOAD_CONST              30 (('status', 'int', 'text', 'str', 'return', 'str'))
+            156 LOAD_CONST              19 (<code object classify at 0x269d4610, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 144>)
+            158 MAKE_FUNCTION            4 (annotations)
+            160 STORE_NAME              20 (classify)
+
+166         162 LOAD_CONST              31 (('text', 'str', 'return', 'str | None'))
+            164 LOAD_CONST              20 (<code object rejected_param at 0x7f6c933bd330, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 166>)
+            166 MAKE_FUNCTION            4 (annotations)
+            168 STORE_NAME              21 (rejected_param)
+
+173         170 LOAD_CONST              32 (('return', 'int'))
+            172 LOAD_CONST              21 (<code object _int at 0x7f6c9340faa0, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 173>)
+            174 MAKE_FUNCTION            4 (annotations)
+            176 STORE_NAME              22 (_int)
+            178 RETURN_CONST            11 (None)
+
+Disassembly of <code object url at 0x7f6c9329e3d0, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 31>:
+ 31           0 RESUME                   0
+
+ 32           2 LOAD_FAST                0 (base_url)
+              4 LOAD_ATTR                1 (NULL|self + rstrip)
+             24 LOAD_CONST               1 ('/')
+             26 CALL                     1
+             34 LOAD_CONST               2 ('/messages')
+             36 BINARY_OP                0 (+)
+             40 RETURN_VALUE
+
+Disassembly of <code object models_url at 0x7f6c9329dd40, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 35>:
+ 35           0 RESUME                   0
+
+ 36           2 LOAD_FAST                0 (base_url)
+              4 LOAD_ATTR                1 (NULL|self + rstrip)
+             24 LOAD_CONST               1 ('/')
+             26 CALL                     1
+             34 LOAD_CONST               2 ('/models')
+             36 BINARY_OP                0 (+)
+             40 RETURN_VALUE
+
+Disassembly of <code object headers at 0x7f6c9340f660, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 39>:
+ 39           0 RESUME                   0
+
+ 40           2 LOAD_CONST               1 ('application/json')
+              4 LOAD_GLOBAL              0 (API_VERSION)
+             14 LOAD_CONST               2 (('Content-Type', 'anthropic-version'))
+             16 BUILD_CONST_KEY_MAP      2
+             18 STORE_FAST               2 (out)
+
+ 41          20 LOAD_FAST                0 (api_key)
+             22 POP_JUMP_IF_FALSE        5 (to 34)
+
+ 42          24 LOAD_FAST                0 (api_key)
+             26 LOAD_FAST                2 (out)
+             28 LOAD_CONST               3 ('x-api-key')
+             30 STORE_SUBSCR
+
+ 43     >>   34 LOAD_FAST                2 (out)
+             36 LOAD_ATTR                3 (NULL|self + update)
+             56 LOAD_FAST                1 (extra)
+             58 COPY                     1
+             60 POP_JUMP_IF_TRUE         2 (to 66)
+             62 POP_TOP
+             64 BUILD_MAP                0
+        >>   66 CALL                     1
+             74 POP_TOP
+
+ 44          76 LOAD_FAST                2 (out)
+             78 RETURN_VALUE
+
+Disassembly of <code object _split_system at 0x269918e0, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 47>:
+ 47           0 RESUME                   0
+
+ 53           2 BUILD_LIST               0
+              4 STORE_FAST               1 (system_parts)
+
+ 54           6 BUILD_LIST               0
+              8 STORE_FAST               2 (rest)
+
+ 55          10 LOAD_FAST                0 (messages)
+             12 GET_ITER
+        >>   14 FOR_ITER               166 (to 350)
+             18 STORE_FAST               3 (msg)
+
+ 56          20 LOAD_FAST                3 (msg)
+             22 LOAD_ATTR                1 (NULL|self + get)
+             42 LOAD_CONST               1 ('role')
+             44 CALL                     1
+             52 COPY                     1
+             54 POP_JUMP_IF_TRUE         2 (to 60)
+             56 POP_TOP
+             58 LOAD_CONST               2 ('')
+        >>   60 LOAD_ATTR                3 (NULL|self + strip)
+             80 CALL                     0
+             88 STORE_FAST               4 (role)
+
+ 57          90 LOAD_FAST                3 (msg)
+             92 LOAD_ATTR                1 (NULL|self + get)
+            112 LOAD_CONST               3 ('content')
+            114 CALL                     1
+            122 STORE_FAST               5 (content)
+
+ 58         124 LOAD_FAST                4 (role)
+            126 LOAD_CONST               4 ('system')
+            128 COMPARE_OP              40 (==)
+            132 POP_JUMP_IF_FALSE       49 (to 232)
+
+ 59         134 LOAD_FAST                1 (system_parts)
+            136 LOAD_ATTR                5 (NULL|self + append)
+            156 LOAD_GLOBAL              7 (NULL + isinstance)
+            166 LOAD_FAST                5 (content)
+            168 LOAD_GLOBAL              8 (str)
+            178 CALL                     2
+            186 POP_JUMP_IF_FALSE        2 (to 192)
+            188 LOAD_FAST                5 (content)
+            190 JUMP_FORWARD            14 (to 220)
+        >>  192 LOAD_GLOBAL              9 (NULL + str)
+            202 LOAD_FAST                5 (content)
+            204 COPY                     1
+            206 POP_JUMP_IF_TRUE         2 (to 212)
+            208 POP_TOP
+            210 LOAD_CONST               2 ('')
+        >>  212 CALL                     1
+        >>  220 CALL                     1
+            228 POP_TOP
+
+ 60         230 JUMP_BACKWARD          109 (to 14)
+
+ 62     >>  232 LOAD_FAST                2 (rest)
+            234 LOAD_ATTR                5 (NULL|self + append)
+            254 LOAD_FAST                4 (role)
+            256 LOAD_CONST               5 ('assistant')
+            258 COMPARE_OP              40 (==)
+            262 POP_JUMP_IF_FALSE        2 (to 268)
+            264 LOAD_CONST               5 ('assistant')
+            266 JUMP_FORWARD             1 (to 270)
+        >>  268 LOAD_CONST               6 ('user')
+
+ 63     >>  270 LOAD_GLOBAL              7 (NULL + isinstance)
+            280 LOAD_FAST                5 (content)
+            282 LOAD_GLOBAL              8 (str)
+            292 CALL                     2
+            300 POP_JUMP_IF_FALSE        2 (to 306)
+            302 LOAD_FAST                5 (content)
+            304 JUMP_FORWARD            14 (to 334)
+        >>  306 LOAD_GLOBAL              9 (NULL + str)
+            316 LOAD_FAST                5 (content)
+            318 COPY                     1
+            320 POP_JUMP_IF_TRUE         2 (to 326)
+            322 POP_TOP
+            324 LOAD_CONST               2 ('')
+        >>  326 CALL                     1
+
+ 62     >>  334 LOAD_CONST               7 (('role', 'content'))
+            336 BUILD_CONST_KEY_MAP      2
+            338 CALL                     1
+            346 POP_TOP
+            348 JUMP_BACKWARD          168 (to 14)
+
+ 55     >>  350 END_FOR
+
+ 65         352 LOAD_FAST                2 (rest)
+            354 POP_JUMP_IF_TRUE        24 (to 404)
+
+ 66         356 LOAD_CONST               6 ('user')
+            358 LOAD_FAST                1 (system_parts)
+            360 POP_JUMP_IF_FALSE       16 (to 394)
+            362 LOAD_FAST                1 (system_parts)
+            364 LOAD_ATTR               11 (NULL|self + pop)
+            384 CALL                     0
+            392 JUMP_FORWARD             1 (to 396)
+        >>  394 LOAD_CONST               2 ('')
+        >>  396 LOAD_CONST               7 (('role', 'content'))
+            398 BUILD_CONST_KEY_MAP      2
+            400 BUILD_LIST               1
+            402 STORE_FAST               2 (rest)
+
+ 67     >>  404 LOAD_CONST               8 ('\n\n')
+            406 LOAD_ATTR               13 (NULL|self + join)
+            426 LOAD_CONST               9 (<code object <genexpr> at 0x7f6c9329e1f0, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 67>)
+            428 MAKE_FUNCTION            0
+            430 LOAD_FAST                1 (system_parts)
+            432 GET_ITER
+            434 CALL                     0
+            442 CALL                     1
+            450 LOAD_FAST                2 (rest)
+            452 BUILD_TUPLE              2
+            454 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c9329e1f0, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 67>:
+ 67           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                 9 (to 30)
+             12 STORE_FAST               1 (p)
+             14 LOAD_FAST                1 (p)
+             16 POP_JUMP_IF_TRUE         1 (to 20)
+             18 JUMP_BACKWARD            6 (to 8)
+        >>   20 LOAD_FAST                1 (p)
+             22 YIELD_VALUE              1
+             24 RESUME                   1
+             26 POP_TOP
+             28 JUMP_BACKWARD           11 (to 8)
+        >>   30 END_FOR
+             32 RETURN_CONST             0 (None)
+        >>   34 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             36 RERAISE                  1
+ExceptionTable:
+  4 to 16 -> 34 [0] lasti
+  20 to 32 -> 34 [0] lasti
+
+Disassembly of <code object build_body at 0x7f6c9327ad80, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 70>:
+ 70           0 RESUME                   0
+
+ 73           2 LOAD_GLOBAL              1 (NULL + _split_system)
+             12 LOAD_FAST                1 (messages)
+             14 CALL                     1
+             22 UNPACK_SEQUENCE          2
+             26 STORE_FAST               6 (system)
+             28 STORE_FAST               7 (rest)
+
+ 74          30 LOAD_FAST                3 (max_tokens)
+             32 POP_JUMP_IF_FALSE       11 (to 56)
+             34 LOAD_GLOBAL              3 (NULL + int)
+             44 LOAD_FAST                3 (max_tokens)
+             46 CALL                     1
+             54 JUMP_FORWARD             5 (to 66)
+        >>   56 LOAD_GLOBAL              4 (_FALLBACK_MAX_TOKENS)
+        >>   66 STORE_FAST               8 (budget)
+
+ 76          68 LOAD_FAST                0 (model)
+             70 LOAD_ATTR                6 (id)
+
+ 77          90 LOAD_FAST                7 (rest)
+
+ 79          92 LOAD_GLOBAL              9 (NULL + min)
+            102 LOAD_FAST                8 (budget)
+            104 LOAD_FAST                0 (model)
+            106 LOAD_ATTR               10 (max_output_tokens)
+            126 CALL                     2
+
+ 75         134 LOAD_CONST               1 (('model', 'messages', 'max_tokens'))
+            136 BUILD_CONST_KEY_MAP      3
+            138 STORE_FAST               9 (body)
+
+ 81         140 LOAD_FAST                6 (system)
+            142 POP_JUMP_IF_FALSE        5 (to 154)
+
+ 82         144 LOAD_FAST                6 (system)
+            146 LOAD_FAST                9 (body)
+            148 LOAD_CONST               2 ('system')
+            150 STORE_SUBSCR
+
+ 83     >>  154 LOAD_FAST                2 (temperature)
+            156 POP_JUMP_IF_NONE        21 (to 200)
+            158 LOAD_FAST                0 (model)
+            160 LOAD_ATTR               12 (honors_temperature)
+            180 POP_JUMP_IF_FALSE        9 (to 200)
+            182 LOAD_CONST               3 ('temperature')
+            184 LOAD_FAST                5 (drop)
+            186 CONTAINS_OP              1
+            188 POP_JUMP_IF_FALSE        5 (to 200)
+
+ 84         190 LOAD_FAST                2 (temperature)
+            192 LOAD_FAST                9 (body)
+            194 LOAD_CONST               3 ('temperature')
+            196 STORE_SUBSCR
+
+ 89     >>  200 LOAD_FAST                9 (body)
+            202 RETURN_VALUE
+
+Disassembly of <code object _content_to_text at 0x2908fe80, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 92>:
+ 92           0 RESUME                   0
+
+ 94           2 LOAD_GLOBAL              1 (NULL + isinstance)
+             12 LOAD_FAST                0 (content)
+             14 LOAD_GLOBAL              2 (str)
+             24 CALL                     2
+             32 POP_JUMP_IF_FALSE        2 (to 38)
+
+ 95          34 LOAD_FAST                0 (content)
+             36 RETURN_VALUE
+
+ 96     >>   38 LOAD_GLOBAL              1 (NULL + isinstance)
+             48 LOAD_FAST                0 (content)
+             50 LOAD_GLOBAL              4 (list)
+             60 CALL                     2
+             68 POP_JUMP_IF_TRUE        15 (to 100)
+
+ 97          70 LOAD_FAST                0 (content)
+             72 POP_JUMP_IF_NOT_NONE     2 (to 78)
+             74 LOAD_CONST               1 ('')
+             76 RETURN_VALUE
+        >>   78 LOAD_GLOBAL              3 (NULL + str)
+             88 LOAD_FAST                0 (content)
+             90 CALL                     1
+             98 RETURN_VALUE
+
+ 98     >>  100 BUILD_LIST               0
+            102 STORE_FAST               1 (parts)
+
+ 99         104 LOAD_FAST                0 (content)
+            106 GET_ITER
+        >>  108 FOR_ITER               119 (to 350)
+            112 STORE_FAST               2 (block)
+
+100         114 LOAD_GLOBAL              1 (NULL + isinstance)
+            124 LOAD_FAST                2 (block)
+            126 LOAD_GLOBAL              6 (dict)
+            136 CALL                     2
+            144 POP_JUMP_IF_FALSE       67 (to 280)
+
+101         146 LOAD_FAST                2 (block)
+            148 LOAD_ATTR                9 (NULL|self + get)
+            168 LOAD_CONST               2 ('type')
+            170 CALL                     1
+            178 LOAD_CONST               3 ('text')
+            180 COMPARE_OP              40 (==)
+            184 POP_JUMP_IF_TRUE         1 (to 188)
+            186 JUMP_BACKWARD           40 (to 108)
+
+102     >>  188 LOAD_FAST                1 (parts)
+            190 LOAD_ATTR               11 (NULL|self + append)
+            210 LOAD_GLOBAL              3 (NULL + str)
+            220 LOAD_FAST                2 (block)
+            222 LOAD_ATTR                9 (NULL|self + get)
+            242 LOAD_CONST               3 ('text')
+            244 CALL                     1
+            252 COPY                     1
+            254 POP_JUMP_IF_TRUE         2 (to 260)
+            256 POP_TOP
+            258 LOAD_CONST               1 ('')
+        >>  260 CALL                     1
+            268 CALL                     1
+            276 POP_TOP
+            278 JUMP_BACKWARD           86 (to 108)
+
+103     >>  280 LOAD_GLOBAL              1 (NULL + isinstance)
+            290 LOAD_FAST                2 (block)
+            292 LOAD_GLOBAL              2 (str)
+            302 CALL                     2
+            310 POP_JUMP_IF_TRUE         1 (to 314)
+            312 JUMP_BACKWARD          103 (to 108)
+
+104     >>  314 LOAD_FAST                1 (parts)
+            316 LOAD_ATTR               11 (NULL|self + append)
+            336 LOAD_FAST                2 (block)
+            338 CALL                     1
+            346 POP_TOP
+            348 JUMP_BACKWARD          121 (to 108)
+
+ 99     >>  350 END_FOR
+
+105         352 LOAD_CONST               1 ('')
+            354 LOAD_ATTR               13 (NULL|self + join)
+            374 LOAD_FAST                1 (parts)
+            376 CALL                     1
+            384 RETURN_VALUE
+
+Disassembly of <code object parse at 0x2906c9b0, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 108>:
+108           0 RESUME                   0
+
+109           2 LOAD_GLOBAL              1 (NULL + isinstance)
+             12 LOAD_FAST                0 (data)
+             14 LOAD_GLOBAL              2 (dict)
+             24 CALL                     2
+             32 POP_JUMP_IF_FALSE        4 (to 42)
+             34 LOAD_CONST               1 ('content')
+             36 LOAD_FAST                0 (data)
+             38 CONTAINS_OP              1
+             40 POP_JUMP_IF_FALSE       11 (to 64)
+
+110     >>   42 LOAD_GLOBAL              5 (NULL + ValueError)
+             52 LOAD_CONST               2 ("không có trường 'content' ở cấp cao nhất")
+             54 CALL                     1
+             62 RAISE_VARARGS            1
+
+111     >>   64 LOAD_GLOBAL              7 (NULL + _content_to_text)
+             74 LOAD_FAST                0 (data)
+             76 LOAD_ATTR                9 (NULL|self + get)
+             96 LOAD_CONST               1 ('content')
+             98 CALL                     1
+            106 CALL                     1
+            114 STORE_FAST               1 (text)
+
+113         116 LOAD_FAST                0 (data)
+            118 LOAD_ATTR                9 (NULL|self + get)
+            138 LOAD_CONST               3 ('usage')
+            140 CALL                     1
+            148 COPY                     1
+            150 POP_JUMP_IF_TRUE         2 (to 156)
+            152 POP_TOP
+            154 BUILD_MAP                0
+        >>  156 STORE_FAST               2 (usage)
+
+114         158 LOAD_GLOBAL             11 (NULL + _int)
+            168 LOAD_FAST                2 (usage)
+            170 LOAD_ATTR                9 (NULL|self + get)
+            190 LOAD_CONST               4 ('input_tokens')
+            192 CALL                     1
+            200 CALL                     1
+            208 STORE_FAST               3 (tokens_in)
+
+115         210 LOAD_GLOBAL             11 (NULL + _int)
+            220 LOAD_FAST                2 (usage)
+            222 LOAD_ATTR                9 (NULL|self + get)
+            242 LOAD_CONST               5 ('output_tokens')
+            244 CALL                     1
+            252 CALL                     1
+            260 STORE_FAST               4 (tokens_out)
+
+118         262 LOAD_GLOBAL             11 (NULL + _int)
+            272 LOAD_FAST                2 (usage)
+            274 LOAD_ATTR                9 (NULL|self + get)
+            294 LOAD_CONST               6 ('cache_read_input_tokens')
+            296 CALL                     1
+            304 CALL                     1
+            312 STORE_FAST               5 (cached)
+
+122         314 LOAD_GLOBAL             13 (NULL + ParsedReply)
+
+123         324 LOAD_FAST                1 (text)
+
+124         326 LOAD_FAST                3 (tokens_in)
+            328 LOAD_FAST                5 (cached)
+            330 BINARY_OP                0 (+)
+
+125         334 LOAD_FAST                4 (tokens_out)
+
+126         336 LOAD_FAST                5 (cached)
+
+127         338 LOAD_CONST               7 (0)
+
+128         340 LOAD_GLOBAL             15 (NULL + str)
+            350 LOAD_FAST                0 (data)
+            352 LOAD_ATTR                9 (NULL|self + get)
+            372 LOAD_CONST               8 ('stop_reason')
+            374 CALL                     1
+            382 COPY                     1
+            384 POP_JUMP_IF_TRUE         2 (to 390)
+            386 POP_TOP
+            388 LOAD_CONST               9 ('')
+        >>  390 CALL                     1
+
+122         398 KW_NAMES                10 (('text', 'tokens_in', 'tokens_out', 'tokens_cached', 'reasoning_tokens', 'finish_reason'))
+            400 CALL                     6
+            408 RETURN_VALUE
+
+Disassembly of <code object parse_models at 0x7f6c93439f30, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 132>:
+132           0 RESUME                   0
+
+133           2 LOAD_GLOBAL              1 (NULL + isinstance)
+             12 LOAD_FAST                0 (data)
+             14 LOAD_GLOBAL              2 (dict)
+             24 CALL                     2
+             32 POP_JUMP_IF_FALSE       17 (to 68)
+             34 LOAD_FAST                0 (data)
+             36 LOAD_ATTR                5 (NULL|self + get)
+             56 LOAD_CONST               1 ('data')
+             58 CALL                     1
+             66 JUMP_FORWARD             1 (to 70)
+        >>   68 LOAD_CONST               0 (None)
+        >>   70 STORE_FAST               1 (items)
+
+134          72 LOAD_GLOBAL              1 (NULL + isinstance)
+             82 LOAD_FAST                1 (items)
+             84 LOAD_GLOBAL              6 (list)
+             94 CALL                     2
+            102 POP_JUMP_IF_TRUE         2 (to 108)
+
+135         104 BUILD_LIST               0
+            106 RETURN_VALUE
+
+136     >>  108 BUILD_LIST               0
+            110 STORE_FAST               2 (out)
+
+137         112 LOAD_FAST                1 (items)
+            114 GET_ITER
+        >>  116 FOR_ITER                89 (to 298)
+            120 STORE_FAST               3 (item)
+
+138         122 LOAD_GLOBAL              9 (NULL + str)
+            132 LOAD_GLOBAL              1 (NULL + isinstance)
+            142 LOAD_FAST                3 (item)
+            144 LOAD_GLOBAL              2 (dict)
+            154 CALL                     2
+            162 POP_JUMP_IF_FALSE       17 (to 198)
+            164 LOAD_FAST                3 (item)
+            166 LOAD_ATTR                5 (NULL|self + get)
+            186 LOAD_CONST               2 ('id')
+            188 CALL                     1
+            196 JUMP_FORWARD             1 (to 200)
+        >>  198 LOAD_FAST                3 (item)
+        >>  200 COPY                     1
+            202 POP_JUMP_IF_TRUE         2 (to 208)
+            204 POP_TOP
+            206 LOAD_CONST               3 ('')
+        >>  208 CALL                     1
+            216 LOAD_ATTR               11 (NULL|self + strip)
+            236 CALL                     0
+            244 STORE_FAST               4 (model_id)
+
+139         246 LOAD_FAST                4 (model_id)
+            248 POP_JUMP_IF_TRUE         1 (to 252)
+            250 JUMP_BACKWARD           68 (to 116)
+        >>  252 LOAD_FAST                4 (model_id)
+            254 LOAD_FAST                2 (out)
+            256 CONTAINS_OP              1
+            258 POP_JUMP_IF_TRUE         1 (to 262)
+            260 JUMP_BACKWARD           73 (to 116)
+
+140     >>  262 LOAD_FAST                2 (out)
+            264 LOAD_ATTR               13 (NULL|self + append)
+            284 LOAD_FAST                4 (model_id)
+            286 CALL                     1
+            294 POP_TOP
+            296 JUMP_BACKWARD           91 (to 116)
+
+137     >>  298 END_FOR
+
+141         300 LOAD_FAST                2 (out)
+            302 RETURN_VALUE
+
+Disassembly of <code object classify at 0x269d4610, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 144>:
+144           0 RESUME                   0
+
+145           2 LOAD_FAST                1 (text)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 LOAD_CONST               1 ('')
+        >>   12 LOAD_ATTR                1 (NULL|self + lower)
+             32 CALL                     0
+             40 STORE_FAST               2 (low)
+
+146          42 LOAD_FAST                0 (status)
+             44 LOAD_CONST               2 ((401, 403))
+             46 CONTAINS_OP              0
+             48 POP_JUMP_IF_FALSE       16 (to 82)
+
+147          50 LOAD_GLOBAL              2 (E)
+             60 LOAD_ATTR                4 (LLM_API_AUTH)
+             80 RETURN_VALUE
+
+148     >>   82 LOAD_FAST                0 (status)
+             84 LOAD_CONST               3 (429)
+             86 COMPARE_OP              40 (==)
+             90 POP_JUMP_IF_FALSE       16 (to 124)
+
+149          92 LOAD_GLOBAL              2 (E)
+            102 LOAD_ATTR                6 (LLM_API_RATE_LIMIT)
+            122 RETURN_VALUE
+
+150     >>  124 LOAD_FAST                0 (status)
+            126 LOAD_CONST               4 (404)
+            128 COMPARE_OP              40 (==)
+            132 POP_JUMP_IF_FALSE       16 (to 166)
+
+151         134 LOAD_GLOBAL              2 (E)
+            144 LOAD_ATTR                8 (LLM_API_BAD_RESPONSE)
+            164 RETURN_VALUE
+
+152     >>  166 LOAD_FAST                0 (status)
+            168 LOAD_CONST               5 (400)
+            170 COMPARE_OP              40 (==)
+            174 POP_JUMP_IF_FALSE       48 (to 272)
+
+154         176 LOAD_CONST               6 ('too long')
+            178 LOAD_FAST                2 (low)
+            180 CONTAINS_OP              0
+            182 POP_JUMP_IF_TRUE        12 (to 208)
+            184 LOAD_CONST               7 ('context')
+            186 LOAD_FAST                2 (low)
+            188 CONTAINS_OP              0
+            190 POP_JUMP_IF_TRUE         8 (to 208)
+            192 LOAD_CONST               8 ('max_tokens')
+            194 LOAD_FAST                2 (low)
+            196 CONTAINS_OP              0
+            198 POP_JUMP_IF_FALSE       20 (to 240)
+            200 LOAD_CONST               9 ('exceed')
+            202 LOAD_FAST                2 (low)
+            204 CONTAINS_OP              0
+            206 POP_JUMP_IF_FALSE       16 (to 240)
+
+155     >>  208 LOAD_GLOBAL              2 (E)
+            218 LOAD_ATTR               10 (LLM_API_CONTEXT_TOO_LONG)
+            238 RETURN_VALUE
+
+156     >>  240 LOAD_GLOBAL              2 (E)
+            250 LOAD_ATTR                8 (LLM_API_BAD_RESPONSE)
+            270 RETURN_VALUE
+
+157     >>  272 LOAD_FAST                0 (status)
+            274 LOAD_CONST              10 (413)
+            276 COMPARE_OP              40 (==)
+            280 POP_JUMP_IF_FALSE       16 (to 314)
+
+158         282 LOAD_GLOBAL              2 (E)
+            292 LOAD_ATTR               10 (LLM_API_CONTEXT_TOO_LONG)
+            312 RETURN_VALUE
+
+159     >>  314 LOAD_FAST                0 (status)
+            316 LOAD_CONST              11 (529)
+            318 COMPARE_OP              40 (==)
+            322 POP_JUMP_IF_FALSE       16 (to 356)
+
+160         324 LOAD_GLOBAL              2 (E)
+            334 LOAD_ATTR               12 (LLM_API_NETWORK)
+            354 RETURN_VALUE
+
+161     >>  356 LOAD_CONST              12 (500)
+            358 LOAD_FAST                0 (status)
+            360 SWAP                     2
+            362 COPY                     2
+            364 COMPARE_OP              26 (<=)
+            368 POP_JUMP_IF_FALSE       20 (to 410)
+            370 LOAD_CONST              13 (600)
+            372 COMPARE_OP               2 (<)
+            376 POP_JUMP_IF_FALSE       33 (to 444)
+
+162         378 LOAD_GLOBAL              2 (E)
+            388 LOAD_ATTR               12 (LLM_API_NETWORK)
+            408 RETURN_VALUE
+
+161     >>  410 POP_TOP
+
+163         412 LOAD_GLOBAL              2 (E)
+            422 LOAD_ATTR                8 (LLM_API_BAD_RESPONSE)
+            442 RETURN_VALUE
+        >>  444 LOAD_GLOBAL              2 (E)
+            454 LOAD_ATTR                8 (LLM_API_BAD_RESPONSE)
+            474 RETURN_VALUE
+
+Disassembly of <code object rejected_param at 0x7f6c933bd330, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 166>:
+166           0 RESUME                   0
+
+167           2 LOAD_FAST                0 (text)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 LOAD_CONST               1 ('')
+        >>   12 LOAD_ATTR                1 (NULL|self + lower)
+             32 CALL                     0
+             40 STORE_FAST               1 (low)
+
+168          42 LOAD_CONST               2 ('temperature')
+             44 LOAD_FAST                1 (low)
+             46 CONTAINS_OP              0
+             48 POP_JUMP_IF_FALSE        1 (to 52)
+
+169          50 RETURN_CONST             2 ('temperature')
+
+170     >>   52 RETURN_CONST             0 (None)
+
+Disassembly of <code object _int at 0x7f6c9340faa0, file "app\adapters\llm_api\dialects\anthropic_messages.py", line 173>:
+173           0 RESUME                   0
+
+174           2 NOP
+
+175           4 LOAD_GLOBAL              1 (NULL + int)
+             14 LOAD_FAST                0 (value)
+             16 COPY                     1
+             18 POP_JUMP_IF_TRUE         2 (to 24)
+             20 POP_TOP
+             22 LOAD_CONST               1 (0)
+        >>   24 CALL                     1
+             32 RETURN_VALUE
+        >>   34 PUSH_EXC_INFO
+
+176          36 LOAD_GLOBAL              2 (TypeError)
+             46 LOAD_GLOBAL              4 (ValueError)
+             56 BUILD_TUPLE              2
+             58 CHECK_EXC_MATCH
+             60 POP_JUMP_IF_FALSE        3 (to 68)
+             62 POP_TOP
+
+177          64 POP_EXCEPT
+             66 RETURN_CONST             1 (0)
+
+176     >>   68 RERAISE                  0
+        >>   70 COPY                     3
+             72 POP_EXCEPT
+             74 RERAISE                  1
+ExceptionTable:
+  4 to 30 -> 34 [0]
+  34 to 62 -> 70 [1] lasti
+  68 to 68 -> 70 [1] lasti

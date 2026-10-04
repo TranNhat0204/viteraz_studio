@@ -1,0 +1,1419 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Adapter yt-dlp — tải YouTube / Bilibili (và fallback đa nền tảng).\n\nVì sao yt-dlp cho YouTube & Bilibili:\n  - YouTube và Bilibili dùng DASH (luồng video & audio TÁCH RỜI) → cần merge bằng ffmpeg.\n    yt-dlp lo việc chọn format tốt nhất + merge ra mp4 hoàn chỉnh, ổn định hơn tự stream.\n  - Cũng dùng được làm fallback chung khi fast-path (HybridCrawler) lỗi.\n\nPhòng thủ:\n  - yt-dlp là dependency tùy chọn: import lười, thiếu → StudioError(YTDLP_NOT_AVAILABLE) có hint.\n  - Việc tải (blocking) chạy trong thread; tiến độ marshal về event loop qua call_soon_threadsafe.\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 12           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 14          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (asyncio)
+             24 STORE_NAME               3 (asyncio)
+
+ 15          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               3 (None)
+             30 IMPORT_NAME              4 (sys)
+             32 STORE_NAME               4 (sys)
+
+ 16          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               3 (None)
+             38 IMPORT_NAME              5 (time)
+             40 STORE_NAME               5 (time)
+
+ 17          42 LOAD_CONST               1 (0)
+             44 LOAD_CONST               4 (('Path',))
+             46 IMPORT_NAME              6 (pathlib)
+             48 IMPORT_FROM              7 (Path)
+             50 STORE_NAME               7 (Path)
+             52 POP_TOP
+
+ 18          54 LOAD_CONST               1 (0)
+             56 LOAD_CONST               5 (('Callable',))
+             58 IMPORT_NAME              8 (typing)
+             60 IMPORT_FROM              9 (Callable)
+             62 STORE_NAME               9 (Callable)
+             64 POP_TOP
+
+ 22          66 LOAD_CONST               6 (4)
+             68 STORE_NAME              10 (_YTDLP_412_RETRIES)
+
+ 24          70 LOAD_CONST               1 (0)
+             72 LOAD_CONST               7 (('make_error', 'E', 'StudioError'))
+             74 IMPORT_NAME             11 (app.core.errors)
+             76 IMPORT_FROM             12 (make_error)
+             78 STORE_NAME              12 (make_error)
+             80 IMPORT_FROM             13 (E)
+             82 STORE_NAME              13 (E)
+             84 IMPORT_FROM             14 (StudioError)
+             86 STORE_NAME              14 (StudioError)
+             88 POP_TOP
+
+ 25          90 LOAD_CONST               1 (0)
+             92 LOAD_CONST               8 (('log',))
+             94 IMPORT_NAME             15 (app.core.logging)
+             96 IMPORT_FROM             16 (log)
+             98 STORE_NAME              16 (log)
+            100 POP_TOP
+
+ 28         102 LOAD_CONST              16 (('return', 'None'))
+            104 LOAD_CONST               9 (<code object _ensure_local_ytdlp at 0x7f6c9326e3d0, file "app\adapters\ytdlp_client.py", line 28>)
+            106 MAKE_FUNCTION            4 (annotations)
+            108 STORE_NAME              17 (_ensure_local_ytdlp)
+
+ 40         110 LOAD_CONST              16 (('return', 'None'))
+            112 LOAD_CONST              10 (<code object _patch_bilibili_referer at 0x7f6c9328a700, file "app\adapters\ytdlp_client.py", line 40>)
+            114 MAKE_FUNCTION            4 (annotations)
+            116 STORE_NAME              18 (_patch_bilibili_referer)
+
+ 71         118 LOAD_CONST              17 (('exc', 'BaseException', 'return', 'bool'))
+            120 LOAD_CONST              11 (<code object _is_412 at 0x7f6c93323530, file "app\adapters\ytdlp_client.py", line 71>)
+            122 MAKE_FUNCTION            4 (annotations)
+            124 STORE_NAME              19 (_is_412)
+
+ 77         126 PUSH_NULL
+            128 LOAD_BUILD_CLASS
+            130 LOAD_CONST              12 (<code object _CancelledDownload at 0x7f6c81a79070, file "app\adapters\ytdlp_client.py", line 77>)
+            132 MAKE_FUNCTION            0
+            134 LOAD_CONST              13 ('_CancelledDownload')
+            136 LOAD_NAME               20 (Exception)
+            138 CALL                     3
+            146 STORE_NAME              21 (_CancelledDownload)
+
+ 81         148 PUSH_NULL
+            150 LOAD_BUILD_CLASS
+            152 LOAD_CONST              14 (<code object YtDlpClient at 0x7f6c93273470, file "app\adapters\ytdlp_client.py", line 81>)
+            154 MAKE_FUNCTION            0
+            156 LOAD_CONST              15 ('YtDlpClient')
+            158 CALL                     2
+            166 STORE_NAME              22 (YtDlpClient)
+            168 RETURN_CONST             3 (None)
+
+Disassembly of <code object _ensure_local_ytdlp at 0x7f6c9326e3d0, file "app\adapters\ytdlp_client.py", line 28>:
+ 28           0 RESUME                   0
+
+ 30           2 NOP
+
+ 31           4 LOAD_CONST               1 (0)
+              6 LOAD_CONST               2 (('get_settings',))
+              8 IMPORT_NAME              0 (app.config)
+             10 IMPORT_FROM              1 (get_settings)
+             12 STORE_FAST               0 (get_settings)
+             14 POP_TOP
+
+ 32          16 PUSH_NULL
+             18 LOAD_FAST                0 (get_settings)
+             20 CALL                     0
+             28 LOAD_ATTR                4 (data_dir)
+             48 LOAD_CONST               3 ('resources')
+             50 BINARY_OP               11 (/)
+             54 LOAD_CONST               4 ('yt-dlp')
+             56 BINARY_OP               11 (/)
+             60 STORE_FAST               1 (d)
+
+ 35          62 LOAD_GLOBAL              9 (NULL + str)
+             72 LOAD_FAST                1 (d)
+             74 LOAD_ATTR               11 (NULL|self + resolve)
+             94 CALL                     0
+            102 CALL                     1
+            110 STORE_FAST               2 (s)
+
+ 36         112 LOAD_FAST                1 (d)
+            114 LOAD_ATTR               13 (NULL|self + exists)
+            134 CALL                     0
+            142 POP_JUMP_IF_FALSE       52 (to 248)
+            144 LOAD_FAST                2 (s)
+            146 LOAD_GLOBAL             14 (sys)
+            156 LOAD_ATTR               16 (path)
+            176 CONTAINS_OP              1
+            178 POP_JUMP_IF_FALSE       33 (to 246)
+
+ 37         180 LOAD_GLOBAL             14 (sys)
+            190 LOAD_ATTR               16 (path)
+            210 LOAD_ATTR               19 (NULL|self + insert)
+            230 LOAD_CONST               1 (0)
+            232 LOAD_FAST                2 (s)
+            234 CALL                     2
+            242 POP_TOP
+            244 RETURN_CONST             5 (None)
+
+ 36     >>  246 RETURN_CONST             5 (None)
+        >>  248 RETURN_CONST             5 (None)
+        >>  250 PUSH_EXC_INFO
+
+ 33         252 LOAD_GLOBAL              6 (Exception)
+            262 CHECK_EXC_MATCH
+            264 POP_JUMP_IF_FALSE        3 (to 272)
+            266 POP_TOP
+
+ 34         268 POP_EXCEPT
+            270 RETURN_CONST             5 (None)
+
+ 33     >>  272 RERAISE                  0
+        >>  274 COPY                     3
+            276 POP_EXCEPT
+            278 RERAISE                  1
+ExceptionTable:
+  4 to 60 -> 250 [0]
+  250 to 266 -> 274 [1] lasti
+  272 to 272 -> 274 [1] lasti
+
+Disassembly of <code object _patch_bilibili_referer at 0x7f6c9328a700, file "app\adapters\ytdlp_client.py", line 40>:
+              0 MAKE_CELL                3 (_orig)
+
+ 40           2 RESUME                   0
+
+ 50           4 NOP
+
+ 51           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('BilibiliBaseIE',))
+             10 IMPORT_NAME              0 (yt_dlp.extractor.bilibili)
+             12 IMPORT_FROM              1 (BilibiliBaseIE)
+             14 STORE_FAST               1 (BilibiliBaseIE)
+             16 POP_TOP
+
+ 54          18 LOAD_GLOBAL              7 (NULL + getattr)
+             28 LOAD_FAST                1 (BilibiliBaseIE)
+             30 LOAD_CONST               4 ('_revo_referer_patched')
+             32 LOAD_CONST               5 (False)
+             34 CALL                     3
+             42 POP_JUMP_IF_FALSE        1 (to 46)
+
+ 55          44 RETURN_CONST             3 (None)
+
+ 56     >>   46 NOP
+
+ 57          48 LOAD_FAST                1 (BilibiliBaseIE)
+             50 LOAD_ATTR                8 (_download_playinfo)
+             70 STORE_DEREF              3 (_orig)
+
+ 59          72 LOAD_CLOSURE             3 (_orig)
+             74 BUILD_TUPLE              1
+             76 LOAD_CONST               6 (<code object _patched at 0x7f6c81c20620, file "app\adapters\ytdlp_client.py", line 59>)
+             78 MAKE_FUNCTION            8 (closure)
+             80 STORE_FAST               2 (_patched)
+
+ 65          82 LOAD_FAST                2 (_patched)
+             84 LOAD_FAST                1 (BilibiliBaseIE)
+             86 STORE_ATTR               4 (_download_playinfo)
+
+ 66          96 LOAD_CONST               7 (True)
+             98 LOAD_FAST                1 (BilibiliBaseIE)
+            100 STORE_ATTR               5 (_revo_referer_patched)
+            110 RETURN_CONST             3 (None)
+        >>  112 PUSH_EXC_INFO
+
+ 52         114 LOAD_GLOBAL              4 (Exception)
+            124 CHECK_EXC_MATCH
+            126 POP_JUMP_IF_FALSE        3 (to 134)
+            128 POP_TOP
+
+ 53         130 POP_EXCEPT
+            132 RETURN_CONST             3 (None)
+
+ 52     >>  134 RERAISE                  0
+        >>  136 COPY                     3
+            138 POP_EXCEPT
+            140 RERAISE                  1
+        >>  142 PUSH_EXC_INFO
+
+ 67         144 LOAD_GLOBAL              4 (Exception)
+            154 CHECK_EXC_MATCH
+            156 POP_JUMP_IF_FALSE        3 (to 164)
+            158 POP_TOP
+
+ 68         160 POP_EXCEPT
+            162 RETURN_CONST             3 (None)
+
+ 67     >>  164 RERAISE                  0
+        >>  166 COPY                     3
+            168 POP_EXCEPT
+            170 RERAISE                  1
+ExceptionTable:
+  6 to 16 -> 112 [0]
+  48 to 108 -> 142 [0]
+  112 to 128 -> 136 [1] lasti
+  134 to 134 -> 136 [1] lasti
+  142 to 158 -> 166 [1] lasti
+  164 to 164 -> 166 [1] lasti
+
+Disassembly of <code object _patched at 0x7f6c81c20620, file "app\adapters\ytdlp_client.py", line 59>:
+              0 COPY_FREE_VARS           1
+
+ 59           2 RESUME                   0
+
+ 60           4 LOAD_GLOBAL              1 (NULL + dict)
+             14 LOAD_FAST                2 (kwargs)
+             16 LOAD_ATTR                3 (NULL|self + get)
+             36 LOAD_CONST               1 ('headers')
+             38 CALL                     1
+             46 COPY                     1
+             48 POP_JUMP_IF_TRUE         2 (to 54)
+             50 POP_TOP
+             52 BUILD_MAP                0
+        >>   54 CALL                     1
+             62 STORE_FAST               3 (h)
+
+ 61          64 LOAD_CONST               2 ('https://www.bilibili.com/')
+             66 LOAD_FAST                3 (h)
+             68 LOAD_CONST               3 ('Referer')
+             70 STORE_SUBSCR
+
+ 62          74 LOAD_FAST                3 (h)
+             76 LOAD_FAST                2 (kwargs)
+             78 LOAD_CONST               1 ('headers')
+             80 STORE_SUBSCR
+
+ 63          84 PUSH_NULL
+             86 LOAD_DEREF               4 (_orig)
+             88 LOAD_FAST                0 (self)
+             90 BUILD_LIST               1
+             92 LOAD_FAST                1 (args)
+             94 LIST_EXTEND              1
+             96 CALL_INTRINSIC_1         6 (INTRINSIC_LIST_TO_TUPLE)
+             98 BUILD_MAP                0
+            100 LOAD_FAST                2 (kwargs)
+            102 DICT_MERGE               1
+            104 CALL_FUNCTION_EX         1
+            106 RETURN_VALUE
+
+Disassembly of <code object _is_412 at 0x7f6c93323530, file "app\adapters\ytdlp_client.py", line 71>:
+ 71           0 RESUME                   0
+
+ 73           2 LOAD_GLOBAL              1 (NULL + str)
+             12 LOAD_FAST                0 (exc)
+             14 CALL                     1
+             22 STORE_FAST               1 (s)
+
+ 74          24 LOAD_CONST               1 ('412')
+             26 LOAD_FAST                1 (s)
+             28 CONTAINS_OP              0
+             30 COPY                     1
+             32 POP_JUMP_IF_FALSE       10 (to 54)
+             34 POP_TOP
+             36 LOAD_CONST               2 ('Precondition')
+             38 LOAD_FAST                1 (s)
+             40 CONTAINS_OP              0
+             42 COPY                     1
+             44 POP_JUMP_IF_TRUE         4 (to 54)
+             46 POP_TOP
+             48 LOAD_CONST               3 ('blocked by server')
+             50 LOAD_FAST                1 (s)
+             52 CONTAINS_OP              0
+        >>   54 RETURN_VALUE
+
+Disassembly of <code object _CancelledDownload at 0x7f6c81a79070, file "app\adapters\ytdlp_client.py", line 77>:
+ 77           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('_CancelledDownload')
+              8 STORE_NAME               2 (__qualname__)
+
+ 78          10 LOAD_CONST               1 ('Ném từ progress hook để dừng yt-dlp khi user hủy.')
+             12 STORE_NAME               3 (__doc__)
+             14 RETURN_CONST             2 (None)
+
+Disassembly of <code object YtDlpClient at 0x7f6c93273470, file "app\adapters\ytdlp_client.py", line 81>:
+ 81           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('YtDlpClient')
+              8 STORE_NAME               2 (__qualname__)
+
+ 82          10 LOAD_CONST               1 ('Bọc yt-dlp cho get_info + download (merge sẵn ra mp4).')
+             12 STORE_NAME               3 (__doc__)
+
+ 84          14 LOAD_NAME                4 (staticmethod)
+
+ 85          16 LOAD_CONST              11 (('return', 'bool'))
+             18 LOAD_CONST               2 (<code object is_available at 0x7f6c93322930, file "app\adapters\ytdlp_client.py", line 84>)
+             20 MAKE_FUNCTION            4 (annotations)
+
+ 84          22 CALL                     0
+
+ 85          30 STORE_NAME               5 (is_available)
+
+ 93          32 LOAD_NAME                4 (staticmethod)
+
+ 94          34 LOAD_CONST               3 (<code object _require at 0x7f6c93273b50, file "app\adapters\ytdlp_client.py", line 93>)
+             36 MAKE_FUNCTION            0
+
+ 93          38 CALL                     0
+
+ 94          46 STORE_NAME               6 (_require)
+
+107          48 LOAD_NAME                4 (staticmethod)
+
+108          50 LOAD_CONST              12 (('return', 'str | None'))
+             52 LOAD_CONST               4 (<code object _ffmpeg_dir at 0x7f6c92ea48f0, file "app\adapters\ytdlp_client.py", line 107>)
+             54 MAKE_FUNCTION            4 (annotations)
+
+107          56 CALL                     0
+
+108          64 STORE_NAME               7 (_ffmpeg_dir)
+
+115          66 LOAD_CONST              13 ((None,))
+             68 LOAD_CONST              14 (('url', 'str', 'platform', 'str | None', 'return', 'dict'))
+             70 LOAD_CONST               6 (<code object get_info at 0x7f6c92d62e20, file "app\adapters\ytdlp_client.py", line 115>)
+             72 MAKE_FUNCTION            5 (defaults, annotations)
+             74 STORE_NAME               8 (get_info)
+
+119          76 LOAD_CONST              15 (('url', 'str', 'return', 'dict'))
+             78 LOAD_CONST               7 (<code object _extract_info at 0x2907ace0, file "app\adapters\ytdlp_client.py", line 119>)
+             80 MAKE_FUNCTION            4 (annotations)
+             82 STORE_NAME               9 (_extract_info)
+
+139          84 NOP
+
+140          86 NOP
+
+141          88 NOP
+
+135          90 LOAD_CONST              16 ((None, None, None))
+
+137          92 NOP
+
+135          94 NOP
+
+138          96 NOP
+
+135          98 NOP
+
+139         100 NOP
+
+135         102 NOP
+
+140         104 NOP
+
+135         106 NOP
+
+141         108 NOP
+
+135         110 NOP
+
+142         112 NOP
+
+135         114 LOAD_CONST              17 (('url', 'str', 'out_path', 'str', 'on_progress', 'Callable[[float, str], None] | None', 'cancel_check', 'Callable[[], bool] | None', 'max_height', 'int | None', 'return', 'None'))
+            116 LOAD_CONST               8 (<code object download at 0x7f6c9296b7b0, file "app\adapters\ytdlp_client.py", line 135>)
+            118 MAKE_FUNCTION            5 (defaults, annotations)
+            120 STORE_NAME              10 (download)
+
+164         122 LOAD_CONST              18 (('url', 'str', 'out', 'Path', 'max_height', 'int | None'))
+            124 LOAD_CONST               9 (<code object _run_download at 0x28e32310, file "app\adapters\ytdlp_client.py", line 164>)
+            126 MAKE_FUNCTION            4 (annotations)
+            128 STORE_NAME              11 (_run_download)
+
+227         130 LOAD_NAME                4 (staticmethod)
+
+228         132 LOAD_CONST              13 ((None,))
+            134 LOAD_CONST              19 (('info', 'dict', 'platform', 'str | None', 'return', 'dict'))
+            136 LOAD_CONST              10 (<code object _normalize at 0x290a2560, file "app\adapters\ytdlp_client.py", line 227>)
+            138 MAKE_FUNCTION            5 (defaults, annotations)
+
+227         140 CALL                     0
+
+228         148 STORE_NAME              12 (_normalize)
+            150 RETURN_CONST             5 (None)
+
+Disassembly of <code object is_available at 0x7f6c93322930, file "app\adapters\ytdlp_client.py", line 84>:
+ 84           0 RESUME                   0
+
+ 86           2 LOAD_GLOBAL              1 (NULL + _ensure_local_ytdlp)
+             12 CALL                     0
+             20 POP_TOP
+
+ 87          22 NOP
+
+ 88          24 LOAD_CONST               1 (0)
+             26 LOAD_CONST               0 (None)
+             28 IMPORT_NAME              1 (yt_dlp)
+             30 STORE_FAST               0 (yt_dlp)
+
+ 89          32 RETURN_CONST             2 (True)
+        >>   34 PUSH_EXC_INFO
+
+ 90          36 LOAD_GLOBAL              4 (Exception)
+             46 CHECK_EXC_MATCH
+             48 POP_JUMP_IF_FALSE        3 (to 56)
+             50 POP_TOP
+
+ 91          52 POP_EXCEPT
+             54 RETURN_CONST             3 (False)
+
+ 90     >>   56 RERAISE                  0
+        >>   58 COPY                     3
+             60 POP_EXCEPT
+             62 RERAISE                  1
+ExceptionTable:
+  24 to 30 -> 34 [0]
+  34 to 50 -> 58 [1] lasti
+  56 to 56 -> 58 [1] lasti
+
+Disassembly of <code object _require at 0x7f6c93273b50, file "app\adapters\ytdlp_client.py", line 93>:
+ 93           0 RESUME                   0
+
+ 95           2 LOAD_GLOBAL              1 (NULL + _ensure_local_ytdlp)
+             12 CALL                     0
+             20 POP_TOP
+
+ 96          22 NOP
+
+ 97          24 LOAD_CONST               1 (0)
+             26 LOAD_CONST               0 (None)
+             28 IMPORT_NAME              1 (yt_dlp)
+             30 STORE_FAST               0 (yt_dlp)
+
+ 98          32 LOAD_GLOBAL              5 (NULL + _patch_bilibili_referer)
+             42 LOAD_FAST                0 (yt_dlp)
+             44 CALL                     1
+             52 POP_TOP
+
+ 99          54 LOAD_FAST                0 (yt_dlp)
+             56 RETURN_VALUE
+        >>   58 PUSH_EXC_INFO
+
+100          60 LOAD_GLOBAL              6 (Exception)
+             70 CHECK_EXC_MATCH
+             72 POP_JUMP_IF_FALSE       37 (to 148)
+             74 STORE_FAST               1 (e)
+
+101          76 LOAD_GLOBAL              9 (NULL + make_error)
+
+102          86 LOAD_GLOBAL             10 (E)
+             96 LOAD_ATTR               12 (YTDLP_NOT_AVAILABLE)
+
+103         116 LOAD_CONST               2 ('Chưa cài yt-dlp để tải YouTube/Bilibili: ')
+            118 LOAD_FAST                1 (e)
+            120 FORMAT_VALUE             0
+            122 BUILD_STRING             2
+
+104         124 LOAD_CONST               3 ('Cài bằng: pip install -U yt-dlp')
+
+101         126 KW_NAMES                 4 (('hint',))
+            128 CALL                     3
+
+105         136 LOAD_FAST                1 (e)
+
+101         138 RAISE_VARARGS            2
+        >>  140 LOAD_CONST               0 (None)
+            142 STORE_FAST               1 (e)
+            144 DELETE_FAST              1 (e)
+            146 RERAISE                  1
+
+100     >>  148 RERAISE                  0
+        >>  150 COPY                     3
+            152 POP_EXCEPT
+            154 RERAISE                  1
+ExceptionTable:
+  24 to 54 -> 58 [0]
+  58 to 74 -> 150 [1] lasti
+  76 to 138 -> 140 [1] lasti
+  140 to 148 -> 150 [1] lasti
+
+Disassembly of <code object _ffmpeg_dir at 0x7f6c92ea48f0, file "app\adapters\ytdlp_client.py", line 107>:
+107           0 RESUME                   0
+
+109           2 NOP
+
+110           4 LOAD_CONST               1 (0)
+              6 LOAD_CONST               2 (('get_ffmpeg_path',))
+              8 IMPORT_NAME              0 (app.adapters.ffmpeg)
+             10 IMPORT_FROM              1 (get_ffmpeg_path)
+             12 STORE_FAST               0 (get_ffmpeg_path)
+             14 POP_TOP
+
+111          16 LOAD_GLOBAL              5 (NULL + str)
+             26 LOAD_GLOBAL              7 (NULL + Path)
+             36 PUSH_NULL
+             38 LOAD_FAST                0 (get_ffmpeg_path)
+             40 CALL                     0
+             48 CALL                     1
+             56 LOAD_ATTR                8 (parent)
+             76 CALL                     1
+             84 RETURN_VALUE
+        >>   86 PUSH_EXC_INFO
+
+112          88 LOAD_GLOBAL             10 (Exception)
+             98 CHECK_EXC_MATCH
+            100 POP_JUMP_IF_FALSE        3 (to 108)
+            102 POP_TOP
+
+113         104 POP_EXCEPT
+            106 RETURN_CONST             0 (None)
+
+112     >>  108 RERAISE                  0
+        >>  110 COPY                     3
+            112 POP_EXCEPT
+            114 RERAISE                  1
+ExceptionTable:
+  4 to 82 -> 86 [0]
+  86 to 102 -> 110 [1] lasti
+  108 to 108 -> 110 [1] lasti
+
+Disassembly of <code object get_info at 0x7f6c92d62e20, file "app\adapters\ytdlp_client.py", line 115>:
+115           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+116           6 LOAD_GLOBAL              1 (NULL + asyncio)
+             16 LOAD_ATTR                2 (to_thread)
+             36 LOAD_FAST                0 (self)
+             38 LOAD_ATTR                4 (_extract_info)
+             58 LOAD_FAST                1 (url)
+             60 CALL                     2
+             68 GET_AWAITABLE            0
+             70 LOAD_CONST               0 (None)
+        >>   72 SEND                     3 (to 82)
+             76 YIELD_VALUE              2
+             78 RESUME                   3
+             80 JUMP_BACKWARD_NO_INTERRUPT     5 (to 72)
+        >>   82 END_SEND
+             84 STORE_FAST               3 (info)
+
+117          86 LOAD_FAST                0 (self)
+             88 LOAD_ATTR                7 (NULL|self + _normalize)
+            108 LOAD_FAST                3 (info)
+            110 LOAD_FAST                2 (platform)
+            112 KW_NAMES                 1 (('platform',))
+            114 CALL                     2
+            122 RETURN_VALUE
+
+116     >>  124 CLEANUP_THROW
+            126 JUMP_BACKWARD           23 (to 82)
+        >>  128 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            130 RERAISE                  1
+ExceptionTable:
+  4 to 74 -> 128 [0] lasti
+  76 to 76 -> 124 [2]
+  78 to 124 -> 128 [0] lasti
+
+Disassembly of <code object _extract_info at 0x2907ace0, file "app\adapters\ytdlp_client.py", line 119>:
+119           0 RESUME                   0
+
+120           2 LOAD_FAST                0 (self)
+              4 LOAD_ATTR                1 (NULL|self + _require)
+             24 CALL                     0
+             32 STORE_FAST               2 (yt_dlp)
+
+121          34 LOAD_CONST               1 (True)
+             36 LOAD_CONST               1 (True)
+             38 LOAD_CONST               1 (True)
+             40 LOAD_CONST               1 (True)
+             42 LOAD_CONST               2 (('quiet', 'no_warnings', 'noplaylist', 'skip_download'))
+             44 BUILD_CONST_KEY_MAP      4
+             46 STORE_FAST               3 (opts)
+
+122          48 LOAD_CONST               0 (None)
+             50 STORE_FAST               4 (last)
+
+123          52 LOAD_GLOBAL              3 (NULL + range)
+             62 LOAD_CONST               3 (1)
+             64 LOAD_GLOBAL              4 (_YTDLP_412_RETRIES)
+             74 LOAD_CONST               3 (1)
+             76 BINARY_OP                0 (+)
+             80 CALL                     2
+             88 GET_ITER
+        >>   90 FOR_ITER                54 (to 202)
+             94 STORE_FAST               5 (attempt)
+
+124          96 NOP
+
+125          98 LOAD_FAST                2 (yt_dlp)
+            100 LOAD_ATTR                7 (NULL|self + YoutubeDL)
+            120 LOAD_FAST                3 (opts)
+            122 CALL                     1
+            130 BEFORE_WITH
+            132 STORE_FAST               6 (ydl)
+
+126         134 LOAD_FAST                6 (ydl)
+            136 LOAD_ATTR                9 (NULL|self + extract_info)
+            156 LOAD_FAST                1 (url)
+            158 LOAD_CONST               4 (False)
+            160 KW_NAMES                 5 (('download',))
+            162 CALL                     2
+            170 COPY                     1
+            172 POP_JUMP_IF_TRUE         2 (to 178)
+            174 POP_TOP
+            176 BUILD_MAP                0
+
+125     >>  178 SWAP                     2
+            180 LOAD_CONST               0 (None)
+            182 LOAD_CONST               0 (None)
+            184 LOAD_CONST               0 (None)
+            186 CALL                     2
+            194 POP_TOP
+            196 SWAP                     2
+            198 POP_TOP
+            200 RETURN_VALUE
+
+123     >>  202 END_FOR
+
+133         204 LOAD_GLOBAL             21 (NULL + make_error)
+            214 LOAD_GLOBAL             22 (E)
+            224 LOAD_ATTR               24 (DOUYIN_PARSE_FAILED)
+            244 LOAD_CONST               8 ('yt-dlp phân tích thất bại: ')
+            246 LOAD_FAST                4 (last)
+            248 FORMAT_VALUE             0
+            250 BUILD_STRING             2
+            252 CALL                     2
+            260 RAISE_VARARGS            1
+
+125     >>  262 PUSH_EXC_INFO
+            264 WITH_EXCEPT_START
+            266 POP_JUMP_IF_TRUE         1 (to 270)
+            268 RERAISE                  2
+        >>  270 POP_TOP
+            272 POP_EXCEPT
+            274 POP_TOP
+            276 POP_TOP
+            278 JUMP_FORWARD             3 (to 286)
+        >>  280 COPY                     3
+            282 POP_EXCEPT
+            284 RERAISE                  1
+        >>  286 JUMP_BACKWARD           99 (to 90)
+        >>  288 PUSH_EXC_INFO
+
+127         290 LOAD_GLOBAL             10 (Exception)
+            300 CHECK_EXC_MATCH
+            302 POP_JUMP_IF_FALSE       96 (to 496)
+            304 STORE_FAST               7 (e)
+
+128         306 LOAD_FAST                7 (e)
+            308 STORE_FAST               4 (last)
+
+129         310 LOAD_GLOBAL             13 (NULL + _is_412)
+            320 LOAD_FAST                7 (e)
+            322 CALL                     1
+            330 POP_JUMP_IF_FALSE       48 (to 428)
+            332 LOAD_FAST                5 (attempt)
+            334 LOAD_GLOBAL              4 (_YTDLP_412_RETRIES)
+            344 COMPARE_OP               2 (<)
+            348 POP_JUMP_IF_FALSE       39 (to 428)
+
+130         350 LOAD_GLOBAL             15 (NULL + time)
+            360 LOAD_ATTR               16 (sleep)
+            380 LOAD_GLOBAL             19 (NULL + min)
+            390 LOAD_CONST               6 (1.5)
+            392 LOAD_FAST                5 (attempt)
+            394 BINARY_OP                5 (*)
+            398 LOAD_CONST               7 (6.0)
+            400 CALL                     2
+            408 CALL                     1
+            416 POP_TOP
+
+131         418 POP_EXCEPT
+            420 LOAD_CONST               0 (None)
+            422 STORE_FAST               7 (e)
+            424 DELETE_FAST              7 (e)
+            426 JUMP_BACKWARD          169 (to 90)
+
+132     >>  428 LOAD_GLOBAL             21 (NULL + make_error)
+            438 LOAD_GLOBAL             22 (E)
+            448 LOAD_ATTR               24 (DOUYIN_PARSE_FAILED)
+            468 LOAD_CONST               8 ('yt-dlp phân tích thất bại: ')
+            470 LOAD_FAST                7 (e)
+            472 FORMAT_VALUE             0
+            474 BUILD_STRING             2
+            476 CALL                     2
+            484 LOAD_FAST                7 (e)
+            486 RAISE_VARARGS            2
+        >>  488 LOAD_CONST               0 (None)
+            490 STORE_FAST               7 (e)
+            492 DELETE_FAST              7 (e)
+            494 RERAISE                  1
+
+127     >>  496 RERAISE                  0
+        >>  498 COPY                     3
+            500 POP_EXCEPT
+            502 RERAISE                  1
+ExceptionTable:
+  98 to 130 -> 288 [1]
+  132 to 176 -> 262 [2] lasti
+  178 to 194 -> 288 [1]
+  262 to 270 -> 280 [4] lasti
+  272 to 284 -> 288 [1]
+  288 to 304 -> 498 [2] lasti
+  306 to 416 -> 488 [2] lasti
+  428 to 486 -> 488 [2] lasti
+  488 to 496 -> 498 [2] lasti
+
+Disassembly of <code object download at 0x7f6c9296b7b0, file "app\adapters\ytdlp_client.py", line 135>:
+              0 MAKE_CELL                3 (on_progress)
+              2 MAKE_CELL                4 (cancel_check)
+              4 MAKE_CELL                8 (loop)
+
+135           6 RETURN_GENERATOR
+              8 POP_TOP
+             10 RESUME                   0
+
+144          12 LOAD_GLOBAL              1 (NULL + asyncio)
+             22 LOAD_ATTR                2 (get_running_loop)
+             42 CALL                     0
+             50 STORE_DEREF              8 (loop)
+
+145          52 LOAD_GLOBAL              5 (NULL + Path)
+             62 LOAD_FAST                2 (out_path)
+             64 CALL                     1
+             72 STORE_FAST               6 (out)
+
+147          74 LOAD_CONST               3 (('d', 'dict'))
+             76 LOAD_CLOSURE             4 (cancel_check)
+             78 LOAD_CLOSURE             8 (loop)
+             80 LOAD_CLOSURE             3 (on_progress)
+             82 BUILD_TUPLE              3
+             84 LOAD_CONST               1 (<code object hook at 0x29082db0, file "app\adapters\ytdlp_client.py", line 147>)
+             86 MAKE_FUNCTION           12 (annotations, closure)
+             88 STORE_FAST               7 (hook)
+
+162          90 LOAD_GLOBAL              1 (NULL + asyncio)
+            100 LOAD_ATTR                6 (to_thread)
+            120 LOAD_FAST                0 (self)
+            122 LOAD_ATTR                8 (_run_download)
+            142 LOAD_FAST                1 (url)
+            144 LOAD_FAST                6 (out)
+            146 LOAD_FAST                7 (hook)
+            148 LOAD_FAST                5 (max_height)
+            150 CALL                     5
+            158 GET_AWAITABLE            0
+            160 LOAD_CONST               2 (None)
+        >>  162 SEND                     3 (to 172)
+            166 YIELD_VALUE              2
+            168 RESUME                   3
+            170 JUMP_BACKWARD_NO_INTERRUPT     5 (to 162)
+        >>  172 END_SEND
+            174 POP_TOP
+            176 RETURN_CONST             2 (None)
+        >>  178 CLEANUP_THROW
+            180 JUMP_BACKWARD            5 (to 172)
+        >>  182 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            184 RERAISE                  1
+ExceptionTable:
+  10 to 164 -> 182 [0] lasti
+  166 to 166 -> 178 [2]
+  168 to 178 -> 182 [0] lasti
+
+Disassembly of <code object hook at 0x29082db0, file "app\adapters\ytdlp_client.py", line 147>:
+              0 COPY_FREE_VARS           3
+
+147           2 RESUME                   0
+
+148           4 LOAD_DEREF               7 (cancel_check)
+              6 POP_JUMP_IF_FALSE       17 (to 42)
+              8 PUSH_NULL
+             10 LOAD_DEREF               7 (cancel_check)
+             12 CALL                     0
+             20 POP_JUMP_IF_FALSE       10 (to 42)
+
+149          22 LOAD_GLOBAL              1 (NULL + _CancelledDownload)
+             32 CALL                     0
+             40 RAISE_VARARGS            1
+
+150     >>   42 LOAD_FAST                0 (d)
+             44 LOAD_ATTR                3 (NULL|self + get)
+             64 LOAD_CONST               1 ('status')
+             66 CALL                     1
+             74 LOAD_CONST               2 ('downloading')
+             76 COMPARE_OP              40 (==)
+             80 POP_JUMP_IF_FALSE      173 (to 428)
+             82 LOAD_DEREF               9 (on_progress)
+             84 POP_JUMP_IF_FALSE      171 (to 428)
+
+151          86 LOAD_FAST                0 (d)
+             88 LOAD_ATTR                3 (NULL|self + get)
+            108 LOAD_CONST               3 ('total_bytes')
+            110 CALL                     1
+            118 COPY                     1
+            120 POP_JUMP_IF_TRUE        21 (to 164)
+            122 POP_TOP
+            124 LOAD_FAST                0 (d)
+            126 LOAD_ATTR                3 (NULL|self + get)
+            146 LOAD_CONST               4 ('total_bytes_estimate')
+            148 CALL                     1
+            156 COPY                     1
+            158 POP_JUMP_IF_TRUE         2 (to 164)
+            160 POP_TOP
+            162 LOAD_CONST               5 (0)
+        >>  164 STORE_FAST               1 (total)
+
+152         166 LOAD_FAST                0 (d)
+            168 LOAD_ATTR                3 (NULL|self + get)
+            188 LOAD_CONST               6 ('downloaded_bytes')
+            190 CALL                     1
+            198 COPY                     1
+            200 POP_JUMP_IF_TRUE         2 (to 206)
+            202 POP_TOP
+            204 LOAD_CONST               5 (0)
+        >>  206 STORE_FAST               2 (done)
+
+153         208 LOAD_FAST                1 (total)
+            210 POP_JUMP_IF_FALSE      107 (to 426)
+
+154         212 LOAD_FAST                0 (d)
+            214 LOAD_ATTR                3 (NULL|self + get)
+            234 LOAD_CONST               7 ('speed')
+            236 CALL                     1
+            244 COPY                     1
+            246 POP_JUMP_IF_TRUE         2 (to 252)
+            248 POP_TOP
+            250 LOAD_CONST               5 (0)
+        >>  252 LOAD_CONST               8 (1024)
+            254 BINARY_OP               11 (/)
+            258 STORE_FAST               3 (spd)
+
+155         260 LOAD_FAST                0 (d)
+            262 LOAD_ATTR                3 (NULL|self + get)
+            282 LOAD_CONST               9 ('eta')
+            284 CALL                     1
+            292 COPY                     1
+            294 POP_JUMP_IF_TRUE         2 (to 300)
+            296 POP_TOP
+            298 LOAD_CONST               5 (0)
+        >>  300 STORE_FAST               4 (eta)
+
+156         302 LOAD_CONST              10 (0.05)
+            304 LOAD_CONST              11 (0.9)
+            306 LOAD_GLOBAL              5 (NULL + min)
+            316 LOAD_FAST                2 (done)
+            318 LOAD_FAST                1 (total)
+            320 BINARY_OP               11 (/)
+            324 LOAD_CONST              12 (1.0)
+            326 CALL                     2
+            334 BINARY_OP                5 (*)
+            338 BINARY_OP                0 (+)
+            342 STORE_FAST               5 (frac)
+
+157         344 LOAD_FAST                2 (done)
+            346 LOAD_CONST              13 (1048576)
+            348 BINARY_OP                2 (//)
+            352 FORMAT_VALUE             0
+            354 LOAD_CONST              14 ('MB / ')
+            356 LOAD_FAST                1 (total)
+            358 LOAD_CONST              13 (1048576)
+            360 BINARY_OP                2 (//)
+            364 FORMAT_VALUE             0
+            366 LOAD_CONST              15 ('MB · ')
+            368 LOAD_FAST                3 (spd)
+            370 LOAD_CONST              16 ('.0f')
+            372 FORMAT_VALUE             4 (with format)
+            374 LOAD_CONST              17 ('KB/s · còn ~')
+            376 LOAD_FAST                4 (eta)
+            378 FORMAT_VALUE             0
+            380 LOAD_CONST              18 ('s')
+            382 BUILD_STRING             8
+            384 STORE_FAST               6 (msg)
+
+158         386 LOAD_DEREF               8 (loop)
+            388 LOAD_ATTR                7 (NULL|self + call_soon_threadsafe)
+            408 LOAD_DEREF               9 (on_progress)
+            410 LOAD_FAST                5 (frac)
+            412 LOAD_FAST                6 (msg)
+            414 CALL                     3
+            422 POP_TOP
+            424 RETURN_CONST             0 (None)
+
+153     >>  426 RETURN_CONST             0 (None)
+
+159     >>  428 LOAD_FAST                0 (d)
+            430 LOAD_ATTR                3 (NULL|self + get)
+            450 LOAD_CONST               1 ('status')
+            452 CALL                     1
+            460 LOAD_CONST              19 ('finished')
+            462 COMPARE_OP              40 (==)
+            466 POP_JUMP_IF_FALSE       23 (to 514)
+            468 LOAD_DEREF               9 (on_progress)
+            470 POP_JUMP_IF_FALSE       20 (to 512)
+
+160         472 LOAD_DEREF               8 (loop)
+            474 LOAD_ATTR                7 (NULL|self + call_soon_threadsafe)
+            494 LOAD_DEREF               9 (on_progress)
+            496 LOAD_CONST              20 (0.96)
+            498 LOAD_CONST              21 ('Đang ghép video + audio…')
+            500 CALL                     3
+            508 POP_TOP
+            510 RETURN_CONST             0 (None)
+
+159     >>  512 RETURN_CONST             0 (None)
+        >>  514 RETURN_CONST             0 (None)
+
+Disassembly of <code object _run_download at 0x28e32310, file "app\adapters\ytdlp_client.py", line 164>:
+164           0 RESUME                   0
+
+165           2 LOAD_FAST                0 (self)
+              4 LOAD_ATTR                1 (NULL|self + _require)
+             24 CALL                     0
+             32 STORE_FAST               5 (yt_dlp)
+
+167          34 LOAD_GLOBAL              3 (NULL + str)
+             44 LOAD_FAST                2 (out)
+             46 LOAD_ATTR                5 (NULL|self + with_suffix)
+             66 LOAD_CONST               1 ('')
+             68 CALL                     1
+             76 CALL                     1
+             84 LOAD_CONST               2 ('.%(ext)s')
+             86 BINARY_OP                0 (+)
+             90 STORE_FAST               6 (outtmpl)
+
+168          92 LOAD_FAST                4 (max_height)
+             94 POP_JUMP_IF_FALSE       10 (to 116)
+
+169          96 LOAD_CONST               3 ('bv*[height<=')
+             98 LOAD_FAST                4 (max_height)
+            100 FORMAT_VALUE             0
+            102 LOAD_CONST               4 (']+ba/b[height<=')
+            104 LOAD_FAST                4 (max_height)
+            106 FORMAT_VALUE             0
+            108 LOAD_CONST               5 (']/bv*+ba/b')
+            110 BUILD_STRING             5
+            112 STORE_FAST               7 (fmt)
+            114 JUMP_FORWARD             2 (to 120)
+
+171     >>  116 LOAD_CONST               6 ('bv*+ba/b')
+            118 STORE_FAST               7 (fmt)
+
+173     >>  120 LOAD_FAST                7 (fmt)
+
+174         122 LOAD_FAST                6 (outtmpl)
+
+175         124 LOAD_CONST               7 ('mp4')
+
+176         126 LOAD_CONST               8 (True)
+
+177         128 LOAD_CONST               8 (True)
+
+178         130 LOAD_CONST               8 (True)
+
+179         132 LOAD_CONST               9 (4)
+
+180         134 LOAD_CONST              10 (5)
+
+181         136 LOAD_CONST              10 (5)
+
+186         138 LOAD_CONST              11 (10485760)
+
+187         140 LOAD_FAST                3 (hook)
+            142 BUILD_LIST               1
+
+172         144 LOAD_CONST              12 (('format', 'outtmpl', 'merge_output_format', 'quiet', 'no_warnings', 'noplaylist', 'concurrent_fragment_downloads', 'retries', 'fragment_retries', 'http_chunk_size', 'progress_hooks'))
+            146 BUILD_CONST_KEY_MAP     11
+            148 STORE_FAST               8 (opts)
+
+189         150 LOAD_FAST                0 (self)
+            152 LOAD_ATTR                7 (NULL|self + _ffmpeg_dir)
+            172 CALL                     0
+            180 STORE_FAST               9 (ff)
+
+190         182 LOAD_FAST                9 (ff)
+            184 POP_JUMP_IF_FALSE        5 (to 196)
+
+191         186 LOAD_FAST                9 (ff)
+            188 LOAD_FAST                8 (opts)
+            190 LOAD_CONST              13 ('ffmpeg_location')
+            192 STORE_SUBSCR
+
+192     >>  196 LOAD_GLOBAL              9 (NULL + range)
+            206 LOAD_CONST              14 (1)
+            208 LOAD_GLOBAL             10 (_YTDLP_412_RETRIES)
+            218 LOAD_CONST              14 (1)
+            220 BINARY_OP                0 (+)
+            224 CALL                     2
+            232 GET_ITER
+        >>  234 FOR_ITER                48 (to 334)
+            238 STORE_FAST              10 (attempt)
+
+193         240 NOP
+
+194         242 LOAD_FAST                5 (yt_dlp)
+            244 LOAD_ATTR               13 (NULL|self + YoutubeDL)
+            264 LOAD_FAST                8 (opts)
+            266 CALL                     1
+            274 BEFORE_WITH
+            276 STORE_FAST              11 (ydl)
+
+195         278 LOAD_FAST               11 (ydl)
+            280 LOAD_ATTR               15 (NULL|self + download)
+            300 LOAD_FAST                1 (url)
+            302 BUILD_LIST               1
+            304 CALL                     1
+            312 POP_TOP
+
+194         314 LOAD_CONST               0 (None)
+            316 LOAD_CONST               0 (None)
+            318 LOAD_CONST               0 (None)
+            320 CALL                     2
+            328 POP_TOP
+
+196     >>  330 POP_TOP
+            332 JUMP_FORWARD             1 (to 336)
+
+192     >>  334 END_FOR
+
+217     >>  336 LOAD_FAST                2 (out)
+            338 LOAD_ATTR               43 (NULL|self + exists)
+            358 CALL                     0
+            366 POP_JUMP_IF_TRUE       163 (to 694)
+
+218         368 LOAD_FAST                2 (out)
+            370 LOAD_ATTR                5 (NULL|self + with_suffix)
+            390 LOAD_CONST               1 ('')
+            392 CALL                     1
+            400 STORE_FAST              14 (stem)
+
+219         402 LOAD_GLOBAL             45 (NULL + sorted)
+            412 LOAD_FAST               14 (stem)
+            414 LOAD_ATTR               46 (parent)
+            434 LOAD_ATTR               49 (NULL|self + glob)
+            454 LOAD_FAST               14 (stem)
+            456 LOAD_ATTR               50 (name)
+            476 LOAD_CONST              28 ('.*')
+            478 BINARY_OP                0 (+)
+            482 CALL                     1
+
+220         490 LOAD_CONST              29 (<code object <lambda> at 0x7f6c93323930, file "app\adapters\ytdlp_client.py", line 220>)
+            492 MAKE_FUNCTION            0
+            494 LOAD_CONST               8 (True)
+
+219         496 KW_NAMES                30 (('key', 'reverse'))
+            498 CALL                     3
+            506 STORE_FAST              15 (cand)
+
+221         508 LOAD_FAST               15 (cand)
+            510 GET_ITER
+            512 LOAD_FAST_AND_CLEAR     16 (p)
+            514 SWAP                     2
+            516 BUILD_LIST               0
+            518 SWAP                     2
+        >>  520 FOR_ITER                33 (to 590)
+            524 STORE_FAST              16 (p)
+            526 LOAD_FAST               16 (p)
+            528 LOAD_ATTR               52 (suffix)
+            548 LOAD_ATTR               37 (NULL|self + lower)
+            568 CALL                     0
+            576 LOAD_CONST              31 (('.mp4', '.mkv', '.webm', '.mov'))
+            578 CONTAINS_OP              0
+            580 POP_JUMP_IF_TRUE         1 (to 584)
+            582 JUMP_BACKWARD           32 (to 520)
+        >>  584 LOAD_FAST               16 (p)
+            586 LIST_APPEND              2
+            588 JUMP_BACKWARD           35 (to 520)
+        >>  590 END_FOR
+            592 STORE_FAST              15 (cand)
+            594 STORE_FAST              16 (p)
+
+222         596 LOAD_FAST               15 (cand)
+            598 POP_JUMP_IF_FALSE       21 (to 642)
+
+223         600 LOAD_FAST               15 (cand)
+            602 LOAD_CONST              32 (0)
+            604 BINARY_SUBSCR
+            608 LOAD_ATTR               55 (NULL|self + replace)
+            628 LOAD_FAST                2 (out)
+            630 CALL                     1
+            638 POP_TOP
+            640 RETURN_CONST             0 (None)
+
+225     >>  642 LOAD_GLOBAL             19 (NULL + make_error)
+            652 LOAD_GLOBAL             20 (E)
+            662 LOAD_ATTR               40 (DOWNLOAD_NETWORK)
+            682 LOAD_CONST              33 ('yt-dlp không tạo được file output')
+            684 CALL                     2
+            692 RAISE_VARARGS            1
+
+217     >>  694 RETURN_CONST             0 (None)
+
+194     >>  696 PUSH_EXC_INFO
+            698 WITH_EXCEPT_START
+            700 POP_JUMP_IF_TRUE         1 (to 704)
+            702 RERAISE                  2
+        >>  704 POP_TOP
+            706 POP_EXCEPT
+            708 POP_TOP
+            710 POP_TOP
+            712 JUMP_BACKWARD          192 (to 330)
+        >>  714 COPY                     3
+            716 POP_EXCEPT
+            718 RERAISE                  1
+        >>  720 PUSH_EXC_INFO
+
+197         722 LOAD_GLOBAL             16 (_CancelledDownload)
+            732 CHECK_EXC_MATCH
+            734 POP_JUMP_IF_FALSE       27 (to 790)
+            736 POP_TOP
+
+198         738 LOAD_GLOBAL             19 (NULL + make_error)
+            748 LOAD_GLOBAL             20 (E)
+            758 LOAD_ATTR               22 (CANCELLED)
+            778 LOAD_CONST              15 ('Đã hủy khi tải')
+            780 CALL                     2
+            788 RAISE_VARARGS            1
+
+199     >>  790 LOAD_GLOBAL             24 (StudioError)
+            800 CHECK_EXC_MATCH
+            802 POP_JUMP_IF_FALSE        2 (to 808)
+            804 POP_TOP
+
+200         806 RAISE_VARARGS            0
+
+201     >>  808 LOAD_GLOBAL             26 (Exception)
+            818 CHECK_EXC_MATCH
+            820 POP_JUMP_IF_FALSE      182 (to 1186)
+            822 STORE_FAST              12 (e)
+
+203         824 LOAD_GLOBAL             29 (NULL + _is_412)
+            834 LOAD_FAST               12 (e)
+            836 CALL                     1
+            844 POP_JUMP_IF_FALSE       49 (to 944)
+            846 LOAD_FAST               10 (attempt)
+            848 LOAD_GLOBAL             10 (_YTDLP_412_RETRIES)
+            858 COMPARE_OP               2 (<)
+            862 POP_JUMP_IF_FALSE       40 (to 944)
+
+204         864 LOAD_GLOBAL             31 (NULL + time)
+            874 LOAD_ATTR               32 (sleep)
+            894 LOAD_GLOBAL             35 (NULL + min)
+            904 LOAD_CONST              16 (1.5)
+            906 LOAD_FAST               10 (attempt)
+            908 BINARY_OP                5 (*)
+            912 LOAD_CONST              17 (6.0)
+            914 CALL                     2
+            922 CALL                     1
+            930 POP_TOP
+
+205         932 POP_EXCEPT
+            934 LOAD_CONST               0 (None)
+            936 STORE_FAST              12 (e)
+            938 DELETE_FAST             12 (e)
+            940 EXTENDED_ARG             1
+            942 JUMP_BACKWARD          355 (to 234)
+
+206     >>  944 LOAD_GLOBAL              3 (NULL + str)
+            954 LOAD_FAST               12 (e)
+            956 CALL                     1
+            964 LOAD_ATTR               37 (NULL|self + lower)
+            984 CALL                     0
+            992 STORE_FAST              13 (msg)
+
+208         994 LOAD_CONST              18 ('sign in')
+            996 LOAD_FAST               13 (msg)
+            998 CONTAINS_OP              0
+           1000 POP_JUMP_IF_TRUE        28 (to 1058)
+           1002 LOAD_CONST              19 ('log in')
+           1004 LOAD_FAST               13 (msg)
+           1006 CONTAINS_OP              0
+           1008 POP_JUMP_IF_TRUE        24 (to 1058)
+           1010 LOAD_CONST              20 ('cookie')
+           1012 LOAD_FAST               13 (msg)
+           1014 CONTAINS_OP              0
+           1016 POP_JUMP_IF_TRUE        20 (to 1058)
+
+209        1018 LOAD_CONST              21 ('private video')
+           1020 LOAD_FAST               13 (msg)
+           1022 CONTAINS_OP              0
+           1024 POP_JUMP_IF_TRUE        16 (to 1058)
+           1026 LOAD_CONST              22 ('members only')
+           1028 LOAD_FAST               13 (msg)
+           1030 CONTAINS_OP              0
+           1032 POP_JUMP_IF_TRUE        12 (to 1058)
+
+210        1034 LOAD_CONST              23 ('age-restricted')
+           1036 LOAD_FAST               13 (msg)
+           1038 CONTAINS_OP              0
+           1040 POP_JUMP_IF_TRUE         8 (to 1058)
+           1042 LOAD_CONST              24 ('age restricted')
+           1044 LOAD_FAST               13 (msg)
+           1046 CONTAINS_OP              0
+           1048 POP_JUMP_IF_TRUE         4 (to 1058)
+
+211        1050 LOAD_CONST              25 ('confirm your age')
+           1052 LOAD_FAST               13 (msg)
+           1054 CONTAINS_OP              0
+           1056 POP_JUMP_IF_FALSE       30 (to 1118)
+
+212     >> 1058 LOAD_GLOBAL             19 (NULL + make_error)
+           1068 LOAD_GLOBAL             20 (E)
+           1078 LOAD_ATTR               38 (DOUYIN_COOKIE_REQUIRED)
+
+213        1098 LOAD_CONST              26 ('Nội dung cần đăng nhập/cookie: ')
+           1100 LOAD_FAST               12 (e)
+           1102 FORMAT_VALUE             0
+           1104 BUILD_STRING             2
+
+212        1106 CALL                     2
+
+213        1114 LOAD_FAST               12 (e)
+
+212        1116 RAISE_VARARGS            2
+
+214     >> 1118 LOAD_GLOBAL             19 (NULL + make_error)
+           1128 LOAD_GLOBAL             20 (E)
+           1138 LOAD_ATTR               40 (DOWNLOAD_NETWORK)
+           1158 LOAD_CONST              27 ('yt-dlp tải lỗi: ')
+           1160 LOAD_FAST               12 (e)
+           1162 FORMAT_VALUE             0
+           1164 BUILD_STRING             2
+           1166 CALL                     2
+           1174 LOAD_FAST               12 (e)
+           1176 RAISE_VARARGS            2
+        >> 1178 LOAD_CONST               0 (None)
+           1180 STORE_FAST              12 (e)
+           1182 DELETE_FAST             12 (e)
+           1184 RERAISE                  1
+
+201     >> 1186 RERAISE                  0
+        >> 1188 COPY                     3
+           1190 POP_EXCEPT
+           1192 RERAISE                  1
+        >> 1194 SWAP                     2
+           1196 POP_TOP
+
+221        1198 SWAP                     2
+           1200 STORE_FAST              16 (p)
+           1202 RERAISE                  0
+ExceptionTable:
+  242 to 274 -> 720 [1]
+  276 to 312 -> 696 [2] lasti
+  314 to 328 -> 720 [1]
+  516 to 580 -> 1194 [2]
+  584 to 590 -> 1194 [2]
+  696 to 704 -> 714 [4] lasti
+  706 to 718 -> 720 [1]
+  720 to 822 -> 1188 [2] lasti
+  824 to 930 -> 1178 [2] lasti
+  944 to 1176 -> 1178 [2] lasti
+  1178 to 1186 -> 1188 [2] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c93323930, file "app\adapters\ytdlp_client.py", line 220>:
+220           0 RESUME                   0
+              2 LOAD_FAST                0 (p)
+              4 LOAD_ATTR                1 (NULL|self + stat)
+             24 CALL                     0
+             32 LOAD_ATTR                2 (st_size)
+             52 RETURN_VALUE
+
+Disassembly of <code object _normalize at 0x290a2560, file "app\adapters\ytdlp_client.py", line 227>:
+227           0 RESUME                   0
+
+229           2 LOAD_FAST                0 (info)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 BUILD_MAP                0
+        >>   12 STORE_FAST               2 (d)
+
+230          14 LOAD_FAST                2 (d)
+             16 LOAD_ATTR                1 (NULL|self + get)
+             36 LOAD_CONST               1 ('duration')
+             38 CALL                     1
+             46 STORE_FAST               3 (dur)
+
+231          48 LOAD_GLOBAL              3 (NULL + isinstance)
+             58 LOAD_FAST                3 (dur)
+             60 LOAD_GLOBAL              4 (int)
+             70 LOAD_GLOBAL              6 (float)
+             80 BUILD_TUPLE              2
+             82 CALL                     2
+             90 POP_JUMP_IF_FALSE       14 (to 120)
+             92 LOAD_GLOBAL              5 (NULL + int)
+            102 LOAD_FAST                3 (dur)
+            104 LOAD_CONST               2 (1000)
+            106 BINARY_OP                5 (*)
+            110 CALL                     1
+            118 JUMP_FORWARD             1 (to 122)
+        >>  120 LOAD_CONST               0 (None)
+        >>  122 STORE_FAST               4 (duration_ms)
+
+232         124 LOAD_FAST                2 (d)
+            126 LOAD_ATTR                1 (NULL|self + get)
+            146 LOAD_CONST               3 ('height')
+            148 CALL                     1
+            156 STORE_FAST               5 (height)
+
+234         158 LOAD_FAST                1 (platform)
+            160 COPY                     1
+            162 POP_JUMP_IF_TRUE        36 (to 236)
+            164 POP_TOP
+            166 LOAD_FAST                2 (d)
+            168 LOAD_ATTR                1 (NULL|self + get)
+            188 LOAD_CONST               4 ('extractor_key')
+            190 LOAD_CONST               5 ('')
+            192 CALL                     2
+            200 LOAD_ATTR                9 (NULL|self + lower)
+            220 CALL                     0
+            228 COPY                     1
+            230 POP_JUMP_IF_TRUE         2 (to 236)
+            232 POP_TOP
+            234 LOAD_CONST               0 (None)
+
+235     >>  236 LOAD_CONST               0 (None)
+
+236         238 LOAD_FAST                2 (d)
+            240 LOAD_ATTR                1 (NULL|self + get)
+            260 LOAD_CONST               6 ('title')
+            262 CALL                     1
+            270 COPY                     1
+            272 POP_JUMP_IF_TRUE        17 (to 308)
+            274 POP_TOP
+            276 LOAD_FAST                2 (d)
+            278 LOAD_ATTR                1 (NULL|self + get)
+            298 LOAD_CONST               7 ('fulltitle')
+            300 CALL                     1
+
+237     >>  308 LOAD_FAST                2 (d)
+            310 LOAD_ATTR                1 (NULL|self + get)
+            330 LOAD_CONST               8 ('uploader')
+            332 CALL                     1
+            340 COPY                     1
+            342 POP_JUMP_IF_TRUE        36 (to 416)
+            344 POP_TOP
+            346 LOAD_FAST                2 (d)
+            348 LOAD_ATTR                1 (NULL|self + get)
+            368 LOAD_CONST               9 ('channel')
+            370 CALL                     1
+            378 COPY                     1
+            380 POP_JUMP_IF_TRUE        17 (to 416)
+            382 POP_TOP
+            384 LOAD_FAST                2 (d)
+            386 LOAD_ATTR                1 (NULL|self + get)
+            406 LOAD_CONST              10 ('creator')
+            408 CALL                     1
+
+238     >>  416 LOAD_FAST                4 (duration_ms)
+
+239         418 LOAD_FAST                2 (d)
+            420 LOAD_ATTR                1 (NULL|self + get)
+            440 LOAD_CONST              11 ('id')
+            442 CALL                     1
+
+240         450 LOAD_FAST                2 (d)
+            452 LOAD_ATTR                1 (NULL|self + get)
+            472 LOAD_CONST              12 ('thumbnail')
+            474 CALL                     1
+
+241         482 LOAD_FAST                5 (height)
+            484 POP_JUMP_IF_FALSE       25 (to 536)
+            486 LOAD_FAST                2 (d)
+            488 LOAD_ATTR                1 (NULL|self + get)
+            508 LOAD_CONST              13 ('width')
+            510 CALL                     1
+            518 FORMAT_VALUE             0
+            520 LOAD_CONST              14 ('x')
+            522 LOAD_FAST                5 (height)
+            524 FORMAT_VALUE             0
+            526 BUILD_STRING             3
+
+242         528 LOAD_CONST              15 ('yt-dlp')
+
+233         530 LOAD_CONST              16 (('platform', 'download_url', 'title', 'author', 'duration_ms', 'aweme_id', 'cover_url', 'resolution', '_via'))
+            532 BUILD_CONST_KEY_MAP      9
+            534 RETURN_VALUE
+
+241     >>  536 LOAD_CONST               0 (None)
+
+242         538 LOAD_CONST              15 ('yt-dlp')
+
+233         540 LOAD_CONST              16 (('platform', 'download_url', 'title', 'author', 'duration_ms', 'aweme_id', 'cover_url', 'resolution', '_via'))
+            542 BUILD_CONST_KEY_MAP      9
+            544 RETURN_VALUE

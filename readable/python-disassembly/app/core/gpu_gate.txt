@@ -1,0 +1,886 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('GpuGate — cổng tài nguyên GPU DÙNG CHUNG cho mọi tác vụ đụng CUDA.\n\nVì sao cần (xem docs/plan-recap-throughput-queue-gpu.md §3): lane của JobQueue điều phối *job*,\nnhưng GPU bị tiêu thụ ở những chỗ KHÔNG khớp với lane khai báo:\n\n  - `transcribe`, `separate_audio`  → lane GPU (đúng)\n  - `tts` → lane NET **6 slot**, nhưng bên trong lại chạy Whisper word-timestamps (căn timing) và/\n    hoặc TTS local (omnivoice/revo_voice/kokoro) → 6 tiến trình CUDA song song ⇒ hết VRAM, tự tụt\n    về CPU, chậm gấp nhiều lần. Đây là nguyên nhân "chạy recap nhiều video là nghẽn".\n\nGpuGate là semaphore toàn cục: ai đụng GPU đều phải xin slot, bất kể đang ở lane nào.\nJob đợi ở đây KHÔNG chặn các job NET/CPU khác (chúng vẫn chạy trên worker của lane mình).\n\nDùng:\n    from app.core.gpu_gate import gpu_gate\n    async with gpu_gate.slot("whisper", label=video_id):\n        ...  # chạy tác vụ CUDA\n\n`snapshot()` phục vụ GET /system/perf để nhìn thấy ai đang giữ GPU.\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 21           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 23          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (asyncio)
+             24 STORE_NAME               3 (asyncio)
+
+ 24          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               3 (None)
+             30 IMPORT_NAME              4 (contextlib)
+             32 STORE_NAME               4 (contextlib)
+
+ 25          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               3 (None)
+             38 IMPORT_NAME              5 (itertools)
+             40 STORE_NAME               5 (itertools)
+
+ 26          42 LOAD_CONST               1 (0)
+             44 LOAD_CONST               3 (None)
+             46 IMPORT_NAME              6 (time)
+             48 STORE_NAME               6 (time)
+
+ 28          50 LOAD_CONST               1 (0)
+             52 LOAD_CONST               4 (('log',))
+             54 IMPORT_NAME              7 (app.core.logging)
+             56 IMPORT_FROM              8 (log)
+             58 STORE_NAME               8 (log)
+             60 POP_TOP
+
+ 31          62 LOAD_CONST               5 (1)
+             64 STORE_NAME               9 (_DEFAULT_CONCURRENCY)
+
+ 34          66 PUSH_NULL
+             68 LOAD_BUILD_CLASS
+             70 LOAD_CONST               6 (<code object _Holder at 0x7f6c92eb7750, file "app\core\gpu_gate.py", line 34>)
+             72 MAKE_FUNCTION            0
+             74 LOAD_CONST               7 ('_Holder')
+             76 CALL                     2
+             84 STORE_NAME              10 (_Holder)
+
+ 44          86 PUSH_NULL
+             88 LOAD_BUILD_CLASS
+             90 LOAD_CONST               8 (<code object GpuGate at 0x7f6c9333a130, file "app\core\gpu_gate.py", line 44>)
+             92 MAKE_FUNCTION            0
+             94 LOAD_CONST               9 ('GpuGate')
+             96 CALL                     2
+            104 STORE_NAME              11 (GpuGate)
+
+138         106 PUSH_NULL
+            108 LOAD_NAME               11 (GpuGate)
+            110 CALL                     0
+            118 STORE_NAME              12 (gpu_gate)
+
+145         120 PUSH_NULL
+            122 LOAD_NAME               11 (GpuGate)
+            124 LOAD_CONST              10 (2)
+            126 CALL                     1
+            134 STORE_NAME              13 (nvenc_gate)
+            136 RETURN_CONST             3 (None)
+
+Disassembly of <code object _Holder at 0x7f6c92eb7750, file "app\core\gpu_gate.py", line 34>:
+ 34           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('_Holder')
+              8 STORE_NAME               2 (__qualname__)
+
+ 35          10 LOAD_CONST               1 (('id', 'kind', 'label', 'since'))
+             12 STORE_NAME               3 (__slots__)
+
+ 37          14 LOAD_CONST               4 (('hid', 'int', 'kind', 'str', 'label', 'str'))
+             16 LOAD_CONST               2 (<code object __init__ at 0x7f6c81b7fbd0, file "app\core\gpu_gate.py", line 37>)
+             18 MAKE_FUNCTION            4 (annotations)
+             20 STORE_NAME               4 (__init__)
+             22 RETURN_CONST             3 (None)
+
+Disassembly of <code object __init__ at 0x7f6c81b7fbd0, file "app\core\gpu_gate.py", line 37>:
+ 37           0 RESUME                   0
+
+ 38           2 LOAD_FAST                1 (hid)
+              4 LOAD_FAST                0 (self)
+              6 STORE_ATTR               0 (id)
+
+ 39          16 LOAD_FAST                2 (kind)
+             18 LOAD_FAST                0 (self)
+             20 STORE_ATTR               1 (kind)
+
+ 40          30 LOAD_FAST                3 (label)
+             32 LOAD_FAST                0 (self)
+             34 STORE_ATTR               2 (label)
+
+ 41          44 LOAD_GLOBAL              7 (NULL + time)
+             54 LOAD_ATTR                8 (monotonic)
+             74 CALL                     0
+             82 LOAD_FAST                0 (self)
+             84 STORE_ATTR               5 (since)
+             94 RETURN_CONST             0 (None)
+
+Disassembly of <code object GpuGate at 0x7f6c9333a130, file "app\core\gpu_gate.py", line 44>:
+ 44           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('GpuGate')
+              8 STORE_NAME               2 (__qualname__)
+
+ 45          10 LOAD_CONST               1 ('Semaphore GPU có thể đổi kích thước lúc runtime + telemetry ai đang giữ slot.')
+             12 STORE_NAME               3 (__doc__)
+
+ 47          14 LOAD_NAME                4 (_DEFAULT_CONCURRENCY)
+             16 BUILD_TUPLE              1
+             18 LOAD_CONST              11 (('concurrency', 'int', 'return', 'None'))
+             20 LOAD_CONST               2 (<code object __init__ at 0x7f6c92d62b80, file "app\core\gpu_gate.py", line 47>)
+             22 MAKE_FUNCTION            5 (defaults, annotations)
+             24 STORE_NAME               5 (__init__)
+
+ 57          26 LOAD_CONST              12 (('return', 'asyncio.Condition'))
+             28 LOAD_CONST               3 (<code object _condition at 0x7f6c81c21f10, file "app\core\gpu_gate.py", line 57>)
+             30 MAKE_FUNCTION            4 (annotations)
+             32 STORE_NAME               6 (_condition)
+
+ 63          34 LOAD_NAME                7 (property)
+
+ 64          36 LOAD_CONST              13 (('return', 'int'))
+             38 LOAD_CONST               4 (<code object size at 0x7f6c92eb7c90, file "app\core\gpu_gate.py", line 63>)
+             40 MAKE_FUNCTION            4 (annotations)
+
+ 63          42 CALL                     0
+
+ 64          50 STORE_NAME               8 (size)
+
+ 67          52 LOAD_NAME                7 (property)
+
+ 68          54 LOAD_CONST              13 (('return', 'int'))
+             56 LOAD_CONST               5 (<code object active at 0x7f6c92ee93e0, file "app\core\gpu_gate.py", line 67>)
+             58 MAKE_FUNCTION            4 (annotations)
+
+ 67          60 CALL                     0
+
+ 68          68 STORE_NAME               9 (active)
+
+ 71          70 LOAD_CONST              11 (('concurrency', 'int', 'return', 'None'))
+             72 LOAD_CONST               6 (<code object resize at 0x269fea00, file "app\core\gpu_gate.py", line 71>)
+             74 MAKE_FUNCTION            4 (annotations)
+             76 STORE_NAME              10 (resize)
+
+ 86          78 LOAD_NAME               11 (contextlib)
+             80 LOAD_ATTR               24 (asynccontextmanager)
+
+ 87         100 LOAD_CONST              14 (('',))
+            102 LOAD_CONST              15 (('kind', 'str', 'label', 'str'))
+            104 LOAD_CONST               7 (<code object slot at 0x28e35200, file "app\core\gpu_gate.py", line 86>)
+            106 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 86         108 CALL                     0
+
+ 87         116 STORE_NAME              13 (slot)
+
+112         118 LOAD_NAME               14 (staticmethod)
+
+113         120 LOAD_CONST              16 (('cond', 'asyncio.Condition', 'return', 'None'))
+            122 LOAD_CONST               8 (<code object _notify_soon at 0x7f6c92ea6fb0, file "app\core\gpu_gate.py", line 112>)
+            124 MAKE_FUNCTION            4 (annotations)
+
+112         126 CALL                     0
+
+113         134 STORE_NAME              15 (_notify_soon)
+
+122         136 LOAD_CONST              17 (('return', 'dict'))
+            138 LOAD_CONST               9 (<code object snapshot at 0x290ce2f0, file "app\core\gpu_gate.py", line 122>)
+            140 MAKE_FUNCTION            4 (annotations)
+            142 STORE_NAME              16 (snapshot)
+            144 RETURN_CONST            10 (None)
+
+Disassembly of <code object __init__ at 0x7f6c92d62b80, file "app\core\gpu_gate.py", line 47>:
+ 47           0 RESUME                   0
+
+ 48           2 LOAD_GLOBAL              1 (NULL + max)
+             12 LOAD_CONST               1 (1)
+             14 LOAD_FAST                1 (concurrency)
+             16 CALL                     2
+             24 LOAD_FAST                0 (self)
+             26 STORE_ATTR               1 (_size)
+
+ 49          36 LOAD_GLOBAL              5 (NULL + itertools)
+             46 LOAD_ATTR                6 (count)
+             66 LOAD_CONST               1 (1)
+             68 CALL                     1
+             76 LOAD_FAST                0 (self)
+             78 STORE_ATTR               4 (_seq)
+
+ 50          88 BUILD_MAP                0
+             90 LOAD_FAST                0 (self)
+             92 STORE_ATTR               5 (_holders)
+
+ 51         102 BUILD_MAP                0
+            104 LOAD_FAST                0 (self)
+            106 STORE_ATTR               6 (_waiting)
+
+ 55         116 LOAD_CONST               0 (None)
+            118 LOAD_FAST                0 (self)
+            120 STORE_ATTR               7 (_cond)
+            130 RETURN_CONST             0 (None)
+
+Disassembly of <code object _condition at 0x7f6c81c21f10, file "app\core\gpu_gate.py", line 57>:
+ 57           0 RESUME                   0
+
+ 59           2 LOAD_FAST                0 (self)
+              4 LOAD_ATTR                0 (_cond)
+             24 POP_JUMP_IF_NOT_NONE    25 (to 76)
+
+ 60          26 LOAD_GLOBAL              3 (NULL + asyncio)
+             36 LOAD_ATTR                4 (Condition)
+             56 CALL                     0
+             64 LOAD_FAST                0 (self)
+             66 STORE_ATTR               0 (_cond)
+
+ 61     >>   76 LOAD_FAST                0 (self)
+             78 LOAD_ATTR                0 (_cond)
+             98 RETURN_VALUE
+
+Disassembly of <code object size at 0x7f6c92eb7c90, file "app\core\gpu_gate.py", line 63>:
+ 63           0 RESUME                   0
+
+ 65           2 LOAD_FAST                0 (self)
+              4 LOAD_ATTR                0 (_size)
+             24 RETURN_VALUE
+
+Disassembly of <code object active at 0x7f6c92ee93e0, file "app\core\gpu_gate.py", line 67>:
+ 67           0 RESUME                   0
+
+ 69           2 LOAD_GLOBAL              1 (NULL + len)
+             12 LOAD_FAST                0 (self)
+             14 LOAD_ATTR                2 (_holders)
+             34 CALL                     1
+             42 RETURN_VALUE
+
+Disassembly of <code object resize at 0x269fea00, file "app\core\gpu_gate.py", line 71>:
+              0 MAKE_CELL                0 (self)
+
+ 71           2 RESUME                   0
+
+ 73           4 LOAD_GLOBAL              1 (NULL + max)
+             14 LOAD_CONST               1 (1)
+             16 LOAD_GLOBAL              3 (NULL + int)
+             26 LOAD_FAST                1 (concurrency)
+             28 CALL                     1
+             36 CALL                     2
+             44 STORE_FAST               2 (target)
+
+ 74          46 LOAD_FAST                2 (target)
+             48 LOAD_DEREF               0 (self)
+             50 LOAD_ATTR                4 (_size)
+             70 COMPARE_OP              40 (==)
+             74 POP_JUMP_IF_FALSE        1 (to 78)
+
+ 75          76 RETURN_CONST             2 (None)
+
+ 76     >>   78 LOAD_FAST                2 (target)
+             80 LOAD_DEREF               0 (self)
+             82 LOAD_ATTR                4 (_size)
+            102 COMPARE_OP              68 (>)
+            106 STORE_FAST               3 (grew)
+
+ 77         108 LOAD_FAST                2 (target)
+            110 LOAD_DEREF               0 (self)
+            112 STORE_ATTR               2 (_size)
+
+ 78         122 LOAD_GLOBAL              7 (NULL + log)
+            132 LOAD_ATTR                8 (info)
+            152 LOAD_CONST               3 ('[gpu-gate] số tác vụ GPU song song: ')
+            154 LOAD_FAST                2 (target)
+            156 FORMAT_VALUE             0
+            158 BUILD_STRING             2
+            160 CALL                     1
+            168 POP_TOP
+
+ 79         170 LOAD_FAST                3 (grew)
+            172 POP_JUMP_IF_FALSE       93 (to 360)
+            174 LOAD_DEREF               0 (self)
+            176 LOAD_ATTR               10 (_cond)
+            196 POP_JUMP_IF_NONE        80 (to 358)
+
+ 80         198 LOAD_CLOSURE             0 (self)
+            200 BUILD_TUPLE              1
+            202 LOAD_CONST               4 (<code object _wake at 0x7f6c92c2b930, file "app\core\gpu_gate.py", line 80>)
+            204 MAKE_FUNCTION            8 (closure)
+            206 STORE_FAST               4 (_wake)
+
+ 83         208 LOAD_GLOBAL             13 (NULL + contextlib)
+            218 LOAD_ATTR               14 (suppress)
+            238 LOAD_GLOBAL             16 (RuntimeError)
+            248 CALL                     1
+            256 BEFORE_WITH
+            258 POP_TOP
+
+ 84         260 LOAD_GLOBAL             19 (NULL + asyncio)
+            270 LOAD_ATTR               20 (get_running_loop)
+            290 CALL                     0
+            298 LOAD_ATTR               23 (NULL|self + create_task)
+            318 PUSH_NULL
+            320 LOAD_FAST                4 (_wake)
+            322 CALL                     0
+            330 CALL                     1
+            338 POP_TOP
+
+ 83         340 LOAD_CONST               2 (None)
+            342 LOAD_CONST               2 (None)
+            344 LOAD_CONST               2 (None)
+            346 CALL                     2
+            354 POP_TOP
+            356 RETURN_CONST             2 (None)
+
+ 79     >>  358 RETURN_CONST             2 (None)
+        >>  360 RETURN_CONST             2 (None)
+
+ 83     >>  362 PUSH_EXC_INFO
+            364 WITH_EXCEPT_START
+            366 POP_JUMP_IF_TRUE         1 (to 370)
+            368 RERAISE                  2
+        >>  370 POP_TOP
+            372 POP_EXCEPT
+            374 POP_TOP
+            376 POP_TOP
+            378 RETURN_CONST             2 (None)
+        >>  380 COPY                     3
+            382 POP_EXCEPT
+            384 RERAISE                  1
+ExceptionTable:
+  258 to 338 -> 362 [1] lasti
+  362 to 370 -> 380 [3] lasti
+
+Disassembly of <code object _wake at 0x7f6c92c2b930, file "app\core\gpu_gate.py", line 80>:
+              0 COPY_FREE_VARS           1
+
+ 80           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+ 81           8 LOAD_DEREF               0 (self)
+             10 LOAD_ATTR                0 (_cond)
+             30 BEFORE_ASYNC_WITH
+             32 GET_AWAITABLE            1
+             34 LOAD_CONST               0 (None)
+        >>   36 SEND                     3 (to 46)
+             40 YIELD_VALUE              2
+             42 RESUME                   3
+             44 JUMP_BACKWARD_NO_INTERRUPT     5 (to 36)
+        >>   46 END_SEND
+             48 POP_TOP
+
+ 82          50 LOAD_DEREF               0 (self)
+             52 LOAD_ATTR                0 (_cond)
+             72 LOAD_ATTR                3 (NULL|self + notify_all)
+             92 CALL                     0
+            100 POP_TOP
+
+ 81         102 LOAD_CONST               0 (None)
+            104 LOAD_CONST               0 (None)
+            106 LOAD_CONST               0 (None)
+            108 CALL                     2
+            116 GET_AWAITABLE            2
+            118 LOAD_CONST               0 (None)
+        >>  120 SEND                     3 (to 130)
+            124 YIELD_VALUE              2
+            126 RESUME                   3
+            128 JUMP_BACKWARD_NO_INTERRUPT     5 (to 120)
+        >>  130 END_SEND
+            132 POP_TOP
+            134 RETURN_CONST             0 (None)
+        >>  136 CLEANUP_THROW
+            138 JUMP_BACKWARD           47 (to 46)
+        >>  140 CLEANUP_THROW
+            142 JUMP_BACKWARD            7 (to 130)
+        >>  144 PUSH_EXC_INFO
+            146 WITH_EXCEPT_START
+            148 GET_AWAITABLE            2
+            150 LOAD_CONST               0 (None)
+        >>  152 SEND                     4 (to 164)
+            156 YIELD_VALUE              3
+            158 RESUME                   3
+            160 JUMP_BACKWARD_NO_INTERRUPT     5 (to 152)
+        >>  162 CLEANUP_THROW
+        >>  164 END_SEND
+            166 POP_JUMP_IF_TRUE         1 (to 170)
+            168 RERAISE                  2
+        >>  170 POP_TOP
+            172 POP_EXCEPT
+            174 POP_TOP
+            176 POP_TOP
+            178 RETURN_CONST             0 (None)
+        >>  180 COPY                     3
+            182 POP_EXCEPT
+            184 RERAISE                  1
+        >>  186 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            188 RERAISE                  1
+ExceptionTable:
+  6 to 38 -> 186 [0] lasti
+  40 to 40 -> 136 [3]
+  42 to 46 -> 186 [0] lasti
+  48 to 100 -> 144 [1] lasti
+  102 to 122 -> 186 [0] lasti
+  124 to 124 -> 140 [2]
+  126 to 136 -> 186 [0] lasti
+  140 to 140 -> 186 [0] lasti
+  144 to 154 -> 180 [3] lasti
+  156 to 156 -> 162 [6]
+  158 to 170 -> 180 [3] lasti
+  172 to 184 -> 186 [0] lasti
+
+Disassembly of <code object slot at 0x28e35200, file "app\core\gpu_gate.py", line 86>:
+              0 MAKE_CELL                0 (self)
+
+ 86           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+ 89           8 LOAD_GLOBAL              1 (NULL + next)
+             18 LOAD_DEREF               0 (self)
+             20 LOAD_ATTR                2 (_seq)
+             40 CALL                     1
+             48 STORE_FAST               3 (hid)
+
+ 90          50 LOAD_GLOBAL              5 (NULL + _Holder)
+             60 LOAD_FAST                3 (hid)
+             62 LOAD_FAST                1 (kind)
+             64 LOAD_FAST                2 (label)
+             66 CALL                     3
+             74 STORE_FAST               4 (h)
+
+ 91          76 LOAD_DEREF               0 (self)
+             78 LOAD_ATTR                7 (NULL|self + _condition)
+             98 CALL                     0
+            106 STORE_FAST               5 (cond)
+
+ 92         108 LOAD_FAST                4 (h)
+            110 LOAD_DEREF               0 (self)
+            112 LOAD_ATTR                8 (_waiting)
+            132 LOAD_FAST                3 (hid)
+            134 STORE_SUBSCR
+
+ 93         138 LOAD_GLOBAL             11 (NULL + time)
+            148 LOAD_ATTR               12 (monotonic)
+            168 CALL                     0
+            176 STORE_FAST               6 (t0)
+
+ 94         178 NOP
+
+ 95         180 LOAD_FAST                5 (cond)
+            182 BEFORE_ASYNC_WITH
+            184 GET_AWAITABLE            1
+            186 LOAD_CONST               1 (None)
+        >>  188 SEND                     3 (to 198)
+            192 YIELD_VALUE              3
+            194 RESUME                   3
+            196 JUMP_BACKWARD_NO_INTERRUPT     5 (to 188)
+        >>  198 END_SEND
+            200 POP_TOP
+
+ 96         202 LOAD_FAST                5 (cond)
+            204 LOAD_ATTR               15 (NULL|self + wait_for)
+            224 LOAD_CLOSURE             0 (self)
+            226 BUILD_TUPLE              1
+            228 LOAD_CONST               2 (<code object <lambda> at 0x7f6c92b70250, file "app\core\gpu_gate.py", line 96>)
+            230 MAKE_FUNCTION            8 (closure)
+            232 CALL                     1
+            240 GET_AWAITABLE            0
+            242 LOAD_CONST               1 (None)
+        >>  244 SEND                     3 (to 254)
+            248 YIELD_VALUE              4
+            250 RESUME                   3
+            252 JUMP_BACKWARD_NO_INTERRUPT     5 (to 244)
+        >>  254 END_SEND
+            256 POP_TOP
+
+ 97         258 LOAD_GLOBAL             11 (NULL + time)
+            268 LOAD_ATTR               12 (monotonic)
+            288 CALL                     0
+            296 LOAD_FAST                4 (h)
+            298 STORE_ATTR               8 (since)
+
+ 98         308 LOAD_FAST                4 (h)
+            310 LOAD_DEREF               0 (self)
+            312 LOAD_ATTR               18 (_holders)
+            332 LOAD_FAST                3 (hid)
+            334 STORE_SUBSCR
+
+ 95         338 LOAD_CONST               1 (None)
+            340 LOAD_CONST               1 (None)
+            342 LOAD_CONST               1 (None)
+            344 CALL                     2
+            352 GET_AWAITABLE            2
+            354 LOAD_CONST               1 (None)
+        >>  356 SEND                     3 (to 366)
+            360 YIELD_VALUE              3
+            362 RESUME                   3
+            364 JUMP_BACKWARD_NO_INTERRUPT     5 (to 356)
+        >>  366 END_SEND
+            368 POP_TOP
+
+100     >>  370 LOAD_DEREF               0 (self)
+            372 LOAD_ATTR                8 (_waiting)
+            392 LOAD_ATTR               21 (NULL|self + pop)
+            412 LOAD_FAST                3 (hid)
+            414 LOAD_CONST               1 (None)
+            416 CALL                     2
+            424 POP_TOP
+
+101         426 LOAD_FAST                4 (h)
+            428 LOAD_ATTR               16 (since)
+            448 LOAD_FAST                6 (t0)
+            450 BINARY_OP               10 (-)
+            454 STORE_FAST               7 (waited)
+
+102         456 LOAD_FAST                7 (waited)
+            458 LOAD_CONST               3 (1.0)
+            460 COMPARE_OP              68 (>)
+            464 POP_JUMP_IF_FALSE       32 (to 530)
+
+103         466 LOAD_GLOBAL             23 (NULL + log)
+            476 LOAD_ATTR               24 (info)
+            496 LOAD_CONST               4 ('[gpu-gate] ')
+            498 LOAD_FAST                1 (kind)
+            500 FORMAT_VALUE             0
+            502 LOAD_CONST               5 ('(')
+            504 LOAD_FAST                2 (label)
+            506 FORMAT_VALUE             0
+            508 LOAD_CONST               6 (') đã chờ ')
+            510 LOAD_FAST                7 (waited)
+            512 LOAD_CONST               7 ('.1f')
+            514 FORMAT_VALUE             4 (with format)
+            516 LOAD_CONST               8 ('s để vào GPU.')
+            518 BUILD_STRING             7
+            520 CALL                     1
+            528 POP_TOP
+
+104     >>  530 NOP
+
+105         532 LOAD_CONST               1 (None)
+            534 CALL_INTRINSIC_1         4 (INTRINSIC_ASYNC_GEN_WRAP)
+            536 YIELD_VALUE              2
+            538 RESUME                   1
+            540 POP_TOP
+
+109         542 LOAD_DEREF               0 (self)
+            544 LOAD_ATTR               18 (_holders)
+            564 LOAD_ATTR               21 (NULL|self + pop)
+            584 LOAD_FAST                3 (hid)
+            586 LOAD_CONST               1 (None)
+            588 CALL                     2
+            596 POP_TOP
+
+110         598 LOAD_DEREF               0 (self)
+            600 LOAD_ATTR               27 (NULL|self + _notify_soon)
+            620 LOAD_FAST                5 (cond)
+            622 CALL                     1
+            630 POP_TOP
+            632 RETURN_CONST             1 (None)
+
+ 95     >>  634 CLEANUP_THROW
+            636 JUMP_BACKWARD          220 (to 198)
+
+ 96     >>  638 CLEANUP_THROW
+            640 JUMP_BACKWARD          194 (to 254)
+
+ 95     >>  642 CLEANUP_THROW
+            644 JUMP_BACKWARD          140 (to 366)
+        >>  646 PUSH_EXC_INFO
+            648 WITH_EXCEPT_START
+            650 GET_AWAITABLE            2
+            652 LOAD_CONST               1 (None)
+        >>  654 SEND                     4 (to 666)
+            658 YIELD_VALUE              4
+            660 RESUME                   3
+            662 JUMP_BACKWARD_NO_INTERRUPT     5 (to 654)
+        >>  664 CLEANUP_THROW
+        >>  666 END_SEND
+            668 POP_JUMP_IF_TRUE         1 (to 672)
+            670 RERAISE                  2
+        >>  672 POP_TOP
+            674 POP_EXCEPT
+            676 POP_TOP
+            678 POP_TOP
+            680 JUMP_BACKWARD          156 (to 370)
+        >>  682 COPY                     3
+            684 POP_EXCEPT
+            686 RERAISE                  1
+        >>  688 PUSH_EXC_INFO
+
+100         690 LOAD_DEREF               0 (self)
+            692 LOAD_ATTR                8 (_waiting)
+            712 LOAD_ATTR               21 (NULL|self + pop)
+            732 LOAD_FAST                3 (hid)
+            734 LOAD_CONST               1 (None)
+            736 CALL                     2
+            744 POP_TOP
+            746 RERAISE                  0
+        >>  748 COPY                     3
+            750 POP_EXCEPT
+            752 RERAISE                  1
+        >>  754 PUSH_EXC_INFO
+
+109         756 LOAD_DEREF               0 (self)
+            758 LOAD_ATTR               18 (_holders)
+            778 LOAD_ATTR               21 (NULL|self + pop)
+            798 LOAD_FAST                3 (hid)
+            800 LOAD_CONST               1 (None)
+            802 CALL                     2
+            810 POP_TOP
+
+110         812 LOAD_DEREF               0 (self)
+            814 LOAD_ATTR               27 (NULL|self + _notify_soon)
+            834 LOAD_FAST                5 (cond)
+            836 CALL                     1
+            844 POP_TOP
+            846 RERAISE                  0
+        >>  848 COPY                     3
+            850 POP_EXCEPT
+            852 RERAISE                  1
+        >>  854 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            856 RERAISE                  1
+ExceptionTable:
+  6 to 176 -> 854 [0] lasti
+  180 to 190 -> 688 [0]
+  192 to 192 -> 634 [3]
+  194 to 198 -> 688 [0]
+  200 to 246 -> 646 [1] lasti
+  248 to 248 -> 638 [3]
+  250 to 336 -> 646 [1] lasti
+  338 to 358 -> 688 [0]
+  360 to 360 -> 642 [2]
+  362 to 368 -> 688 [0]
+  370 to 528 -> 854 [0] lasti
+  532 to 540 -> 754 [0]
+  542 to 632 -> 854 [0] lasti
+  634 to 634 -> 688 [0]
+  638 to 638 -> 646 [1] lasti
+  642 to 642 -> 688 [0]
+  646 to 656 -> 682 [3] lasti
+  658 to 658 -> 664 [6]
+  660 to 672 -> 682 [3] lasti
+  674 to 686 -> 688 [0]
+  688 to 746 -> 748 [1] lasti
+  748 to 752 -> 854 [0] lasti
+  754 to 846 -> 848 [1] lasti
+  848 to 852 -> 854 [0] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c92b70250, file "app\core\gpu_gate.py", line 96>:
+              0 COPY_FREE_VARS           1
+
+ 96           2 RESUME                   0
+              4 LOAD_GLOBAL              1 (NULL + len)
+             14 LOAD_DEREF               0 (self)
+             16 LOAD_ATTR                2 (_holders)
+             36 CALL                     1
+             44 LOAD_DEREF               0 (self)
+             46 LOAD_ATTR                4 (_size)
+             66 COMPARE_OP               2 (<)
+             70 RETURN_VALUE
+
+Disassembly of <code object _notify_soon at 0x7f6c92ea6fb0, file "app\core\gpu_gate.py", line 112>:
+              0 MAKE_CELL                0 (cond)
+
+112           2 RESUME                   0
+
+114           4 LOAD_CLOSURE             0 (cond)
+              6 BUILD_TUPLE              1
+              8 LOAD_CONST               1 (<code object _wake at 0x7f6c93339fd0, file "app\core\gpu_gate.py", line 114>)
+             10 MAKE_FUNCTION            8 (closure)
+             12 STORE_FAST               1 (_wake)
+
+117          14 NOP
+
+118          16 LOAD_GLOBAL              1 (NULL + asyncio)
+             26 LOAD_ATTR                2 (get_running_loop)
+             46 CALL                     0
+             54 LOAD_ATTR                5 (NULL|self + create_task)
+             74 PUSH_NULL
+             76 LOAD_FAST                1 (_wake)
+             78 CALL                     0
+             86 CALL                     1
+             94 POP_TOP
+             96 RETURN_CONST             0 (None)
+        >>   98 PUSH_EXC_INFO
+
+119         100 LOAD_GLOBAL              6 (RuntimeError)
+            110 CHECK_EXC_MATCH
+            112 POP_JUMP_IF_FALSE        3 (to 120)
+            114 POP_TOP
+
+120         116 POP_EXCEPT
+            118 RETURN_CONST             0 (None)
+
+119     >>  120 RERAISE                  0
+        >>  122 COPY                     3
+            124 POP_EXCEPT
+            126 RERAISE                  1
+ExceptionTable:
+  16 to 94 -> 98 [0]
+  98 to 114 -> 122 [1] lasti
+  120 to 120 -> 122 [1] lasti
+
+Disassembly of <code object _wake at 0x7f6c93339fd0, file "app\core\gpu_gate.py", line 114>:
+              0 COPY_FREE_VARS           1
+
+114           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+115           8 LOAD_DEREF               0 (cond)
+             10 BEFORE_ASYNC_WITH
+             12 GET_AWAITABLE            1
+             14 LOAD_CONST               0 (None)
+        >>   16 SEND                     3 (to 26)
+             20 YIELD_VALUE              2
+             22 RESUME                   3
+             24 JUMP_BACKWARD_NO_INTERRUPT     5 (to 16)
+        >>   26 END_SEND
+             28 POP_TOP
+
+116          30 LOAD_DEREF               0 (cond)
+             32 LOAD_ATTR                1 (NULL|self + notify_all)
+             52 CALL                     0
+             60 POP_TOP
+
+115          62 LOAD_CONST               0 (None)
+             64 LOAD_CONST               0 (None)
+             66 LOAD_CONST               0 (None)
+             68 CALL                     2
+             76 GET_AWAITABLE            2
+             78 LOAD_CONST               0 (None)
+        >>   80 SEND                     3 (to 90)
+             84 YIELD_VALUE              2
+             86 RESUME                   3
+             88 JUMP_BACKWARD_NO_INTERRUPT     5 (to 80)
+        >>   90 END_SEND
+             92 POP_TOP
+             94 RETURN_CONST             0 (None)
+        >>   96 CLEANUP_THROW
+             98 JUMP_BACKWARD           37 (to 26)
+        >>  100 CLEANUP_THROW
+            102 JUMP_BACKWARD            7 (to 90)
+        >>  104 PUSH_EXC_INFO
+            106 WITH_EXCEPT_START
+            108 GET_AWAITABLE            2
+            110 LOAD_CONST               0 (None)
+        >>  112 SEND                     4 (to 124)
+            116 YIELD_VALUE              3
+            118 RESUME                   3
+            120 JUMP_BACKWARD_NO_INTERRUPT     5 (to 112)
+        >>  122 CLEANUP_THROW
+        >>  124 END_SEND
+            126 POP_JUMP_IF_TRUE         1 (to 130)
+            128 RERAISE                  2
+        >>  130 POP_TOP
+            132 POP_EXCEPT
+            134 POP_TOP
+            136 POP_TOP
+            138 RETURN_CONST             0 (None)
+        >>  140 COPY                     3
+            142 POP_EXCEPT
+            144 RERAISE                  1
+        >>  146 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            148 RERAISE                  1
+ExceptionTable:
+  6 to 18 -> 146 [0] lasti
+  20 to 20 -> 96 [3]
+  22 to 26 -> 146 [0] lasti
+  28 to 60 -> 104 [1] lasti
+  62 to 82 -> 146 [0] lasti
+  84 to 84 -> 100 [2]
+  86 to 96 -> 146 [0] lasti
+  100 to 100 -> 146 [0] lasti
+  104 to 114 -> 140 [3] lasti
+  116 to 116 -> 122 [6]
+  118 to 130 -> 140 [3] lasti
+  132 to 144 -> 146 [0] lasti
+
+Disassembly of <code object snapshot at 0x290ce2f0, file "app\core\gpu_gate.py", line 122>:
+122           0 RESUME                   0
+
+123           2 LOAD_GLOBAL              1 (NULL + time)
+             12 LOAD_ATTR                2 (monotonic)
+             32 CALL                     0
+             40 STORE_FAST               1 (now)
+
+125          42 LOAD_FAST                0 (self)
+             44 LOAD_ATTR                4 (_size)
+
+128          64 LOAD_FAST                0 (self)
+             66 LOAD_ATTR                6 (_holders)
+             86 LOAD_ATTR                9 (NULL|self + values)
+            106 CALL                     0
+            114 GET_ITER
+
+126         116 LOAD_FAST_AND_CLEAR      2 (h)
+            118 SWAP                     2
+            120 BUILD_LIST               0
+            122 SWAP                     2
+
+128     >>  124 FOR_ITER                51 (to 230)
+            128 STORE_FAST               2 (h)
+
+127         130 LOAD_FAST                2 (h)
+            132 LOAD_ATTR               10 (kind)
+            152 LOAD_FAST                2 (h)
+            154 LOAD_ATTR               12 (label)
+            174 LOAD_GLOBAL             15 (NULL + round)
+            184 LOAD_FAST                1 (now)
+            186 LOAD_FAST                2 (h)
+            188 LOAD_ATTR               16 (since)
+            208 BINARY_OP               10 (-)
+            212 LOAD_CONST               1 (1)
+            214 CALL                     2
+            222 LOAD_CONST               2 (('kind', 'label', 'elapsed_s'))
+            224 BUILD_CONST_KEY_MAP      3
+            226 LIST_APPEND              2
+            228 JUMP_BACKWARD           53 (to 124)
+
+128     >>  230 END_FOR
+
+126         232 SWAP                     2
+            234 STORE_FAST               2 (h)
+
+132         236 LOAD_FAST                0 (self)
+            238 LOAD_ATTR               18 (_waiting)
+            258 LOAD_ATTR                9 (NULL|self + values)
+            278 CALL                     0
+            286 GET_ITER
+
+130         288 LOAD_FAST_AND_CLEAR      2 (h)
+            290 SWAP                     2
+            292 BUILD_LIST               0
+            294 SWAP                     2
+
+132     >>  296 FOR_ITER                51 (to 402)
+            300 STORE_FAST               2 (h)
+
+131         302 LOAD_FAST                2 (h)
+            304 LOAD_ATTR               10 (kind)
+            324 LOAD_FAST                2 (h)
+            326 LOAD_ATTR               12 (label)
+            346 LOAD_GLOBAL             15 (NULL + round)
+            356 LOAD_FAST                1 (now)
+            358 LOAD_FAST                2 (h)
+            360 LOAD_ATTR               16 (since)
+            380 BINARY_OP               10 (-)
+            384 LOAD_CONST               1 (1)
+            386 CALL                     2
+            394 LOAD_CONST               3 (('kind', 'label', 'waited_s'))
+            396 BUILD_CONST_KEY_MAP      3
+            398 LIST_APPEND              2
+            400 JUMP_BACKWARD           53 (to 296)
+
+132     >>  402 END_FOR
+
+130         404 SWAP                     2
+            406 STORE_FAST               2 (h)
+
+124         408 LOAD_CONST               4 (('size', 'running', 'waiting'))
+            410 BUILD_CONST_KEY_MAP      3
+            412 RETURN_VALUE
+        >>  414 SWAP                     2
+            416 POP_TOP
+
+126         418 SWAP                     2
+            420 STORE_FAST               2 (h)
+            422 RERAISE                  0
+        >>  424 SWAP                     2
+            426 POP_TOP
+
+130         428 SWAP                     2
+            430 STORE_FAST               2 (h)
+            432 RERAISE                  0
+ExceptionTable:
+  120 to 230 -> 414 [3]
+  292 to 402 -> 424 [4]

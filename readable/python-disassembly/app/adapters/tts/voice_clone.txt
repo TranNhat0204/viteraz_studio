@@ -1,0 +1,72 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Kho giọng clone — CHỈ còn helper đường dẫn.\n\nTrước đây file này còn chứa ops OpenVoice v2 (nạp converter torch, trích tone-color embedding,\nconvert màu giọng) phục vụ provider "openvoice"/RevoVoice cũ. Provider đó ĐÃ GỠ HẲN (xem\napp/adapters/tts/__init__.py) nên toàn bộ phần torch bị xoá; giữ lại 2 helper vì:\n\n  - `voice_clones_dir()` — OmniVoice lưu reference WAV `<id>.wav` ở đây (omnivoice_tts.ref_audio_path);\n  - `target_se_path()`   — trỏ tới `<id>.pth` của giọng clone openvoice CŨ, chỉ dùng để DỌN file\n                           thừa còn sót trên máy user (xoá giọng clone / dọn preset lúc khởi động).\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 11           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 13          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('Path',))
+             22 IMPORT_NAME              3 (pathlib)
+             24 IMPORT_FROM              4 (Path)
+             26 STORE_NAME               4 (Path)
+             28 POP_TOP
+
+ 16          30 LOAD_CONST               7 (('return', 'Path'))
+             32 LOAD_CONST               4 (<code object voice_clones_dir at 0x7f6c81c203c0, file "app\adapters\tts\voice_clone.py", line 16>)
+             34 MAKE_FUNCTION            4 (annotations)
+             36 STORE_NAME               5 (voice_clones_dir)
+
+ 24          38 LOAD_CONST               8 (('clone_id', 'str', 'return', 'Path'))
+             40 LOAD_CONST               5 (<code object target_se_path at 0x7f6c932dfa50, file "app\adapters\tts\voice_clone.py", line 24>)
+             42 MAKE_FUNCTION            4 (annotations)
+             44 STORE_NAME               6 (target_se_path)
+             46 RETURN_CONST             6 (None)
+
+Disassembly of <code object voice_clones_dir at 0x7f6c81c203c0, file "app\adapters\tts\voice_clone.py", line 16>:
+ 16           0 RESUME                   0
+
+ 17           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('get_settings',))
+              6 IMPORT_NAME              0 (app.config)
+              8 IMPORT_FROM              1 (get_settings)
+             10 STORE_FAST               0 (get_settings)
+             12 POP_TOP
+
+ 19          14 PUSH_NULL
+             16 LOAD_FAST                0 (get_settings)
+             18 CALL                     0
+             26 LOAD_ATTR                4 (data_dir)
+             46 LOAD_CONST               3 ('resources')
+             48 BINARY_OP               11 (/)
+             52 LOAD_CONST               4 ('voice_clones')
+             54 BINARY_OP               11 (/)
+             58 STORE_FAST               1 (d)
+
+ 20          60 LOAD_FAST                1 (d)
+             62 LOAD_ATTR                7 (NULL|self + mkdir)
+             82 LOAD_CONST               5 (True)
+             84 LOAD_CONST               5 (True)
+             86 KW_NAMES                 6 (('parents', 'exist_ok'))
+             88 CALL                     2
+             96 POP_TOP
+
+ 21          98 LOAD_FAST                1 (d)
+            100 RETURN_VALUE
+
+Disassembly of <code object target_se_path at 0x7f6c932dfa50, file "app\adapters\tts\voice_clone.py", line 24>:
+ 24           0 RESUME                   0
+
+ 26           2 LOAD_GLOBAL              1 (NULL + voice_clones_dir)
+             12 CALL                     0
+             20 LOAD_FAST                0 (clone_id)
+             22 FORMAT_VALUE             0
+             24 LOAD_CONST               1 ('.pth')
+             26 BUILD_STRING             2
+             28 BINARY_OP               11 (/)
+             32 RETURN_VALUE

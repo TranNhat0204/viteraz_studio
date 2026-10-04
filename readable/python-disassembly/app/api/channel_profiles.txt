@@ -1,0 +1,566 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Router channel-profiles — bộ preset có tên cho từng kênh (pipeline + voice + brand + SEO).\n\nLưu dưới dạng JSON trong bảng Setting (key="channel_profiles") để KHÔNG cần migration bảng mới.\nMỗi profile = {id, name, config, created_at}. Frontend "apply" = nạp config vào panel chạy.\n')
+              4 STORE_NAME               0 (__doc__)
+
+  6           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+  8          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (json)
+             24 STORE_NAME               3 (json)
+
+  9          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               3 (None)
+             30 IMPORT_NAME              4 (uuid)
+             32 STORE_NAME               4 (uuid)
+
+ 10          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               4 (('datetime',))
+             38 IMPORT_NAME              5 (datetime)
+             40 IMPORT_FROM              5 (datetime)
+             42 STORE_NAME               5 (datetime)
+             44 POP_TOP
+
+ 12          46 LOAD_CONST               1 (0)
+             48 LOAD_CONST               5 (('APIRouter', 'Depends'))
+             50 IMPORT_NAME              6 (fastapi)
+             52 IMPORT_FROM              7 (APIRouter)
+             54 STORE_NAME               7 (APIRouter)
+             56 IMPORT_FROM              8 (Depends)
+             58 STORE_NAME               8 (Depends)
+             60 POP_TOP
+
+ 13          62 LOAD_CONST               1 (0)
+             64 LOAD_CONST               6 (('BaseModel',))
+             66 IMPORT_NAME              9 (pydantic)
+             68 IMPORT_FROM             10 (BaseModel)
+             70 STORE_NAME              10 (BaseModel)
+             72 POP_TOP
+
+ 14          74 LOAD_CONST               1 (0)
+             76 LOAD_CONST               7 (('Session',))
+             78 IMPORT_NAME             11 (sqlalchemy.orm)
+             80 IMPORT_FROM             12 (Session)
+             82 STORE_NAME              12 (Session)
+             84 POP_TOP
+
+ 16          86 LOAD_CONST               1 (0)
+             88 LOAD_CONST               8 (('verify_token', 'get_session'))
+             90 IMPORT_NAME             13 (app.deps)
+             92 IMPORT_FROM             14 (verify_token)
+             94 STORE_NAME              14 (verify_token)
+             96 IMPORT_FROM             15 (get_session)
+             98 STORE_NAME              15 (get_session)
+            100 POP_TOP
+
+ 17         102 LOAD_CONST               1 (0)
+            104 LOAD_CONST               9 (('StudioError', 'E'))
+            106 IMPORT_NAME             16 (app.core.errors)
+            108 IMPORT_FROM             17 (StudioError)
+            110 STORE_NAME              17 (StudioError)
+            112 IMPORT_FROM             18 (E)
+            114 STORE_NAME              18 (E)
+            116 POP_TOP
+
+ 18         118 LOAD_CONST               1 (0)
+            120 LOAD_CONST              10 (('Setting',))
+            122 IMPORT_NAME             19 (app.db.models)
+            124 IMPORT_FROM             20 (Setting)
+            126 STORE_NAME              20 (Setting)
+            128 POP_TOP
+
+ 19         130 LOAD_CONST               1 (0)
+            132 LOAD_CONST              11 (('sanitize_config',))
+            134 IMPORT_NAME             21 (app.pipeline.base)
+            136 IMPORT_FROM             22 (sanitize_config)
+            138 STORE_NAME              22 (sanitize_config)
+            140 POP_TOP
+
+ 21         142 PUSH_NULL
+            144 LOAD_NAME                7 (APIRouter)
+            146 LOAD_CONST              12 ('/api/v1')
+            148 LOAD_CONST              13 ('channel-profiles')
+            150 BUILD_LIST               1
+            152 PUSH_NULL
+            154 LOAD_NAME                8 (Depends)
+            156 LOAD_NAME               14 (verify_token)
+            158 CALL                     1
+            166 BUILD_LIST               1
+            168 KW_NAMES                14 (('prefix', 'tags', 'dependencies'))
+            170 CALL                     3
+            178 STORE_NAME              23 (router)
+
+ 23         180 LOAD_CONST              15 ('channel_profiles')
+            182 STORE_NAME              24 (_KEY)
+
+ 26         184 LOAD_CONST              28 (('db', 'Session', 'return', 'list[dict]'))
+            186 LOAD_CONST              16 (<code object _load at 0x7f6c9324f130, file "app\api\channel_profiles.py", line 26>)
+            188 MAKE_FUNCTION            4 (annotations)
+            190 STORE_NAME              25 (_load)
+
+ 37         192 LOAD_CONST              29 (('db', 'Session', 'items', 'list[dict]', 'return', 'None'))
+            194 LOAD_CONST              17 (<code object _save at 0x7f6c81a74030, file "app\api\channel_profiles.py", line 37>)
+            196 MAKE_FUNCTION            4 (annotations)
+            198 STORE_NAME              26 (_save)
+
+ 47         200 PUSH_NULL
+            202 LOAD_BUILD_CLASS
+            204 LOAD_CONST              18 (<code object ProfileBody at 0x7f6c932dfe10, file "app\api\channel_profiles.py", line 47>)
+            206 MAKE_FUNCTION            0
+            208 LOAD_CONST              19 ('ProfileBody')
+            210 LOAD_NAME               10 (BaseModel)
+            212 CALL                     3
+            220 STORE_NAME              27 (ProfileBody)
+
+ 52         222 LOAD_NAME               23 (router)
+            224 LOAD_ATTR               57 (NULL|self + get)
+            244 LOAD_CONST              20 ('/channel-profiles')
+            246 CALL                     1
+
+ 53         254 PUSH_NULL
+            256 LOAD_NAME                8 (Depends)
+            258 LOAD_NAME               15 (get_session)
+            260 CALL                     1
+            268 BUILD_TUPLE              1
+            270 LOAD_CONST              30 (('db', 'Session'))
+            272 LOAD_CONST              21 (<code object list_profiles at 0x7f6c92ee8300, file "app\api\channel_profiles.py", line 52>)
+            274 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 52         276 CALL                     0
+
+ 53         284 STORE_NAME              29 (list_profiles)
+
+ 57         286 LOAD_NAME               23 (router)
+            288 LOAD_ATTR               61 (NULL|self + post)
+            308 LOAD_CONST              20 ('/channel-profiles')
+            310 LOAD_CONST              22 (201)
+            312 KW_NAMES                23 (('status_code',))
+            314 CALL                     2
+
+ 58         322 PUSH_NULL
+            324 LOAD_NAME                8 (Depends)
+            326 LOAD_NAME               15 (get_session)
+            328 CALL                     1
+            336 BUILD_TUPLE              1
+            338 LOAD_CONST              31 (('body', 'ProfileBody', 'db', 'Session'))
+            340 LOAD_CONST              24 (<code object create_profile at 0x29097120, file "app\api\channel_profiles.py", line 57>)
+            342 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 57         344 CALL                     0
+
+ 58         352 STORE_NAME              31 (create_profile)
+
+ 74         354 LOAD_NAME               23 (router)
+            356 LOAD_ATTR               65 (NULL|self + put)
+            376 LOAD_CONST              25 ('/channel-profiles/{profile_id}')
+            378 CALL                     1
+
+ 75         386 PUSH_NULL
+            388 LOAD_NAME                8 (Depends)
+            390 LOAD_NAME               15 (get_session)
+            392 CALL                     1
+            400 BUILD_TUPLE              1
+            402 LOAD_CONST              32 (('profile_id', 'str', 'body', 'ProfileBody', 'db', 'Session'))
+            404 LOAD_CONST              26 (<code object update_profile at 0x2908f210, file "app\api\channel_profiles.py", line 74>)
+            406 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 74         408 CALL                     0
+
+ 75         416 STORE_NAME              33 (update_profile)
+
+ 87         418 LOAD_NAME               23 (router)
+            420 LOAD_ATTR               69 (NULL|self + delete)
+            440 LOAD_CONST              25 ('/channel-profiles/{profile_id}')
+            442 CALL                     1
+
+ 88         450 PUSH_NULL
+            452 LOAD_NAME                8 (Depends)
+            454 LOAD_NAME               15 (get_session)
+            456 CALL                     1
+            464 BUILD_TUPLE              1
+            466 LOAD_CONST              33 (('profile_id', 'str', 'db', 'Session'))
+            468 LOAD_CONST              27 (<code object delete_profile at 0x7f6c9324f9f0, file "app\api\channel_profiles.py", line 87>)
+            470 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 87         472 CALL                     0
+
+ 88         480 STORE_NAME              35 (delete_profile)
+            482 RETURN_CONST             3 (None)
+
+Disassembly of <code object _load at 0x7f6c9324f130, file "app\api\channel_profiles.py", line 26>:
+ 26           0 RESUME                   0
+
+ 27           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_GLOBAL              2 (Setting)
+             34 LOAD_GLOBAL              4 (_KEY)
+             44 CALL                     2
+             52 STORE_FAST               1 (row)
+
+ 28          54 LOAD_FAST                1 (row)
+             56 POP_JUMP_IF_FALSE       12 (to 82)
+             58 LOAD_FAST                1 (row)
+             60 LOAD_ATTR                6 (value)
+             80 POP_JUMP_IF_TRUE         2 (to 86)
+
+ 29     >>   82 BUILD_LIST               0
+             84 RETURN_VALUE
+
+ 30     >>   86 NOP
+
+ 31          88 LOAD_GLOBAL              9 (NULL + json)
+             98 LOAD_ATTR               10 (loads)
+            118 LOAD_FAST                1 (row)
+            120 LOAD_ATTR                6 (value)
+            140 CALL                     1
+            148 STORE_FAST               2 (data)
+
+ 32         150 LOAD_GLOBAL             13 (NULL + isinstance)
+            160 LOAD_FAST                2 (data)
+            162 LOAD_GLOBAL             14 (list)
+            172 CALL                     2
+            180 POP_JUMP_IF_FALSE        2 (to 186)
+            182 LOAD_FAST                2 (data)
+            184 RETURN_VALUE
+        >>  186 BUILD_LIST               0
+            188 RETURN_VALUE
+        >>  190 PUSH_EXC_INFO
+
+ 33         192 LOAD_GLOBAL              8 (json)
+            202 LOAD_ATTR               16 (JSONDecodeError)
+            222 CHECK_EXC_MATCH
+            224 POP_JUMP_IF_FALSE        5 (to 236)
+            226 POP_TOP
+
+ 34         228 BUILD_LIST               0
+            230 SWAP                     2
+            232 POP_EXCEPT
+            234 RETURN_VALUE
+
+ 33     >>  236 RERAISE                  0
+        >>  238 COPY                     3
+            240 POP_EXCEPT
+            242 RERAISE                  1
+ExceptionTable:
+  88 to 182 -> 190 [0]
+  186 to 186 -> 190 [0]
+  190 to 230 -> 238 [1] lasti
+  236 to 236 -> 238 [1] lasti
+
+Disassembly of <code object _save at 0x7f6c81a74030, file "app\api\channel_profiles.py", line 37>:
+ 37           0 RESUME                   0
+
+ 38           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_GLOBAL              2 (Setting)
+             34 LOAD_GLOBAL              4 (_KEY)
+             44 CALL                     2
+             52 STORE_FAST               2 (row)
+
+ 39          54 LOAD_GLOBAL              7 (NULL + json)
+             64 LOAD_ATTR                8 (dumps)
+             84 LOAD_FAST                1 (items)
+             86 LOAD_CONST               1 (False)
+             88 KW_NAMES                 2 (('ensure_ascii',))
+             90 CALL                     2
+             98 STORE_FAST               3 (blob)
+
+ 40         100 LOAD_FAST                2 (row)
+            102 POP_JUMP_IF_FALSE        8 (to 120)
+
+ 41         104 LOAD_FAST                3 (blob)
+            106 LOAD_FAST                2 (row)
+            108 STORE_ATTR               5 (value)
+            118 JUMP_FORWARD            32 (to 184)
+
+ 43     >>  120 LOAD_FAST                0 (db)
+            122 LOAD_ATTR               13 (NULL|self + add)
+            142 LOAD_GLOBAL              3 (NULL + Setting)
+            152 LOAD_GLOBAL              4 (_KEY)
+            162 LOAD_FAST                3 (blob)
+            164 KW_NAMES                 3 (('key', 'value'))
+            166 CALL                     2
+            174 CALL                     1
+            182 POP_TOP
+
+ 44     >>  184 LOAD_FAST                0 (db)
+            186 LOAD_ATTR               15 (NULL|self + commit)
+            206 CALL                     0
+            214 POP_TOP
+            216 RETURN_CONST             0 (None)
+
+Disassembly of <code object ProfileBody at 0x7f6c932dfe10, file "app\api\channel_profiles.py", line 47>:
+ 47           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('ProfileBody')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 48          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('name')
+             18 STORE_SUBSCR
+
+ 49          22 BUILD_MAP                0
+             24 STORE_NAME               4 (config)
+             26 LOAD_CONST               3 ('dict')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               4 ('config')
+             32 STORE_SUBSCR
+             36 RETURN_CONST             5 (None)
+
+Disassembly of <code object list_profiles at 0x7f6c92ee8300, file "app\api\channel_profiles.py", line 52>:
+ 52           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 54           6 LOAD_CONST               1 ('profiles')
+              8 LOAD_GLOBAL              1 (NULL + _load)
+             18 LOAD_FAST                0 (db)
+             20 CALL                     1
+             28 BUILD_MAP                1
+             30 RETURN_VALUE
+        >>   32 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             34 RERAISE                  1
+ExceptionTable:
+  4 to 30 -> 32 [0] lasti
+
+Disassembly of <code object create_profile at 0x29097120, file "app\api\channel_profiles.py", line 57>:
+ 57           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 59           6 LOAD_FAST                0 (body)
+              8 LOAD_ATTR                0 (name)
+             28 COPY                     1
+             30 POP_JUMP_IF_TRUE         2 (to 36)
+             32 POP_TOP
+             34 LOAD_CONST               1 ('')
+        >>   36 LOAD_ATTR                3 (NULL|self + strip)
+             56 CALL                     0
+             64 STORE_FAST               2 (name)
+
+ 60          66 LOAD_FAST                2 (name)
+             68 POP_JUMP_IF_TRUE        28 (to 126)
+
+ 61          70 LOAD_GLOBAL              5 (NULL + StudioError)
+             80 LOAD_GLOBAL              6 (E)
+             90 LOAD_ATTR                8 (UNKNOWN)
+            110 LOAD_CONST               2 ('Tên profile không được trống')
+            112 LOAD_CONST               3 (422)
+            114 KW_NAMES                 4 (('status_code',))
+            116 CALL                     3
+            124 RAISE_VARARGS            1
+
+ 62     >>  126 LOAD_GLOBAL             11 (NULL + _load)
+            136 LOAD_FAST                1 (db)
+            138 CALL                     1
+            146 STORE_FAST               3 (items)
+
+ 64         148 LOAD_GLOBAL             13 (NULL + uuid)
+            158 LOAD_ATTR               14 (uuid4)
+            178 CALL                     0
+            186 LOAD_ATTR               16 (hex)
+
+ 65         206 LOAD_FAST                2 (name)
+
+ 66         208 LOAD_GLOBAL             19 (NULL + sanitize_config)
+            218 LOAD_FAST                0 (body)
+            220 LOAD_ATTR               20 (config)
+            240 COPY                     1
+            242 POP_JUMP_IF_TRUE         2 (to 248)
+            244 POP_TOP
+            246 BUILD_MAP                0
+        >>  248 CALL                     1
+
+ 67         256 LOAD_GLOBAL             23 (NULL + datetime)
+            266 LOAD_ATTR               24 (utcnow)
+            286 CALL                     0
+            294 LOAD_ATTR               27 (NULL|self + isoformat)
+            314 CALL                     0
+
+ 63         322 LOAD_CONST               5 (('id', 'name', 'config', 'created_at'))
+            324 BUILD_CONST_KEY_MAP      4
+            326 STORE_FAST               4 (profile)
+
+ 69         328 LOAD_FAST                3 (items)
+            330 LOAD_ATTR               29 (NULL|self + append)
+            350 LOAD_FAST                4 (profile)
+            352 CALL                     1
+            360 POP_TOP
+
+ 70         362 LOAD_GLOBAL             31 (NULL + _save)
+            372 LOAD_FAST                1 (db)
+            374 LOAD_FAST                3 (items)
+            376 CALL                     2
+            384 POP_TOP
+
+ 71         386 LOAD_FAST                4 (profile)
+            388 RETURN_VALUE
+        >>  390 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            392 RERAISE                  1
+ExceptionTable:
+  4 to 388 -> 390 [0] lasti
+
+Disassembly of <code object update_profile at 0x2908f210, file "app\api\channel_profiles.py", line 74>:
+ 74           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 76           6 LOAD_GLOBAL              1 (NULL + _load)
+             16 LOAD_FAST                2 (db)
+             18 CALL                     1
+             26 STORE_FAST               3 (items)
+
+ 77          28 LOAD_FAST                3 (items)
+             30 GET_ITER
+        >>   32 FOR_ITER               133 (to 302)
+             36 STORE_FAST               4 (p)
+
+ 78          38 LOAD_FAST                4 (p)
+             40 LOAD_ATTR                3 (NULL|self + get)
+             60 LOAD_CONST               1 ('id')
+             62 CALL                     1
+             70 LOAD_FAST                0 (profile_id)
+             72 COMPARE_OP              40 (==)
+             76 POP_JUMP_IF_TRUE         1 (to 80)
+             78 JUMP_BACKWARD           24 (to 32)
+
+ 79     >>   80 LOAD_FAST                1 (body)
+             82 LOAD_ATTR                4 (name)
+            102 POP_JUMP_IF_FALSE       55 (to 214)
+            104 LOAD_FAST                1 (body)
+            106 LOAD_ATTR                4 (name)
+            126 LOAD_ATTR                7 (NULL|self + strip)
+            146 CALL                     0
+            154 POP_JUMP_IF_FALSE       29 (to 214)
+
+ 80         156 LOAD_FAST                1 (body)
+            158 LOAD_ATTR                4 (name)
+            178 LOAD_ATTR                7 (NULL|self + strip)
+            198 CALL                     0
+            206 LOAD_FAST                4 (p)
+            208 LOAD_CONST               2 ('name')
+            210 STORE_SUBSCR
+
+ 81     >>  214 LOAD_GLOBAL              9 (NULL + sanitize_config)
+            224 LOAD_FAST                1 (body)
+            226 LOAD_ATTR               10 (config)
+            246 COPY                     1
+            248 POP_JUMP_IF_TRUE         2 (to 254)
+            250 POP_TOP
+            252 BUILD_MAP                0
+        >>  254 CALL                     1
+            262 LOAD_FAST                4 (p)
+            264 LOAD_CONST               3 ('config')
+            266 STORE_SUBSCR
+
+ 82         270 LOAD_GLOBAL             13 (NULL + _save)
+            280 LOAD_FAST                2 (db)
+            282 LOAD_FAST                3 (items)
+            284 CALL                     2
+            292 POP_TOP
+
+ 83         294 LOAD_FAST                4 (p)
+            296 SWAP                     2
+            298 POP_TOP
+            300 RETURN_VALUE
+
+ 77     >>  302 END_FOR
+
+ 84         304 LOAD_GLOBAL             15 (NULL + StudioError)
+            314 LOAD_GLOBAL             16 (E)
+            324 LOAD_ATTR               18 (UNKNOWN)
+            344 LOAD_CONST               4 ('Profile không tồn tại')
+            346 LOAD_CONST               5 (404)
+            348 KW_NAMES                 6 (('status_code',))
+            350 CALL                     3
+            358 RAISE_VARARGS            1
+        >>  360 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            362 RERAISE                  1
+ExceptionTable:
+  4 to 76 -> 360 [0] lasti
+  80 to 358 -> 360 [0] lasti
+
+Disassembly of <code object delete_profile at 0x7f6c9324f9f0, file "app\api\channel_profiles.py", line 87>:
+ 87           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 89           6 LOAD_GLOBAL              1 (NULL + _load)
+             16 LOAD_FAST                1 (db)
+             18 CALL                     1
+             26 STORE_FAST               2 (items)
+
+ 90          28 LOAD_FAST                2 (items)
+             30 GET_ITER
+             32 LOAD_FAST_AND_CLEAR      3 (p)
+             34 SWAP                     2
+             36 BUILD_LIST               0
+             38 SWAP                     2
+        >>   40 FOR_ITER                25 (to 94)
+             44 STORE_FAST               3 (p)
+             46 LOAD_FAST                3 (p)
+             48 LOAD_ATTR                3 (NULL|self + get)
+             68 LOAD_CONST               1 ('id')
+             70 CALL                     1
+             78 LOAD_FAST                0 (profile_id)
+             80 COMPARE_OP              55 (!=)
+             84 POP_JUMP_IF_TRUE         1 (to 88)
+             86 JUMP_BACKWARD           24 (to 40)
+        >>   88 LOAD_FAST                3 (p)
+             90 LIST_APPEND              2
+             92 JUMP_BACKWARD           27 (to 40)
+        >>   94 END_FOR
+             96 STORE_FAST               4 (new_items)
+             98 STORE_FAST               3 (p)
+
+ 91         100 LOAD_GLOBAL              5 (NULL + len)
+            110 LOAD_FAST                4 (new_items)
+            112 CALL                     1
+            120 LOAD_GLOBAL              5 (NULL + len)
+            130 LOAD_FAST                2 (items)
+            132 CALL                     1
+            140 COMPARE_OP              40 (==)
+            144 POP_JUMP_IF_FALSE       28 (to 202)
+
+ 92         146 LOAD_GLOBAL              7 (NULL + StudioError)
+            156 LOAD_GLOBAL              8 (E)
+            166 LOAD_ATTR               10 (UNKNOWN)
+            186 LOAD_CONST               2 ('Profile không tồn tại')
+            188 LOAD_CONST               3 (404)
+            190 KW_NAMES                 4 (('status_code',))
+            192 CALL                     3
+            200 RAISE_VARARGS            1
+
+ 93     >>  202 LOAD_GLOBAL             13 (NULL + _save)
+            212 LOAD_FAST                1 (db)
+            214 LOAD_FAST                4 (new_items)
+            216 CALL                     2
+            224 POP_TOP
+
+ 94         226 LOAD_CONST               5 (True)
+            228 LOAD_FAST                0 (profile_id)
+            230 LOAD_CONST               6 (('ok', 'deleted'))
+            232 BUILD_CONST_KEY_MAP      2
+            234 RETURN_VALUE
+        >>  236 SWAP                     2
+            238 POP_TOP
+
+ 90         240 SWAP                     2
+            242 STORE_FAST               3 (p)
+            244 RERAISE                  0
+        >>  246 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            248 RERAISE                  1
+ExceptionTable:
+  4 to 34 -> 246 [0] lasti
+  36 to 84 -> 236 [2]
+  88 to 94 -> 236 [2]
+  96 to 244 -> 246 [0] lasti

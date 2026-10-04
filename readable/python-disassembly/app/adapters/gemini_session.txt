@@ -1,0 +1,2043 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Gemini (đăng nhập tài khoản Google) adapter — dịch/SEO không cần API key.\n\nBackend KHÔNG gọi trực tiếp gemini.google.com (cookie Google phiên + token SNlM0e nằm trong\ntrình duyệt). Thay vào đó gọi "bridge" HTTP do Electron mở (xem desktop/electron/gemini/bridge.ts);\nElectron thực thi request bằng phiên trình duyệt đã đăng nhập của user. URL bridge truyền qua\n--gemini-bridge-url (config).\n\nClient này khớp interface với DeepSeekClient / ChatGPTSessionClient (translate_batch / _call_api /\nrewrite_batch) để pipeline + SEO dùng chung. CHẶT THEO SETTING: lỗi → báo rõ (không auto-fallback).\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 11           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 13          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (asyncio)
+             24 STORE_NAME               3 (asyncio)
+
+ 14          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               4 (('Callable',))
+             30 IMPORT_NAME              4 (typing)
+             32 IMPORT_FROM              5 (Callable)
+             34 STORE_NAME               5 (Callable)
+             36 POP_TOP
+
+ 16          38 LOAD_CONST               1 (0)
+             40 LOAD_CONST               3 (None)
+             42 IMPORT_NAME              6 (httpx)
+             44 STORE_NAME               6 (httpx)
+
+ 18          46 LOAD_CONST               1 (0)
+             48 LOAD_CONST               5 (('get_settings',))
+             50 IMPORT_NAME              7 (app.config)
+             52 IMPORT_FROM              8 (get_settings)
+             54 STORE_NAME               8 (get_settings)
+             56 POP_TOP
+
+ 19          58 LOAD_CONST               1 (0)
+             60 LOAD_CONST               6 (('StudioError', 'make_error', 'E'))
+             62 IMPORT_NAME              9 (app.core.errors)
+             64 IMPORT_FROM             10 (StudioError)
+             66 STORE_NAME              10 (StudioError)
+             68 IMPORT_FROM             11 (make_error)
+             70 STORE_NAME              11 (make_error)
+             72 IMPORT_FROM             12 (E)
+             74 STORE_NAME              12 (E)
+             76 POP_TOP
+
+ 20          78 LOAD_CONST               1 (0)
+             80 LOAD_CONST               7 (('log',))
+             82 IMPORT_NAME             13 (app.core.logging)
+             84 IMPORT_FROM             14 (log)
+             86 STORE_NAME              14 (log)
+             88 POP_TOP
+
+ 21          90 LOAD_CONST               1 (0)
+             92 LOAD_CONST               8 (('SessionLocal',))
+             94 IMPORT_NAME             15 (app.db.session)
+             96 IMPORT_FROM             16 (SessionLocal)
+             98 STORE_NAME              16 (SessionLocal)
+            100 POP_TOP
+
+ 22         102 LOAD_CONST               1 (0)
+            104 LOAD_CONST               9 (('Setting',))
+            106 IMPORT_NAME             17 (app.db.models)
+            108 IMPORT_FROM             18 (Setting)
+            110 STORE_NAME              18 (Setting)
+            112 POP_TOP
+
+ 23         114 LOAD_CONST               1 (0)
+            116 LOAD_CONST              10 (('_build_translate_prompt', '_parse_response_texts', 'apply_retimed', 'CARRYOVER_PAIRS', 'DEFAULT_BATCH_SIZE'))
+            118 IMPORT_NAME             19 (app.adapters.deepseek)
+            120 IMPORT_FROM             20 (_build_translate_prompt)
+            122 STORE_NAME              20 (_build_translate_prompt)
+            124 IMPORT_FROM             21 (_parse_response_texts)
+            126 STORE_NAME              21 (_parse_response_texts)
+            128 IMPORT_FROM             22 (apply_retimed)
+            130 STORE_NAME              22 (apply_retimed)
+            132 IMPORT_FROM             23 (CARRYOVER_PAIRS)
+            134 STORE_NAME              23 (CARRYOVER_PAIRS)
+            136 IMPORT_FROM             24 (DEFAULT_BATCH_SIZE)
+            138 STORE_NAME              24 (DEFAULT_BATCH_SIZE)
+            140 POP_TOP
+
+ 30         142 LOAD_CONST               1 (0)
+            144 LOAD_CONST              11 (('_extract_json_array', '_combine_messages', 'complete_and_parse'))
+            146 IMPORT_NAME             25 (app.adapters.chatgpt_session)
+            148 IMPORT_FROM             26 (_extract_json_array)
+            150 STORE_NAME              26 (_extract_json_array)
+            152 IMPORT_FROM             27 (_combine_messages)
+            154 STORE_NAME              27 (_combine_messages)
+            156 IMPORT_FROM             28 (complete_and_parse)
+            158 STORE_NAME              28 (complete_and_parse)
+            160 POP_TOP
+
+ 34         162 LOAD_CONST              12 (240.0)
+            164 STORE_NAME              29 (COMPLETE_TIMEOUT)
+
+ 35         166 LOAD_CONST              13 (3)
+            168 STORE_NAME              30 (MAX_RETRIES)
+
+ 38         170 LOAD_CONST              14 ((5.0, 15.0, 30.0))
+            172 STORE_NAME              31 (OVERLOAD_BACKOFF)
+
+ 41         174 LOAD_CONST              15 (12)
+            176 STORE_NAME              32 (SESSION_REWRITE_BATCH)
+
+ 46         178 LOAD_CONST              16 ('flash-3.8')
+            180 STORE_NAME              33 (DEFAULT_GEMINI_MODEL)
+
+ 47         182 BUILD_SET                0
+            184 LOAD_CONST              17 (frozenset({'flash-lite-3.5', 'thinking', 'pro-3.1', 'flash-3.8'}))
+            186 SET_UPDATE               1
+            188 STORE_NAME              34 (GEMINI_MODEL_IDS)
+
+ 52         190 LOAD_CONST              18 ('flash-lite-3.5')
+
+ 53         192 LOAD_CONST              16 ('flash-3.8')
+
+ 51         194 LOAD_CONST              19 (('flash-lite-3.1', 'flash-3.5'))
+            196 BUILD_CONST_KEY_MAP      2
+            198 STORE_NAME              35 (GEMINI_MODEL_MIGRATION)
+
+ 57         200 LOAD_CONST              25 (('return', 'str'))
+            202 LOAD_CONST              20 (<code object get_gemini_model at 0x7f6c93392470, file "app\adapters\gemini_session.py", line 57>)
+            204 MAKE_FUNCTION            4 (annotations)
+            206 STORE_NAME              36 (get_gemini_model)
+
+ 66         208 PUSH_NULL
+            210 LOAD_BUILD_CLASS
+            212 LOAD_CONST              21 (<code object GeminiSessionClient at 0x7f6c933da040, file "app\adapters\gemini_session.py", line 66>)
+            214 MAKE_FUNCTION            0
+            216 LOAD_CONST              22 ('GeminiSessionClient')
+            218 CALL                     2
+            226 STORE_NAME              37 (GeminiSessionClient)
+
+294         228 PUSH_NULL
+            230 LOAD_BUILD_CLASS
+            232 LOAD_CONST              23 (<code object _GeminiChatSession at 0x7f6c9329e3d0, file "app\adapters\gemini_session.py", line 294>)
+            234 MAKE_FUNCTION            0
+            236 LOAD_CONST              24 ('_GeminiChatSession')
+            238 CALL                     2
+            246 STORE_NAME              38 (_GeminiChatSession)
+
+323         248 LOAD_NAME               12 (E)
+            250 LOAD_ATTR               78 (GEMINI_AUTH)
+            270 LOAD_NAME               12 (E)
+            272 LOAD_ATTR               80 (GEMINI_RATE_LIMIT)
+            292 LOAD_NAME               12 (E)
+            294 LOAD_ATTR               82 (GEMINI_OVERLOAD)
+            314 LOAD_NAME               12 (E)
+            316 LOAD_ATTR               84 (GEMINI_NETWORK)
+
+324         336 LOAD_NAME               12 (E)
+            338 LOAD_ATTR               86 (GEMINI_BAD_RESPONSE)
+            358 LOAD_NAME               12 (E)
+            360 LOAD_ATTR               88 (GEMINI_BRIDGE_UNAVAILABLE)
+
+323         380 BUILD_SET                6
+            382 STORE_NAME              45 (_KNOWN)
+            384 RETURN_CONST             3 (None)
+
+Disassembly of <code object get_gemini_model at 0x7f6c93392470, file "app\adapters\gemini_session.py", line 57>:
+ 57           0 RESUME                   0
+
+ 59           2 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             12 CALL                     0
+             20 BEFORE_WITH
+             22 STORE_FAST               0 (db)
+
+ 60          24 LOAD_FAST                0 (db)
+             26 LOAD_ATTR                3 (NULL|self + get)
+             46 LOAD_GLOBAL              4 (Setting)
+             56 LOAD_CONST               1 ('gemini_model')
+             58 CALL                     2
+             66 STORE_FAST               1 (row)
+
+ 61          68 LOAD_FAST                1 (row)
+             70 POP_JUMP_IF_FALSE       24 (to 120)
+             72 LOAD_FAST                1 (row)
+             74 LOAD_ATTR                6 (value)
+             94 POP_JUMP_IF_FALSE       12 (to 120)
+             96 LOAD_FAST                1 (row)
+             98 LOAD_ATTR                6 (value)
+            118 JUMP_FORWARD             1 (to 122)
+        >>  120 LOAD_CONST               2 ('')
+        >>  122 LOAD_ATTR                9 (NULL|self + strip)
+            142 CALL                     0
+            150 STORE_FAST               2 (val)
+
+ 59         152 LOAD_CONST               3 (None)
+            154 LOAD_CONST               3 (None)
+            156 LOAD_CONST               3 (None)
+            158 CALL                     2
+            166 POP_TOP
+
+ 62     >>  168 LOAD_GLOBAL             10 (GEMINI_MODEL_MIGRATION)
+            178 LOAD_ATTR                3 (NULL|self + get)
+            198 LOAD_FAST_CHECK          2 (val)
+            200 LOAD_FAST                2 (val)
+            202 CALL                     2
+            210 STORE_FAST               2 (val)
+
+ 63         212 LOAD_FAST                2 (val)
+            214 LOAD_GLOBAL             12 (GEMINI_MODEL_IDS)
+            224 CONTAINS_OP              0
+            226 POP_JUMP_IF_FALSE        2 (to 232)
+            228 LOAD_FAST                2 (val)
+            230 RETURN_VALUE
+        >>  232 LOAD_GLOBAL             14 (DEFAULT_GEMINI_MODEL)
+            242 RETURN_VALUE
+
+ 59     >>  244 PUSH_EXC_INFO
+            246 WITH_EXCEPT_START
+            248 POP_JUMP_IF_TRUE         1 (to 252)
+            250 RERAISE                  2
+        >>  252 POP_TOP
+            254 POP_EXCEPT
+            256 POP_TOP
+            258 POP_TOP
+            260 JUMP_BACKWARD           47 (to 168)
+        >>  262 COPY                     3
+            264 POP_EXCEPT
+            266 RERAISE                  1
+ExceptionTable:
+  22 to 150 -> 244 [1] lasti
+  244 to 252 -> 262 [3] lasti
+
+Disassembly of <code object GeminiSessionClient at 0x7f6c933da040, file "app\adapters\gemini_session.py", line 66>:
+ 66           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('GeminiSessionClient')
+              8 STORE_NAME               2 (__qualname__)
+
+ 67          10 NOP
+
+ 68          12 NOP
+
+ 67          14 LOAD_CONST              16 ((None, None, None))
+
+ 68          16 NOP
+
+ 67          18 LOAD_CONST              17 (('bridge_url', 'str | None', 'token', 'str | None', 'model', 'str | None'))
+             20 LOAD_CONST               2 (<code object __init__ at 0x7f6c92968630, file "app\adapters\gemini_session.py", line 67>)
+             22 MAKE_FUNCTION            5 (defaults, annotations)
+             24 STORE_NAME               3 (__init__)
+
+ 74          26 LOAD_NAME                4 (property)
+
+ 75          28 LOAD_CONST              18 (('return', 'bool'))
+             30 LOAD_CONST               3 (<code object available at 0x7f6c9329df20, file "app\adapters\gemini_session.py", line 74>)
+             32 MAKE_FUNCTION            4 (annotations)
+
+ 74          34 CALL                     0
+
+ 75          42 STORE_NAME               5 (available)
+
+ 78          44 LOAD_CONST              19 (('return', 'dict'))
+             46 LOAD_CONST               4 (<code object get_status at 0x269be8e0, file "app\adapters\gemini_session.py", line 78>)
+             48 MAKE_FUNCTION            4 (annotations)
+             50 STORE_NAME               6 (get_status)
+
+ 94          52 NOP
+
+ 93          54 LOAD_CONST              20 ((None,))
+
+ 94          56 NOP
+
+ 93          58 NOP
+
+ 94          60 NOP
+
+ 93          62 NOP
+
+ 94          64 NOP
+
+ 93          66 NOP
+
+ 95          68 NOP
+
+ 93          70 LOAD_CONST              21 (('prompt', 'str', 'conversation', 'dict | None', 'model', 'str | None', 'return', 'tuple[str, dict | None]'))
+             72 LOAD_CONST               5 (<code object _post_complete at 0x2908d730, file "app\adapters\gemini_session.py", line 93>)
+             74 MAKE_FUNCTION            5 (defaults, annotations)
+             76 STORE_NAME               7 (_post_complete)
+
+153          78 LOAD_CONST              20 ((None,))
+             80 LOAD_CONST              22 (('prompt', 'str', 'model', 'str | None', 'return', 'str'))
+             82 LOAD_CONST               6 (<code object _complete at 0x7f6c933b7600, file "app\adapters\gemini_session.py", line 153>)
+             84 MAKE_FUNCTION            5 (defaults, annotations)
+             86 STORE_NAME               8 (_complete)
+
+161          88 LOAD_CONST              23 (('conversation', 'dict | None', 'return', 'None'))
+             90 LOAD_CONST               7 (<code object _delete_conversation at 0x26a37f10, file "app\adapters\gemini_session.py", line 161>)
+             92 MAKE_FUNCTION            4 (annotations)
+             94 STORE_NAME               9 (_delete_conversation)
+
+175          96 LOAD_CONST              24 (('',))
+             98 LOAD_CONST              25 (('system', 'str', 'return', "'_GeminiChatSession'"))
+            100 LOAD_CONST               8 (<code object start_chat at 0x7f6c929b4810, file "app\adapters\gemini_session.py", line 175>)
+            102 MAKE_FUNCTION            5 (defaults, annotations)
+            104 STORE_NAME              10 (start_chat)
+
+179         106 LOAD_CONST              26 ((0.3,))
+            108 LOAD_CONST              27 (('messages', 'list[dict]', 'temperature', 'float', 'return', 'str'))
+            110 LOAD_CONST               9 (<code object _call_api at 0x7f6c9327d8f0, file "app\adapters\gemini_session.py", line 179>)
+            112 MAKE_FUNCTION            5 (defaults, annotations)
+            114 STORE_NAME              11 (_call_api)
+
+186         116 LOAD_CONST              10 ('auto')
+
+187         118 LOAD_CONST              11 ('vi')
+
+188         120 LOAD_NAME               12 (DEFAULT_BATCH_SIZE)
+
+189         122 LOAD_CONST               1 (None)
+
+190         124 LOAD_CONST               1 (None)
+
+191         126 LOAD_CONST               1 (None)
+
+192         128 LOAD_CONST               1 (None)
+
+193         130 LOAD_CONST              12 (False)
+
+183         132 BUILD_TUPLE              8
+
+185         134 NOP
+
+183         136 NOP
+
+186         138 NOP
+
+183         140 NOP
+
+187         142 NOP
+
+183         144 NOP
+
+188         146 NOP
+
+183         148 NOP
+
+189         150 NOP
+
+183         152 NOP
+
+190         154 NOP
+
+183         156 NOP
+
+191         158 NOP
+
+183         160 NOP
+
+193         162 NOP
+
+183         164 NOP
+
+194         166 NOP
+
+183         168 LOAD_CONST              28 (('segments', 'list[dict]', 'src_lang', 'str', 'dst_lang', 'str', 'batch_size', 'int', 'on_progress', 'Callable[[float, str], None] | None', 'cancel_check', 'Callable[[], bool] | None', 'genre', 'str | None', 'length_fit', 'bool', 'return', 'list[dict]'))
+            170 LOAD_CONST              13 (<code object translate_batch at 0x290854e0, file "app\adapters\gemini_session.py", line 183>)
+            172 MAKE_FUNCTION            5 (defaults, annotations)
+            174 STORE_NAME              13 (translate_batch)
+
+242         176 NOP
+
+243         178 NOP
+
+244         180 NOP
+
+245         182 NOP
+
+246         184 NOP
+
+247         186 NOP
+
+239         188 LOAD_CONST              29 (('auto', 'vi', 'review', 30, None, None))
+
+241         190 NOP
+
+239         192 NOP
+
+242         194 NOP
+
+239         196 NOP
+
+243         198 NOP
+
+239         200 NOP
+
+244         202 NOP
+
+239         204 NOP
+
+245         206 NOP
+
+239         208 NOP
+
+246         210 NOP
+
+239         212 NOP
+
+247         214 NOP
+
+239         216 NOP
+
+248         218 NOP
+
+239         220 LOAD_CONST              30 (('segments', 'list[dict]', 'src_lang', 'str', 'dst_lang', 'str', 'mode', 'str', 'batch_size', 'int', 'on_progress', 'Callable[[float, str], None] | None', 'cancel_check', 'Callable[[], bool] | None', 'return', 'list[dict]'))
+            222 LOAD_CONST              14 (<code object rewrite_batch at 0x28e44440, file "app\adapters\gemini_session.py", line 239>)
+            224 MAKE_FUNCTION            5 (defaults, annotations)
+            226 STORE_NAME              14 (rewrite_batch)
+
+281         228 LOAD_CONST              31 (('batch', 'list[dict]', 'texts', 'list[str]', 'return', 'list[dict]'))
+            230 LOAD_CONST              15 (<code object _merge at 0x7f6c9327b0a0, file "app\adapters\gemini_session.py", line 281>)
+            232 MAKE_FUNCTION            4 (annotations)
+            234 STORE_NAME              15 (_merge)
+            236 RETURN_CONST             1 (None)
+
+Disassembly of <code object __init__ at 0x7f6c92968630, file "app\adapters\gemini_session.py", line 67>:
+ 67           0 RESUME                   0
+
+ 69           2 LOAD_GLOBAL              1 (NULL + get_settings)
+             12 CALL                     0
+             20 STORE_FAST               4 (st)
+
+ 70          22 LOAD_FAST                1 (bridge_url)
+             24 COPY                     1
+             26 POP_JUMP_IF_TRUE        16 (to 60)
+             28 POP_TOP
+             30 LOAD_FAST                4 (st)
+             32 LOAD_ATTR                2 (gemini_bridge_url)
+             52 COPY                     1
+             54 POP_JUMP_IF_TRUE         2 (to 60)
+             56 POP_TOP
+             58 LOAD_CONST               1 ('')
+        >>   60 LOAD_ATTR                5 (NULL|self + rstrip)
+             80 LOAD_CONST               2 ('/')
+             82 CALL                     1
+             90 LOAD_FAST                0 (self)
+             92 STORE_ATTR               3 (bridge_url)
+
+ 71         102 LOAD_FAST                2 (token)
+            104 COPY                     1
+            106 POP_JUMP_IF_TRUE        12 (to 132)
+            108 POP_TOP
+            110 LOAD_FAST                4 (st)
+            112 LOAD_ATTR                8 (token)
+        >>  132 LOAD_FAST                0 (self)
+            134 STORE_ATTR               4 (token)
+
+ 72         144 LOAD_FAST                3 (model)
+            146 COPY                     1
+            148 POP_JUMP_IF_TRUE        10 (to 170)
+            150 POP_TOP
+            152 LOAD_GLOBAL             11 (NULL + get_gemini_model)
+            162 CALL                     0
+        >>  170 LOAD_FAST                0 (self)
+            172 STORE_ATTR               6 (model)
+            182 RETURN_CONST             0 (None)
+
+Disassembly of <code object available at 0x7f6c9329df20, file "app\adapters\gemini_session.py", line 74>:
+ 74           0 RESUME                   0
+
+ 76           2 LOAD_GLOBAL              1 (NULL + bool)
+             12 LOAD_FAST                0 (self)
+             14 LOAD_ATTR                2 (bridge_url)
+             34 CALL                     1
+             42 RETURN_VALUE
+
+Disassembly of <code object get_status at 0x269be8e0, file "app\adapters\gemini_session.py", line 78>:
+ 78           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 79           6 LOAD_FAST                0 (self)
+              8 LOAD_ATTR                0 (available)
+             28 POP_JUMP_IF_TRUE         4 (to 38)
+
+ 80          30 LOAD_CONST               1 ('connected')
+             32 LOAD_CONST               2 (False)
+             34 BUILD_MAP                1
+             36 RETURN_VALUE
+
+ 81     >>   38 NOP
+
+ 82          40 LOAD_GLOBAL              3 (NULL + httpx)
+             50 LOAD_ATTR                4 (AsyncClient)
+             70 LOAD_CONST               3 (15.0)
+             72 KW_NAMES                 4 (('timeout',))
+             74 CALL                     1
+             82 BEFORE_ASYNC_WITH
+             84 GET_AWAITABLE            1
+             86 LOAD_CONST               0 (None)
+        >>   88 SEND                     3 (to 98)
+             92 YIELD_VALUE              3
+             94 RESUME                   3
+             96 JUMP_BACKWARD_NO_INTERRUPT     5 (to 88)
+        >>   98 END_SEND
+            100 STORE_FAST               1 (client)
+
+ 83         102 LOAD_FAST                1 (client)
+            104 LOAD_ATTR                7 (NULL|self + get)
+
+ 84         124 LOAD_FAST                0 (self)
+            126 LOAD_ATTR                8 (bridge_url)
+            146 FORMAT_VALUE             0
+            148 LOAD_CONST               5 ('/gemini/status')
+            150 BUILD_STRING             2
+
+ 85         152 LOAD_CONST               6 ('X-Studio-Token')
+            154 LOAD_FAST                0 (self)
+            156 LOAD_ATTR               10 (token)
+            176 BUILD_MAP                1
+
+ 83         178 KW_NAMES                 7 (('headers',))
+            180 CALL                     2
+            188 GET_AWAITABLE            0
+            190 LOAD_CONST               0 (None)
+        >>  192 SEND                     3 (to 202)
+            196 YIELD_VALUE              4
+            198 RESUME                   3
+            200 JUMP_BACKWARD_NO_INTERRUPT     5 (to 192)
+        >>  202 END_SEND
+            204 STORE_FAST               2 (resp)
+
+ 87         206 LOAD_FAST                2 (resp)
+            208 LOAD_ATTR               12 (status_code)
+            228 LOAD_CONST               8 (200)
+            230 COMPARE_OP              40 (==)
+            234 POP_JUMP_IF_FALSE       33 (to 302)
+
+ 88         236 LOAD_FAST                2 (resp)
+            238 LOAD_ATTR               15 (NULL|self + json)
+            258 CALL                     0
+
+ 82         266 SWAP                     2
+            268 LOAD_CONST               0 (None)
+            270 LOAD_CONST               0 (None)
+            272 LOAD_CONST               0 (None)
+            274 CALL                     2
+            282 GET_AWAITABLE            2
+            284 LOAD_CONST               0 (None)
+        >>  286 SEND                     3 (to 296)
+            290 YIELD_VALUE              3
+            292 RESUME                   3
+            294 JUMP_BACKWARD_NO_INTERRUPT     5 (to 286)
+        >>  296 END_SEND
+            298 POP_TOP
+            300 RETURN_VALUE
+        >>  302 LOAD_CONST               0 (None)
+            304 LOAD_CONST               0 (None)
+            306 LOAD_CONST               0 (None)
+            308 CALL                     2
+            316 GET_AWAITABLE            2
+            318 LOAD_CONST               0 (None)
+        >>  320 SEND                     3 (to 330)
+            324 YIELD_VALUE              3
+            326 RESUME                   3
+            328 JUMP_BACKWARD_NO_INTERRUPT     5 (to 320)
+        >>  330 END_SEND
+            332 POP_TOP
+
+ 91     >>  334 LOAD_CONST               1 ('connected')
+            336 LOAD_CONST               2 (False)
+            338 BUILD_MAP                1
+            340 RETURN_VALUE
+
+ 82     >>  342 CLEANUP_THROW
+            344 JUMP_BACKWARD          124 (to 98)
+
+ 83     >>  346 CLEANUP_THROW
+            348 JUMP_BACKWARD           74 (to 202)
+
+ 82     >>  350 CLEANUP_THROW
+            352 JUMP_BACKWARD           29 (to 296)
+        >>  354 CLEANUP_THROW
+            356 JUMP_BACKWARD           14 (to 330)
+        >>  358 PUSH_EXC_INFO
+            360 WITH_EXCEPT_START
+            362 GET_AWAITABLE            2
+            364 LOAD_CONST               0 (None)
+        >>  366 SEND                     4 (to 378)
+            370 YIELD_VALUE              4
+            372 RESUME                   3
+            374 JUMP_BACKWARD_NO_INTERRUPT     5 (to 366)
+        >>  376 CLEANUP_THROW
+        >>  378 END_SEND
+            380 POP_JUMP_IF_TRUE         1 (to 384)
+            382 RERAISE                  2
+        >>  384 POP_TOP
+            386 POP_EXCEPT
+            388 POP_TOP
+            390 POP_TOP
+            392 JUMP_BACKWARD           30 (to 334)
+        >>  394 COPY                     3
+            396 POP_EXCEPT
+            398 RERAISE                  1
+        >>  400 PUSH_EXC_INFO
+
+ 89         402 LOAD_GLOBAL              2 (httpx)
+            412 LOAD_ATTR               16 (HTTPError)
+            432 CHECK_EXC_MATCH
+            434 POP_JUMP_IF_FALSE        6 (to 448)
+            436 POP_TOP
+
+ 90         438 POP_EXCEPT
+
+ 91         440 LOAD_CONST               1 ('connected')
+            442 LOAD_CONST               2 (False)
+            444 BUILD_MAP                1
+            446 RETURN_VALUE
+
+ 89     >>  448 RERAISE                  0
+        >>  450 COPY                     3
+            452 POP_EXCEPT
+            454 RERAISE                  1
+        >>  456 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            458 RERAISE                  1
+ExceptionTable:
+  4 to 36 -> 456 [0] lasti
+  40 to 90 -> 400 [0]
+  92 to 92 -> 342 [3]
+  94 to 98 -> 400 [0]
+  100 to 194 -> 358 [1] lasti
+  196 to 196 -> 346 [3]
+  198 to 264 -> 358 [1] lasti
+  266 to 288 -> 400 [0]
+  290 to 290 -> 350 [3]
+  292 to 298 -> 400 [0]
+  300 to 300 -> 456 [0] lasti
+  302 to 322 -> 400 [0]
+  324 to 324 -> 354 [2]
+  326 to 332 -> 400 [0]
+  334 to 340 -> 456 [0] lasti
+  342 to 342 -> 400 [0]
+  346 to 346 -> 358 [1] lasti
+  350 to 350 -> 400 [0]
+  354 to 354 -> 400 [0]
+  358 to 368 -> 394 [3] lasti
+  370 to 370 -> 376 [6]
+  372 to 384 -> 394 [3] lasti
+  386 to 398 -> 400 [0]
+  400 to 436 -> 450 [1] lasti
+  438 to 446 -> 456 [0] lasti
+  448 to 448 -> 450 [1] lasti
+  450 to 454 -> 456 [0] lasti
+
+Disassembly of <code object _post_complete at 0x2908d730, file "app\adapters\gemini_session.py", line 93>:
+ 93           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 99           6 LOAD_FAST                0 (self)
+              8 LOAD_ATTR                0 (available)
+             28 POP_JUMP_IF_TRUE        26 (to 82)
+
+100          30 LOAD_GLOBAL              3 (NULL + make_error)
+             40 LOAD_GLOBAL              4 (E)
+             50 LOAD_ATTR                6 (GEMINI_BRIDGE_UNAVAILABLE)
+
+101          70 LOAD_CONST               1 ('Chưa có cầu nối Gemini (bridge URL trống).')
+
+100          72 CALL                     2
+             80 RAISE_VARARGS            1
+
+102     >>   82 LOAD_FAST                3 (model)
+             84 COPY                     1
+             86 POP_JUMP_IF_TRUE        12 (to 112)
+             88 POP_TOP
+             90 LOAD_FAST                0 (self)
+             92 LOAD_ATTR                8 (model)
+        >>  112 STORE_FAST               3 (model)
+
+103         114 LOAD_CONST               2 (None)
+            116 STORE_FAST               4 (last_error)
+
+104         118 LOAD_GLOBAL             11 (NULL + range)
+            128 LOAD_CONST               3 (1)
+            130 LOAD_GLOBAL             12 (MAX_RETRIES)
+            140 LOAD_CONST               3 (1)
+            142 BINARY_OP                0 (+)
+            146 CALL                     2
+            154 GET_ITER
+        >>  156 EXTENDED_ARG             2
+            158 FOR_ITER               520 (to 1202)
+            162 STORE_FAST               5 (attempt)
+
+105         164 NOP
+
+106         166 LOAD_GLOBAL             15 (NULL + httpx)
+            176 LOAD_ATTR               16 (AsyncClient)
+            196 LOAD_GLOBAL             18 (COMPLETE_TIMEOUT)
+            206 KW_NAMES                 4 (('timeout',))
+            208 CALL                     1
+            216 BEFORE_ASYNC_WITH
+            218 GET_AWAITABLE            1
+            220 LOAD_CONST               2 (None)
+        >>  222 SEND                     3 (to 232)
+            226 YIELD_VALUE              3
+            228 RESUME                   3
+            230 JUMP_BACKWARD_NO_INTERRUPT     5 (to 222)
+        >>  232 END_SEND
+            234 STORE_FAST               6 (client)
+
+107         236 LOAD_FAST                6 (client)
+            238 LOAD_ATTR               21 (NULL|self + post)
+
+108         258 LOAD_FAST                0 (self)
+            260 LOAD_ATTR               22 (bridge_url)
+            280 FORMAT_VALUE             0
+            282 LOAD_CONST               5 ('/gemini/complete')
+            284 BUILD_STRING             2
+
+109         286 LOAD_FAST                0 (self)
+            288 LOAD_ATTR               24 (token)
+            308 LOAD_CONST               6 ('application/json')
+            310 LOAD_CONST               7 (('X-Studio-Token', 'Content-Type'))
+            312 BUILD_CONST_KEY_MAP      2
+
+110         314 LOAD_FAST                1 (prompt)
+            316 LOAD_FAST                3 (model)
+            318 LOAD_FAST                2 (conversation)
+            320 LOAD_CONST               8 (('prompt', 'model', 'conversation'))
+            322 BUILD_CONST_KEY_MAP      3
+
+107         324 KW_NAMES                 9 (('headers', 'json'))
+            326 CALL                     3
+            334 GET_AWAITABLE            0
+            336 LOAD_CONST               2 (None)
+        >>  338 SEND                     3 (to 348)
+            342 YIELD_VALUE              4
+            344 RESUME                   3
+            346 JUMP_BACKWARD_NO_INTERRUPT     5 (to 338)
+        >>  348 END_SEND
+            350 STORE_FAST               7 (resp)
+
+106         352 LOAD_CONST               2 (None)
+            354 LOAD_CONST               2 (None)
+            356 LOAD_CONST               2 (None)
+            358 CALL                     2
+            366 GET_AWAITABLE            2
+            368 LOAD_CONST               2 (None)
+        >>  370 SEND                     3 (to 380)
+            374 YIELD_VALUE              3
+            376 RESUME                   3
+            378 JUMP_BACKWARD_NO_INTERRUPT     5 (to 370)
+        >>  380 END_SEND
+            382 POP_TOP
+
+119     >>  384 LOAD_FAST_CHECK          7 (resp)
+            386 LOAD_ATTR               32 (status_code)
+            406 LOAD_CONST              12 (200)
+            408 COMPARE_OP              40 (==)
+            412 POP_JUMP_IF_FALSE       83 (to 580)
+
+120         414 LOAD_FAST                7 (resp)
+            416 LOAD_ATTR               35 (NULL|self + json)
+            436 CALL                     0
+            444 STORE_FAST               9 (data)
+
+121         446 LOAD_FAST                9 (data)
+            448 LOAD_ATTR               37 (NULL|self + get)
+            468 LOAD_CONST              13 ('text')
+            470 LOAD_CONST              14 ('')
+            472 CALL                     2
+            480 STORE_FAST              10 (text)
+
+122         482 LOAD_FAST               10 (text)
+            484 POP_JUMP_IF_TRUE        26 (to 538)
+
+123         486 LOAD_GLOBAL              3 (NULL + make_error)
+            496 LOAD_GLOBAL              4 (E)
+            506 LOAD_ATTR               38 (GEMINI_BAD_RESPONSE)
+            526 LOAD_CONST              15 ('Gemini trả về rỗng.')
+            528 CALL                     2
+            536 RAISE_VARARGS            1
+
+124     >>  538 LOAD_FAST               10 (text)
+            540 LOAD_FAST                9 (data)
+            542 LOAD_ATTR               37 (NULL|self + get)
+            562 LOAD_CONST              16 ('conversation')
+            564 CALL                     1
+            572 BUILD_TUPLE              2
+            574 SWAP                     2
+            576 POP_TOP
+            578 RETURN_VALUE
+
+127     >>  580 NOP
+
+128         582 LOAD_FAST                7 (resp)
+            584 LOAD_ATTR               35 (NULL|self + json)
+            604 CALL                     0
+            612 STORE_FAST              11 (err)
+
+129         614 LOAD_FAST               11 (err)
+            616 LOAD_ATTR               37 (NULL|self + get)
+            636 LOAD_CONST              17 ('error_code')
+            638 LOAD_GLOBAL              4 (E)
+            648 LOAD_ATTR               40 (GEMINI_NETWORK)
+            668 CALL                     2
+            676 STORE_FAST              12 (code)
+
+130         678 LOAD_FAST               11 (err)
+            680 LOAD_ATTR               37 (NULL|self + get)
+            700 LOAD_CONST              18 ('message')
+            702 LOAD_CONST              19 ('HTTP ')
+            704 LOAD_FAST                7 (resp)
+            706 LOAD_ATTR               32 (status_code)
+            726 FORMAT_VALUE             0
+            728 BUILD_STRING             2
+            730 CALL                     2
+            738 STORE_FAST              13 (msg)
+
+135     >>  740 LOAD_FAST               12 (code)
+            742 LOAD_GLOBAL              4 (E)
+            752 LOAD_ATTR               44 (GEMINI_RATE_LIMIT)
+            772 COMPARE_OP              40 (==)
+            776 POP_JUMP_IF_FALSE       26 (to 830)
+
+136         778 LOAD_GLOBAL              3 (NULL + make_error)
+            788 LOAD_GLOBAL              4 (E)
+            798 LOAD_ATTR               44 (GEMINI_RATE_LIMIT)
+            818 LOAD_FAST               13 (msg)
+            820 CALL                     2
+            828 RAISE_VARARGS            1
+
+137     >>  830 LOAD_FAST               12 (code)
+            832 LOAD_GLOBAL              4 (E)
+            842 LOAD_ATTR               46 (GEMINI_AUTH)
+            862 COMPARE_OP              40 (==)
+            866 POP_JUMP_IF_FALSE       26 (to 920)
+
+138         868 LOAD_GLOBAL              3 (NULL + make_error)
+            878 LOAD_GLOBAL              4 (E)
+            888 LOAD_ATTR               46 (GEMINI_AUTH)
+            908 LOAD_FAST               13 (msg)
+            910 CALL                     2
+            918 RAISE_VARARGS            1
+
+140     >>  920 LOAD_GLOBAL              3 (NULL + make_error)
+            930 LOAD_FAST               12 (code)
+            932 LOAD_GLOBAL             48 (_KNOWN)
+            942 CONTAINS_OP              0
+            944 POP_JUMP_IF_FALSE        2 (to 950)
+            946 LOAD_FAST               12 (code)
+            948 JUMP_FORWARD            15 (to 980)
+        >>  950 LOAD_GLOBAL              4 (E)
+            960 LOAD_ATTR               40 (GEMINI_NETWORK)
+        >>  980 LOAD_FAST               13 (msg)
+            982 CALL                     2
+            990 STORE_FAST               4 (last_error)
+
+141         992 LOAD_FAST                5 (attempt)
+            994 LOAD_GLOBAL             12 (MAX_RETRIES)
+           1004 COMPARE_OP               2 (<)
+           1008 POP_JUMP_IF_TRUE         2 (to 1014)
+           1010 EXTENDED_ARG             1
+           1012 JUMP_BACKWARD          429 (to 156)
+
+144     >> 1014 LOAD_FAST               12 (code)
+           1016 LOAD_GLOBAL              4 (E)
+           1026 LOAD_ATTR               50 (GEMINI_OVERLOAD)
+           1046 COMPARE_OP              40 (==)
+           1050 POP_JUMP_IF_FALSE       39 (to 1130)
+
+145        1052 LOAD_GLOBAL             52 (OVERLOAD_BACKOFF)
+           1062 LOAD_GLOBAL             55 (NULL + min)
+           1072 LOAD_FAST                5 (attempt)
+           1074 LOAD_CONST               3 (1)
+           1076 BINARY_OP               10 (-)
+           1080 LOAD_GLOBAL             57 (NULL + len)
+           1090 LOAD_GLOBAL             52 (OVERLOAD_BACKOFF)
+           1100 CALL                     1
+           1108 LOAD_CONST               3 (1)
+           1110 BINARY_OP               10 (-)
+           1114 CALL                     2
+           1122 BINARY_SUBSCR
+           1126 STORE_FAST              14 (delay)
+           1128 JUMP_FORWARD             5 (to 1140)
+
+147     >> 1130 LOAD_CONST              11 (2)
+           1132 LOAD_FAST                5 (attempt)
+           1134 BINARY_OP                8 (**)
+           1138 STORE_FAST              14 (delay)
+
+148     >> 1140 LOAD_GLOBAL             29 (NULL + asyncio)
+           1150 LOAD_ATTR               30 (sleep)
+           1170 LOAD_FAST               14 (delay)
+           1172 CALL                     1
+           1180 GET_AWAITABLE            0
+           1182 LOAD_CONST               2 (None)
+        >> 1184 SEND                     3 (to 1194)
+           1188 YIELD_VALUE              2
+           1190 RESUME                   3
+           1192 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1184)
+        >> 1194 END_SEND
+           1196 POP_TOP
+
+149        1198 EXTENDED_ARG             2
+           1200 JUMP_BACKWARD          523 (to 156)
+
+104     >> 1202 END_FOR
+
+151        1204 LOAD_FAST                4 (last_error)
+           1206 COPY                     1
+           1208 POP_JUMP_IF_TRUE        26 (to 1262)
+           1210 POP_TOP
+           1212 LOAD_GLOBAL              3 (NULL + make_error)
+           1222 LOAD_GLOBAL              4 (E)
+           1232 LOAD_ATTR               40 (GEMINI_NETWORK)
+           1252 LOAD_CONST              20 ('Hết số lần thử Gemini.')
+           1254 CALL                     2
+        >> 1262 RAISE_VARARGS            1
+
+106     >> 1264 CLEANUP_THROW
+           1266 EXTENDED_ARG             2
+           1268 JUMP_BACKWARD          519 (to 232)
+
+107     >> 1270 CLEANUP_THROW
+           1272 EXTENDED_ARG             1
+           1274 JUMP_BACKWARD          464 (to 348)
+
+106     >> 1276 CLEANUP_THROW
+           1278 EXTENDED_ARG             1
+           1280 JUMP_BACKWARD          451 (to 380)
+        >> 1282 PUSH_EXC_INFO
+           1284 WITH_EXCEPT_START
+           1286 GET_AWAITABLE            2
+           1288 LOAD_CONST               2 (None)
+        >> 1290 SEND                     4 (to 1302)
+           1294 YIELD_VALUE              4
+           1296 RESUME                   3
+           1298 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1290)
+        >> 1300 CLEANUP_THROW
+        >> 1302 END_SEND
+           1304 POP_JUMP_IF_TRUE         1 (to 1308)
+           1306 RERAISE                  2
+        >> 1308 POP_TOP
+           1310 POP_EXCEPT
+           1312 POP_TOP
+           1314 POP_TOP
+           1316 EXTENDED_ARG             1
+           1318 JUMP_BACKWARD          468 (to 384)
+        >> 1320 COPY                     3
+           1322 POP_EXCEPT
+           1324 RERAISE                  1
+        >> 1326 PUSH_EXC_INFO
+
+112        1328 LOAD_GLOBAL             14 (httpx)
+           1338 LOAD_ATTR               26 (HTTPError)
+           1358 CHECK_EXC_MATCH
+           1360 POP_JUMP_IF_FALSE       82 (to 1526)
+           1362 STORE_FAST               8 (e)
+
+113        1364 LOAD_GLOBAL              3 (NULL + make_error)
+           1374 LOAD_GLOBAL              4 (E)
+           1384 LOAD_ATTR                6 (GEMINI_BRIDGE_UNAVAILABLE)
+
+114        1404 LOAD_CONST              10 ('Không gọi được bridge Gemini: ')
+           1406 LOAD_FAST                8 (e)
+           1408 FORMAT_VALUE             0
+           1410 BUILD_STRING             2
+
+113        1412 CALL                     2
+           1420 STORE_FAST               4 (last_error)
+
+115        1422 LOAD_FAST                5 (attempt)
+           1424 LOAD_GLOBAL             12 (MAX_RETRIES)
+           1434 COMPARE_OP               2 (<)
+           1438 POP_JUMP_IF_FALSE       33 (to 1506)
+
+116        1440 LOAD_GLOBAL             29 (NULL + asyncio)
+           1450 LOAD_ATTR               30 (sleep)
+           1470 LOAD_CONST              11 (2)
+           1472 LOAD_FAST                5 (attempt)
+           1474 BINARY_OP                8 (**)
+           1478 CALL                     1
+           1486 GET_AWAITABLE            0
+           1488 LOAD_CONST               2 (None)
+        >> 1490 SEND                     4 (to 1502)
+           1494 YIELD_VALUE              4
+           1496 RESUME                   3
+           1498 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1490)
+        >> 1500 CLEANUP_THROW
+        >> 1502 END_SEND
+           1504 POP_TOP
+
+117     >> 1506 POP_EXCEPT
+           1508 LOAD_CONST               2 (None)
+           1510 STORE_FAST               8 (e)
+           1512 DELETE_FAST              8 (e)
+           1514 EXTENDED_ARG             2
+           1516 JUMP_BACKWARD          681 (to 156)
+        >> 1518 LOAD_CONST               2 (None)
+           1520 STORE_FAST               8 (e)
+           1522 DELETE_FAST              8 (e)
+           1524 RERAISE                  1
+
+112     >> 1526 RERAISE                  0
+        >> 1528 COPY                     3
+           1530 POP_EXCEPT
+           1532 RERAISE                  1
+        >> 1534 PUSH_EXC_INFO
+
+131        1536 LOAD_GLOBAL             42 (Exception)
+           1546 CHECK_EXC_MATCH
+           1548 POP_JUMP_IF_FALSE       35 (to 1620)
+           1550 POP_TOP
+
+132        1552 LOAD_GLOBAL              4 (E)
+           1562 LOAD_ATTR               40 (GEMINI_NETWORK)
+           1582 LOAD_CONST              19 ('HTTP ')
+           1584 LOAD_FAST                7 (resp)
+           1586 LOAD_ATTR               32 (status_code)
+           1606 FORMAT_VALUE             0
+           1608 BUILD_STRING             2
+           1610 STORE_FAST              13 (msg)
+           1612 STORE_FAST              12 (code)
+           1614 POP_EXCEPT
+           1616 EXTENDED_ARG             1
+           1618 JUMP_BACKWARD          440 (to 740)
+
+131     >> 1620 RERAISE                  0
+        >> 1622 COPY                     3
+           1624 POP_EXCEPT
+           1626 RERAISE                  1
+
+148     >> 1628 CLEANUP_THROW
+           1630 JUMP_BACKWARD          219 (to 1194)
+        >> 1632 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1634 RERAISE                  1
+ExceptionTable:
+  4 to 162 -> 1632 [0] lasti
+  166 to 224 -> 1326 [1]
+  226 to 226 -> 1264 [4]
+  228 to 232 -> 1326 [1]
+  234 to 340 -> 1282 [2] lasti
+  342 to 342 -> 1270 [4]
+  344 to 350 -> 1282 [2] lasti
+  352 to 372 -> 1326 [1]
+  374 to 374 -> 1276 [3]
+  376 to 382 -> 1326 [1]
+  384 to 578 -> 1632 [0] lasti
+  582 to 738 -> 1534 [1]
+  740 to 1008 -> 1632 [0] lasti
+  1014 to 1186 -> 1632 [0] lasti
+  1188 to 1188 -> 1628 [3]
+  1190 to 1262 -> 1632 [0] lasti
+  1264 to 1264 -> 1326 [1]
+  1270 to 1270 -> 1282 [2] lasti
+  1276 to 1276 -> 1326 [1]
+  1282 to 1292 -> 1320 [4] lasti
+  1294 to 1294 -> 1300 [7]
+  1296 to 1308 -> 1320 [4] lasti
+  1310 to 1324 -> 1326 [1]
+  1326 to 1362 -> 1528 [2] lasti
+  1364 to 1492 -> 1518 [2] lasti
+  1494 to 1494 -> 1500 [4]
+  1496 to 1504 -> 1518 [2] lasti
+  1506 to 1516 -> 1632 [0] lasti
+  1518 to 1526 -> 1528 [2] lasti
+  1528 to 1532 -> 1632 [0] lasti
+  1534 to 1612 -> 1622 [2] lasti
+  1614 to 1618 -> 1632 [0] lasti
+  1620 to 1620 -> 1622 [2] lasti
+  1622 to 1628 -> 1632 [0] lasti
+
+Disassembly of <code object _complete at 0x7f6c933b7600, file "app\adapters\gemini_session.py", line 153>:
+153           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+156           6 LOAD_FAST                0 (self)
+              8 LOAD_ATTR                1 (NULL|self + _post_complete)
+             28 LOAD_FAST                1 (prompt)
+             30 LOAD_CONST               1 (None)
+             32 LOAD_FAST                2 (model)
+             34 CALL                     3
+             42 GET_AWAITABLE            0
+             44 LOAD_CONST               1 (None)
+        >>   46 SEND                     3 (to 56)
+             50 YIELD_VALUE              2
+             52 RESUME                   3
+             54 JUMP_BACKWARD_NO_INTERRUPT     5 (to 46)
+        >>   56 END_SEND
+             58 UNPACK_SEQUENCE          2
+             62 STORE_FAST               3 (text)
+             64 STORE_FAST               4 (conv)
+
+157          66 LOAD_FAST                4 (conv)
+             68 POP_JUMP_IF_FALSE       25 (to 120)
+
+158          70 LOAD_FAST                0 (self)
+             72 LOAD_ATTR                3 (NULL|self + _delete_conversation)
+             92 LOAD_FAST                4 (conv)
+             94 CALL                     1
+            102 GET_AWAITABLE            0
+            104 LOAD_CONST               1 (None)
+        >>  106 SEND                     3 (to 116)
+            110 YIELD_VALUE              2
+            112 RESUME                   3
+            114 JUMP_BACKWARD_NO_INTERRUPT     5 (to 106)
+        >>  116 END_SEND
+            118 POP_TOP
+
+159     >>  120 LOAD_FAST                3 (text)
+            122 RETURN_VALUE
+
+156     >>  124 CLEANUP_THROW
+            126 JUMP_BACKWARD           36 (to 56)
+
+158     >>  128 CLEANUP_THROW
+            130 JUMP_BACKWARD            8 (to 116)
+        >>  132 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            134 RERAISE                  1
+ExceptionTable:
+  4 to 48 -> 132 [0] lasti
+  50 to 50 -> 124 [2]
+  52 to 108 -> 132 [0] lasti
+  110 to 110 -> 128 [2]
+  112 to 124 -> 132 [0] lasti
+  128 to 128 -> 132 [0] lasti
+
+Disassembly of <code object _delete_conversation at 0x26a37f10, file "app\adapters\gemini_session.py", line 161>:
+161           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+163           6 LOAD_FAST                0 (self)
+              8 LOAD_ATTR                0 (available)
+             28 POP_JUMP_IF_FALSE        2 (to 34)
+             30 LOAD_FAST                1 (conversation)
+             32 POP_JUMP_IF_TRUE         1 (to 36)
+
+164     >>   34 RETURN_CONST             1 (None)
+
+165     >>   36 NOP
+
+166          38 LOAD_GLOBAL              3 (NULL + httpx)
+             48 LOAD_ATTR                4 (AsyncClient)
+             68 LOAD_CONST               2 (15.0)
+             70 KW_NAMES                 3 (('timeout',))
+             72 CALL                     1
+             80 BEFORE_ASYNC_WITH
+             82 GET_AWAITABLE            1
+             84 LOAD_CONST               1 (None)
+        >>   86 SEND                     3 (to 96)
+             90 YIELD_VALUE              3
+             92 RESUME                   3
+             94 JUMP_BACKWARD_NO_INTERRUPT     5 (to 86)
+        >>   96 END_SEND
+             98 STORE_FAST               2 (client)
+
+167         100 LOAD_FAST                2 (client)
+            102 LOAD_ATTR                7 (NULL|self + post)
+
+168         122 LOAD_FAST                0 (self)
+            124 LOAD_ATTR                8 (bridge_url)
+            144 FORMAT_VALUE             0
+            146 LOAD_CONST               4 ('/gemini/delete')
+            148 BUILD_STRING             2
+
+169         150 LOAD_FAST                0 (self)
+            152 LOAD_ATTR               10 (token)
+            172 LOAD_CONST               5 ('application/json')
+            174 LOAD_CONST               6 (('X-Studio-Token', 'Content-Type'))
+            176 BUILD_CONST_KEY_MAP      2
+
+170         178 LOAD_CONST               7 ('conversation')
+            180 LOAD_FAST                1 (conversation)
+            182 BUILD_MAP                1
+
+167         184 KW_NAMES                 8 (('headers', 'json'))
+            186 CALL                     3
+            194 GET_AWAITABLE            0
+            196 LOAD_CONST               1 (None)
+        >>  198 SEND                     3 (to 208)
+            202 YIELD_VALUE              4
+            204 RESUME                   3
+            206 JUMP_BACKWARD_NO_INTERRUPT     5 (to 198)
+        >>  208 END_SEND
+            210 POP_TOP
+
+166         212 LOAD_CONST               1 (None)
+            214 LOAD_CONST               1 (None)
+            216 LOAD_CONST               1 (None)
+            218 CALL                     2
+            226 GET_AWAITABLE            2
+            228 LOAD_CONST               1 (None)
+        >>  230 SEND                     3 (to 240)
+            234 YIELD_VALUE              3
+            236 RESUME                   3
+            238 JUMP_BACKWARD_NO_INTERRUPT     5 (to 230)
+        >>  240 END_SEND
+            242 POP_TOP
+            244 RETURN_CONST             1 (None)
+        >>  246 CLEANUP_THROW
+            248 JUMP_BACKWARD           77 (to 96)
+
+167     >>  250 CLEANUP_THROW
+            252 JUMP_BACKWARD           23 (to 208)
+
+166     >>  254 CLEANUP_THROW
+            256 JUMP_BACKWARD            9 (to 240)
+        >>  258 PUSH_EXC_INFO
+            260 WITH_EXCEPT_START
+            262 GET_AWAITABLE            2
+            264 LOAD_CONST               1 (None)
+        >>  266 SEND                     4 (to 278)
+            270 YIELD_VALUE              4
+            272 RESUME                   3
+            274 JUMP_BACKWARD_NO_INTERRUPT     5 (to 266)
+        >>  276 CLEANUP_THROW
+        >>  278 END_SEND
+            280 POP_JUMP_IF_TRUE         1 (to 284)
+            282 RERAISE                  2
+        >>  284 POP_TOP
+            286 POP_EXCEPT
+            288 POP_TOP
+            290 POP_TOP
+            292 RETURN_CONST             1 (None)
+        >>  294 COPY                     3
+            296 POP_EXCEPT
+            298 RERAISE                  1
+        >>  300 PUSH_EXC_INFO
+
+172         302 LOAD_GLOBAL              2 (httpx)
+            312 LOAD_ATTR               12 (HTTPError)
+            332 CHECK_EXC_MATCH
+            334 POP_JUMP_IF_FALSE        3 (to 342)
+            336 POP_TOP
+
+173         338 POP_EXCEPT
+            340 RETURN_CONST             1 (None)
+
+172     >>  342 RERAISE                  0
+        >>  344 COPY                     3
+            346 POP_EXCEPT
+            348 RERAISE                  1
+        >>  350 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            352 RERAISE                  1
+ExceptionTable:
+  4 to 34 -> 350 [0] lasti
+  38 to 88 -> 300 [0]
+  90 to 90 -> 246 [3]
+  92 to 96 -> 300 [0]
+  98 to 200 -> 258 [1] lasti
+  202 to 202 -> 250 [3]
+  204 to 210 -> 258 [1] lasti
+  212 to 232 -> 300 [0]
+  234 to 234 -> 254 [2]
+  236 to 242 -> 300 [0]
+  244 to 244 -> 350 [0] lasti
+  246 to 246 -> 300 [0]
+  250 to 250 -> 258 [1] lasti
+  254 to 254 -> 300 [0]
+  258 to 268 -> 294 [3] lasti
+  270 to 270 -> 276 [6]
+  272 to 284 -> 294 [3] lasti
+  286 to 290 -> 300 [0]
+  292 to 292 -> 350 [0] lasti
+  294 to 298 -> 300 [0]
+  300 to 336 -> 344 [1] lasti
+  338 to 340 -> 350 [0] lasti
+  342 to 342 -> 344 [1] lasti
+  344 to 348 -> 350 [0] lasti
+
+Disassembly of <code object start_chat at 0x7f6c929b4810, file "app\adapters\gemini_session.py", line 175>:
+175           0 RESUME                   0
+
+177           2 LOAD_GLOBAL              1 (NULL + _GeminiChatSession)
+             12 LOAD_FAST                0 (self)
+             14 LOAD_FAST                1 (system)
+             16 CALL                     2
+             24 RETURN_VALUE
+
+Disassembly of <code object _call_api at 0x7f6c9327d8f0, file "app\adapters\gemini_session.py", line 179>:
+179           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+181           6 LOAD_FAST                0 (self)
+              8 LOAD_ATTR                1 (NULL|self + _complete)
+             28 LOAD_GLOBAL              3 (NULL + _combine_messages)
+             38 LOAD_FAST                1 (messages)
+             40 CALL                     1
+             48 CALL                     1
+             56 GET_AWAITABLE            0
+             58 LOAD_CONST               1 (None)
+        >>   60 SEND                     3 (to 70)
+             64 YIELD_VALUE              2
+             66 RESUME                   3
+             68 JUMP_BACKWARD_NO_INTERRUPT     5 (to 60)
+        >>   70 END_SEND
+             72 RETURN_VALUE
+        >>   74 CLEANUP_THROW
+             76 JUMP_BACKWARD            4 (to 70)
+        >>   78 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             80 RERAISE                  1
+ExceptionTable:
+  4 to 62 -> 78 [0] lasti
+  64 to 64 -> 74 [2]
+  66 to 74 -> 78 [0] lasti
+
+Disassembly of <code object translate_batch at 0x290854e0, file "app\adapters\gemini_session.py", line 183>:
+183           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+195           6 LOAD_FAST                1 (segments)
+              8 POP_JUMP_IF_TRUE         2 (to 14)
+
+196          10 BUILD_LIST               0
+             12 RETURN_VALUE
+
+198     >>   14 BUILD_LIST               0
+             16 STORE_FAST              10 (translated)
+
+199          18 LOAD_GLOBAL              1 (NULL + len)
+             28 LOAD_FAST                1 (segments)
+             30 CALL                     1
+             38 STORE_FAST              11 (total)
+
+200          40 LOAD_CONST               1 (0)
+             42 STORE_FAST              12 (done)
+
+201          44 LOAD_FAST               11 (total)
+             46 LOAD_FAST                4 (batch_size)
+             48 BINARY_OP                0 (+)
+             52 LOAD_CONST               2 (1)
+             54 BINARY_OP               10 (-)
+             58 LOAD_FAST                4 (batch_size)
+             60 BINARY_OP                2 (//)
+             64 STORE_FAST              13 (n_batches)
+
+202          66 BUILD_LIST               0
+             68 STORE_FAST              14 (context_pairs)
+
+204          70 LOAD_GLOBAL              3 (NULL + range)
+             80 LOAD_CONST               1 (0)
+             82 LOAD_FAST               11 (total)
+             84 LOAD_FAST                4 (batch_size)
+             86 CALL                     3
+             94 GET_ITER
+        >>   96 EXTENDED_ARG             1
+             98 FOR_ITER               364 (to 830)
+            102 STORE_FAST              15 (i)
+
+205         104 LOAD_FAST                6 (cancel_check)
+            106 POP_JUMP_IF_FALSE       33 (to 174)
+            108 PUSH_NULL
+            110 LOAD_FAST                6 (cancel_check)
+            112 CALL                     0
+            120 POP_JUMP_IF_FALSE       26 (to 174)
+
+206         122 LOAD_GLOBAL              5 (NULL + make_error)
+            132 LOAD_GLOBAL              6 (E)
+            142 LOAD_ATTR                8 (CANCELLED)
+            162 LOAD_CONST               3 ('Đã huỷ khi đang dịch.')
+            164 CALL                     2
+            172 RAISE_VARARGS            1
+
+208     >>  174 LOAD_FAST                1 (segments)
+            176 LOAD_FAST               15 (i)
+            178 LOAD_FAST               15 (i)
+            180 LOAD_FAST                4 (batch_size)
+            182 BINARY_OP                0 (+)
+            186 BINARY_SLICE
+            188 STORE_FAST              16 (batch)
+
+209         190 LOAD_FAST                5 (on_progress)
+            192 POP_JUMP_IF_FALSE       24 (to 242)
+
+210         194 PUSH_NULL
+            196 LOAD_FAST                5 (on_progress)
+            198 LOAD_FAST               12 (done)
+            200 LOAD_FAST               11 (total)
+            202 BINARY_OP               11 (/)
+
+211         206 LOAD_CONST               4 ('Đang gọi Gemini… batch ')
+            208 LOAD_FAST               15 (i)
+            210 LOAD_FAST                4 (batch_size)
+            212 BINARY_OP                2 (//)
+            216 LOAD_CONST               2 (1)
+            218 BINARY_OP                0 (+)
+            222 FORMAT_VALUE             0
+            224 LOAD_CONST               5 ('/')
+            226 LOAD_FAST               13 (n_batches)
+            228 FORMAT_VALUE             0
+            230 BUILD_STRING             4
+
+210         232 CALL                     2
+            240 POP_TOP
+
+213     >>  242 LOAD_GLOBAL             11 (NULL + _build_translate_prompt)
+            252 LOAD_FAST               16 (batch)
+            254 LOAD_FAST                2 (src_lang)
+            256 LOAD_FAST                3 (dst_lang)
+            258 LOAD_FAST                7 (genre)
+
+214         260 LOAD_FAST                8 (glossary)
+            262 LOAD_FAST               14 (context_pairs)
+            264 LOAD_FAST                9 (length_fit)
+
+213         266 KW_NAMES                 6 (('pace_fit',))
+            268 CALL                     7
+            276 STORE_FAST              17 (messages)
+
+215         278 LOAD_GLOBAL             13 (NULL + _combine_messages)
+            288 LOAD_FAST               17 (messages)
+            290 CALL                     1
+            298 STORE_FAST              18 (prompt)
+
+216         300 LOAD_FAST                9 (length_fit)
+            302 POP_JUMP_IF_FALSE       51 (to 406)
+
+218         304 LOAD_GLOBAL             15 (NULL + complete_and_parse)
+
+219         314 LOAD_FAST                0 (self)
+            316 LOAD_ATTR               16 (_complete)
+            336 LOAD_FAST               18 (prompt)
+
+220         338 LOAD_FAST               16 (batch)
+            340 BUILD_TUPLE              1
+            342 LOAD_CONST               7 (<code object <lambda> at 0x7f6c9329d980, file "app\adapters\gemini_session.py", line 220>)
+            344 MAKE_FUNCTION            1 (defaults)
+
+221         346 LOAD_GLOBAL              6 (E)
+            356 LOAD_ATTR               18 (GEMINI_BAD_RESPONSE)
+            376 LOAD_CONST               8 ('Gemini')
+
+218         378 CALL                     5
+            386 GET_AWAITABLE            0
+            388 LOAD_CONST               0 (None)
+        >>  390 SEND                     3 (to 400)
+            394 YIELD_VALUE              2
+            396 RESUME                   3
+            398 JUMP_BACKWARD_NO_INTERRUPT     5 (to 390)
+        >>  400 END_SEND
+            402 STORE_FAST              19 (result)
+            404 JUMP_FORWARD            66 (to 538)
+
+223     >>  406 LOAD_GLOBAL             15 (NULL + complete_and_parse)
+
+224         416 LOAD_FAST                0 (self)
+            418 LOAD_ATTR               16 (_complete)
+            438 LOAD_FAST               18 (prompt)
+
+225         440 LOAD_CONST               9 (<code object <lambda> at 0x7f6c9329dc50, file "app\adapters\gemini_session.py", line 225>)
+            442 MAKE_FUNCTION            0
+
+226         444 LOAD_GLOBAL              6 (E)
+            454 LOAD_ATTR               18 (GEMINI_BAD_RESPONSE)
+            474 LOAD_CONST               8 ('Gemini')
+
+223         476 CALL                     5
+            484 GET_AWAITABLE            0
+            486 LOAD_CONST               0 (None)
+        >>  488 SEND                     3 (to 498)
+            492 YIELD_VALUE              2
+            494 RESUME                   3
+            496 JUMP_BACKWARD_NO_INTERRUPT     5 (to 488)
+        >>  498 END_SEND
+            500 STORE_FAST              20 (texts)
+
+227         502 LOAD_FAST                0 (self)
+            504 LOAD_ATTR               21 (NULL|self + _merge)
+            524 LOAD_FAST               16 (batch)
+            526 LOAD_FAST               20 (texts)
+            528 CALL                     2
+            536 STORE_FAST              19 (result)
+
+228     >>  538 LOAD_FAST               10 (translated)
+            540 LOAD_ATTR               23 (NULL|self + extend)
+            560 LOAD_FAST               19 (result)
+            562 CALL                     1
+            570 POP_TOP
+
+230         572 LOAD_GLOBAL             25 (NULL + zip)
+            582 LOAD_FAST               16 (batch)
+            584 LOAD_FAST               19 (result)
+            586 CALL                     2
+            594 GET_ITER
+
+229         596 LOAD_FAST_AND_CLEAR     21 (b)
+            598 LOAD_FAST_AND_CLEAR     22 (r)
+            600 SWAP                     3
+            602 BUILD_LIST               0
+            604 SWAP                     2
+
+230     >>  606 FOR_ITER                41 (to 692)
+            610 UNPACK_SEQUENCE          2
+            614 STORE_FAST              21 (b)
+            616 STORE_FAST              22 (r)
+
+229         618 LOAD_FAST               21 (b)
+            620 LOAD_ATTR               27 (NULL|self + get)
+            640 LOAD_CONST              10 ('text')
+            642 LOAD_CONST              11 ('')
+            644 CALL                     2
+            652 LOAD_FAST               22 (r)
+            654 LOAD_ATTR               27 (NULL|self + get)
+            674 LOAD_CONST              10 ('text')
+            676 LOAD_CONST              11 ('')
+            678 CALL                     2
+            686 BUILD_TUPLE              2
+            688 LIST_APPEND              2
+            690 JUMP_BACKWARD           43 (to 606)
+
+230     >>  692 END_FOR
+
+229         694 SWAP                     3
+            696 STORE_FAST              22 (r)
+            698 STORE_FAST              21 (b)
+
+230         700 LOAD_GLOBAL             28 (CARRYOVER_PAIRS)
+            710 UNARY_NEGATIVE
+            712 LOAD_CONST               0 (None)
+
+229         714 BINARY_SLICE
+            716 STORE_FAST              14 (context_pairs)
+
+231         718 LOAD_FAST               12 (done)
+            720 LOAD_GLOBAL              1 (NULL + len)
+            730 LOAD_FAST               16 (batch)
+            732 CALL                     1
+            740 BINARY_OP               13 (+=)
+            744 STORE_FAST              12 (done)
+
+232         746 LOAD_FAST                5 (on_progress)
+            748 POP_JUMP_IF_TRUE         2 (to 754)
+            750 EXTENDED_ARG             1
+            752 JUMP_BACKWARD          329 (to 96)
+
+233     >>  754 LOAD_FAST               12 (done)
+            756 LOAD_FAST               11 (total)
+            758 BINARY_OP               11 (/)
+            762 STORE_FAST              23 (pct)
+
+234         764 PUSH_NULL
+            766 LOAD_FAST                5 (on_progress)
+            768 LOAD_FAST               23 (pct)
+            770 LOAD_CONST              12 ('Đang dịch (Gemini)… ')
+            772 LOAD_GLOBAL             31 (NULL + int)
+            782 LOAD_FAST               23 (pct)
+            784 LOAD_CONST              13 (100)
+            786 BINARY_OP                5 (*)
+            790 CALL                     1
+            798 FORMAT_VALUE             0
+            800 LOAD_CONST              14 ('% (')
+            802 LOAD_FAST               12 (done)
+            804 FORMAT_VALUE             0
+            806 LOAD_CONST               5 ('/')
+            808 LOAD_FAST               11 (total)
+            810 FORMAT_VALUE             0
+            812 LOAD_CONST              15 (' đoạn)')
+            814 BUILD_STRING             7
+            816 CALL                     2
+            824 POP_TOP
+            826 EXTENDED_ARG             1
+            828 JUMP_BACKWARD          367 (to 96)
+
+204     >>  830 END_FOR
+
+236         832 LOAD_FAST               10 (translated)
+            834 RETURN_VALUE
+
+218     >>  836 CLEANUP_THROW
+            838 JUMP_BACKWARD          220 (to 400)
+
+223     >>  840 CLEANUP_THROW
+            842 JUMP_BACKWARD          173 (to 498)
+        >>  844 SWAP                     2
+            846 POP_TOP
+
+229         848 SWAP                     3
+            850 STORE_FAST              22 (r)
+            852 STORE_FAST              21 (b)
+            854 RERAISE                  0
+        >>  856 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            858 RERAISE                  1
+ExceptionTable:
+  4 to 392 -> 856 [0] lasti
+  394 to 394 -> 836 [3]
+  396 to 490 -> 856 [0] lasti
+  492 to 492 -> 840 [3]
+  494 to 600 -> 856 [0] lasti
+  602 to 692 -> 844 [4]
+  694 to 748 -> 856 [0] lasti
+  754 to 836 -> 856 [0] lasti
+  840 to 840 -> 856 [0] lasti
+  844 to 854 -> 856 [0] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c9329d980, file "app\adapters\gemini_session.py", line 220>:
+220           0 RESUME                   0
+              2 LOAD_GLOBAL              1 (NULL + apply_retimed)
+             12 LOAD_FAST                1 (_b)
+             14 LOAD_GLOBAL              3 (NULL + _extract_json_array)
+             24 LOAD_FAST                0 (raw)
+             26 CALL                     1
+             34 CALL                     2
+             42 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c9329dc50, file "app\adapters\gemini_session.py", line 225>:
+225           0 RESUME                   0
+              2 LOAD_GLOBAL              1 (NULL + _parse_response_texts)
+             12 LOAD_GLOBAL              3 (NULL + _extract_json_array)
+             22 LOAD_FAST                0 (raw)
+             24 CALL                     1
+             32 CALL                     1
+             40 RETURN_VALUE
+
+Disassembly of <code object rewrite_batch at 0x28e44440, file "app\adapters\gemini_session.py", line 239>:
+              0 MAKE_CELL               17 (batch)
+              2 MAKE_CELL               18 (premium)
+
+239           4 RETURN_GENERATOR
+              6 POP_TOP
+              8 RESUME                   0
+
+249          10 LOAD_CONST               1 (0)
+             12 LOAD_CONST               2 (('premium',))
+             14 IMPORT_NAME              0 (app.adapters)
+             16 IMPORT_FROM              1 (premium)
+             18 STORE_DEREF             18 (premium)
+             20 POP_TOP
+
+251          22 LOAD_FAST                1 (segments)
+             24 POP_JUMP_IF_TRUE         2 (to 30)
+
+252          26 BUILD_LIST               0
+             28 RETURN_VALUE
+
+254     >>   30 LOAD_GLOBAL              5 (NULL + max)
+             40 LOAD_CONST               3 (1)
+             42 LOAD_GLOBAL              7 (NULL + min)
+             52 LOAD_FAST                5 (batch_size)
+             54 LOAD_GLOBAL              8 (SESSION_REWRITE_BATCH)
+             64 CALL                     2
+             72 CALL                     2
+             80 STORE_FAST               5 (batch_size)
+
+255          82 BUILD_LIST               0
+             84 STORE_FAST               8 (groups)
+
+256          86 LOAD_GLOBAL             11 (NULL + len)
+             96 LOAD_FAST                1 (segments)
+             98 CALL                     1
+            106 STORE_FAST               9 (total)
+
+257         108 LOAD_CONST               1 (0)
+            110 STORE_FAST              10 (done)
+
+258         112 LOAD_FAST                9 (total)
+            114 LOAD_FAST                5 (batch_size)
+            116 BINARY_OP                0 (+)
+            120 LOAD_CONST               3 (1)
+            122 BINARY_OP               10 (-)
+            126 LOAD_FAST                5 (batch_size)
+            128 BINARY_OP                2 (//)
+            132 STORE_FAST              11 (n_batches)
+
+260         134 LOAD_GLOBAL             13 (NULL + range)
+            144 LOAD_CONST               1 (0)
+            146 LOAD_FAST                9 (total)
+            148 LOAD_FAST                5 (batch_size)
+            150 CALL                     3
+            158 GET_ITER
+        >>  160 FOR_ITER               239 (to 642)
+            164 STORE_FAST              12 (i)
+
+261         166 LOAD_FAST                7 (cancel_check)
+            168 POP_JUMP_IF_FALSE       33 (to 236)
+            170 PUSH_NULL
+            172 LOAD_FAST                7 (cancel_check)
+            174 CALL                     0
+            182 POP_JUMP_IF_FALSE       26 (to 236)
+
+262         184 LOAD_GLOBAL             15 (NULL + make_error)
+            194 LOAD_GLOBAL             16 (E)
+            204 LOAD_ATTR               18 (CANCELLED)
+            224 LOAD_CONST               4 ('Đã huỷ khi đang viết lại lời thoại.')
+            226 CALL                     2
+            234 RAISE_VARARGS            1
+
+263     >>  236 LOAD_FAST                1 (segments)
+            238 LOAD_FAST               12 (i)
+            240 LOAD_FAST               12 (i)
+            242 LOAD_FAST                5 (batch_size)
+            244 BINARY_OP                0 (+)
+            248 BINARY_SLICE
+            250 STORE_DEREF             17 (batch)
+
+264         252 LOAD_FAST                6 (on_progress)
+            254 POP_JUMP_IF_FALSE       24 (to 304)
+
+265         256 PUSH_NULL
+            258 LOAD_FAST                6 (on_progress)
+            260 LOAD_FAST               10 (done)
+            262 LOAD_FAST                9 (total)
+            264 BINARY_OP               11 (/)
+            268 LOAD_CONST               5 ('Gemini viết lại lời thoại… batch ')
+            270 LOAD_FAST               12 (i)
+            272 LOAD_FAST                5 (batch_size)
+            274 BINARY_OP                2 (//)
+            278 LOAD_CONST               3 (1)
+            280 BINARY_OP                0 (+)
+            284 FORMAT_VALUE             0
+            286 LOAD_CONST               6 ('/')
+            288 LOAD_FAST               11 (n_batches)
+            290 FORMAT_VALUE             0
+            292 BUILD_STRING             4
+            294 CALL                     2
+            302 POP_TOP
+
+267     >>  304 LOAD_DEREF              18 (premium)
+            306 LOAD_ATTR               21 (NULL|self + to_blocks)
+            326 LOAD_DEREF              17 (batch)
+            328 LOAD_FAST                3 (dst_lang)
+            330 CALL                     2
+            338 STORE_FAST              13 (blocks)
+
+268         340 LOAD_DEREF              18 (premium)
+            342 LOAD_ATTR               23 (NULL|self + build_rewrite_messages)
+            362 LOAD_FAST               13 (blocks)
+            364 LOAD_FAST                2 (src_lang)
+            366 LOAD_FAST                3 (dst_lang)
+            368 LOAD_FAST                4 (mode)
+            370 CALL                     4
+            378 STORE_FAST              14 (messages)
+
+269         380 LOAD_GLOBAL             25 (NULL + _combine_messages)
+            390 LOAD_FAST               14 (messages)
+            392 CALL                     1
+            400 STORE_FAST              15 (prompt)
+
+270         402 LOAD_FAST                8 (groups)
+            404 LOAD_ATTR               27 (NULL|self + extend)
+            424 LOAD_GLOBAL             29 (NULL + complete_and_parse)
+
+271         434 LOAD_FAST                0 (self)
+            436 LOAD_ATTR               30 (_complete)
+            456 LOAD_FAST               15 (prompt)
+
+272         458 LOAD_CLOSURE            17 (batch)
+            460 LOAD_CLOSURE            18 (premium)
+            462 BUILD_TUPLE              2
+            464 LOAD_CONST               7 (<code object <lambda> at 0x7f6c9329de30, file "app\adapters\gemini_session.py", line 272>)
+            466 MAKE_FUNCTION            8 (closure)
+
+273         468 LOAD_GLOBAL             16 (E)
+            478 LOAD_ATTR               32 (GEMINI_BAD_RESPONSE)
+            498 LOAD_CONST               8 ('Gemini rewrite')
+
+270         500 CALL                     5
+            508 GET_AWAITABLE            0
+            510 LOAD_CONST               0 (None)
+        >>  512 SEND                     3 (to 522)
+            516 YIELD_VALUE              2
+            518 RESUME                   3
+            520 JUMP_BACKWARD_NO_INTERRUPT     5 (to 512)
+        >>  522 END_SEND
+            524 CALL                     1
+            532 POP_TOP
+
+274         534 LOAD_FAST               10 (done)
+            536 LOAD_GLOBAL             11 (NULL + len)
+            546 LOAD_DEREF              17 (batch)
+            548 CALL                     1
+            556 BINARY_OP               13 (+=)
+            560 STORE_FAST              10 (done)
+
+275         562 LOAD_FAST                6 (on_progress)
+            564 POP_JUMP_IF_TRUE         1 (to 568)
+            566 JUMP_BACKWARD          204 (to 160)
+
+276     >>  568 LOAD_FAST               10 (done)
+            570 LOAD_FAST                9 (total)
+            572 BINARY_OP               11 (/)
+            576 STORE_FAST              16 (pct)
+
+277         578 PUSH_NULL
+            580 LOAD_FAST                6 (on_progress)
+            582 LOAD_FAST               16 (pct)
+            584 LOAD_CONST               9 ('Đang viết lại (Gemini)… ')
+            586 LOAD_GLOBAL             35 (NULL + int)
+            596 LOAD_FAST               16 (pct)
+            598 LOAD_CONST              10 (100)
+            600 BINARY_OP                5 (*)
+            604 CALL                     1
+            612 FORMAT_VALUE             0
+            614 LOAD_CONST              11 ('% (')
+            616 LOAD_FAST               10 (done)
+            618 FORMAT_VALUE             0
+            620 LOAD_CONST               6 ('/')
+            622 LOAD_FAST                9 (total)
+            624 FORMAT_VALUE             0
+            626 LOAD_CONST              12 (' đoạn)')
+            628 BUILD_STRING             7
+            630 CALL                     2
+            638 POP_TOP
+            640 JUMP_BACKWARD          241 (to 160)
+
+260     >>  642 END_FOR
+
+279         644 LOAD_FAST                8 (groups)
+            646 RETURN_VALUE
+
+270     >>  648 CLEANUP_THROW
+            650 JUMP_BACKWARD           65 (to 522)
+        >>  652 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            654 RERAISE                  1
+ExceptionTable:
+  8 to 514 -> 652 [0] lasti
+  516 to 516 -> 648 [5]
+  518 to 564 -> 652 [0] lasti
+  568 to 648 -> 652 [0] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c9329de30, file "app\adapters\gemini_session.py", line 272>:
+              0 COPY_FREE_VARS           2
+
+272           2 RESUME                   0
+              4 LOAD_DEREF               2 (premium)
+              6 LOAD_ATTR                1 (NULL|self + parse_rewrite_response)
+             26 LOAD_FAST                0 (raw)
+             28 LOAD_DEREF               1 (batch)
+             30 CALL                     2
+             38 RETURN_VALUE
+
+Disassembly of <code object _merge at 0x7f6c9327b0a0, file "app\adapters\gemini_session.py", line 281>:
+281           0 RESUME                   0
+
+282           2 BUILD_LIST               0
+              4 STORE_FAST               3 (merged)
+
+283           6 LOAD_GLOBAL              1 (NULL + enumerate)
+             16 LOAD_FAST                1 (batch)
+             18 CALL                     1
+             26 GET_ITER
+        >>   28 FOR_ITER                78 (to 188)
+             32 UNPACK_SEQUENCE          2
+             36 STORE_FAST               4 (idx)
+             38 STORE_FAST               5 (seg)
+
+284          40 LOAD_FAST                4 (idx)
+             42 LOAD_GLOBAL              3 (NULL + len)
+             52 LOAD_FAST                2 (texts)
+             54 CALL                     1
+             62 COMPARE_OP               2 (<)
+             66 POP_JUMP_IF_FALSE       10 (to 88)
+             68 LOAD_FAST                2 (texts)
+             70 LOAD_FAST                4 (idx)
+             72 BINARY_SUBSCR
+             76 POP_JUMP_IF_FALSE        5 (to 88)
+             78 LOAD_FAST                2 (texts)
+             80 LOAD_FAST                4 (idx)
+             82 BINARY_SUBSCR
+             86 JUMP_FORWARD            17 (to 122)
+        >>   88 LOAD_FAST                5 (seg)
+             90 LOAD_ATTR                5 (NULL|self + get)
+            110 LOAD_CONST               1 ('text')
+            112 LOAD_CONST               2 ('')
+            114 CALL                     2
+        >>  122 STORE_FAST               6 (text)
+
+285         124 LOAD_FAST                3 (merged)
+            126 LOAD_ATTR                7 (NULL|self + append)
+
+286         146 LOAD_FAST                5 (seg)
+            148 LOAD_CONST               3 ('seq')
+            150 BINARY_SUBSCR
+
+287         154 LOAD_FAST                5 (seg)
+            156 LOAD_CONST               4 ('start_ms')
+            158 BINARY_SUBSCR
+
+288         162 LOAD_FAST                5 (seg)
+            164 LOAD_CONST               5 ('end_ms')
+            166 BINARY_SUBSCR
+
+289         170 LOAD_FAST                6 (text)
+
+285         172 LOAD_CONST               6 (('seq', 'start_ms', 'end_ms', 'text'))
+            174 BUILD_CONST_KEY_MAP      4
+            176 CALL                     1
+            184 POP_TOP
+            186 JUMP_BACKWARD           80 (to 28)
+
+283     >>  188 END_FOR
+
+291         190 LOAD_FAST                3 (merged)
+            192 RETURN_VALUE
+
+Disassembly of <code object _GeminiChatSession at 0x7f6c9329e3d0, file "app\adapters\gemini_session.py", line 294>:
+294           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('_GeminiChatSession')
+              8 STORE_NAME               2 (__qualname__)
+
+295          10 LOAD_CONST               1 ("Phiên hội thoại Gemini nhiều lượt — gửi nhiều prompt trên CÙNG conversation để giữ ngữ cảnh\n    (cast/style/nội dung đồng bộ giữa các chunk storyboard). Gemini web không có 'system role' →\n    ghép system vào lượt user đầu tiên.")
+             12 STORE_NAME               3 (__doc__)
+
+299          14 LOAD_CONST               6 (('',))
+             16 LOAD_CONST               7 (('client', 'GeminiSessionClient', 'system', 'str'))
+             18 LOAD_CONST               2 (<code object __init__ at 0x7f6c9327d350, file "app\adapters\gemini_session.py", line 299>)
+             20 MAKE_FUNCTION            5 (defaults, annotations)
+             22 STORE_NAME               4 (__init__)
+
+304          24 LOAD_CONST               8 (('prompt', 'str', 'return', 'str'))
+             26 LOAD_CONST               3 (<code object send at 0x7f6c9327b550, file "app\adapters\gemini_session.py", line 304>)
+             28 MAKE_FUNCTION            4 (annotations)
+             30 STORE_NAME               5 (send)
+
+316          32 LOAD_CONST               9 (('return', 'None'))
+             34 LOAD_CONST               4 (<code object aclose at 0x7f6c93271370, file "app\adapters\gemini_session.py", line 316>)
+             36 MAKE_FUNCTION            4 (annotations)
+             38 STORE_NAME               6 (aclose)
+             40 RETURN_CONST             5 (None)
+
+Disassembly of <code object __init__ at 0x7f6c9327d350, file "app\adapters\gemini_session.py", line 299>:
+299           0 RESUME                   0
+
+300           2 LOAD_FAST                1 (client)
+              4 LOAD_FAST                0 (self)
+              6 STORE_ATTR               0 (client)
+
+301          16 LOAD_CONST               0 (None)
+             18 LOAD_FAST                0 (self)
+             20 STORE_ATTR               1 (conversation)
+
+302          30 LOAD_FAST                2 (system)
+             32 COPY                     1
+             34 POP_JUMP_IF_TRUE         2 (to 40)
+             36 POP_TOP
+             38 LOAD_CONST               1 ('')
+        >>   40 LOAD_ATTR                5 (NULL|self + strip)
+             60 CALL                     0
+             68 LOAD_FAST                0 (self)
+             70 STORE_ATTR               3 (_pending_system)
+             80 RETURN_CONST             0 (None)
+
+Disassembly of <code object send at 0x7f6c9327b550, file "app\adapters\gemini_session.py", line 304>:
+304           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+305           6 LOAD_FAST                0 (self)
+              8 LOAD_ATTR                0 (_pending_system)
+             28 POP_JUMP_IF_FALSE       25 (to 80)
+
+306          30 LOAD_CONST               1 ('[Instructions]\n')
+             32 LOAD_FAST                0 (self)
+             34 LOAD_ATTR                0 (_pending_system)
+             54 FORMAT_VALUE             0
+             56 LOAD_CONST               2 ('\n\n')
+             58 LOAD_FAST                1 (prompt)
+             60 FORMAT_VALUE             0
+             62 BUILD_STRING             4
+             64 STORE_FAST               1 (prompt)
+
+307          66 LOAD_CONST               3 ('')
+             68 LOAD_FAST                0 (self)
+             70 STORE_ATTR               0 (_pending_system)
+
+308     >>   80 LOAD_FAST                0 (self)
+             82 LOAD_ATTR                2 (client)
+            102 LOAD_ATTR                5 (NULL|self + _post_complete)
+            122 LOAD_FAST                1 (prompt)
+            124 LOAD_FAST                0 (self)
+            126 LOAD_ATTR                6 (conversation)
+            146 CALL                     2
+            154 GET_AWAITABLE            0
+            156 LOAD_CONST               0 (None)
+        >>  158 SEND                     3 (to 168)
+            162 YIELD_VALUE              2
+            164 RESUME                   3
+            166 JUMP_BACKWARD_NO_INTERRUPT     5 (to 158)
+        >>  168 END_SEND
+            170 UNPACK_SEQUENCE          2
+            174 STORE_FAST               2 (text)
+            176 STORE_FAST               3 (conv)
+
+312         178 LOAD_FAST                3 (conv)
+            180 POP_JUMP_IF_FALSE        7 (to 196)
+
+313         182 LOAD_FAST                3 (conv)
+            184 LOAD_FAST                0 (self)
+            186 STORE_ATTR               3 (conversation)
+
+314     >>  196 LOAD_FAST                2 (text)
+            198 RETURN_VALUE
+
+308     >>  200 CLEANUP_THROW
+            202 JUMP_BACKWARD           18 (to 168)
+        >>  204 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            206 RERAISE                  1
+ExceptionTable:
+  4 to 160 -> 204 [0] lasti
+  162 to 162 -> 200 [2]
+  164 to 200 -> 204 [0] lasti
+
+Disassembly of <code object aclose at 0x7f6c93271370, file "app\adapters\gemini_session.py", line 316>:
+316           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+318           6 LOAD_FAST                0 (self)
+              8 LOAD_ATTR                0 (conversation)
+             28 POP_JUMP_IF_FALSE       53 (to 136)
+
+319          30 LOAD_FAST                0 (self)
+             32 LOAD_ATTR                2 (client)
+             52 LOAD_ATTR                5 (NULL|self + _delete_conversation)
+             72 LOAD_FAST                0 (self)
+             74 LOAD_ATTR                0 (conversation)
+             94 CALL                     1
+            102 GET_AWAITABLE            0
+            104 LOAD_CONST               1 (None)
+        >>  106 SEND                     3 (to 116)
+            110 YIELD_VALUE              2
+            112 RESUME                   3
+            114 JUMP_BACKWARD_NO_INTERRUPT     5 (to 106)
+        >>  116 END_SEND
+            118 POP_TOP
+
+320         120 LOAD_CONST               1 (None)
+            122 LOAD_FAST                0 (self)
+            124 STORE_ATTR               0 (conversation)
+            134 RETURN_CONST             1 (None)
+
+318     >>  136 RETURN_CONST             1 (None)
+
+319     >>  138 CLEANUP_THROW
+            140 JUMP_BACKWARD           13 (to 116)
+        >>  142 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            144 RERAISE                  1
+ExceptionTable:
+  4 to 108 -> 142 [0] lasti
+  110 to 110 -> 138 [2]
+  112 to 138 -> 142 [0] lasti

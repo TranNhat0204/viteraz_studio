@@ -1,0 +1,2238 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Step download — tải video Douyin/TikTok về source.mp4. Xem docs/06 §6.6.\n\nFast path: bọc HybridCrawler để lấy URL nguồn và metadata cho nội dung người dùng có quyền sử dụng.\n\nTải bền: resume bằng HTTP Range (tận dụng file .part dang dở), retry + exponential\nbackoff khi lỗi mạng, và verify Content-Length trước khi commit ra source.mp4 để\nKHÔNG bao giờ coi một file thiếu byte là hợp lệ (sẽ bị skip oan ở lần chạy sau).\n')
+              4 STORE_NAME               0 (__doc__)
+
+  9           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 11          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (asyncio)
+             24 STORE_NAME               3 (asyncio)
+
+ 13          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               3 (None)
+             30 IMPORT_NAME              4 (httpx)
+             32 STORE_NAME               4 (httpx)
+
+ 15          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               4 (('Path',))
+             38 IMPORT_NAME              5 (pathlib)
+             40 IMPORT_FROM              6 (Path)
+             42 STORE_NAME               6 (Path)
+             44 POP_TOP
+
+ 17          46 LOAD_CONST               1 (0)
+             48 LOAD_CONST               5 (('StudioError', 'E', 'make_error'))
+             50 IMPORT_NAME              7 (app.core.errors)
+             52 IMPORT_FROM              8 (StudioError)
+             54 STORE_NAME               8 (StudioError)
+             56 IMPORT_FROM              9 (E)
+             58 STORE_NAME               9 (E)
+             60 IMPORT_FROM             10 (make_error)
+             62 STORE_NAME              10 (make_error)
+             64 POP_TOP
+
+ 18          66 LOAD_CONST               1 (0)
+             68 LOAD_CONST               6 (('ProjectFS',))
+             70 IMPORT_NAME             11 (app.core.fs)
+             72 IMPORT_FROM             12 (ProjectFS)
+             74 STORE_NAME              12 (ProjectFS)
+             76 POP_TOP
+
+ 19          78 LOAD_CONST               1 (0)
+             80 LOAD_CONST               7 (('BaseStep', 'StepContext'))
+             82 IMPORT_NAME             13 (app.pipeline.base)
+             84 IMPORT_FROM             14 (BaseStep)
+             86 STORE_NAME              14 (BaseStep)
+             88 IMPORT_FROM             15 (StepContext)
+             90 STORE_NAME              15 (StepContext)
+             92 POP_TOP
+
+ 20          94 LOAD_CONST               1 (0)
+             96 LOAD_CONST               8 (('SessionLocal',))
+             98 IMPORT_NAME             16 (app.db.session)
+            100 IMPORT_FROM             17 (SessionLocal)
+            102 STORE_NAME              17 (SessionLocal)
+            104 POP_TOP
+
+ 21         106 LOAD_CONST               1 (0)
+            108 LOAD_CONST               9 (('Project', 'Video'))
+            110 IMPORT_NAME             18 (app.db.models)
+            112 IMPORT_FROM             19 (Project)
+            114 STORE_NAME              19 (Project)
+            116 IMPORT_FROM             20 (Video)
+            118 STORE_NAME              20 (Video)
+            120 POP_TOP
+
+ 24         122 LOAD_CONST              10 (4)
+            124 STORE_NAME              21 (_MAX_ATTEMPTS)
+
+ 25         126 LOAD_CONST              11 (20.0)
+            128 STORE_NAME              22 (_CONNECT_TIMEOUT)
+
+ 26         130 LOAD_CONST              12 (60.0)
+            132 STORE_NAME              23 (_READ_TIMEOUT)
+
+ 27         134 LOAD_CONST              13 (1.5)
+            136 STORE_NAME              24 (_BACKOFF_BASE)
+
+ 30         138 PUSH_NULL
+            140 LOAD_BUILD_CLASS
+            142 LOAD_CONST              14 (<code object DownloadStep at 0x7f6c92c3c420, file "app\pipeline\steps\download.py", line 30>)
+            144 MAKE_FUNCTION            0
+            146 LOAD_CONST              15 ('DownloadStep')
+            148 LOAD_NAME               14 (BaseStep)
+            150 CALL                     3
+            158 STORE_NAME              25 (DownloadStep)
+            160 RETURN_CONST             3 (None)
+
+Disassembly of <code object DownloadStep at 0x7f6c92c3c420, file "app\pipeline\steps\download.py", line 30>:
+ 30           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('DownloadStep')
+              8 STORE_NAME               2 (__qualname__)
+
+ 31          10 LOAD_CONST               1 ('download')
+             12 STORE_NAME               3 (name)
+
+ 32          14 LOAD_CONST               2 ('NET')
+             16 STORE_NAME               4 (resource)
+
+ 33          18 LOAD_CONST               3 ('source')
+             20 BUILD_LIST               1
+             22 STORE_NAME               5 (produces)
+
+ 35          24 LOAD_CONST              13 (('ctx', 'StepContext', 'return', 'dict'))
+             26 LOAD_CONST               4 (<code object run at 0x28b16820, file "app\pipeline\steps\download.py", line 35>)
+             28 MAKE_FUNCTION            4 (annotations)
+             30 STORE_NAME               6 (run)
+
+ 84          32 NOP
+
+ 85          34 NOP
+
+ 84          36 NOP
+
+ 85          38 NOP
+
+ 84          40 NOP
+
+ 85          42 NOP
+
+ 84          44 NOP
+
+ 85          46 NOP
+
+ 84          48 LOAD_CONST              14 (('ctx', 'StepContext', 'source_url', 'str', 'platform', 'str', 'platform_label', 'str', 'fs', 'ProjectFS', 'return', 'dict'))
+             50 LOAD_CONST               5 (<code object _run_hybrid at 0x28b788e0, file "app\pipeline\steps\download.py", line 84>)
+             52 MAKE_FUNCTION            4 (annotations)
+             54 STORE_NAME               7 (_run_hybrid)
+
+107          56 NOP
+
+108          58 NOP
+
+107          60 NOP
+
+108          62 NOP
+
+107          64 NOP
+
+108          66 NOP
+
+107          68 LOAD_CONST              15 (('ctx', 'StepContext', 'source_url', 'str', 'platform', 'str', 'fs', 'ProjectFS', 'return', 'dict'))
+             70 LOAD_CONST               6 (<code object _run_ytdlp at 0x290e9f20, file "app\pipeline\steps\download.py", line 107>)
+             72 MAKE_FUNCTION            4 (annotations)
+             74 STORE_NAME               8 (_run_ytdlp)
+
+140          76 LOAD_CONST              16 (('ctx', 'StepContext', 'cover_url', 'str | None', 'fs', 'ProjectFS', 'return', 'str | None'))
+             78 LOAD_CONST               7 (<code object _fetch_thumbnail at 0x7f6c92996c30, file "app\pipeline\steps\download.py", line 140>)
+             80 MAKE_FUNCTION            4 (annotations)
+             82 STORE_NAME               9 (_fetch_thumbnail)
+
+151          84 LOAD_CONST              17 (('ctx', 'StepContext', 'url', 'str', 'out_path', 'Path'))
+             86 LOAD_CONST               8 (<code object _download_thumbnail at 0x28b1b950, file "app\pipeline\steps\download.py", line 151>)
+             88 MAKE_FUNCTION            4 (annotations)
+             90 STORE_NAME              10 (_download_thumbnail)
+
+164          92 LOAD_CONST              18 ((None,))
+             94 LOAD_CONST              19 (('ctx', 'StepContext', 'info', 'dict', 'thumbnail_path', 'str | None'))
+             96 LOAD_CONST              10 (<code object _save_meta at 0x290b69f0, file "app\pipeline\steps\download.py", line 164>)
+             98 MAKE_FUNCTION            5 (defaults, annotations)
+            100 STORE_NAME              11 (_save_meta)
+
+192         102 LOAD_CONST              18 ((None,))
+            104 LOAD_CONST              20 (('ctx', 'StepContext', 'url', 'str', 'platform', 'str | None'))
+            106 LOAD_CONST              11 (<code object _download_stream at 0x290e7c80, file "app\pipeline\steps\download.py", line 192>)
+            108 MAKE_FUNCTION            5 (defaults, annotations)
+            110 STORE_NAME              12 (_download_stream)
+
+243         112 NOP
+
+244         114 NOP
+
+243         116 NOP
+
+244         118 NOP
+
+243         120 NOP
+
+244         122 NOP
+
+243         124 NOP
+
+244         126 NOP
+
+243         128 LOAD_CONST              21 (('ctx', 'StepContext', 'url', 'str', 'headers', 'dict', 'tmp', 'Path', 'timeout', 'httpx.Timeout', 'attempt', 'int', 'return', 'int'))
+            130 LOAD_CONST              12 (<code object _stream_attempt at 0x26a03cd0, file "app\pipeline\steps\download.py", line 243>)
+            132 MAKE_FUNCTION            4 (annotations)
+            134 STORE_NAME              13 (_stream_attempt)
+            136 RETURN_CONST             9 (None)
+
+Disassembly of <code object run at 0x28b16820, file "app\pipeline\steps\download.py", line 35>:
+ 35           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 37           6 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             16 CALL                     0
+             24 BEFORE_WITH
+             26 STORE_FAST               2 (db)
+
+ 38          28 LOAD_FAST                2 (db)
+             30 LOAD_ATTR                3 (NULL|self + get)
+             50 LOAD_GLOBAL              4 (Video)
+             60 LOAD_FAST                1 (ctx)
+             62 LOAD_ATTR                6 (video_id)
+             82 CALL                     2
+             90 STORE_FAST               3 (video)
+
+ 39          92 LOAD_FAST                2 (db)
+             94 LOAD_ATTR                3 (NULL|self + get)
+            114 LOAD_GLOBAL              8 (Project)
+            124 LOAD_FAST                1 (ctx)
+            126 LOAD_ATTR               10 (project_id)
+            146 CALL                     2
+            154 STORE_FAST               4 (project)
+
+ 40         156 LOAD_FAST                3 (video)
+            158 POP_JUMP_IF_FALSE        2 (to 164)
+            160 LOAD_FAST                4 (project)
+            162 POP_JUMP_IF_TRUE        26 (to 216)
+
+ 41     >>  164 LOAD_GLOBAL             13 (NULL + make_error)
+            174 LOAD_GLOBAL             14 (E)
+            184 LOAD_ATTR               16 (VIDEO_NOT_FOUND)
+            204 LOAD_CONST               1 ('Không tìm thấy video/project')
+            206 CALL                     2
+            214 RAISE_VARARGS            1
+
+ 42     >>  216 LOAD_FAST                3 (video)
+            218 LOAD_ATTR               18 (source_url)
+            238 STORE_FAST               5 (source_url)
+
+ 43         240 LOAD_FAST                3 (video)
+            242 LOAD_ATTR               20 (platform)
+            262 COPY                     1
+            264 POP_JUMP_IF_TRUE         2 (to 270)
+            266 POP_TOP
+            268 LOAD_CONST               2 ('video')
+        >>  270 STORE_FAST               6 (platform)
+
+ 44         272 LOAD_FAST                4 (project)
+            274 LOAD_ATTR               22 (root_path)
+            294 STORE_FAST               7 (root_path)
+
+ 37         296 LOAD_CONST               0 (None)
+            298 LOAD_CONST               0 (None)
+            300 LOAD_CONST               0 (None)
+            302 CALL                     2
+            310 POP_TOP
+
+ 46     >>  312 LOAD_GLOBAL             25 (NULL + ProjectFS)
+            322 LOAD_FAST_CHECK          7 (root_path)
+            324 CALL                     1
+            332 STORE_FAST               8 (fs)
+
+ 47         334 LOAD_FAST                8 (fs)
+            336 LOAD_ATTR               27 (NULL|self + source_mp4)
+            356 LOAD_FAST                1 (ctx)
+            358 LOAD_ATTR                6 (video_id)
+            378 CALL                     1
+            386 STORE_FAST               9 (out_path)
+
+ 50         388 LOAD_FAST                9 (out_path)
+            390 LOAD_ATTR               29 (NULL|self + exists)
+            410 CALL                     0
+            418 POP_JUMP_IF_FALSE      220 (to 860)
+            420 LOAD_FAST                9 (out_path)
+            422 LOAD_ATTR               31 (NULL|self + stat)
+            442 CALL                     0
+            450 LOAD_ATTR               32 (st_size)
+            470 LOAD_CONST               3 (0)
+            472 COMPARE_OP              68 (>)
+            476 POP_JUMP_IF_FALSE      191 (to 860)
+
+ 51         478 LOAD_FAST                1 (ctx)
+            480 LOAD_ATTR               35 (NULL|self + emit_log)
+            500 LOAD_CONST               4 ('File video đã tồn tại: ')
+            502 LOAD_FAST                9 (out_path)
+            504 LOAD_ATTR               36 (name)
+            524 FORMAT_VALUE             0
+            526 LOAD_CONST               5 (' (')
+            528 LOAD_FAST                9 (out_path)
+            530 LOAD_ATTR               31 (NULL|self + stat)
+            550 CALL                     0
+            558 LOAD_ATTR               32 (st_size)
+            578 LOAD_CONST               6 (1024)
+            580 BINARY_OP                2 (//)
+            584 FORMAT_VALUE             0
+            586 LOAD_CONST               7 ('KB)')
+            588 BUILD_STRING             5
+            590 CALL                     1
+            598 POP_TOP
+
+ 52         600 LOAD_FAST                1 (ctx)
+            602 LOAD_ATTR               39 (NULL|self + emit_progress)
+            622 LOAD_CONST               8 (1.0)
+            624 LOAD_CONST               9 ('Video đã có sẵn, bỏ qua tải.')
+            626 CALL                     2
+            634 POP_TOP
+
+ 53         636 LOAD_FAST                8 (fs)
+            638 LOAD_ATTR               41 (NULL|self + thumbnail)
+            658 LOAD_FAST                1 (ctx)
+            660 LOAD_ATTR                6 (video_id)
+            680 CALL                     1
+            688 STORE_FAST              10 (tb_path)
+
+ 54         690 LOAD_FAST               10 (tb_path)
+            692 LOAD_ATTR               29 (NULL|self + exists)
+            712 CALL                     0
+            720 POP_JUMP_IF_FALSE       11 (to 744)
+            722 LOAD_GLOBAL             43 (NULL + str)
+            732 LOAD_FAST               10 (tb_path)
+            734 CALL                     1
+            742 JUMP_FORWARD             1 (to 746)
+        >>  744 LOAD_CONST               0 (None)
+        >>  746 STORE_FAST              11 (thumbnail_path)
+
+ 55         748 LOAD_GLOBAL             45 (NULL + round)
+            758 LOAD_FAST                9 (out_path)
+            760 LOAD_ATTR               31 (NULL|self + stat)
+            780 CALL                     0
+            788 LOAD_ATTR               32 (st_size)
+            808 LOAD_CONST              10 (1048576)
+            810 BINARY_OP               11 (/)
+            814 LOAD_CONST              11 (2)
+            816 CALL                     2
+            824 STORE_FAST              12 (size_mb)
+
+ 57         826 LOAD_GLOBAL             43 (NULL + str)
+            836 LOAD_FAST                9 (out_path)
+            838 CALL                     1
+
+ 58         846 LOAD_FAST               12 (size_mb)
+            848 LOAD_CONST              12 ('already_exists')
+            850 LOAD_CONST              13 (('size_mb', 'note'))
+            852 BUILD_CONST_KEY_MAP      2
+
+ 56         854 LOAD_CONST              14 (('source', 'meta'))
+            856 BUILD_CONST_KEY_MAP      2
+            858 RETURN_VALUE
+
+ 61     >>  860 LOAD_FAST_CHECK          6 (platform)
+            862 POP_JUMP_IF_FALSE       16 (to 896)
+            864 LOAD_FAST                6 (platform)
+            866 LOAD_ATTR               47 (NULL|self + capitalize)
+            886 CALL                     0
+            894 JUMP_FORWARD             1 (to 898)
+        >>  896 LOAD_CONST              15 ('Video')
+        >>  898 STORE_FAST              13 (platform_label)
+
+ 62         900 LOAD_FAST                1 (ctx)
+            902 LOAD_ATTR               35 (NULL|self + emit_log)
+            922 LOAD_CONST              16 ('Lấy thông tin video: ')
+            924 LOAD_FAST_CHECK          5 (source_url)
+            926 FORMAT_VALUE             0
+            928 BUILD_STRING             2
+            930 CALL                     1
+            938 POP_TOP
+
+ 63         940 LOAD_FAST                1 (ctx)
+            942 LOAD_ATTR               39 (NULL|self + emit_progress)
+            962 LOAD_CONST              17 (0.05)
+            964 LOAD_CONST              18 ('Đang phân tích URL ')
+            966 LOAD_FAST               13 (platform_label)
+            968 FORMAT_VALUE             0
+            970 LOAD_CONST              19 ('…')
+            972 BUILD_STRING             3
+            974 CALL                     2
+            982 POP_TOP
+
+ 65         984 LOAD_CONST               3 (0)
+            986 LOAD_CONST              20 (('YTDLP_PLATFORMS',))
+            988 IMPORT_NAME             24 (app.services.video_service)
+            990 IMPORT_FROM             25 (YTDLP_PLATFORMS)
+            992 STORE_FAST              14 (YTDLP_PLATFORMS)
+            994 POP_TOP
+
+ 66         996 LOAD_FAST                6 (platform)
+            998 LOAD_FAST               14 (YTDLP_PLATFORMS)
+           1000 CONTAINS_OP              0
+           1002 STORE_FAST              15 (use_ytdlp)
+
+ 69        1004 LOAD_FAST               15 (use_ytdlp)
+           1006 POP_JUMP_IF_FALSE       30 (to 1068)
+
+ 70        1008 LOAD_FAST                0 (self)
+           1010 LOAD_ATTR               53 (NULL|self + _run_ytdlp)
+           1030 LOAD_FAST                1 (ctx)
+           1032 LOAD_FAST                5 (source_url)
+           1034 LOAD_FAST                9 (out_path)
+           1036 LOAD_FAST                6 (platform)
+           1038 LOAD_FAST                8 (fs)
+           1040 CALL                     5
+           1048 GET_AWAITABLE            0
+           1050 LOAD_CONST               0 (None)
+        >> 1052 SEND                     3 (to 1062)
+           1056 YIELD_VALUE              2
+           1058 RESUME                   3
+           1060 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1052)
+        >> 1062 END_SEND
+           1064 STORE_FAST              16 (info)
+           1066 JUMP_FORWARD            30 (to 1128)
+
+ 72     >> 1068 LOAD_FAST                0 (self)
+           1070 LOAD_ATTR               55 (NULL|self + _run_hybrid)
+           1090 LOAD_FAST                1 (ctx)
+           1092 LOAD_FAST                5 (source_url)
+           1094 LOAD_FAST                9 (out_path)
+           1096 LOAD_FAST                6 (platform)
+           1098 LOAD_FAST               13 (platform_label)
+           1100 LOAD_FAST                8 (fs)
+           1102 CALL                     6
+           1110 GET_AWAITABLE            0
+           1112 LOAD_CONST               0 (None)
+        >> 1114 SEND                     3 (to 1124)
+           1118 YIELD_VALUE              2
+           1120 RESUME                   3
+           1122 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1114)
+        >> 1124 END_SEND
+           1126 STORE_FAST              16 (info)
+
+ 74     >> 1128 LOAD_FAST                9 (out_path)
+           1130 LOAD_ATTR               29 (NULL|self + exists)
+           1150 CALL                     0
+           1158 POP_JUMP_IF_FALSE       39 (to 1238)
+           1160 LOAD_GLOBAL             45 (NULL + round)
+           1170 LOAD_FAST                9 (out_path)
+           1172 LOAD_ATTR               31 (NULL|self + stat)
+           1192 CALL                     0
+           1200 LOAD_ATTR               32 (st_size)
+           1220 LOAD_CONST              10 (1048576)
+           1222 BINARY_OP               11 (/)
+           1226 LOAD_CONST              11 (2)
+           1228 CALL                     2
+           1236 JUMP_FORWARD             1 (to 1240)
+        >> 1238 LOAD_CONST               3 (0)
+        >> 1240 STORE_FAST              12 (size_mb)
+
+ 76        1242 LOAD_GLOBAL             43 (NULL + str)
+           1252 LOAD_FAST                9 (out_path)
+           1254 CALL                     1
+
+ 78        1262 LOAD_FAST               12 (size_mb)
+
+ 79        1264 LOAD_FAST               16 (info)
+           1266 LOAD_ATTR                3 (NULL|self + get)
+           1286 LOAD_CONST              21 ('resolution')
+           1288 CALL                     1
+
+ 80        1296 LOAD_FAST               16 (info)
+           1298 LOAD_ATTR                3 (NULL|self + get)
+           1318 LOAD_CONST              22 ('title')
+           1320 CALL                     1
+
+ 77        1328 LOAD_CONST              23 (('size_mb', 'resolution', 'title'))
+           1330 BUILD_CONST_KEY_MAP      3
+
+ 75        1332 LOAD_CONST              14 (('source', 'meta'))
+           1334 BUILD_CONST_KEY_MAP      2
+           1336 RETURN_VALUE
+
+ 37     >> 1338 PUSH_EXC_INFO
+           1340 WITH_EXCEPT_START
+           1342 POP_JUMP_IF_TRUE         1 (to 1346)
+           1344 RERAISE                  2
+        >> 1346 POP_TOP
+           1348 POP_EXCEPT
+           1350 POP_TOP
+           1352 POP_TOP
+           1354 EXTENDED_ARG             2
+           1356 JUMP_BACKWARD          523 (to 312)
+        >> 1358 COPY                     3
+           1360 POP_EXCEPT
+           1362 RERAISE                  1
+
+ 70     >> 1364 CLEANUP_THROW
+           1366 JUMP_BACKWARD          153 (to 1062)
+
+ 72     >> 1368 CLEANUP_THROW
+           1370 JUMP_BACKWARD          124 (to 1124)
+        >> 1372 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1374 RERAISE                  1
+ExceptionTable:
+  4 to 24 -> 1372 [0] lasti
+  26 to 294 -> 1338 [1] lasti
+  296 to 1054 -> 1372 [0] lasti
+  1056 to 1056 -> 1364 [2]
+  1058 to 1116 -> 1372 [0] lasti
+  1118 to 1118 -> 1368 [2]
+  1120 to 1336 -> 1372 [0] lasti
+  1338 to 1346 -> 1358 [3] lasti
+  1348 to 1364 -> 1372 [0] lasti
+  1368 to 1368 -> 1372 [0] lasti
+
+Disassembly of <code object _run_hybrid at 0x28b788e0, file "app\pipeline\steps\download.py", line 84>:
+ 84           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 87           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('HybridVideoClient',))
+             10 IMPORT_NAME              0 (app.adapters.hybrid_client)
+             12 IMPORT_FROM              1 (HybridVideoClient)
+             14 STORE_FAST               7 (HybridVideoClient)
+             16 POP_TOP
+
+ 88          18 PUSH_NULL
+             20 LOAD_FAST                7 (HybridVideoClient)
+             22 CALL                     0
+             30 STORE_FAST               8 (client)
+
+ 89          32 NOP
+
+ 90          34 LOAD_FAST                8 (client)
+             36 LOAD_ATTR                5 (NULL|self + get_video_info)
+             56 LOAD_FAST                2 (source_url)
+             58 LOAD_FAST                4 (platform)
+             60 KW_NAMES                 3 (('platform',))
+             62 CALL                     2
+             70 GET_AWAITABLE            0
+             72 LOAD_CONST               4 (None)
+        >>   74 SEND                     3 (to 84)
+             78 YIELD_VALUE              3
+             80 RESUME                   3
+             82 JUMP_BACKWARD_NO_INTERRUPT     5 (to 74)
+        >>   84 END_SEND
+             86 STORE_FAST               9 (info)
+
+ 96          88 LOAD_FAST                9 (info)
+             90 LOAD_ATTR               17 (NULL|self + get)
+            110 LOAD_CONST               6 ('download_url')
+            112 CALL                     1
+            120 STORE_FAST              11 (play_url)
+
+ 97         122 LOAD_FAST               11 (play_url)
+            124 POP_JUMP_IF_TRUE        30 (to 186)
+
+ 98         126 LOAD_GLOBAL             11 (NULL + make_error)
+            136 LOAD_GLOBAL             12 (E)
+            146 LOAD_ATTR               14 (DOUYIN_PARSE_FAILED)
+            166 LOAD_CONST               7 ('Không lấy được URL tải ')
+            168 LOAD_FAST                5 (platform_label)
+            170 FORMAT_VALUE             0
+            172 LOAD_CONST               8 (' (video riêng tư?)')
+            174 BUILD_STRING             3
+            176 CALL                     2
+            184 RAISE_VARARGS            1
+
+100     >>  186 LOAD_FAST                0 (self)
+            188 LOAD_ATTR               19 (NULL|self + _fetch_thumbnail)
+            208 LOAD_FAST                1 (ctx)
+            210 LOAD_FAST                9 (info)
+            212 LOAD_ATTR               17 (NULL|self + get)
+            232 LOAD_CONST               9 ('cover_url')
+            234 CALL                     1
+            242 LOAD_FAST                6 (fs)
+            244 CALL                     3
+            252 GET_AWAITABLE            0
+            254 LOAD_CONST               4 (None)
+        >>  256 SEND                     3 (to 266)
+            260 YIELD_VALUE              2
+            262 RESUME                   3
+            264 JUMP_BACKWARD_NO_INTERRUPT     5 (to 256)
+        >>  266 END_SEND
+            268 STORE_FAST              12 (thumbnail_path)
+
+101         270 LOAD_FAST                0 (self)
+            272 LOAD_ATTR               21 (NULL|self + _save_meta)
+            292 LOAD_FAST                1 (ctx)
+            294 LOAD_FAST                9 (info)
+            296 LOAD_FAST               12 (thumbnail_path)
+            298 CALL                     3
+            306 POP_TOP
+
+103         308 LOAD_FAST                1 (ctx)
+            310 LOAD_ATTR               23 (NULL|self + emit_log)
+            330 LOAD_CONST              10 ('Bắt đầu tải video…')
+            332 CALL                     1
+            340 POP_TOP
+
+104         342 LOAD_FAST                0 (self)
+            344 LOAD_ATTR               25 (NULL|self + _download_stream)
+            364 LOAD_FAST                1 (ctx)
+            366 LOAD_FAST               11 (play_url)
+            368 LOAD_FAST                3 (out_path)
+            370 LOAD_FAST                4 (platform)
+            372 KW_NAMES                 3 (('platform',))
+            374 CALL                     4
+            382 GET_AWAITABLE            0
+            384 LOAD_CONST               4 (None)
+        >>  386 SEND                     3 (to 396)
+            390 YIELD_VALUE              2
+            392 RESUME                   3
+            394 JUMP_BACKWARD_NO_INTERRUPT     5 (to 386)
+        >>  396 END_SEND
+            398 POP_TOP
+
+105         400 LOAD_FAST                9 (info)
+            402 RETURN_VALUE
+
+ 90     >>  404 CLEANUP_THROW
+            406 JUMP_BACKWARD          162 (to 84)
+        >>  408 PUSH_EXC_INFO
+
+ 91         410 LOAD_GLOBAL              6 (StudioError)
+            420 CHECK_EXC_MATCH
+            422 POP_JUMP_IF_FALSE        2 (to 428)
+            424 POP_TOP
+
+ 92         426 RAISE_VARARGS            0
+
+ 93     >>  428 LOAD_GLOBAL              8 (Exception)
+            438 CHECK_EXC_MATCH
+            440 POP_JUMP_IF_FALSE       35 (to 512)
+            442 STORE_FAST              10 (e)
+
+ 94         444 LOAD_GLOBAL             11 (NULL + make_error)
+            454 LOAD_GLOBAL             12 (E)
+            464 LOAD_ATTR               14 (DOUYIN_PARSE_FAILED)
+            484 LOAD_CONST               5 ('Phân tích thất bại: ')
+            486 LOAD_FAST               10 (e)
+            488 FORMAT_VALUE             0
+            490 BUILD_STRING             2
+            492 CALL                     2
+            500 LOAD_FAST               10 (e)
+            502 RAISE_VARARGS            2
+        >>  504 LOAD_CONST               4 (None)
+            506 STORE_FAST              10 (e)
+            508 DELETE_FAST             10 (e)
+            510 RERAISE                  1
+
+ 93     >>  512 RERAISE                  0
+        >>  514 COPY                     3
+            516 POP_EXCEPT
+            518 RERAISE                  1
+
+100     >>  520 CLEANUP_THROW
+            522 JUMP_BACKWARD          129 (to 266)
+
+104     >>  524 CLEANUP_THROW
+            526 JUMP_BACKWARD           66 (to 396)
+        >>  528 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            530 RERAISE                  1
+ExceptionTable:
+  4 to 30 -> 528 [0] lasti
+  34 to 76 -> 408 [0]
+  78 to 78 -> 404 [2]
+  80 to 86 -> 408 [0]
+  88 to 258 -> 528 [0] lasti
+  260 to 260 -> 520 [2]
+  262 to 388 -> 528 [0] lasti
+  390 to 390 -> 524 [2]
+  392 to 402 -> 528 [0] lasti
+  404 to 404 -> 408 [0]
+  408 to 442 -> 514 [1] lasti
+  444 to 502 -> 504 [1] lasti
+  504 to 512 -> 514 [1] lasti
+  514 to 520 -> 528 [0] lasti
+  524 to 524 -> 528 [0] lasti
+
+Disassembly of <code object _run_ytdlp at 0x290e9f20, file "app\pipeline\steps\download.py", line 107>:
+              0 MAKE_CELL                1 (ctx)
+
+107           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+110           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('YtDlpClient',))
+             12 IMPORT_NAME              0 (app.adapters.ytdlp_client)
+             14 IMPORT_FROM              1 (YtDlpClient)
+             16 STORE_FAST               6 (YtDlpClient)
+             18 POP_TOP
+
+111          20 PUSH_NULL
+             22 LOAD_FAST                6 (YtDlpClient)
+             24 CALL                     0
+             32 STORE_FAST               7 (client)
+
+112          34 LOAD_FAST                7 (client)
+             36 LOAD_ATTR                5 (NULL|self + is_available)
+             56 CALL                     0
+             64 POP_JUMP_IF_TRUE        28 (to 122)
+
+113          66 LOAD_GLOBAL              7 (NULL + make_error)
+             76 LOAD_GLOBAL              8 (E)
+             86 LOAD_ATTR               10 (YTDLP_NOT_AVAILABLE)
+
+114         106 LOAD_CONST               3 ('Cần yt-dlp để tải YouTube/Bilibili.')
+
+115         108 LOAD_CONST               4 ('Cài bằng: pip install -U yt-dlp')
+
+113         110 KW_NAMES                 5 (('hint',))
+            112 CALL                     3
+            120 RAISE_VARARGS            1
+
+117     >>  122 LOAD_FAST                7 (client)
+            124 LOAD_ATTR               13 (NULL|self + get_info)
+            144 LOAD_FAST                2 (source_url)
+            146 LOAD_FAST                4 (platform)
+            148 KW_NAMES                 6 (('platform',))
+            150 CALL                     2
+            158 GET_AWAITABLE            0
+            160 LOAD_CONST               7 (None)
+        >>  162 SEND                     3 (to 172)
+            166 YIELD_VALUE              2
+            168 RESUME                   3
+            170 JUMP_BACKWARD_NO_INTERRUPT     5 (to 162)
+        >>  172 END_SEND
+            174 STORE_FAST               8 (info)
+
+118         176 LOAD_FAST                4 (platform)
+            178 LOAD_FAST                8 (info)
+            180 LOAD_CONST               8 ('platform')
+            182 STORE_SUBSCR
+
+120         186 LOAD_FAST                0 (self)
+            188 LOAD_ATTR               15 (NULL|self + _fetch_thumbnail)
+            208 LOAD_DEREF               1 (ctx)
+            210 LOAD_FAST                8 (info)
+            212 LOAD_ATTR               17 (NULL|self + get)
+            232 LOAD_CONST               9 ('cover_url')
+            234 CALL                     1
+            242 LOAD_FAST                5 (fs)
+            244 CALL                     3
+            252 GET_AWAITABLE            0
+            254 LOAD_CONST               7 (None)
+        >>  256 SEND                     3 (to 266)
+            260 YIELD_VALUE              2
+            262 RESUME                   3
+            264 JUMP_BACKWARD_NO_INTERRUPT     5 (to 256)
+        >>  266 END_SEND
+            268 STORE_FAST               9 (thumbnail_path)
+
+121         270 LOAD_FAST                0 (self)
+            272 LOAD_ATTR               19 (NULL|self + _save_meta)
+            292 LOAD_DEREF               1 (ctx)
+            294 LOAD_FAST                8 (info)
+            296 LOAD_FAST                9 (thumbnail_path)
+            298 CALL                     3
+            306 POP_TOP
+
+124         308 LOAD_DEREF               1 (ctx)
+            310 LOAD_ATTR               20 (config)
+            330 LOAD_ATTR               17 (NULL|self + get)
+            350 LOAD_CONST              10 ('max_height')
+            352 CALL                     1
+            360 STORE_FAST              10 (max_h)
+
+125         362 NOP
+
+126         364 LOAD_FAST               10 (max_h)
+            366 POP_JUMP_IF_FALSE       11 (to 390)
+            368 LOAD_GLOBAL             23 (NULL + int)
+            378 LOAD_FAST               10 (max_h)
+            380 CALL                     1
+            388 JUMP_FORWARD             1 (to 392)
+        >>  390 LOAD_CONST               7 (None)
+        >>  392 STORE_FAST              10 (max_h)
+
+130     >>  394 LOAD_DEREF               1 (ctx)
+            396 LOAD_ATTR               29 (NULL|self + emit_log)
+            416 LOAD_CONST              11 ('Bắt đầu tải bằng yt-dlp')
+            418 LOAD_FAST               10 (max_h)
+            420 POP_JUMP_IF_FALSE        6 (to 434)
+            422 LOAD_CONST              12 (' (≤')
+            424 LOAD_FAST               10 (max_h)
+            426 FORMAT_VALUE             0
+            428 LOAD_CONST              13 ('p)')
+            430 BUILD_STRING             3
+            432 JUMP_FORWARD             1 (to 436)
+        >>  434 LOAD_CONST              14 ('')
+        >>  436 FORMAT_VALUE             0
+            438 LOAD_CONST              15 ('…')
+            440 BUILD_STRING             3
+            442 CALL                     1
+            450 POP_TOP
+
+131         452 LOAD_FAST                7 (client)
+            454 LOAD_ATTR               31 (NULL|self + download)
+
+132         474 LOAD_FAST                2 (source_url)
+            476 LOAD_GLOBAL             33 (NULL + str)
+            486 LOAD_FAST                3 (out_path)
+            488 CALL                     1
+
+133         496 LOAD_CLOSURE             1 (ctx)
+            498 BUILD_TUPLE              1
+            500 LOAD_CONST              16 (<code object <lambda> at 0x7f6c92eebf00, file "app\pipeline\steps\download.py", line 133>)
+            502 MAKE_FUNCTION            8 (closure)
+
+134         504 LOAD_CLOSURE             1 (ctx)
+            506 BUILD_TUPLE              1
+            508 LOAD_CONST              17 (<code object <lambda> at 0x7f6c92eebd20, file "app\pipeline\steps\download.py", line 134>)
+            510 MAKE_FUNCTION            8 (closure)
+
+135         512 LOAD_FAST               10 (max_h)
+
+131         514 KW_NAMES                18 (('on_progress', 'cancel_check', 'max_height'))
+            516 CALL                     5
+            524 GET_AWAITABLE            0
+            526 LOAD_CONST               7 (None)
+        >>  528 SEND                     3 (to 538)
+            532 YIELD_VALUE              2
+            534 RESUME                   3
+            536 JUMP_BACKWARD_NO_INTERRUPT     5 (to 528)
+        >>  538 END_SEND
+            540 POP_TOP
+
+137         542 LOAD_DEREF               1 (ctx)
+            544 LOAD_ATTR               35 (NULL|self + emit_progress)
+            564 LOAD_CONST              19 (1.0)
+            566 LOAD_CONST              20 ('Tải xong')
+            568 CALL                     2
+            576 POP_TOP
+
+138         578 LOAD_FAST                8 (info)
+            580 RETURN_VALUE
+
+117     >>  582 CLEANUP_THROW
+            584 JUMP_BACKWARD          207 (to 172)
+
+120     >>  586 CLEANUP_THROW
+            588 JUMP_BACKWARD          162 (to 266)
+        >>  590 PUSH_EXC_INFO
+
+127         592 LOAD_GLOBAL             24 (TypeError)
+            602 LOAD_GLOBAL             26 (ValueError)
+            612 BUILD_TUPLE              2
+            614 CHECK_EXC_MATCH
+            616 POP_JUMP_IF_FALSE        5 (to 628)
+            618 POP_TOP
+
+128         620 LOAD_CONST               7 (None)
+            622 STORE_FAST              10 (max_h)
+            624 POP_EXCEPT
+            626 JUMP_BACKWARD          117 (to 394)
+
+127     >>  628 RERAISE                  0
+        >>  630 COPY                     3
+            632 POP_EXCEPT
+            634 RERAISE                  1
+
+131     >>  636 CLEANUP_THROW
+            638 JUMP_BACKWARD           51 (to 538)
+        >>  640 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            642 RERAISE                  1
+ExceptionTable:
+  6 to 164 -> 640 [0] lasti
+  166 to 166 -> 582 [2]
+  168 to 258 -> 640 [0] lasti
+  260 to 260 -> 586 [2]
+  262 to 360 -> 640 [0] lasti
+  364 to 392 -> 590 [0]
+  394 to 530 -> 640 [0] lasti
+  532 to 532 -> 636 [2]
+  534 to 582 -> 640 [0] lasti
+  586 to 586 -> 640 [0] lasti
+  590 to 622 -> 630 [1] lasti
+  624 to 626 -> 640 [0] lasti
+  628 to 628 -> 630 [1] lasti
+  630 to 636 -> 640 [0] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c92eebf00, file "app\pipeline\steps\download.py", line 133>:
+              0 COPY_FREE_VARS           1
+
+133           2 RESUME                   0
+              4 LOAD_DEREF               2 (ctx)
+              6 LOAD_ATTR                1 (NULL|self + emit_progress)
+             26 LOAD_FAST                0 (f)
+             28 LOAD_FAST                1 (m)
+             30 CALL                     2
+             38 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c92eebd20, file "app\pipeline\steps\download.py", line 134>:
+              0 COPY_FREE_VARS           1
+
+134           2 RESUME                   0
+              4 LOAD_DEREF               0 (ctx)
+              6 LOAD_ATTR                1 (NULL|self + is_cancelled)
+             26 CALL                     0
+             34 RETURN_VALUE
+
+Disassembly of <code object _fetch_thumbnail at 0x7f6c92996c30, file "app\pipeline\steps\download.py", line 140>:
+140           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+141           6 LOAD_FAST                2 (cover_url)
+              8 POP_JUMP_IF_TRUE         1 (to 12)
+
+142          10 RETURN_CONST             0 (None)
+
+143     >>   12 LOAD_FAST                3 (fs)
+             14 LOAD_ATTR                1 (NULL|self + thumbnail)
+             34 LOAD_FAST                1 (ctx)
+             36 LOAD_ATTR                2 (video_id)
+             56 CALL                     1
+             64 STORE_FAST               4 (tb_path)
+
+144          66 LOAD_FAST                4 (tb_path)
+             68 LOAD_ATTR                5 (NULL|self + exists)
+             88 CALL                     0
+             96 POP_JUMP_IF_FALSE       28 (to 154)
+
+145          98 LOAD_FAST                1 (ctx)
+            100 LOAD_ATTR                7 (NULL|self + emit_log)
+            120 LOAD_CONST               1 ('Cover thumbnail đã có.')
+            122 CALL                     1
+            130 POP_TOP
+
+146         132 LOAD_GLOBAL              9 (NULL + str)
+            142 LOAD_FAST                4 (tb_path)
+            144 CALL                     1
+            152 RETURN_VALUE
+
+147     >>  154 LOAD_FAST                1 (ctx)
+            156 LOAD_ATTR                7 (NULL|self + emit_log)
+            176 LOAD_CONST               2 ('Đang tải cover thumbnail…')
+            178 CALL                     1
+            186 POP_TOP
+
+148         188 LOAD_FAST                0 (self)
+            190 LOAD_ATTR               11 (NULL|self + _download_thumbnail)
+            210 LOAD_FAST                1 (ctx)
+            212 LOAD_FAST                2 (cover_url)
+            214 LOAD_FAST                4 (tb_path)
+            216 CALL                     3
+            224 GET_AWAITABLE            0
+            226 LOAD_CONST               0 (None)
+        >>  228 SEND                     3 (to 238)
+            232 YIELD_VALUE              2
+            234 RESUME                   3
+            236 JUMP_BACKWARD_NO_INTERRUPT     5 (to 228)
+        >>  238 END_SEND
+            240 POP_TOP
+
+149         242 LOAD_FAST                4 (tb_path)
+            244 LOAD_ATTR                5 (NULL|self + exists)
+            264 CALL                     0
+            272 POP_JUMP_IF_FALSE       11 (to 296)
+            274 LOAD_GLOBAL              9 (NULL + str)
+            284 LOAD_FAST                4 (tb_path)
+            286 CALL                     1
+            294 RETURN_VALUE
+        >>  296 LOAD_CONST               0 (None)
+            298 RETURN_VALUE
+
+148     >>  300 CLEANUP_THROW
+            302 JUMP_BACKWARD           33 (to 238)
+        >>  304 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            306 RERAISE                  1
+ExceptionTable:
+  4 to 230 -> 304 [0] lasti
+  232 to 232 -> 300 [2]
+  234 to 300 -> 304 [0] lasti
+
+Disassembly of <code object _download_thumbnail at 0x28b1b950, file "app\pipeline\steps\download.py", line 151>:
+151           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+152           6 LOAD_CONST               1 ('User-Agent')
+              8 LOAD_CONST               2 ('Mozilla/5.0')
+             10 BUILD_MAP                1
+             12 STORE_FAST               4 (headers)
+
+153          14 NOP
+
+154          16 LOAD_GLOBAL              1 (NULL + httpx)
+             26 LOAD_ATTR                2 (AsyncClient)
+             46 LOAD_CONST               3 (15.0)
+             48 LOAD_CONST               4 (True)
+             50 KW_NAMES                 5 (('timeout', 'follow_redirects'))
+             52 CALL                     2
+             60 BEFORE_ASYNC_WITH
+             62 GET_AWAITABLE            1
+             64 LOAD_CONST               0 (None)
+        >>   66 SEND                     3 (to 76)
+             70 YIELD_VALUE              3
+             72 RESUME                   3
+             74 JUMP_BACKWARD_NO_INTERRUPT     5 (to 66)
+        >>   76 END_SEND
+             78 STORE_FAST               5 (client)
+
+155          80 LOAD_FAST                5 (client)
+             82 LOAD_ATTR                5 (NULL|self + get)
+            102 LOAD_FAST                2 (url)
+            104 LOAD_FAST                4 (headers)
+            106 KW_NAMES                 6 (('headers',))
+            108 CALL                     2
+            116 GET_AWAITABLE            0
+            118 LOAD_CONST               0 (None)
+        >>  120 SEND                     3 (to 130)
+            124 YIELD_VALUE              4
+            126 RESUME                   3
+            128 JUMP_BACKWARD_NO_INTERRUPT     5 (to 120)
+        >>  130 END_SEND
+            132 STORE_FAST               6 (resp)
+
+156         134 LOAD_FAST                6 (resp)
+            136 LOAD_ATTR                6 (status_code)
+            156 LOAD_CONST               7 (200)
+            158 COMPARE_OP              40 (==)
+            162 POP_JUMP_IF_FALSE       45 (to 254)
+
+157         164 LOAD_FAST                3 (out_path)
+            166 LOAD_ATTR                9 (NULL|self + write_bytes)
+            186 LOAD_FAST                6 (resp)
+            188 LOAD_ATTR               10 (content)
+            208 CALL                     1
+            216 POP_TOP
+
+158         218 LOAD_FAST                1 (ctx)
+            220 LOAD_ATTR               13 (NULL|self + emit_log)
+            240 LOAD_CONST               8 ('Tải thành công cover thumbnail.')
+            242 CALL                     1
+            250 POP_TOP
+            252 JUMP_FORWARD            33 (to 320)
+
+160     >>  254 LOAD_FAST                1 (ctx)
+            256 LOAD_ATTR               13 (NULL|self + emit_log)
+            276 LOAD_CONST               9 ('Không tải được cover thumbnail (HTTP ')
+            278 LOAD_FAST                6 (resp)
+            280 LOAD_ATTR                6 (status_code)
+            300 FORMAT_VALUE             0
+            302 LOAD_CONST              10 (')')
+            304 BUILD_STRING             3
+            306 LOAD_CONST              11 ('warn')
+            308 KW_NAMES                12 (('level',))
+            310 CALL                     2
+            318 POP_TOP
+
+154     >>  320 LOAD_CONST               0 (None)
+            322 LOAD_CONST               0 (None)
+            324 LOAD_CONST               0 (None)
+            326 CALL                     2
+            334 GET_AWAITABLE            2
+            336 LOAD_CONST               0 (None)
+        >>  338 SEND                     3 (to 348)
+            342 YIELD_VALUE              3
+            344 RESUME                   3
+            346 JUMP_BACKWARD_NO_INTERRUPT     5 (to 338)
+        >>  348 END_SEND
+            350 POP_TOP
+            352 RETURN_CONST             0 (None)
+        >>  354 CLEANUP_THROW
+            356 JUMP_BACKWARD          141 (to 76)
+
+155     >>  358 CLEANUP_THROW
+            360 JUMP_BACKWARD          116 (to 130)
+
+154     >>  362 CLEANUP_THROW
+            364 JUMP_BACKWARD            9 (to 348)
+        >>  366 PUSH_EXC_INFO
+            368 WITH_EXCEPT_START
+            370 GET_AWAITABLE            2
+            372 LOAD_CONST               0 (None)
+        >>  374 SEND                     4 (to 386)
+            378 YIELD_VALUE              4
+            380 RESUME                   3
+            382 JUMP_BACKWARD_NO_INTERRUPT     5 (to 374)
+        >>  384 CLEANUP_THROW
+        >>  386 END_SEND
+            388 POP_JUMP_IF_TRUE         1 (to 392)
+            390 RERAISE                  2
+        >>  392 POP_TOP
+            394 POP_EXCEPT
+            396 POP_TOP
+            398 POP_TOP
+            400 RETURN_CONST             0 (None)
+        >>  402 COPY                     3
+            404 POP_EXCEPT
+            406 RERAISE                  1
+        >>  408 PUSH_EXC_INFO
+
+161         410 LOAD_GLOBAL             14 (Exception)
+            420 CHECK_EXC_MATCH
+            422 POP_JUMP_IF_FALSE       32 (to 488)
+            424 STORE_FAST               7 (e)
+
+162         426 LOAD_FAST                1 (ctx)
+            428 LOAD_ATTR               13 (NULL|self + emit_log)
+            448 LOAD_CONST              13 ('Lỗi tải cover thumbnail: ')
+            450 LOAD_FAST                7 (e)
+            452 FORMAT_VALUE             0
+            454 BUILD_STRING             2
+            456 LOAD_CONST              11 ('warn')
+            458 KW_NAMES                12 (('level',))
+            460 CALL                     2
+            468 POP_TOP
+            470 POP_EXCEPT
+            472 LOAD_CONST               0 (None)
+            474 STORE_FAST               7 (e)
+            476 DELETE_FAST              7 (e)
+            478 RETURN_CONST             0 (None)
+        >>  480 LOAD_CONST               0 (None)
+            482 STORE_FAST               7 (e)
+            484 DELETE_FAST              7 (e)
+            486 RERAISE                  1
+
+161     >>  488 RERAISE                  0
+        >>  490 COPY                     3
+            492 POP_EXCEPT
+            494 RERAISE                  1
+        >>  496 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            498 RERAISE                  1
+ExceptionTable:
+  4 to 12 -> 496 [0] lasti
+  16 to 68 -> 408 [0]
+  70 to 70 -> 354 [3]
+  72 to 76 -> 408 [0]
+  78 to 122 -> 366 [1] lasti
+  124 to 124 -> 358 [3]
+  126 to 318 -> 366 [1] lasti
+  320 to 340 -> 408 [0]
+  342 to 342 -> 362 [2]
+  344 to 350 -> 408 [0]
+  352 to 352 -> 496 [0] lasti
+  354 to 354 -> 408 [0]
+  358 to 358 -> 366 [1] lasti
+  362 to 362 -> 408 [0]
+  366 to 376 -> 402 [3] lasti
+  378 to 378 -> 384 [6]
+  380 to 392 -> 402 [3] lasti
+  394 to 398 -> 408 [0]
+  400 to 400 -> 496 [0] lasti
+  402 to 406 -> 408 [0]
+  408 to 424 -> 490 [1] lasti
+  426 to 468 -> 480 [1] lasti
+  470 to 478 -> 496 [0] lasti
+  480 to 488 -> 490 [1] lasti
+  490 to 494 -> 496 [0] lasti
+
+Disassembly of <code object _save_meta at 0x290b69f0, file "app\pipeline\steps\download.py", line 164>:
+164           0 RESUME                   0
+
+165           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('bus',))
+              6 IMPORT_NAME              0 (app.core.events)
+              8 IMPORT_FROM              1 (bus)
+             10 STORE_FAST               4 (bus)
+             12 POP_TOP
+
+166          14 LOAD_CONST               1 (0)
+             16 LOAD_CONST               3 (('get_settings',))
+             18 IMPORT_NAME              2 (app.config)
+             20 IMPORT_FROM              3 (get_settings)
+             22 STORE_FAST               5 (get_settings)
+             24 POP_TOP
+
+167          26 LOAD_GLOBAL              9 (NULL + SessionLocal)
+             36 CALL                     0
+             44 BEFORE_WITH
+             46 STORE_FAST               6 (db)
+
+168          48 LOAD_FAST                6 (db)
+             50 LOAD_ATTR               11 (NULL|self + get)
+             70 LOAD_GLOBAL             12 (Video)
+             80 LOAD_FAST                1 (ctx)
+             82 LOAD_ATTR               14 (video_id)
+            102 CALL                     2
+            110 STORE_FAST               7 (v)
+
+169         112 LOAD_FAST                7 (v)
+            114 EXTENDED_ARG             1
+            116 POP_JUMP_IF_FALSE      256 (to 630)
+
+170         118 LOAD_FAST                2 (info)
+            120 LOAD_ATTR               11 (NULL|self + get)
+            140 LOAD_CONST               4 ('title')
+            142 CALL                     1
+            150 COPY                     1
+            152 POP_JUMP_IF_TRUE        12 (to 178)
+            154 POP_TOP
+            156 LOAD_FAST                7 (v)
+            158 LOAD_ATTR               16 (title)
+        >>  178 LOAD_FAST                7 (v)
+            180 STORE_ATTR               8 (title)
+
+171         190 LOAD_FAST                2 (info)
+            192 LOAD_ATTR               11 (NULL|self + get)
+            212 LOAD_CONST               5 ('author')
+            214 CALL                     1
+            222 COPY                     1
+            224 POP_JUMP_IF_TRUE        12 (to 250)
+            226 POP_TOP
+            228 LOAD_FAST                7 (v)
+            230 LOAD_ATTR               18 (author)
+        >>  250 LOAD_FAST                7 (v)
+            252 STORE_ATTR               9 (author)
+
+172         262 LOAD_FAST                2 (info)
+            264 LOAD_ATTR               11 (NULL|self + get)
+            284 LOAD_CONST               6 ('duration_ms')
+            286 CALL                     1
+            294 COPY                     1
+            296 POP_JUMP_IF_TRUE        12 (to 322)
+            298 POP_TOP
+            300 LOAD_FAST                7 (v)
+            302 LOAD_ATTR               20 (duration_ms)
+        >>  322 LOAD_FAST                7 (v)
+            324 STORE_ATTR              10 (duration_ms)
+
+173         334 LOAD_FAST                2 (info)
+            336 LOAD_ATTR               11 (NULL|self + get)
+            356 LOAD_CONST               7 ('aweme_id')
+            358 CALL                     1
+            366 COPY                     1
+            368 POP_JUMP_IF_TRUE        12 (to 394)
+            370 POP_TOP
+            372 LOAD_FAST                7 (v)
+            374 LOAD_ATTR               22 (aweme_id)
+        >>  394 LOAD_FAST                7 (v)
+            396 STORE_ATTR              11 (aweme_id)
+
+174         406 LOAD_FAST                2 (info)
+            408 LOAD_ATTR               11 (NULL|self + get)
+            428 LOAD_CONST               8 ('cover_url')
+            430 CALL                     1
+            438 COPY                     1
+            440 POP_JUMP_IF_TRUE        12 (to 466)
+            442 POP_TOP
+            444 LOAD_FAST                7 (v)
+            446 LOAD_ATTR               24 (cover_url)
+        >>  466 LOAD_FAST                7 (v)
+            468 STORE_ATTR              12 (cover_url)
+
+175         478 LOAD_FAST                2 (info)
+            480 LOAD_ATTR               11 (NULL|self + get)
+            500 LOAD_CONST               9 ('platform')
+            502 CALL                     1
+            510 POP_JUMP_IF_FALSE       34 (to 580)
+            512 LOAD_FAST                7 (v)
+            514 LOAD_ATTR               26 (platform)
+            534 POP_JUMP_IF_TRUE        22 (to 580)
+
+176         536 LOAD_FAST                2 (info)
+            538 LOAD_ATTR               11 (NULL|self + get)
+            558 LOAD_CONST               9 ('platform')
+            560 CALL                     1
+            568 LOAD_FAST                7 (v)
+            570 STORE_ATTR              13 (platform)
+
+177     >>  580 LOAD_FAST                3 (thumbnail_path)
+            582 POP_JUMP_IF_FALSE        7 (to 598)
+
+178         584 LOAD_FAST                3 (thumbnail_path)
+            586 LOAD_FAST                7 (v)
+            588 STORE_ATTR              14 (thumbnail_path)
+
+179     >>  598 LOAD_FAST                6 (db)
+            600 LOAD_ATTR               31 (NULL|self + commit)
+            620 CALL                     0
+            628 POP_TOP
+
+167     >>  630 LOAD_CONST               0 (None)
+            632 LOAD_CONST               0 (None)
+            634 LOAD_CONST               0 (None)
+            636 CALL                     2
+            644 POP_TOP
+
+182     >>  646 PUSH_NULL
+            648 LOAD_FAST                5 (get_settings)
+            650 CALL                     0
+            658 STORE_FAST               8 (settings)
+
+183         660 LOAD_CONST               0 (None)
+            662 STORE_FAST               9 (thumbnail_url)
+
+184         664 LOAD_FAST                3 (thumbnail_path)
+            666 POP_JUMP_IF_FALSE       41 (to 750)
+
+185         668 LOAD_CONST              10 ('http://127.0.0.1:')
+            670 LOAD_FAST                8 (settings)
+            672 LOAD_ATTR               32 (port)
+            692 FORMAT_VALUE             0
+            694 LOAD_CONST              11 ('/api/v1/videos/')
+            696 LOAD_FAST                1 (ctx)
+            698 LOAD_ATTR               14 (video_id)
+            718 FORMAT_VALUE             0
+            720 LOAD_CONST              12 ('/preview/thumbnail?token=')
+            722 LOAD_FAST                8 (settings)
+            724 LOAD_ATTR               34 (token)
+            744 FORMAT_VALUE             0
+            746 BUILD_STRING             6
+            748 STORE_FAST               9 (thumbnail_url)
+
+187     >>  750 LOAD_FAST                4 (bus)
+            752 LOAD_ATTR               37 (NULL|self + video_meta)
+            772 LOAD_FAST                1 (ctx)
+            774 LOAD_ATTR               38 (project_id)
+            794 LOAD_FAST                1 (ctx)
+            796 LOAD_ATTR               14 (video_id)
+
+188         816 LOAD_FAST                2 (info)
+            818 LOAD_ATTR               11 (NULL|self + get)
+            838 LOAD_CONST               4 ('title')
+            840 CALL                     1
+            848 LOAD_FAST                2 (info)
+            850 LOAD_ATTR               11 (NULL|self + get)
+            870 LOAD_CONST               5 ('author')
+            872 CALL                     1
+
+189         880 LOAD_FAST                2 (info)
+            882 LOAD_ATTR               11 (NULL|self + get)
+            902 LOAD_CONST               6 ('duration_ms')
+            904 CALL                     1
+            912 LOAD_FAST                2 (info)
+            914 LOAD_ATTR               11 (NULL|self + get)
+            934 LOAD_CONST               8 ('cover_url')
+            936 CALL                     1
+
+190         944 LOAD_FAST                9 (thumbnail_url)
+
+187         946 KW_NAMES                13 (('title', 'author', 'duration_ms', 'cover_url', 'thumbnail_path'))
+            948 CALL                     7
+            956 POP_TOP
+            958 RETURN_CONST             0 (None)
+
+167     >>  960 PUSH_EXC_INFO
+            962 WITH_EXCEPT_START
+            964 POP_JUMP_IF_TRUE         1 (to 968)
+            966 RERAISE                  2
+        >>  968 POP_TOP
+            970 POP_EXCEPT
+            972 POP_TOP
+            974 POP_TOP
+            976 JUMP_BACKWARD          166 (to 646)
+        >>  978 COPY                     3
+            980 POP_EXCEPT
+            982 RERAISE                  1
+ExceptionTable:
+  46 to 628 -> 960 [1] lasti
+  960 to 968 -> 978 [3] lasti
+
+Disassembly of <code object _download_stream at 0x290e7c80, file "app\pipeline\steps\download.py", line 192>:
+192           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+194           6 LOAD_FAST                4 (platform)
+              8 LOAD_CONST               1 ('tiktok')
+             10 COMPARE_OP              40 (==)
+             14 POP_JUMP_IF_FALSE        2 (to 20)
+             16 LOAD_CONST               2 ('https://www.tiktok.com/')
+             18 JUMP_FORWARD             1 (to 22)
+        >>   20 LOAD_CONST               3 ('https://www.douyin.com/')
+        >>   22 STORE_FAST               5 (referer)
+
+195          24 LOAD_CONST               4 ('Mozilla/5.0')
+             26 LOAD_FAST                5 (referer)
+             28 LOAD_CONST               5 (('User-Agent', 'Referer'))
+             30 BUILD_CONST_KEY_MAP      2
+             32 STORE_FAST               6 (headers)
+
+196          34 LOAD_GLOBAL              1 (NULL + Path)
+             44 LOAD_FAST                3 (out_path)
+             46 CALL                     1
+             54 LOAD_ATTR                3 (NULL|self + with_suffix)
+             74 LOAD_CONST               6 ('.part')
+             76 CALL                     1
+             84 STORE_FAST               7 (tmp)
+
+197          86 LOAD_GLOBAL              5 (NULL + httpx)
+             96 LOAD_ATTR                6 (Timeout)
+            116 LOAD_GLOBAL              8 (_READ_TIMEOUT)
+            126 LOAD_GLOBAL             10 (_CONNECT_TIMEOUT)
+            136 KW_NAMES                 7 (('connect',))
+            138 CALL                     2
+            146 STORE_FAST               8 (timeout)
+
+199         148 LOAD_CONST               8 (None)
+            150 STORE_FAST               9 (last_err)
+
+200         152 LOAD_GLOBAL             13 (NULL + range)
+            162 LOAD_CONST               9 (1)
+            164 LOAD_GLOBAL             14 (_MAX_ATTEMPTS)
+            174 LOAD_CONST               9 (1)
+            176 BINARY_OP                0 (+)
+            180 CALL                     2
+            188 GET_ITER
+        >>  190 FOR_ITER               226 (to 646)
+            194 STORE_FAST              10 (attempt)
+
+201         196 LOAD_FAST                1 (ctx)
+            198 LOAD_ATTR               17 (NULL|self + is_cancelled)
+            218 CALL                     0
+            226 POP_JUMP_IF_FALSE       26 (to 280)
+
+202         228 LOAD_GLOBAL             19 (NULL + make_error)
+            238 LOAD_GLOBAL             20 (E)
+            248 LOAD_ATTR               22 (CANCELLED)
+            268 LOAD_CONST              10 ('Đã hủy khi tải')
+            270 CALL                     2
+            278 RAISE_VARARGS            1
+
+203     >>  280 NOP
+
+204         282 LOAD_FAST                0 (self)
+            284 LOAD_ATTR               25 (NULL|self + _stream_attempt)
+            304 LOAD_FAST                1 (ctx)
+            306 LOAD_FAST                2 (url)
+            308 LOAD_FAST                6 (headers)
+            310 LOAD_FAST                7 (tmp)
+            312 LOAD_FAST                8 (timeout)
+            314 LOAD_FAST               10 (attempt)
+            316 CALL                     6
+            324 GET_AWAITABLE            0
+            326 LOAD_CONST               8 (None)
+        >>  328 SEND                     3 (to 338)
+            332 YIELD_VALUE              3
+            334 RESUME                   3
+            336 JUMP_BACKWARD_NO_INTERRUPT     5 (to 328)
+        >>  338 END_SEND
+            340 STORE_FAST              11 (total)
+
+206         342 LOAD_FAST                7 (tmp)
+            344 LOAD_ATTR               27 (NULL|self + exists)
+            364 CALL                     0
+            372 POP_JUMP_IF_FALSE       26 (to 426)
+            374 LOAD_FAST                7 (tmp)
+            376 LOAD_ATTR               29 (NULL|self + stat)
+            396 CALL                     0
+            404 LOAD_ATTR               30 (st_size)
+            424 JUMP_FORWARD             1 (to 428)
+        >>  426 LOAD_CONST              11 (0)
+        >>  428 STORE_FAST              12 (got)
+
+207         430 LOAD_FAST               12 (got)
+            432 LOAD_CONST              11 (0)
+            434 COMPARE_OP              26 (<=)
+            438 POP_JUMP_IF_FALSE       26 (to 492)
+
+208         440 LOAD_GLOBAL             19 (NULL + make_error)
+            450 LOAD_GLOBAL             20 (E)
+            460 LOAD_ATTR               32 (DOWNLOAD_NETWORK)
+            480 LOAD_CONST              12 ('Tải về 0 byte')
+            482 CALL                     2
+            490 RAISE_VARARGS            1
+
+209     >>  492 LOAD_FAST               11 (total)
+            494 POP_JUMP_IF_FALSE       38 (to 572)
+            496 LOAD_FAST               12 (got)
+            498 LOAD_FAST               11 (total)
+            500 COMPARE_OP               2 (<)
+            504 POP_JUMP_IF_FALSE       33 (to 572)
+
+211         506 LOAD_GLOBAL             19 (NULL + make_error)
+            516 LOAD_GLOBAL             20 (E)
+            526 LOAD_ATTR               32 (DOWNLOAD_NETWORK)
+
+212         546 LOAD_CONST              13 ('Tải thiếu dữ liệu (')
+            548 LOAD_FAST               12 (got)
+            550 FORMAT_VALUE             0
+            552 LOAD_CONST              14 ('/')
+            554 LOAD_FAST               11 (total)
+            556 FORMAT_VALUE             0
+            558 LOAD_CONST              15 (' byte)')
+            560 BUILD_STRING             5
+
+211         562 CALL                     2
+            570 RAISE_VARARGS            1
+
+213     >>  572 LOAD_FAST                7 (tmp)
+            574 LOAD_ATTR               35 (NULL|self + replace)
+            594 LOAD_FAST                3 (out_path)
+            596 CALL                     1
+            604 POP_TOP
+
+214         606 LOAD_FAST                1 (ctx)
+            608 LOAD_ATTR               37 (NULL|self + emit_progress)
+            628 LOAD_CONST              16 (1.0)
+            630 LOAD_CONST              17 ('Tải xong')
+            632 CALL                     2
+            640 POP_TOP
+
+215         642 POP_TOP
+            644 RETURN_CONST             8 (None)
+
+200     >>  646 END_FOR
+
+239         648 LOAD_GLOBAL             61 (NULL + isinstance)
+            658 LOAD_FAST                9 (last_err)
+            660 LOAD_GLOBAL              4 (httpx)
+            670 LOAD_ATTR               42 (TimeoutException)
+            690 CALL                     2
+            698 POP_JUMP_IF_FALSE       36 (to 772)
+
+240         700 LOAD_GLOBAL             19 (NULL + make_error)
+            710 LOAD_GLOBAL             20 (E)
+            720 LOAD_ATTR               62 (DOUYIN_TIMEOUT)
+            740 LOAD_CONST              31 ('Hết thời gian chờ sau ')
+            742 LOAD_GLOBAL             14 (_MAX_ATTEMPTS)
+            752 FORMAT_VALUE             0
+            754 LOAD_CONST              32 (' lần: ')
+            756 LOAD_FAST                9 (last_err)
+            758 FORMAT_VALUE             0
+            760 BUILD_STRING             4
+            762 CALL                     2
+            770 RAISE_VARARGS            1
+
+241     >>  772 LOAD_GLOBAL             19 (NULL + make_error)
+            782 LOAD_GLOBAL             20 (E)
+            792 LOAD_ATTR               32 (DOWNLOAD_NETWORK)
+            812 LOAD_CONST              33 ('Tải thất bại sau ')
+            814 LOAD_GLOBAL             14 (_MAX_ATTEMPTS)
+            824 FORMAT_VALUE             0
+            826 LOAD_CONST              32 (' lần: ')
+            828 LOAD_FAST                9 (last_err)
+            830 FORMAT_VALUE             0
+            832 BUILD_STRING             4
+            834 CALL                     2
+            842 RAISE_VARARGS            1
+
+204     >>  844 CLEANUP_THROW
+            846 JUMP_BACKWARD          255 (to 338)
+        >>  848 PUSH_EXC_INFO
+
+216         850 LOAD_GLOBAL             38 (StudioError)
+            860 CHECK_EXC_MATCH
+            862 POP_JUMP_IF_FALSE       42 (to 948)
+            864 STORE_FAST              13 (se)
+
+217         866 LOAD_FAST               13 (se)
+            868 LOAD_ATTR               40 (code)
+            888 LOAD_GLOBAL             20 (E)
+            898 LOAD_ATTR               22 (CANCELLED)
+            918 COMPARE_OP              40 (==)
+            922 POP_JUMP_IF_FALSE        1 (to 926)
+
+218         924 RAISE_VARARGS            0
+
+219     >>  926 LOAD_FAST               13 (se)
+            928 STORE_FAST               9 (last_err)
+            930 POP_EXCEPT
+            932 LOAD_CONST               8 (None)
+            934 STORE_FAST              13 (se)
+            936 DELETE_FAST             13 (se)
+            938 JUMP_FORWARD            58 (to 1056)
+        >>  940 LOAD_CONST               8 (None)
+            942 STORE_FAST              13 (se)
+            944 DELETE_FAST             13 (se)
+            946 RERAISE                  1
+
+220     >>  948 LOAD_GLOBAL              4 (httpx)
+            958 LOAD_ATTR               42 (TimeoutException)
+            978 LOAD_GLOBAL              4 (httpx)
+            988 LOAD_ATTR               44 (HTTPError)
+           1008 LOAD_GLOBAL             46 (OSError)
+           1018 BUILD_TUPLE              3
+           1020 CHECK_EXC_MATCH
+           1022 POP_JUMP_IF_FALSE       12 (to 1048)
+           1024 STORE_FAST              14 (e)
+
+221        1026 LOAD_FAST               14 (e)
+           1028 STORE_FAST               9 (last_err)
+           1030 POP_EXCEPT
+           1032 LOAD_CONST               8 (None)
+           1034 STORE_FAST              14 (e)
+           1036 DELETE_FAST             14 (e)
+           1038 JUMP_FORWARD             8 (to 1056)
+        >> 1040 LOAD_CONST               8 (None)
+           1042 STORE_FAST              14 (e)
+           1044 DELETE_FAST             14 (e)
+           1046 RERAISE                  1
+
+220     >> 1048 RERAISE                  0
+        >> 1050 COPY                     3
+           1052 POP_EXCEPT
+           1054 RERAISE                  1
+
+224     >> 1056 LOAD_FAST               10 (attempt)
+           1058 LOAD_GLOBAL             14 (_MAX_ATTEMPTS)
+           1068 COMPARE_OP               2 (<)
+           1072 POP_JUMP_IF_TRUE         2 (to 1078)
+           1074 EXTENDED_ARG             1
+           1076 JUMP_BACKWARD          444 (to 190)
+
+225     >> 1078 LOAD_GLOBAL             49 (NULL + min)
+           1088 LOAD_GLOBAL             50 (_BACKOFF_BASE)
+           1098 LOAD_CONST              18 (2)
+           1100 LOAD_FAST               10 (attempt)
+           1102 LOAD_CONST               9 (1)
+           1104 BINARY_OP               10 (-)
+           1108 BINARY_OP                8 (**)
+           1112 BINARY_OP                5 (*)
+           1116 LOAD_CONST              19 (20.0)
+           1118 CALL                     2
+           1126 STORE_FAST              15 (delay)
+
+226        1128 LOAD_FAST                7 (tmp)
+           1130 LOAD_ATTR               27 (NULL|self + exists)
+           1150 CALL                     0
+           1158 POP_JUMP_IF_FALSE       29 (to 1218)
+           1160 LOAD_FAST                7 (tmp)
+           1162 LOAD_ATTR               29 (NULL|self + stat)
+           1182 CALL                     0
+           1190 LOAD_ATTR               30 (st_size)
+           1210 LOAD_CONST              20 (1024)
+           1212 BINARY_OP                2 (//)
+           1216 JUMP_FORWARD             1 (to 1220)
+        >> 1218 LOAD_CONST              11 (0)
+        >> 1220 STORE_FAST              16 (resume_at)
+
+227        1222 LOAD_FAST                1 (ctx)
+           1224 LOAD_ATTR               53 (NULL|self + emit_log)
+
+228        1244 LOAD_CONST              21 ('Tải lỗi (lần ')
+           1246 LOAD_FAST               10 (attempt)
+           1248 FORMAT_VALUE             0
+           1250 LOAD_CONST              14 ('/')
+           1252 LOAD_GLOBAL             14 (_MAX_ATTEMPTS)
+           1262 FORMAT_VALUE             0
+           1264 LOAD_CONST              22 ('): ')
+           1266 LOAD_FAST                9 (last_err)
+           1268 FORMAT_VALUE             0
+           1270 LOAD_CONST              23 ('. Thử lại sau ')
+
+229        1272 LOAD_FAST               15 (delay)
+           1274 LOAD_CONST              24 ('.0f')
+           1276 FORMAT_VALUE             4 (with format)
+           1278 LOAD_CONST              25 ('s (nối tiếp từ ')
+           1280 LOAD_FAST               16 (resume_at)
+           1282 FORMAT_VALUE             0
+           1284 LOAD_CONST              26 ('KB)…')
+
+228        1286 BUILD_STRING            11
+
+230        1288 LOAD_CONST              27 ('warn')
+
+227        1290 KW_NAMES                28 (('level',))
+           1292 CALL                     2
+           1300 POP_TOP
+
+233        1302 LOAD_GLOBAL             13 (NULL + range)
+           1312 LOAD_GLOBAL             55 (NULL + int)
+           1322 LOAD_FAST               15 (delay)
+           1324 LOAD_CONST              29 (4)
+           1326 BINARY_OP                5 (*)
+           1330 CALL                     1
+           1338 CALL                     1
+           1346 GET_ITER
+        >> 1348 FOR_ITER                74 (to 1500)
+           1352 STORE_FAST              17 (_)
+
+234        1354 LOAD_FAST                1 (ctx)
+           1356 LOAD_ATTR               17 (NULL|self + is_cancelled)
+           1376 CALL                     0
+           1384 POP_JUMP_IF_FALSE       26 (to 1438)
+
+235        1386 LOAD_GLOBAL             19 (NULL + make_error)
+           1396 LOAD_GLOBAL             20 (E)
+           1406 LOAD_ATTR               22 (CANCELLED)
+           1426 LOAD_CONST              10 ('Đã hủy khi tải')
+           1428 CALL                     2
+           1436 RAISE_VARARGS            1
+
+236     >> 1438 LOAD_GLOBAL             57 (NULL + asyncio)
+           1448 LOAD_ATTR               58 (sleep)
+           1468 LOAD_CONST              30 (0.25)
+           1470 CALL                     1
+           1478 GET_AWAITABLE            0
+           1480 LOAD_CONST               8 (None)
+        >> 1482 SEND                     4 (to 1494)
+           1486 YIELD_VALUE              2
+           1488 RESUME                   3
+           1490 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1482)
+        >> 1492 CLEANUP_THROW
+        >> 1494 END_SEND
+           1496 POP_TOP
+           1498 JUMP_BACKWARD           76 (to 1348)
+
+233     >> 1500 END_FOR
+           1502 EXTENDED_ARG             2
+           1504 JUMP_BACKWARD          658 (to 190)
+        >> 1506 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1508 RERAISE                  1
+ExceptionTable:
+  4 to 278 -> 1506 [0] lasti
+  282 to 330 -> 848 [1]
+  332 to 332 -> 844 [3]
+  334 to 640 -> 848 [1]
+  642 to 842 -> 1506 [0] lasti
+  844 to 844 -> 848 [1]
+  848 to 864 -> 1050 [2] lasti
+  866 to 928 -> 940 [2] lasti
+  930 to 938 -> 1506 [0] lasti
+  940 to 1024 -> 1050 [2] lasti
+  1026 to 1028 -> 1040 [2] lasti
+  1030 to 1038 -> 1506 [0] lasti
+  1040 to 1048 -> 1050 [2] lasti
+  1050 to 1072 -> 1506 [0] lasti
+  1078 to 1484 -> 1506 [0] lasti
+  1486 to 1486 -> 1492 [4]
+  1488 to 1504 -> 1506 [0] lasti
+
+Disassembly of <code object _stream_attempt at 0x26a03cd0, file "app\pipeline\steps\download.py", line 243>:
+243           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+250           6 LOAD_FAST                4 (tmp)
+              8 LOAD_ATTR                1 (NULL|self + exists)
+             28 CALL                     0
+             36 POP_JUMP_IF_FALSE       26 (to 90)
+             38 LOAD_FAST                4 (tmp)
+             40 LOAD_ATTR                3 (NULL|self + stat)
+             60 CALL                     0
+             68 LOAD_ATTR                4 (st_size)
+             88 JUMP_FORWARD             1 (to 92)
+        >>   90 LOAD_CONST               1 (0)
+        >>   92 STORE_FAST               7 (resume_from)
+
+251          94 LOAD_GLOBAL              7 (NULL + dict)
+            104 LOAD_FAST                3 (headers)
+            106 CALL                     1
+            114 STORE_FAST               8 (req_headers)
+
+252         116 LOAD_FAST                7 (resume_from)
+            118 LOAD_CONST               1 (0)
+            120 COMPARE_OP              68 (>)
+            124 POP_JUMP_IF_FALSE        9 (to 144)
+
+253         126 LOAD_CONST               2 ('bytes=')
+            128 LOAD_FAST                7 (resume_from)
+            130 FORMAT_VALUE             0
+            132 LOAD_CONST               3 ('-')
+            134 BUILD_STRING             3
+            136 LOAD_FAST                8 (req_headers)
+            138 LOAD_CONST               4 ('Range')
+            140 STORE_SUBSCR
+
+255     >>  144 LOAD_CONST               1 (0)
+            146 LOAD_CONST               5 (None)
+            148 IMPORT_NAME              4 (time)
+            150 STORE_FAST               9 (_time)
+
+256         152 LOAD_GLOBAL             11 (NULL + httpx)
+            162 LOAD_ATTR               12 (AsyncClient)
+            182 LOAD_FAST                5 (timeout)
+            184 LOAD_CONST               6 (True)
+            186 KW_NAMES                 7 (('timeout', 'follow_redirects'))
+            188 CALL                     2
+            196 BEFORE_ASYNC_WITH
+            198 GET_AWAITABLE            1
+            200 LOAD_CONST               5 (None)
+        >>  202 SEND                     3 (to 212)
+            206 YIELD_VALUE              2
+            208 RESUME                   3
+            210 JUMP_BACKWARD_NO_INTERRUPT     5 (to 202)
+        >>  212 END_SEND
+            214 STORE_FAST              10 (client)
+
+257         216 LOAD_FAST               10 (client)
+            218 LOAD_ATTR               15 (NULL|self + stream)
+            238 LOAD_CONST               8 ('GET')
+            240 LOAD_FAST                2 (url)
+            242 LOAD_FAST                8 (req_headers)
+            244 KW_NAMES                 9 (('headers',))
+            246 CALL                     3
+            254 BEFORE_ASYNC_WITH
+            256 GET_AWAITABLE            1
+            258 LOAD_CONST               5 (None)
+        >>  260 SEND                     3 (to 270)
+            264 YIELD_VALUE              3
+            266 RESUME                   3
+            268 JUMP_BACKWARD_NO_INTERRUPT     5 (to 260)
+        >>  270 END_SEND
+            272 STORE_FAST              11 (resp)
+
+258         274 LOAD_FAST               11 (resp)
+            276 LOAD_ATTR               16 (status_code)
+            296 LOAD_CONST              10 ((200, 206))
+            298 CONTAINS_OP              1
+            300 POP_JUMP_IF_FALSE       94 (to 490)
+
+259         302 LOAD_FAST               11 (resp)
+            304 LOAD_ATTR               16 (status_code)
+            324 LOAD_CONST              11 ((403, 401))
+            326 CONTAINS_OP              0
+            328 POP_JUMP_IF_FALSE       40 (to 410)
+
+260         330 LOAD_GLOBAL             19 (NULL + make_error)
+            340 LOAD_GLOBAL             20 (E)
+            350 LOAD_ATTR               22 (DOWNLOAD_NETWORK)
+            370 LOAD_CONST              12 ('HTTP ')
+            372 LOAD_FAST               11 (resp)
+            374 LOAD_ATTR               16 (status_code)
+            394 FORMAT_VALUE             0
+            396 LOAD_CONST              13 (' — link tải có thể đã hết hạn')
+            398 BUILD_STRING             3
+            400 CALL                     2
+            408 RAISE_VARARGS            1
+
+261     >>  410 LOAD_GLOBAL             19 (NULL + make_error)
+            420 LOAD_GLOBAL             20 (E)
+            430 LOAD_ATTR               22 (DOWNLOAD_NETWORK)
+            450 LOAD_CONST              12 ('HTTP ')
+            452 LOAD_FAST               11 (resp)
+            454 LOAD_ATTR               16 (status_code)
+            474 FORMAT_VALUE             0
+            476 LOAD_CONST              14 (' khi tải')
+            478 BUILD_STRING             3
+            480 CALL                     2
+            488 RAISE_VARARGS            1
+
+264     >>  490 LOAD_FAST               11 (resp)
+            492 LOAD_ATTR               16 (status_code)
+            512 LOAD_CONST              15 (206)
+            514 COMPARE_OP              40 (==)
+            518 POP_JUMP_IF_FALSE      112 (to 744)
+
+265         520 LOAD_CONST              16 ('ab')
+            522 STORE_FAST              12 (mode)
+
+266         524 LOAD_FAST                7 (resume_from)
+            526 STORE_FAST              13 (downloaded)
+
+268         528 LOAD_FAST               11 (resp)
+            530 LOAD_ATTR               24 (headers)
+            550 LOAD_ATTR               27 (NULL|self + get)
+            570 LOAD_CONST              17 ('Content-Range')
+            572 LOAD_CONST              18 ('')
+            574 CALL                     2
+            582 STORE_FAST              14 (cr)
+
+269         584 LOAD_CONST               1 (0)
+            586 STORE_FAST              15 (total)
+
+270         588 LOAD_CONST              19 ('/')
+            590 LOAD_FAST               14 (cr)
+            592 CONTAINS_OP              0
+            594 POP_JUMP_IF_FALSE       31 (to 658)
+
+271         596 NOP
+
+272         598 LOAD_GLOBAL             29 (NULL + int)
+            608 LOAD_FAST               14 (cr)
+            610 LOAD_ATTR               31 (NULL|self + rsplit)
+            630 LOAD_CONST              19 ('/')
+            632 LOAD_CONST              20 (1)
+            634 CALL                     2
+            642 LOAD_CONST              20 (1)
+            644 BINARY_SUBSCR
+            648 CALL                     1
+            656 STORE_FAST              15 (total)
+
+275     >>  658 LOAD_FAST               15 (total)
+            660 POP_JUMP_IF_TRUE       106 (to 874)
+
+276         662 LOAD_FAST                7 (resume_from)
+            664 LOAD_GLOBAL             29 (NULL + int)
+            674 LOAD_FAST               11 (resp)
+            676 LOAD_ATTR               24 (headers)
+            696 LOAD_ATTR               27 (NULL|self + get)
+            716 LOAD_CONST              21 ('Content-Length')
+            718 LOAD_CONST               1 (0)
+            720 CALL                     2
+            728 CALL                     1
+            736 BINARY_OP                0 (+)
+            740 STORE_FAST              15 (total)
+            742 JUMP_FORWARD            65 (to 874)
+
+278     >>  744 LOAD_CONST              22 ('wb')
+            746 STORE_FAST              12 (mode)
+
+279         748 LOAD_CONST               1 (0)
+            750 STORE_FAST              13 (downloaded)
+
+280         752 LOAD_GLOBAL             29 (NULL + int)
+            762 LOAD_FAST               11 (resp)
+            764 LOAD_ATTR               24 (headers)
+            784 LOAD_ATTR               27 (NULL|self + get)
+            804 LOAD_CONST              21 ('Content-Length')
+            806 LOAD_CONST               1 (0)
+            808 CALL                     2
+            816 CALL                     1
+            824 STORE_FAST              15 (total)
+
+281         826 LOAD_FAST                7 (resume_from)
+            828 LOAD_CONST               1 (0)
+            830 COMPARE_OP              68 (>)
+            834 POP_JUMP_IF_FALSE       19 (to 874)
+
+282         836 LOAD_FAST                1 (ctx)
+            838 LOAD_ATTR               35 (NULL|self + emit_log)
+            858 LOAD_CONST              23 ('Server không hỗ trợ resume — tải lại từ đầu.')
+            860 LOAD_CONST              24 ('warn')
+            862 KW_NAMES                25 (('level',))
+            864 CALL                     2
+            872 POP_TOP
+
+284     >>  874 LOAD_FAST                9 (_time)
+            876 LOAD_ATTR               37 (NULL|self + monotonic)
+            896 CALL                     0
+            904 STORE_FAST              16 (last_ui)
+
+285         906 LOAD_FAST               13 (downloaded)
+            908 STORE_FAST              17 (last_bytes)
+
+286         910 LOAD_GLOBAL             39 (NULL + open)
+            920 LOAD_FAST                4 (tmp)
+            922 LOAD_FAST               12 (mode)
+            924 CALL                     2
+            932 BEFORE_WITH
+            934 STORE_FAST              18 (f)
+
+287         936 LOAD_FAST               11 (resp)
+            938 LOAD_ATTR               41 (NULL|self + aiter_bytes)
+            958 LOAD_CONST              26 (65536)
+            960 KW_NAMES                27 (('chunk_size',))
+            962 CALL                     1
+            970 GET_AITER
+        >>  972 GET_ANEXT
+            974 LOAD_CONST               5 (None)
+        >>  976 SEND                     3 (to 986)
+            980 YIELD_VALUE              6
+            982 RESUME                   3
+            984 JUMP_BACKWARD_NO_INTERRUPT     5 (to 976)
+        >>  986 END_SEND
+            988 STORE_FAST              19 (chunk)
+
+288         990 LOAD_FAST                1 (ctx)
+            992 LOAD_ATTR               43 (NULL|self + is_cancelled)
+           1012 CALL                     0
+           1020 POP_JUMP_IF_FALSE       26 (to 1074)
+
+289        1022 LOAD_GLOBAL             19 (NULL + make_error)
+           1032 LOAD_GLOBAL             20 (E)
+           1042 LOAD_ATTR               44 (CANCELLED)
+           1062 LOAD_CONST              28 ('Đã hủy khi tải')
+           1064 CALL                     2
+           1072 RAISE_VARARGS            1
+
+290     >> 1074 LOAD_FAST               18 (f)
+           1076 LOAD_ATTR               47 (NULL|self + write)
+           1096 LOAD_FAST               19 (chunk)
+           1098 CALL                     1
+           1106 POP_TOP
+
+291        1108 LOAD_FAST               13 (downloaded)
+           1110 LOAD_GLOBAL             49 (NULL + len)
+           1120 LOAD_FAST               19 (chunk)
+           1122 CALL                     1
+           1130 BINARY_OP               13 (+=)
+           1134 STORE_FAST              13 (downloaded)
+
+292        1136 LOAD_FAST                9 (_time)
+           1138 LOAD_ATTR               37 (NULL|self + monotonic)
+           1158 CALL                     0
+           1166 STORE_FAST              20 (now)
+
+293        1168 LOAD_FAST               20 (now)
+           1170 LOAD_FAST               16 (last_ui)
+           1172 BINARY_OP               10 (-)
+           1176 LOAD_CONST              29 (0.5)
+           1178 COMPARE_OP              92 (>=)
+           1182 POP_JUMP_IF_TRUE         1 (to 1186)
+           1184 JUMP_BACKWARD          107 (to 972)
+
+294     >> 1186 LOAD_FAST               13 (downloaded)
+           1188 LOAD_FAST               17 (last_bytes)
+           1190 BINARY_OP               10 (-)
+           1194 LOAD_FAST               20 (now)
+           1196 LOAD_FAST               16 (last_ui)
+           1198 BINARY_OP               10 (-)
+           1202 BINARY_OP               11 (/)
+           1206 LOAD_CONST              30 (1024)
+           1208 BINARY_OP               11 (/)
+           1212 STORE_FAST              21 (speed)
+
+295        1214 LOAD_FAST               20 (now)
+           1216 LOAD_FAST               13 (downloaded)
+           1218 STORE_FAST              17 (last_bytes)
+           1220 STORE_FAST              16 (last_ui)
+
+296        1222 LOAD_FAST               15 (total)
+           1224 POP_JUMP_IF_FALSE       69 (to 1364)
+
+297        1226 LOAD_FAST               15 (total)
+           1228 LOAD_FAST               13 (downloaded)
+           1230 BINARY_OP               10 (-)
+           1234 LOAD_GLOBAL             51 (NULL + max)
+           1244 LOAD_FAST               21 (speed)
+           1246 LOAD_CONST              30 (1024)
+           1248 BINARY_OP                5 (*)
+           1252 LOAD_CONST              20 (1)
+           1254 CALL                     2
+           1262 BINARY_OP               11 (/)
+           1266 STORE_FAST              22 (eta)
+
+298        1268 LOAD_FAST                1 (ctx)
+           1270 LOAD_ATTR               53 (NULL|self + emit_progress)
+
+299        1290 LOAD_CONST              31 (0.05)
+           1292 LOAD_CONST              32 (0.95)
+           1294 LOAD_FAST               13 (downloaded)
+           1296 BINARY_OP                5 (*)
+           1300 LOAD_FAST               15 (total)
+           1302 BINARY_OP               11 (/)
+           1306 BINARY_OP                0 (+)
+
+300        1310 LOAD_FAST               13 (downloaded)
+           1312 LOAD_CONST              33 (1048576)
+           1314 BINARY_OP                2 (//)
+           1318 FORMAT_VALUE             0
+           1320 LOAD_CONST              34 ('MB / ')
+           1322 LOAD_FAST               15 (total)
+           1324 LOAD_CONST              33 (1048576)
+           1326 BINARY_OP                2 (//)
+           1330 FORMAT_VALUE             0
+           1332 LOAD_CONST              35 ('MB · ')
+
+301        1334 LOAD_FAST               21 (speed)
+           1336 LOAD_CONST              36 ('.0f')
+           1338 FORMAT_VALUE             4 (with format)
+           1340 LOAD_CONST              37 ('KB/s · còn ~')
+           1342 LOAD_FAST               22 (eta)
+           1344 LOAD_CONST              36 ('.0f')
+           1346 FORMAT_VALUE             4 (with format)
+           1348 LOAD_CONST              38 ('s')
+
+300        1350 BUILD_STRING             8
+
+298        1352 CALL                     2
+           1360 POP_TOP
+           1362 JUMP_BACKWARD          196 (to 972)
+
+304     >> 1364 LOAD_FAST                1 (ctx)
+           1366 LOAD_ATTR               53 (NULL|self + emit_progress)
+           1386 LOAD_CONST              29 (0.5)
+           1388 LOAD_FAST               13 (downloaded)
+           1390 LOAD_CONST              33 (1048576)
+           1392 BINARY_OP                2 (//)
+           1396 FORMAT_VALUE             0
+           1398 LOAD_CONST              35 ('MB · ')
+           1400 LOAD_FAST               21 (speed)
+           1402 LOAD_CONST              36 ('.0f')
+           1404 FORMAT_VALUE             4 (with format)
+           1406 LOAD_CONST              39 ('KB/s')
+           1408 BUILD_STRING             4
+           1410 CALL                     2
+           1418 POP_TOP
+           1420 JUMP_BACKWARD          225 (to 972)
+
+256     >> 1422 CLEANUP_THROW
+           1424 EXTENDED_ARG             2
+           1426 JUMP_BACKWARD          608 (to 212)
+
+257     >> 1428 CLEANUP_THROW
+           1430 EXTENDED_ARG             2
+           1432 JUMP_BACKWARD          582 (to 270)
+        >> 1434 PUSH_EXC_INFO
+
+273        1436 LOAD_GLOBAL             32 (ValueError)
+           1446 CHECK_EXC_MATCH
+           1448 POP_JUMP_IF_FALSE        6 (to 1462)
+           1450 POP_TOP
+
+274        1452 LOAD_CONST               1 (0)
+           1454 STORE_FAST              15 (total)
+           1456 POP_EXCEPT
+           1458 EXTENDED_ARG             1
+           1460 JUMP_BACKWARD          402 (to 658)
+
+273     >> 1462 RERAISE                  0
+        >> 1464 COPY                     3
+           1466 POP_EXCEPT
+           1468 RERAISE                  1
+
+287     >> 1470 CLEANUP_THROW
+           1472 JUMP_BACKWARD          244 (to 986)
+        >> 1474 END_ASYNC_FOR
+           1476 NOP
+
+286        1478 LOAD_CONST               5 (None)
+           1480 LOAD_CONST               5 (None)
+           1482 LOAD_CONST               5 (None)
+           1484 CALL                     2
+           1492 POP_TOP
+           1494 JUMP_FORWARD            12 (to 1520)
+        >> 1496 PUSH_EXC_INFO
+           1498 WITH_EXCEPT_START
+           1500 POP_JUMP_IF_TRUE         1 (to 1504)
+           1502 RERAISE                  2
+        >> 1504 POP_TOP
+           1506 POP_EXCEPT
+           1508 POP_TOP
+           1510 POP_TOP
+           1512 JUMP_FORWARD             3 (to 1520)
+        >> 1514 COPY                     3
+           1516 POP_EXCEPT
+           1518 RERAISE                  1
+
+305     >> 1520 LOAD_FAST               15 (total)
+
+257        1522 SWAP                     2
+           1524 LOAD_CONST               5 (None)
+           1526 LOAD_CONST               5 (None)
+           1528 LOAD_CONST               5 (None)
+           1530 CALL                     2
+           1538 GET_AWAITABLE            2
+           1540 LOAD_CONST               5 (None)
+        >> 1542 SEND                     4 (to 1554)
+           1546 YIELD_VALUE              3
+           1548 RESUME                   3
+           1550 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1542)
+        >> 1552 CLEANUP_THROW
+        >> 1554 END_SEND
+           1556 POP_TOP
+
+256        1558 SWAP                     2
+           1560 LOAD_CONST               5 (None)
+           1562 LOAD_CONST               5 (None)
+           1564 LOAD_CONST               5 (None)
+           1566 CALL                     2
+           1574 GET_AWAITABLE            2
+           1576 LOAD_CONST               5 (None)
+        >> 1578 SEND                     4 (to 1590)
+           1582 YIELD_VALUE              2
+           1584 RESUME                   3
+           1586 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1578)
+        >> 1588 CLEANUP_THROW
+        >> 1590 END_SEND
+           1592 POP_TOP
+           1594 RETURN_VALUE
+
+257     >> 1596 PUSH_EXC_INFO
+           1598 WITH_EXCEPT_START
+           1600 GET_AWAITABLE            2
+           1602 LOAD_CONST               5 (None)
+        >> 1604 SEND                     4 (to 1616)
+           1608 YIELD_VALUE              4
+           1610 RESUME                   3
+           1612 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1604)
+        >> 1614 CLEANUP_THROW
+        >> 1616 END_SEND
+           1618 POP_JUMP_IF_TRUE         1 (to 1622)
+           1620 RERAISE                  2
+        >> 1622 POP_TOP
+           1624 POP_EXCEPT
+           1626 POP_TOP
+           1628 POP_TOP
+           1630 JUMP_FORWARD             3 (to 1638)
+        >> 1632 COPY                     3
+           1634 POP_EXCEPT
+           1636 RERAISE                  1
+
+256     >> 1638 LOAD_CONST               5 (None)
+           1640 LOAD_CONST               5 (None)
+           1642 LOAD_CONST               5 (None)
+           1644 CALL                     2
+           1652 GET_AWAITABLE            2
+           1654 LOAD_CONST               5 (None)
+        >> 1656 SEND                     4 (to 1668)
+           1660 YIELD_VALUE              2
+           1662 RESUME                   3
+           1664 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1656)
+        >> 1666 CLEANUP_THROW
+        >> 1668 END_SEND
+           1670 POP_TOP
+           1672 RETURN_CONST             5 (None)
+        >> 1674 PUSH_EXC_INFO
+           1676 WITH_EXCEPT_START
+           1678 GET_AWAITABLE            2
+           1680 LOAD_CONST               5 (None)
+        >> 1682 SEND                     4 (to 1694)
+           1686 YIELD_VALUE              3
+           1688 RESUME                   3
+           1690 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1682)
+        >> 1692 CLEANUP_THROW
+        >> 1694 END_SEND
+           1696 POP_JUMP_IF_TRUE         1 (to 1700)
+           1698 RERAISE                  2
+        >> 1700 POP_TOP
+           1702 POP_EXCEPT
+           1704 POP_TOP
+           1706 POP_TOP
+           1708 RETURN_CONST             5 (None)
+        >> 1710 COPY                     3
+           1712 POP_EXCEPT
+           1714 RERAISE                  1
+        >> 1716 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1718 RERAISE                  1
+ExceptionTable:
+  4 to 204 -> 1716 [0] lasti
+  206 to 206 -> 1422 [3]
+  208 to 212 -> 1716 [0] lasti
+  214 to 262 -> 1674 [1] lasti
+  264 to 264 -> 1428 [4]
+  266 to 270 -> 1674 [1] lasti
+  272 to 594 -> 1596 [2] lasti
+  598 to 656 -> 1434 [2]
+  658 to 932 -> 1596 [2] lasti
+  934 to 970 -> 1496 [3] lasti
+  972 to 978 -> 1474 [4]
+  980 to 980 -> 1470 [6]
+  982 to 986 -> 1474 [4]
+  988 to 1182 -> 1496 [3] lasti
+  1186 to 1420 -> 1496 [3] lasti
+  1422 to 1422 -> 1716 [0] lasti
+  1428 to 1428 -> 1674 [1] lasti
+  1434 to 1454 -> 1464 [3] lasti
+  1456 to 1460 -> 1596 [2] lasti
+  1462 to 1462 -> 1464 [3] lasti
+  1464 to 1468 -> 1596 [2] lasti
+  1470 to 1470 -> 1474 [4]
+  1474 to 1474 -> 1496 [3] lasti
+  1478 to 1494 -> 1596 [2] lasti
+  1496 to 1504 -> 1514 [5] lasti
+  1506 to 1520 -> 1596 [2] lasti
+  1522 to 1544 -> 1674 [1] lasti
+  1546 to 1546 -> 1552 [4]
+  1548 to 1556 -> 1674 [1] lasti
+  1558 to 1580 -> 1716 [0] lasti
+  1582 to 1582 -> 1588 [3]
+  1584 to 1594 -> 1716 [0] lasti
+  1596 to 1606 -> 1632 [4] lasti
+  1608 to 1608 -> 1614 [7]
+  1610 to 1622 -> 1632 [4] lasti
+  1624 to 1636 -> 1674 [1] lasti
+  1638 to 1658 -> 1716 [0] lasti
+  1660 to 1660 -> 1666 [2]
+  1662 to 1672 -> 1716 [0] lasti
+  1674 to 1684 -> 1710 [3] lasti
+  1686 to 1686 -> 1692 [6]
+  1688 to 1700 -> 1710 [3] lasti
+  1702 to 1714 -> 1716 [0] lasti

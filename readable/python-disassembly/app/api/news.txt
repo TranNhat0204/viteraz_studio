@@ -1,0 +1,569 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Router API Tin tức — crawl RSS, lọc danh sách bài báo và đọc bài.')
+              4 STORE_NAME               0 (__doc__)
+
+  2           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+  4          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('APIRouter', 'Depends', 'Query', 'HTTPException'))
+             22 IMPORT_NAME              3 (fastapi)
+             24 IMPORT_FROM              4 (APIRouter)
+             26 STORE_NAME               4 (APIRouter)
+             28 IMPORT_FROM              5 (Depends)
+             30 STORE_NAME               5 (Depends)
+             32 IMPORT_FROM              6 (Query)
+             34 STORE_NAME               6 (Query)
+             36 IMPORT_FROM              7 (HTTPException)
+             38 STORE_NAME               7 (HTTPException)
+             40 POP_TOP
+
+  5          42 LOAD_CONST               1 (0)
+             44 LOAD_CONST               4 (('BaseModel',))
+             46 IMPORT_NAME              8 (pydantic)
+             48 IMPORT_FROM              9 (BaseModel)
+             50 STORE_NAME               9 (BaseModel)
+             52 POP_TOP
+
+  6          54 LOAD_CONST               1 (0)
+             56 LOAD_CONST               5 (('Session',))
+             58 IMPORT_NAME             10 (sqlalchemy.orm)
+             60 IMPORT_FROM             11 (Session)
+             62 STORE_NAME              11 (Session)
+             64 POP_TOP
+
+  8          66 LOAD_CONST               1 (0)
+             68 LOAD_CONST               6 (('verify_token', 'get_session'))
+             70 IMPORT_NAME             12 (app.deps)
+             72 IMPORT_FROM             13 (verify_token)
+             74 STORE_NAME              13 (verify_token)
+             76 IMPORT_FROM             14 (get_session)
+             78 STORE_NAME              14 (get_session)
+             80 POP_TOP
+
+  9          82 LOAD_CONST               1 (0)
+             84 LOAD_CONST               7 (('news_crawler_service',))
+             86 IMPORT_NAME             15 (app.services)
+             88 IMPORT_FROM             16 (news_crawler_service)
+             90 STORE_NAME              17 (svc)
+             92 POP_TOP
+
+ 11          94 PUSH_NULL
+             96 LOAD_NAME                4 (APIRouter)
+             98 LOAD_CONST               8 ('/api/v1/news')
+            100 LOAD_CONST               9 ('news')
+            102 BUILD_LIST               1
+            104 PUSH_NULL
+            106 LOAD_NAME                5 (Depends)
+            108 LOAD_NAME               13 (verify_token)
+            110 CALL                     1
+            118 BUILD_LIST               1
+            120 KW_NAMES                10 (('prefix', 'tags', 'dependencies'))
+            122 CALL                     3
+            130 STORE_NAME              18 (router)
+
+ 14         132 PUSH_NULL
+            134 LOAD_BUILD_CLASS
+            136 LOAD_CONST              11 (<code object CrawlNowRequest at 0x7f6c929b5c30, file "app\api\news.py", line 14>)
+            138 MAKE_FUNCTION            0
+            140 LOAD_CONST              12 ('CrawlNowRequest')
+            142 LOAD_NAME                9 (BaseModel)
+            144 CALL                     3
+            152 STORE_NAME              19 (CrawlNowRequest)
+
+ 18         154 LOAD_NAME               18 (router)
+            156 LOAD_ATTR               41 (NULL|self + post)
+            176 LOAD_CONST              13 ('/crawl-now')
+            178 CALL                     1
+
+ 21         186 PUSH_NULL
+            188 LOAD_NAME                5 (Depends)
+            190 LOAD_NAME               14 (get_session)
+            192 CALL                     1
+
+ 19         200 BUILD_TUPLE              1
+
+ 20         202 NOP
+
+ 19         204 NOP
+
+ 21         206 NOP
+
+ 19         208 LOAD_CONST              36 (('body', 'CrawlNowRequest', 'db', 'Session'))
+            210 LOAD_CONST              14 (<code object crawl_now_endpoint at 0x7f6c81b7eaf0, file "app\api\news.py", line 18>)
+            212 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 18         214 CALL                     0
+
+ 19         222 STORE_NAME              21 (crawl_now_endpoint)
+
+ 27         224 LOAD_NAME               18 (router)
+            226 LOAD_ATTR               45 (NULL|self + get)
+            246 LOAD_CONST              15 ('/articles')
+            248 CALL                     1
+
+ 29         256 PUSH_NULL
+            258 LOAD_NAME                6 (Query)
+            260 LOAD_CONST              16 (None)
+            262 LOAD_CONST              17 ('Lọc theo nguồn: bbc | guardian | nyt')
+            264 KW_NAMES                18 (('description',))
+            266 CALL                     2
+
+ 30         274 PUSH_NULL
+            276 LOAD_NAME                6 (Query)
+            278 LOAD_CONST              16 (None)
+            280 LOAD_CONST              19 ('Từ khóa tìm kiếm trong tiêu đề/tóm tắt')
+            282 KW_NAMES                18 (('description',))
+            284 CALL                     2
+
+ 31         292 PUSH_NULL
+            294 LOAD_NAME                6 (Query)
+            296 LOAD_CONST              16 (None)
+            298 LOAD_CONST              20 ('Lọc theo category')
+            300 KW_NAMES                18 (('description',))
+            302 CALL                     2
+
+ 32         310 PUSH_NULL
+            312 LOAD_NAME                6 (Query)
+            314 LOAD_CONST              21 (20)
+            316 LOAD_CONST              22 (1)
+            318 LOAD_CONST              23 (100)
+            320 KW_NAMES                24 (('ge', 'le'))
+            322 CALL                     3
+
+ 33         330 PUSH_NULL
+            332 LOAD_NAME                6 (Query)
+            334 LOAD_CONST               1 (0)
+            336 LOAD_CONST               1 (0)
+            338 KW_NAMES                25 (('ge',))
+            340 CALL                     2
+
+ 34         348 PUSH_NULL
+            350 LOAD_NAME                6 (Query)
+            352 LOAD_CONST              16 (None)
+            354 LOAD_CONST              26 ('Project ID')
+            356 KW_NAMES                18 (('description',))
+            358 CALL                     2
+
+ 35         366 PUSH_NULL
+            368 LOAD_NAME                5 (Depends)
+            370 LOAD_NAME               14 (get_session)
+            372 CALL                     1
+
+ 28         380 BUILD_TUPLE              7
+
+ 29         382 NOP
+
+ 28         384 NOP
+
+ 30         386 NOP
+
+ 28         388 NOP
+
+ 31         390 NOP
+
+ 28         392 NOP
+
+ 32         394 NOP
+
+ 28         396 NOP
+
+ 33         398 NOP
+
+ 28         400 NOP
+
+ 34         402 NOP
+
+ 28         404 NOP
+
+ 35         406 NOP
+
+ 28         408 LOAD_CONST              37 (('source', 'str | None', 'q', 'str | None', 'category', 'str | None', 'limit', 'int', 'offset', 'int', 'project_id', 'str | None', 'db', 'Session'))
+            410 LOAD_CONST              27 (<code object list_articles_endpoint at 0x7f6c92a3bcc0, file "app\api\news.py", line 27>)
+            412 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 27         414 CALL                     0
+
+ 28         422 STORE_NAME              23 (list_articles_endpoint)
+
+ 49         424 LOAD_NAME               18 (router)
+            426 LOAD_ATTR               45 (NULL|self + get)
+            446 LOAD_CONST              28 ('/topics')
+            448 CALL                     1
+
+ 51         456 PUSH_NULL
+            458 LOAD_NAME                6 (Query)
+            460 LOAD_CONST              16 (None)
+            462 LOAD_CONST              26 ('Project ID')
+            464 KW_NAMES                18 (('description',))
+            466 CALL                     2
+
+ 52         474 PUSH_NULL
+            476 LOAD_NAME                5 (Depends)
+            478 LOAD_NAME               14 (get_session)
+            480 CALL                     1
+
+ 50         488 BUILD_TUPLE              2
+
+ 51         490 NOP
+
+ 50         492 NOP
+
+ 52         494 NOP
+
+ 50         496 LOAD_CONST              38 (('project_id', 'str | None', 'db', 'Session'))
+            498 LOAD_CONST              29 (<code object list_topics_endpoint at 0x7f6c92e4c830, file "app\api\news.py", line 49>)
+            500 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 49         502 CALL                     0
+
+ 50         510 STORE_NAME              24 (list_topics_endpoint)
+
+ 59         512 LOAD_NAME               18 (router)
+            514 LOAD_ATTR               45 (NULL|self + get)
+            534 LOAD_CONST              30 ('/{article_id}/read')
+            536 CALL                     1
+
+ 62         544 PUSH_NULL
+            546 LOAD_NAME                5 (Depends)
+            548 LOAD_NAME               14 (get_session)
+            550 CALL                     1
+
+ 60         558 BUILD_TUPLE              1
+
+ 61         560 NOP
+
+ 60         562 NOP
+
+ 62         564 NOP
+
+ 60         566 LOAD_CONST              39 (('article_id', 'str', 'db', 'Session'))
+            568 LOAD_CONST              31 (<code object read_article_endpoint at 0x7f6c81c21200, file "app\api\news.py", line 59>)
+            570 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 59         572 CALL                     0
+
+ 60         580 STORE_NAME              25 (read_article_endpoint)
+
+ 71         582 PUSH_NULL
+            584 LOAD_BUILD_CLASS
+            586 LOAD_CONST              32 (<code object ImportToChannelBody at 0x7f6c92ee95c0, file "app\api\news.py", line 71>)
+            588 MAKE_FUNCTION            0
+            590 LOAD_CONST              33 ('ImportToChannelBody')
+            592 LOAD_NAME                9 (BaseModel)
+            594 CALL                     3
+            602 STORE_NAME              26 (ImportToChannelBody)
+
+ 76         604 LOAD_NAME               18 (router)
+            606 LOAD_ATTR               41 (NULL|self + post)
+            626 LOAD_CONST              34 ('/{article_id}/import')
+            628 CALL                     1
+
+ 80         636 PUSH_NULL
+            638 LOAD_NAME                5 (Depends)
+            640 LOAD_NAME               14 (get_session)
+            642 CALL                     1
+
+ 77         650 BUILD_TUPLE              1
+
+ 78         652 NOP
+
+ 77         654 NOP
+
+ 79         656 NOP
+
+ 77         658 NOP
+
+ 80         660 NOP
+
+ 77         662 LOAD_CONST              40 (('article_id', 'str', 'body', 'ImportToChannelBody', 'db', 'Session'))
+            664 LOAD_CONST              35 (<code object import_article_to_channel at 0x290ebef0, file "app\api\news.py", line 76>)
+            666 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 76         668 CALL                     0
+
+ 77         676 STORE_NAME              27 (import_article_to_channel)
+            678 RETURN_CONST            16 (None)
+
+Disassembly of <code object CrawlNowRequest at 0x7f6c929b5c30, file "app\api\news.py", line 14>:
+ 14           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('CrawlNowRequest')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 15          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('project_id')
+             18 STORE_SUBSCR
+             22 RETURN_CONST             3 (None)
+
+Disassembly of <code object crawl_now_endpoint at 0x7f6c81b7eaf0, file "app\api\news.py", line 18>:
+ 18           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 24           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (crawl_now)
+             36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (body)
+             40 LOAD_ATTR                4 (project_id)
+             60 KW_NAMES                 1 (('db', 'project_id'))
+             62 CALL                     2
+             70 GET_AWAITABLE            0
+             72 LOAD_CONST               2 (None)
+        >>   74 SEND                     3 (to 84)
+             78 YIELD_VALUE              2
+             80 RESUME                   3
+             82 JUMP_BACKWARD_NO_INTERRUPT     5 (to 74)
+        >>   84 END_SEND
+             86 RETURN_VALUE
+        >>   88 CLEANUP_THROW
+             90 JUMP_BACKWARD            4 (to 84)
+        >>   92 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             94 RERAISE                  1
+ExceptionTable:
+  4 to 76 -> 92 [0] lasti
+  78 to 78 -> 88 [2]
+  80 to 88 -> 92 [0] lasti
+
+Disassembly of <code object list_articles_endpoint at 0x7f6c92a3bcc0, file "app\api\news.py", line 27>:
+ 27           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 38           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (list_articles)
+
+ 39          36 LOAD_FAST                6 (db)
+
+ 40          38 LOAD_FAST                0 (source)
+
+ 41          40 LOAD_FAST                1 (q)
+
+ 42          42 LOAD_FAST                2 (category)
+
+ 43          44 LOAD_FAST                3 (limit)
+
+ 44          46 LOAD_FAST                4 (offset)
+
+ 45          48 LOAD_FAST                5 (project_id)
+
+ 38          50 KW_NAMES                 1 (('source', 'q', 'category', 'limit', 'offset', 'project_id'))
+             52 CALL                     7
+             60 RETURN_VALUE
+        >>   62 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             64 RERAISE                  1
+ExceptionTable:
+  4 to 60 -> 62 [0] lasti
+
+Disassembly of <code object list_topics_endpoint at 0x7f6c92e4c830, file "app\api\news.py", line 49>:
+ 49           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 55           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (list_topics)
+             36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (project_id)
+             40 KW_NAMES                 1 (('project_id',))
+             42 CALL                     2
+             50 STORE_FAST               2 (topics)
+
+ 56          52 LOAD_CONST               2 ('topics')
+             54 LOAD_FAST                2 (topics)
+             56 BUILD_MAP                1
+             58 RETURN_VALUE
+        >>   60 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             62 RERAISE                  1
+ExceptionTable:
+  4 to 58 -> 60 [0] lasti
+
+Disassembly of <code object read_article_endpoint at 0x7f6c81c21200, file "app\api\news.py", line 59>:
+ 59           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 65           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (read_article)
+             36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (article_id)
+             40 CALL                     2
+             48 GET_AWAITABLE            0
+             50 LOAD_CONST               1 (None)
+        >>   52 SEND                     3 (to 62)
+             56 YIELD_VALUE              2
+             58 RESUME                   3
+             60 JUMP_BACKWARD_NO_INTERRUPT     5 (to 52)
+        >>   62 END_SEND
+             64 STORE_FAST               2 (result)
+
+ 66          66 LOAD_FAST                2 (result)
+             68 POP_JUMP_IF_NOT_NONE    13 (to 96)
+
+ 67          70 LOAD_GLOBAL              5 (NULL + HTTPException)
+             80 LOAD_CONST               2 (404)
+             82 LOAD_CONST               3 ('Bài báo không tồn tại.')
+             84 KW_NAMES                 4 (('status_code', 'detail'))
+             86 CALL                     2
+             94 RAISE_VARARGS            1
+
+ 68     >>   96 LOAD_FAST                2 (result)
+             98 RETURN_VALUE
+
+ 65     >>  100 CLEANUP_THROW
+            102 JUMP_BACKWARD           21 (to 62)
+        >>  104 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            106 RERAISE                  1
+ExceptionTable:
+  4 to 54 -> 104 [0] lasti
+  56 to 56 -> 100 [2]
+  58 to 100 -> 104 [0] lasti
+
+Disassembly of <code object ImportToChannelBody at 0x7f6c92ee95c0, file "app\api\news.py", line 71>:
+ 71           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('ImportToChannelBody')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 72          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('project_id')
+             18 STORE_SUBSCR
+
+ 73          22 LOAD_CONST               3 ('long')
+             24 STORE_NAME               4 (format)
+             26 LOAD_CONST               4 ('str | None')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('format')
+             32 STORE_SUBSCR
+             36 RETURN_CONST             6 (None)
+
+Disassembly of <code object import_article_to_channel at 0x290ebef0, file "app\api\news.py", line 76>:
+ 76           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 87           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('NewsArticle',))
+             10 IMPORT_NAME              0 (app.db.models)
+             12 IMPORT_FROM              1 (NewsArticle)
+             14 STORE_FAST               3 (NewsArticle)
+             16 POP_TOP
+
+ 88          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('job_queue',))
+             22 IMPORT_NAME              2 (app.pipeline.queue)
+             24 IMPORT_FROM              3 (job_queue)
+             26 STORE_FAST               4 (job_queue)
+             28 POP_TOP
+
+ 91          30 LOAD_FAST                2 (db)
+             32 LOAD_ATTR                9 (NULL|self + get)
+             52 LOAD_FAST                3 (NewsArticle)
+             54 LOAD_FAST                0 (article_id)
+             56 CALL                     2
+             64 STORE_FAST               5 (article)
+
+ 92          66 LOAD_FAST                5 (article)
+             68 POP_JUMP_IF_NOT_NONE    13 (to 96)
+
+ 93          70 LOAD_GLOBAL             11 (NULL + HTTPException)
+             80 LOAD_CONST               5 (404)
+             82 LOAD_CONST               6 ('Bài báo không tồn tại.')
+             84 KW_NAMES                 7 (('status_code', 'detail'))
+             86 CALL                     2
+             94 RAISE_VARARGS            1
+
+ 94     >>   96 LOAD_FAST                5 (article)
+             98 LOAD_ATTR               12 (title_origin)
+            118 COPY                     1
+            120 POP_JUMP_IF_TRUE         2 (to 126)
+            122 POP_TOP
+            124 LOAD_CONST               8 ('Bài báo')
+        >>  126 LOAD_CONST               4 (None)
+            128 LOAD_CONST               9 (80)
+            130 BINARY_SLICE
+            132 STORE_FAST               6 (article_title)
+
+ 96         134 LOAD_FAST                4 (job_queue)
+            136 LOAD_ATTR               15 (NULL|self + enqueue_background_task)
+
+ 97         156 LOAD_CONST              10 ('news_import')
+
+ 99         158 LOAD_FAST                0 (article_id)
+
+100         160 LOAD_FAST                1 (body)
+            162 LOAD_ATTR               16 (project_id)
+
+101         182 LOAD_FAST                1 (body)
+            184 LOAD_ATTR               18 (format)
+            204 COPY                     1
+            206 POP_JUMP_IF_TRUE         2 (to 212)
+            208 POP_TOP
+            210 LOAD_CONST              11 ('long')
+
+102     >>  212 LOAD_CONST              12 ('📰 ')
+            214 LOAD_FAST                6 (article_title)
+            216 FORMAT_VALUE             0
+            218 BUILD_STRING             2
+
+ 98         220 LOAD_CONST              13 (('article_id', 'project_id', 'video_format', 'label'))
+            222 BUILD_CONST_KEY_MAP      4
+
+104         224 LOAD_CONST              14 ('news_import:')
+            226 LOAD_FAST                0 (article_id)
+            228 FORMAT_VALUE             0
+            230 LOAD_CONST              15 (':')
+            232 LOAD_FAST                1 (body)
+            234 LOAD_ATTR               16 (project_id)
+            254 FORMAT_VALUE             0
+            256 BUILD_STRING             4
+
+105         258 LOAD_CONST              16 (60)
+
+106         260 LOAD_FAST                1 (body)
+            262 LOAD_ATTR               16 (project_id)
+
+ 96         282 KW_NAMES                17 (('dedupe_key', 'priority', 'project_id'))
+            284 CALL                     5
+            292 GET_AWAITABLE            0
+            294 LOAD_CONST               4 (None)
+        >>  296 SEND                     3 (to 306)
+            300 YIELD_VALUE              2
+            302 RESUME                   3
+            304 JUMP_BACKWARD_NO_INTERRUPT     5 (to 296)
+        >>  306 END_SEND
+            308 STORE_FAST               7 (job_id)
+
+110         310 LOAD_CONST              18 ('queued')
+
+111         312 LOAD_FAST                7 (job_id)
+
+112         314 LOAD_CONST              19 ('Đã thêm vào hàng đợi. AI đang phân tích bài báo và tạo ý tưởng...')
+
+113         316 LOAD_FAST                0 (article_id)
+
+114         318 LOAD_FAST                1 (body)
+            320 LOAD_ATTR               16 (project_id)
+
+109         340 LOAD_CONST              20 (('status', 'job_id', 'message', 'article_id', 'project_id'))
+            342 BUILD_CONST_KEY_MAP      5
+            344 RETURN_VALUE
+
+ 96     >>  346 CLEANUP_THROW
+            348 JUMP_BACKWARD           22 (to 306)
+        >>  350 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            352 RERAISE                  1
+ExceptionTable:
+  4 to 298 -> 350 [0] lasti
+  300 to 300 -> 346 [2]
+  302 to 346 -> 350 [0] lasti

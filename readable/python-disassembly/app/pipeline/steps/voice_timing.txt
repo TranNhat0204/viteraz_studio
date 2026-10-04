@@ -1,0 +1,448 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Step `voice_timing` — TRÍCH XUẤT MỐC THỜI GIAN từ giọng đọc đã có.\n\nVì sao là một BƯỚC RIÊNG chứ không nằm trong `tts`:\n\nMốc câu là ĐẦU VÀO của toàn bộ phần hình — `storyboard` cắt cảnh ≤8s theo mốc câu, ảnh/clip sinh theo\ncảnh, `assemble` ghép theo cảnh. Nhưng việc lấy mốc (Whisper nghe lại chính giọng vừa đọc) lại là khâu\nhay hỏng nhất trên máy yếu: model nhỏ nghe sai tiếng Việt, CPU chậm, GPU trục trặc thất thường. Khi nó\nnằm chung trong `tts`, hỏng một lượt Whisper là phải đọc lại TOÀN BỘ voiceover mới thử lại được — mất\nvài phút và tốn quota TTS, trong khi file giọng vẫn còn nguyên trên đĩa và chẳng có gì sai với nó.\n\nTách ra thì màn hình tiến độ nói đúng chuyện đang xảy ra ("Lồng tiếng" xong, "Trích xuất Time" hỏng)\nvà user bấm chạy lại đúng một bước.\n\nKHÔNG CÓ ĐƯỜNG ƯỚC LƯỢNG. Bản trước, khi không căn được, chia timing theo tỉ lệ độ dài ký tự câu rồi\nđi tiếp và báo `success` — cả video lệch tiếng mà không ai biết. Nay hết thang thử là ném\nVOICE_TIMING_FAILED. Xem docs/plan-tach-buoc-trich-xuat-timing.md.\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 18           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 20          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('make_error', 'E'))
+             22 IMPORT_NAME              3 (app.core.errors)
+             24 IMPORT_FROM              4 (make_error)
+             26 STORE_NAME               4 (make_error)
+             28 IMPORT_FROM              5 (E)
+             30 STORE_NAME               5 (E)
+             32 POP_TOP
+
+ 21          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               4 (('ProjectFS',))
+             38 IMPORT_NAME              6 (app.core.fs)
+             40 IMPORT_FROM              7 (ProjectFS)
+             42 STORE_NAME               7 (ProjectFS)
+             44 POP_TOP
+
+ 22          46 LOAD_CONST               1 (0)
+             48 LOAD_CONST               5 (('SubtitleSegment',))
+             50 IMPORT_NAME              8 (app.db.models)
+             52 IMPORT_FROM              9 (SubtitleSegment)
+             54 STORE_NAME               9 (SubtitleSegment)
+             56 POP_TOP
+
+ 23          58 LOAD_CONST               1 (0)
+             60 LOAD_CONST               6 (('SessionLocal',))
+             62 IMPORT_NAME             10 (app.db.session)
+             64 IMPORT_FROM             11 (SessionLocal)
+             66 STORE_NAME              11 (SessionLocal)
+             68 POP_TOP
+
+ 24          70 LOAD_CONST               1 (0)
+             72 LOAD_CONST               7 (('BaseStep', 'StepContext'))
+             74 IMPORT_NAME             12 (app.pipeline.base)
+             76 IMPORT_FROM             13 (BaseStep)
+             78 STORE_NAME              13 (BaseStep)
+             80 IMPORT_FROM             14 (StepContext)
+             82 STORE_NAME              14 (StepContext)
+             84 POP_TOP
+
+ 25          86 LOAD_CONST               1 (0)
+             88 LOAD_CONST               8 (('TTSStep', '_parse_lexicon', 'apply_lexicon'))
+             90 IMPORT_NAME             15 (app.pipeline.steps.tts)
+             92 IMPORT_FROM             16 (TTSStep)
+             94 STORE_NAME              16 (TTSStep)
+             96 IMPORT_FROM             17 (_parse_lexicon)
+             98 STORE_NAME              17 (_parse_lexicon)
+            100 IMPORT_FROM             18 (apply_lexicon)
+            102 STORE_NAME              18 (apply_lexicon)
+            104 POP_TOP
+
+ 28         106 PUSH_NULL
+            108 LOAD_BUILD_CLASS
+            110 LOAD_CONST               9 (<code object VoiceTimingStep at 0x7f6c93094b70, file "app\pipeline\steps\voice_timing.py", line 28>)
+            112 MAKE_FUNCTION            0
+            114 LOAD_CONST              10 ('VoiceTimingStep')
+            116 LOAD_NAME               13 (BaseStep)
+            118 CALL                     3
+            126 STORE_NAME              19 (VoiceTimingStep)
+
+ 79         128 PUSH_NULL
+            130 LOAD_BUILD_CLASS
+            132 LOAD_CONST              11 (<code object _Row at 0x7f6c92be26b0, file "app\pipeline\steps\voice_timing.py", line 79>)
+            134 MAKE_FUNCTION            0
+            136 LOAD_CONST              12 ('_Row')
+            138 CALL                     2
+            146 STORE_NAME              20 (_Row)
+            148 RETURN_CONST            13 (None)
+
+Disassembly of <code object VoiceTimingStep at 0x7f6c93094b70, file "app\pipeline\steps\voice_timing.py", line 28>:
+ 28           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('VoiceTimingStep')
+              8 STORE_NAME               2 (__qualname__)
+
+ 29          10 LOAD_CONST               1 ('voice_timing')
+             12 STORE_NAME               3 (name)
+
+ 32          14 LOAD_CONST               2 ('GPU')
+             16 STORE_NAME               4 (resource)
+
+ 35          18 LOAD_CONST               1 ('voice_timing')
+             20 BUILD_LIST               1
+             22 STORE_NAME               5 (produces)
+
+ 37          24 LOAD_CONST               5 (('ctx', 'StepContext', 'return', 'dict'))
+             26 LOAD_CONST               3 (<code object run at 0x28b1d120, file "app\pipeline\steps\voice_timing.py", line 37>)
+             28 MAKE_FUNCTION            4 (annotations)
+             30 STORE_NAME               6 (run)
+             32 RETURN_CONST             4 (None)
+
+Disassembly of <code object run at 0x28b1d120, file "app\pipeline\steps\voice_timing.py", line 37>:
+              0 MAKE_CELL                1 (ctx)
+
+ 37           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+ 38           8 LOAD_GLOBAL              1 (NULL + ProjectFS)
+             18 LOAD_DEREF               1 (ctx)
+             20 LOAD_ATTR                2 (workdir)
+             40 CALL                     1
+             48 STORE_FAST               2 (fs)
+
+ 39          50 LOAD_FAST                2 (fs)
+             52 LOAD_ATTR                5 (NULL|self + voiceover)
+             72 LOAD_DEREF               1 (ctx)
+             74 LOAD_ATTR                6 (video_id)
+             94 CALL                     1
+            102 STORE_FAST               3 (voiceover)
+
+ 40         104 LOAD_FAST                3 (voiceover)
+            106 LOAD_ATTR                9 (NULL|self + exists)
+            126 CALL                     0
+            134 POP_JUMP_IF_TRUE        28 (to 192)
+
+ 41         136 LOAD_GLOBAL             11 (NULL + make_error)
+
+ 42         146 LOAD_GLOBAL             12 (E)
+            156 LOAD_ATTR               14 (PRECONDITION_MISSING)
+
+ 43         176 LOAD_CONST               1 ('Chưa có file giọng đọc để trích mốc thời gian. Hãy chạy bước Lồng tiếng trước.')
+
+ 44         178 LOAD_CONST               2 ('Chạy step tts trước.')
+
+ 41         180 KW_NAMES                 3 (('hint',))
+            182 CALL                     3
+            190 RAISE_VARARGS            1
+
+ 46     >>  192 LOAD_DEREF               1 (ctx)
+            194 LOAD_ATTR               16 (config)
+            214 LOAD_ATTR               19 (NULL|self + get)
+            234 LOAD_CONST               4 ('dst_lang')
+            236 CALL                     1
+            244 COPY                     1
+            246 POP_JUMP_IF_TRUE         2 (to 252)
+            248 POP_TOP
+            250 LOAD_CONST               5 ('vi')
+        >>  252 LOAD_ATTR               21 (NULL|self + lower)
+            272 CALL                     0
+            280 STORE_FAST               4 (dst_lang)
+
+ 47         282 LOAD_GLOBAL             23 (NULL + _parse_lexicon)
+            292 LOAD_DEREF               1 (ctx)
+            294 LOAD_ATTR               16 (config)
+            314 LOAD_ATTR               19 (NULL|self + get)
+            334 LOAD_CONST               6 ('pronunciations')
+            336 CALL                     1
+            344 COPY                     1
+            346 POP_JUMP_IF_TRUE        27 (to 402)
+            348 POP_TOP
+            350 LOAD_DEREF               1 (ctx)
+            352 LOAD_ATTR               16 (config)
+            372 LOAD_ATTR               19 (NULL|self + get)
+            392 LOAD_CONST               7 ('lexicon')
+            394 CALL                     1
+        >>  402 CALL                     1
+            410 STORE_FAST               5 (lexicon)
+
+ 51         412 LOAD_CLOSURE             1 (ctx)
+            414 BUILD_TUPLE              1
+            416 LOAD_CONST               8 (<code object _q at 0x7f6c81b0adb0, file "app\pipeline\steps\voice_timing.py", line 51>)
+            418 MAKE_FUNCTION            8 (closure)
+            420 STORE_FAST               6 (_q)
+
+ 57         422 LOAD_GLOBAL             25 (NULL + SessionLocal)
+            432 CALL                     0
+            440 BEFORE_WITH
+            442 STORE_FAST               7 (db)
+
+ 58         444 PUSH_NULL
+            446 LOAD_FAST                6 (_q)
+            448 LOAD_FAST                7 (db)
+            450 LOAD_CONST               9 ('translated')
+            452 CALL                     2
+            460 COPY                     1
+            462 POP_JUMP_IF_TRUE         9 (to 482)
+            464 POP_TOP
+            466 PUSH_NULL
+            468 LOAD_FAST                6 (_q)
+            470 LOAD_FAST                7 (db)
+            472 LOAD_CONST              10 ('original')
+            474 CALL                     2
+        >>  482 STORE_FAST               8 (rows)
+
+ 61         484 LOAD_FAST                8 (rows)
+            486 GET_ITER
+            488 LOAD_FAST_AND_CLEAR      9 (r)
+            490 SWAP                     2
+            492 BUILD_LIST               0
+            494 SWAP                     2
+        >>  496 FOR_ITER                56 (to 612)
+            500 STORE_FAST               9 (r)
+            502 LOAD_GLOBAL             27 (NULL + _Row)
+            512 LOAD_FAST                9 (r)
+            514 LOAD_ATTR               28 (id)
+            534 LOAD_FAST                9 (r)
+            536 LOAD_ATTR               30 (seq)
+            556 LOAD_FAST                9 (r)
+            558 LOAD_ATTR               32 (kind)
+            578 LOAD_FAST                9 (r)
+            580 LOAD_ATTR               34 (text)
+            600 CALL                     4
+            608 LIST_APPEND              2
+            610 JUMP_BACKWARD           58 (to 496)
+        >>  612 END_FOR
+            614 STORE_FAST               8 (rows)
+            616 STORE_FAST               9 (r)
+
+ 57         618 LOAD_CONST               0 (None)
+            620 LOAD_CONST               0 (None)
+            622 LOAD_CONST               0 (None)
+            624 CALL                     2
+            632 POP_TOP
+
+ 63     >>  634 LOAD_FAST_CHECK          8 (rows)
+            636 POP_JUMP_IF_TRUE        26 (to 690)
+
+ 64         638 LOAD_GLOBAL             11 (NULL + make_error)
+
+ 65         648 LOAD_GLOBAL             12 (E)
+            658 LOAD_ATTR               14 (PRECONDITION_MISSING)
+
+ 66         678 LOAD_CONST              11 ('Không tìm thấy phụ đề để căn theo giọng. Hãy chạy lại bước Kịch bản/Lồng tiếng.')
+
+ 64         680 CALL                     2
+            688 RAISE_VARARGS            1
+
+ 68     >>  690 LOAD_FAST                8 (rows)
+            692 LOAD_CONST              12 (0)
+            694 BINARY_SUBSCR
+            698 LOAD_ATTR               32 (kind)
+            718 COPY                     1
+            720 POP_JUMP_IF_TRUE         2 (to 726)
+            722 POP_TOP
+            724 LOAD_CONST              10 ('original')
+        >>  726 STORE_FAST              10 (seg_kind)
+
+ 71         728 LOAD_FAST                8 (rows)
+            730 GET_ITER
+            732 LOAD_FAST_AND_CLEAR      9 (r)
+            734 SWAP                     2
+            736 BUILD_LIST               0
+            738 SWAP                     2
+        >>  740 FOR_ITER                55 (to 854)
+            744 STORE_FAST               9 (r)
+            746 LOAD_FAST                9 (r)
+            748 LOAD_ATTR               28 (id)
+            768 LOAD_GLOBAL             37 (NULL + apply_lexicon)
+            778 LOAD_FAST                9 (r)
+            780 LOAD_ATTR               34 (text)
+            800 COPY                     1
+            802 POP_JUMP_IF_TRUE         2 (to 808)
+            804 POP_TOP
+            806 LOAD_CONST              13 ('')
+        >>  808 LOAD_ATTR               39 (NULL|self + strip)
+            828 CALL                     0
+            836 LOAD_FAST                5 (lexicon)
+            838 LOAD_FAST                4 (dst_lang)
+            840 CALL                     3
+            848 BUILD_TUPLE              2
+            850 LIST_APPEND              2
+            852 JUMP_BACKWARD           57 (to 740)
+        >>  854 END_FOR
+            856 STORE_FAST              11 (sentences)
+            858 STORE_FAST               9 (r)
+
+ 73         860 LOAD_DEREF               1 (ctx)
+            862 LOAD_ATTR               41 (NULL|self + emit_progress)
+            882 LOAD_CONST              14 (0.05)
+            884 LOAD_CONST              15 ('Trích mốc thời gian cho ')
+            886 LOAD_GLOBAL             43 (NULL + len)
+            896 LOAD_FAST                8 (rows)
+            898 CALL                     1
+            906 FORMAT_VALUE             0
+            908 LOAD_CONST              16 (' câu từ giọng đã đọc…')
+            910 BUILD_STRING             3
+            912 CALL                     2
+            920 POP_TOP
+
+ 74         922 LOAD_GLOBAL             45 (NULL + TTSStep)
+            932 CALL                     0
+            940 LOAD_ATTR               47 (NULL|self + extract_voice_timing)
+            960 LOAD_DEREF               1 (ctx)
+            962 LOAD_FAST                2 (fs)
+            964 LOAD_FAST                8 (rows)
+            966 LOAD_FAST               11 (sentences)
+            968 LOAD_FAST               10 (seg_kind)
+            970 LOAD_FAST                4 (dst_lang)
+            972 CALL                     6
+            980 GET_AWAITABLE            0
+            982 LOAD_CONST               0 (None)
+        >>  984 SEND                     3 (to 994)
+            988 YIELD_VALUE              2
+            990 RESUME                   3
+            992 JUMP_BACKWARD_NO_INTERRUPT     5 (to 984)
+        >>  994 END_SEND
+            996 STORE_FAST              12 (n)
+
+ 75         998 LOAD_DEREF               1 (ctx)
+           1000 LOAD_ATTR               41 (NULL|self + emit_progress)
+           1020 LOAD_CONST              17 (1.0)
+           1022 LOAD_CONST              18 ('Xong mốc thời gian ')
+           1024 LOAD_FAST               12 (n)
+           1026 FORMAT_VALUE             0
+           1028 LOAD_CONST              19 (' câu.')
+           1030 BUILD_STRING             3
+           1032 CALL                     2
+           1040 POP_TOP
+
+ 76        1042 LOAD_CONST              20 ('voice_timing')
+           1044 LOAD_GLOBAL             49 (NULL + str)
+           1054 LOAD_FAST                2 (fs)
+           1056 LOAD_ATTR               51 (NULL|self + subtitle_words)
+           1076 LOAD_DEREF               1 (ctx)
+           1078 LOAD_ATTR                6 (video_id)
+           1098 CALL                     1
+           1106 LOAD_ATTR               53 (NULL|self + resolve)
+           1126 CALL                     0
+           1134 CALL                     1
+           1142 BUILD_MAP                1
+           1144 RETURN_VALUE
+        >> 1146 SWAP                     2
+           1148 POP_TOP
+
+ 61        1150 SWAP                     2
+           1152 STORE_FAST               9 (r)
+           1154 RERAISE                  0
+
+ 57     >> 1156 PUSH_EXC_INFO
+           1158 WITH_EXCEPT_START
+           1160 POP_JUMP_IF_TRUE         1 (to 1164)
+           1162 RERAISE                  2
+        >> 1164 POP_TOP
+           1166 POP_EXCEPT
+           1168 POP_TOP
+           1170 POP_TOP
+           1172 EXTENDED_ARG             1
+           1174 JUMP_BACKWARD          271 (to 634)
+        >> 1176 COPY                     3
+           1178 POP_EXCEPT
+           1180 RERAISE                  1
+        >> 1182 SWAP                     2
+           1184 POP_TOP
+
+ 71        1186 SWAP                     2
+           1188 STORE_FAST               9 (r)
+           1190 RERAISE                  0
+
+ 74     >> 1192 CLEANUP_THROW
+           1194 JUMP_BACKWARD          101 (to 994)
+        >> 1196 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1198 RERAISE                  1
+ExceptionTable:
+  6 to 440 -> 1196 [0] lasti
+  442 to 490 -> 1156 [1] lasti
+  492 to 612 -> 1146 [3]
+  614 to 616 -> 1156 [1] lasti
+  618 to 734 -> 1196 [0] lasti
+  736 to 854 -> 1182 [2]
+  856 to 986 -> 1196 [0] lasti
+  988 to 988 -> 1192 [2]
+  990 to 1144 -> 1196 [0] lasti
+  1146 to 1154 -> 1156 [1] lasti
+  1156 to 1164 -> 1176 [3] lasti
+  1166 to 1192 -> 1196 [0] lasti
+
+Disassembly of <code object _q at 0x7f6c81b0adb0, file "app\pipeline\steps\voice_timing.py", line 51>:
+              0 COPY_FREE_VARS           1
+
+ 51           2 RESUME                   0
+
+ 52           4 LOAD_FAST                0 (db)
+              6 LOAD_ATTR                1 (NULL|self + query)
+             26 LOAD_GLOBAL              2 (SubtitleSegment)
+             36 CALL                     1
+
+ 53          44 LOAD_ATTR                5 (NULL|self + filter)
+             64 LOAD_GLOBAL              2 (SubtitleSegment)
+             74 LOAD_ATTR                6 (video_id)
+             94 LOAD_DEREF               2 (ctx)
+             96 LOAD_ATTR                6 (video_id)
+            116 COMPARE_OP              40 (==)
+
+ 54         120 LOAD_GLOBAL              2 (SubtitleSegment)
+            130 LOAD_ATTR                8 (kind)
+            150 LOAD_FAST                1 (kind)
+            152 COMPARE_OP              40 (==)
+
+ 53         156 CALL                     2
+
+ 55         164 LOAD_ATTR               11 (NULL|self + order_by)
+            184 LOAD_GLOBAL              2 (SubtitleSegment)
+            194 LOAD_ATTR               12 (seq)
+            214 CALL                     1
+            222 LOAD_ATTR               15 (NULL|self + all)
+            242 CALL                     0
+
+ 52         250 RETURN_VALUE
+
+Disassembly of <code object _Row at 0x7f6c92be26b0, file "app\pipeline\steps\voice_timing.py", line 79>:
+ 79           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('_Row')
+              8 STORE_NAME               2 (__qualname__)
+
+ 80          10 LOAD_CONST               1 ('Bản chụp gọn của SubtitleSegment (id/seq/kind/text) — dùng sau khi session đã đóng.')
+             12 STORE_NAME               3 (__doc__)
+
+ 82          14 LOAD_CONST               2 (('id', 'seq', 'kind', 'text'))
+             16 STORE_NAME               4 (__slots__)
+
+ 84          18 LOAD_CONST               3 (<code object __init__ at 0x7f6c930b9ce0, file "app\pipeline\steps\voice_timing.py", line 84>)
+             20 MAKE_FUNCTION            0
+             22 STORE_NAME               5 (__init__)
+             24 RETURN_CONST             4 (None)
+
+Disassembly of <code object __init__ at 0x7f6c930b9ce0, file "app\pipeline\steps\voice_timing.py", line 84>:
+ 84           0 RESUME                   0
+
+ 85           2 LOAD_FAST                1 (id_)
+              4 LOAD_FAST                2 (seq)
+              6 LOAD_FAST                3 (kind)
+              8 LOAD_FAST                4 (text)
+             10 BUILD_TUPLE              4
+             12 UNPACK_SEQUENCE          4
+             16 LOAD_FAST                0 (self)
+             18 STORE_ATTR               0 (id)
+             28 LOAD_FAST                0 (self)
+             30 STORE_ATTR               1 (seq)
+             40 LOAD_FAST                0 (self)
+             42 STORE_ATTR               2 (kind)
+             52 LOAD_FAST                0 (self)
+             54 STORE_ATTR               3 (text)
+             64 RETURN_CONST             0 (None)

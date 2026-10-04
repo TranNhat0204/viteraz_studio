@@ -1,0 +1,233 @@
+  0           0 RESUME                   0
+
+  1           2 SETUP_ANNOTATIONS
+              4 LOAD_CONST               0 ('Mã hoá bí mật (token FB, secret) — fail-closed như LoHa safeStorage.\n\n- Dùng Fernet (cryptography) với key đọc từ env FB_SECRET_KEY; nếu thiếu → tạo key mới\n  lưu `data_dir/fb_secret.key` (0451 perms). KHÔNG BAO GIỜ lưu plaintext token.\n- encrypt failure → raise ngay (không im lặng ghi plaintext).\n')
+              6 STORE_NAME               0 (__doc__)
+
+  7           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('annotations',))
+             12 IMPORT_NAME              1 (__future__)
+             14 IMPORT_FROM              2 (annotations)
+             16 STORE_NAME               2 (annotations)
+             18 POP_TOP
+
+  9          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               3 (None)
+             24 IMPORT_NAME              3 (os)
+             26 STORE_NAME               3 (os)
+
+ 10          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               4 (('Path',))
+             32 IMPORT_NAME              4 (pathlib)
+             34 IMPORT_FROM              5 (Path)
+             36 STORE_NAME               5 (Path)
+             38 POP_TOP
+
+ 12          40 LOAD_CONST               1 (0)
+             42 LOAD_CONST               5 (('Fernet', 'InvalidToken'))
+             44 IMPORT_NAME              6 (cryptography.fernet)
+             46 IMPORT_FROM              7 (Fernet)
+             48 STORE_NAME               7 (Fernet)
+             50 IMPORT_FROM              8 (InvalidToken)
+             52 STORE_NAME               8 (InvalidToken)
+             54 POP_TOP
+
+ 14          56 LOAD_CONST               1 (0)
+             58 LOAD_CONST               6 (('get_settings',))
+             60 IMPORT_NAME              9 (app.config)
+             62 IMPORT_FROM             10 (get_settings)
+             64 STORE_NAME              10 (get_settings)
+             66 POP_TOP
+
+ 16          68 LOAD_CONST               3 (None)
+             70 STORE_GLOBAL            11 (_fernet)
+             72 LOAD_CONST               7 ('Fernet | None')
+             74 LOAD_NAME               12 (__annotations__)
+             76 LOAD_CONST               8 ('_fernet')
+             78 STORE_SUBSCR
+
+ 19          82 LOAD_CONST              12 (('return', 'Fernet'))
+             84 LOAD_CONST               9 (<code object _get_fernet at 0x28c15e60, file "app\services\fb_crypto.py", line 19>)
+             86 MAKE_FUNCTION            4 (annotations)
+             88 STORE_NAME              13 (_get_fernet)
+
+ 42          90 LOAD_CONST              13 (('plain', 'str', 'return', 'str'))
+             92 LOAD_CONST              10 (<code object encrypt_secret at 0x7f6c92692470, file "app\services\fb_crypto.py", line 42>)
+             94 MAKE_FUNCTION            4 (annotations)
+             96 STORE_NAME              14 (encrypt_secret)
+
+ 49          98 LOAD_CONST              14 (('cipher', 'str', 'return', 'str'))
+            100 LOAD_CONST              11 (<code object decrypt_secret at 0x7f6c926aeb50, file "app\services\fb_crypto.py", line 49>)
+            102 MAKE_FUNCTION            4 (annotations)
+            104 STORE_NAME              15 (decrypt_secret)
+            106 RETURN_CONST             3 (None)
+
+Disassembly of <code object _get_fernet at 0x28c15e60, file "app\services\fb_crypto.py", line 19>:
+ 19           0 RESUME                   0
+
+ 21           2 LOAD_GLOBAL              0 (_fernet)
+             12 POP_JUMP_IF_NONE         6 (to 26)
+
+ 22          14 LOAD_GLOBAL              0 (_fernet)
+             24 RETURN_VALUE
+
+ 23     >>   26 LOAD_GLOBAL              2 (os)
+             36 LOAD_ATTR                4 (environ)
+             56 LOAD_ATTR                7 (NULL|self + get)
+             76 LOAD_CONST               1 ('FB_SECRET_KEY')
+             78 CALL                     1
+             86 STORE_FAST               0 (key)
+
+ 24          88 LOAD_FAST                0 (key)
+             90 POP_JUMP_IF_FALSE       31 (to 154)
+
+ 25          92 LOAD_GLOBAL              9 (NULL + Fernet)
+            102 LOAD_FAST                0 (key)
+            104 LOAD_ATTR               11 (NULL|self + encode)
+            124 CALL                     0
+            132 CALL                     1
+            140 STORE_GLOBAL             0 (_fernet)
+
+ 26         142 LOAD_GLOBAL              0 (_fernet)
+            152 RETURN_VALUE
+
+ 27     >>  154 LOAD_GLOBAL             13 (NULL + get_settings)
+            164 CALL                     0
+            172 STORE_FAST               1 (settings)
+
+ 28         174 LOAD_GLOBAL             15 (NULL + Path)
+            184 LOAD_FAST                1 (settings)
+            186 LOAD_ATTR               16 (data_dir)
+            206 CALL                     1
+            214 LOAD_CONST               2 ('fb_secret.key')
+            216 BINARY_OP               11 (/)
+            220 STORE_FAST               2 (key_path)
+
+ 29         222 LOAD_FAST                2 (key_path)
+            224 LOAD_ATTR               19 (NULL|self + exists)
+            244 CALL                     0
+            252 POP_JUMP_IF_FALSE       31 (to 316)
+
+ 30         254 LOAD_FAST                2 (key_path)
+            256 LOAD_ATTR               21 (NULL|self + read_text)
+            276 CALL                     0
+            284 LOAD_ATTR               23 (NULL|self + strip)
+            304 CALL                     0
+            312 STORE_FAST               0 (key)
+            314 JUMP_FORWARD            74 (to 464)
+
+ 32     >>  316 LOAD_GLOBAL              9 (NULL + Fernet)
+            326 LOAD_ATTR               24 (generate_key)
+            346 CALL                     0
+            354 LOAD_ATTR               27 (NULL|self + decode)
+            374 CALL                     0
+            382 STORE_FAST               0 (key)
+
+ 33         384 LOAD_FAST                2 (key_path)
+            386 LOAD_ATTR               29 (NULL|self + write_text)
+            406 LOAD_FAST                0 (key)
+            408 CALL                     1
+            416 POP_TOP
+
+ 34         418 NOP
+
+ 35         420 LOAD_GLOBAL              3 (NULL + os)
+            430 LOAD_ATTR               30 (chmod)
+            450 LOAD_FAST                2 (key_path)
+            452 LOAD_CONST               3 (384)
+            454 CALL                     2
+            462 POP_TOP
+
+ 38     >>  464 LOAD_GLOBAL              9 (NULL + Fernet)
+            474 LOAD_FAST                0 (key)
+            476 LOAD_ATTR               11 (NULL|self + encode)
+            496 CALL                     0
+            504 CALL                     1
+            512 STORE_GLOBAL             0 (_fernet)
+
+ 39         514 LOAD_GLOBAL              0 (_fernet)
+            524 RETURN_VALUE
+        >>  526 PUSH_EXC_INFO
+
+ 36         528 LOAD_GLOBAL             32 (OSError)
+            538 CHECK_EXC_MATCH
+            540 POP_JUMP_IF_FALSE        3 (to 548)
+            542 POP_TOP
+
+ 37         544 POP_EXCEPT
+            546 JUMP_BACKWARD           42 (to 464)
+
+ 36     >>  548 RERAISE                  0
+        >>  550 COPY                     3
+            552 POP_EXCEPT
+            554 RERAISE                  1
+ExceptionTable:
+  420 to 462 -> 526 [0]
+  526 to 542 -> 550 [1] lasti
+  548 to 548 -> 550 [1] lasti
+
+Disassembly of <code object encrypt_secret at 0x7f6c92692470, file "app\services\fb_crypto.py", line 42>:
+ 42           0 RESUME                   0
+
+ 44           2 LOAD_FAST                0 (plain)
+              4 POP_JUMP_IF_TRUE         1 (to 8)
+
+ 45           6 RETURN_CONST             1 ('')
+
+ 46     >>    8 LOAD_GLOBAL              1 (NULL + _get_fernet)
+             18 CALL                     0
+             26 LOAD_ATTR                3 (NULL|self + encrypt)
+             46 LOAD_FAST                0 (plain)
+             48 LOAD_ATTR                5 (NULL|self + encode)
+             68 CALL                     0
+             76 CALL                     1
+             84 LOAD_ATTR                7 (NULL|self + decode)
+            104 CALL                     0
+            112 RETURN_VALUE
+
+Disassembly of <code object decrypt_secret at 0x7f6c926aeb50, file "app\services\fb_crypto.py", line 49>:
+ 49           0 RESUME                   0
+
+ 51           2 LOAD_FAST                0 (cipher)
+              4 POP_JUMP_IF_TRUE         1 (to 8)
+
+ 52           6 RETURN_CONST             1 ('')
+
+ 53     >>    8 NOP
+
+ 54          10 LOAD_GLOBAL              1 (NULL + _get_fernet)
+             20 CALL                     0
+             28 LOAD_ATTR                3 (NULL|self + decrypt)
+             48 LOAD_FAST                0 (cipher)
+             50 LOAD_ATTR                5 (NULL|self + encode)
+             70 CALL                     0
+             78 CALL                     1
+             86 LOAD_ATTR                7 (NULL|self + decode)
+            106 CALL                     0
+            114 RETURN_VALUE
+        >>  116 PUSH_EXC_INFO
+
+ 55         118 LOAD_GLOBAL              8 (InvalidToken)
+            128 CHECK_EXC_MATCH
+            130 POP_JUMP_IF_FALSE       17 (to 166)
+            132 STORE_FAST               1 (e)
+
+ 56         134 LOAD_GLOBAL             11 (NULL + ValueError)
+            144 LOAD_CONST               2 ('Không giải mã được secret — key FB_SECRET_KEY có thể đã đổi')
+            146 CALL                     1
+            154 LOAD_FAST                1 (e)
+            156 RAISE_VARARGS            2
+        >>  158 LOAD_CONST               3 (None)
+            160 STORE_FAST               1 (e)
+            162 DELETE_FAST              1 (e)
+            164 RERAISE                  1
+
+ 55     >>  166 RERAISE                  0
+        >>  168 COPY                     3
+            170 POP_EXCEPT
+            172 RERAISE                  1
+ExceptionTable:
+  10 to 112 -> 116 [0]
+  116 to 132 -> 168 [1] lasti
+  134 to 156 -> 158 [1] lasti
+  158 to 166 -> 168 [1] lasti

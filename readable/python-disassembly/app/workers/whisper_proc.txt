@@ -1,0 +1,3365 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Worker process cách ly cho Whisper (faster-whisper / ctranslate2).\n\nChạy ở process riêng để crash native CUDA/C++ không kéo sập FastAPI.\n\nHAI CHẾ ĐỘ:\n  1. One-shot (mặc định, giữ nguyên giao diện cũ): nạp model → transcribe 1 file → in kết quả → thoát.\n  2. `--serve` (MỚI, mặc định của WhisperEngine): **thường trú** — nạp model MỘT LẦN rồi phục vụ\n     nhiều yêu cầu qua stdin/stdout (JSON theo dòng). Trước đây mỗi lần nhận diện đều spawn process\n     và nạp lại model (small ~3-6s, medium ~10-15s, large-v3 ~20-35s); recap 20 video gọi 2 lần/video\n     ⇒ 40 lần nạp = hàng chục phút chờ thuần tuý. Chế độ serve xoá sạch chi phí đó.\n\nTỐC ĐỘ (xem docs/plan-recap-throughput-queue-gpu.md §4):\n  - `BatchedInferencePipeline` (faster-whisper ≥1.1): xử lý nhiều cửa sổ audio song song → GPU util\n    từ ~30% lên ~90%, nhanh 3-4×. Tự fallback về giải mã tuần tự nếu bản CUDA không hợp.\n  - `beam_size=1` (greedy) + `condition_on_previous_text=False`: nhanh thêm ~1.8× và hết lặp câu\n    (ảo giác) ở đoạn im lặng.\n  - Số luồng CPU nhận từ engine (`--cpu-threads`) thay vì cứng 4 — máy nhiều nhân không bị bóp cổ.\n\nGIAO THỨC serve (mỗi dòng 1 JSON):\n  → {"type":"transcribe","req_id":"r1","audio_path":...,"out_srt":...,"out_vtt":...,\n     "out_result":...,"src_lang":"auto","word_timestamps":false,"vad":true,\n     "batch_size":8,"beam_size":1}\n  ← {"type":"progress","req_id":"r1","progress":0.42,"text":"..."}\n  ← {"type":"result","req_id":"r1","status":"success"|"failed"|"cancelled", ...}\n  → {"type":"cancel","req_id":"r1"}      (huỷ yêu cầu đang chạy)\n  → {"type":"ping"}  ← {"type":"pong"}\n  → {"type":"shutdown"}\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 29           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 33          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (os)
+             24 STORE_NAME               3 (os)
+
+ 34          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               3 (None)
+             30 IMPORT_NAME              4 (sys)
+             32 STORE_NAME               4 (sys)
+
+ 47          34 LOAD_NAME                4 (sys)
+             36 LOAD_ATTR               10 (stdin)
+             56 LOAD_NAME                4 (sys)
+             58 LOAD_ATTR               12 (stdout)
+             78 LOAD_NAME                4 (sys)
+             80 LOAD_ATTR               14 (stderr)
+            100 BUILD_TUPLE              3
+            102 GET_ITER
+        >>  104 FOR_ITER                22 (to 152)
+            108 STORE_NAME               8 (_stream)
+
+ 48         110 NOP
+
+ 49         112 LOAD_NAME                8 (_stream)
+            114 LOAD_ATTR               19 (NULL|self + reconfigure)
+            134 LOAD_CONST               4 ('utf-8')
+            136 LOAD_CONST               5 ('replace')
+            138 KW_NAMES                 6 (('encoding', 'errors'))
+            140 CALL                     2
+            148 POP_TOP
+            150 JUMP_BACKWARD           24 (to 104)
+
+ 47     >>  152 END_FOR
+
+ 54         154 LOAD_CONST              34 (('return', 'int'))
+            156 LOAD_CONST               7 (<code object _early_cpu_threads at 0x290dd510, file "app\workers\whisper_proc.py", line 54>)
+            158 MAKE_FUNCTION            4 (annotations)
+            160 STORE_NAME              11 (_early_cpu_threads)
+
+ 71         162 PUSH_NULL
+            164 LOAD_NAME               11 (_early_cpu_threads)
+            166 CALL                     0
+            174 STORE_NAME              12 (_CPU_THREADS)
+
+ 72         176 LOAD_CONST               8 (('OMP_NUM_THREADS', 'MKL_NUM_THREADS', 'OPENBLAS_NUM_THREADS', 'VECLIB_MAXIMUM_THREADS', 'NUMEXPR_NUM_THREADS'))
+            178 GET_ITER
+        >>  180 FOR_ITER                23 (to 230)
+            184 STORE_NAME              13 (_k)
+
+ 74         186 PUSH_NULL
+            188 LOAD_NAME               14 (str)
+            190 LOAD_NAME               12 (_CPU_THREADS)
+            192 CALL                     1
+            200 LOAD_NAME                3 (os)
+            202 LOAD_ATTR               30 (environ)
+            222 LOAD_NAME               13 (_k)
+            224 STORE_SUBSCR
+            228 JUMP_BACKWARD           25 (to 180)
+
+ 72     >>  230 END_FOR
+
+ 76         232 LOAD_CONST               1 (0)
+            234 LOAD_CONST               3 (None)
+            236 IMPORT_NAME             16 (argparse)
+            238 STORE_NAME              16 (argparse)
+
+ 77         240 LOAD_CONST               1 (0)
+            242 LOAD_CONST               3 (None)
+            244 IMPORT_NAME             17 (json)
+            246 STORE_NAME              17 (json)
+
+ 78         248 LOAD_CONST               1 (0)
+            250 LOAD_CONST               3 (None)
+            252 IMPORT_NAME             18 (traceback)
+            254 STORE_NAME              18 (traceback)
+
+ 79         256 LOAD_CONST               1 (0)
+            258 LOAD_CONST               9 (('Path',))
+            260 IMPORT_NAME             19 (pathlib)
+            262 IMPORT_FROM             20 (Path)
+            264 STORE_NAME              20 (Path)
+            266 POP_TOP
+
+ 82         268 LOAD_CONST              35 (('ms', 'int', 'return', 'str'))
+            270 LOAD_CONST              10 (<code object format_srt_time at 0x7f6c920dc270, file "app\workers\whisper_proc.py", line 82>)
+            272 MAKE_FUNCTION            4 (annotations)
+            274 STORE_NAME              21 (format_srt_time)
+
+ 90         276 LOAD_CONST              35 (('ms', 'int', 'return', 'str'))
+            278 LOAD_CONST              11 (<code object format_vtt_time at 0x7f6c920dc390, file "app\workers\whisper_proc.py", line 90>)
+            280 MAKE_FUNCTION            4 (annotations)
+            282 STORE_NAME              22 (format_vtt_time)
+
+ 98         284 LOAD_CONST              36 (('obj', 'dict', 'return', 'None'))
+            286 LOAD_CONST              12 (<code object _emit at 0x7f6c920d4b70, file "app\workers\whisper_proc.py", line 98>)
+            288 MAKE_FUNCTION            4 (annotations)
+            290 STORE_NAME              23 (_emit)
+
+110         292 PUSH_NULL
+            294 LOAD_BUILD_CLASS
+            296 LOAD_CONST              13 (<code object CancelledRequest at 0x7f6c92a37360, file "app\workers\whisper_proc.py", line 110>)
+            298 MAKE_FUNCTION            0
+            300 LOAD_CONST              14 ('CancelledRequest')
+            302 LOAD_NAME               10 (Exception)
+            304 CALL                     3
+            312 STORE_NAME              24 (CancelledRequest)
+
+138         314 LOAD_CONST              15 (1500)
+            316 STORE_NAME              25 (_SNAP_MAX_MS)
+
+141         318 LOAD_CONST              37 (('start_ms', 'int', 'end_ms', 'int', 'words', 'list[dict]', 'return', 'tuple[int, int]'))
+            320 LOAD_CONST              16 (<code object _snap_to_words at 0x7f6c92412f50, file "app\workers\whisper_proc.py", line 141>)
+            322 MAKE_FUNCTION            4 (annotations)
+            324 STORE_NAME              26 (_snap_to_words)
+
+167         326 LOAD_CONST              17 (2000)
+            328 STORE_NAME              27 (_MEL_BLOCK_FRAMES)
+
+169         330 LOAD_CONST               3 (None)
+            332 STORE_GLOBAL            28 (_BLOCKED_FE_CLS)
+
+172         334 LOAD_CONST              18 (<code object _blocked_fe_class at 0x7f6c920dc4b0, file "app\workers\whisper_proc.py", line 172>)
+            336 MAKE_FUNCTION            0
+            338 STORE_NAME              29 (_blocked_fe_class)
+
+256         340 LOAD_CONST              38 (('return', 'bool'))
+            342 LOAD_CONST              19 (<code object _install_blocked_features at 0x28db5250, file "app\workers\whisper_proc.py", line 256>)
+            344 MAKE_FUNCTION            4 (annotations)
+            346 STORE_NAME              30 (_install_blocked_features)
+
+290         348 LOAD_CONST              39 ((None,))
+            350 LOAD_CONST              40 (('model_dir_path', 'Path', 'device', 'str', 'compute_type', 'str | None'))
+            352 LOAD_CONST              20 (<code object load_model at 0x28d706f0, file "app\workers\whisper_proc.py", line 290>)
+            354 MAKE_FUNCTION            5 (defaults, annotations)
+            356 STORE_NAME              31 (load_model)
+
+361         358 LOAD_CONST              41 (('batch_size', 'int'))
+            360 LOAD_CONST              21 (<code object _make_batched at 0x7f6c92051d10, file "app\workers\whisper_proc.py", line 361>)
+            362 MAKE_FUNCTION            4 (annotations)
+            364 STORE_NAME              32 (_make_batched)
+
+377         366 LOAD_CONST              22 (False)
+
+378         368 LOAD_CONST              23 (True)
+            370 LOAD_CONST               3 (None)
+
+379         372 LOAD_CONST               3 (None)
+            374 LOAD_CONST               3 (None)
+            376 LOAD_CONST              24 ('cpu')
+
+375         378 LOAD_CONST              25 (('snap_to_words', 'condition_on_prev', 'temperature', 'on_progress', 'cancel_check', 'device_used'))
+            380 BUILD_CONST_KEY_MAP      6
+
+376         382 NOP
+
+375         384 NOP
+
+376         386 NOP
+
+375         388 NOP
+
+376         390 NOP
+
+375         392 NOP
+
+377         394 NOP
+
+375         396 NOP
+
+377         398 NOP
+
+375         400 NOP
+
+377         402 NOP
+
+375         404 NOP
+
+378         406 NOP
+
+375         408 NOP
+
+379         410 NOP
+
+375         412 NOP
+
+379         414 NOP
+
+375         416 LOAD_CONST              42 (('audio_path', 'Path', 'out_srt', 'Path', 'out_vtt', 'Path', 'src_lang', 'str', 'word_timestamps', 'bool', 'vad', 'bool', 'batch_size', 'int', 'beam_size', 'int', 'snap_to_words', 'bool', 'condition_on_prev', 'bool', 'device_used', 'str', 'return', 'dict'))
+            418 LOAD_CONST              26 (<code object transcribe_one at 0x28db3350, file "app\workers\whisper_proc.py", line 375>)
+            420 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            422 STORE_NAME              33 (transcribe_one)
+
+472         424 LOAD_CONST              43 (('device_used', 'str', 'return', 'tuple[str, str]'))
+            426 LOAD_CONST              27 (<code object classify_error at 0x7f6c927a70f0, file "app\workers\whisper_proc.py", line 472>)
+            428 MAKE_FUNCTION            4 (annotations)
+            430 STORE_NAME              34 (classify_error)
+
+500         432 LOAD_CONST              44 (('audio_path', 'Path', 'model_dir_path', 'Path', 'return', 'tuple[str, str] | None'))
+            434 LOAD_CONST              28 (<code object _validate_inputs at 0x7f6c92413120, file "app\workers\whisper_proc.py", line 500>)
+            436 MAKE_FUNCTION            4 (annotations)
+            438 STORE_NAME              35 (_validate_inputs)
+
+516         440 LOAD_CONST              45 (('result_obj', 'dict', 'out_result', 'str | None', 'extra', 'dict', 'return', 'None'))
+            442 LOAD_CONST              29 (<code object _write_result at 0x28be4770, file "app\workers\whisper_proc.py", line 516>)
+            444 MAKE_FUNCTION            4 (annotations)
+            446 STORE_NAME              36 (_write_result)
+
+535         448 LOAD_CONST              46 (('model_dir_path', 'Path', 'device', 'str', 'compute_type', 'str | None', 'return', 'None'))
+            450 LOAD_CONST              30 (<code object serve at 0x28db8a30, file "app\workers\whisper_proc.py", line 535>)
+            452 MAKE_FUNCTION            4 (annotations)
+            454 STORE_NAME              37 (serve)
+
+615         456 LOAD_CONST              47 (('return', 'None'))
+            458 LOAD_CONST              31 (<code object one_shot at 0x28dbde00, file "app\workers\whisper_proc.py", line 615>)
+            460 MAKE_FUNCTION            4 (annotations)
+            462 STORE_NAME              38 (one_shot)
+
+651         464 LOAD_CONST              32 (<code object main at 0x28d95720, file "app\workers\whisper_proc.py", line 651>)
+            466 MAKE_FUNCTION            0
+            468 STORE_NAME              39 (main)
+
+692         470 LOAD_NAME               40 (__name__)
+            472 LOAD_CONST              33 ('__main__')
+            474 COMPARE_OP              40 (==)
+            478 POP_JUMP_IF_FALSE        8 (to 496)
+
+693         480 PUSH_NULL
+            482 LOAD_NAME               39 (main)
+            484 CALL                     0
+            492 POP_TOP
+            494 RETURN_CONST             3 (None)
+
+692     >>  496 RETURN_CONST             3 (None)
+        >>  498 PUSH_EXC_INFO
+
+ 50         500 LOAD_NAME               10 (Exception)
+            502 CHECK_EXC_MATCH
+            504 POP_JUMP_IF_FALSE        3 (to 512)
+            506 POP_TOP
+
+ 51         508 POP_EXCEPT
+            510 JUMP_BACKWARD          204 (to 104)
+
+ 50     >>  512 RERAISE                  0
+        >>  514 COPY                     3
+            516 POP_EXCEPT
+            518 RERAISE                  1
+ExceptionTable:
+  112 to 148 -> 498 [1]
+  498 to 506 -> 514 [2] lasti
+  512 to 512 -> 514 [2] lasti
+
+Disassembly of <code object _early_cpu_threads at 0x290dd510, file "app\workers\whisper_proc.py", line 54>:
+ 54           0 RESUME                   0
+
+ 55           2 LOAD_CONST               0 (None)
+              4 STORE_FAST               0 (val)
+
+ 56           6 LOAD_GLOBAL              0 (sys)
+             16 LOAD_ATTR                2 (argv)
+             36 STORE_FAST               1 (argv)
+
+ 57          38 LOAD_GLOBAL              5 (NULL + enumerate)
+             48 LOAD_FAST                1 (argv)
+             50 CALL                     1
+             58 GET_ITER
+        >>   60 FOR_ITER                75 (to 214)
+             64 UNPACK_SEQUENCE          2
+             68 STORE_FAST               2 (i)
+             70 STORE_FAST               3 (a)
+
+ 58          72 LOAD_FAST                3 (a)
+             74 LOAD_CONST               1 ('--cpu-threads')
+             76 COMPARE_OP              40 (==)
+             80 POP_JUMP_IF_FALSE       26 (to 134)
+             82 LOAD_FAST                2 (i)
+             84 LOAD_CONST               2 (1)
+             86 BINARY_OP                0 (+)
+             90 LOAD_GLOBAL              7 (NULL + len)
+            100 LOAD_FAST                1 (argv)
+            102 CALL                     1
+            110 COMPARE_OP               2 (<)
+            114 POP_JUMP_IF_FALSE        9 (to 134)
+
+ 59         116 LOAD_FAST                1 (argv)
+            118 LOAD_FAST                2 (i)
+            120 LOAD_CONST               2 (1)
+            122 BINARY_OP                0 (+)
+            126 BINARY_SUBSCR
+            130 STORE_FAST               0 (val)
+            132 JUMP_BACKWARD           37 (to 60)
+
+ 60     >>  134 LOAD_FAST                3 (a)
+            136 LOAD_ATTR                9 (NULL|self + startswith)
+            156 LOAD_CONST               3 ('--cpu-threads=')
+            158 CALL                     1
+            166 POP_JUMP_IF_TRUE         1 (to 170)
+            168 JUMP_BACKWARD           55 (to 60)
+
+ 61     >>  170 LOAD_FAST                3 (a)
+            172 LOAD_ATTR               11 (NULL|self + split)
+            192 LOAD_CONST               4 ('=')
+            194 LOAD_CONST               2 (1)
+            196 CALL                     2
+            204 LOAD_CONST               2 (1)
+            206 BINARY_SUBSCR
+            210 STORE_FAST               0 (val)
+            212 JUMP_BACKWARD           77 (to 60)
+
+ 57     >>  214 END_FOR
+
+ 62         216 NOP
+
+ 63         218 LOAD_FAST                0 (val)
+            220 POP_JUMP_IF_FALSE       11 (to 244)
+            222 LOAD_GLOBAL             13 (NULL + int)
+            232 LOAD_FAST                0 (val)
+            234 CALL                     1
+            242 JUMP_FORWARD             1 (to 246)
+        >>  244 LOAD_CONST               5 (0)
+        >>  246 STORE_FAST               4 (n)
+
+ 66     >>  248 LOAD_FAST                4 (n)
+            250 LOAD_CONST               5 (0)
+            252 COMPARE_OP              26 (<=)
+            256 POP_JUMP_IF_FALSE       34 (to 326)
+
+ 67         258 LOAD_GLOBAL             19 (NULL + min)
+            268 LOAD_GLOBAL             21 (NULL + os)
+            278 LOAD_ATTR               22 (cpu_count)
+            298 CALL                     0
+            306 COPY                     1
+            308 POP_JUMP_IF_TRUE         2 (to 314)
+            310 POP_TOP
+            312 LOAD_CONST               6 (4)
+        >>  314 LOAD_CONST               7 (8)
+            316 CALL                     2
+            324 STORE_FAST               4 (n)
+
+ 68     >>  326 LOAD_GLOBAL             25 (NULL + max)
+            336 LOAD_CONST               2 (1)
+            338 LOAD_GLOBAL             19 (NULL + min)
+            348 LOAD_FAST                4 (n)
+            350 LOAD_CONST               8 (32)
+            352 CALL                     2
+            360 CALL                     2
+            368 RETURN_VALUE
+        >>  370 PUSH_EXC_INFO
+
+ 64         372 LOAD_GLOBAL             14 (TypeError)
+            382 LOAD_GLOBAL             16 (ValueError)
+            392 BUILD_TUPLE              2
+            394 CHECK_EXC_MATCH
+            396 POP_JUMP_IF_FALSE        5 (to 408)
+            398 POP_TOP
+
+ 65         400 LOAD_CONST               5 (0)
+            402 STORE_FAST               4 (n)
+            404 POP_EXCEPT
+            406 JUMP_BACKWARD           80 (to 248)
+
+ 64     >>  408 RERAISE                  0
+        >>  410 COPY                     3
+            412 POP_EXCEPT
+            414 RERAISE                  1
+ExceptionTable:
+  218 to 246 -> 370 [0]
+  370 to 402 -> 410 [1] lasti
+  408 to 408 -> 410 [1] lasti
+
+Disassembly of <code object format_srt_time at 0x7f6c920dc270, file "app\workers\whisper_proc.py", line 82>:
+ 82           0 RESUME                   0
+
+ 83           2 LOAD_FAST                0 (ms)
+              4 LOAD_CONST               1 (3600000)
+              6 BINARY_OP                2 (//)
+             10 STORE_FAST               1 (h)
+
+ 84          12 LOAD_FAST                0 (ms)
+             14 LOAD_CONST               1 (3600000)
+             16 BINARY_OP                6 (%)
+             20 LOAD_CONST               2 (60000)
+             22 BINARY_OP                2 (//)
+             26 STORE_FAST               2 (m)
+
+ 85          28 LOAD_FAST                0 (ms)
+             30 LOAD_CONST               2 (60000)
+             32 BINARY_OP                6 (%)
+             36 LOAD_CONST               3 (1000)
+             38 BINARY_OP                2 (//)
+             42 STORE_FAST               3 (s)
+
+ 86          44 LOAD_FAST                0 (ms)
+             46 LOAD_CONST               3 (1000)
+             48 BINARY_OP                6 (%)
+             52 STORE_FAST               4 (ms_remain)
+
+ 87          54 LOAD_FAST                1 (h)
+             56 LOAD_CONST               4 ('02d')
+             58 FORMAT_VALUE             4 (with format)
+             60 LOAD_CONST               5 (':')
+             62 LOAD_FAST                2 (m)
+             64 LOAD_CONST               4 ('02d')
+             66 FORMAT_VALUE             4 (with format)
+             68 LOAD_CONST               5 (':')
+             70 LOAD_FAST                3 (s)
+             72 LOAD_CONST               4 ('02d')
+             74 FORMAT_VALUE             4 (with format)
+             76 LOAD_CONST               6 (',')
+             78 LOAD_FAST                4 (ms_remain)
+             80 LOAD_CONST               7 ('03d')
+             82 FORMAT_VALUE             4 (with format)
+             84 BUILD_STRING             7
+             86 RETURN_VALUE
+
+Disassembly of <code object format_vtt_time at 0x7f6c920dc390, file "app\workers\whisper_proc.py", line 90>:
+ 90           0 RESUME                   0
+
+ 91           2 LOAD_FAST                0 (ms)
+              4 LOAD_CONST               1 (3600000)
+              6 BINARY_OP                2 (//)
+             10 STORE_FAST               1 (h)
+
+ 92          12 LOAD_FAST                0 (ms)
+             14 LOAD_CONST               1 (3600000)
+             16 BINARY_OP                6 (%)
+             20 LOAD_CONST               2 (60000)
+             22 BINARY_OP                2 (//)
+             26 STORE_FAST               2 (m)
+
+ 93          28 LOAD_FAST                0 (ms)
+             30 LOAD_CONST               2 (60000)
+             32 BINARY_OP                6 (%)
+             36 LOAD_CONST               3 (1000)
+             38 BINARY_OP                2 (//)
+             42 STORE_FAST               3 (s)
+
+ 94          44 LOAD_FAST                0 (ms)
+             46 LOAD_CONST               3 (1000)
+             48 BINARY_OP                6 (%)
+             52 STORE_FAST               4 (ms_remain)
+
+ 95          54 LOAD_FAST                1 (h)
+             56 LOAD_CONST               4 ('02d')
+             58 FORMAT_VALUE             4 (with format)
+             60 LOAD_CONST               5 (':')
+             62 LOAD_FAST                2 (m)
+             64 LOAD_CONST               4 ('02d')
+             66 FORMAT_VALUE             4 (with format)
+             68 LOAD_CONST               5 (':')
+             70 LOAD_FAST                3 (s)
+             72 LOAD_CONST               4 ('02d')
+             74 FORMAT_VALUE             4 (with format)
+             76 LOAD_CONST               6 ('.')
+             78 LOAD_FAST                4 (ms_remain)
+             80 LOAD_CONST               7 ('03d')
+             82 FORMAT_VALUE             4 (with format)
+             84 BUILD_STRING             7
+             86 RETURN_VALUE
+
+Disassembly of <code object _emit at 0x7f6c920d4b70, file "app\workers\whisper_proc.py", line 98>:
+ 98           0 RESUME                   0
+
+106           2 LOAD_GLOBAL              1 (NULL + print)
+             12 LOAD_GLOBAL              3 (NULL + json)
+             22 LOAD_ATTR                4 (dumps)
+             42 LOAD_FAST                0 (obj)
+             44 LOAD_CONST               1 (True)
+             46 KW_NAMES                 2 (('ensure_ascii',))
+             48 CALL                     2
+             56 CALL                     1
+             64 POP_TOP
+
+107          66 LOAD_GLOBAL              6 (sys)
+             76 LOAD_ATTR                8 (stdout)
+             96 LOAD_ATTR               11 (NULL|self + flush)
+            116 CALL                     0
+            124 POP_TOP
+            126 RETURN_CONST             3 (None)
+
+Disassembly of <code object CancelledRequest at 0x7f6c92a37360, file "app\workers\whisper_proc.py", line 110>:
+110           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('CancelledRequest')
+              8 STORE_NAME               2 (__qualname__)
+
+111          10 LOAD_CONST               1 ('Yêu cầu bị huỷ giữa chừng (chế độ serve).')
+             12 STORE_NAME               3 (__doc__)
+             14 RETURN_CONST             2 (None)
+
+Disassembly of <code object _snap_to_words at 0x7f6c92412f50, file "app\workers\whisper_proc.py", line 141>:
+141           0 RESUME                   0
+
+152           2 LOAD_GLOBAL              1 (NULL + int)
+             12 LOAD_FAST                2 (words)
+             14 LOAD_CONST               1 (0)
+             16 BINARY_SUBSCR
+             20 LOAD_ATTR                3 (NULL|self + get)
+             40 LOAD_CONST               2 ('start_ms')
+             42 CALL                     1
+             50 COPY                     1
+             52 POP_JUMP_IF_TRUE         2 (to 58)
+             54 POP_TOP
+             56 LOAD_CONST               1 (0)
+        >>   58 CALL                     1
+             66 STORE_FAST               3 (ws)
+
+153          68 LOAD_GLOBAL              1 (NULL + int)
+             78 LOAD_FAST                2 (words)
+             80 LOAD_CONST               3 (-1)
+             82 BINARY_SUBSCR
+             86 LOAD_ATTR                3 (NULL|self + get)
+            106 LOAD_CONST               4 ('end_ms')
+            108 CALL                     1
+            116 COPY                     1
+            118 POP_JUMP_IF_TRUE         2 (to 124)
+            120 POP_TOP
+            122 LOAD_CONST               1 (0)
+        >>  124 CALL                     1
+            132 STORE_FAST               4 (we_)
+
+154         134 LOAD_FAST                0 (start_ms)
+            136 LOAD_FAST                1 (end_ms)
+            138 STORE_FAST               6 (new_end)
+            140 STORE_FAST               5 (new_start)
+
+155         142 LOAD_CONST               1 (0)
+            144 LOAD_FAST                3 (ws)
+            146 LOAD_FAST                0 (start_ms)
+            148 BINARY_OP               10 (-)
+            152 SWAP                     2
+            154 COPY                     2
+            156 COMPARE_OP               2 (<)
+            160 POP_JUMP_IF_FALSE        9 (to 180)
+            162 LOAD_GLOBAL              4 (_SNAP_MAX_MS)
+            172 COMPARE_OP              26 (<=)
+            176 POP_JUMP_IF_FALSE        5 (to 188)
+            178 JUMP_FORWARD             2 (to 184)
+        >>  180 POP_TOP
+            182 JUMP_FORWARD             2 (to 188)
+
+156     >>  184 LOAD_FAST                3 (ws)
+            186 STORE_FAST               5 (new_start)
+
+157     >>  188 LOAD_CONST               1 (0)
+            190 LOAD_FAST                1 (end_ms)
+            192 LOAD_FAST                4 (we_)
+            194 BINARY_OP               10 (-)
+            198 SWAP                     2
+            200 COPY                     2
+            202 COMPARE_OP               2 (<)
+            206 POP_JUMP_IF_FALSE        9 (to 226)
+            208 LOAD_GLOBAL              4 (_SNAP_MAX_MS)
+            218 COMPARE_OP              26 (<=)
+            222 POP_JUMP_IF_FALSE        5 (to 234)
+            224 JUMP_FORWARD             2 (to 230)
+        >>  226 POP_TOP
+            228 JUMP_FORWARD             2 (to 234)
+
+158     >>  230 LOAD_FAST                4 (we_)
+            232 STORE_FAST               6 (new_end)
+
+159     >>  234 LOAD_FAST                6 (new_end)
+            236 LOAD_FAST                5 (new_start)
+            238 BINARY_OP               10 (-)
+            242 LOAD_CONST               5 (120)
+            244 COMPARE_OP               2 (<)
+            248 POP_JUMP_IF_FALSE        4 (to 258)
+
+160         250 LOAD_FAST                0 (start_ms)
+            252 LOAD_FAST                1 (end_ms)
+            254 BUILD_TUPLE              2
+            256 RETURN_VALUE
+
+161     >>  258 LOAD_FAST                5 (new_start)
+            260 LOAD_FAST                6 (new_end)
+            262 BUILD_TUPLE              2
+            264 RETURN_VALUE
+
+Disassembly of <code object _blocked_fe_class at 0x7f6c920dc4b0, file "app\workers\whisper_proc.py", line 172>:
+              0 MAKE_CELL                2 (np)
+
+172           2 RESUME                   0
+
+189           4 LOAD_GLOBAL              0 (_BLOCKED_FE_CLS)
+             14 POP_JUMP_IF_NONE         6 (to 28)
+
+190          16 LOAD_GLOBAL              0 (_BLOCKED_FE_CLS)
+             26 RETURN_VALUE
+
+192     >>   28 LOAD_CONST               2 (0)
+             30 LOAD_CONST               1 (None)
+             32 IMPORT_NAME              1 (numpy)
+             34 STORE_DEREF              2 (np)
+
+193          36 LOAD_CONST               2 (0)
+             38 LOAD_CONST               3 (('FeatureExtractor',))
+             40 IMPORT_NAME              2 (faster_whisper.feature_extractor)
+             42 IMPORT_FROM              3 (FeatureExtractor)
+             44 STORE_FAST               0 (FeatureExtractor)
+             46 POP_TOP
+
+195          48 PUSH_NULL
+             50 LOAD_BUILD_CLASS
+             52 LOAD_CLOSURE             2 (np)
+             54 BUILD_TUPLE              1
+             56 LOAD_CONST               4 (<code object BlockedFeatureExtractor at 0x7f6c927d6010, file "app\workers\whisper_proc.py", line 195>)
+             58 MAKE_FUNCTION            8 (closure)
+             60 LOAD_CONST               5 ('BlockedFeatureExtractor')
+             62 LOAD_FAST                0 (FeatureExtractor)
+             64 CALL                     3
+             72 STORE_FAST               1 (BlockedFeatureExtractor)
+
+252          74 LOAD_FAST                1 (BlockedFeatureExtractor)
+             76 STORE_GLOBAL             0 (_BLOCKED_FE_CLS)
+
+253          78 LOAD_GLOBAL              0 (_BLOCKED_FE_CLS)
+             88 RETURN_VALUE
+
+Disassembly of <code object BlockedFeatureExtractor at 0x7f6c927d6010, file "app\workers\whisper_proc.py", line 195>:
+              0 COPY_FREE_VARS           1
+              2 MAKE_CELL                0 (__class__)
+
+195           4 RESUME                   0
+              6 LOAD_NAME                0 (__name__)
+              8 STORE_NAME               1 (__module__)
+             10 LOAD_CONST               0 ('_blocked_fe_class.<locals>.BlockedFeatureExtractor')
+             12 STORE_NAME               2 (__qualname__)
+
+199          14 LOAD_CONST               2 ((160, None))
+             16 LOAD_CLOSURE             0 (__class__)
+             18 LOAD_CLOSURE             1 (np)
+             20 BUILD_TUPLE              2
+             22 LOAD_CONST               1 (<code object __call__ at 0x28db2c50, file "app\workers\whisper_proc.py", line 199>)
+             24 MAKE_FUNCTION            9 (defaults, closure)
+             26 STORE_NAME               3 (__call__)
+             28 LOAD_CLOSURE             0 (__class__)
+             30 COPY                     1
+             32 STORE_NAME               4 (__classcell__)
+             34 RETURN_VALUE
+
+Disassembly of <code object __call__ at 0x28db2c50, file "app\workers\whisper_proc.py", line 199>:
+              0 COPY_FREE_VARS           2
+
+199           2 RESUME                   0
+
+200           4 LOAD_FAST                3 (chunk_length)
+              6 POP_JUMP_IF_NONE        50 (to 108)
+
+201           8 LOAD_FAST                3 (chunk_length)
+             10 LOAD_FAST                0 (self)
+             12 LOAD_ATTR                0 (sampling_rate)
+             32 BINARY_OP                5 (*)
+             36 LOAD_FAST                0 (self)
+             38 STORE_ATTR               1 (n_samples)
+
+202          48 LOAD_FAST                0 (self)
+             50 LOAD_ATTR                2 (n_samples)
+             70 LOAD_FAST                0 (self)
+             72 LOAD_ATTR                4 (hop_length)
+             92 BINARY_OP                2 (//)
+             96 LOAD_FAST                0 (self)
+             98 STORE_ATTR               3 (nb_max_frames)
+
+204     >>  108 LOAD_GLOBAL              9 (NULL + isinstance)
+            118 LOAD_FAST                1 (waveform)
+            120 LOAD_DEREF              19 (np)
+            122 LOAD_ATTR               10 (ndarray)
+            142 CALL                     2
+            150 POP_JUMP_IF_FALSE       15 (to 182)
+            152 LOAD_FAST                1 (waveform)
+            154 LOAD_ATTR               12 (ndim)
+            174 LOAD_CONST               1 (1)
+            176 COMPARE_OP              55 (!=)
+            180 POP_JUMP_IF_FALSE       17 (to 216)
+
+205     >>  182 LOAD_GLOBAL             14 (super)
+            192 LOAD_DEREF              18 (__class__)
+            194 LOAD_FAST                0 (self)
+            196 LOAD_SUPER_ATTR         33 (NULL|self + __call__)
+            200 LOAD_FAST                1 (waveform)
+            202 LOAD_FAST                2 (padding)
+            204 KW_NAMES                 2 (('padding',))
+            206 CALL                     2
+            214 RETURN_VALUE
+
+207     >>  216 LOAD_FAST                0 (self)
+            218 LOAD_ATTR               18 (n_fft)
+            238 LOAD_FAST                0 (self)
+            240 LOAD_ATTR                4 (hop_length)
+            260 STORE_FAST               5 (hop)
+            262 STORE_FAST               4 (n_fft)
+
+208         264 LOAD_FAST                4 (n_fft)
+            266 LOAD_CONST               3 (2)
+            268 BINARY_OP                2 (//)
+            272 STORE_FAST               6 (pad)
+
+209         274 LOAD_FAST                1 (waveform)
+            276 LOAD_ATTR               20 (shape)
+            296 LOAD_CONST               4 (0)
+            298 BINARY_SUBSCR
+            302 STORE_FAST               7 (n)
+
+214         304 LOAD_FAST                7 (n)
+            306 LOAD_FAST                0 (self)
+            308 LOAD_ATTR                0 (sampling_rate)
+            328 COMPARE_OP               2 (<)
+            332 POP_JUMP_IF_FALSE       17 (to 368)
+
+215         334 LOAD_GLOBAL             14 (super)
+            344 LOAD_DEREF              18 (__class__)
+            346 LOAD_FAST                0 (self)
+            348 LOAD_SUPER_ATTR         33 (NULL|self + __call__)
+            352 LOAD_FAST                1 (waveform)
+            354 LOAD_FAST                2 (padding)
+            356 KW_NAMES                 2 (('padding',))
+            358 CALL                     2
+            366 RETURN_VALUE
+
+217     >>  368 LOAD_FAST                1 (waveform)
+            370 LOAD_ATTR               22 (dtype)
+            390 LOAD_DEREF              19 (np)
+            392 LOAD_ATTR               24 (float32)
+            412 IS_OP                    1
+            414 POP_JUMP_IF_FALSE       27 (to 470)
+
+218         416 LOAD_FAST                1 (waveform)
+            418 LOAD_ATTR               27 (NULL|self + astype)
+            438 LOAD_DEREF              19 (np)
+            440 LOAD_ATTR               24 (float32)
+            460 CALL                     1
+            468 STORE_FAST               1 (waveform)
+
+221     >>  470 LOAD_FAST                7 (n)
+            472 LOAD_FAST                2 (padding)
+            474 BINARY_OP                0 (+)
+            478 STORE_FAST               8 (tail)
+
+222         480 LOAD_DEREF              19 (np)
+            482 LOAD_ATTR               29 (NULL|self + zeros)
+            502 LOAD_CONST               1 (1)
+            504 LOAD_FAST                8 (tail)
+            506 LOAD_CONST               3 (2)
+            508 LOAD_FAST                6 (pad)
+            510 BINARY_OP                5 (*)
+            514 BINARY_OP                0 (+)
+            518 BUILD_TUPLE              2
+            520 LOAD_DEREF              19 (np)
+            522 LOAD_ATTR               24 (float32)
+            542 KW_NAMES                 5 (('dtype',))
+            544 CALL                     2
+            552 STORE_FAST               9 (padded)
+
+223         554 LOAD_FAST                1 (waveform)
+            556 LOAD_FAST                9 (padded)
+            558 LOAD_CONST               4 (0)
+            560 LOAD_FAST                6 (pad)
+            562 LOAD_FAST                6 (pad)
+            564 LOAD_FAST                7 (n)
+            566 BINARY_OP                0 (+)
+            570 BUILD_SLICE              2
+            572 BUILD_TUPLE              2
+            574 STORE_SUBSCR
+
+224         578 LOAD_FAST                1 (waveform)
+            580 LOAD_FAST                6 (pad)
+            582 LOAD_CONST               4 (0)
+            584 LOAD_CONST               6 (-1)
+            586 BUILD_SLICE              3
+            588 BINARY_SUBSCR
+            592 LOAD_FAST                9 (padded)
+            594 LOAD_CONST               4 (0)
+            596 LOAD_CONST               0 (None)
+            598 LOAD_FAST                6 (pad)
+            600 BUILD_SLICE              2
+            602 BUILD_TUPLE              2
+            604 STORE_SUBSCR
+
+225         608 LOAD_FAST                9 (padded)
+            610 LOAD_CONST               4 (0)
+            612 LOAD_FAST                6 (pad)
+            614 LOAD_FAST                8 (tail)
+            616 BINARY_OP                0 (+)
+            620 LOAD_CONST               3 (2)
+            622 BINARY_OP               10 (-)
+            626 LOAD_FAST                6 (pad)
+            628 LOAD_FAST                8 (tail)
+            630 BINARY_OP                0 (+)
+            634 LOAD_CONST               3 (2)
+            636 BINARY_OP               10 (-)
+            640 LOAD_FAST                6 (pad)
+            642 BINARY_OP               10 (-)
+            646 LOAD_CONST               6 (-1)
+            648 BUILD_SLICE              3
+            650 BUILD_TUPLE              2
+            652 BINARY_SUBSCR
+            656 LOAD_FAST                9 (padded)
+            658 LOAD_CONST               4 (0)
+            660 LOAD_FAST                6 (pad)
+            662 LOAD_FAST                8 (tail)
+            664 BINARY_OP                0 (+)
+            668 LOAD_CONST               0 (None)
+            670 BUILD_SLICE              2
+            672 BUILD_TUPLE              2
+            674 STORE_SUBSCR
+
+228         678 LOAD_CONST               1 (1)
+            680 LOAD_FAST                9 (padded)
+            682 LOAD_ATTR               20 (shape)
+            702 LOAD_CONST               1 (1)
+            704 BINARY_SUBSCR
+            708 LOAD_FAST                4 (n_fft)
+            710 BINARY_OP               10 (-)
+            714 LOAD_FAST                5 (hop)
+            716 BINARY_OP                2 (//)
+            720 BINARY_OP                0 (+)
+            724 LOAD_CONST               1 (1)
+            726 BINARY_OP               10 (-)
+            730 STORE_FAST              10 (n_frames)
+
+230         732 LOAD_DEREF              19 (np)
+            734 LOAD_ATTR               31 (NULL|self + hanning)
+            754 LOAD_FAST                4 (n_fft)
+            756 LOAD_CONST               1 (1)
+            758 BINARY_OP                0 (+)
+            762 CALL                     1
+            770 LOAD_CONST               0 (None)
+            772 LOAD_CONST               6 (-1)
+            774 BINARY_SLICE
+            776 LOAD_ATTR               27 (NULL|self + astype)
+            796 LOAD_CONST               7 ('float32')
+            798 CALL                     1
+            806 STORE_FAST              11 (window)
+
+231         808 LOAD_DEREF              19 (np)
+            810 LOAD_ATTR               32 (lib)
+            830 LOAD_ATTR               34 (stride_tricks)
+            850 LOAD_ATTR               37 (NULL|self + as_strided)
+
+232         870 LOAD_FAST                9 (padded)
+            872 LOAD_CONST               1 (1)
+            874 LOAD_FAST               10 (n_frames)
+            876 LOAD_FAST                4 (n_fft)
+            878 BUILD_TUPLE              3
+
+233         880 LOAD_FAST                9 (padded)
+            882 LOAD_ATTR               38 (strides)
+            902 LOAD_CONST               4 (0)
+            904 BINARY_SUBSCR
+            908 LOAD_FAST                5 (hop)
+            910 LOAD_FAST                9 (padded)
+            912 LOAD_ATTR               38 (strides)
+            932 LOAD_CONST               1 (1)
+            934 BINARY_SUBSCR
+            938 BINARY_OP                5 (*)
+            942 LOAD_FAST                9 (padded)
+            944 LOAD_ATTR               38 (strides)
+            964 LOAD_CONST               1 (1)
+            966 BINARY_SUBSCR
+            970 BUILD_TUPLE              3
+
+231         972 CALL                     3
+            980 STORE_FAST              12 (frames)
+
+235         982 LOAD_DEREF              19 (np)
+            984 LOAD_ATTR               41 (NULL|self + empty)
+           1004 LOAD_FAST                0 (self)
+           1006 LOAD_ATTR               42 (mel_filters)
+           1026 LOAD_ATTR               20 (shape)
+           1046 LOAD_CONST               1 (1)
+           1048 BINARY_SUBSCR
+           1052 LOAD_FAST               10 (n_frames)
+           1054 BUILD_TUPLE              2
+           1056 LOAD_DEREF              19 (np)
+           1058 LOAD_ATTR               24 (float32)
+           1078 KW_NAMES                 5 (('dtype',))
+           1080 CALL                     2
+           1088 STORE_FAST              13 (mag)
+
+236        1090 LOAD_GLOBAL             45 (NULL + range)
+           1100 LOAD_CONST               4 (0)
+           1102 LOAD_FAST               10 (n_frames)
+           1104 LOAD_GLOBAL             46 (_MEL_BLOCK_FRAMES)
+           1114 CALL                     3
+           1122 GET_ITER
+        >> 1124 FOR_ITER               118 (to 1364)
+           1128 STORE_FAST              14 (i0)
+
+237        1130 LOAD_GLOBAL             49 (NULL + min)
+           1140 LOAD_FAST               14 (i0)
+           1142 LOAD_GLOBAL             46 (_MEL_BLOCK_FRAMES)
+           1152 BINARY_OP                0 (+)
+           1156 LOAD_FAST               10 (n_frames)
+           1158 CALL                     2
+           1166 STORE_FAST              15 (i1)
+
+238        1168 LOAD_DEREF              19 (np)
+           1170 LOAD_ATTR               50 (fft)
+           1190 LOAD_ATTR               53 (NULL|self + rfft)
+           1210 LOAD_FAST               12 (frames)
+           1212 LOAD_CONST               4 (0)
+           1214 LOAD_FAST               14 (i0)
+           1216 LOAD_FAST               15 (i1)
+           1218 BUILD_SLICE              2
+           1220 LOAD_CONST               0 (None)
+           1222 LOAD_CONST               0 (None)
+           1224 BUILD_SLICE              2
+           1226 BUILD_TUPLE              3
+           1228 BINARY_SUBSCR
+           1232 LOAD_FAST               11 (window)
+           1234 BINARY_OP                5 (*)
+           1238 LOAD_FAST                4 (n_fft)
+           1240 LOAD_CONST               6 (-1)
+           1242 KW_NAMES                 8 (('n', 'axis'))
+           1244 CALL                     3
+           1252 LOAD_ATTR               27 (NULL|self + astype)
+           1272 LOAD_CONST               9 ('complex64')
+           1274 CALL                     1
+           1282 STORE_FAST              16 (spec)
+
+239        1284 LOAD_DEREF              19 (np)
+           1286 LOAD_ATTR               55 (NULL|self + abs)
+           1306 LOAD_FAST               16 (spec)
+           1308 LOAD_ATTR               56 (T)
+           1328 CALL                     1
+           1336 LOAD_CONST               3 (2)
+           1338 BINARY_OP                8 (**)
+           1342 LOAD_FAST               13 (mag)
+           1344 LOAD_CONST               0 (None)
+           1346 LOAD_CONST               0 (None)
+           1348 BUILD_SLICE              2
+           1350 LOAD_FAST               14 (i0)
+           1352 LOAD_FAST               15 (i1)
+           1354 BUILD_SLICE              2
+           1356 BUILD_TUPLE              2
+           1358 STORE_SUBSCR
+           1362 JUMP_BACKWARD          120 (to 1124)
+
+236     >> 1364 END_FOR
+
+241        1366 DELETE_FAST             12 (frames)
+           1368 DELETE_FAST              9 (padded)
+
+242        1370 LOAD_FAST                0 (self)
+           1372 LOAD_ATTR               42 (mel_filters)
+           1392 LOAD_FAST               13 (mag)
+           1394 BINARY_OP                4 (@)
+           1398 STORE_FAST              17 (mel)
+
+243        1400 DELETE_FAST             13 (mag)
+
+245        1402 LOAD_DEREF              19 (np)
+           1404 LOAD_ATTR               59 (NULL|self + clip)
+           1424 LOAD_FAST               17 (mel)
+           1426 LOAD_CONST              10 (1e-10)
+           1428 LOAD_CONST               0 (None)
+           1430 LOAD_FAST               17 (mel)
+           1432 KW_NAMES                11 (('out',))
+           1434 CALL                     4
+           1442 POP_TOP
+
+246        1444 LOAD_DEREF              19 (np)
+           1446 LOAD_ATTR               61 (NULL|self + log10)
+           1466 LOAD_FAST               17 (mel)
+           1468 LOAD_FAST               17 (mel)
+           1470 KW_NAMES                11 (('out',))
+           1472 CALL                     2
+           1480 POP_TOP
+
+247        1482 LOAD_DEREF              19 (np)
+           1484 LOAD_ATTR               63 (NULL|self + maximum)
+           1504 LOAD_FAST               17 (mel)
+           1506 LOAD_FAST               17 (mel)
+           1508 LOAD_ATTR               65 (NULL|self + max)
+           1528 CALL                     0
+           1536 LOAD_CONST              12 (8.0)
+           1538 BINARY_OP               10 (-)
+           1542 LOAD_FAST               17 (mel)
+           1544 KW_NAMES                11 (('out',))
+           1546 CALL                     3
+           1554 POP_TOP
+
+248        1556 LOAD_FAST               17 (mel)
+           1558 LOAD_CONST              13 (4.0)
+           1560 BINARY_OP               13 (+=)
+           1564 STORE_FAST              17 (mel)
+
+249        1566 LOAD_FAST               17 (mel)
+           1568 LOAD_CONST              13 (4.0)
+           1570 BINARY_OP               24 (/=)
+           1574 STORE_FAST              17 (mel)
+
+250        1576 LOAD_FAST               17 (mel)
+           1578 RETURN_VALUE
+
+Disassembly of <code object _install_blocked_features at 0x28db5250, file "app\workers\whisper_proc.py", line 256>:
+256           0 RESUME                   0
+
+264           2 NOP
+
+265           4 LOAD_CONST               1 (0)
+              6 LOAD_CONST               2 (None)
+              8 IMPORT_NAME              0 (numpy)
+             10 STORE_FAST               1 (np)
+
+266          12 LOAD_CONST               1 (0)
+             14 LOAD_CONST               3 (('FeatureExtractor',))
+             16 IMPORT_NAME              1 (faster_whisper.feature_extractor)
+             18 IMPORT_FROM              2 (FeatureExtractor)
+             20 STORE_FAST               2 (FeatureExtractor)
+             22 POP_TOP
+
+268          24 LOAD_GLOBAL              7 (NULL + getattr)
+             34 LOAD_FAST                0 (model)
+             36 LOAD_CONST               4 ('feature_extractor')
+             38 LOAD_CONST               2 (None)
+             40 CALL                     3
+             48 STORE_FAST               3 (fe)
+
+269          50 LOAD_GLOBAL              9 (NULL + _blocked_fe_class)
+             60 CALL                     0
+             68 STORE_FAST               4 (blocked_cls)
+
+270          70 LOAD_GLOBAL             11 (NULL + isinstance)
+             80 LOAD_FAST                3 (fe)
+             82 LOAD_FAST                2 (FeatureExtractor)
+             84 CALL                     2
+             92 POP_JUMP_IF_FALSE       12 (to 118)
+             94 LOAD_GLOBAL             11 (NULL + isinstance)
+            104 LOAD_FAST                3 (fe)
+            106 LOAD_FAST                4 (blocked_cls)
+            108 CALL                     2
+            116 POP_JUMP_IF_FALSE        1 (to 120)
+
+271     >>  118 RETURN_CONST             5 (False)
+
+273     >>  120 LOAD_FAST                1 (np)
+            122 LOAD_ATTR               12 (random)
+            142 LOAD_ATTR               15 (NULL|self + default_rng)
+            162 LOAD_CONST               1 (0)
+            164 CALL                     1
+            172 LOAD_ATTR               17 (NULL|self + standard_normal)
+            192 LOAD_CONST               6 (45)
+            194 LOAD_FAST                3 (fe)
+            196 LOAD_ATTR               18 (sampling_rate)
+            216 BINARY_OP                5 (*)
+            220 CALL                     1
+            228 LOAD_CONST               7 (0.1)
+            230 BINARY_OP                5 (*)
+            234 LOAD_ATTR               21 (NULL|self + astype)
+            254 LOAD_FAST                1 (np)
+            256 LOAD_ATTR               22 (float32)
+            276 CALL                     1
+            284 STORE_FAST               5 (probe)
+
+274         286 PUSH_NULL
+            288 LOAD_FAST                3 (fe)
+            290 LOAD_FAST                5 (probe)
+            292 CALL                     1
+            300 STORE_FAST               6 (ref)
+
+275         302 LOAD_FAST                3 (fe)
+            304 LOAD_ATTR               24 (__class__)
+            324 STORE_FAST               7 (orig_cls)
+
+276         326 LOAD_FAST                4 (blocked_cls)
+            328 LOAD_FAST                3 (fe)
+            330 STORE_ATTR              12 (__class__)
+
+277         340 PUSH_NULL
+            342 LOAD_FAST                3 (fe)
+            344 LOAD_FAST                5 (probe)
+            346 CALL                     1
+            354 STORE_FAST               8 (got)
+
+278         356 LOAD_FAST                6 (ref)
+            358 LOAD_ATTR               26 (shape)
+            378 LOAD_FAST                8 (got)
+            380 LOAD_ATTR               26 (shape)
+            400 COMPARE_OP              55 (!=)
+            404 POP_JUMP_IF_TRUE        18 (to 442)
+            406 LOAD_FAST                1 (np)
+            408 LOAD_ATTR               29 (NULL|self + array_equal)
+            428 LOAD_FAST                6 (ref)
+            430 LOAD_FAST                8 (got)
+            432 CALL                     2
+            440 POP_JUMP_IF_TRUE        35 (to 512)
+
+279     >>  442 LOAD_FAST                7 (orig_cls)
+            444 LOAD_FAST                3 (fe)
+            446 STORE_ATTR              12 (__class__)
+
+280         456 LOAD_GLOBAL             31 (NULL + print)
+            466 LOAD_CONST               8 ('Warning: mel theo khối KHÔNG khớp bản gốc trên bài tự kiểm → giữ bản gốc.')
+
+281         468 LOAD_GLOBAL             32 (sys)
+            478 LOAD_ATTR               34 (stderr)
+
+280         498 KW_NAMES                 9 (('file',))
+            500 CALL                     2
+            508 POP_TOP
+
+282         510 RETURN_CONST             5 (False)
+
+283     >>  512 RETURN_CONST            10 (True)
+        >>  514 PUSH_EXC_INFO
+
+284         516 LOAD_GLOBAL             36 (Exception)
+            526 CHECK_EXC_MATCH
+            528 POP_JUMP_IF_FALSE       41 (to 612)
+            530 STORE_FAST               9 (e)
+
+285         532 LOAD_GLOBAL             31 (NULL + print)
+            542 LOAD_CONST              11 ('Warning: không gắn được mel theo khối (')
+            544 LOAD_FAST                9 (e)
+            546 FORMAT_VALUE             0
+            548 LOAD_CONST              12 ('); dùng bản gốc.')
+            550 BUILD_STRING             3
+            552 LOAD_GLOBAL             32 (sys)
+            562 LOAD_ATTR               34 (stderr)
+            582 KW_NAMES                 9 (('file',))
+            584 CALL                     2
+            592 POP_TOP
+
+286         594 POP_EXCEPT
+            596 LOAD_CONST               2 (None)
+            598 STORE_FAST               9 (e)
+            600 DELETE_FAST              9 (e)
+            602 RETURN_CONST             5 (False)
+        >>  604 LOAD_CONST               2 (None)
+            606 STORE_FAST               9 (e)
+            608 DELETE_FAST              9 (e)
+            610 RERAISE                  1
+
+284     >>  612 RERAISE                  0
+        >>  614 COPY                     3
+            616 POP_EXCEPT
+            618 RERAISE                  1
+ExceptionTable:
+  4 to 116 -> 514 [0]
+  120 to 508 -> 514 [0]
+  514 to 530 -> 614 [1] lasti
+  532 to 592 -> 604 [1] lasti
+  604 to 612 -> 614 [1] lasti
+
+Disassembly of <code object load_model at 0x28d706f0, file "app\workers\whisper_proc.py", line 290>:
+              0 MAKE_CELL                0 (model_dir_path)
+              2 MAKE_CELL                2 (compute_type)
+              4 MAKE_CELL               16 (WhisperModel)
+              6 MAKE_CELL               17 (_ct)
+
+290           8 RESUME                   0
+
+292          10 LOAD_CONST               1 (0)
+             12 LOAD_CONST               2 (('setup_cuda_dll_dirs', 'probe_cuda'))
+             14 IMPORT_NAME              0 (app.core.gpu)
+             16 IMPORT_FROM              1 (setup_cuda_dll_dirs)
+             18 STORE_FAST               3 (setup_cuda_dll_dirs)
+             20 IMPORT_FROM              2 (probe_cuda)
+             22 STORE_FAST               4 (probe_cuda)
+             24 POP_TOP
+
+293          26 PUSH_NULL
+             28 LOAD_FAST                3 (setup_cuda_dll_dirs)
+             30 CALL                     0
+             38 POP_TOP
+
+295          40 LOAD_CONST               1 (0)
+             42 LOAD_CONST               3 (('WhisperModel',))
+             44 IMPORT_NAME              3 (faster_whisper)
+             46 IMPORT_FROM              4 (WhisperModel)
+             48 STORE_DEREF             16 (WhisperModel)
+             50 POP_TOP
+
+297          52 LOAD_FAST                1 (device)
+             54 STORE_FAST               5 (device_used)
+
+298          56 LOAD_FAST                1 (device)
+             58 LOAD_CONST               4 ('cuda')
+             60 COMPARE_OP              40 (==)
+             64 POP_JUMP_IF_FALSE       75 (to 216)
+
+299          66 PUSH_NULL
+             68 LOAD_FAST                4 (probe_cuda)
+             70 CALL                     0
+             78 STORE_FAST               6 (info)
+
+300          80 LOAD_FAST                6 (info)
+             82 LOAD_CONST               5 ('usable')
+             84 BINARY_SUBSCR
+             88 POP_JUMP_IF_TRUE        63 (to 216)
+
+301          90 LOAD_FAST                6 (info)
+             92 LOAD_CONST               6 ('missing')
+             94 BINARY_SUBSCR
+             98 POP_JUMP_IF_FALSE       23 (to 146)
+            100 LOAD_CONST               7 ('thiếu thư viện ')
+            102 LOAD_CONST               8 (', ')
+            104 LOAD_ATTR               11 (NULL|self + join)
+            124 LOAD_FAST                6 (info)
+            126 LOAD_CONST               6 ('missing')
+            128 BINARY_SUBSCR
+            132 CALL                     1
+            140 BINARY_OP                0 (+)
+            144 JUMP_FORWARD             1 (to 148)
+
+302     >>  146 LOAD_CONST               9 ('không phát hiện GPU NVIDIA dùng được')
+
+301     >>  148 STORE_FAST               7 (reason)
+
+303         150 LOAD_GLOBAL             13 (NULL + print)
+            160 LOAD_CONST              10 ('Warning: yêu cầu CUDA nhưng chưa dùng được (')
+            162 LOAD_FAST                7 (reason)
+            164 FORMAT_VALUE             0
+            166 LOAD_CONST              11 ('); chuyển sang CPU.')
+            168 BUILD_STRING             3
+
+304         170 LOAD_GLOBAL             14 (sys)
+            180 LOAD_ATTR               16 (stderr)
+
+303         200 KW_NAMES                12 (('file',))
+            202 CALL                     2
+            210 POP_TOP
+
+305         212 LOAD_CONST              13 ('cpu')
+            214 STORE_FAST               5 (device_used)
+
+307     >>  216 LOAD_CONST              24 (('dev', 'str', 'return', 'str'))
+            218 LOAD_CLOSURE             2 (compute_type)
+            220 BUILD_TUPLE              1
+            222 LOAD_CONST              14 (<code object _ct at 0x7f6c92393910, file "app\workers\whisper_proc.py", line 307>)
+            224 MAKE_FUNCTION           12 (annotations, closure)
+            226 STORE_DEREF             17 (_ct)
+
+313         228 LOAD_CONST              25 (('dev', 'str'))
+            230 LOAD_CLOSURE            16 (WhisperModel)
+            232 LOAD_CLOSURE            17 (_ct)
+            234 LOAD_CLOSURE             0 (model_dir_path)
+            236 BUILD_TUPLE              3
+            238 LOAD_CONST              15 (<code object _build at 0x7f6c920749c0, file "app\workers\whisper_proc.py", line 313>)
+            240 MAKE_FUNCTION           12 (annotations, closure)
+            242 STORE_FAST               8 (_build)
+
+317         244 NOP
+
+318         246 PUSH_NULL
+            248 LOAD_FAST                8 (_build)
+            250 LOAD_FAST                5 (device_used)
+            252 CALL                     1
+            260 STORE_FAST               9 (model)
+
+357     >>  262 LOAD_GLOBAL             33 (NULL + _install_blocked_features)
+            272 LOAD_FAST                9 (model)
+            274 CALL                     1
+            282 POP_TOP
+
+358         284 LOAD_FAST                9 (model)
+            286 LOAD_FAST                5 (device_used)
+            288 BUILD_TUPLE              2
+            290 RETURN_VALUE
+        >>  292 PUSH_EXC_INFO
+
+319         294 LOAD_GLOBAL             18 (Exception)
+            304 CHECK_EXC_MATCH
+            306 EXTENDED_ARG             1
+            308 POP_JUMP_IF_FALSE      318 (to 946)
+            310 STORE_FAST              10 (e)
+
+320         312 LOAD_GLOBAL             21 (NULL + str)
+            322 LOAD_FAST               10 (e)
+            324 CALL                     1
+            332 LOAD_ATTR               23 (NULL|self + lower)
+            352 CALL                     0
+            360 STORE_FAST              11 (err_str)
+
+321         362 LOAD_CONST              16 ('incomplete')
+            364 LOAD_FAST               11 (err_str)
+            366 CONTAINS_OP              0
+            368 COPY                     1
+            370 POP_JUMP_IF_TRUE        10 (to 392)
+            372 POP_TOP
+            374 LOAD_CONST              17 ('failed to read')
+            376 LOAD_FAST               11 (err_str)
+            378 CONTAINS_OP              0
+            380 COPY                     1
+            382 POP_JUMP_IF_TRUE         4 (to 392)
+            384 POP_TOP
+
+322         386 LOAD_CONST              18 ('model.bin')
+            388 LOAD_FAST               11 (err_str)
+            390 CONTAINS_OP              0
+
+321     >>  392 STORE_FAST              12 (is_model_corrupt)
+
+323         394 LOAD_FAST               12 (is_model_corrupt)
+            396 POP_JUMP_IF_FALSE       80 (to 558)
+
+324         398 LOAD_DEREF               0 (model_dir_path)
+            400 LOAD_CONST              18 ('model.bin')
+            402 BINARY_OP               11 (/)
+            406 STORE_FAST              13 (model_bin_file)
+
+325         408 LOAD_FAST               13 (model_bin_file)
+            410 LOAD_ATTR               25 (NULL|self + exists)
+            430 CALL                     0
+            438 POP_JUMP_IF_FALSE       33 (to 506)
+
+326         440 NOP
+
+327         442 LOAD_FAST               13 (model_bin_file)
+            444 LOAD_ATTR               27 (NULL|self + unlink)
+            464 CALL                     0
+            472 POP_TOP
+            474 JUMP_FORWARD            15 (to 506)
+        >>  476 PUSH_EXC_INFO
+
+328         478 LOAD_GLOBAL             18 (Exception)
+            488 CHECK_EXC_MATCH
+            490 POP_JUMP_IF_FALSE        3 (to 498)
+            492 POP_TOP
+
+329         494 POP_EXCEPT
+            496 JUMP_FORWARD             4 (to 506)
+
+328     >>  498 RERAISE                  0
+        >>  500 COPY                     3
+            502 POP_EXCEPT
+            504 RERAISE                  1
+
+330     >>  506 LOAD_GLOBAL             29 (NULL + ValueError)
+
+331         516 LOAD_CONST              19 ('Mô hình Whisper (')
+            518 LOAD_DEREF               0 (model_dir_path)
+            520 LOAD_ATTR               30 (name)
+            540 FORMAT_VALUE             0
+            542 LOAD_CONST              20 (') bị lỗi/chưa tải hoàn tất. Hệ thống đã tự động xoá file lỗi này. Hãy vào mục Cài đặt và tải lại bộ công cụ.')
+            544 BUILD_STRING             3
+
+330         546 CALL                     1
+
+332         554 LOAD_FAST               10 (e)
+
+330         556 RAISE_VARARGS            2
+
+333     >>  558 LOAD_FAST                5 (device_used)
+            560 LOAD_CONST               4 ('cuda')
+            562 COMPARE_OP              40 (==)
+            566 POP_JUMP_IF_FALSE      178 (to 924)
+
+334         568 LOAD_GLOBAL             13 (NULL + print)
+            578 LOAD_CONST              21 ('Warning: CUDA load failed (')
+            580 LOAD_FAST               10 (e)
+            582 FORMAT_VALUE             0
+            584 LOAD_CONST              22 ('), falling back to CPU...')
+            586 BUILD_STRING             3
+            588 LOAD_GLOBAL             14 (sys)
+            598 LOAD_ATTR               16 (stderr)
+            618 KW_NAMES                12 (('file',))
+            620 CALL                     2
+            628 POP_TOP
+
+335         630 NOP
+
+336         632 PUSH_NULL
+            634 LOAD_FAST                8 (_build)
+            636 LOAD_CONST              13 ('cpu')
+            638 CALL                     1
+            646 STORE_FAST               9 (model)
+
+337         648 LOAD_CONST              13 ('cpu')
+            650 STORE_FAST               5 (device_used)
+            652 JUMP_FORWARD           136 (to 926)
+        >>  654 PUSH_EXC_INFO
+
+338         656 LOAD_GLOBAL             18 (Exception)
+            666 CHECK_EXC_MATCH
+            668 POP_JUMP_IF_FALSE      123 (to 916)
+            670 STORE_FAST              14 (inner_e)
+
+339         672 LOAD_GLOBAL             21 (NULL + str)
+            682 LOAD_FAST               14 (inner_e)
+            684 CALL                     1
+            692 LOAD_ATTR               23 (NULL|self + lower)
+            712 CALL                     0
+            720 STORE_FAST              15 (inner)
+
+340         722 LOAD_CONST              16 ('incomplete')
+            724 LOAD_FAST               15 (inner)
+            726 CONTAINS_OP              0
+            728 POP_JUMP_IF_TRUE         8 (to 746)
+            730 LOAD_CONST              17 ('failed to read')
+            732 LOAD_FAST               15 (inner)
+            734 CONTAINS_OP              0
+            736 POP_JUMP_IF_TRUE         4 (to 746)
+            738 LOAD_CONST              18 ('model.bin')
+            740 LOAD_FAST               15 (inner)
+            742 CONTAINS_OP              0
+            744 POP_JUMP_IF_FALSE       80 (to 906)
+
+341     >>  746 LOAD_DEREF               0 (model_dir_path)
+            748 LOAD_CONST              18 ('model.bin')
+            750 BINARY_OP               11 (/)
+            754 STORE_FAST              13 (model_bin_file)
+
+342         756 LOAD_FAST               13 (model_bin_file)
+            758 LOAD_ATTR               25 (NULL|self + exists)
+            778 CALL                     0
+            786 POP_JUMP_IF_FALSE       33 (to 854)
+
+343         788 NOP
+
+344         790 LOAD_FAST               13 (model_bin_file)
+            792 LOAD_ATTR               27 (NULL|self + unlink)
+            812 CALL                     0
+            820 POP_TOP
+            822 JUMP_FORWARD            15 (to 854)
+        >>  824 PUSH_EXC_INFO
+
+345         826 LOAD_GLOBAL             18 (Exception)
+            836 CHECK_EXC_MATCH
+            838 POP_JUMP_IF_FALSE        3 (to 846)
+            840 POP_TOP
+
+346         842 POP_EXCEPT
+            844 JUMP_FORWARD             4 (to 854)
+
+345     >>  846 RERAISE                  0
+        >>  848 COPY                     3
+            850 POP_EXCEPT
+            852 RERAISE                  1
+
+347     >>  854 LOAD_GLOBAL             29 (NULL + ValueError)
+
+348         864 LOAD_CONST              19 ('Mô hình Whisper (')
+            866 LOAD_DEREF               0 (model_dir_path)
+            868 LOAD_ATTR               30 (name)
+            888 FORMAT_VALUE             0
+            890 LOAD_CONST              20 (') bị lỗi/chưa tải hoàn tất. Hệ thống đã tự động xoá file lỗi này. Hãy vào mục Cài đặt và tải lại bộ công cụ.')
+            892 BUILD_STRING             3
+
+347         894 CALL                     1
+
+350         902 LOAD_FAST               14 (inner_e)
+
+347         904 RAISE_VARARGS            2
+
+351     >>  906 RAISE_VARARGS            0
+        >>  908 LOAD_CONST              23 (None)
+            910 STORE_FAST              14 (inner_e)
+            912 DELETE_FAST             14 (inner_e)
+            914 RERAISE                  1
+
+338     >>  916 RERAISE                  0
+        >>  918 COPY                     3
+            920 POP_EXCEPT
+            922 RERAISE                  1
+
+353     >>  924 RAISE_VARARGS            0
+
+337     >>  926 POP_EXCEPT
+            928 LOAD_CONST              23 (None)
+            930 STORE_FAST              10 (e)
+            932 DELETE_FAST             10 (e)
+            934 EXTENDED_ARG             1
+            936 JUMP_BACKWARD          338 (to 262)
+        >>  938 LOAD_CONST              23 (None)
+            940 STORE_FAST              10 (e)
+            942 DELETE_FAST             10 (e)
+            944 RERAISE                  1
+
+319     >>  946 RERAISE                  0
+        >>  948 COPY                     3
+            950 POP_EXCEPT
+            952 RERAISE                  1
+ExceptionTable:
+  246 to 260 -> 292 [0]
+  292 to 310 -> 948 [1] lasti
+  312 to 438 -> 938 [1] lasti
+  442 to 472 -> 476 [1]
+  474 to 474 -> 938 [1] lasti
+  476 to 492 -> 500 [2] lasti
+  494 to 496 -> 938 [1] lasti
+  498 to 498 -> 500 [2] lasti
+  500 to 628 -> 938 [1] lasti
+  632 to 650 -> 654 [1]
+  652 to 652 -> 938 [1] lasti
+  654 to 670 -> 918 [2] lasti
+  672 to 786 -> 908 [2] lasti
+  790 to 820 -> 824 [2]
+  822 to 822 -> 908 [2] lasti
+  824 to 840 -> 848 [3] lasti
+  842 to 844 -> 908 [2] lasti
+  846 to 846 -> 848 [3] lasti
+  848 to 906 -> 908 [2] lasti
+  908 to 916 -> 918 [2] lasti
+  918 to 924 -> 938 [1] lasti
+  938 to 946 -> 948 [1] lasti
+
+Disassembly of <code object _ct at 0x7f6c92393910, file "app\workers\whisper_proc.py", line 307>:
+              0 COPY_FREE_VARS           1
+
+307           2 RESUME                   0
+
+308           4 LOAD_DEREF               1 (compute_type)
+              6 POP_JUMP_IF_FALSE        2 (to 12)
+
+309           8 LOAD_DEREF               1 (compute_type)
+             10 RETURN_VALUE
+
+311     >>   12 LOAD_FAST                0 (dev)
+             14 LOAD_CONST               1 ('cuda')
+             16 COMPARE_OP              40 (==)
+             20 POP_JUMP_IF_FALSE        2 (to 26)
+             22 LOAD_CONST               2 ('int8_float16')
+             24 RETURN_VALUE
+        >>   26 LOAD_CONST               3 ('int8')
+             28 RETURN_VALUE
+
+Disassembly of <code object _build at 0x7f6c920749c0, file "app\workers\whisper_proc.py", line 313>:
+              0 COPY_FREE_VARS           3
+
+313           2 RESUME                   0
+
+314           4 PUSH_NULL
+              6 LOAD_DEREF               1 (WhisperModel)
+              8 LOAD_GLOBAL              1 (NULL + str)
+             18 LOAD_DEREF               3 (model_dir_path)
+             20 CALL                     1
+             28 LOAD_FAST                0 (dev)
+             30 PUSH_NULL
+             32 LOAD_DEREF               2 (_ct)
+             34 LOAD_FAST                0 (dev)
+             36 CALL                     1
+
+315          44 LOAD_GLOBAL              2 (_CPU_THREADS)
+             54 LOAD_CONST               1 (1)
+
+314          56 KW_NAMES                 2 (('device', 'compute_type', 'cpu_threads', 'num_workers'))
+             58 CALL                     5
+             66 RETURN_VALUE
+
+Disassembly of <code object _make_batched at 0x7f6c92051d10, file "app\workers\whisper_proc.py", line 361>:
+361           0 RESUME                   0
+
+363           2 LOAD_FAST                1 (batch_size)
+              4 LOAD_CONST               1 (1)
+              6 COMPARE_OP              26 (<=)
+             10 POP_JUMP_IF_FALSE        1 (to 14)
+
+364          12 RETURN_CONST             2 (None)
+
+365     >>   14 NOP
+
+366          16 LOAD_CONST               3 (0)
+             18 LOAD_CONST               4 (('BatchedInferencePipeline',))
+             20 IMPORT_NAME              0 (faster_whisper)
+             22 IMPORT_FROM              1 (BatchedInferencePipeline)
+             24 STORE_FAST               2 (BatchedInferencePipeline)
+             26 POP_TOP
+
+367          28 PUSH_NULL
+             30 LOAD_FAST                2 (BatchedInferencePipeline)
+             32 LOAD_FAST                0 (model)
+             34 KW_NAMES                 5 (('model',))
+             36 CALL                     1
+             44 RETURN_VALUE
+        >>   46 PUSH_EXC_INFO
+
+368          48 LOAD_GLOBAL              4 (Exception)
+             58 CHECK_EXC_MATCH
+             60 POP_JUMP_IF_FALSE       41 (to 144)
+             62 STORE_FAST               3 (e)
+
+369          64 LOAD_GLOBAL              7 (NULL + print)
+             74 LOAD_CONST               6 ('Warning: BatchedInferencePipeline không dùng được (')
+             76 LOAD_FAST                3 (e)
+             78 FORMAT_VALUE             0
+             80 LOAD_CONST               7 ('); giải mã tuần tự.')
+             82 BUILD_STRING             3
+
+370          84 LOAD_GLOBAL              8 (sys)
+             94 LOAD_ATTR               10 (stderr)
+
+369         114 KW_NAMES                 8 (('file',))
+            116 CALL                     2
+            124 POP_TOP
+
+371         126 POP_EXCEPT
+            128 LOAD_CONST               2 (None)
+            130 STORE_FAST               3 (e)
+            132 DELETE_FAST              3 (e)
+            134 RETURN_CONST             2 (None)
+        >>  136 LOAD_CONST               2 (None)
+            138 STORE_FAST               3 (e)
+            140 DELETE_FAST              3 (e)
+            142 RERAISE                  1
+
+368     >>  144 RERAISE                  0
+        >>  146 COPY                     3
+            148 POP_EXCEPT
+            150 RERAISE                  1
+ExceptionTable:
+  16 to 42 -> 46 [0]
+  46 to 62 -> 146 [1] lasti
+  64 to 124 -> 136 [1] lasti
+  136 to 144 -> 146 [1] lasti
+
+Disassembly of <code object transcribe_one at 0x28db3350, file "app\workers\whisper_proc.py", line 375>:
+375           0 RESUME                   0
+
+391           2 LOAD_FAST                4 (src_lang)
+              4 LOAD_CONST               1 ('auto')
+              6 COMPARE_OP              40 (==)
+             10 POP_JUMP_IF_FALSE        2 (to 16)
+             12 LOAD_CONST               2 (None)
+             14 JUMP_FORWARD             1 (to 18)
+        >>   16 LOAD_FAST                4 (src_lang)
+        >>   18 STORE_FAST              15 (language)
+
+393          20 LOAD_GLOBAL              1 (NULL + dict)
+
+394          30 LOAD_FAST               15 (language)
+
+395          32 LOAD_FAST                5 (word_timestamps)
+
+396          34 LOAD_GLOBAL              3 (NULL + max)
+             44 LOAD_CONST               3 (1)
+             46 LOAD_FAST                8 (beam_size)
+             48 CALL                     2
+
+400          56 LOAD_GLOBAL              5 (NULL + bool)
+             66 LOAD_FAST               10 (condition_on_prev)
+             68 CALL                     1
+
+393          76 KW_NAMES                 4 (('language', 'word_timestamps', 'beam_size', 'condition_on_previous_text'))
+             78 CALL                     4
+             86 STORE_FAST              16 (common)
+
+402          88 LOAD_FAST               11 (temperature)
+             90 POP_JUMP_IF_NONE         5 (to 102)
+
+403          92 LOAD_FAST               11 (temperature)
+             94 LOAD_FAST               16 (common)
+             96 LOAD_CONST               5 ('temperature')
+             98 STORE_SUBSCR
+
+405     >>  102 LOAD_CONST               2 (None)
+            104 COPY                     1
+            106 STORE_FAST              17 (segments)
+            108 STORE_FAST              18 (info)
+
+406         110 LOAD_FAST               14 (device_used)
+            112 LOAD_CONST               6 ('cuda')
+            114 COMPARE_OP              40 (==)
+            118 POP_JUMP_IF_FALSE       12 (to 144)
+            120 LOAD_GLOBAL              7 (NULL + _make_batched)
+            130 LOAD_FAST                0 (model)
+            132 LOAD_FAST                7 (batch_size)
+            134 CALL                     2
+            142 JUMP_FORWARD             1 (to 146)
+        >>  144 LOAD_CONST               2 (None)
+        >>  146 STORE_FAST              19 (pipe)
+
+407         148 LOAD_FAST               19 (pipe)
+            150 POP_JUMP_IF_NONE        35 (to 222)
+
+408         152 NOP
+
+409         154 PUSH_NULL
+            156 LOAD_FAST               19 (pipe)
+            158 LOAD_ATTR                8 (transcribe)
+            178 LOAD_GLOBAL             11 (NULL + str)
+            188 LOAD_FAST                1 (audio_path)
+            190 CALL                     1
+            198 BUILD_TUPLE              1
+            200 LOAD_FAST                7 (batch_size)
+
+410         202 LOAD_FAST                6 (vad)
+
+409         204 LOAD_CONST               7 (('batch_size', 'vad_filter'))
+            206 BUILD_CONST_KEY_MAP      2
+
+410         208 LOAD_FAST               16 (common)
+
+409         210 DICT_MERGE               1
+            212 CALL_FUNCTION_EX         1
+            214 UNPACK_SEQUENCE          2
+            218 STORE_FAST              17 (segments)
+            220 STORE_FAST              18 (info)
+
+414     >>  222 LOAD_FAST               17 (segments)
+            224 POP_JUMP_IF_NOT_NONE    33 (to 292)
+
+415         226 PUSH_NULL
+            228 LOAD_FAST                0 (model)
+            230 LOAD_ATTR                8 (transcribe)
+            250 LOAD_GLOBAL             11 (NULL + str)
+            260 LOAD_FAST                1 (audio_path)
+            262 CALL                     1
+            270 BUILD_TUPLE              1
+            272 LOAD_CONST              11 ('vad_filter')
+            274 LOAD_FAST                6 (vad)
+            276 BUILD_MAP                1
+            278 LOAD_FAST               16 (common)
+            280 DICT_MERGE               1
+            282 CALL_FUNCTION_EX         1
+            284 UNPACK_SEQUENCE          2
+            288 STORE_FAST              17 (segments)
+            290 STORE_FAST              18 (info)
+
+417     >>  292 BUILD_LIST               0
+            294 STORE_FAST              21 (all_segments)
+
+418         296 BUILD_LIST               0
+            298 STORE_FAST              22 (flat_words)
+
+419         300 LOAD_GLOBAL             21 (NULL + getattr)
+            310 LOAD_FAST               18 (info)
+            312 LOAD_CONST              12 ('duration')
+            314 LOAD_CONST              13 (0.0)
+            316 CALL                     3
+            324 COPY                     1
+            326 POP_JUMP_IF_TRUE         2 (to 332)
+            328 POP_TOP
+            330 LOAD_CONST              13 (0.0)
+        >>  332 STORE_FAST              23 (duration)
+
+421         334 LOAD_FAST               17 (segments)
+            336 GET_ITER
+        >>  338 EXTENDED_ARG             1
+            340 FOR_ITER               360 (to 1064)
+            344 STORE_FAST              24 (segment)
+
+422         346 LOAD_FAST               13 (cancel_check)
+            348 POP_JUMP_IF_FALSE       17 (to 384)
+            350 PUSH_NULL
+            352 LOAD_FAST               13 (cancel_check)
+            354 CALL                     0
+            362 POP_JUMP_IF_FALSE       10 (to 384)
+
+423         364 LOAD_GLOBAL             23 (NULL + CancelledRequest)
+            374 CALL                     0
+            382 RAISE_VARARGS            1
+
+424     >>  384 LOAD_GLOBAL             25 (NULL + int)
+            394 LOAD_FAST               24 (segment)
+            396 LOAD_ATTR               26 (start)
+            416 LOAD_CONST              14 (1000)
+            418 BINARY_OP                5 (*)
+            422 CALL                     1
+            430 STORE_FAST              25 (start_ms)
+
+425         432 LOAD_GLOBAL             25 (NULL + int)
+            442 LOAD_FAST               24 (segment)
+            444 LOAD_ATTR               28 (end)
+            464 LOAD_CONST              14 (1000)
+            466 BINARY_OP                5 (*)
+            470 CALL                     1
+            478 STORE_FAST              26 (end_ms)
+
+426         480 LOAD_FAST               24 (segment)
+            482 LOAD_ATTR               30 (text)
+            502 COPY                     1
+            504 POP_JUMP_IF_TRUE         2 (to 510)
+            506 POP_TOP
+            508 LOAD_CONST              15 ('')
+        >>  510 LOAD_ATTR               33 (NULL|self + strip)
+            530 CALL                     0
+            538 STORE_FAST              27 (text_str)
+
+428         540 BUILD_LIST               0
+            542 STORE_FAST              28 (seg_words)
+
+429         544 LOAD_FAST                5 (word_timestamps)
+            546 POP_JUMP_IF_FALSE      150 (to 848)
+            548 LOAD_GLOBAL             21 (NULL + getattr)
+            558 LOAD_FAST               24 (segment)
+            560 LOAD_CONST              16 ('words')
+            562 LOAD_CONST               2 (None)
+            564 CALL                     3
+            572 POP_JUMP_IF_FALSE      137 (to 848)
+
+430         574 LOAD_FAST               24 (segment)
+            576 LOAD_ATTR               34 (words)
+            596 GET_ITER
+        >>  598 FOR_ITER               122 (to 846)
+            602 STORE_FAST              29 (w)
+
+431         604 LOAD_FAST               29 (w)
+            606 LOAD_ATTR               36 (word)
+            626 COPY                     1
+            628 POP_JUMP_IF_TRUE         2 (to 634)
+            630 POP_TOP
+            632 LOAD_CONST              15 ('')
+        >>  634 LOAD_ATTR               33 (NULL|self + strip)
+            654 CALL                     0
+
+432         662 LOAD_GLOBAL             25 (NULL + int)
+            672 LOAD_FAST               29 (w)
+            674 LOAD_ATTR               26 (start)
+            694 COPY                     1
+            696 POP_JUMP_IF_TRUE         2 (to 702)
+            698 POP_TOP
+            700 LOAD_CONST              17 (0)
+        >>  702 LOAD_CONST              14 (1000)
+            704 BINARY_OP                5 (*)
+            708 CALL                     1
+
+433         716 LOAD_GLOBAL             25 (NULL + int)
+            726 LOAD_FAST               29 (w)
+            728 LOAD_ATTR               28 (end)
+            748 COPY                     1
+            750 POP_JUMP_IF_TRUE         2 (to 756)
+            752 POP_TOP
+            754 LOAD_CONST              17 (0)
+        >>  756 LOAD_CONST              14 (1000)
+            758 BINARY_OP                5 (*)
+            762 CALL                     1
+
+431         770 LOAD_CONST              18 (('text', 'start_ms', 'end_ms'))
+            772 BUILD_CONST_KEY_MAP      3
+            774 STORE_FAST              30 (ws)
+
+434         776 LOAD_FAST               28 (seg_words)
+            778 LOAD_ATTR               39 (NULL|self + append)
+            798 LOAD_FAST               30 (ws)
+            800 CALL                     1
+            808 POP_TOP
+
+435         810 LOAD_FAST               22 (flat_words)
+            812 LOAD_ATTR               39 (NULL|self + append)
+            832 LOAD_FAST               30 (ws)
+            834 CALL                     1
+            842 POP_TOP
+            844 JUMP_BACKWARD          124 (to 598)
+
+430     >>  846 END_FOR
+
+437     >>  848 LOAD_FAST                9 (snap_to_words)
+            850 POP_JUMP_IF_FALSE       18 (to 888)
+            852 LOAD_FAST               28 (seg_words)
+            854 POP_JUMP_IF_FALSE       16 (to 888)
+
+438         856 LOAD_GLOBAL             41 (NULL + _snap_to_words)
+            866 LOAD_FAST               25 (start_ms)
+            868 LOAD_FAST               26 (end_ms)
+            870 LOAD_FAST               28 (seg_words)
+            872 CALL                     3
+            880 UNPACK_SEQUENCE          2
+            884 STORE_FAST              25 (start_ms)
+            886 STORE_FAST              26 (end_ms)
+
+440     >>  888 LOAD_GLOBAL             43 (NULL + len)
+            898 LOAD_FAST               21 (all_segments)
+            900 CALL                     1
+            908 LOAD_CONST               3 (1)
+            910 BINARY_OP                0 (+)
+            914 LOAD_FAST               25 (start_ms)
+
+441         916 LOAD_FAST               26 (end_ms)
+            918 LOAD_FAST               27 (text_str)
+
+440         920 LOAD_CONST              19 (('seq', 'start_ms', 'end_ms', 'text'))
+            922 BUILD_CONST_KEY_MAP      4
+            924 STORE_FAST              31 (seg_dict)
+
+442         926 LOAD_FAST               28 (seg_words)
+            928 POP_JUMP_IF_FALSE        5 (to 940)
+
+443         930 LOAD_FAST               28 (seg_words)
+            932 LOAD_FAST               31 (seg_dict)
+            934 LOAD_CONST              16 ('words')
+            936 STORE_SUBSCR
+
+444     >>  940 LOAD_FAST               21 (all_segments)
+            942 LOAD_ATTR               39 (NULL|self + append)
+            962 LOAD_FAST               31 (seg_dict)
+            964 CALL                     1
+            972 POP_TOP
+
+446         974 LOAD_FAST               12 (on_progress)
+            976 POP_JUMP_IF_TRUE         2 (to 982)
+            978 EXTENDED_ARG             1
+            980 JUMP_BACKWARD          322 (to 338)
+
+447     >>  982 PUSH_NULL
+            984 LOAD_FAST               12 (on_progress)
+            986 LOAD_FAST               23 (duration)
+            988 LOAD_CONST              17 (0)
+            990 COMPARE_OP              68 (>)
+            994 POP_JUMP_IF_FALSE       25 (to 1046)
+            996 LOAD_GLOBAL             45 (NULL + min)
+           1006 LOAD_CONST              20 (1.0)
+           1008 LOAD_FAST               24 (segment)
+           1010 LOAD_ATTR               28 (end)
+           1030 LOAD_FAST               23 (duration)
+           1032 BINARY_OP               11 (/)
+           1036 CALL                     2
+           1044 JUMP_FORWARD             1 (to 1048)
+        >> 1046 LOAD_CONST              20 (1.0)
+        >> 1048 LOAD_FAST               27 (text_str)
+           1050 CALL                     2
+           1058 POP_TOP
+           1060 EXTENDED_ARG             1
+           1062 JUMP_BACKWARD          363 (to 338)
+
+421     >> 1064 END_FOR
+
+449        1066 LOAD_FAST                2 (out_srt)
+           1068 LOAD_ATTR               46 (parent)
+           1088 LOAD_ATTR               49 (NULL|self + mkdir)
+           1108 LOAD_CONST              21 (True)
+           1110 LOAD_CONST              21 (True)
+           1112 KW_NAMES                22 (('parents', 'exist_ok'))
+           1114 CALL                     2
+           1122 POP_TOP
+
+450        1124 LOAD_GLOBAL             51 (NULL + open)
+           1134 LOAD_FAST                2 (out_srt)
+           1136 LOAD_CONST              23 ('w')
+           1138 LOAD_CONST              24 ('utf-8')
+           1140 KW_NAMES                25 (('encoding',))
+           1142 CALL                     3
+           1150 BEFORE_WITH
+           1152 STORE_FAST              32 (f)
+
+451        1154 LOAD_FAST               21 (all_segments)
+           1156 GET_ITER
+        >> 1158 FOR_ITER                95 (to 1352)
+           1162 STORE_FAST              33 (seg)
+
+452        1164 LOAD_FAST               32 (f)
+           1166 LOAD_ATTR               53 (NULL|self + write)
+           1186 LOAD_FAST               33 (seg)
+           1188 LOAD_CONST              26 ('seq')
+           1190 BINARY_SUBSCR
+           1194 FORMAT_VALUE             0
+           1196 LOAD_CONST              27 ('\n')
+           1198 BUILD_STRING             2
+           1200 CALL                     1
+           1208 POP_TOP
+
+453        1210 LOAD_FAST               32 (f)
+           1212 LOAD_ATTR               53 (NULL|self + write)
+           1232 LOAD_GLOBAL             55 (NULL + format_srt_time)
+           1242 LOAD_FAST               33 (seg)
+           1244 LOAD_CONST              28 ('start_ms')
+           1246 BINARY_SUBSCR
+           1250 CALL                     1
+           1258 FORMAT_VALUE             0
+           1260 LOAD_CONST              29 (' --> ')
+           1262 LOAD_GLOBAL             55 (NULL + format_srt_time)
+           1272 LOAD_FAST               33 (seg)
+           1274 LOAD_CONST              30 ('end_ms')
+           1276 BINARY_SUBSCR
+           1280 CALL                     1
+           1288 FORMAT_VALUE             0
+           1290 LOAD_CONST              27 ('\n')
+           1292 BUILD_STRING             4
+           1294 CALL                     1
+           1302 POP_TOP
+
+454        1304 LOAD_FAST               32 (f)
+           1306 LOAD_ATTR               53 (NULL|self + write)
+           1326 LOAD_FAST               33 (seg)
+           1328 LOAD_CONST              31 ('text')
+           1330 BINARY_SUBSCR
+           1334 FORMAT_VALUE             0
+           1336 LOAD_CONST              32 ('\n\n')
+           1338 BUILD_STRING             2
+           1340 CALL                     1
+           1348 POP_TOP
+           1350 JUMP_BACKWARD           97 (to 1158)
+
+451     >> 1352 END_FOR
+           1354 NOP
+
+450        1356 LOAD_CONST               2 (None)
+           1358 LOAD_CONST               2 (None)
+           1360 LOAD_CONST               2 (None)
+           1362 CALL                     2
+           1370 POP_TOP
+
+456     >> 1372 LOAD_FAST                3 (out_vtt)
+           1374 LOAD_ATTR               46 (parent)
+           1394 LOAD_ATTR               49 (NULL|self + mkdir)
+           1414 LOAD_CONST              21 (True)
+           1416 LOAD_CONST              21 (True)
+           1418 KW_NAMES                22 (('parents', 'exist_ok'))
+           1420 CALL                     2
+           1428 POP_TOP
+
+457        1430 LOAD_GLOBAL             51 (NULL + open)
+           1440 LOAD_FAST                3 (out_vtt)
+           1442 LOAD_CONST              23 ('w')
+           1444 LOAD_CONST              24 ('utf-8')
+           1446 KW_NAMES                25 (('encoding',))
+           1448 CALL                     3
+           1456 BEFORE_WITH
+           1458 STORE_FAST              32 (f)
+
+458        1460 LOAD_FAST               32 (f)
+           1462 LOAD_ATTR               53 (NULL|self + write)
+           1482 LOAD_CONST              33 ('WEBVTT\n\n')
+           1484 CALL                     1
+           1492 POP_TOP
+
+459        1494 LOAD_FAST               21 (all_segments)
+           1496 GET_ITER
+        >> 1498 FOR_ITER                95 (to 1692)
+           1502 STORE_FAST              33 (seg)
+
+460        1504 LOAD_FAST               32 (f)
+           1506 LOAD_ATTR               53 (NULL|self + write)
+           1526 LOAD_FAST               33 (seg)
+           1528 LOAD_CONST              26 ('seq')
+           1530 BINARY_SUBSCR
+           1534 FORMAT_VALUE             0
+           1536 LOAD_CONST              27 ('\n')
+           1538 BUILD_STRING             2
+           1540 CALL                     1
+           1548 POP_TOP
+
+461        1550 LOAD_FAST               32 (f)
+           1552 LOAD_ATTR               53 (NULL|self + write)
+           1572 LOAD_GLOBAL             57 (NULL + format_vtt_time)
+           1582 LOAD_FAST               33 (seg)
+           1584 LOAD_CONST              28 ('start_ms')
+           1586 BINARY_SUBSCR
+           1590 CALL                     1
+           1598 FORMAT_VALUE             0
+           1600 LOAD_CONST              29 (' --> ')
+           1602 LOAD_GLOBAL             57 (NULL + format_vtt_time)
+           1612 LOAD_FAST               33 (seg)
+           1614 LOAD_CONST              30 ('end_ms')
+           1616 BINARY_SUBSCR
+           1620 CALL                     1
+           1628 FORMAT_VALUE             0
+           1630 LOAD_CONST              27 ('\n')
+           1632 BUILD_STRING             4
+           1634 CALL                     1
+           1642 POP_TOP
+
+462        1644 LOAD_FAST               32 (f)
+           1646 LOAD_ATTR               53 (NULL|self + write)
+           1666 LOAD_FAST               33 (seg)
+           1668 LOAD_CONST              31 ('text')
+           1670 BINARY_SUBSCR
+           1674 FORMAT_VALUE             0
+           1676 LOAD_CONST              32 ('\n\n')
+           1678 BUILD_STRING             2
+           1680 CALL                     1
+           1688 POP_TOP
+           1690 JUMP_BACKWARD           97 (to 1498)
+
+459     >> 1692 END_FOR
+           1694 NOP
+
+457        1696 LOAD_CONST               2 (None)
+           1698 LOAD_CONST               2 (None)
+           1700 LOAD_CONST               2 (None)
+           1702 CALL                     2
+           1710 POP_TOP
+
+465     >> 1712 LOAD_FAST               14 (device_used)
+
+466        1714 LOAD_GLOBAL             21 (NULL + getattr)
+           1724 LOAD_FAST               18 (info)
+           1726 LOAD_CONST              34 ('language')
+           1728 LOAD_CONST               2 (None)
+           1730 CALL                     3
+
+467        1738 LOAD_FAST               21 (all_segments)
+
+468        1740 LOAD_FAST               22 (flat_words)
+
+464        1742 LOAD_CONST              35 (('device_used', 'language', 'segments', 'words'))
+           1744 BUILD_CONST_KEY_MAP      4
+           1746 RETURN_VALUE
+        >> 1748 PUSH_EXC_INFO
+
+411        1750 LOAD_GLOBAL             12 (Exception)
+           1760 CHECK_EXC_MATCH
+           1762 POP_JUMP_IF_FALSE       46 (to 1856)
+           1764 STORE_FAST              20 (e)
+
+412        1766 LOAD_GLOBAL             15 (NULL + print)
+           1776 LOAD_CONST               8 ('Warning: batched transcribe lỗi (')
+           1778 LOAD_FAST               20 (e)
+           1780 FORMAT_VALUE             0
+           1782 LOAD_CONST               9 ('); giải mã tuần tự.')
+           1784 BUILD_STRING             3
+           1786 LOAD_GLOBAL             16 (sys)
+           1796 LOAD_ATTR               18 (stderr)
+           1816 KW_NAMES                10 (('file',))
+           1818 CALL                     2
+           1826 POP_TOP
+
+413        1828 LOAD_CONST               2 (None)
+           1830 COPY                     1
+           1832 STORE_FAST              17 (segments)
+           1834 STORE_FAST              18 (info)
+           1836 POP_EXCEPT
+           1838 LOAD_CONST               2 (None)
+           1840 STORE_FAST              20 (e)
+           1842 DELETE_FAST             20 (e)
+           1844 EXTENDED_ARG             3
+           1846 JUMP_BACKWARD          813 (to 222)
+        >> 1848 LOAD_CONST               2 (None)
+           1850 STORE_FAST              20 (e)
+           1852 DELETE_FAST             20 (e)
+           1854 RERAISE                  1
+
+411     >> 1856 RERAISE                  0
+        >> 1858 COPY                     3
+           1860 POP_EXCEPT
+           1862 RERAISE                  1
+
+450     >> 1864 PUSH_EXC_INFO
+           1866 WITH_EXCEPT_START
+           1868 POP_JUMP_IF_TRUE         1 (to 1872)
+           1870 RERAISE                  2
+        >> 1872 POP_TOP
+           1874 POP_EXCEPT
+           1876 POP_TOP
+           1878 POP_TOP
+           1880 JUMP_BACKWARD          255 (to 1372)
+        >> 1882 COPY                     3
+           1884 POP_EXCEPT
+           1886 RERAISE                  1
+
+457     >> 1888 PUSH_EXC_INFO
+           1890 WITH_EXCEPT_START
+           1892 POP_JUMP_IF_TRUE         1 (to 1896)
+           1894 RERAISE                  2
+        >> 1896 POP_TOP
+           1898 POP_EXCEPT
+           1900 POP_TOP
+           1902 POP_TOP
+           1904 JUMP_BACKWARD           97 (to 1712)
+        >> 1906 COPY                     3
+           1908 POP_EXCEPT
+           1910 RERAISE                  1
+ExceptionTable:
+  154 to 220 -> 1748 [0]
+  1152 to 1352 -> 1864 [1] lasti
+  1458 to 1692 -> 1888 [1] lasti
+  1748 to 1764 -> 1858 [1] lasti
+  1766 to 1834 -> 1848 [1] lasti
+  1848 to 1856 -> 1858 [1] lasti
+  1864 to 1872 -> 1882 [3] lasti
+  1888 to 1896 -> 1906 [3] lasti
+
+Disassembly of <code object classify_error at 0x7f6c927a70f0, file "app\workers\whisper_proc.py", line 472>:
+              0 MAKE_CELL                4 (low)
+
+472           2 RESUME                   0
+
+483           4 LOAD_GLOBAL              1 (NULL + str)
+             14 LOAD_GLOBAL              3 (NULL + getattr)
+             24 LOAD_FAST                0 (exc)
+             26 LOAD_CONST               1 ('message')
+             28 LOAD_CONST               2 (None)
+             30 CALL                     3
+             38 COPY                     1
+             40 POP_JUMP_IF_TRUE         2 (to 46)
+             42 POP_TOP
+             44 LOAD_FAST                0 (exc)
+        >>   46 CALL                     1
+             54 STORE_FAST               2 (msg)
+
+484          56 LOAD_FAST                2 (msg)
+             58 LOAD_ATTR                5 (NULL|self + lower)
+             78 CALL                     0
+             86 STORE_DEREF              4 (low)
+
+485          88 LOAD_CONST               3 (('mkl_malloc', 'failed to allocate', 'bad_alloc', 'out of memory', 'cannot allocate', 'unable to allocate', 'insufficient memory', 'memoryerror', 'alloc failed'))
+             90 STORE_FAST               3 (_mem_markers)
+
+488          92 LOAD_CONST               4 ('bị lỗi/chưa tải hoàn tất')
+             94 LOAD_FAST                2 (msg)
+             96 CONTAINS_OP              0
+             98 POP_JUMP_IF_FALSE        7 (to 114)
+
+489         100 LOAD_CONST               5 ('WHISPER_MODEL_DOWNLOAD_FAILED')
+            102 LOAD_CONST               6 ('Transcription failed: ')
+            104 LOAD_FAST                2 (msg)
+            106 FORMAT_VALUE             0
+            108 BUILD_STRING             2
+            110 BUILD_TUPLE              2
+            112 RETURN_VALUE
+
+490     >>  114 LOAD_GLOBAL              7 (NULL + isinstance)
+            124 LOAD_FAST                0 (exc)
+            126 LOAD_GLOBAL              8 (MemoryError)
+            136 CALL                     2
+            144 POP_JUMP_IF_TRUE        20 (to 186)
+            146 LOAD_GLOBAL             11 (NULL + any)
+            156 LOAD_CLOSURE             4 (low)
+            158 BUILD_TUPLE              1
+            160 LOAD_CONST               7 (<code object <genexpr> at 0x7f6c927d5b60, file "app\workers\whisper_proc.py", line 490>)
+            162 MAKE_FUNCTION            8 (closure)
+            164 LOAD_FAST                3 (_mem_markers)
+            166 GET_ITER
+            168 CALL                     0
+            176 CALL                     1
+            184 POP_JUMP_IF_FALSE       11 (to 208)
+
+491     >>  186 LOAD_CONST               8 ('cuda')
+            188 LOAD_DEREF               4 (low)
+            190 CONTAINS_OP              0
+            192 POP_JUMP_IF_FALSE        6 (to 206)
+            194 LOAD_FAST                1 (device_used)
+            196 LOAD_CONST               8 ('cuda')
+            198 COMPARE_OP              40 (==)
+            202 POP_JUMP_IF_FALSE        1 (to 206)
+
+492         204 RETURN_CONST             9 (('WHISPER_OOM_VRAM', 'Hết VRAM khi nhận diện giọng. Hãy hạ model hoặc chuyển sang CPU.'))
+
+494     >>  206 RETURN_CONST            10 (('WHISPER_OOM_RAM', 'Thiếu bộ nhớ (RAM) khi nhận diện giọng. Hãy chọn model Whisper nhỏ hơn (vd small/medium) hoặc đóng bớt ứng dụng đang mở rồi thử lại.'))
+
+497     >>  208 LOAD_CONST              11 ('WHISPER_AUDIO_INVALID')
+            210 LOAD_CONST               6 ('Transcription failed: ')
+            212 LOAD_FAST                2 (msg)
+            214 FORMAT_VALUE             0
+            216 BUILD_STRING             2
+            218 BUILD_TUPLE              2
+            220 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c927d5b60, file "app\workers\whisper_proc.py", line 490>:
+              0 COPY_FREE_VARS           1
+
+490           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                 8 (to 30)
+             14 STORE_FAST               1 (k)
+             16 LOAD_FAST                1 (k)
+             18 LOAD_DEREF               2 (low)
+             20 CONTAINS_OP              0
+             22 YIELD_VALUE              1
+             24 RESUME                   1
+             26 POP_TOP
+             28 JUMP_BACKWARD           10 (to 10)
+        >>   30 END_FOR
+             32 RETURN_CONST             0 (None)
+        >>   34 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             36 RERAISE                  1
+ExceptionTable:
+  6 to 32 -> 34 [0] lasti
+
+Disassembly of <code object _validate_inputs at 0x7f6c92413120, file "app\workers\whisper_proc.py", line 500>:
+500           0 RESUME                   0
+
+502           2 LOAD_FAST                0 (audio_path)
+              4 LOAD_ATTR                1 (NULL|self + exists)
+             24 CALL                     0
+             32 POP_JUMP_IF_TRUE         7 (to 48)
+
+503          34 LOAD_CONST               1 ('WHISPER_AUDIO_INVALID')
+             36 LOAD_CONST               2 ('Không tìm thấy file audio đầu vào: ')
+             38 LOAD_FAST                0 (audio_path)
+             40 FORMAT_VALUE             0
+             42 BUILD_STRING             2
+             44 BUILD_TUPLE              2
+             46 RETURN_VALUE
+
+504     >>   48 NOP
+
+505          50 LOAD_FAST                0 (audio_path)
+             52 LOAD_ATTR                3 (NULL|self + stat)
+             72 CALL                     0
+             80 LOAD_ATTR                4 (st_size)
+            100 LOAD_CONST               3 (1024)
+            102 COMPARE_OP               2 (<)
+            106 POP_JUMP_IF_FALSE       32 (to 172)
+
+506         108 LOAD_CONST               1 ('WHISPER_AUDIO_INVALID')
+
+507         110 LOAD_CONST               4 ('File audio rỗng/hỏng (')
+            112 LOAD_FAST                0 (audio_path)
+            114 LOAD_ATTR                3 (NULL|self + stat)
+            134 CALL                     0
+            142 LOAD_ATTR                4 (st_size)
+            162 FORMAT_VALUE             0
+            164 LOAD_CONST               5 (' byte). Hãy chạy lại bước Tách âm thanh (Extract audio).')
+            166 BUILD_STRING             3
+
+506         168 BUILD_TUPLE              2
+            170 RETURN_VALUE
+
+505     >>  172 NOP
+
+511     >>  174 LOAD_FAST                1 (model_dir_path)
+            176 LOAD_CONST               6 ('model.bin')
+            178 BINARY_OP               11 (/)
+            182 LOAD_ATTR                1 (NULL|self + exists)
+            202 CALL                     0
+            210 POP_JUMP_IF_TRUE         7 (to 226)
+
+512         212 LOAD_CONST               7 ('WHISPER_MODEL_DOWNLOAD_FAILED')
+            214 LOAD_CONST               8 ('Mô hình Whisper chưa được tải đầy đủ tại: ')
+            216 LOAD_FAST                1 (model_dir_path)
+            218 FORMAT_VALUE             0
+            220 BUILD_STRING             2
+            222 BUILD_TUPLE              2
+            224 RETURN_VALUE
+
+513     >>  226 RETURN_CONST             9 (None)
+        >>  228 PUSH_EXC_INFO
+
+509         230 LOAD_GLOBAL              6 (OSError)
+            240 CHECK_EXC_MATCH
+            242 POP_JUMP_IF_FALSE        3 (to 250)
+            244 POP_TOP
+
+510         246 POP_EXCEPT
+            248 JUMP_BACKWARD           38 (to 174)
+
+509     >>  250 RERAISE                  0
+        >>  252 COPY                     3
+            254 POP_EXCEPT
+            256 RERAISE                  1
+ExceptionTable:
+  50 to 168 -> 228 [0]
+  228 to 244 -> 252 [1] lasti
+  250 to 250 -> 252 [1] lasti
+
+Disassembly of <code object _write_result at 0x28be4770, file "app\workers\whisper_proc.py", line 516>:
+516           0 RESUME                   0
+
+518           2 LOAD_FAST                1 (out_result)
+              4 POP_JUMP_IF_FALSE      167 (to 340)
+
+519           6 NOP
+
+520           8 LOAD_GLOBAL              1 (NULL + Path)
+             18 LOAD_FAST                1 (out_result)
+             20 CALL                     1
+             28 LOAD_ATTR                2 (parent)
+             48 LOAD_ATTR                5 (NULL|self + mkdir)
+             68 LOAD_CONST               1 (True)
+             70 LOAD_CONST               1 (True)
+             72 KW_NAMES                 2 (('parents', 'exist_ok'))
+             74 CALL                     2
+             82 POP_TOP
+
+521          84 LOAD_GLOBAL              7 (NULL + open)
+             94 LOAD_FAST                1 (out_result)
+             96 LOAD_CONST               3 ('w')
+             98 LOAD_CONST               4 ('utf-8')
+            100 KW_NAMES                 5 (('encoding',))
+            102 CALL                     3
+            110 BEFORE_WITH
+            112 STORE_FAST               3 (rf)
+
+522         114 LOAD_GLOBAL              9 (NULL + json)
+            124 LOAD_ATTR               10 (dump)
+            144 LOAD_FAST                0 (result_obj)
+            146 LOAD_FAST                3 (rf)
+            148 LOAD_CONST               6 (False)
+            150 KW_NAMES                 7 (('ensure_ascii',))
+            152 CALL                     3
+            160 POP_TOP
+
+521         162 LOAD_CONST               8 (None)
+            164 LOAD_CONST               8 (None)
+            166 LOAD_CONST               8 (None)
+            168 CALL                     2
+            176 POP_TOP
+
+523     >>  178 LOAD_GLOBAL             13 (NULL + _emit)
+            188 BUILD_MAP                0
+            190 LOAD_FAST                2 (extra)
+            192 DICT_UPDATE              1
+            194 LOAD_CONST               9 ('result')
+            196 LOAD_CONST              10 ('success')
+
+524         198 LOAD_FAST                0 (result_obj)
+            200 LOAD_ATTR               15 (NULL|self + get)
+            220 LOAD_CONST              11 ('device_used')
+            222 CALL                     1
+
+525         230 LOAD_FAST                0 (result_obj)
+            232 LOAD_ATTR               15 (NULL|self + get)
+            252 LOAD_CONST              12 ('language')
+            254 CALL                     1
+
+526         262 LOAD_FAST                1 (out_result)
+
+527         264 LOAD_GLOBAL             17 (NULL + len)
+            274 LOAD_FAST                0 (result_obj)
+            276 LOAD_ATTR               15 (NULL|self + get)
+            296 LOAD_CONST              13 ('segments')
+            298 CALL                     1
+            306 COPY                     1
+            308 POP_JUMP_IF_TRUE         2 (to 314)
+            310 POP_TOP
+            312 BUILD_LIST               0
+        >>  314 CALL                     1
+
+523         322 LOAD_CONST              14 (('type', 'status', 'device_used', 'language', 'result_file', 'segments_count'))
+            324 BUILD_CONST_KEY_MAP      6
+            326 DICT_UPDATE              1
+            328 CALL                     1
+            336 POP_TOP
+
+528         338 RETURN_CONST             8 (None)
+
+531     >>  340 LOAD_GLOBAL             13 (NULL + _emit)
+            350 BUILD_MAP                0
+            352 LOAD_FAST                2 (extra)
+            354 DICT_UPDATE              1
+            356 LOAD_FAST                0 (result_obj)
+            358 DICT_UPDATE              1
+            360 LOAD_CONST               9 ('result')
+            362 LOAD_CONST              10 ('success')
+            364 LOAD_CONST              15 (('type', 'status'))
+            366 BUILD_CONST_KEY_MAP      2
+            368 DICT_UPDATE              1
+            370 CALL                     1
+            378 POP_TOP
+            380 RETURN_CONST             8 (None)
+
+521     >>  382 PUSH_EXC_INFO
+            384 WITH_EXCEPT_START
+            386 POP_JUMP_IF_TRUE         1 (to 390)
+            388 RERAISE                  2
+        >>  390 POP_TOP
+            392 POP_EXCEPT
+            394 POP_TOP
+            396 POP_TOP
+            398 JUMP_BACKWARD          111 (to 178)
+        >>  400 COPY                     3
+            402 POP_EXCEPT
+            404 RERAISE                  1
+        >>  406 PUSH_EXC_INFO
+
+529         408 LOAD_GLOBAL             18 (Exception)
+            418 CHECK_EXC_MATCH
+            420 POP_JUMP_IF_FALSE        3 (to 428)
+            422 POP_TOP
+
+530         424 POP_EXCEPT
+            426 JUMP_BACKWARD           44 (to 340)
+
+529     >>  428 RERAISE                  0
+        >>  430 COPY                     3
+            432 POP_EXCEPT
+            434 RERAISE                  1
+ExceptionTable:
+  8 to 110 -> 406 [0]
+  112 to 160 -> 382 [1] lasti
+  162 to 336 -> 406 [0]
+  382 to 390 -> 400 [3] lasti
+  392 to 404 -> 406 [0]
+  406 to 422 -> 430 [1] lasti
+  428 to 428 -> 430 [1] lasti
+
+Disassembly of <code object serve at 0x28db8a30, file "app\workers\whisper_proc.py", line 535>:
+              0 MAKE_CELL               14 (cancelled)
+              2 MAKE_CELL               15 (req_id)
+              4 MAKE_CELL               16 (tag)
+
+535           6 RESUME                   0
+
+537           8 NOP
+
+538          10 LOAD_GLOBAL              1 (NULL + load_model)
+             20 LOAD_FAST                0 (model_dir_path)
+             22 LOAD_FAST                1 (device)
+             24 LOAD_FAST                2 (compute_type)
+             26 CALL                     3
+             34 UNPACK_SEQUENCE          2
+             38 STORE_FAST               3 (model)
+             40 STORE_FAST               4 (device_used)
+
+544     >>   42 LOAD_GLOBAL              7 (NULL + _emit)
+             52 LOAD_CONST               1 ('ready')
+             54 LOAD_CONST               6 ('success')
+             56 LOAD_FAST_CHECK          4 (device_used)
+
+545          58 LOAD_GLOBAL             12 (_CPU_THREADS)
+
+544          68 LOAD_CONST               7 (('type', 'status', 'device_used', 'cpu_threads'))
+             70 BUILD_CONST_KEY_MAP      4
+             72 CALL                     1
+             80 POP_TOP
+
+547          82 LOAD_GLOBAL             15 (NULL + set)
+             92 CALL                     0
+            100 STORE_DEREF             14 (cancelled)
+
+549         102 LOAD_GLOBAL              8 (sys)
+            112 LOAD_ATTR               16 (stdin)
+            132 GET_ITER
+        >>  134 EXTENDED_ARG             2
+            136 FOR_ITER               550 (to 1240)
+            140 STORE_FAST               8 (line)
+
+550         142 LOAD_FAST                8 (line)
+            144 LOAD_ATTR               19 (NULL|self + strip)
+            164 CALL                     0
+            172 STORE_FAST               8 (line)
+
+551         174 LOAD_FAST                8 (line)
+            176 POP_JUMP_IF_TRUE         1 (to 180)
+
+552         178 JUMP_BACKWARD           23 (to 134)
+
+553     >>  180 NOP
+
+554         182 LOAD_GLOBAL             21 (NULL + json)
+            192 LOAD_ATTR               22 (loads)
+            212 LOAD_FAST                8 (line)
+            214 CALL                     1
+            222 STORE_FAST               9 (req)
+
+557         224 LOAD_FAST                9 (req)
+            226 LOAD_ATTR               27 (NULL|self + get)
+            246 LOAD_CONST               8 ('type')
+            248 CALL                     1
+            256 STORE_FAST              10 (rtype)
+
+559         258 LOAD_FAST               10 (rtype)
+            260 LOAD_CONST               9 ('shutdown')
+            262 COMPARE_OP              40 (==)
+            266 POP_JUMP_IF_FALSE        2 (to 272)
+
+560         268 POP_TOP
+            270 RETURN_CONST             5 (None)
+
+561     >>  272 LOAD_FAST               10 (rtype)
+            274 LOAD_CONST              10 ('ping')
+            276 COMPARE_OP              40 (==)
+            280 POP_JUMP_IF_FALSE       14 (to 310)
+
+562         282 LOAD_GLOBAL              7 (NULL + _emit)
+            292 LOAD_CONST               8 ('type')
+            294 LOAD_CONST              11 ('pong')
+            296 BUILD_MAP                1
+            298 CALL                     1
+            306 POP_TOP
+
+563         308 JUMP_BACKWARD           88 (to 134)
+
+564     >>  310 LOAD_FAST               10 (rtype)
+            312 LOAD_CONST              12 ('cancel')
+            314 COMPARE_OP              40 (==)
+            318 POP_JUMP_IF_FALSE       46 (to 412)
+
+566         320 LOAD_DEREF              14 (cancelled)
+            322 LOAD_ATTR               29 (NULL|self + add)
+            342 LOAD_GLOBAL             31 (NULL + str)
+            352 LOAD_FAST                9 (req)
+            354 LOAD_ATTR               27 (NULL|self + get)
+            374 LOAD_CONST              13 ('req_id')
+            376 CALL                     1
+            384 COPY                     1
+            386 POP_JUMP_IF_TRUE         2 (to 392)
+            388 POP_TOP
+            390 LOAD_CONST              14 ('')
+        >>  392 CALL                     1
+            400 CALL                     1
+            408 POP_TOP
+
+567         410 JUMP_BACKWARD          139 (to 134)
+
+568     >>  412 LOAD_FAST               10 (rtype)
+            414 LOAD_CONST              15 ('transcribe')
+            416 COMPARE_OP              55 (!=)
+            420 POP_JUMP_IF_FALSE        1 (to 424)
+
+569         422 JUMP_BACKWARD          145 (to 134)
+
+571     >>  424 LOAD_GLOBAL             31 (NULL + str)
+            434 LOAD_FAST                9 (req)
+            436 LOAD_ATTR               27 (NULL|self + get)
+            456 LOAD_CONST              13 ('req_id')
+            458 CALL                     1
+            466 COPY                     1
+            468 POP_JUMP_IF_TRUE         2 (to 474)
+            470 POP_TOP
+            472 LOAD_CONST              14 ('')
+        >>  474 CALL                     1
+            482 STORE_DEREF             15 (req_id)
+
+572         484 LOAD_DEREF              14 (cancelled)
+            486 LOAD_ATTR               33 (NULL|self + discard)
+            506 LOAD_DEREF              15 (req_id)
+            508 CALL                     1
+            516 POP_TOP
+
+573         518 LOAD_CONST              13 ('req_id')
+            520 LOAD_DEREF              15 (req_id)
+            522 BUILD_MAP                1
+            524 STORE_DEREF             16 (tag)
+
+574         526 LOAD_GLOBAL             35 (NULL + Path)
+            536 LOAD_FAST                9 (req)
+            538 LOAD_ATTR               27 (NULL|self + get)
+            558 LOAD_CONST              16 ('audio_path')
+            560 CALL                     1
+            568 COPY                     1
+            570 POP_JUMP_IF_TRUE         2 (to 576)
+            572 POP_TOP
+            574 LOAD_CONST              14 ('')
+        >>  576 CALL                     1
+            584 STORE_FAST              11 (audio_path)
+
+575         586 LOAD_GLOBAL             37 (NULL + _validate_inputs)
+            596 LOAD_FAST               11 (audio_path)
+            598 LOAD_FAST                0 (model_dir_path)
+            600 CALL                     2
+            608 STORE_FAST              12 (bad)
+
+576         610 LOAD_FAST               12 (bad)
+            612 POP_JUMP_IF_FALSE       28 (to 670)
+
+577         614 LOAD_GLOBAL              7 (NULL + _emit)
+            624 BUILD_MAP                0
+            626 LOAD_DEREF              16 (tag)
+            628 DICT_UPDATE              1
+            630 LOAD_CONST              17 ('result')
+            632 LOAD_CONST               2 ('failed')
+
+578         634 LOAD_FAST               12 (bad)
+            636 LOAD_CONST              18 (0)
+            638 BINARY_SUBSCR
+            642 LOAD_FAST               12 (bad)
+            644 LOAD_CONST               4 (1)
+            646 BINARY_SUBSCR
+
+577         650 LOAD_CONST               3 (('type', 'status', 'error_code', 'error_message'))
+            652 BUILD_CONST_KEY_MAP      4
+            654 DICT_UPDATE              1
+            656 CALL                     1
+            664 POP_TOP
+
+579         666 EXTENDED_ARG             1
+            668 JUMP_BACKWARD          268 (to 134)
+
+581     >>  670 NOP
+
+582         672 LOAD_GLOBAL             39 (NULL + transcribe_one)
+
+583         682 LOAD_FAST_CHECK          3 (model)
+
+584         684 LOAD_FAST               11 (audio_path)
+
+585         686 LOAD_GLOBAL             35 (NULL + Path)
+            696 LOAD_FAST                9 (req)
+            698 LOAD_CONST              19 ('out_srt')
+            700 BINARY_SUBSCR
+            704 CALL                     1
+            712 LOAD_GLOBAL             35 (NULL + Path)
+            722 LOAD_FAST                9 (req)
+            724 LOAD_CONST              20 ('out_vtt')
+            726 BINARY_SUBSCR
+            730 CALL                     1
+
+586         738 LOAD_GLOBAL             31 (NULL + str)
+            748 LOAD_FAST                9 (req)
+            750 LOAD_ATTR               27 (NULL|self + get)
+            770 LOAD_CONST              21 ('src_lang')
+            772 CALL                     1
+            780 COPY                     1
+            782 POP_JUMP_IF_TRUE         2 (to 788)
+            784 POP_TOP
+            786 LOAD_CONST              22 ('auto')
+        >>  788 CALL                     1
+
+587         796 LOAD_GLOBAL             41 (NULL + bool)
+            806 LOAD_FAST                9 (req)
+            808 LOAD_ATTR               27 (NULL|self + get)
+            828 LOAD_CONST              23 ('word_timestamps')
+            830 CALL                     1
+            838 CALL                     1
+
+588         846 LOAD_GLOBAL             41 (NULL + bool)
+            856 LOAD_FAST                9 (req)
+            858 LOAD_ATTR               27 (NULL|self + get)
+            878 LOAD_CONST              24 ('vad')
+            880 LOAD_CONST              25 (True)
+            882 CALL                     2
+            890 CALL                     1
+
+591         898 LOAD_GLOBAL             43 (NULL + int)
+            908 LOAD_FAST                9 (req)
+            910 LOAD_ATTR               27 (NULL|self + get)
+            930 LOAD_CONST              26 ('batch_size')
+            932 CALL                     1
+            940 COPY                     1
+            942 POP_JUMP_IF_TRUE         2 (to 948)
+            944 POP_TOP
+            946 LOAD_CONST               4 (1)
+        >>  948 CALL                     1
+
+592         956 LOAD_GLOBAL             43 (NULL + int)
+            966 LOAD_FAST                9 (req)
+            968 LOAD_ATTR               27 (NULL|self + get)
+            988 LOAD_CONST              27 ('beam_size')
+            990 CALL                     1
+            998 COPY                     1
+           1000 POP_JUMP_IF_TRUE         2 (to 1006)
+           1002 POP_TOP
+           1004 LOAD_CONST              28 (5)
+        >> 1006 CALL                     1
+
+593        1014 LOAD_GLOBAL             41 (NULL + bool)
+           1024 LOAD_FAST                9 (req)
+           1026 LOAD_ATTR               27 (NULL|self + get)
+           1046 LOAD_CONST              29 ('snap_to_words')
+           1048 CALL                     1
+           1056 CALL                     1
+
+594        1064 LOAD_GLOBAL             41 (NULL + bool)
+           1074 LOAD_FAST                9 (req)
+           1076 LOAD_ATTR               27 (NULL|self + get)
+           1096 LOAD_CONST              30 ('condition_on_prev')
+           1098 LOAD_CONST              25 (True)
+           1100 CALL                     2
+           1108 CALL                     1
+
+596        1116 LOAD_FAST                9 (req)
+           1118 LOAD_ATTR               27 (NULL|self + get)
+           1138 LOAD_CONST              31 ('temperature')
+           1140 CALL                     1
+
+597        1148 LOAD_CLOSURE            16 (tag)
+           1150 BUILD_TUPLE              1
+           1152 LOAD_CONST              32 (<code object <lambda> at 0x7f6c927d5e30, file "app\workers\whisper_proc.py", line 597>)
+           1154 MAKE_FUNCTION            8 (closure)
+
+598        1156 LOAD_CLOSURE            14 (cancelled)
+           1158 LOAD_CLOSURE            15 (req_id)
+           1160 BUILD_TUPLE              2
+           1162 LOAD_CONST              33 (<code object <lambda> at 0x7f6c92a34ac0, file "app\workers\whisper_proc.py", line 598>)
+           1164 MAKE_FUNCTION            8 (closure)
+
+599        1166 LOAD_FAST                4 (device_used)
+
+582        1168 KW_NAMES                34 (('audio_path', 'out_srt', 'out_vtt', 'src_lang', 'word_timestamps', 'vad', 'batch_size', 'beam_size', 'snap_to_words', 'condition_on_prev', 'temperature', 'on_progress', 'cancel_check', 'device_used'))
+           1170 CALL                    15
+           1178 STORE_FAST              13 (result)
+
+611        1180 LOAD_GLOBAL             51 (NULL + _write_result)
+           1190 LOAD_FAST               13 (result)
+           1192 LOAD_FAST                9 (req)
+           1194 LOAD_ATTR               27 (NULL|self + get)
+           1214 LOAD_CONST              38 ('out_result')
+           1216 CALL                     1
+           1224 LOAD_DEREF              16 (tag)
+           1226 CALL                     3
+           1234 POP_TOP
+           1236 EXTENDED_ARG             2
+           1238 JUMP_BACKWARD          553 (to 134)
+
+549     >> 1240 END_FOR
+           1242 RETURN_CONST             5 (None)
+        >> 1244 PUSH_EXC_INFO
+
+539        1246 LOAD_GLOBAL              2 (Exception)
+           1256 CHECK_EXC_MATCH
+           1258 POP_JUMP_IF_FALSE       63 (to 1386)
+           1260 STORE_FAST               5 (e)
+
+540        1262 LOAD_GLOBAL              5 (NULL + classify_error)
+           1272 LOAD_FAST                5 (e)
+           1274 LOAD_FAST                1 (device)
+           1276 CALL                     2
+           1284 UNPACK_SEQUENCE          2
+           1288 STORE_FAST               6 (code)
+           1290 STORE_FAST               7 (message)
+
+541        1292 LOAD_GLOBAL              7 (NULL + _emit)
+           1302 LOAD_CONST               1 ('ready')
+           1304 LOAD_CONST               2 ('failed')
+           1306 LOAD_FAST                6 (code)
+           1308 LOAD_FAST                7 (message)
+           1310 LOAD_CONST               3 (('type', 'status', 'error_code', 'error_message'))
+           1312 BUILD_CONST_KEY_MAP      4
+           1314 CALL                     1
+           1322 POP_TOP
+
+542        1324 LOAD_GLOBAL              9 (NULL + sys)
+           1334 LOAD_ATTR               10 (exit)
+           1354 LOAD_CONST               4 (1)
+           1356 CALL                     1
+           1364 POP_TOP
+           1366 POP_EXCEPT
+           1368 LOAD_CONST               5 (None)
+           1370 STORE_FAST               5 (e)
+           1372 DELETE_FAST              5 (e)
+           1374 EXTENDED_ARG             2
+           1376 JUMP_BACKWARD          668 (to 42)
+        >> 1378 LOAD_CONST               5 (None)
+           1380 STORE_FAST               5 (e)
+           1382 DELETE_FAST              5 (e)
+           1384 RERAISE                  1
+
+539     >> 1386 RERAISE                  0
+        >> 1388 COPY                     3
+           1390 POP_EXCEPT
+           1392 RERAISE                  1
+        >> 1394 PUSH_EXC_INFO
+
+555        1396 LOAD_GLOBAL             24 (ValueError)
+           1406 CHECK_EXC_MATCH
+           1408 POP_JUMP_IF_FALSE        4 (to 1418)
+           1410 POP_TOP
+
+556        1412 POP_EXCEPT
+           1414 EXTENDED_ARG             2
+           1416 JUMP_BACKWARD          642 (to 134)
+
+555     >> 1418 RERAISE                  0
+        >> 1420 COPY                     3
+           1422 POP_EXCEPT
+           1424 RERAISE                  1
+        >> 1426 PUSH_EXC_INFO
+
+601        1428 LOAD_GLOBAL             44 (CancelledRequest)
+           1438 CHECK_EXC_MATCH
+           1440 POP_JUMP_IF_FALSE       39 (to 1520)
+           1442 POP_TOP
+
+602        1444 LOAD_DEREF              14 (cancelled)
+           1446 LOAD_ATTR               33 (NULL|self + discard)
+           1466 LOAD_DEREF              15 (req_id)
+           1468 CALL                     1
+           1476 POP_TOP
+
+603        1478 LOAD_GLOBAL              7 (NULL + _emit)
+           1488 BUILD_MAP                0
+           1490 LOAD_DEREF              16 (tag)
+           1492 DICT_UPDATE              1
+           1494 LOAD_CONST              17 ('result')
+           1496 LOAD_CONST              35 ('cancelled')
+           1498 LOAD_CONST              36 (('type', 'status'))
+           1500 BUILD_CONST_KEY_MAP      2
+           1502 DICT_UPDATE              1
+           1504 CALL                     1
+           1512 POP_TOP
+
+604        1514 POP_EXCEPT
+           1516 EXTENDED_ARG             2
+           1518 JUMP_BACKWARD          693 (to 134)
+
+605     >> 1520 LOAD_GLOBAL              2 (Exception)
+           1530 CHECK_EXC_MATCH
+           1532 POP_JUMP_IF_FALSE       65 (to 1664)
+           1534 STORE_FAST               5 (e)
+
+606        1536 LOAD_GLOBAL              5 (NULL + classify_error)
+           1546 LOAD_FAST                5 (e)
+           1548 LOAD_FAST                4 (device_used)
+           1550 CALL                     2
+           1558 UNPACK_SEQUENCE          2
+           1562 STORE_FAST               6 (code)
+           1564 STORE_FAST               7 (message)
+
+607        1566 LOAD_GLOBAL              7 (NULL + _emit)
+           1576 BUILD_MAP                0
+           1578 LOAD_DEREF              16 (tag)
+           1580 DICT_UPDATE              1
+           1582 LOAD_CONST              17 ('result')
+           1584 LOAD_CONST               2 ('failed')
+           1586 LOAD_FAST                6 (code)
+
+608        1588 LOAD_FAST                7 (message)
+           1590 LOAD_GLOBAL             47 (NULL + traceback)
+           1600 LOAD_ATTR               48 (format_exc)
+           1620 CALL                     0
+
+607        1628 LOAD_CONST              37 (('type', 'status', 'error_code', 'error_message', 'traceback'))
+           1630 BUILD_CONST_KEY_MAP      5
+           1632 DICT_UPDATE              1
+           1634 CALL                     1
+           1642 POP_TOP
+
+609        1644 POP_EXCEPT
+           1646 LOAD_CONST               5 (None)
+           1648 STORE_FAST               5 (e)
+           1650 DELETE_FAST              5 (e)
+           1652 EXTENDED_ARG             2
+           1654 JUMP_BACKWARD          761 (to 134)
+        >> 1656 LOAD_CONST               5 (None)
+           1658 STORE_FAST               5 (e)
+           1660 DELETE_FAST              5 (e)
+           1662 RERAISE                  1
+
+605     >> 1664 RERAISE                  0
+        >> 1666 COPY                     3
+           1668 POP_EXCEPT
+           1670 RERAISE                  1
+ExceptionTable:
+  10 to 40 -> 1244 [0]
+  182 to 222 -> 1394 [1]
+  672 to 1178 -> 1426 [1]
+  1244 to 1260 -> 1388 [1] lasti
+  1262 to 1364 -> 1378 [1] lasti
+  1378 to 1386 -> 1388 [1] lasti
+  1394 to 1410 -> 1420 [2] lasti
+  1418 to 1418 -> 1420 [2] lasti
+  1426 to 1512 -> 1666 [2] lasti
+  1520 to 1534 -> 1666 [2] lasti
+  1536 to 1642 -> 1656 [2] lasti
+  1656 to 1664 -> 1666 [2] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c927d5e30, file "app\workers\whisper_proc.py", line 597>:
+              0 COPY_FREE_VARS           1
+
+597           2 RESUME                   0
+              4 LOAD_GLOBAL              1 (NULL + _emit)
+             14 BUILD_MAP                0
+             16 LOAD_DEREF               2 (tag)
+             18 DICT_UPDATE              1
+             20 LOAD_CONST               1 ('progress')
+             22 LOAD_FAST                0 (p)
+             24 LOAD_FAST                1 (t)
+             26 LOAD_CONST               2 (('type', 'progress', 'text'))
+             28 BUILD_CONST_KEY_MAP      3
+             30 DICT_UPDATE              1
+             32 CALL                     1
+             40 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c92a34ac0, file "app\workers\whisper_proc.py", line 598>:
+              0 COPY_FREE_VARS           2
+
+598           2 RESUME                   0
+              4 LOAD_DEREF               1 (req_id)
+              6 LOAD_DEREF               0 (cancelled)
+              8 CONTAINS_OP              0
+             10 RETURN_VALUE
+
+Disassembly of <code object one_shot at 0x28dbde00, file "app\workers\whisper_proc.py", line 615>:
+615           0 RESUME                   0
+
+616           2 LOAD_GLOBAL              1 (NULL + Path)
+             12 LOAD_FAST                0 (args)
+             14 LOAD_ATTR                2 (audio_path)
+             34 CALL                     1
+             42 STORE_FAST               1 (audio_path)
+
+617          44 LOAD_GLOBAL              1 (NULL + Path)
+             54 LOAD_FAST                0 (args)
+             56 LOAD_ATTR                4 (model_dir_path)
+             76 CALL                     1
+             84 STORE_FAST               2 (model_dir_path)
+
+619          86 LOAD_GLOBAL              7 (NULL + _validate_inputs)
+             96 LOAD_FAST                1 (audio_path)
+             98 LOAD_FAST                2 (model_dir_path)
+            100 CALL                     2
+            108 STORE_FAST               3 (bad)
+
+620         110 LOAD_FAST                3 (bad)
+            112 POP_JUMP_IF_FALSE       43 (to 200)
+
+621         114 LOAD_GLOBAL              9 (NULL + _emit)
+            124 LOAD_CONST               1 ('result')
+            126 LOAD_CONST               2 ('failed')
+            128 LOAD_FAST                3 (bad)
+            130 LOAD_CONST               3 (0)
+            132 BINARY_SUBSCR
+            136 LOAD_FAST                3 (bad)
+            138 LOAD_CONST               4 (1)
+            140 BINARY_SUBSCR
+            144 LOAD_CONST               5 (('type', 'status', 'error_code', 'error_message'))
+            146 BUILD_CONST_KEY_MAP      4
+            148 CALL                     1
+            156 POP_TOP
+
+622         158 LOAD_GLOBAL             11 (NULL + sys)
+            168 LOAD_ATTR               12 (exit)
+            188 LOAD_CONST               4 (1)
+            190 CALL                     1
+            198 POP_TOP
+
+624     >>  200 LOAD_FAST                0 (args)
+            202 LOAD_ATTR               14 (device)
+            222 STORE_FAST               4 (device_used)
+
+625         224 NOP
+
+626         226 LOAD_GLOBAL             17 (NULL + load_model)
+            236 LOAD_FAST                2 (model_dir_path)
+            238 LOAD_FAST                0 (args)
+            240 LOAD_ATTR               14 (device)
+            260 LOAD_FAST                0 (args)
+            262 LOAD_ATTR               18 (compute_type)
+            282 CALL                     3
+            290 UNPACK_SEQUENCE          2
+            294 STORE_FAST               5 (model)
+            296 STORE_FAST               4 (device_used)
+
+627         298 LOAD_GLOBAL             21 (NULL + transcribe_one)
+
+628         308 LOAD_FAST                5 (model)
+
+629         310 LOAD_FAST                1 (audio_path)
+
+630         312 LOAD_GLOBAL              1 (NULL + Path)
+            322 LOAD_FAST                0 (args)
+            324 LOAD_ATTR               22 (out_srt)
+            344 CALL                     1
+            352 LOAD_GLOBAL              1 (NULL + Path)
+            362 LOAD_FAST                0 (args)
+            364 LOAD_ATTR               24 (out_vtt)
+            384 CALL                     1
+
+631         392 LOAD_FAST                0 (args)
+            394 LOAD_ATTR               26 (src_lang)
+
+632         414 LOAD_GLOBAL             29 (NULL + bool)
+            424 LOAD_FAST                0 (args)
+            426 LOAD_ATTR               30 (word_timestamps)
+            446 CALL                     1
+
+633         454 LOAD_FAST                0 (args)
+            456 LOAD_ATTR               32 (no_vad)
+            476 UNARY_NOT
+
+634         478 LOAD_GLOBAL             35 (NULL + int)
+            488 LOAD_FAST                0 (args)
+            490 LOAD_ATTR               36 (batch_size)
+            510 COPY                     1
+            512 POP_JUMP_IF_TRUE         2 (to 518)
+            514 POP_TOP
+            516 LOAD_CONST               4 (1)
+        >>  518 CALL                     1
+
+635         526 LOAD_GLOBAL             35 (NULL + int)
+            536 LOAD_FAST                0 (args)
+            538 LOAD_ATTR               38 (beam_size)
+            558 COPY                     1
+            560 POP_JUMP_IF_TRUE         2 (to 566)
+            562 POP_TOP
+            564 LOAD_CONST               6 (5)
+        >>  566 CALL                     1
+
+636         574 LOAD_GLOBAL             29 (NULL + bool)
+            584 LOAD_FAST                0 (args)
+            586 LOAD_ATTR               40 (snap_words)
+            606 CALL                     1
+
+637         614 LOAD_FAST                0 (args)
+            616 LOAD_ATTR               42 (no_condition_prev)
+            636 UNARY_NOT
+
+638         638 LOAD_FAST                0 (args)
+            640 LOAD_ATTR               44 (greedy_temp)
+            660 POP_JUMP_IF_FALSE        3 (to 668)
+            662 LOAD_CONST               7 (0.0)
+            664 BUILD_LIST               1
+            666 JUMP_FORWARD             1 (to 670)
+        >>  668 LOAD_CONST               0 (None)
+
+639     >>  670 LOAD_CONST               8 (<code object <lambda> at 0x7f6c923932f0, file "app\workers\whisper_proc.py", line 639>)
+            672 MAKE_FUNCTION            0
+
+640         674 LOAD_FAST                4 (device_used)
+
+627         676 KW_NAMES                 9 (('audio_path', 'out_srt', 'out_vtt', 'src_lang', 'word_timestamps', 'vad', 'batch_size', 'beam_size', 'snap_to_words', 'condition_on_prev', 'temperature', 'on_progress', 'device_used'))
+            678 CALL                    14
+            686 STORE_FAST               6 (result)
+
+648     >>  688 LOAD_GLOBAL             55 (NULL + _write_result)
+            698 LOAD_FAST_CHECK          6 (result)
+            700 LOAD_FAST                0 (args)
+            702 LOAD_ATTR               56 (out_result)
+            722 BUILD_MAP                0
+            724 CALL                     3
+            732 POP_TOP
+            734 RETURN_CONST             0 (None)
+        >>  736 PUSH_EXC_INFO
+
+642         738 LOAD_GLOBAL             46 (Exception)
+            748 CHECK_EXC_MATCH
+            750 POP_JUMP_IF_FALSE       81 (to 914)
+            752 STORE_FAST               7 (e)
+
+643         754 LOAD_GLOBAL             49 (NULL + classify_error)
+            764 LOAD_FAST                7 (e)
+            766 LOAD_FAST                4 (device_used)
+            768 CALL                     2
+            776 UNPACK_SEQUENCE          2
+            780 STORE_FAST               8 (code)
+            782 STORE_FAST               9 (message)
+
+644         784 LOAD_GLOBAL              9 (NULL + _emit)
+            794 LOAD_CONST               1 ('result')
+            796 LOAD_CONST               2 ('failed')
+            798 LOAD_FAST                8 (code)
+
+645         800 LOAD_FAST                9 (message)
+            802 LOAD_GLOBAL             51 (NULL + traceback)
+            812 LOAD_ATTR               52 (format_exc)
+            832 CALL                     0
+
+644         840 LOAD_CONST              10 (('type', 'status', 'error_code', 'error_message', 'traceback'))
+            842 BUILD_CONST_KEY_MAP      5
+            844 CALL                     1
+            852 POP_TOP
+
+646         854 LOAD_GLOBAL             11 (NULL + sys)
+            864 LOAD_ATTR               12 (exit)
+            884 LOAD_CONST               4 (1)
+            886 CALL                     1
+            894 POP_TOP
+            896 POP_EXCEPT
+            898 LOAD_CONST               0 (None)
+            900 STORE_FAST               7 (e)
+            902 DELETE_FAST              7 (e)
+            904 JUMP_BACKWARD          109 (to 688)
+        >>  906 LOAD_CONST               0 (None)
+            908 STORE_FAST               7 (e)
+            910 DELETE_FAST              7 (e)
+            912 RERAISE                  1
+
+642     >>  914 RERAISE                  0
+        >>  916 COPY                     3
+            918 POP_EXCEPT
+            920 RERAISE                  1
+ExceptionTable:
+  226 to 686 -> 736 [0]
+  736 to 752 -> 916 [1] lasti
+  754 to 894 -> 906 [1] lasti
+  906 to 914 -> 916 [1] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c923932f0, file "app\workers\whisper_proc.py", line 639>:
+639           0 RESUME                   0
+              2 LOAD_GLOBAL              1 (NULL + _emit)
+             12 LOAD_CONST               1 ('progress')
+             14 LOAD_FAST                0 (p)
+             16 LOAD_FAST                1 (t)
+             18 LOAD_CONST               2 (('type', 'progress', 'text'))
+             20 BUILD_CONST_KEY_MAP      3
+             22 CALL                     1
+             30 RETURN_VALUE
+
+Disassembly of <code object main at 0x28d95720, file "app\workers\whisper_proc.py", line 651>:
+651           0 RESUME                   0
+
+652           2 LOAD_GLOBAL              1 (NULL + argparse)
+             12 LOAD_ATTR                2 (ArgumentParser)
+             32 CALL                     0
+             40 STORE_FAST               0 (parser)
+
+653          42 LOAD_FAST                0 (parser)
+             44 LOAD_ATTR                5 (NULL|self + add_argument)
+             64 LOAD_CONST               1 ('--serve')
+             66 LOAD_CONST               2 ('store_true')
+
+654          68 LOAD_CONST               3 ('Chế độ thường trú: nạp model 1 lần, phục vụ nhiều yêu cầu qua stdin.')
+
+653          70 KW_NAMES                 4 (('action', 'help'))
+             72 CALL                     3
+             80 POP_TOP
+
+655          82 LOAD_FAST                0 (parser)
+             84 LOAD_ATTR                5 (NULL|self + add_argument)
+            104 LOAD_CONST               5 ('--audio-path')
+            106 CALL                     1
+            114 POP_TOP
+
+656         116 LOAD_FAST                0 (parser)
+            118 LOAD_ATTR                5 (NULL|self + add_argument)
+            138 LOAD_CONST               6 ('--model-dir-path')
+            140 LOAD_CONST               7 (True)
+            142 KW_NAMES                 8 (('required',))
+            144 CALL                     2
+            152 POP_TOP
+
+657         154 LOAD_FAST                0 (parser)
+            156 LOAD_ATTR                5 (NULL|self + add_argument)
+            176 LOAD_CONST               9 ('--device')
+            178 LOAD_CONST              10 ('cpu')
+            180 KW_NAMES                11 (('default',))
+            182 CALL                     2
+            190 POP_TOP
+
+658         192 LOAD_FAST                0 (parser)
+            194 LOAD_ATTR                5 (NULL|self + add_argument)
+            214 LOAD_CONST              12 ('--compute-type')
+            216 LOAD_CONST               0 (None)
+            218 KW_NAMES                11 (('default',))
+            220 CALL                     2
+            228 POP_TOP
+
+659         230 LOAD_FAST                0 (parser)
+            232 LOAD_ATTR                5 (NULL|self + add_argument)
+            252 LOAD_CONST              13 ('--cpu-threads')
+            254 LOAD_GLOBAL              6 (int)
+            264 LOAD_CONST              14 (0)
+            266 KW_NAMES                15 (('type', 'default'))
+            268 CALL                     3
+            276 POP_TOP
+
+660         278 LOAD_FAST                0 (parser)
+            280 LOAD_ATTR                5 (NULL|self + add_argument)
+            300 LOAD_CONST              16 ('--src-lang')
+            302 LOAD_CONST              17 ('auto')
+            304 KW_NAMES                11 (('default',))
+            306 CALL                     2
+            314 POP_TOP
+
+661         316 LOAD_FAST                0 (parser)
+            318 LOAD_ATTR                5 (NULL|self + add_argument)
+            338 LOAD_CONST              18 ('--out-srt')
+            340 CALL                     1
+            348 POP_TOP
+
+662         350 LOAD_FAST                0 (parser)
+            352 LOAD_ATTR                5 (NULL|self + add_argument)
+            372 LOAD_CONST              19 ('--out-vtt')
+            374 CALL                     1
+            382 POP_TOP
+
+666         384 LOAD_FAST                0 (parser)
+            386 LOAD_ATTR                5 (NULL|self + add_argument)
+            406 LOAD_CONST              20 ('--out-result')
+            408 LOAD_CONST               0 (None)
+            410 KW_NAMES                11 (('default',))
+            412 CALL                     2
+            420 POP_TOP
+
+667         422 LOAD_FAST                0 (parser)
+            424 LOAD_ATTR                5 (NULL|self + add_argument)
+            444 LOAD_CONST              21 ('--word-timestamps')
+            446 LOAD_CONST               2 ('store_true')
+            448 KW_NAMES                22 (('action',))
+            450 CALL                     2
+            458 POP_TOP
+
+669         460 LOAD_FAST                0 (parser)
+            462 LOAD_ATTR                5 (NULL|self + add_argument)
+            482 LOAD_CONST              23 ('--snap-words')
+            484 LOAD_CONST               2 ('store_true')
+            486 KW_NAMES                22 (('action',))
+            488 CALL                     2
+            496 POP_TOP
+
+670         498 LOAD_FAST                0 (parser)
+            500 LOAD_ATTR                5 (NULL|self + add_argument)
+            520 LOAD_CONST              24 ('--no-vad')
+            522 LOAD_CONST               2 ('store_true')
+            524 KW_NAMES                22 (('action',))
+            526 CALL                     2
+            534 POP_TOP
+
+671         536 LOAD_FAST                0 (parser)
+            538 LOAD_ATTR                5 (NULL|self + add_argument)
+            558 LOAD_CONST              25 ('--no-condition-prev')
+            560 LOAD_CONST               2 ('store_true')
+
+672         562 LOAD_CONST              26 ('Tắt condition_on_previous_text (đường CĂN TIMING).')
+
+671         564 KW_NAMES                 4 (('action', 'help'))
+            566 CALL                     3
+            574 POP_TOP
+
+673         576 LOAD_FAST                0 (parser)
+            578 LOAD_ATTR                5 (NULL|self + add_argument)
+            598 LOAD_CONST              27 ('--greedy-temp')
+            600 LOAD_CONST               2 ('store_true')
+
+674         602 LOAD_CONST              28 ('Ghim temperature=[0.0] — tái lập được và nhanh hơn nhiều lần. CHỈ cho đường CĂN TIMING, không dùng cho phụ đề.')
+
+673         604 KW_NAMES                 4 (('action', 'help'))
+            606 CALL                     3
+            614 POP_TOP
+
+677         616 LOAD_FAST                0 (parser)
+            618 LOAD_ATTR                5 (NULL|self + add_argument)
+            638 LOAD_CONST              29 ('--batch-size')
+            640 LOAD_GLOBAL              6 (int)
+            650 LOAD_CONST              30 (1)
+            652 KW_NAMES                15 (('type', 'default'))
+            654 CALL                     3
+            662 POP_TOP
+
+678         664 LOAD_FAST                0 (parser)
+            666 LOAD_ATTR                5 (NULL|self + add_argument)
+            686 LOAD_CONST              31 ('--beam-size')
+            688 LOAD_GLOBAL              6 (int)
+            698 LOAD_CONST              32 (5)
+            700 KW_NAMES                15 (('type', 'default'))
+            702 CALL                     3
+            710 POP_TOP
+
+679         712 LOAD_FAST                0 (parser)
+            714 LOAD_ATTR                9 (NULL|self + parse_known_args)
+            734 CALL                     0
+            742 LOAD_CONST              14 (0)
+            744 BINARY_SUBSCR
+            748 STORE_FAST               1 (args)
+
+681         750 LOAD_FAST                1 (args)
+            752 LOAD_ATTR               10 (serve)
+            772 POP_JUMP_IF_FALSE       53 (to 880)
+
+682         774 LOAD_GLOBAL             11 (NULL + serve)
+            784 LOAD_GLOBAL             13 (NULL + Path)
+            794 LOAD_FAST                1 (args)
+            796 LOAD_ATTR               14 (model_dir_path)
+            816 CALL                     1
+            824 LOAD_FAST                1 (args)
+            826 LOAD_ATTR               16 (device)
+            846 LOAD_FAST                1 (args)
+            848 LOAD_ATTR               18 (compute_type)
+            868 CALL                     3
+            876 POP_TOP
+
+683         878 RETURN_CONST             0 (None)
+
+685     >>  880 LOAD_FAST                1 (args)
+            882 LOAD_ATTR               20 (audio_path)
+            902 POP_JUMP_IF_FALSE       24 (to 952)
+            904 LOAD_FAST                1 (args)
+            906 LOAD_ATTR               22 (out_srt)
+            926 POP_JUMP_IF_FALSE       12 (to 952)
+            928 LOAD_FAST                1 (args)
+            930 LOAD_ATTR               24 (out_vtt)
+            950 POP_JUMP_IF_TRUE        37 (to 1026)
+
+686     >>  952 LOAD_GLOBAL             27 (NULL + _emit)
+            962 LOAD_CONST              33 ('result')
+            964 LOAD_CONST              34 ('failed')
+            966 LOAD_CONST              35 ('WHISPER_AUDIO_INVALID')
+
+687         968 LOAD_CONST              36 ('Thiếu tham số --audio-path/--out-srt/--out-vtt')
+
+686         970 LOAD_CONST              37 (('type', 'status', 'error_code', 'error_message'))
+            972 BUILD_CONST_KEY_MAP      4
+            974 CALL                     1
+            982 POP_TOP
+
+688         984 LOAD_GLOBAL             29 (NULL + sys)
+            994 LOAD_ATTR               30 (exit)
+           1014 LOAD_CONST              38 (2)
+           1016 CALL                     1
+           1024 POP_TOP
+
+689     >> 1026 LOAD_GLOBAL             33 (NULL + one_shot)
+           1036 LOAD_FAST                1 (args)
+           1038 CALL                     1
+           1046 POP_TOP
+           1048 RETURN_CONST             0 (None)

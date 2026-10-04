@@ -1,0 +1,1647 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Token pool Facebook — port từ LoHa pickToken (4 chiến lược) + user_tokens/token_page_access.\n\nNhiều user-token quản nhiều page → mỗi lần đăng pick 1 token hợp lệ cho page đó, tự xoay\nvòng, đánh dấu token hỏng (error_count >= 3 → inactive, phải reactivate tay).\n\n⚠️ Token LUÔN mã hoá Fernet khi lưu (fb_crypto) — module này không bao giờ log plaintext.\n')
+              4 STORE_NAME               0 (__doc__)
+
+  8           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 10          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (hashlib)
+             24 STORE_NAME               3 (hashlib)
+
+ 11          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               3 (None)
+             30 IMPORT_NAME              4 (random)
+             32 STORE_NAME               4 (random)
+
+ 12          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               4 (('dataclass',))
+             38 IMPORT_NAME              5 (dataclasses)
+             40 IMPORT_FROM              6 (dataclass)
+             42 STORE_NAME               6 (dataclass)
+             44 POP_TOP
+
+ 13          46 LOAD_CONST               1 (0)
+             48 LOAD_CONST               5 (('datetime',))
+             50 IMPORT_NAME              7 (datetime)
+             52 IMPORT_FROM              7 (datetime)
+             54 STORE_NAME               7 (datetime)
+             56 POP_TOP
+
+ 15          58 LOAD_CONST               1 (0)
+             60 LOAD_CONST               6 (('or_', 'select', 'update'))
+             62 IMPORT_NAME              8 (sqlalchemy)
+             64 IMPORT_FROM              9 (or_)
+             66 STORE_NAME               9 (or_)
+             68 IMPORT_FROM             10 (select)
+             70 STORE_NAME              10 (select)
+             72 IMPORT_FROM             11 (update)
+             74 STORE_NAME              11 (update)
+             76 POP_TOP
+
+ 16          78 LOAD_CONST               1 (0)
+             80 LOAD_CONST               7 (('Session',))
+             82 IMPORT_NAME             12 (sqlalchemy.orm)
+             84 IMPORT_FROM             13 (Session)
+             86 STORE_NAME              13 (Session)
+             88 POP_TOP
+
+ 18          90 LOAD_CONST               1 (0)
+             92 LOAD_CONST               8 (('log',))
+             94 IMPORT_NAME             14 (app.core.logging)
+             96 IMPORT_FROM             15 (log)
+             98 STORE_NAME              15 (log)
+            100 POP_TOP
+
+ 19         102 LOAD_CONST               1 (0)
+            104 LOAD_CONST               9 (('FbToken', 'FbTokenPageAccess'))
+            106 IMPORT_NAME             16 (app.db.models)
+            108 IMPORT_FROM             17 (FbToken)
+            110 STORE_NAME              17 (FbToken)
+            112 IMPORT_FROM             18 (FbTokenPageAccess)
+            114 STORE_NAME              18 (FbTokenPageAccess)
+            116 POP_TOP
+
+ 20         118 LOAD_CONST               1 (0)
+            120 LOAD_CONST              10 (('fb_crypto',))
+            122 IMPORT_NAME             19 (app.services)
+            124 IMPORT_FROM             20 (fb_crypto)
+            126 STORE_NAME              20 (fb_crypto)
+            128 POP_TOP
+
+ 21         130 LOAD_CONST               1 (0)
+            132 LOAD_CONST              11 (('FbError',))
+            134 IMPORT_NAME             21 (app.services.fb_errors)
+            136 IMPORT_FROM             22 (FbError)
+            138 STORE_NAME              22 (FbError)
+            140 POP_TOP
+
+ 23         142 LOAD_CONST              12 (3)
+            144 STORE_NAME              23 (MAX_ERROR_COUNT)
+
+ 24         146 LOAD_CONST              13 (2)
+            148 STORE_NAME              24 (BLOCK_SIZE)
+
+ 27         150 LOAD_NAME                6 (dataclass)
+
+ 28         152 PUSH_NULL
+            154 LOAD_BUILD_CLASS
+            156 LOAD_CONST              14 (<code object TokenPick at 0x7f6c92696a60, file "app\services\fb_token_pool.py", line 27>)
+            158 MAKE_FUNCTION            0
+            160 LOAD_CONST              15 ('TokenPick')
+            162 CALL                     2
+
+ 27         170 CALL                     0
+
+ 28         178 STORE_NAME              25 (TokenPick)
+
+ 33         180 LOAD_CONST              33 (('db', 'Session', 'access_token', 'str', 'fingerprint', 'str', 'return', 'FbToken | None'))
+            182 LOAD_CONST              16 (<code object _find_existing_token at 0x28c2cd50, file "app\services\fb_token_pool.py", line 33>)
+            184 MAKE_FUNCTION            4 (annotations)
+            186 STORE_NAME              26 (_find_existing_token)
+
+ 54         188 PUSH_NULL
+            190 LOAD_BUILD_CLASS
+            192 LOAD_CONST              17 (<code object _CasConflict at 0x7f6c924e0370, file "app\services\fb_token_pool.py", line 54>)
+            194 MAKE_FUNCTION            0
+            196 LOAD_CONST              18 ('_CasConflict')
+            198 LOAD_NAME               27 (Exception)
+            200 CALL                     3
+            208 STORE_NAME              28 (_CasConflict)
+
+ 59         210 LOAD_CONST              19 ('least_used')
+
+ 60         212 LOAD_CONST               3 (None)
+
+ 61         214 LOAD_NAME               24 (BLOCK_SIZE)
+            216 LOAD_CONST               1 (0)
+
+ 59         218 BUILD_TUPLE              4
+
+ 60         220 NOP
+
+ 59         222 NOP
+
+ 61         224 NOP
+
+ 59         226 NOP
+
+ 61         228 NOP
+
+ 59         230 NOP
+
+ 61         232 NOP
+
+ 59         234 LOAD_CONST              34 (('db', 'Session', 'page_id', 'str', 'strategy', 'str', 'exclude_token_ids', 'set[str] | None', 'block_size', 'int', '_retry', 'int', 'return', 'TokenPick | None'))
+            236 LOAD_CONST              20 (<code object pick_token at 0x28bf79c0, file "app\services\fb_token_pool.py", line 59>)
+            238 MAKE_FUNCTION            5 (defaults, annotations)
+            240 STORE_NAME              29 (pick_token)
+
+150         242 LOAD_CONST              35 (('db', 'Session', 'page_id', 'str', 'return', 'FbToken | None'))
+            244 LOAD_CONST              21 (<code object peek_token at 0x28afc210, file "app\services\fb_token_pool.py", line 150>)
+            246 MAKE_FUNCTION            4 (annotations)
+            248 STORE_NAME              30 (peek_token)
+
+169         250 LOAD_CONST              36 (('db', 'Session', 'token', 'FbToken', 'return', 'None'))
+            252 LOAD_CONST              22 (<code object mark_success at 0x7f6c926934b0, file "app\services\fb_token_pool.py", line 169>)
+            254 MAKE_FUNCTION            4 (annotations)
+            256 STORE_NAME              31 (mark_success)
+
+177         258 LOAD_CONST              37 (('db', 'Session', 'token', 'FbToken', 'err', 'FbError | Exception', 'return', 'None'))
+            260 LOAD_CONST              23 (<code object mark_error at 0x28bda300, file "app\services\fb_token_pool.py", line 177>)
+            262 MAKE_FUNCTION            4 (annotations)
+            264 STORE_NAME              32 (mark_error)
+
+191         266 LOAD_CONST              38 (('db', 'Session', 'token_id', 'str', 'return', 'FbToken'))
+            268 LOAD_CONST              24 (<code object reactivate at 0x7f6c819a6120, file "app\services\fb_token_pool.py", line 191>)
+            270 MAKE_FUNCTION            4 (annotations)
+            272 STORE_NAME              33 (reactivate)
+
+205         274 NOP
+
+206         276 NOP
+
+207         278 NOP
+
+205         280 LOAD_CONST              39 ((None, None, None))
+
+207         282 LOAD_CONST              25 (True)
+
+205         284 LOAD_CONST              26 (('commit',))
+            286 BUILD_CONST_KEY_MAP      1
+
+206         288 NOP
+
+205         290 NOP
+
+207         292 NOP
+
+205         294 NOP
+
+207         296 NOP
+
+205         298 NOP
+
+207         300 NOP
+
+205         302 LOAD_CONST              40 (('db', 'Session', 'access_token', 'str', 'user_id', 'str | None', 'user_name', 'str | None', 'expires_at', 'datetime | None', 'commit', 'bool', 'return', 'FbToken'))
+            304 LOAD_CONST              27 (<code object add_user_token at 0x26a13630, file "app\services\fb_token_pool.py", line 205>)
+            306 MAKE_FUNCTION            7 (defaults, kwdefaults, annotations)
+            308 STORE_NAME              34 (add_user_token)
+
+244         310 NOP
+
+243         312 LOAD_CONST              41 ((None,))
+
+245         314 LOAD_CONST               3 (None)
+
+246         316 LOAD_CONST              25 (True)
+
+243         318 LOAD_CONST              28 (('owner_user_token', 'commit'))
+            320 BUILD_CONST_KEY_MAP      2
+
+244         322 NOP
+
+243         324 NOP
+
+245         326 NOP
+
+243         328 NOP
+
+246         330 NOP
+
+243         332 NOP
+
+246         334 NOP
+
+243         336 LOAD_CONST              42 (('db', 'Session', 'page_id', 'str', 'access_token', 'str', 'expires_at', 'datetime | None', 'owner_user_token', 'FbToken | None', 'commit', 'bool', 'return', 'FbToken'))
+            338 LOAD_CONST              29 (<code object add_page_token at 0x28c187c0, file "app\services\fb_token_pool.py", line 243>)
+            340 MAKE_FUNCTION            7 (defaults, kwdefaults, annotations)
+            342 STORE_NAME              35 (add_page_token)
+
+286         344 LOAD_CONST              43 (('db', 'Session', 'token_id', 'str', 'page_id', 'str', 'return', 'FbTokenPageAccess'))
+            346 LOAD_CONST              30 (<code object grant_page_access at 0x7f6c819a6cc0, file "app\services\fb_token_pool.py", line 286>)
+            348 MAKE_FUNCTION            4 (annotations)
+            350 STORE_NAME              36 (grant_page_access)
+
+300         352 LOAD_CONST              44 (('db', 'Session', 'token_id', 'str', 'return', 'str'))
+            354 LOAD_CONST              31 (<code object decrypt_token at 0x7f6c9234d530, file "app\services\fb_token_pool.py", line 300>)
+            356 MAKE_FUNCTION            4 (annotations)
+            358 STORE_NAME              37 (decrypt_token)
+
+308         360 LOAD_CONST              41 ((None,))
+            362 LOAD_CONST              45 (('db', 'Session', 'page_id', 'str | None', 'return', 'list[FbToken]'))
+            364 LOAD_CONST              32 (<code object list_tokens at 0x7f6c92699c50, file "app\services\fb_token_pool.py", line 308>)
+            366 MAKE_FUNCTION            5 (defaults, annotations)
+            368 STORE_NAME              38 (list_tokens)
+            370 RETURN_CONST             3 (None)
+
+Disassembly of <code object TokenPick at 0x7f6c92696a60, file "app\services\fb_token_pool.py", line 27>:
+ 27           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('TokenPick')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 29          12 LOAD_CONST               1 ('FbToken')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('token')
+             18 STORE_SUBSCR
+
+ 30          22 LOAD_CONST               3 ('str')
+             24 LOAD_NAME                3 (__annotations__)
+             26 LOAD_CONST               4 ('reason')
+             28 STORE_SUBSCR
+             32 RETURN_CONST             5 (None)
+
+Disassembly of <code object _find_existing_token at 0x28c2cd50, file "app\services\fb_token_pool.py", line 33>:
+ 33           0 RESUME                   0
+
+ 34           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + execute)
+
+ 35          24 LOAD_GLOBAL              3 (NULL + select)
+             34 LOAD_GLOBAL              4 (FbToken)
+             44 CALL                     1
+             52 LOAD_ATTR                7 (NULL|self + where)
+             72 LOAD_GLOBAL              4 (FbToken)
+             82 LOAD_ATTR                8 (token_fingerprint)
+            102 LOAD_FAST                2 (fingerprint)
+            104 COMPARE_OP              40 (==)
+            108 CALL                     1
+
+ 34         116 CALL                     1
+
+ 36         124 LOAD_ATTR               11 (NULL|self + scalar_one_or_none)
+            144 CALL                     0
+
+ 34         152 STORE_FAST               3 (tok)
+
+ 37         154 LOAD_FAST                3 (tok)
+            156 POP_JUMP_IF_NONE         2 (to 162)
+
+ 38         158 LOAD_FAST                3 (tok)
+            160 RETURN_VALUE
+
+ 40     >>  162 LOAD_FAST                0 (db)
+            164 LOAD_ATTR                1 (NULL|self + execute)
+
+ 41         184 LOAD_GLOBAL              3 (NULL + select)
+            194 LOAD_GLOBAL              4 (FbToken)
+            204 CALL                     1
+            212 LOAD_ATTR                7 (NULL|self + where)
+            232 LOAD_GLOBAL              4 (FbToken)
+            242 LOAD_ATTR                8 (token_fingerprint)
+            262 LOAD_ATTR               13 (NULL|self + is_)
+            282 LOAD_CONST               0 (None)
+            284 CALL                     1
+            292 CALL                     1
+
+ 40         300 CALL                     1
+
+ 42         308 LOAD_ATTR               15 (NULL|self + scalars)
+            328 CALL                     0
+            336 LOAD_ATTR               17 (NULL|self + all)
+            356 CALL                     0
+
+ 40         364 STORE_FAST               4 (legacy)
+
+ 43         366 LOAD_FAST                4 (legacy)
+            368 GET_ITER
+        >>  370 FOR_ITER                64 (to 502)
+            374 STORE_FAST               5 (candidate)
+
+ 44         376 NOP
+
+ 45         378 LOAD_GLOBAL             19 (NULL + fb_crypto)
+            388 LOAD_ATTR               20 (decrypt_secret)
+            408 LOAD_FAST                5 (candidate)
+            410 LOAD_ATTR               22 (access_token)
+            430 CALL                     1
+            438 LOAD_FAST                1 (access_token)
+            440 COMPARE_OP              40 (==)
+            444 POP_JUMP_IF_FALSE       27 (to 500)
+
+ 46         446 LOAD_FAST                2 (fingerprint)
+            448 LOAD_FAST                5 (candidate)
+            450 STORE_ATTR               4 (token_fingerprint)
+
+ 47         460 LOAD_FAST                0 (db)
+            462 LOAD_ATTR               25 (NULL|self + flush)
+            482 CALL                     0
+            490 POP_TOP
+
+ 48         492 LOAD_FAST                5 (candidate)
+            494 SWAP                     2
+            496 POP_TOP
+            498 RETURN_VALUE
+
+ 45     >>  500 JUMP_BACKWARD           66 (to 370)
+
+ 43     >>  502 END_FOR
+
+ 51         504 RETURN_CONST             0 (None)
+        >>  506 PUSH_EXC_INFO
+
+ 49         508 LOAD_GLOBAL             26 (Exception)
+            518 CHECK_EXC_MATCH
+            520 POP_JUMP_IF_FALSE        3 (to 528)
+            522 POP_TOP
+
+ 50         524 POP_EXCEPT
+            526 JUMP_BACKWARD           79 (to 370)
+
+ 49     >>  528 RERAISE                  0
+        >>  530 COPY                     3
+            532 POP_EXCEPT
+            534 RERAISE                  1
+ExceptionTable:
+  378 to 492 -> 506 [1]
+  506 to 522 -> 530 [2] lasti
+  528 to 528 -> 530 [2] lasti
+
+Disassembly of <code object _CasConflict at 0x7f6c924e0370, file "app\services\fb_token_pool.py", line 54>:
+ 54           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('_CasConflict')
+              8 STORE_NAME               2 (__qualname__)
+
+ 55          10 LOAD_CONST               1 ('Lỗi CAS conflict khi 2 worker chọn cùng 1 token.')
+             12 STORE_NAME               3 (__doc__)
+
+ 56          14 RETURN_CONST             2 (None)
+
+Disassembly of <code object pick_token at 0x28bf79c0, file "app\services\fb_token_pool.py", line 59>:
+              0 MAKE_CELL                4 (block_size)
+
+ 59           2 RESUME                   0
+
+ 68           4 LOAD_FAST                0 (db)
+              6 LOAD_ATTR                1 (NULL|self + execute)
+
+ 69          26 LOAD_GLOBAL              3 (NULL + select)
+             36 LOAD_GLOBAL              4 (FbToken)
+             46 CALL                     1
+             54 LOAD_ATTR                7 (NULL|self + where)
+
+ 70          74 LOAD_GLOBAL              4 (FbToken)
+             84 LOAD_ATTR                8 (status)
+            104 LOAD_CONST               1 ('active')
+            106 COMPARE_OP              40 (==)
+
+ 71         110 LOAD_GLOBAL              4 (FbToken)
+            120 LOAD_ATTR               10 (page_id)
+            140 LOAD_FAST                1 (page_id)
+            142 COMPARE_OP              40 (==)
+
+ 72         146 LOAD_GLOBAL             13 (NULL + or_)
+            156 LOAD_GLOBAL              4 (FbToken)
+            166 LOAD_ATTR               14 (expires_at)
+            186 LOAD_ATTR               17 (NULL|self + is_)
+            206 LOAD_CONST               2 (None)
+            208 CALL                     1
+            216 LOAD_GLOBAL              4 (FbToken)
+            226 LOAD_ATTR               14 (expires_at)
+            246 LOAD_GLOBAL             19 (NULL + datetime)
+            256 LOAD_ATTR               20 (now)
+            276 CALL                     0
+            284 COMPARE_OP              68 (>)
+            288 CALL                     2
+
+ 69         296 CALL                     3
+
+ 68         304 CALL                     1
+
+ 74         312 LOAD_ATTR               23 (NULL|self + scalars)
+            332 CALL                     0
+            340 LOAD_ATTR               25 (NULL|self + all)
+            360 CALL                     0
+
+ 68         368 STORE_FAST               6 (tokens)
+
+ 75         370 LOAD_FAST                3 (exclude_token_ids)
+            372 POP_JUMP_IF_FALSE       30 (to 434)
+
+ 76         374 LOAD_FAST                6 (tokens)
+            376 GET_ITER
+            378 LOAD_FAST_AND_CLEAR      7 (t)
+            380 SWAP                     2
+            382 BUILD_LIST               0
+            384 SWAP                     2
+        >>  386 FOR_ITER                19 (to 428)
+            390 STORE_FAST               7 (t)
+            392 LOAD_FAST                7 (t)
+            394 LOAD_ATTR               26 (id)
+            414 LOAD_FAST                3 (exclude_token_ids)
+            416 CONTAINS_OP              1
+            418 POP_JUMP_IF_TRUE         1 (to 422)
+            420 JUMP_BACKWARD           18 (to 386)
+        >>  422 LOAD_FAST                7 (t)
+            424 LIST_APPEND              2
+            426 JUMP_BACKWARD           21 (to 386)
+        >>  428 END_FOR
+            430 STORE_FAST               6 (tokens)
+            432 STORE_FAST               7 (t)
+
+ 79     >>  434 LOAD_FAST                6 (tokens)
+            436 EXTENDED_ARG             1
+            438 POP_JUMP_IF_TRUE       284 (to 1008)
+
+ 80         440 LOAD_GLOBAL              3 (NULL + select)
+            450 LOAD_GLOBAL             28 (FbTokenPageAccess)
+            460 LOAD_ATTR               30 (token_id)
+            480 CALL                     1
+            488 LOAD_ATTR                7 (NULL|self + where)
+
+ 81         508 LOAD_GLOBAL             28 (FbTokenPageAccess)
+            518 LOAD_ATTR               10 (page_id)
+            538 LOAD_FAST                1 (page_id)
+            540 COMPARE_OP              40 (==)
+
+ 80         544 CALL                     1
+            552 STORE_FAST               8 (access_token_ids)
+
+ 83         554 LOAD_FAST                0 (db)
+            556 LOAD_ATTR                1 (NULL|self + execute)
+
+ 84         576 LOAD_GLOBAL              3 (NULL + select)
+            586 LOAD_GLOBAL              4 (FbToken)
+            596 CALL                     1
+            604 LOAD_ATTR                7 (NULL|self + where)
+
+ 85         624 LOAD_GLOBAL              4 (FbToken)
+            634 LOAD_ATTR                8 (status)
+            654 LOAD_CONST               1 ('active')
+            656 COMPARE_OP              40 (==)
+
+ 86         660 LOAD_GLOBAL              4 (FbToken)
+            670 LOAD_ATTR               26 (id)
+            690 LOAD_ATTR               33 (NULL|self + in_)
+            710 LOAD_FAST                8 (access_token_ids)
+            712 CALL                     1
+
+ 87         720 LOAD_GLOBAL             13 (NULL + or_)
+            730 LOAD_GLOBAL              4 (FbToken)
+            740 LOAD_ATTR               14 (expires_at)
+            760 LOAD_ATTR               17 (NULL|self + is_)
+            780 LOAD_CONST               2 (None)
+            782 CALL                     1
+            790 LOAD_GLOBAL              4 (FbToken)
+            800 LOAD_ATTR               14 (expires_at)
+            820 LOAD_GLOBAL             19 (NULL + datetime)
+            830 LOAD_ATTR               20 (now)
+            850 CALL                     0
+            858 COMPARE_OP              68 (>)
+            862 CALL                     2
+
+ 84         870 CALL                     3
+
+ 83         878 CALL                     1
+
+ 89         886 LOAD_ATTR               23 (NULL|self + scalars)
+            906 CALL                     0
+            914 LOAD_ATTR               25 (NULL|self + all)
+            934 CALL                     0
+
+ 83         942 STORE_FAST               6 (tokens)
+
+ 90         944 LOAD_FAST                3 (exclude_token_ids)
+            946 POP_JUMP_IF_FALSE       30 (to 1008)
+
+ 91         948 LOAD_FAST                6 (tokens)
+            950 GET_ITER
+            952 LOAD_FAST_AND_CLEAR      7 (t)
+            954 SWAP                     2
+            956 BUILD_LIST               0
+            958 SWAP                     2
+        >>  960 FOR_ITER                19 (to 1002)
+            964 STORE_FAST               7 (t)
+            966 LOAD_FAST                7 (t)
+            968 LOAD_ATTR               26 (id)
+            988 LOAD_FAST                3 (exclude_token_ids)
+            990 CONTAINS_OP              1
+            992 POP_JUMP_IF_TRUE         1 (to 996)
+            994 JUMP_BACKWARD           18 (to 960)
+        >>  996 LOAD_FAST                7 (t)
+            998 LIST_APPEND              2
+           1000 JUMP_BACKWARD           21 (to 960)
+        >> 1002 END_FOR
+           1004 STORE_FAST               6 (tokens)
+           1006 STORE_FAST               7 (t)
+
+ 93     >> 1008 LOAD_FAST                6 (tokens)
+           1010 POP_JUMP_IF_TRUE         1 (to 1014)
+
+ 94        1012 RETURN_CONST             2 (None)
+
+ 96     >> 1014 LOAD_CONST              18 (('t', 'FbToken'))
+           1016 LOAD_CONST               3 (<code object sort_key at 0x7f6c92693870, file "app\services\fb_token_pool.py", line 96>)
+           1018 MAKE_FUNCTION            4 (annotations)
+           1020 STORE_FAST               9 (sort_key)
+
+104        1022 LOAD_FAST                2 (strategy)
+           1024 LOAD_CONST               4 ('random')
+           1026 COMPARE_OP              40 (==)
+           1030 POP_JUMP_IF_FALSE       24 (to 1080)
+
+105        1032 LOAD_GLOBAL             35 (NULL + random)
+           1042 LOAD_ATTR               36 (choice)
+           1062 LOAD_FAST                6 (tokens)
+           1064 CALL                     1
+           1072 STORE_FAST              10 (pick)
+
+106        1074 LOAD_CONST               4 ('random')
+           1076 STORE_FAST              11 (reason)
+           1078 JUMP_FORWARD           165 (to 1410)
+
+107     >> 1080 LOAD_FAST                2 (strategy)
+           1082 LOAD_CONST               5 ('block')
+           1084 COMPARE_OP              40 (==)
+           1088 POP_JUMP_IF_FALSE      123 (to 1336)
+
+108        1090 LOAD_GLOBAL             39 (NULL + max)
+           1100 LOAD_CONST               6 (1)
+           1102 LOAD_GLOBAL             41 (NULL + min)
+           1112 LOAD_CONST               7 (100)
+           1114 LOAD_GLOBAL             43 (NULL + int)
+           1124 LOAD_DEREF               4 (block_size)
+           1126 COPY                     1
+           1128 POP_JUMP_IF_TRUE         6 (to 1142)
+           1130 POP_TOP
+           1132 LOAD_GLOBAL             44 (BLOCK_SIZE)
+        >> 1142 CALL                     1
+           1150 CALL                     2
+           1158 CALL                     2
+           1166 STORE_DEREF              4 (block_size)
+
+109        1168 LOAD_GLOBAL             47 (NULL + sorted)
+           1178 LOAD_FAST                6 (tokens)
+           1180 LOAD_FAST                9 (sort_key)
+           1182 KW_NAMES                 8 (('key',))
+           1184 CALL                     2
+           1192 STORE_FAST              12 (tokens_sorted)
+
+110        1194 LOAD_FAST               12 (tokens_sorted)
+           1196 GET_ITER
+           1198 LOAD_FAST_AND_CLEAR      7 (t)
+           1200 SWAP                     2
+           1202 BUILD_LIST               0
+           1204 SWAP                     2
+        >> 1206 FOR_ITER                24 (to 1258)
+           1210 STORE_FAST               7 (t)
+           1212 LOAD_FAST                7 (t)
+           1214 LOAD_ATTR               48 (use_count)
+           1234 COPY                     1
+           1236 POP_JUMP_IF_TRUE         2 (to 1242)
+           1238 POP_TOP
+           1240 LOAD_CONST               9 (0)
+        >> 1242 LOAD_DEREF               4 (block_size)
+           1244 BINARY_OP                6 (%)
+           1248 POP_JUMP_IF_TRUE         1 (to 1252)
+           1250 JUMP_BACKWARD           23 (to 1206)
+        >> 1252 LOAD_FAST                7 (t)
+           1254 LIST_APPEND              2
+           1256 JUMP_BACKWARD           26 (to 1206)
+        >> 1258 END_FOR
+           1260 STORE_FAST              13 (partial)
+           1262 STORE_FAST               7 (t)
+
+111        1264 LOAD_FAST               13 (partial)
+           1266 POP_JUMP_IF_FALSE       15 (to 1298)
+
+112        1268 LOAD_GLOBAL             39 (NULL + max)
+           1278 LOAD_FAST               13 (partial)
+           1280 LOAD_CONST              10 (<code object <lambda> at 0x7f6c92404d30, file "app\services\fb_token_pool.py", line 112>)
+           1282 MAKE_FUNCTION            0
+           1284 KW_NAMES                 8 (('key',))
+           1286 CALL                     2
+           1294 STORE_FAST              10 (pick)
+           1296 JUMP_FORWARD            16 (to 1330)
+
+114     >> 1298 LOAD_GLOBAL             41 (NULL + min)
+           1308 LOAD_FAST               12 (tokens_sorted)
+           1310 LOAD_CLOSURE             4 (block_size)
+           1312 BUILD_TUPLE              1
+           1314 LOAD_CONST              11 (<code object <lambda> at 0x7f6c926f9ce0, file "app\services\fb_token_pool.py", line 114>)
+           1316 MAKE_FUNCTION            8 (closure)
+           1318 KW_NAMES                 8 (('key',))
+           1320 CALL                     2
+           1328 STORE_FAST              10 (pick)
+
+115     >> 1330 LOAD_CONST               5 ('block')
+           1332 STORE_FAST              11 (reason)
+           1334 JUMP_FORWARD            37 (to 1410)
+
+116     >> 1336 LOAD_FAST                2 (strategy)
+           1338 LOAD_CONST              12 ('round_robin')
+           1340 COMPARE_OP              40 (==)
+           1344 POP_JUMP_IF_FALSE       17 (to 1380)
+
+117        1346 LOAD_GLOBAL             41 (NULL + min)
+           1356 LOAD_FAST                6 (tokens)
+           1358 LOAD_CONST              13 (<code object <lambda> at 0x7f6c926935f0, file "app\services\fb_token_pool.py", line 117>)
+           1360 MAKE_FUNCTION            0
+           1362 KW_NAMES                 8 (('key',))
+           1364 CALL                     2
+           1372 STORE_FAST              10 (pick)
+
+118        1374 LOAD_CONST              12 ('round_robin')
+           1376 STORE_FAST              11 (reason)
+           1378 JUMP_FORWARD            15 (to 1410)
+
+120     >> 1380 LOAD_GLOBAL             41 (NULL + min)
+           1390 LOAD_FAST                6 (tokens)
+           1392 LOAD_FAST                9 (sort_key)
+           1394 KW_NAMES                 8 (('key',))
+           1396 CALL                     2
+           1404 STORE_FAST              10 (pick)
+
+121        1406 LOAD_CONST              14 ('least_used')
+           1408 STORE_FAST              11 (reason)
+
+124     >> 1410 LOAD_FAST               10 (pick)
+           1412 LOAD_ATTR               48 (use_count)
+           1432 COPY                     1
+           1434 POP_JUMP_IF_TRUE         2 (to 1440)
+           1436 POP_TOP
+           1438 LOAD_CONST               9 (0)
+        >> 1440 STORE_FAST              14 (old_use_count)
+
+125        1442 NOP
+
+126        1444 LOAD_FAST                0 (db)
+           1446 LOAD_ATTR               51 (NULL|self + begin_nested)
+           1466 CALL                     0
+           1474 BEFORE_WITH
+           1476 POP_TOP
+
+127        1478 LOAD_FAST                0 (db)
+           1480 LOAD_ATTR                1 (NULL|self + execute)
+
+128        1500 LOAD_GLOBAL             53 (NULL + update)
+           1510 LOAD_GLOBAL              4 (FbToken)
+           1520 CALL                     1
+
+129        1528 LOAD_ATTR                7 (NULL|self + where)
+
+130        1548 LOAD_GLOBAL              4 (FbToken)
+           1558 LOAD_ATTR               26 (id)
+           1578 LOAD_FAST               10 (pick)
+           1580 LOAD_ATTR               26 (id)
+           1600 COMPARE_OP              40 (==)
+
+131        1604 LOAD_GLOBAL              4 (FbToken)
+           1614 LOAD_ATTR                8 (status)
+           1634 LOAD_CONST               1 ('active')
+           1636 COMPARE_OP              40 (==)
+
+132        1640 LOAD_GLOBAL              4 (FbToken)
+           1650 LOAD_ATTR               48 (use_count)
+           1670 LOAD_FAST               14 (old_use_count)
+           1672 COMPARE_OP              40 (==)
+
+129        1676 CALL                     3
+
+134        1684 LOAD_ATTR               55 (NULL|self + values)
+           1704 LOAD_FAST               14 (old_use_count)
+           1706 LOAD_CONST               6 (1)
+           1708 BINARY_OP                0 (+)
+           1712 LOAD_GLOBAL             19 (NULL + datetime)
+           1722 LOAD_ATTR               20 (now)
+           1742 CALL                     0
+           1750 KW_NAMES                15 (('use_count', 'last_used_at'))
+           1752 CALL                     2
+
+127        1760 CALL                     1
+           1768 STORE_FAST              15 (claimed)
+
+136        1770 LOAD_FAST               15 (claimed)
+           1772 LOAD_ATTR               56 (rowcount)
+           1792 LOAD_CONST               6 (1)
+           1794 COMPARE_OP              55 (!=)
+           1798 POP_JUMP_IF_FALSE       10 (to 1820)
+
+137        1800 LOAD_GLOBAL             59 (NULL + _CasConflict)
+           1810 CALL                     0
+           1818 RAISE_VARARGS            1
+
+136     >> 1820 NOP
+
+126        1822 LOAD_CONST               2 (None)
+           1824 LOAD_CONST               2 (None)
+           1826 LOAD_CONST               2 (None)
+           1828 CALL                     2
+           1836 POP_TOP
+
+145     >> 1838 LOAD_FAST                0 (db)
+           1840 LOAD_ATTR               63 (NULL|self + commit)
+           1860 CALL                     0
+           1868 POP_TOP
+
+146        1870 LOAD_FAST                0 (db)
+           1872 LOAD_ATTR               65 (NULL|self + refresh)
+           1892 LOAD_FAST               10 (pick)
+           1894 CALL                     1
+           1902 POP_TOP
+
+147        1904 LOAD_GLOBAL             67 (NULL + TokenPick)
+           1914 LOAD_FAST               10 (pick)
+           1916 LOAD_FAST               11 (reason)
+           1918 CALL                     2
+           1926 RETURN_VALUE
+        >> 1928 SWAP                     2
+           1930 POP_TOP
+
+ 76        1932 SWAP                     2
+           1934 STORE_FAST               7 (t)
+           1936 RERAISE                  0
+        >> 1938 SWAP                     2
+           1940 POP_TOP
+
+ 91        1942 SWAP                     2
+           1944 STORE_FAST               7 (t)
+           1946 RERAISE                  0
+        >> 1948 SWAP                     2
+           1950 POP_TOP
+
+110        1952 SWAP                     2
+           1954 STORE_FAST               7 (t)
+           1956 RERAISE                  0
+
+126     >> 1958 PUSH_EXC_INFO
+           1960 WITH_EXCEPT_START
+           1962 POP_JUMP_IF_TRUE         1 (to 1966)
+           1964 RERAISE                  2
+        >> 1966 POP_TOP
+           1968 POP_EXCEPT
+           1970 POP_TOP
+           1972 POP_TOP
+           1974 JUMP_BACKWARD           69 (to 1838)
+        >> 1976 COPY                     3
+           1978 POP_EXCEPT
+           1980 RERAISE                  1
+        >> 1982 PUSH_EXC_INFO
+
+138        1984 LOAD_GLOBAL             58 (_CasConflict)
+           1994 CHECK_EXC_MATCH
+           1996 POP_JUMP_IF_FALSE       30 (to 2058)
+           1998 POP_TOP
+
+139        2000 LOAD_FAST                5 (_retry)
+           2002 LOAD_CONST              16 (3)
+           2004 COMPARE_OP              92 (>=)
+           2008 POP_JUMP_IF_FALSE        2 (to 2014)
+
+140        2010 POP_EXCEPT
+           2012 RETURN_CONST             2 (None)
+
+141     >> 2014 LOAD_GLOBAL             61 (NULL + pick_token)
+
+142        2024 LOAD_FAST                0 (db)
+           2026 LOAD_FAST                1 (page_id)
+           2028 LOAD_FAST                2 (strategy)
+           2030 LOAD_FAST                3 (exclude_token_ids)
+
+143        2032 LOAD_DEREF               4 (block_size)
+           2034 LOAD_FAST                5 (_retry)
+           2036 LOAD_CONST               6 (1)
+           2038 BINARY_OP                0 (+)
+
+141        2042 KW_NAMES                17 (('strategy', 'exclude_token_ids', 'block_size', '_retry'))
+           2044 CALL                     6
+           2052 SWAP                     2
+           2054 POP_EXCEPT
+           2056 RETURN_VALUE
+
+138     >> 2058 RERAISE                  0
+        >> 2060 COPY                     3
+           2062 POP_EXCEPT
+           2064 RERAISE                  1
+ExceptionTable:
+  382 to 418 -> 1928 [2]
+  422 to 428 -> 1928 [2]
+  956 to 992 -> 1938 [2]
+  996 to 1002 -> 1938 [2]
+  1202 to 1248 -> 1948 [2]
+  1252 to 1258 -> 1948 [2]
+  1444 to 1474 -> 1982 [0]
+  1476 to 1818 -> 1958 [1] lasti
+  1822 to 1836 -> 1982 [0]
+  1958 to 1966 -> 1976 [3] lasti
+  1968 to 1980 -> 1982 [0]
+  1982 to 2008 -> 2060 [1] lasti
+  2014 to 2052 -> 2060 [1] lasti
+  2058 to 2058 -> 2060 [1] lasti
+
+Disassembly of <code object sort_key at 0x7f6c92693870, file "app\services\fb_token_pool.py", line 96>:
+ 96           0 RESUME                   0
+
+ 98           2 LOAD_FAST                0 (t)
+              4 LOAD_ATTR                0 (error_count)
+             24 COPY                     1
+             26 POP_JUMP_IF_TRUE         2 (to 32)
+             28 POP_TOP
+             30 LOAD_CONST               1 (0)
+        >>   32 LOAD_CONST               2 (5)
+             34 BINARY_OP                5 (*)
+             38 LOAD_CONST               3 (60)
+             40 BINARY_OP                5 (*)
+             44 STORE_FAST               1 (err_penalty)
+
+ 99          46 LOAD_FAST                0 (t)
+             48 LOAD_ATTR                2 (last_used_at)
+             68 STORE_FAST               2 (last_used)
+
+100          70 LOAD_FAST                2 (last_used)
+             72 POP_JUMP_IF_NOT_NONE     1 (to 76)
+
+101          74 RETURN_CONST             4 (0.0)
+
+102     >>   76 LOAD_FAST                2 (last_used)
+             78 LOAD_ATTR                5 (NULL|self + timestamp)
+             98 CALL                     0
+            106 LOAD_FAST                1 (err_penalty)
+            108 BINARY_OP                0 (+)
+            112 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c92404d30, file "app\services\fb_token_pool.py", line 112>:
+112           0 RESUME                   0
+              2 LOAD_FAST                0 (t)
+              4 LOAD_ATTR                0 (last_used_at)
+             24 COPY                     1
+             26 POP_JUMP_IF_TRUE        16 (to 60)
+             28 POP_TOP
+             30 LOAD_GLOBAL              2 (datetime)
+             40 LOAD_ATTR                4 (min)
+        >>   60 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c926f9ce0, file "app\services\fb_token_pool.py", line 114>:
+              0 COPY_FREE_VARS           1
+
+114           2 RESUME                   0
+              4 LOAD_FAST                0 (t)
+              6 LOAD_ATTR                0 (use_count)
+             26 COPY                     1
+             28 POP_JUMP_IF_TRUE         2 (to 34)
+             30 POP_TOP
+             32 LOAD_CONST               1 (0)
+        >>   34 LOAD_DEREF               1 (block_size)
+             36 BINARY_OP                2 (//)
+             40 LOAD_FAST                0 (t)
+             42 LOAD_ATTR                2 (id)
+             62 BUILD_TUPLE              2
+             64 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c926935f0, file "app\services\fb_token_pool.py", line 117>:
+117           0 RESUME                   0
+              2 LOAD_FAST                0 (t)
+              4 LOAD_ATTR                0 (use_count)
+             24 COPY                     1
+             26 POP_JUMP_IF_TRUE         2 (to 32)
+             28 POP_TOP
+             30 LOAD_CONST               1 (0)
+        >>   32 LOAD_FAST                0 (t)
+             34 LOAD_ATTR                2 (last_used_at)
+             54 COPY                     1
+             56 POP_JUMP_IF_TRUE        16 (to 90)
+             58 POP_TOP
+             60 LOAD_GLOBAL              4 (datetime)
+             70 LOAD_ATTR                6 (min)
+        >>   90 LOAD_FAST                0 (t)
+             92 LOAD_ATTR                8 (id)
+            112 BUILD_TUPLE              3
+            114 RETURN_VALUE
+
+Disassembly of <code object peek_token at 0x28afc210, file "app\services\fb_token_pool.py", line 150>:
+150           0 RESUME                   0
+
+153           2 LOAD_GLOBAL              0 (FbToken)
+             12 LOAD_ATTR                2 (status)
+             32 LOAD_CONST               1 ('active')
+             34 COMPARE_OP              40 (==)
+
+154          38 LOAD_GLOBAL              5 (NULL + or_)
+             48 LOAD_GLOBAL              0 (FbToken)
+             58 LOAD_ATTR                6 (expires_at)
+             78 LOAD_ATTR                9 (NULL|self + is_)
+             98 LOAD_CONST               2 (None)
+            100 CALL                     1
+            108 LOAD_GLOBAL              0 (FbToken)
+            118 LOAD_ATTR                6 (expires_at)
+            138 LOAD_GLOBAL             11 (NULL + datetime)
+            148 LOAD_ATTR               12 (now)
+            168 CALL                     0
+            176 COMPARE_OP              68 (>)
+            180 CALL                     2
+
+152         188 BUILD_TUPLE              2
+            190 STORE_FAST               2 (valid)
+
+156         192 LOAD_FAST                0 (db)
+            194 LOAD_ATTR               15 (NULL|self + execute)
+
+157         214 PUSH_NULL
+            216 LOAD_GLOBAL             17 (NULL + select)
+            226 LOAD_GLOBAL              0 (FbToken)
+            236 CALL                     1
+            244 LOAD_ATTR               18 (where)
+            264 BUILD_LIST               0
+            266 LOAD_FAST                2 (valid)
+            268 LIST_EXTEND              1
+            270 LOAD_GLOBAL              0 (FbToken)
+            280 LOAD_ATTR               20 (page_id)
+            300 LOAD_FAST                1 (page_id)
+            302 COMPARE_OP              40 (==)
+            306 LIST_APPEND              1
+            308 CALL_INTRINSIC_1         6 (INTRINSIC_LIST_TO_TUPLE)
+            310 CALL_FUNCTION_EX         0
+
+156         312 CALL                     1
+
+158         320 LOAD_ATTR               23 (NULL|self + scalars)
+            340 CALL                     0
+            348 LOAD_ATTR               25 (NULL|self + first)
+            368 CALL                     0
+
+156         376 STORE_FAST               3 (token)
+
+159         378 LOAD_FAST                3 (token)
+            380 POP_JUMP_IF_NONE         2 (to 386)
+
+160         382 LOAD_FAST                3 (token)
+            384 RETURN_VALUE
+
+161     >>  386 LOAD_GLOBAL             17 (NULL + select)
+            396 LOAD_GLOBAL             26 (FbTokenPageAccess)
+            406 LOAD_ATTR               28 (token_id)
+            426 CALL                     1
+            434 LOAD_ATTR               19 (NULL|self + where)
+
+162         454 LOAD_GLOBAL             26 (FbTokenPageAccess)
+            464 LOAD_ATTR               20 (page_id)
+            484 LOAD_FAST                1 (page_id)
+            486 COMPARE_OP              40 (==)
+
+161         490 CALL                     1
+            498 STORE_FAST               4 (access_ids)
+
+164         500 LOAD_FAST                0 (db)
+            502 LOAD_ATTR               15 (NULL|self + execute)
+
+165         522 PUSH_NULL
+            524 LOAD_GLOBAL             17 (NULL + select)
+            534 LOAD_GLOBAL              0 (FbToken)
+            544 CALL                     1
+            552 LOAD_ATTR               18 (where)
+            572 BUILD_LIST               0
+            574 LOAD_FAST                2 (valid)
+            576 LIST_EXTEND              1
+            578 LOAD_GLOBAL              0 (FbToken)
+            588 LOAD_ATTR               30 (id)
+            608 LOAD_ATTR               33 (NULL|self + in_)
+            628 LOAD_FAST                4 (access_ids)
+            630 CALL                     1
+            638 LIST_APPEND              1
+            640 CALL_INTRINSIC_1         6 (INTRINSIC_LIST_TO_TUPLE)
+            642 CALL_FUNCTION_EX         0
+
+164         644 CALL                     1
+
+166         652 LOAD_ATTR               23 (NULL|self + scalars)
+            672 CALL                     0
+            680 LOAD_ATTR               25 (NULL|self + first)
+            700 CALL                     0
+
+164         708 RETURN_VALUE
+
+Disassembly of <code object mark_success at 0x7f6c926934b0, file "app\services\fb_token_pool.py", line 169>:
+169           0 RESUME                   0
+
+171           2 LOAD_CONST               1 (0)
+              4 LOAD_FAST                1 (token)
+              6 STORE_ATTR               0 (error_count)
+
+172          16 LOAD_CONST               2 (None)
+             18 LOAD_FAST                1 (token)
+             20 STORE_ATTR               1 (last_error_message)
+
+173          30 LOAD_GLOBAL              5 (NULL + datetime)
+             40 LOAD_ATTR                6 (now)
+             60 CALL                     0
+             68 LOAD_FAST                1 (token)
+             70 STORE_ATTR               4 (last_used_at)
+
+174          80 LOAD_FAST                0 (db)
+             82 LOAD_ATTR               11 (NULL|self + commit)
+            102 CALL                     0
+            110 POP_TOP
+            112 RETURN_CONST             2 (None)
+
+Disassembly of <code object mark_error at 0x28bda300, file "app\services\fb_token_pool.py", line 177>:
+177           0 RESUME                   0
+
+179           2 LOAD_FAST                1 (token)
+              4 LOAD_ATTR                0 (error_count)
+             24 COPY                     1
+             26 POP_JUMP_IF_TRUE         2 (to 32)
+             28 POP_TOP
+             30 LOAD_CONST               1 (0)
+        >>   32 LOAD_CONST               2 (1)
+             34 BINARY_OP                0 (+)
+             38 LOAD_FAST                1 (token)
+             40 STORE_ATTR               0 (error_count)
+
+180          50 LOAD_GLOBAL              3 (NULL + str)
+             60 LOAD_FAST                2 (err)
+             62 CALL                     1
+             70 LOAD_CONST               3 (None)
+             72 LOAD_CONST               4 (500)
+             74 BINARY_SLICE
+             76 LOAD_FAST                1 (token)
+             78 STORE_ATTR               2 (last_error_message)
+
+181          88 LOAD_GLOBAL              7 (NULL + isinstance)
+             98 LOAD_FAST                2 (err)
+            100 LOAD_GLOBAL              8 (FbError)
+            110 CALL                     2
+            118 POP_JUMP_IF_FALSE       69 (to 258)
+            120 LOAD_FAST                2 (err)
+            122 LOAD_ATTR               10 (kind)
+            142 LOAD_CONST               5 (frozenset({'token_expired', 'invalid_token', 'session_expired'}))
+            144 CONTAINS_OP              0
+            146 POP_JUMP_IF_FALSE       55 (to 258)
+
+183         148 LOAD_CONST               6 ('expired')
+            150 LOAD_FAST                1 (token)
+            152 STORE_ATTR               6 (status)
+
+184         162 LOAD_GLOBAL             15 (NULL + log)
+            172 LOAD_ATTR               16 (warning)
+            192 LOAD_CONST               7 ('[fb_token_pool] token ')
+            194 LOAD_FAST                1 (token)
+            196 LOAD_ATTR               18 (id)
+            216 FORMAT_VALUE             0
+            218 LOAD_CONST               8 (' expired: ')
+            220 LOAD_FAST                2 (err)
+            222 LOAD_ATTR               10 (kind)
+            242 FORMAT_VALUE             0
+            244 BUILD_STRING             4
+            246 CALL                     1
+            254 POP_TOP
+            256 JUMP_FORWARD            74 (to 406)
+
+185     >>  258 LOAD_FAST                1 (token)
+            260 LOAD_ATTR                0 (error_count)
+            280 LOAD_GLOBAL             20 (MAX_ERROR_COUNT)
+            290 COMPARE_OP              92 (>=)
+            294 POP_JUMP_IF_FALSE       55 (to 406)
+
+186         296 LOAD_CONST               9 ('inactive')
+            298 LOAD_FAST                1 (token)
+            300 STORE_ATTR               6 (status)
+
+187         310 LOAD_GLOBAL             15 (NULL + log)
+            320 LOAD_ATTR               16 (warning)
+            340 LOAD_CONST               7 ('[fb_token_pool] token ')
+            342 LOAD_FAST                1 (token)
+            344 LOAD_ATTR               18 (id)
+            364 FORMAT_VALUE             0
+            366 LOAD_CONST              10 (' inactive sau ')
+            368 LOAD_FAST                1 (token)
+            370 LOAD_ATTR                0 (error_count)
+            390 FORMAT_VALUE             0
+            392 LOAD_CONST              11 (' lỗi')
+            394 BUILD_STRING             5
+            396 CALL                     1
+            404 POP_TOP
+
+188     >>  406 LOAD_FAST                0 (db)
+            408 LOAD_ATTR               23 (NULL|self + commit)
+            428 CALL                     0
+            436 POP_TOP
+            438 RETURN_CONST             3 (None)
+
+Disassembly of <code object reactivate at 0x7f6c819a6120, file "app\services\fb_token_pool.py", line 191>:
+191           0 RESUME                   0
+
+192           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_GLOBAL              2 (FbToken)
+             34 LOAD_FAST                1 (token_id)
+             36 CALL                     2
+             44 STORE_FAST               2 (token)
+
+193          46 LOAD_FAST                2 (token)
+             48 POP_JUMP_IF_NOT_NONE    11 (to 72)
+
+194          50 LOAD_GLOBAL              5 (NULL + ValueError)
+             60 LOAD_CONST               1 ('Token không tồn tại')
+             62 CALL                     1
+             70 RAISE_VARARGS            1
+
+195     >>   72 LOAD_FAST                2 (token)
+             74 LOAD_ATTR                6 (expires_at)
+             94 POP_JUMP_IF_NONE        44 (to 184)
+             96 LOAD_FAST                2 (token)
+             98 LOAD_ATTR                6 (expires_at)
+            118 LOAD_GLOBAL              9 (NULL + datetime)
+            128 LOAD_ATTR               10 (now)
+            148 CALL                     0
+            156 COMPARE_OP              26 (<=)
+            160 POP_JUMP_IF_FALSE       11 (to 184)
+
+196         162 LOAD_GLOBAL              5 (NULL + ValueError)
+            172 LOAD_CONST               2 ('Token đã hết hạn, cần nhập token mới')
+            174 CALL                     1
+            182 RAISE_VARARGS            1
+
+197     >>  184 LOAD_CONST               3 ('active')
+            186 LOAD_FAST                2 (token)
+            188 STORE_ATTR               6 (status)
+
+198         198 LOAD_CONST               4 (0)
+            200 LOAD_FAST                2 (token)
+            202 STORE_ATTR               7 (error_count)
+
+199         212 LOAD_CONST               0 (None)
+            214 LOAD_FAST                2 (token)
+            216 STORE_ATTR               8 (last_error_message)
+
+200         226 LOAD_FAST                0 (db)
+            228 LOAD_ATTR               19 (NULL|self + commit)
+            248 CALL                     0
+            256 POP_TOP
+
+201         258 LOAD_FAST                0 (db)
+            260 LOAD_ATTR               21 (NULL|self + refresh)
+            280 LOAD_FAST                2 (token)
+            282 CALL                     1
+            290 POP_TOP
+
+202         292 LOAD_FAST                2 (token)
+            294 RETURN_VALUE
+
+Disassembly of <code object add_user_token at 0x26a13630, file "app\services\fb_token_pool.py", line 205>:
+205           0 RESUME                   0
+
+209           2 LOAD_GLOBAL              1 (NULL + hashlib)
+             12 LOAD_ATTR                2 (sha256)
+             32 LOAD_FAST                1 (access_token)
+             34 LOAD_ATTR                5 (NULL|self + encode)
+             54 LOAD_CONST               1 ('utf-8')
+             56 CALL                     1
+             64 CALL                     1
+             72 LOAD_ATTR                7 (NULL|self + hexdigest)
+             92 CALL                     0
+            100 STORE_FAST               6 (fingerprint)
+
+210         102 LOAD_GLOBAL              9 (NULL + _find_existing_token)
+            112 LOAD_FAST                0 (db)
+            114 LOAD_FAST                1 (access_token)
+            116 LOAD_FAST                6 (fingerprint)
+            118 CALL                     3
+            126 STORE_FAST               7 (tok)
+
+211         128 LOAD_FAST                7 (tok)
+            130 POP_JUMP_IF_NONE       125 (to 382)
+
+212         132 LOAD_FAST                2 (user_id)
+            134 COPY                     1
+            136 POP_JUMP_IF_TRUE        12 (to 162)
+            138 POP_TOP
+            140 LOAD_FAST                7 (tok)
+            142 LOAD_ATTR               10 (user_id)
+        >>  162 LOAD_FAST                7 (tok)
+            164 STORE_ATTR               5 (user_id)
+
+213         174 LOAD_FAST                3 (user_name)
+            176 COPY                     1
+            178 POP_JUMP_IF_TRUE        12 (to 204)
+            180 POP_TOP
+            182 LOAD_FAST                7 (tok)
+            184 LOAD_ATTR               12 (user_name)
+        >>  204 LOAD_FAST                7 (tok)
+            206 STORE_ATTR               6 (user_name)
+
+214         216 LOAD_FAST                4 (expires_at)
+            218 COPY                     1
+            220 POP_JUMP_IF_TRUE        12 (to 246)
+            222 POP_TOP
+            224 LOAD_FAST                7 (tok)
+            226 LOAD_ATTR               14 (expires_at)
+        >>  246 LOAD_FAST                7 (tok)
+            248 STORE_ATTR               7 (expires_at)
+
+215         258 LOAD_CONST               2 ('active')
+            260 LOAD_FAST                7 (tok)
+            262 STORE_ATTR               8 (status)
+
+216         272 LOAD_FAST                5 (commit)
+            274 POP_JUMP_IF_FALSE       35 (to 346)
+
+217         276 LOAD_FAST                0 (db)
+            278 LOAD_ATTR               19 (NULL|self + commit)
+            298 CALL                     0
+            306 POP_TOP
+
+218         308 LOAD_FAST                0 (db)
+            310 LOAD_ATTR               21 (NULL|self + refresh)
+            330 LOAD_FAST                7 (tok)
+            332 CALL                     1
+            340 POP_TOP
+
+221         342 LOAD_FAST                7 (tok)
+            344 RETURN_VALUE
+
+220     >>  346 LOAD_FAST                0 (db)
+            348 LOAD_ATTR               23 (NULL|self + flush)
+            368 CALL                     0
+            376 POP_TOP
+
+221         378 LOAD_FAST                7 (tok)
+            380 RETURN_VALUE
+
+223     >>  382 LOAD_GLOBAL             25 (NULL + fb_crypto)
+            392 LOAD_ATTR               26 (encrypt_secret)
+            412 LOAD_FAST                1 (access_token)
+            414 CALL                     1
+            422 STORE_FAST               8 (enc)
+
+224         424 LOAD_GLOBAL             29 (NULL + FbToken)
+
+225         434 LOAD_FAST                2 (user_id)
+
+226         436 LOAD_FAST                3 (user_name)
+
+227         438 LOAD_FAST                6 (fingerprint)
+
+228         440 LOAD_FAST                8 (enc)
+
+229         442 LOAD_CONST               3 ('user')
+
+230         444 LOAD_CONST               2 ('active')
+
+231         446 LOAD_FAST                4 (expires_at)
+
+224         448 KW_NAMES                 4 (('user_id', 'user_name', 'token_fingerprint', 'access_token', 'token_type', 'status', 'expires_at'))
+            450 CALL                     7
+            458 STORE_FAST               7 (tok)
+
+233         460 LOAD_FAST                0 (db)
+            462 LOAD_ATTR               31 (NULL|self + add)
+            482 LOAD_FAST                7 (tok)
+            484 CALL                     1
+            492 POP_TOP
+
+234         494 LOAD_FAST                5 (commit)
+            496 POP_JUMP_IF_FALSE       34 (to 566)
+
+235         498 LOAD_FAST                0 (db)
+            500 LOAD_ATTR               19 (NULL|self + commit)
+            520 CALL                     0
+            528 POP_TOP
+
+236         530 LOAD_FAST                0 (db)
+            532 LOAD_ATTR               21 (NULL|self + refresh)
+            552 LOAD_FAST                7 (tok)
+            554 CALL                     1
+            562 POP_TOP
+            564 JUMP_FORWARD            16 (to 598)
+
+238     >>  566 LOAD_FAST                0 (db)
+            568 LOAD_ATTR               23 (NULL|self + flush)
+            588 CALL                     0
+            596 POP_TOP
+
+239     >>  598 LOAD_GLOBAL             33 (NULL + log)
+            608 LOAD_ATTR               34 (info)
+            628 LOAD_CONST               5 ('[fb_token_pool] thêm user token ')
+            630 LOAD_FAST                7 (tok)
+            632 LOAD_ATTR               36 (id)
+            652 FORMAT_VALUE             0
+            654 BUILD_STRING             2
+            656 CALL                     1
+            664 POP_TOP
+
+240         666 LOAD_FAST                7 (tok)
+            668 RETURN_VALUE
+
+Disassembly of <code object add_page_token at 0x28c187c0, file "app\services\fb_token_pool.py", line 243>:
+243           0 RESUME                   0
+
+248           2 LOAD_GLOBAL              1 (NULL + hashlib)
+             12 LOAD_ATTR                2 (sha256)
+             32 LOAD_FAST                2 (access_token)
+             34 LOAD_ATTR                5 (NULL|self + encode)
+             54 LOAD_CONST               1 ('utf-8')
+             56 CALL                     1
+             64 CALL                     1
+             72 LOAD_ATTR                7 (NULL|self + hexdigest)
+             92 CALL                     0
+            100 STORE_FAST               6 (fingerprint)
+
+249         102 LOAD_GLOBAL              9 (NULL + _find_existing_token)
+            112 LOAD_FAST                0 (db)
+            114 LOAD_FAST                2 (access_token)
+            116 LOAD_FAST                6 (fingerprint)
+            118 CALL                     3
+            126 STORE_FAST               7 (tok)
+
+250         128 LOAD_FAST                7 (tok)
+            130 POP_JUMP_IF_NONE       193 (to 518)
+
+251         132 LOAD_FAST                1 (page_id)
+            134 LOAD_FAST                7 (tok)
+            136 STORE_ATTR               5 (page_id)
+
+252         146 LOAD_FAST                4 (owner_user_token)
+            148 POP_JUMP_IF_FALSE       12 (to 174)
+            150 LOAD_FAST                4 (owner_user_token)
+            152 LOAD_ATTR               12 (user_id)
+            172 JUMP_FORWARD             1 (to 176)
+        >>  174 LOAD_CONST               2 (None)
+        >>  176 COPY                     1
+            178 POP_JUMP_IF_TRUE        12 (to 204)
+            180 POP_TOP
+            182 LOAD_FAST                7 (tok)
+            184 LOAD_ATTR               12 (user_id)
+        >>  204 LOAD_FAST                7 (tok)
+            206 STORE_ATTR               6 (user_id)
+
+253         216 LOAD_FAST                4 (owner_user_token)
+            218 POP_JUMP_IF_FALSE       12 (to 244)
+            220 LOAD_FAST                4 (owner_user_token)
+            222 LOAD_ATTR               14 (user_name)
+            242 JUMP_FORWARD             1 (to 246)
+        >>  244 LOAD_CONST               2 (None)
+        >>  246 COPY                     1
+            248 POP_JUMP_IF_TRUE        12 (to 274)
+            250 POP_TOP
+            252 LOAD_FAST                7 (tok)
+            254 LOAD_ATTR               14 (user_name)
+        >>  274 LOAD_FAST                7 (tok)
+            276 STORE_ATTR               7 (user_name)
+
+254         286 LOAD_FAST                4 (owner_user_token)
+            288 POP_JUMP_IF_FALSE       12 (to 314)
+            290 LOAD_FAST                4 (owner_user_token)
+            292 LOAD_ATTR               16 (id)
+            312 JUMP_FORWARD            11 (to 336)
+        >>  314 LOAD_FAST                7 (tok)
+            316 LOAD_ATTR               18 (owner_user_token_id)
+        >>  336 LOAD_FAST                7 (tok)
+            338 STORE_ATTR               9 (owner_user_token_id)
+
+255         348 LOAD_CONST               3 ('active')
+            350 LOAD_FAST                7 (tok)
+            352 STORE_ATTR              10 (status)
+
+256         362 LOAD_GLOBAL             23 (NULL + grant_page_access)
+            372 LOAD_FAST                0 (db)
+            374 LOAD_FAST                7 (tok)
+            376 LOAD_ATTR               16 (id)
+            396 LOAD_FAST                1 (page_id)
+            398 CALL                     3
+            406 POP_TOP
+
+257         408 LOAD_FAST                5 (commit)
+            410 POP_JUMP_IF_FALSE       35 (to 482)
+
+258         412 LOAD_FAST                0 (db)
+            414 LOAD_ATTR               25 (NULL|self + commit)
+            434 CALL                     0
+            442 POP_TOP
+
+259         444 LOAD_FAST                0 (db)
+            446 LOAD_ATTR               27 (NULL|self + refresh)
+            466 LOAD_FAST                7 (tok)
+            468 CALL                     1
+            476 POP_TOP
+
+262         478 LOAD_FAST                7 (tok)
+            480 RETURN_VALUE
+
+261     >>  482 LOAD_FAST                0 (db)
+            484 LOAD_ATTR               29 (NULL|self + flush)
+            504 CALL                     0
+            512 POP_TOP
+
+262         514 LOAD_FAST                7 (tok)
+            516 RETURN_VALUE
+
+264     >>  518 LOAD_GLOBAL             31 (NULL + fb_crypto)
+            528 LOAD_ATTR               32 (encrypt_secret)
+            548 LOAD_FAST                2 (access_token)
+            550 CALL                     1
+            558 STORE_FAST               8 (enc)
+
+265         560 LOAD_GLOBAL             35 (NULL + FbToken)
+
+266         570 LOAD_FAST                8 (enc)
+
+267         572 LOAD_FAST                6 (fingerprint)
+
+268         574 LOAD_CONST               4 ('page')
+
+269         576 LOAD_FAST                1 (page_id)
+
+270         578 LOAD_FAST                4 (owner_user_token)
+            580 POP_JUMP_IF_FALSE       12 (to 606)
+            582 LOAD_FAST                4 (owner_user_token)
+            584 LOAD_ATTR               12 (user_id)
+            604 JUMP_FORWARD             1 (to 608)
+        >>  606 LOAD_CONST               2 (None)
+
+271     >>  608 LOAD_FAST                4 (owner_user_token)
+            610 POP_JUMP_IF_FALSE       12 (to 636)
+            612 LOAD_FAST                4 (owner_user_token)
+            614 LOAD_ATTR               14 (user_name)
+            634 JUMP_FORWARD             1 (to 638)
+        >>  636 LOAD_CONST               2 (None)
+
+272     >>  638 LOAD_FAST                4 (owner_user_token)
+            640 POP_JUMP_IF_FALSE       12 (to 666)
+            642 LOAD_FAST                4 (owner_user_token)
+            644 LOAD_ATTR               16 (id)
+            664 JUMP_FORWARD             1 (to 668)
+        >>  666 LOAD_CONST               2 (None)
+
+273     >>  668 LOAD_CONST               3 ('active')
+
+274         670 LOAD_FAST                3 (expires_at)
+
+265         672 KW_NAMES                 5 (('access_token', 'token_fingerprint', 'token_type', 'page_id', 'user_id', 'user_name', 'owner_user_token_id', 'status', 'expires_at'))
+            674 CALL                     9
+            682 STORE_FAST               7 (tok)
+
+276         684 LOAD_FAST                0 (db)
+            686 LOAD_ATTR               37 (NULL|self + add)
+            706 LOAD_FAST                7 (tok)
+            708 CALL                     1
+            716 POP_TOP
+
+277         718 LOAD_FAST                0 (db)
+            720 LOAD_ATTR               29 (NULL|self + flush)
+            740 CALL                     0
+            748 POP_TOP
+
+278         750 LOAD_GLOBAL             23 (NULL + grant_page_access)
+            760 LOAD_FAST                0 (db)
+            762 LOAD_FAST                7 (tok)
+            764 LOAD_ATTR               16 (id)
+            784 LOAD_FAST                1 (page_id)
+            786 CALL                     3
+            794 POP_TOP
+
+279         796 LOAD_FAST                5 (commit)
+            798 POP_JUMP_IF_FALSE       33 (to 866)
+
+280         800 LOAD_FAST                0 (db)
+            802 LOAD_ATTR               25 (NULL|self + commit)
+            822 CALL                     0
+            830 POP_TOP
+
+281         832 LOAD_FAST                0 (db)
+            834 LOAD_ATTR               27 (NULL|self + refresh)
+            854 LOAD_FAST                7 (tok)
+            856 CALL                     1
+            864 POP_TOP
+
+282     >>  866 LOAD_GLOBAL             39 (NULL + log)
+            876 LOAD_ATTR               40 (info)
+            896 LOAD_CONST               6 ('[fb_token_pool] thêm page token ')
+            898 LOAD_FAST                7 (tok)
+            900 LOAD_ATTR               16 (id)
+            920 FORMAT_VALUE             0
+            922 LOAD_CONST               7 (' → page ')
+            924 LOAD_FAST                1 (page_id)
+            926 FORMAT_VALUE             0
+            928 BUILD_STRING             4
+            930 CALL                     1
+            938 POP_TOP
+
+283         940 LOAD_FAST                7 (tok)
+            942 RETURN_VALUE
+
+Disassembly of <code object grant_page_access at 0x7f6c819a6cc0, file "app\services\fb_token_pool.py", line 286>:
+286           0 RESUME                   0
+
+287           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + execute)
+
+288          24 LOAD_GLOBAL              3 (NULL + select)
+             34 LOAD_GLOBAL              4 (FbTokenPageAccess)
+             44 CALL                     1
+             52 LOAD_ATTR                7 (NULL|self + where)
+
+289          72 LOAD_GLOBAL              4 (FbTokenPageAccess)
+             82 LOAD_ATTR                8 (token_id)
+            102 LOAD_FAST                1 (token_id)
+            104 COMPARE_OP              40 (==)
+
+290         108 LOAD_GLOBAL              4 (FbTokenPageAccess)
+            118 LOAD_ATTR               10 (page_id)
+            138 LOAD_FAST                2 (page_id)
+            140 COMPARE_OP              40 (==)
+
+288         144 CALL                     2
+
+287         152 CALL                     1
+
+292         160 LOAD_ATTR               13 (NULL|self + scalar_one_or_none)
+            180 CALL                     0
+
+287         188 STORE_FAST               3 (row)
+
+293         190 LOAD_FAST                3 (row)
+            192 POP_JUMP_IF_NOT_NONE    46 (to 286)
+
+294         194 LOAD_GLOBAL              5 (NULL + FbTokenPageAccess)
+            204 LOAD_FAST                1 (token_id)
+            206 LOAD_FAST                2 (page_id)
+            208 KW_NAMES                 1 (('token_id', 'page_id'))
+            210 CALL                     2
+            218 STORE_FAST               3 (row)
+
+295         220 LOAD_FAST                0 (db)
+            222 LOAD_ATTR               15 (NULL|self + add)
+            242 LOAD_FAST                3 (row)
+            244 CALL                     1
+            252 POP_TOP
+
+296         254 LOAD_FAST                0 (db)
+            256 LOAD_ATTR               17 (NULL|self + flush)
+            276 CALL                     0
+            284 POP_TOP
+
+297     >>  286 LOAD_FAST                3 (row)
+            288 RETURN_VALUE
+
+Disassembly of <code object decrypt_token at 0x7f6c9234d530, file "app\services\fb_token_pool.py", line 300>:
+300           0 RESUME                   0
+
+302           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_GLOBAL              2 (FbToken)
+             34 LOAD_FAST                1 (token_id)
+             36 CALL                     2
+             44 STORE_FAST               2 (tok)
+
+303          46 LOAD_FAST                2 (tok)
+             48 POP_JUMP_IF_NOT_NONE    11 (to 72)
+
+304          50 LOAD_GLOBAL              5 (NULL + ValueError)
+             60 LOAD_CONST               1 ('Token không tồn tại')
+             62 CALL                     1
+             70 RAISE_VARARGS            1
+
+305     >>   72 LOAD_GLOBAL              7 (NULL + fb_crypto)
+             82 LOAD_ATTR                8 (decrypt_secret)
+            102 LOAD_FAST                2 (tok)
+            104 LOAD_ATTR               10 (access_token)
+            124 CALL                     1
+            132 RETURN_VALUE
+
+Disassembly of <code object list_tokens at 0x7f6c92699c50, file "app\services\fb_token_pool.py", line 308>:
+308           0 RESUME                   0
+
+309           2 LOAD_GLOBAL              1 (NULL + select)
+             12 LOAD_GLOBAL              2 (FbToken)
+             22 CALL                     1
+             30 STORE_FAST               2 (q)
+
+310          32 LOAD_FAST                1 (page_id)
+             34 POP_JUMP_IF_FALSE       34 (to 104)
+
+311          36 LOAD_FAST                2 (q)
+             38 LOAD_ATTR                5 (NULL|self + where)
+             58 LOAD_GLOBAL              2 (FbToken)
+             68 LOAD_ATTR                6 (page_id)
+             88 LOAD_FAST                1 (page_id)
+             90 COMPARE_OP              40 (==)
+             94 CALL                     1
+            102 STORE_FAST               2 (q)
+
+312     >>  104 LOAD_FAST                0 (db)
+            106 LOAD_ATTR                9 (NULL|self + execute)
+            126 LOAD_FAST                2 (q)
+            128 LOAD_ATTR               11 (NULL|self + order_by)
+            148 LOAD_GLOBAL              2 (FbToken)
+            158 LOAD_ATTR               12 (created_at)
+            178 LOAD_ATTR               15 (NULL|self + desc)
+            198 CALL                     0
+            206 CALL                     1
+            214 CALL                     1
+            222 LOAD_ATTR               17 (NULL|self + scalars)
+            242 CALL                     0
+            250 LOAD_ATTR               19 (NULL|self + all)
+            270 CALL                     0
+            278 RETURN_VALUE

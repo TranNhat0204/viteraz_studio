@@ -1,0 +1,644 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Step slow_source — (tuỳ chọn) làm chậm video gốc NGAY sau download.\n\nMục đích: với phim nói nhanh (TQ → VI/EN dài hơn ô), làm chậm CHÍNH source.mp4 trước khi tách audio\n→ mọi bước sau (extract_audio → transcribe → translate → tts → render) cùng chạy trên MỘT timeline\nđã chậm, nên voice ↔ subtitle ↔ video luôn khớp tự nhiên (kể cả editor preview vì editor phát source).\n\nBật bằng config `slow_video`: "15" (×0.85) | "10" (×0.90) | "off" (mặc định, no-op).\nGiữ bản gốc nguyên tại source.orig.mp4 để bật/tắt qua lại mà KHÔNG cần tải lại video.\nVideo & tiếng GỐC chậm cùng hệ số (setpts + atempo giữ cao độ) nên A/V vẫn đồng bộ.\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 11           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 13          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (shutil)
+             24 STORE_NAME               3 (shutil)
+
+ 14          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               4 (('Path',))
+             30 IMPORT_NAME              4 (pathlib)
+             32 IMPORT_FROM              5 (Path)
+             34 STORE_NAME               5 (Path)
+             36 POP_TOP
+
+ 16          38 LOAD_CONST               1 (0)
+             40 LOAD_CONST               5 (('make_error', 'StudioError', 'E'))
+             42 IMPORT_NAME              6 (app.core.errors)
+             44 IMPORT_FROM              7 (make_error)
+             46 STORE_NAME               7 (make_error)
+             48 IMPORT_FROM              8 (StudioError)
+             50 STORE_NAME               8 (StudioError)
+             52 IMPORT_FROM              9 (E)
+             54 STORE_NAME               9 (E)
+             56 POP_TOP
+
+ 17          58 LOAD_CONST               1 (0)
+             60 LOAD_CONST               6 (('ProjectFS',))
+             62 IMPORT_NAME             10 (app.core.fs)
+             64 IMPORT_FROM             11 (ProjectFS)
+             66 STORE_NAME              11 (ProjectFS)
+             68 POP_TOP
+
+ 18          70 LOAD_CONST               1 (0)
+             72 LOAD_CONST               7 (('FFmpegRunner',))
+             74 IMPORT_NAME             12 (app.adapters.ffmpeg)
+             76 IMPORT_FROM             13 (FFmpegRunner)
+             78 STORE_NAME              13 (FFmpegRunner)
+             80 POP_TOP
+
+ 19          82 LOAD_CONST               1 (0)
+             84 LOAD_CONST               8 (('filtergraph',))
+             86 IMPORT_NAME             14 (app.render)
+             88 IMPORT_FROM             15 (filtergraph)
+             90 STORE_NAME              15 (filtergraph)
+             92 POP_TOP
+
+ 20          94 LOAD_CONST               1 (0)
+             96 LOAD_CONST               9 (('BaseStep', 'StepContext'))
+             98 IMPORT_NAME             16 (app.pipeline.base)
+            100 IMPORT_FROM             17 (BaseStep)
+            102 STORE_NAME              17 (BaseStep)
+            104 IMPORT_FROM             18 (StepContext)
+            106 STORE_NAME              18 (StepContext)
+            108 POP_TOP
+
+ 23         110 LOAD_CONST              13 (('config', 'dict', 'return', 'float | None'))
+            112 LOAD_CONST              10 (<code object slow_factor at 0x7f6c92c3d140, file "app\pipeline\steps\slow_source.py", line 23>)
+            114 MAKE_FUNCTION            4 (annotations)
+            116 STORE_NAME              19 (slow_factor)
+
+ 33         118 PUSH_NULL
+            120 LOAD_BUILD_CLASS
+            122 LOAD_CONST              11 (<code object SlowSourceStep at 0x7f6c930946c0, file "app\pipeline\steps\slow_source.py", line 33>)
+            124 MAKE_FUNCTION            0
+            126 LOAD_CONST              12 ('SlowSourceStep')
+            128 LOAD_NAME               17 (BaseStep)
+            130 CALL                     3
+            138 STORE_NAME              20 (SlowSourceStep)
+            140 RETURN_CONST             3 (None)
+
+Disassembly of <code object slow_factor at 0x7f6c92c3d140, file "app\pipeline\steps\slow_source.py", line 23>:
+ 23           0 RESUME                   0
+
+ 25           2 LOAD_GLOBAL              1 (NULL + str)
+             12 LOAD_FAST                0 (config)
+             14 COPY                     1
+             16 POP_JUMP_IF_TRUE         2 (to 22)
+             18 POP_TOP
+             20 BUILD_MAP                0
+        >>   22 LOAD_ATTR                3 (NULL|self + get)
+             42 LOAD_CONST               1 ('slow_video')
+             44 LOAD_CONST               2 ('off')
+             46 CALL                     2
+             54 CALL                     1
+             62 LOAD_ATTR                5 (NULL|self + strip)
+             82 CALL                     0
+             90 LOAD_ATTR                7 (NULL|self + lower)
+            110 CALL                     0
+            118 STORE_FAST               1 (v)
+
+ 26         120 LOAD_FAST                1 (v)
+            122 LOAD_CONST               3 (('15', '15%', '0.85'))
+            124 CONTAINS_OP              0
+            126 POP_JUMP_IF_FALSE        1 (to 130)
+
+ 27         128 RETURN_CONST             4 (0.85)
+
+ 28     >>  130 LOAD_FAST                1 (v)
+            132 LOAD_CONST               5 (('10', '10%', '0.9', '0.90'))
+            134 CONTAINS_OP              0
+            136 POP_JUMP_IF_FALSE        1 (to 140)
+
+ 29         138 RETURN_CONST             6 (0.9)
+
+ 30     >>  140 RETURN_CONST             7 (None)
+
+Disassembly of <code object SlowSourceStep at 0x7f6c930946c0, file "app\pipeline\steps\slow_source.py", line 33>:
+ 33           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('SlowSourceStep')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 34          12 LOAD_CONST               1 ('slow_source')
+             14 STORE_NAME               3 (name)
+
+ 35          16 LOAD_CONST               2 ('CPU')
+             18 STORE_NAME               4 (resource)
+
+ 36          20 BUILD_LIST               0
+             22 STORE_NAME               5 (produces)
+             24 LOAD_CONST               3 ('list[str]')
+             26 LOAD_NAME                6 (__annotations__)
+             28 LOAD_CONST               4 ('produces')
+             30 STORE_SUBSCR
+
+ 38          34 LOAD_CONST               7 (('ctx', 'StepContext', 'return', 'dict'))
+             36 LOAD_CONST               5 (<code object run at 0x290b11f0, file "app\pipeline\steps\slow_source.py", line 38>)
+             38 MAKE_FUNCTION            4 (annotations)
+             40 STORE_NAME               7 (run)
+             42 RETURN_CONST             6 (None)
+
+Disassembly of <code object run at 0x290b11f0, file "app\pipeline\steps\slow_source.py", line 38>:
+              0 MAKE_CELL                1 (ctx)
+              2 MAKE_CELL               13 (factor)
+              4 MAKE_CELL               14 (has_audio)
+              6 MAKE_CELL               15 (orig)
+              8 MAKE_CELL               16 (pct)
+             10 MAKE_CELL               17 (tmp)
+
+ 38          12 RETURN_GENERATOR
+             14 POP_TOP
+             16 RESUME                   0
+
+ 39          18 LOAD_GLOBAL              1 (NULL + ProjectFS)
+             28 LOAD_DEREF               1 (ctx)
+             30 LOAD_ATTR                2 (workdir)
+             50 CALL                     1
+             58 STORE_FAST               2 (fs)
+
+ 40          60 LOAD_FAST                2 (fs)
+             62 LOAD_ATTR                5 (NULL|self + source_mp4)
+             82 LOAD_DEREF               1 (ctx)
+             84 LOAD_ATTR                6 (video_id)
+            104 CALL                     1
+            112 STORE_FAST               3 (source)
+
+ 41         114 LOAD_FAST                3 (source)
+            116 LOAD_ATTR                9 (NULL|self + with_name)
+            136 LOAD_CONST               1 ('source.orig.mp4')
+            138 CALL                     1
+            146 STORE_DEREF             15 (orig)
+
+ 42         148 LOAD_GLOBAL             11 (NULL + slow_factor)
+            158 LOAD_DEREF               1 (ctx)
+            160 LOAD_ATTR               12 (config)
+            180 CALL                     1
+            188 STORE_DEREF             13 (factor)
+
+ 44         190 LOAD_FAST                3 (source)
+            192 LOAD_ATTR               15 (NULL|self + exists)
+            212 CALL                     0
+            220 POP_JUMP_IF_TRUE        44 (to 310)
+            222 LOAD_DEREF              15 (orig)
+            224 LOAD_ATTR               15 (NULL|self + exists)
+            244 CALL                     0
+            252 POP_JUMP_IF_TRUE        28 (to 310)
+
+ 45         254 LOAD_GLOBAL             17 (NULL + make_error)
+
+ 46         264 LOAD_GLOBAL             18 (E)
+            274 LOAD_ATTR               20 (PRECONDITION_MISSING)
+
+ 47         294 LOAD_CONST               2 ('Thiếu file video gốc (source.mp4). Vui lòng tải lại video.')
+
+ 48         296 LOAD_CONST               3 ('Hãy chạy step download trước.')
+
+ 45         298 KW_NAMES                 4 (('hint',))
+            300 CALL                     3
+            308 RAISE_VARARGS            1
+
+ 52     >>  310 LOAD_DEREF              13 (factor)
+            312 POP_JUMP_IF_NOT_NONE    76 (to 466)
+
+ 53         314 LOAD_DEREF              15 (orig)
+            316 LOAD_ATTR               15 (NULL|self + exists)
+            336 CALL                     0
+            344 POP_JUMP_IF_FALSE       41 (to 428)
+
+ 54         346 LOAD_GLOBAL             23 (NULL + shutil)
+            356 LOAD_ATTR               24 (copyfile)
+            376 LOAD_DEREF              15 (orig)
+            378 LOAD_FAST                3 (source)
+            380 CALL                     2
+            388 POP_TOP
+
+ 55         390 LOAD_DEREF               1 (ctx)
+            392 LOAD_ATTR               27 (NULL|self + emit_log)
+            412 LOAD_CONST               5 ('Làm chậm video: TẮT → đã khôi phục video gốc (tốc độ thường).')
+            414 CALL                     1
+            422 POP_TOP
+
+ 58         424 BUILD_MAP                0
+            426 RETURN_VALUE
+
+ 57     >>  428 LOAD_DEREF               1 (ctx)
+            430 LOAD_ATTR               27 (NULL|self + emit_log)
+            450 LOAD_CONST               6 ('Làm chậm video: TẮT (giữ nguyên video gốc).')
+            452 CALL                     1
+            460 POP_TOP
+
+ 58         462 BUILD_MAP                0
+            464 RETURN_VALUE
+
+ 61     >>  466 LOAD_DEREF              15 (orig)
+            468 LOAD_ATTR               15 (NULL|self + exists)
+            488 CALL                     0
+            496 POP_JUMP_IF_TRUE        22 (to 542)
+
+ 62         498 LOAD_GLOBAL             23 (NULL + shutil)
+            508 LOAD_ATTR               24 (copyfile)
+            528 LOAD_FAST                3 (source)
+            530 LOAD_DEREF              15 (orig)
+            532 CALL                     2
+            540 POP_TOP
+
+ 64     >>  542 LOAD_GLOBAL             29 (NULL + FFmpegRunner)
+            552 CALL                     0
+            560 STORE_FAST               4 (runner)
+
+ 65         562 LOAD_FAST                4 (runner)
+            564 LOAD_ATTR               31 (NULL|self + probe)
+            584 LOAD_GLOBAL             33 (NULL + str)
+            594 LOAD_DEREF              15 (orig)
+            596 CALL                     1
+            604 CALL                     1
+            612 GET_AWAITABLE            0
+            614 LOAD_CONST               0 (None)
+        >>  616 SEND                     3 (to 626)
+            620 YIELD_VALUE              2
+            622 RESUME                   3
+            624 JUMP_BACKWARD_NO_INTERRUPT     5 (to 616)
+        >>  626 END_SEND
+            628 STORE_FAST               5 (probe)
+
+ 66         630 LOAD_GLOBAL             35 (NULL + bool)
+            640 LOAD_FAST                5 (probe)
+            642 LOAD_ATTR               37 (NULL|self + get)
+            662 LOAD_CONST               7 ('has_audio')
+            664 CALL                     1
+            672 CALL                     1
+            680 STORE_DEREF             14 (has_audio)
+
+ 67         682 LOAD_GLOBAL             39 (NULL + float)
+            692 LOAD_FAST                5 (probe)
+            694 LOAD_ATTR               37 (NULL|self + get)
+            714 LOAD_CONST               8 ('duration_sec')
+            716 CALL                     1
+            724 COPY                     1
+            726 POP_JUMP_IF_TRUE         2 (to 732)
+            728 POP_TOP
+            730 LOAD_CONST               9 (0.0)
+        >>  732 CALL                     1
+            740 STORE_FAST               6 (src_dur)
+
+ 68         742 LOAD_FAST                6 (src_dur)
+            744 LOAD_CONST              10 (0)
+            746 COMPARE_OP              68 (>)
+            750 POP_JUMP_IF_FALSE        5 (to 762)
+            752 LOAD_FAST                6 (src_dur)
+            754 LOAD_DEREF              13 (factor)
+            756 BINARY_OP               11 (/)
+            760 JUMP_FORWARD             1 (to 764)
+        >>  762 LOAD_CONST               9 (0.0)
+        >>  764 STORE_FAST               7 (out_dur)
+
+ 69         766 LOAD_GLOBAL             41 (NULL + round)
+            776 LOAD_CONST              11 (1.0)
+            778 LOAD_DEREF              13 (factor)
+            780 BINARY_OP               10 (-)
+            784 LOAD_CONST              12 (100)
+            786 BINARY_OP                5 (*)
+            790 CALL                     1
+            798 STORE_DEREF             16 (pct)
+
+ 70         800 LOAD_DEREF               1 (ctx)
+            802 LOAD_ATTR               27 (NULL|self + emit_log)
+            822 LOAD_CONST              13 ('Làm chậm video ')
+            824 LOAD_DEREF              16 (pct)
+            826 FORMAT_VALUE             0
+            828 LOAD_CONST              14 ('% (×')
+            830 LOAD_DEREF              13 (factor)
+            832 LOAD_CONST              15 ('g')
+            834 FORMAT_VALUE             4 (with format)
+            836 LOAD_CONST              16 (') — giữ cao độ tiếng gốc; mọi bước sau chạy trên timeline đã chậm để voice↔sub khớp.')
+            838 BUILD_STRING             5
+            840 CALL                     1
+            848 POP_TOP
+
+ 73         850 LOAD_FAST                3 (source)
+            852 LOAD_ATTR                9 (NULL|self + with_name)
+            872 LOAD_CONST              17 ('source.slow.tmp.mp4')
+            874 CALL                     1
+            882 STORE_DEREF             17 (tmp)
+
+ 75         884 LOAD_CONST              33 (('codec_args', 'list[str]', 'return', 'list[str]'))
+            886 LOAD_CLOSURE            13 (factor)
+            888 LOAD_CLOSURE            14 (has_audio)
+            890 LOAD_CLOSURE            15 (orig)
+            892 LOAD_CLOSURE            17 (tmp)
+            894 BUILD_TUPLE              4
+            896 LOAD_CONST              18 (<code object _assemble at 0x7f6c92c3d290, file "app\pipeline\steps\slow_source.py", line 75>)
+            898 MAKE_FUNCTION           12 (annotations, closure)
+            900 STORE_FAST               8 (_assemble)
+
+ 85         902 LOAD_CONST              34 (('p', 'float'))
+            904 LOAD_CLOSURE             1 (ctx)
+            906 LOAD_CLOSURE            16 (pct)
+            908 BUILD_TUPLE              2
+            910 LOAD_CONST              19 (<code object on_prog at 0x7f6c930b89c0, file "app\pipeline\steps\slow_source.py", line 85>)
+            912 MAKE_FUNCTION           12 (annotations, closure)
+            914 STORE_FAST               9 (on_prog)
+
+ 90         916 LOAD_GLOBAL             43 (NULL + filtergraph)
+            926 LOAD_ATTR               44 (resolve_video_codec_args)
+            946 LOAD_CONST              20 ('export')
+            948 LOAD_DEREF               1 (ctx)
+            950 LOAD_ATTR               12 (config)
+            970 CALL                     2
+            978 GET_AWAITABLE            0
+            980 LOAD_CONST               0 (None)
+        >>  982 SEND                     3 (to 992)
+            986 YIELD_VALUE              2
+            988 RESUME                   3
+            990 JUMP_BACKWARD_NO_INTERRUPT     5 (to 982)
+        >>  992 END_SEND
+            994 UNPACK_SEQUENCE          2
+            998 STORE_FAST              10 (codec_args)
+           1000 STORE_FAST              11 (enc_name)
+
+ 91        1002 NOP
+
+ 92        1004 LOAD_FAST                4 (runner)
+           1006 LOAD_ATTR               47 (NULL|self + run_render)
+
+ 93        1026 PUSH_NULL
+           1028 LOAD_FAST                8 (_assemble)
+           1030 LOAD_FAST               10 (codec_args)
+           1032 CALL                     1
+           1040 LOAD_FAST                7 (out_dur)
+           1042 LOAD_FAST                9 (on_prog)
+
+ 94        1044 LOAD_CLOSURE             1 (ctx)
+           1046 BUILD_TUPLE              1
+           1048 LOAD_CONST              21 (<code object <lambda> at 0x7f6c93094c60, file "app\pipeline\steps\slow_source.py", line 94>)
+           1050 MAKE_FUNCTION            8 (closure)
+           1052 LOAD_GLOBAL             33 (NULL + str)
+           1062 LOAD_FAST                3 (source)
+           1064 LOAD_ATTR               48 (parent)
+           1084 CALL                     1
+
+ 95        1092 LOAD_GLOBAL             18 (E)
+           1102 LOAD_ATTR               50 (FFMPEG_RUNTIME_ERROR)
+
+ 92        1122 KW_NAMES                22 (('duration_sec', 'on_progress', 'cancel_check', 'cwd', 'error_code'))
+           1124 CALL                     6
+           1132 GET_AWAITABLE            0
+           1134 LOAD_CONST               0 (None)
+        >> 1136 SEND                     3 (to 1146)
+           1140 YIELD_VALUE              3
+           1142 RESUME                   3
+           1144 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1136)
+        >> 1146 END_SEND
+           1148 POP_TOP
+
+108     >> 1150 LOAD_GLOBAL             23 (NULL + shutil)
+           1160 LOAD_ATTR               60 (move)
+           1180 LOAD_GLOBAL             33 (NULL + str)
+           1190 LOAD_DEREF              17 (tmp)
+           1192 CALL                     1
+           1200 LOAD_GLOBAL             33 (NULL + str)
+           1210 LOAD_FAST                3 (source)
+           1212 CALL                     1
+           1220 CALL                     2
+           1228 POP_TOP
+
+109        1230 LOAD_DEREF               1 (ctx)
+           1232 LOAD_ATTR               27 (NULL|self + emit_log)
+           1252 LOAD_CONST              30 ('Đã làm chậm video ')
+           1254 LOAD_DEREF              16 (pct)
+           1256 FORMAT_VALUE             0
+           1258 LOAD_CONST              31 ('% → các bước sau dùng bản này.')
+           1260 BUILD_STRING             3
+           1262 CALL                     1
+           1270 POP_TOP
+
+110        1272 LOAD_CONST              32 ('slowed_pct')
+           1274 LOAD_DEREF              16 (pct)
+           1276 BUILD_MAP                1
+           1278 RETURN_VALUE
+
+ 65     >> 1280 CLEANUP_THROW
+           1282 EXTENDED_ARG             1
+           1284 JUMP_BACKWARD          330 (to 626)
+
+ 90     >> 1286 CLEANUP_THROW
+           1288 JUMP_BACKWARD          149 (to 992)
+
+ 92     >> 1290 CLEANUP_THROW
+           1292 JUMP_BACKWARD           74 (to 1146)
+        >> 1294 PUSH_EXC_INFO
+
+ 97        1296 LOAD_GLOBAL             52 (StudioError)
+           1306 CHECK_EXC_MATCH
+           1308 POP_JUMP_IF_FALSE      174 (to 1658)
+           1310 STORE_FAST              12 (e)
+
+ 98        1312 LOAD_FAST               11 (enc_name)
+           1314 LOAD_CONST              23 ('libx264')
+           1316 COMPARE_OP              40 (==)
+           1320 POP_JUMP_IF_TRUE        29 (to 1380)
+           1322 LOAD_FAST               12 (e)
+           1324 LOAD_ATTR               54 (code)
+           1344 LOAD_GLOBAL             18 (E)
+           1354 LOAD_ATTR               56 (CANCELLED)
+           1374 COMPARE_OP              40 (==)
+           1378 POP_JUMP_IF_FALSE        1 (to 1382)
+
+ 99     >> 1380 RAISE_VARARGS            0
+
+100     >> 1382 LOAD_DEREF               1 (ctx)
+           1384 LOAD_ATTR               27 (NULL|self + emit_log)
+           1404 LOAD_CONST              24 ('Encoder ')
+           1406 LOAD_FAST               11 (enc_name)
+           1408 FORMAT_VALUE             0
+           1410 LOAD_CONST              25 (' lỗi runtime (')
+           1412 LOAD_FAST               12 (e)
+           1414 LOAD_ATTR               54 (code)
+           1434 FORMAT_VALUE             0
+           1436 LOAD_CONST              26 (') → làm chậm lại bằng libx264 (CPU).')
+           1438 BUILD_STRING             5
+
+101        1440 LOAD_CONST              27 ('warn')
+
+100        1442 KW_NAMES                28 (('level',))
+           1444 CALL                     2
+           1452 POP_TOP
+
+102        1454 LOAD_FAST                4 (runner)
+           1456 LOAD_ATTR               47 (NULL|self + run_render)
+
+103        1476 PUSH_NULL
+           1478 LOAD_FAST                8 (_assemble)
+           1480 LOAD_GLOBAL             43 (NULL + filtergraph)
+           1490 LOAD_ATTR               58 (video_codec_args)
+           1510 LOAD_CONST              20 ('export')
+           1512 CALL                     1
+           1520 CALL                     1
+           1528 LOAD_FAST                7 (out_dur)
+           1530 LOAD_FAST                9 (on_prog)
+
+104        1532 LOAD_CLOSURE             1 (ctx)
+           1534 BUILD_TUPLE              1
+           1536 LOAD_CONST              29 (<code object <lambda> at 0x7f6c930945d0, file "app\pipeline\steps\slow_source.py", line 104>)
+           1538 MAKE_FUNCTION            8 (closure)
+           1540 LOAD_GLOBAL             33 (NULL + str)
+           1550 LOAD_FAST                3 (source)
+           1552 LOAD_ATTR               48 (parent)
+           1572 CALL                     1
+
+105        1580 LOAD_GLOBAL             18 (E)
+           1590 LOAD_ATTR               50 (FFMPEG_RUNTIME_ERROR)
+
+102        1610 KW_NAMES                22 (('duration_sec', 'on_progress', 'cancel_check', 'cwd', 'error_code'))
+           1612 CALL                     6
+           1620 GET_AWAITABLE            0
+           1622 LOAD_CONST               0 (None)
+        >> 1624 SEND                     4 (to 1636)
+           1628 YIELD_VALUE              4
+           1630 RESUME                   3
+           1632 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1624)
+        >> 1634 CLEANUP_THROW
+        >> 1636 END_SEND
+           1638 POP_TOP
+           1640 POP_EXCEPT
+           1642 LOAD_CONST               0 (None)
+           1644 STORE_FAST              12 (e)
+           1646 DELETE_FAST             12 (e)
+           1648 JUMP_BACKWARD          250 (to 1150)
+        >> 1650 LOAD_CONST               0 (None)
+           1652 STORE_FAST              12 (e)
+           1654 DELETE_FAST             12 (e)
+           1656 RERAISE                  1
+
+ 97     >> 1658 RERAISE                  0
+        >> 1660 COPY                     3
+           1662 POP_EXCEPT
+           1664 RERAISE                  1
+        >> 1666 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1668 RERAISE                  1
+ExceptionTable:
+  16 to 618 -> 1666 [0] lasti
+  620 to 620 -> 1280 [2]
+  622 to 984 -> 1666 [0] lasti
+  986 to 986 -> 1286 [2]
+  988 to 1000 -> 1666 [0] lasti
+  1004 to 1138 -> 1294 [0]
+  1140 to 1140 -> 1290 [2]
+  1142 to 1148 -> 1294 [0]
+  1150 to 1280 -> 1666 [0] lasti
+  1286 to 1286 -> 1666 [0] lasti
+  1290 to 1290 -> 1294 [0]
+  1294 to 1310 -> 1660 [1] lasti
+  1312 to 1626 -> 1650 [1] lasti
+  1628 to 1628 -> 1634 [3]
+  1630 to 1638 -> 1650 [1] lasti
+  1640 to 1648 -> 1666 [0] lasti
+  1650 to 1658 -> 1660 [1] lasti
+  1660 to 1664 -> 1666 [0] lasti
+
+Disassembly of <code object _assemble at 0x7f6c92c3d290, file "app\pipeline\steps\slow_source.py", line 75>:
+              0 COPY_FREE_VARS           4
+
+ 75           2 RESUME                   0
+
+ 76           4 LOAD_CONST               1 ('-y')
+              6 LOAD_CONST               2 ('-i')
+              8 LOAD_GLOBAL              1 (NULL + str)
+             18 LOAD_DEREF               4 (orig)
+             20 CALL                     1
+             28 LOAD_CONST               3 ('-filter:v')
+             30 LOAD_CONST               4 ('setpts=PTS/')
+             32 LOAD_DEREF               2 (factor)
+             34 LOAD_CONST               5 ('g')
+             36 FORMAT_VALUE             4 (with format)
+             38 BUILD_STRING             2
+             40 BUILD_LIST               5
+             42 STORE_FAST               1 (a)
+
+ 77          44 LOAD_DEREF               3 (has_audio)
+             46 POP_JUMP_IF_FALSE       16 (to 80)
+
+ 79          48 LOAD_FAST                1 (a)
+             50 LOAD_CONST               6 ('-filter:a')
+             52 LOAD_CONST               7 ('atempo=')
+             54 LOAD_DEREF               2 (factor)
+             56 LOAD_CONST               5 ('g')
+             58 FORMAT_VALUE             4 (with format)
+             60 BUILD_STRING             2
+             62 LOAD_CONST               8 ('-c:a')
+             64 LOAD_CONST               9 ('aac')
+             66 LOAD_CONST              10 ('-b:a')
+             68 LOAD_CONST              11 ('192k')
+             70 BUILD_LIST               6
+             72 BINARY_OP               13 (+=)
+             76 STORE_FAST               1 (a)
+             78 JUMP_FORWARD             6 (to 92)
+
+ 81     >>   80 LOAD_FAST                1 (a)
+             82 LOAD_CONST              12 ('-an')
+             84 BUILD_LIST               1
+             86 BINARY_OP               13 (+=)
+             90 STORE_FAST               1 (a)
+
+ 82     >>   92 LOAD_FAST                1 (a)
+             94 BUILD_LIST               0
+             96 LOAD_FAST                0 (codec_args)
+             98 LIST_EXTEND              1
+            100 LOAD_CONST              13 ('-movflags')
+            102 LIST_APPEND              1
+            104 LOAD_CONST              14 ('+faststart')
+            106 LIST_APPEND              1
+            108 LOAD_GLOBAL              1 (NULL + str)
+            118 LOAD_DEREF               5 (tmp)
+            120 CALL                     1
+            128 LIST_APPEND              1
+            130 BINARY_OP               13 (+=)
+            134 STORE_FAST               1 (a)
+
+ 83         136 LOAD_FAST                1 (a)
+            138 RETURN_VALUE
+
+Disassembly of <code object on_prog at 0x7f6c930b89c0, file "app\pipeline\steps\slow_source.py", line 85>:
+              0 COPY_FREE_VARS           2
+
+ 85           2 RESUME                   0
+
+ 86           4 LOAD_DEREF               1 (ctx)
+              6 LOAD_ATTR                1 (NULL|self + emit_progress)
+             26 LOAD_FAST                0 (p)
+             28 LOAD_CONST               1 ('Đang làm chậm video ')
+             30 LOAD_DEREF               2 (pct)
+             32 FORMAT_VALUE             0
+             34 LOAD_CONST               2 ('%: ')
+             36 LOAD_GLOBAL              3 (NULL + int)
+             46 LOAD_FAST                0 (p)
+             48 LOAD_CONST               3 (100)
+             50 BINARY_OP                5 (*)
+             54 CALL                     1
+             62 FORMAT_VALUE             0
+             64 LOAD_CONST               4 ('%')
+             66 BUILD_STRING             5
+             68 CALL                     2
+             76 POP_TOP
+             78 RETURN_CONST             0 (None)
+
+Disassembly of <code object <lambda> at 0x7f6c93094c60, file "app\pipeline\steps\slow_source.py", line 94>:
+              0 COPY_FREE_VARS           1
+
+ 94           2 RESUME                   0
+              4 LOAD_DEREF               0 (ctx)
+              6 LOAD_ATTR                1 (NULL|self + is_cancelled)
+             26 CALL                     0
+             34 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c930945d0, file "app\pipeline\steps\slow_source.py", line 104>:
+              0 COPY_FREE_VARS           1
+
+104           2 RESUME                   0
+              4 LOAD_DEREF               0 (ctx)
+              6 LOAD_ATTR                1 (NULL|self + is_cancelled)
+             26 CALL                     0
+             34 RETURN_VALUE

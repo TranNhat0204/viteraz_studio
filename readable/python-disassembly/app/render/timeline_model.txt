@@ -1,0 +1,2195 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Timeline v2 (Studio NLE đa track) — đọc/chuẩn hoá `config.timeline` phía backend.\n\nSchema (docs/studio-editor-nle-upgrade-plan.md §2.1, tập con đã triển khai M1):\n    config.timeline = {\n      version: 2, fps, canvas: {w,h,aspect},\n      tracks: [ {id, kind: video|audio|text, name, index?, muted, solo, locked, hidden, volume,\n                 clips: [ {id, source:{type: media|scene|source|color, media_id?, seq?, hex?},\n                           start_ms, end_ms, src_in_ms?, src_out_ms?, speed?,\n                           transform?: {x_pct,y_pct,scale_pct,rotate_deg,opacity,flip_h,flip_v},\n                           volume?, muted?, disabled?, fade_in_ms?, fade_out_ms?,\n                           transition_out?: {type, duration_ms}, text?: {...manual_text}} ] } ],\n      markers, in_ms, out_ms\n    }\n    config.media_pool = [ {id, kind, path, ...} ]   # FE mirror; path validate lại tại đây\n\nTrack HÌNH index 0 (phần tử đầu trong mảng tracks kind=video) = LỚP NỀN (base) — bake kiểu\nvisual_bake (full-frame + transition). Track hình sau đó = LỚP OVERLAY (PIP/sticker) composite đè.\nTrack TEXT không bake ở compiler — FE mirror sang config.manual_texts (engine bake ASS như cũ).\n\nNguồn "source" = chính source.mp4 của video (video tải-nguồn) → compiler KHÔNG ghi đè source.mp4\nmà xuất timeline.mp4 (non-destructive).\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 23           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 25          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (re)
+             24 STORE_NAME               3 (re)
+
+ 26          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               4 (('dataclass', 'field'))
+             30 IMPORT_NAME              4 (dataclasses)
+             32 IMPORT_FROM              5 (dataclass)
+             34 STORE_NAME               5 (dataclass)
+             36 IMPORT_FROM              6 (field)
+             38 STORE_NAME               6 (field)
+             40 POP_TOP
+
+ 27          42 LOAD_CONST               1 (0)
+             44 LOAD_CONST               5 (('Path',))
+             46 IMPORT_NAME              7 (pathlib)
+             48 IMPORT_FROM              8 (Path)
+             50 STORE_NAME               8 (Path)
+             52 POP_TOP
+
+ 29          54 LOAD_CONST               1 (0)
+             56 LOAD_CONST               6 (('safe_local_path',))
+             58 IMPORT_NAME              9 (app.render.branding)
+             60 IMPORT_FROM             10 (safe_local_path)
+             62 STORE_NAME              10 (safe_local_path)
+             64 POP_TOP
+
+ 31          66 LOAD_CONST               7 (80)
+             68 STORE_NAME              11 (_MIN_CLIP_MS)
+
+ 32          70 LOAD_CONST               8 ((0.25, 4.0))
+             72 UNPACK_SEQUENCE          2
+             76 STORE_NAME              12 (_SPEED_MIN)
+             78 STORE_NAME              13 (_SPEED_MAX)
+
+ 35          80 LOAD_NAME                5 (dataclass)
+
+ 36          82 PUSH_NULL
+             84 LOAD_BUILD_CLASS
+             86 LOAD_CONST               9 (<code object TlTransform at 0x7f6c92bcda50, file "app\render\timeline_model.py", line 35>)
+             88 MAKE_FUNCTION            0
+             90 LOAD_CONST              10 ('TlTransform')
+             92 CALL                     2
+
+ 35         100 CALL                     0
+
+ 36         108 STORE_NAME              14 (TlTransform)
+
+ 46         110 LOAD_NAME                5 (dataclass)
+
+ 47         112 PUSH_NULL
+            114 LOAD_BUILD_CLASS
+            116 LOAD_CONST              11 (<code object TlClip at 0x7f6c93085830, file "app\render\timeline_model.py", line 46>)
+            118 MAKE_FUNCTION            0
+            120 LOAD_CONST              12 ('TlClip')
+            122 CALL                     2
+
+ 46         130 CALL                     0
+
+ 47         138 STORE_NAME              15 (TlClip)
+
+ 75         140 LOAD_NAME                5 (dataclass)
+
+ 76         142 PUSH_NULL
+            144 LOAD_BUILD_CLASS
+            146 LOAD_CONST              13 (<code object TlTrack at 0x7f6c92bcd920, file "app\render\timeline_model.py", line 75>)
+            148 MAKE_FUNCTION            0
+            150 LOAD_CONST              14 ('TlTrack')
+            152 CALL                     2
+
+ 75         160 CALL                     0
+
+ 76         168 STORE_NAME              16 (TlTrack)
+
+ 87         170 LOAD_NAME                5 (dataclass)
+
+ 88         172 PUSH_NULL
+            174 LOAD_BUILD_CLASS
+            176 LOAD_CONST              15 (<code object TimelineV2 at 0x7f6c92888710, file "app\render\timeline_model.py", line 87>)
+            178 MAKE_FUNCTION            0
+            180 LOAD_CONST              16 ('TimelineV2')
+            182 CALL                     2
+
+ 87         190 CALL                     0
+
+ 88         198 STORE_NAME              17 (TimelineV2)
+
+ 99         200 LOAD_CONST              31 ((0.0,))
+            202 LOAD_CONST              32 (('d', 'float', 'return', 'float'))
+            204 LOAD_CONST              17 (<code object _f at 0x7f6c930ba890, file "app\render\timeline_model.py", line 99>)
+            206 MAKE_FUNCTION            5 (defaults, annotations)
+            208 STORE_NAME              18 (_f)
+
+106         210 LOAD_CONST              33 ((0,))
+            212 LOAD_CONST              34 (('d', 'int', 'return', 'int'))
+            214 LOAD_CONST              18 (<code object _i at 0x7f6c930ba670, file "app\render\timeline_model.py", line 106>)
+            216 MAKE_FUNCTION            5 (defaults, annotations)
+            218 STORE_NAME              19 (_i)
+
+113         220 LOAD_CONST              35 (('config', 'dict | None', 'return', 'bool'))
+            222 LOAD_CONST              19 (<code object is_v2 at 0x7f6c92b95f70, file "app\render\timeline_model.py", line 113>)
+            224 MAKE_FUNCTION            4 (annotations)
+            226 STORE_NAME              20 (is_v2)
+
+118         228 LOAD_CONST              36 (('config', 'dict', 'return', 'dict[str, dict]'))
+            230 LOAD_CONST              20 (<code object _media_index at 0x7f6c929f3110, file "app\render\timeline_model.py", line 118>)
+            232 MAKE_FUNCTION            4 (annotations)
+            234 STORE_NAME              21 (_media_index)
+
+126         236 LOAD_CONST              37 (('scenes', 'list[dict]', 'return', 'dict[int, dict]'))
+            238 LOAD_CONST              21 (<code object _scene_index at 0x7f6c930f2fb0, file "app\render\timeline_model.py", line 126>)
+            240 MAKE_FUNCTION            4 (annotations)
+            242 STORE_NAME              22 (_scene_index)
+
+130         244 LOAD_CONST              38 (('return', 'TlTransform | None'))
+            246 LOAD_CONST              22 (<code object _clip_transform at 0x28bc81a0, file "app\render\timeline_model.py", line 130>)
+            248 MAKE_FUNCTION            4 (annotations)
+            250 STORE_NAME              23 (_clip_transform)
+
+142         252 LOAD_CONST              39 (('return', 'dict | None'))
+            254 LOAD_CONST              23 (<code object _norm_transition at 0x7f6c92be2bf0, file "app\render\timeline_model.py", line 142>)
+            256 MAKE_FUNCTION            4 (annotations)
+            258 STORE_NAME              24 (_norm_transition)
+
+147         260 LOAD_CONST              39 (('return', 'dict | None'))
+            262 LOAD_CONST              24 (<code object _norm_chroma at 0x28bbbd00, file "app\render\timeline_model.py", line 147>)
+            264 MAKE_FUNCTION            4 (annotations)
+            266 STORE_NAME              25 (_norm_chroma)
+
+161         268 LOAD_CONST              39 (('return', 'dict | None'))
+            270 LOAD_CONST              25 (<code object _norm_mask at 0x28bca800, file "app\render\timeline_model.py", line 161>)
+            272 MAKE_FUNCTION            4 (annotations)
+            274 STORE_NAME              26 (_norm_mask)
+
+178         276 BUILD_SET                0
+            278 LOAD_CONST              26 (frozenset({'rotate_deg', 'scale_pct', 'x_pct', 'y_pct'}))
+            280 SET_UPDATE               1
+            282 STORE_NAME              27 (_KF_PROPS)
+
+179         284 BUILD_SET                0
+            286 LOAD_CONST              27 (frozenset({'ease_in', 'ease', 'ease_out', 'linear'}))
+            288 SET_UPDATE               1
+            290 STORE_NAME              28 (_KF_EASES)
+
+182         292 LOAD_CONST              40 (('clip_len_ms', 'int', 'return', 'list[dict]'))
+            294 LOAD_CONST              28 (<code object _norm_keyframes at 0x290d1e60, file "app\render\timeline_model.py", line 182>)
+            296 MAKE_FUNCTION            4 (annotations)
+            298 STORE_NAME              29 (_norm_keyframes)
+
+202         300 LOAD_CONST               3 (None)
+
+201         302 LOAD_CONST              29 (('report',))
+            304 BUILD_CONST_KEY_MAP      1
+
+202         306 NOP
+
+201         308 NOP
+
+202         310 NOP
+
+201         312 LOAD_CONST              41 (('config', 'dict', 'scenes', 'list[dict]', 'source_mp4', 'Path | None', 'report', 'list[str] | None', 'return', 'TimelineV2 | None'))
+            314 LOAD_CONST              30 (<code object resolve at 0x28bd28b0, file "app\render\timeline_model.py", line 201>)
+            316 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            318 STORE_NAME              30 (resolve)
+            320 RETURN_CONST             3 (None)
+
+Disassembly of <code object TlTransform at 0x7f6c92bcda50, file "app\render\timeline_model.py", line 35>:
+ 35           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('TlTransform')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 37          12 LOAD_CONST               1 (50.0)
+             14 STORE_NAME               3 (x_pct)
+             16 LOAD_CONST               2 ('float')
+             18 LOAD_NAME                4 (__annotations__)
+             20 LOAD_CONST               3 ('x_pct')
+             22 STORE_SUBSCR
+
+ 38          26 LOAD_CONST               1 (50.0)
+             28 STORE_NAME               5 (y_pct)
+             30 LOAD_CONST               2 ('float')
+             32 LOAD_NAME                4 (__annotations__)
+             34 LOAD_CONST               4 ('y_pct')
+             36 STORE_SUBSCR
+
+ 39          40 LOAD_CONST               5 (100.0)
+             42 STORE_NAME               6 (scale_pct)
+             44 LOAD_CONST               2 ('float')
+             46 LOAD_NAME                4 (__annotations__)
+             48 LOAD_CONST               6 ('scale_pct')
+             50 STORE_SUBSCR
+
+ 40          54 LOAD_CONST               7 (0.0)
+             56 STORE_NAME               7 (rotate_deg)
+             58 LOAD_CONST               2 ('float')
+             60 LOAD_NAME                4 (__annotations__)
+             62 LOAD_CONST               8 ('rotate_deg')
+             64 STORE_SUBSCR
+
+ 41          68 LOAD_CONST               9 (1.0)
+             70 STORE_NAME               8 (opacity)
+             72 LOAD_CONST               2 ('float')
+             74 LOAD_NAME                4 (__annotations__)
+             76 LOAD_CONST              10 ('opacity')
+             78 STORE_SUBSCR
+
+ 42          82 LOAD_CONST              11 (False)
+             84 STORE_NAME               9 (flip_h)
+             86 LOAD_CONST              12 ('bool')
+             88 LOAD_NAME                4 (__annotations__)
+             90 LOAD_CONST              13 ('flip_h')
+             92 STORE_SUBSCR
+
+ 43          96 LOAD_CONST              11 (False)
+             98 STORE_NAME              10 (flip_v)
+            100 LOAD_CONST              12 ('bool')
+            102 LOAD_NAME                4 (__annotations__)
+            104 LOAD_CONST              14 ('flip_v')
+            106 STORE_SUBSCR
+            110 RETURN_CONST            15 (None)
+
+Disassembly of <code object TlClip at 0x7f6c93085830, file "app\render\timeline_model.py", line 46>:
+ 46           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('TlClip')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 48          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('id')
+             18 STORE_SUBSCR
+
+ 49          22 LOAD_CONST               1 ('str')
+             24 LOAD_NAME                3 (__annotations__)
+             26 LOAD_CONST               3 ('source_type')
+             28 STORE_SUBSCR
+
+ 50          32 LOAD_CONST               4 ('str | None')
+             34 LOAD_NAME                3 (__annotations__)
+             36 LOAD_CONST               5 ('media_path')
+             38 STORE_SUBSCR
+
+ 51          42 LOAD_CONST               1 ('str')
+             44 LOAD_NAME                3 (__annotations__)
+             46 LOAD_CONST               6 ('media_kind')
+             48 STORE_SUBSCR
+
+ 52          52 LOAD_CONST               7 ('int | None')
+             54 LOAD_NAME                3 (__annotations__)
+             56 LOAD_CONST               8 ('seq')
+             58 STORE_SUBSCR
+
+ 53          62 LOAD_CONST               1 ('str')
+             64 LOAD_NAME                3 (__annotations__)
+             66 LOAD_CONST               9 ('hex')
+             68 STORE_SUBSCR
+
+ 54          72 LOAD_CONST              10 ('int')
+             74 LOAD_NAME                3 (__annotations__)
+             76 LOAD_CONST              11 ('start_ms')
+             78 STORE_SUBSCR
+
+ 55          82 LOAD_CONST              10 ('int')
+             84 LOAD_NAME                3 (__annotations__)
+             86 LOAD_CONST              12 ('end_ms')
+             88 STORE_SUBSCR
+
+ 56          92 LOAD_CONST              10 ('int')
+             94 LOAD_NAME                3 (__annotations__)
+             96 LOAD_CONST              13 ('src_in_ms')
+             98 STORE_SUBSCR
+
+ 57         102 LOAD_CONST               7 ('int | None')
+            104 LOAD_NAME                3 (__annotations__)
+            106 LOAD_CONST              14 ('src_out_ms')
+            108 STORE_SUBSCR
+
+ 58         112 LOAD_CONST              15 ('float')
+            114 LOAD_NAME                3 (__annotations__)
+            116 LOAD_CONST              16 ('speed')
+            118 STORE_SUBSCR
+
+ 59         122 LOAD_CONST              17 ('TlTransform | None')
+            124 LOAD_NAME                3 (__annotations__)
+            126 LOAD_CONST              18 ('transform')
+            128 STORE_SUBSCR
+
+ 60         132 LOAD_CONST              15 ('float')
+            134 LOAD_NAME                3 (__annotations__)
+            136 LOAD_CONST              19 ('volume')
+            138 STORE_SUBSCR
+
+ 61         142 LOAD_CONST              20 ('bool')
+            144 LOAD_NAME                3 (__annotations__)
+            146 LOAD_CONST              21 ('muted')
+            148 STORE_SUBSCR
+
+ 62         152 LOAD_CONST              10 ('int')
+            154 LOAD_NAME                3 (__annotations__)
+            156 LOAD_CONST              22 ('fade_in_ms')
+            158 STORE_SUBSCR
+
+ 63         162 LOAD_CONST              10 ('int')
+            164 LOAD_NAME                3 (__annotations__)
+            166 LOAD_CONST              23 ('fade_out_ms')
+            168 STORE_SUBSCR
+
+ 64         172 LOAD_CONST              24 ('dict | None')
+            174 LOAD_NAME                3 (__annotations__)
+            176 LOAD_CONST              25 ('transition_out')
+            178 STORE_SUBSCR
+
+ 65         182 LOAD_CONST              20 ('bool')
+            184 LOAD_NAME                3 (__annotations__)
+            186 LOAD_CONST              26 ('has_audio')
+            188 STORE_SUBSCR
+
+ 66         192 PUSH_NULL
+            194 LOAD_NAME                4 (field)
+            196 LOAD_NAME                5 (list)
+            198 KW_NAMES                27 (('default_factory',))
+            200 CALL                     1
+            208 STORE_NAME               6 (keyframes)
+            210 LOAD_CONST              28 ('list[dict]')
+            212 LOAD_NAME                3 (__annotations__)
+            214 LOAD_CONST              29 ('keyframes')
+            216 STORE_SUBSCR
+
+ 67         220 LOAD_CONST              30 (None)
+            222 STORE_NAME               7 (color_grade)
+            224 LOAD_CONST              24 ('dict | None')
+            226 LOAD_NAME                3 (__annotations__)
+            228 LOAD_CONST              31 ('color_grade')
+            230 STORE_SUBSCR
+
+ 68         234 LOAD_CONST              30 (None)
+            236 STORE_NAME               8 (chroma)
+            238 LOAD_CONST              24 ('dict | None')
+            240 LOAD_NAME                3 (__annotations__)
+            242 LOAD_CONST              32 ('chroma')
+            244 STORE_SUBSCR
+
+ 69         248 LOAD_CONST              30 (None)
+            250 STORE_NAME               9 (mask)
+            252 LOAD_CONST              24 ('dict | None')
+            254 LOAD_NAME                3 (__annotations__)
+            256 LOAD_CONST              33 ('mask')
+            258 STORE_SUBSCR
+
+ 70         262 LOAD_CONST              34 (0)
+            264 STORE_NAME              10 (pitch_semitones)
+            266 LOAD_CONST              10 ('int')
+            268 LOAD_NAME                3 (__annotations__)
+            270 LOAD_CONST              35 ('pitch_semitones')
+            272 STORE_SUBSCR
+
+ 71         276 LOAD_CONST              36 (False)
+            278 STORE_NAME              11 (denoise)
+            280 LOAD_CONST              20 ('bool')
+            282 LOAD_NAME                3 (__annotations__)
+            284 LOAD_CONST              37 ('denoise')
+            286 STORE_SUBSCR
+
+ 72         290 LOAD_CONST              36 (False)
+            292 STORE_NAME              12 (normalize)
+            294 LOAD_CONST              20 ('bool')
+            296 LOAD_NAME                3 (__annotations__)
+            298 LOAD_CONST              38 ('normalize')
+            300 STORE_SUBSCR
+            304 RETURN_CONST            30 (None)
+
+Disassembly of <code object TlTrack at 0x7f6c92bcd920, file "app\render\timeline_model.py", line 75>:
+ 75           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('TlTrack')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 77          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('id')
+             18 STORE_SUBSCR
+
+ 78          22 LOAD_CONST               1 ('str')
+             24 LOAD_NAME                3 (__annotations__)
+             26 LOAD_CONST               3 ('kind')
+             28 STORE_SUBSCR
+
+ 79          32 LOAD_CONST               1 ('str')
+             34 LOAD_NAME                3 (__annotations__)
+             36 LOAD_CONST               4 ('name')
+             38 STORE_SUBSCR
+
+ 80          42 LOAD_CONST               5 ('bool')
+             44 LOAD_NAME                3 (__annotations__)
+             46 LOAD_CONST               6 ('muted')
+             48 STORE_SUBSCR
+
+ 81          52 LOAD_CONST               5 ('bool')
+             54 LOAD_NAME                3 (__annotations__)
+             56 LOAD_CONST               7 ('solo')
+             58 STORE_SUBSCR
+
+ 82          62 LOAD_CONST               5 ('bool')
+             64 LOAD_NAME                3 (__annotations__)
+             66 LOAD_CONST               8 ('hidden')
+             68 STORE_SUBSCR
+
+ 83          72 LOAD_CONST               9 ('float')
+             74 LOAD_NAME                3 (__annotations__)
+             76 LOAD_CONST              10 ('volume')
+             78 STORE_SUBSCR
+
+ 84          82 PUSH_NULL
+             84 LOAD_NAME                4 (field)
+             86 LOAD_NAME                5 (list)
+             88 KW_NAMES                11 (('default_factory',))
+             90 CALL                     1
+             98 STORE_NAME               6 (clips)
+            100 LOAD_CONST              12 ('list[TlClip]')
+            102 LOAD_NAME                3 (__annotations__)
+            104 LOAD_CONST              13 ('clips')
+            106 STORE_SUBSCR
+            110 RETURN_CONST            14 (None)
+
+Disassembly of <code object TimelineV2 at 0x7f6c92888710, file "app\render\timeline_model.py", line 87>:
+ 87           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('TimelineV2')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 89          12 LOAD_CONST               1 ('int')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('fps')
+             18 STORE_SUBSCR
+
+ 90          22 LOAD_CONST               1 ('int')
+             24 LOAD_NAME                3 (__annotations__)
+             26 LOAD_CONST               3 ('canvas_w')
+             28 STORE_SUBSCR
+
+ 91          32 LOAD_CONST               1 ('int')
+             34 LOAD_NAME                3 (__annotations__)
+             36 LOAD_CONST               4 ('canvas_h')
+             38 STORE_SUBSCR
+
+ 92          42 LOAD_CONST               5 ('black')
+             44 STORE_NAME               4 (canvas_bg)
+             46 LOAD_CONST               6 ('str')
+             48 LOAD_NAME                3 (__annotations__)
+             50 LOAD_CONST               7 ('canvas_bg')
+             52 STORE_SUBSCR
+
+ 93          56 PUSH_NULL
+             58 LOAD_NAME                5 (field)
+             60 LOAD_NAME                6 (list)
+             62 KW_NAMES                 8 (('default_factory',))
+             64 CALL                     1
+             72 STORE_NAME               7 (video_tracks)
+             74 LOAD_CONST               9 ('list[TlTrack]')
+             76 LOAD_NAME                3 (__annotations__)
+             78 LOAD_CONST              10 ('video_tracks')
+             80 STORE_SUBSCR
+
+ 94          84 PUSH_NULL
+             86 LOAD_NAME                5 (field)
+             88 LOAD_NAME                6 (list)
+             90 KW_NAMES                 8 (('default_factory',))
+             92 CALL                     1
+            100 STORE_NAME               8 (audio_tracks)
+            102 LOAD_CONST               9 ('list[TlTrack]')
+            104 LOAD_NAME                3 (__annotations__)
+            106 LOAD_CONST              11 ('audio_tracks')
+            108 STORE_SUBSCR
+
+ 95         112 LOAD_CONST              12 (0)
+            114 STORE_NAME               9 (duration_ms)
+            116 LOAD_CONST               1 ('int')
+            118 LOAD_NAME                3 (__annotations__)
+            120 LOAD_CONST              13 ('duration_ms')
+            122 STORE_SUBSCR
+
+ 96         126 PUSH_NULL
+            128 LOAD_NAME                5 (field)
+            130 LOAD_NAME                6 (list)
+            132 KW_NAMES                 8 (('default_factory',))
+            134 CALL                     1
+            142 STORE_NAME              10 (dropped)
+            144 LOAD_CONST              14 ('list[str]')
+            146 LOAD_NAME                3 (__annotations__)
+            148 LOAD_CONST              15 ('dropped')
+            150 STORE_SUBSCR
+            154 RETURN_CONST            16 (None)
+
+Disassembly of <code object _f at 0x7f6c930ba890, file "app\render\timeline_model.py", line 99>:
+ 99           0 RESUME                   0
+
+100           2 NOP
+
+101           4 LOAD_GLOBAL              1 (NULL + float)
+             14 LOAD_FAST                0 (v)
+             16 CALL                     1
+             24 RETURN_VALUE
+        >>   26 PUSH_EXC_INFO
+
+102          28 LOAD_GLOBAL              2 (TypeError)
+             38 LOAD_GLOBAL              4 (ValueError)
+             48 BUILD_TUPLE              2
+             50 CHECK_EXC_MATCH
+             52 POP_JUMP_IF_FALSE        5 (to 64)
+             54 POP_TOP
+
+103          56 LOAD_FAST                1 (d)
+             58 SWAP                     2
+             60 POP_EXCEPT
+             62 RETURN_VALUE
+
+102     >>   64 RERAISE                  0
+        >>   66 COPY                     3
+             68 POP_EXCEPT
+             70 RERAISE                  1
+ExceptionTable:
+  4 to 22 -> 26 [0]
+  26 to 58 -> 66 [1] lasti
+  64 to 64 -> 66 [1] lasti
+
+Disassembly of <code object _i at 0x7f6c930ba670, file "app\render\timeline_model.py", line 106>:
+106           0 RESUME                   0
+
+107           2 NOP
+
+108           4 LOAD_GLOBAL              1 (NULL + int)
+             14 LOAD_FAST                0 (v)
+             16 CALL                     1
+             24 RETURN_VALUE
+        >>   26 PUSH_EXC_INFO
+
+109          28 LOAD_GLOBAL              2 (TypeError)
+             38 LOAD_GLOBAL              4 (ValueError)
+             48 BUILD_TUPLE              2
+             50 CHECK_EXC_MATCH
+             52 POP_JUMP_IF_FALSE        5 (to 64)
+             54 POP_TOP
+
+110          56 LOAD_FAST                1 (d)
+             58 SWAP                     2
+             60 POP_EXCEPT
+             62 RETURN_VALUE
+
+109     >>   64 RERAISE                  0
+        >>   66 COPY                     3
+             68 POP_EXCEPT
+             70 RERAISE                  1
+ExceptionTable:
+  4 to 22 -> 26 [0]
+  26 to 58 -> 66 [1] lasti
+  64 to 64 -> 66 [1] lasti
+
+Disassembly of <code object is_v2 at 0x7f6c92b95f70, file "app\render\timeline_model.py", line 113>:
+113           0 RESUME                   0
+
+114           2 LOAD_FAST                0 (config)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 BUILD_MAP                0
+        >>   12 LOAD_ATTR                1 (NULL|self + get)
+             32 LOAD_CONST               1 ('timeline')
+             34 CALL                     1
+             42 STORE_FAST               1 (tl)
+
+115          44 LOAD_GLOBAL              3 (NULL + isinstance)
+             54 LOAD_FAST                1 (tl)
+             56 LOAD_GLOBAL              4 (dict)
+             66 CALL                     2
+             74 COPY                     1
+             76 POP_JUMP_IF_FALSE       62 (to 202)
+             78 POP_TOP
+             80 LOAD_GLOBAL              7 (NULL + _i)
+             90 LOAD_FAST                1 (tl)
+             92 LOAD_ATTR                1 (NULL|self + get)
+            112 LOAD_CONST               2 ('version')
+            114 CALL                     1
+            122 CALL                     1
+            130 LOAD_CONST               3 (2)
+            132 COMPARE_OP              92 (>=)
+            136 COPY                     1
+            138 POP_JUMP_IF_FALSE       31 (to 202)
+            140 POP_TOP
+            142 LOAD_GLOBAL              3 (NULL + isinstance)
+            152 LOAD_FAST                1 (tl)
+            154 LOAD_ATTR                1 (NULL|self + get)
+            174 LOAD_CONST               4 ('tracks')
+            176 CALL                     1
+            184 LOAD_GLOBAL              8 (list)
+            194 CALL                     2
+        >>  202 RETURN_VALUE
+
+Disassembly of <code object _media_index at 0x7f6c929f3110, file "app\render\timeline_model.py", line 118>:
+118           0 RESUME                   0
+
+119           2 BUILD_MAP                0
+              4 STORE_FAST               1 (out)
+
+120           6 LOAD_FAST                0 (config)
+              8 LOAD_ATTR                1 (NULL|self + get)
+             28 LOAD_CONST               1 ('media_pool')
+             30 CALL                     1
+             38 COPY                     1
+             40 POP_JUMP_IF_TRUE         2 (to 46)
+             42 POP_TOP
+             44 BUILD_LIST               0
+        >>   46 GET_ITER
+        >>   48 FOR_ITER                54 (to 160)
+             52 STORE_FAST               2 (it)
+
+121          54 LOAD_GLOBAL              3 (NULL + isinstance)
+             64 LOAD_FAST                2 (it)
+             66 LOAD_GLOBAL              4 (dict)
+             76 CALL                     2
+             84 POP_JUMP_IF_TRUE         1 (to 88)
+             86 JUMP_BACKWARD           20 (to 48)
+        >>   88 LOAD_FAST                2 (it)
+             90 LOAD_ATTR                1 (NULL|self + get)
+            110 LOAD_CONST               2 ('id')
+            112 CALL                     1
+            120 POP_JUMP_IF_TRUE         1 (to 124)
+            122 JUMP_BACKWARD           38 (to 48)
+
+122     >>  124 LOAD_FAST                2 (it)
+            126 LOAD_FAST                1 (out)
+            128 LOAD_GLOBAL              7 (NULL + str)
+            138 LOAD_FAST                2 (it)
+            140 LOAD_CONST               2 ('id')
+            142 BINARY_SUBSCR
+            146 CALL                     1
+            154 STORE_SUBSCR
+            158 JUMP_BACKWARD           56 (to 48)
+
+120     >>  160 END_FOR
+
+123         162 LOAD_FAST                1 (out)
+            164 RETURN_VALUE
+
+Disassembly of <code object _scene_index at 0x7f6c930f2fb0, file "app\render\timeline_model.py", line 126>:
+126           0 RESUME                   0
+
+127           2 LOAD_FAST                0 (scenes)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 BUILD_LIST               0
+        >>   12 GET_ITER
+             14 LOAD_FAST_AND_CLEAR      1 (s)
+             16 SWAP                     2
+             18 BUILD_MAP                0
+             20 SWAP                     2
+        >>   22 FOR_ITER                35 (to 96)
+             26 STORE_FAST               1 (s)
+             28 LOAD_FAST                1 (s)
+             30 LOAD_ATTR                1 (NULL|self + get)
+             50 LOAD_CONST               1 ('seq')
+             52 CALL                     1
+             60 POP_JUMP_IF_NOT_NONE     1 (to 64)
+             62 JUMP_BACKWARD           21 (to 22)
+        >>   64 LOAD_GLOBAL              3 (NULL + int)
+             74 LOAD_FAST                1 (s)
+             76 LOAD_CONST               1 ('seq')
+             78 BINARY_SUBSCR
+             82 CALL                     1
+             90 LOAD_FAST                1 (s)
+             92 MAP_ADD                  2
+             94 JUMP_BACKWARD           37 (to 22)
+        >>   96 END_FOR
+             98 SWAP                     2
+            100 STORE_FAST               1 (s)
+            102 RETURN_VALUE
+        >>  104 SWAP                     2
+            106 POP_TOP
+            108 SWAP                     2
+            110 STORE_FAST               1 (s)
+            112 RERAISE                  0
+ExceptionTable:
+  18 to 60 -> 104 [2]
+  64 to 96 -> 104 [2]
+
+Disassembly of <code object _clip_transform at 0x28bc81a0, file "app\render\timeline_model.py", line 130>:
+130           0 RESUME                   0
+
+131           2 LOAD_GLOBAL              1 (NULL + isinstance)
+             12 LOAD_FAST                0 (raw)
+             14 LOAD_GLOBAL              2 (dict)
+             24 CALL                     2
+             32 POP_JUMP_IF_TRUE         1 (to 36)
+
+132          34 RETURN_CONST             0 (None)
+
+133     >>   36 LOAD_GLOBAL              5 (NULL + TlTransform)
+
+134          46 LOAD_GLOBAL              7 (NULL + _f)
+             56 LOAD_FAST                0 (raw)
+             58 LOAD_ATTR                9 (NULL|self + get)
+             78 LOAD_CONST               1 ('x_pct')
+             80 CALL                     1
+             88 LOAD_CONST               2 (50.0)
+             90 CALL                     2
+             98 LOAD_GLOBAL              7 (NULL + _f)
+            108 LOAD_FAST                0 (raw)
+            110 LOAD_ATTR                9 (NULL|self + get)
+            130 LOAD_CONST               3 ('y_pct')
+            132 CALL                     1
+            140 LOAD_CONST               2 (50.0)
+            142 CALL                     2
+
+135         150 LOAD_GLOBAL             11 (NULL + max)
+            160 LOAD_CONST               4 (1.0)
+            162 LOAD_GLOBAL             13 (NULL + min)
+            172 LOAD_CONST               5 (400.0)
+            174 LOAD_GLOBAL              7 (NULL + _f)
+            184 LOAD_FAST                0 (raw)
+            186 LOAD_ATTR                9 (NULL|self + get)
+            206 LOAD_CONST               6 ('scale_pct')
+            208 CALL                     1
+            216 LOAD_CONST               7 (100.0)
+            218 CALL                     2
+            226 CALL                     2
+            234 CALL                     2
+
+136         242 LOAD_GLOBAL              7 (NULL + _f)
+            252 LOAD_FAST                0 (raw)
+            254 LOAD_ATTR                9 (NULL|self + get)
+            274 LOAD_CONST               8 ('rotate_deg')
+            276 CALL                     1
+            284 LOAD_CONST               9 (0.0)
+            286 CALL                     2
+
+137         294 LOAD_GLOBAL             11 (NULL + max)
+            304 LOAD_CONST               9 (0.0)
+            306 LOAD_GLOBAL             13 (NULL + min)
+            316 LOAD_CONST               4 (1.0)
+            318 LOAD_GLOBAL              7 (NULL + _f)
+            328 LOAD_FAST                0 (raw)
+            330 LOAD_ATTR                9 (NULL|self + get)
+            350 LOAD_CONST              10 ('opacity')
+            352 CALL                     1
+            360 LOAD_CONST               4 (1.0)
+            362 CALL                     2
+            370 CALL                     2
+            378 CALL                     2
+
+138         386 LOAD_GLOBAL             15 (NULL + bool)
+            396 LOAD_FAST                0 (raw)
+            398 LOAD_ATTR                9 (NULL|self + get)
+            418 LOAD_CONST              11 ('flip_h')
+            420 CALL                     1
+            428 CALL                     1
+            436 LOAD_GLOBAL             15 (NULL + bool)
+            446 LOAD_FAST                0 (raw)
+            448 LOAD_ATTR                9 (NULL|self + get)
+            468 LOAD_CONST              12 ('flip_v')
+            470 CALL                     1
+            478 CALL                     1
+
+133         486 KW_NAMES                13 (('x_pct', 'y_pct', 'scale_pct', 'rotate_deg', 'opacity', 'flip_h', 'flip_v'))
+            488 CALL                     7
+            496 RETURN_VALUE
+
+Disassembly of <code object _norm_transition at 0x7f6c92be2bf0, file "app\render\timeline_model.py", line 142>:
+142           0 RESUME                   0
+
+143           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('normalize_transition',))
+              6 IMPORT_NAME              0 (app.render.visual_bake)
+              8 IMPORT_FROM              1 (normalize_transition)
+             10 STORE_FAST               1 (normalize_transition)
+             12 POP_TOP
+
+144          14 PUSH_NULL
+             16 LOAD_FAST                1 (normalize_transition)
+             18 LOAD_FAST                0 (raw)
+             20 CALL                     1
+             28 RETURN_VALUE
+
+Disassembly of <code object _norm_chroma at 0x28bbbd00, file "app\render\timeline_model.py", line 147>:
+147           0 RESUME                   0
+
+149           2 LOAD_GLOBAL              1 (NULL + isinstance)
+             12 LOAD_FAST                0 (raw)
+             14 LOAD_GLOBAL              2 (dict)
+             24 CALL                     2
+             32 POP_JUMP_IF_FALSE       17 (to 68)
+             34 LOAD_FAST                0 (raw)
+             36 LOAD_ATTR                5 (NULL|self + get)
+             56 LOAD_CONST               1 ('enabled')
+             58 CALL                     1
+             66 POP_JUMP_IF_TRUE         1 (to 70)
+
+150     >>   68 RETURN_CONST             2 (None)
+
+151     >>   70 LOAD_GLOBAL              7 (NULL + str)
+             80 LOAD_FAST                0 (raw)
+             82 LOAD_ATTR                5 (NULL|self + get)
+            102 LOAD_CONST               3 ('color')
+            104 CALL                     1
+            112 COPY                     1
+            114 POP_JUMP_IF_TRUE         2 (to 120)
+            116 POP_TOP
+            118 LOAD_CONST               4 ('#00FF00')
+        >>  120 CALL                     1
+            128 LOAD_ATTR                9 (NULL|self + lstrip)
+            148 LOAD_CONST               5 ('#')
+            150 CALL                     1
+            158 STORE_FAST               1 (col)
+
+152         160 LOAD_GLOBAL             11 (NULL + re)
+            170 LOAD_ATTR               12 (fullmatch)
+            190 LOAD_CONST               6 ('[0-9a-fA-F]{6}')
+            192 LOAD_FAST                1 (col)
+            194 CALL                     2
+            202 POP_JUMP_IF_TRUE         2 (to 208)
+
+153         204 LOAD_CONST               7 ('00FF00')
+            206 STORE_FAST               1 (col)
+
+155     >>  208 LOAD_FAST                1 (col)
+            210 LOAD_ATTR               15 (NULL|self + upper)
+            230 CALL                     0
+
+156         238 LOAD_GLOBAL             17 (NULL + max)
+            248 LOAD_CONST               8 (0.01)
+            250 LOAD_GLOBAL             19 (NULL + min)
+            260 LOAD_CONST               9 (1.0)
+            262 LOAD_GLOBAL             21 (NULL + _f)
+            272 LOAD_FAST                0 (raw)
+            274 LOAD_ATTR                5 (NULL|self + get)
+            294 LOAD_CONST              10 ('similarity')
+            296 CALL                     1
+            304 LOAD_CONST              11 (0.35)
+            306 CALL                     2
+            314 CALL                     2
+            322 CALL                     2
+
+157         330 LOAD_GLOBAL             17 (NULL + max)
+            340 LOAD_CONST              12 (0.0)
+            342 LOAD_GLOBAL             19 (NULL + min)
+            352 LOAD_CONST              13 (0.5)
+            354 LOAD_GLOBAL             21 (NULL + _f)
+            364 LOAD_FAST                0 (raw)
+            366 LOAD_ATTR                5 (NULL|self + get)
+            386 LOAD_CONST              14 ('blend')
+            388 CALL                     1
+            396 LOAD_CONST              15 (0.1)
+            398 CALL                     2
+            406 CALL                     2
+            414 CALL                     2
+
+154         422 LOAD_CONST              16 (('color', 'similarity', 'blend'))
+            424 BUILD_CONST_KEY_MAP      3
+            426 RETURN_VALUE
+
+Disassembly of <code object _norm_mask at 0x28bca800, file "app\render\timeline_model.py", line 161>:
+161           0 RESUME                   0
+
+162           2 LOAD_GLOBAL              1 (NULL + isinstance)
+             12 LOAD_FAST                0 (raw)
+             14 LOAD_GLOBAL              2 (dict)
+             24 CALL                     2
+             32 POP_JUMP_IF_FALSE       19 (to 72)
+             34 LOAD_FAST                0 (raw)
+             36 LOAD_ATTR                5 (NULL|self + get)
+             56 LOAD_CONST               1 ('type')
+             58 CALL                     1
+             66 LOAD_CONST               2 (('rect', 'circle'))
+             68 CONTAINS_OP              1
+             70 POP_JUMP_IF_FALSE        1 (to 74)
+
+163     >>   72 RETURN_CONST             0 (None)
+
+165     >>   74 LOAD_FAST                0 (raw)
+             76 LOAD_CONST               1 ('type')
+             78 BINARY_SUBSCR
+
+166          82 LOAD_GLOBAL              7 (NULL + max)
+             92 LOAD_CONST               3 (0.0)
+             94 LOAD_GLOBAL              9 (NULL + min)
+            104 LOAD_CONST               4 (100.0)
+            106 LOAD_GLOBAL             11 (NULL + _f)
+            116 LOAD_FAST                0 (raw)
+            118 LOAD_ATTR                5 (NULL|self + get)
+            138 LOAD_CONST               5 ('x_pct')
+            140 CALL                     1
+            148 LOAD_CONST               6 (50)
+            150 CALL                     2
+            158 CALL                     2
+            166 CALL                     2
+
+167         174 LOAD_GLOBAL              7 (NULL + max)
+            184 LOAD_CONST               3 (0.0)
+            186 LOAD_GLOBAL              9 (NULL + min)
+            196 LOAD_CONST               4 (100.0)
+            198 LOAD_GLOBAL             11 (NULL + _f)
+            208 LOAD_FAST                0 (raw)
+            210 LOAD_ATTR                5 (NULL|self + get)
+            230 LOAD_CONST               7 ('y_pct')
+            232 CALL                     1
+            240 LOAD_CONST               6 (50)
+            242 CALL                     2
+            250 CALL                     2
+            258 CALL                     2
+
+168         266 LOAD_GLOBAL              7 (NULL + max)
+            276 LOAD_CONST               8 (1.0)
+            278 LOAD_GLOBAL              9 (NULL + min)
+            288 LOAD_CONST               4 (100.0)
+            290 LOAD_GLOBAL             11 (NULL + _f)
+            300 LOAD_FAST                0 (raw)
+            302 LOAD_ATTR                5 (NULL|self + get)
+            322 LOAD_CONST               9 ('w_pct')
+            324 CALL                     1
+            332 LOAD_CONST              10 (60)
+            334 CALL                     2
+            342 CALL                     2
+            350 CALL                     2
+
+169         358 LOAD_GLOBAL              7 (NULL + max)
+            368 LOAD_CONST               8 (1.0)
+            370 LOAD_GLOBAL              9 (NULL + min)
+            380 LOAD_CONST               4 (100.0)
+            382 LOAD_GLOBAL             11 (NULL + _f)
+            392 LOAD_FAST                0 (raw)
+            394 LOAD_ATTR                5 (NULL|self + get)
+            414 LOAD_CONST              11 ('h_pct')
+            416 CALL                     1
+            424 LOAD_CONST              10 (60)
+            426 CALL                     2
+            434 CALL                     2
+            442 CALL                     2
+
+170         450 LOAD_GLOBAL              7 (NULL + max)
+            460 LOAD_CONST               3 (0.0)
+            462 LOAD_GLOBAL              9 (NULL + min)
+            472 LOAD_CONST              12 (20.0)
+            474 LOAD_GLOBAL             11 (NULL + _f)
+            484 LOAD_FAST                0 (raw)
+            486 LOAD_ATTR                5 (NULL|self + get)
+            506 LOAD_CONST              13 ('feather')
+            508 CALL                     1
+            516 LOAD_CONST              14 (4)
+            518 CALL                     2
+            526 CALL                     2
+            534 CALL                     2
+
+173         542 LOAD_GLOBAL              7 (NULL + max)
+            552 LOAD_CONST               3 (0.0)
+            554 LOAD_GLOBAL              9 (NULL + min)
+            564 LOAD_CONST              15 (50.0)
+            566 LOAD_GLOBAL             11 (NULL + _f)
+            576 LOAD_FAST                0 (raw)
+            578 LOAD_ATTR                5 (NULL|self + get)
+            598 LOAD_CONST              16 ('radius')
+            600 CALL                     1
+            608 LOAD_CONST              17 (0)
+            610 CALL                     2
+            618 CALL                     2
+            626 CALL                     2
+
+174         634 LOAD_GLOBAL             13 (NULL + bool)
+            644 LOAD_FAST                0 (raw)
+            646 LOAD_ATTR                5 (NULL|self + get)
+            666 LOAD_CONST              18 ('invert')
+            668 CALL                     1
+            676 CALL                     1
+
+164         684 LOAD_CONST              19 (('type', 'x_pct', 'y_pct', 'w_pct', 'h_pct', 'feather', 'radius', 'invert'))
+            686 BUILD_CONST_KEY_MAP      8
+            688 RETURN_VALUE
+
+Disassembly of <code object _norm_keyframes at 0x290d1e60, file "app\render\timeline_model.py", line 182>:
+182           0 RESUME                   0
+
+184           2 BUILD_LIST               0
+              4 STORE_FAST               2 (out)
+
+185           6 LOAD_GLOBAL              1 (NULL + isinstance)
+             16 LOAD_FAST                0 (raw)
+             18 LOAD_GLOBAL              2 (list)
+             28 CALL                     2
+             36 POP_JUMP_IF_TRUE         2 (to 42)
+
+186          38 LOAD_FAST                2 (out)
+             40 RETURN_VALUE
+
+187     >>   42 LOAD_FAST                0 (raw)
+             44 GET_ITER
+        >>   46 FOR_ITER               184 (to 418)
+             50 STORE_FAST               3 (k)
+
+188          52 LOAD_GLOBAL              1 (NULL + isinstance)
+             62 LOAD_FAST                3 (k)
+             64 LOAD_GLOBAL              4 (dict)
+             74 CALL                     2
+             82 POP_JUMP_IF_FALSE       23 (to 130)
+             84 LOAD_FAST                3 (k)
+             86 LOAD_ATTR                7 (NULL|self + get)
+            106 LOAD_CONST               1 ('prop')
+            108 CALL                     1
+            116 LOAD_GLOBAL              8 (_KF_PROPS)
+            126 CONTAINS_OP              1
+            128 POP_JUMP_IF_FALSE        1 (to 132)
+
+189     >>  130 JUMP_BACKWARD           43 (to 46)
+
+190     >>  132 NOP
+
+191         134 LOAD_GLOBAL             11 (NULL + max)
+            144 LOAD_CONST               2 (0)
+            146 LOAD_GLOBAL             13 (NULL + min)
+            156 LOAD_FAST                1 (clip_len_ms)
+            158 LOAD_GLOBAL             15 (NULL + int)
+            168 LOAD_FAST                3 (k)
+            170 LOAD_ATTR                7 (NULL|self + get)
+            190 LOAD_CONST               3 ('at_ms')
+            192 LOAD_CONST               2 (0)
+            194 CALL                     2
+            202 CALL                     1
+            210 CALL                     2
+            218 CALL                     2
+            226 STORE_FAST               4 (at)
+
+192         228 LOAD_GLOBAL             17 (NULL + float)
+            238 LOAD_FAST                3 (k)
+            240 LOAD_ATTR                7 (NULL|self + get)
+            260 LOAD_CONST               4 ('value')
+            262 LOAD_CONST               2 (0)
+            264 CALL                     2
+            272 CALL                     1
+            280 STORE_FAST               5 (val)
+
+195         282 LOAD_FAST                3 (k)
+            284 LOAD_ATTR                7 (NULL|self + get)
+            304 LOAD_CONST               5 ('ease')
+            306 CALL                     1
+            314 LOAD_GLOBAL             22 (_KF_EASES)
+            324 CONTAINS_OP              0
+            326 POP_JUMP_IF_FALSE       17 (to 362)
+            328 LOAD_FAST                3 (k)
+            330 LOAD_ATTR                7 (NULL|self + get)
+            350 LOAD_CONST               5 ('ease')
+            352 CALL                     1
+            360 JUMP_FORWARD             1 (to 364)
+        >>  362 LOAD_CONST               5 ('ease')
+        >>  364 STORE_FAST               6 (ease)
+
+196         366 LOAD_FAST                2 (out)
+            368 LOAD_ATTR               25 (NULL|self + append)
+            388 LOAD_FAST                3 (k)
+            390 LOAD_CONST               1 ('prop')
+            392 BINARY_SUBSCR
+            396 LOAD_FAST                4 (at)
+            398 LOAD_FAST                5 (val)
+            400 LOAD_FAST                6 (ease)
+            402 LOAD_CONST               6 (('prop', 'at_ms', 'value', 'ease'))
+            404 BUILD_CONST_KEY_MAP      4
+            406 CALL                     1
+            414 POP_TOP
+            416 JUMP_BACKWARD          186 (to 46)
+
+187     >>  418 END_FOR
+
+197         420 LOAD_FAST                2 (out)
+            422 LOAD_ATTR               27 (NULL|self + sort)
+            442 LOAD_CONST               7 (<code object <lambda> at 0x7f6c92f045e0, file "app\render\timeline_model.py", line 197>)
+            444 MAKE_FUNCTION            0
+            446 KW_NAMES                 8 (('key',))
+            448 CALL                     1
+            456 POP_TOP
+
+198         458 LOAD_FAST                2 (out)
+            460 RETURN_VALUE
+        >>  462 PUSH_EXC_INFO
+
+193         464 LOAD_GLOBAL             18 (TypeError)
+            474 LOAD_GLOBAL             20 (ValueError)
+            484 BUILD_TUPLE              2
+            486 CHECK_EXC_MATCH
+            488 POP_JUMP_IF_FALSE        3 (to 496)
+            490 POP_TOP
+
+194         492 POP_EXCEPT
+            494 JUMP_BACKWARD          225 (to 46)
+
+193     >>  496 RERAISE                  0
+        >>  498 COPY                     3
+            500 POP_EXCEPT
+            502 RERAISE                  1
+ExceptionTable:
+  134 to 280 -> 462 [1]
+  462 to 490 -> 498 [2] lasti
+  496 to 496 -> 498 [2] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c92f045e0, file "app\render\timeline_model.py", line 197>:
+197           0 RESUME                   0
+              2 LOAD_FAST                0 (x)
+              4 LOAD_CONST               1 ('at_ms')
+              6 BINARY_SUBSCR
+             10 RETURN_VALUE
+
+Disassembly of <code object resolve at 0x28bd28b0, file "app\render\timeline_model.py", line 201>:
+              0 MAKE_CELL               38 (out)
+
+201           2 RESUME                   0
+
+208           4 LOAD_GLOBAL              1 (NULL + is_v2)
+             14 LOAD_FAST                0 (config)
+             16 CALL                     1
+             24 POP_JUMP_IF_TRUE         1 (to 28)
+
+209          26 RETURN_CONST             1 (None)
+
+210     >>   28 LOAD_FAST                0 (config)
+             30 LOAD_CONST               2 ('timeline')
+             32 BINARY_SUBSCR
+             36 STORE_FAST               4 (tl)
+
+211          38 LOAD_GLOBAL              3 (NULL + _media_index)
+             48 LOAD_FAST                0 (config)
+             50 CALL                     1
+             58 STORE_FAST               5 (media)
+
+212          60 LOAD_GLOBAL              5 (NULL + _scene_index)
+             70 LOAD_FAST                1 (scenes)
+             72 CALL                     1
+             80 STORE_FAST               6 (by_seq)
+
+215          82 LOAD_CONST               3 (0)
+             84 LOAD_CONST               4 (('buildable_asset',))
+             86 IMPORT_NAME              3 (app.render.visual_bake)
+             88 IMPORT_FROM              4 (buildable_asset)
+             90 STORE_FAST               7 (buildable_asset)
+             92 POP_TOP
+
+221          94 LOAD_FAST                4 (tl)
+             96 LOAD_ATTR               11 (NULL|self + get)
+            116 LOAD_CONST               5 ('canvas')
+            118 CALL                     1
+            126 COPY                     1
+            128 POP_JUMP_IF_TRUE         2 (to 134)
+            130 POP_TOP
+            132 BUILD_MAP                0
+        >>  134 STORE_FAST               8 (canvas)
+
+222         136 LOAD_GLOBAL             13 (NULL + _i)
+            146 LOAD_FAST                8 (canvas)
+            148 LOAD_ATTR               11 (NULL|self + get)
+            168 LOAD_CONST               6 ('w')
+            170 CALL                     1
+            178 CALL                     1
+            186 LOAD_GLOBAL             13 (NULL + _i)
+            196 LOAD_FAST                8 (canvas)
+            198 LOAD_ATTR               11 (NULL|self + get)
+            218 LOAD_CONST               7 ('h')
+            220 CALL                     1
+            228 CALL                     1
+            236 STORE_FAST              10 (ch)
+            238 STORE_FAST               9 (cw)
+
+223         240 LOAD_FAST                8 (canvas)
+            242 LOAD_ATTR               11 (NULL|self + get)
+            262 LOAD_CONST               8 ('auto')
+            264 LOAD_CONST               9 (True)
+            266 CALL                     2
+            274 UNARY_NOT
+            276 COPY                     1
+            278 POP_JUMP_IF_TRUE        26 (to 332)
+            280 POP_TOP
+            282 LOAD_GLOBAL             15 (NULL + bool)
+            292 LOAD_FAST                8 (canvas)
+            294 LOAD_ATTR               11 (NULL|self + get)
+            314 LOAD_CONST              10 ('measured')
+            316 CALL                     1
+            324 CALL                     1
+        >>  332 COPY                     1
+            334 POP_JUMP_IF_FALSE       12 (to 360)
+            336 POP_TOP
+            338 LOAD_FAST                9 (cw)
+            340 LOAD_CONST               3 (0)
+            342 COMPARE_OP              68 (>)
+            346 COPY                     1
+            348 POP_JUMP_IF_FALSE        5 (to 360)
+            350 POP_TOP
+            352 LOAD_FAST               10 (ch)
+            354 LOAD_CONST               3 (0)
+            356 COMPARE_OP              68 (>)
+        >>  360 STORE_FAST              11 (trust_canvas)
+
+224         362 LOAD_FAST               11 (trust_canvas)
+            364 POP_JUMP_IF_FALSE        5 (to 376)
+
+225         366 LOAD_FAST                9 (cw)
+            368 LOAD_FAST               10 (ch)
+            370 STORE_FAST              13 (h)
+            372 STORE_FAST              12 (w)
+            374 JUMP_FORWARD            17 (to 410)
+
+227     >>  376 LOAD_CONST               3 (0)
+            378 LOAD_CONST              11 (('dims_for',))
+            380 IMPORT_NAME              3 (app.render.visual_bake)
+            382 IMPORT_FROM              8 (dims_for)
+            384 STORE_FAST              14 (dims_for)
+            386 POP_TOP
+
+228         388 PUSH_NULL
+            390 LOAD_FAST               14 (dims_for)
+            392 LOAD_FAST                0 (config)
+            394 CALL                     1
+            402 UNPACK_SEQUENCE          2
+            406 STORE_FAST              12 (w)
+            408 STORE_FAST              13 (h)
+
+229     >>  410 LOAD_GLOBAL             19 (NULL + max)
+            420 LOAD_CONST              12 (320)
+            422 LOAD_FAST               12 (w)
+            424 LOAD_CONST              13 (2)
+            426 BINARY_OP                2 (//)
+            430 LOAD_CONST              13 (2)
+            432 BINARY_OP                5 (*)
+            436 CALL                     2
+            444 LOAD_GLOBAL             19 (NULL + max)
+            454 LOAD_CONST              12 (320)
+            456 LOAD_FAST               13 (h)
+            458 LOAD_CONST              13 (2)
+            460 BINARY_OP                2 (//)
+            464 LOAD_CONST              13 (2)
+            466 BINARY_OP                5 (*)
+            470 CALL                     2
+            478 STORE_FAST              13 (h)
+            480 STORE_FAST              12 (w)
+
+230         482 LOAD_GLOBAL             13 (NULL + _i)
+            492 LOAD_FAST                4 (tl)
+            494 LOAD_ATTR               11 (NULL|self + get)
+            514 LOAD_CONST              14 ('fps')
+            516 CALL                     1
+            524 LOAD_CONST              15 (30)
+            526 CALL                     2
+            534 STORE_FAST              15 (fps)
+
+231         536 LOAD_FAST               15 (fps)
+            538 LOAD_CONST              16 ((24, 25, 30, 50, 60))
+            540 CONTAINS_OP              0
+            542 POP_JUMP_IF_FALSE        2 (to 548)
+            544 LOAD_FAST               15 (fps)
+            546 JUMP_FORWARD             1 (to 550)
+        >>  548 LOAD_CONST              15 (30)
+        >>  550 STORE_FAST              15 (fps)
+
+233         552 LOAD_GLOBAL             21 (NULL + TimelineV2)
+            562 LOAD_FAST               15 (fps)
+            564 LOAD_FAST               12 (w)
+            566 LOAD_FAST               13 (h)
+
+234         568 LOAD_FAST                8 (canvas)
+            570 LOAD_ATTR               11 (NULL|self + get)
+            590 LOAD_CONST              17 ('bg')
+            592 CALL                     1
+            600 LOAD_CONST              18 ('blur')
+            602 COMPARE_OP              40 (==)
+            606 POP_JUMP_IF_FALSE        2 (to 612)
+            608 LOAD_CONST              18 ('blur')
+            610 JUMP_FORWARD             1 (to 614)
+        >>  612 LOAD_CONST              19 ('black')
+
+233     >>  614 KW_NAMES                20 (('fps', 'canvas_w', 'canvas_h', 'canvas_bg'))
+            616 CALL                     4
+            624 STORE_DEREF             38 (out)
+
+236         626 LOAD_FAST                4 (tl)
+            628 LOAD_ATTR               11 (NULL|self + get)
+            648 LOAD_CONST              21 ('tracks')
+            650 CALL                     1
+            658 COPY                     1
+            660 POP_JUMP_IF_TRUE         2 (to 666)
+            662 POP_TOP
+            664 BUILD_LIST               0
+        >>  666 GET_ITER
+        >>  668 EXTENDED_ARG             6
+            670 FOR_ITER              1676 (to 4026)
+            674 STORE_FAST              16 (tr)
+
+237         676 LOAD_GLOBAL             23 (NULL + isinstance)
+            686 LOAD_FAST               16 (tr)
+            688 LOAD_GLOBAL             24 (dict)
+            698 CALL                     2
+            706 POP_JUMP_IF_TRUE         1 (to 710)
+
+238         708 JUMP_BACKWARD           21 (to 668)
+
+239     >>  710 LOAD_FAST               16 (tr)
+            712 LOAD_ATTR               11 (NULL|self + get)
+            732 LOAD_CONST              22 ('kind')
+            734 CALL                     1
+            742 STORE_FAST              17 (kind)
+
+240         744 LOAD_FAST               17 (kind)
+            746 LOAD_CONST              23 (('video', 'audio'))
+            748 CONTAINS_OP              1
+            750 POP_JUMP_IF_FALSE        1 (to 754)
+
+241         752 JUMP_BACKWARD           43 (to 668)
+
+242     >>  754 LOAD_GLOBAL             27 (NULL + TlTrack)
+
+243         764 LOAD_GLOBAL             29 (NULL + str)
+            774 LOAD_FAST               16 (tr)
+            776 LOAD_ATTR               11 (NULL|self + get)
+            796 LOAD_CONST              24 ('id')
+            798 CALL                     1
+            806 COPY                     1
+            808 POP_JUMP_IF_TRUE        46 (to 902)
+            810 POP_TOP
+            812 LOAD_CONST              25 ('t')
+            814 LOAD_GLOBAL             31 (NULL + len)
+            824 LOAD_DEREF              38 (out)
+            826 LOAD_ATTR               32 (video_tracks)
+            846 CALL                     1
+            854 LOAD_GLOBAL             31 (NULL + len)
+            864 LOAD_DEREF              38 (out)
+            866 LOAD_ATTR               34 (audio_tracks)
+            886 CALL                     1
+            894 BINARY_OP                0 (+)
+            898 FORMAT_VALUE             0
+            900 BUILD_STRING             2
+        >>  902 CALL                     1
+
+244         910 LOAD_FAST               17 (kind)
+            912 LOAD_GLOBAL             29 (NULL + str)
+            922 LOAD_FAST               16 (tr)
+            924 LOAD_ATTR               11 (NULL|self + get)
+            944 LOAD_CONST              26 ('name')
+            946 CALL                     1
+            954 COPY                     1
+            956 POP_JUMP_IF_TRUE         2 (to 962)
+            958 POP_TOP
+            960 LOAD_FAST               17 (kind)
+        >>  962 CALL                     1
+
+245         970 LOAD_GLOBAL             15 (NULL + bool)
+            980 LOAD_FAST               16 (tr)
+            982 LOAD_ATTR               11 (NULL|self + get)
+           1002 LOAD_CONST              27 ('muted')
+           1004 CALL                     1
+           1012 CALL                     1
+           1020 LOAD_GLOBAL             15 (NULL + bool)
+           1030 LOAD_FAST               16 (tr)
+           1032 LOAD_ATTR               11 (NULL|self + get)
+           1052 LOAD_CONST              28 ('solo')
+           1054 CALL                     1
+           1062 CALL                     1
+
+246        1070 LOAD_GLOBAL             15 (NULL + bool)
+           1080 LOAD_FAST               16 (tr)
+           1082 LOAD_ATTR               11 (NULL|self + get)
+           1102 LOAD_CONST              29 ('hidden')
+           1104 CALL                     1
+           1112 CALL                     1
+
+247        1120 LOAD_GLOBAL             19 (NULL + max)
+           1130 LOAD_CONST              30 (0.0)
+           1132 LOAD_GLOBAL             37 (NULL + min)
+           1142 LOAD_CONST              31 (2.0)
+           1144 LOAD_GLOBAL             39 (NULL + _f)
+           1154 LOAD_FAST               16 (tr)
+           1156 LOAD_ATTR               11 (NULL|self + get)
+           1176 LOAD_CONST              32 ('volume')
+           1178 CALL                     1
+           1186 LOAD_CONST              33 (1.0)
+           1188 CALL                     2
+           1196 CALL                     2
+           1204 CALL                     2
+
+242        1212 KW_NAMES                34 (('id', 'kind', 'name', 'muted', 'solo', 'hidden', 'volume'))
+           1214 CALL                     7
+           1222 STORE_FAST              18 (track)
+
+249        1224 LOAD_FAST               16 (tr)
+           1226 LOAD_ATTR               11 (NULL|self + get)
+           1246 LOAD_CONST              35 ('clips')
+           1248 CALL                     1
+           1256 COPY                     1
+           1258 POP_JUMP_IF_TRUE         2 (to 1264)
+           1260 POP_TOP
+           1262 BUILD_LIST               0
+        >> 1264 GET_ITER
+        >> 1266 EXTENDED_ARG             5
+           1268 FOR_ITER              1284 (to 3840)
+           1272 STORE_FAST              19 (c)
+
+250        1274 LOAD_GLOBAL             23 (NULL + isinstance)
+           1284 LOAD_FAST               19 (c)
+           1286 LOAD_GLOBAL             24 (dict)
+           1296 CALL                     2
+           1304 POP_JUMP_IF_FALSE       17 (to 1340)
+           1306 LOAD_FAST               19 (c)
+           1308 LOAD_ATTR               11 (NULL|self + get)
+           1328 LOAD_CONST              36 ('disabled')
+           1330 CALL                     1
+           1338 POP_JUMP_IF_FALSE        1 (to 1342)
+
+251     >> 1340 JUMP_BACKWARD           38 (to 1266)
+
+252     >> 1342 LOAD_GLOBAL             29 (NULL + str)
+           1352 LOAD_FAST               19 (c)
+           1354 LOAD_ATTR               11 (NULL|self + get)
+           1374 LOAD_CONST              37 ('label')
+           1376 CALL                     1
+           1384 COPY                     1
+           1386 POP_JUMP_IF_TRUE        21 (to 1430)
+           1388 POP_TOP
+           1390 LOAD_FAST               19 (c)
+           1392 LOAD_ATTR               11 (NULL|self + get)
+           1412 LOAD_CONST              24 ('id')
+           1414 CALL                     1
+           1422 COPY                     1
+           1424 POP_JUMP_IF_TRUE         2 (to 1430)
+           1426 POP_TOP
+           1428 LOAD_CONST              38 ('clip')
+        >> 1430 CALL                     1
+           1438 STORE_FAST              20 (label)
+
+254        1440 LOAD_FAST               20 (label)
+           1442 LOAD_FAST               18 (track)
+           1444 BUILD_TUPLE              2
+           1446 LOAD_CONST              92 (('why', 'str', 'return', 'None'))
+           1448 LOAD_CLOSURE            38 (out)
+           1450 BUILD_TUPLE              1
+           1452 LOAD_CONST              39 (<code object _drop at 0x7f6c81ad3510, file "app\render\timeline_model.py", line 254>)
+           1454 MAKE_FUNCTION           13 (defaults, annotations, closure)
+           1456 STORE_FAST              21 (_drop)
+
+257        1458 LOAD_GLOBAL             13 (NULL + _i)
+           1468 LOAD_FAST               19 (c)
+           1470 LOAD_ATTR               11 (NULL|self + get)
+           1490 LOAD_CONST              40 ('start_ms')
+           1492 CALL                     1
+           1500 CALL                     1
+           1508 STORE_FAST              22 (start)
+           1510 LOAD_GLOBAL             13 (NULL + _i)
+           1520 LOAD_FAST               19 (c)
+           1522 LOAD_ATTR               11 (NULL|self + get)
+           1542 LOAD_CONST              41 ('end_ms')
+           1544 CALL                     1
+           1552 CALL                     1
+           1560 STORE_FAST              23 (end)
+
+258        1562 LOAD_FAST               23 (end)
+           1564 LOAD_FAST               22 (start)
+           1566 BINARY_OP               10 (-)
+           1570 LOAD_GLOBAL             40 (_MIN_CLIP_MS)
+           1580 COMPARE_OP               2 (<)
+           1584 POP_JUMP_IF_FALSE        9 (to 1604)
+
+259        1586 PUSH_NULL
+           1588 LOAD_FAST               21 (_drop)
+           1590 LOAD_CONST              42 ('quá ngắn (<80ms)')
+           1592 CALL                     1
+           1600 POP_TOP
+
+260        1602 JUMP_BACKWARD          169 (to 1266)
+
+261     >> 1604 LOAD_FAST               19 (c)
+           1606 LOAD_ATTR               11 (NULL|self + get)
+           1626 LOAD_CONST              43 ('source')
+           1628 CALL                     1
+           1636 COPY                     1
+           1638 POP_JUMP_IF_TRUE         2 (to 1644)
+           1640 POP_TOP
+           1642 BUILD_MAP                0
+        >> 1644 STORE_FAST              24 (src)
+
+262        1646 LOAD_FAST               24 (src)
+           1648 LOAD_ATTR               11 (NULL|self + get)
+           1668 LOAD_CONST              44 ('type')
+           1670 CALL                     1
+           1678 STORE_FAST              25 (stype)
+
+263        1680 LOAD_CONST               1 (None)
+           1682 STORE_FAST              26 (path)
+
+264        1684 LOAD_CONST              45 ('color')
+           1686 STORE_FAST              27 (mkind)
+
+265        1688 LOAD_CONST              46 (False)
+           1690 STORE_FAST              28 (has_audio)
+
+266        1692 LOAD_CONST               1 (None)
+           1694 STORE_FAST              29 (seq)
+
+267        1696 LOAD_FAST               25 (stype)
+           1698 LOAD_CONST              47 ('media')
+           1700 COMPARE_OP              40 (==)
+           1704 POP_JUMP_IF_FALSE      165 (to 2036)
+
+268        1706 LOAD_FAST                5 (media)
+           1708 LOAD_ATTR               11 (NULL|self + get)
+           1728 LOAD_GLOBAL             29 (NULL + str)
+           1738 LOAD_FAST               24 (src)
+           1740 LOAD_ATTR               11 (NULL|self + get)
+           1760 LOAD_CONST              48 ('media_id')
+           1762 CALL                     1
+           1770 COPY                     1
+           1772 POP_JUMP_IF_TRUE         2 (to 1778)
+           1774 POP_TOP
+           1776 LOAD_CONST              49 ('')
+        >> 1778 CALL                     1
+           1786 CALL                     1
+           1794 STORE_FAST              30 (m)
+
+269        1796 LOAD_FAST               30 (m)
+           1798 POP_JUMP_IF_TRUE        10 (to 1820)
+
+270        1800 PUSH_NULL
+           1802 LOAD_FAST               21 (_drop)
+           1804 LOAD_CONST              50 ('không còn trong kho media (đã xoá?)')
+           1806 CALL                     1
+           1814 POP_TOP
+
+271        1816 EXTENDED_ARG             1
+           1818 JUMP_BACKWARD          277 (to 1266)
+
+272     >> 1820 LOAD_GLOBAL             43 (NULL + safe_local_path)
+           1830 LOAD_FAST               30 (m)
+           1832 LOAD_ATTR               11 (NULL|self + get)
+           1852 LOAD_CONST              51 ('path')
+           1854 CALL                     1
+           1862 CALL                     1
+           1870 STORE_FAST              26 (path)
+
+273        1872 LOAD_FAST               26 (path)
+           1874 POP_JUMP_IF_TRUE        32 (to 1940)
+
+274        1876 PUSH_NULL
+           1878 LOAD_FAST               21 (_drop)
+           1880 LOAD_CONST              52 ('thiếu file nguồn: ')
+           1882 LOAD_FAST               30 (m)
+           1884 LOAD_ATTR               11 (NULL|self + get)
+           1904 LOAD_CONST              51 ('path')
+           1906 CALL                     1
+           1914 COPY                     1
+           1916 POP_JUMP_IF_TRUE         2 (to 1922)
+           1918 POP_TOP
+           1920 LOAD_CONST              53 ('?')
+        >> 1922 FORMAT_VALUE             0
+           1924 BUILD_STRING             2
+           1926 CALL                     1
+           1934 POP_TOP
+
+275        1936 EXTENDED_ARG             1
+           1938 JUMP_BACKWARD          337 (to 1266)
+
+276     >> 1940 LOAD_FAST               30 (m)
+           1942 LOAD_ATTR               11 (NULL|self + get)
+           1962 LOAD_CONST              22 ('kind')
+           1964 CALL                     1
+           1972 COPY                     1
+           1974 POP_JUMP_IF_TRUE         2 (to 1980)
+           1976 POP_TOP
+           1978 LOAD_CONST              54 ('video')
+        >> 1980 STORE_FAST              27 (mkind)
+
+277        1982 LOAD_GLOBAL             15 (NULL + bool)
+           1992 LOAD_FAST               30 (m)
+           1994 LOAD_ATTR               11 (NULL|self + get)
+           2014 LOAD_CONST              55 ('has_audio')
+           2016 CALL                     1
+           2024 CALL                     1
+           2032 STORE_FAST              28 (has_audio)
+           2034 JUMP_FORWARD           167 (to 2370)
+
+278     >> 2036 LOAD_FAST               25 (stype)
+           2038 LOAD_CONST              56 ('scene')
+           2040 COMPARE_OP              40 (==)
+           2044 POP_JUMP_IF_FALSE       88 (to 2222)
+
+279        2046 LOAD_GLOBAL             13 (NULL + _i)
+           2056 LOAD_FAST               24 (src)
+           2058 LOAD_ATTR               11 (NULL|self + get)
+           2078 LOAD_CONST              57 ('seq')
+           2080 CALL                     1
+           2088 LOAD_CONST              58 (-1)
+           2090 CALL                     2
+           2098 STORE_FAST              29 (seq)
+
+283        2100 PUSH_NULL
+           2102 LOAD_FAST                7 (buildable_asset)
+           2104 LOAD_FAST                6 (by_seq)
+           2106 LOAD_ATTR               11 (NULL|self + get)
+           2126 LOAD_FAST               29 (seq)
+           2128 CALL                     1
+           2136 CALL                     1
+           2144 STORE_FAST              31 (got)
+
+284        2146 LOAD_FAST               31 (got)
+           2148 POP_JUMP_IF_NOT_NONE    14 (to 2178)
+
+285        2150 PUSH_NULL
+           2152 LOAD_FAST               21 (_drop)
+           2154 LOAD_CONST              59 ('cảnh #')
+           2156 LOAD_FAST               29 (seq)
+           2158 FORMAT_VALUE             0
+           2160 LOAD_CONST              60 (' chưa có ảnh lẫn clip')
+           2162 BUILD_STRING             3
+           2164 CALL                     1
+           2172 POP_TOP
+
+286        2174 EXTENDED_ARG             1
+           2176 JUMP_BACKWARD          456 (to 1266)
+
+287     >> 2178 LOAD_FAST               31 (got)
+           2180 UNPACK_SEQUENCE          2
+           2184 STORE_FAST              32 (asset)
+           2186 STORE_FAST              27 (mkind)
+
+288        2188 LOAD_GLOBAL             29 (NULL + str)
+           2198 LOAD_FAST               32 (asset)
+           2200 CALL                     1
+           2208 STORE_FAST              26 (path)
+
+291        2210 LOAD_FAST               27 (mkind)
+           2212 LOAD_CONST              54 ('video')
+           2214 COMPARE_OP              40 (==)
+           2218 STORE_FAST              28 (has_audio)
+           2220 JUMP_FORWARD            74 (to 2370)
+
+292     >> 2222 LOAD_FAST               25 (stype)
+           2224 LOAD_CONST              43 ('source')
+           2226 COMPARE_OP              40 (==)
+           2230 POP_JUMP_IF_FALSE       44 (to 2320)
+
+293        2232 LOAD_FAST                2 (source_mp4)
+           2234 POP_JUMP_IF_FALSE       16 (to 2268)
+           2236 LOAD_FAST                2 (source_mp4)
+           2238 LOAD_ATTR               45 (NULL|self + exists)
+           2258 CALL                     0
+           2266 POP_JUMP_IF_TRUE        10 (to 2288)
+
+294     >> 2268 PUSH_NULL
+           2270 LOAD_FAST               21 (_drop)
+           2272 LOAD_CONST              61 ('chưa có source.mp4')
+           2274 CALL                     1
+           2282 POP_TOP
+
+295        2284 EXTENDED_ARG             1
+           2286 JUMP_BACKWARD          511 (to 1266)
+
+296     >> 2288 LOAD_GLOBAL             29 (NULL + str)
+           2298 LOAD_FAST                2 (source_mp4)
+           2300 CALL                     1
+           2308 STORE_FAST              26 (path)
+
+297        2310 LOAD_CONST              54 ('video')
+           2312 STORE_FAST              27 (mkind)
+
+298        2314 LOAD_CONST               9 (True)
+           2316 STORE_FAST              28 (has_audio)
+           2318 JUMP_FORWARD            25 (to 2370)
+
+299     >> 2320 LOAD_FAST               25 (stype)
+           2322 LOAD_CONST              45 ('color')
+           2324 COMPARE_OP              40 (==)
+           2328 POP_JUMP_IF_FALSE        3 (to 2336)
+
+300        2330 LOAD_CONST              45 ('color')
+           2332 STORE_FAST              27 (mkind)
+           2334 JUMP_FORWARD            17 (to 2370)
+
+302     >> 2336 PUSH_NULL
+           2338 LOAD_FAST               21 (_drop)
+           2340 LOAD_CONST              62 ('nguồn không hỗ trợ: ')
+           2342 LOAD_FAST               25 (stype)
+           2344 COPY                     1
+           2346 POP_JUMP_IF_TRUE         2 (to 2352)
+           2348 POP_TOP
+           2350 LOAD_CONST              53 ('?')
+        >> 2352 FORMAT_VALUE             0
+           2354 BUILD_STRING             2
+           2356 CALL                     1
+           2364 POP_TOP
+
+303        2366 EXTENDED_ARG             2
+           2368 JUMP_BACKWARD          552 (to 1266)
+
+304     >> 2370 LOAD_FAST               17 (kind)
+           2372 LOAD_CONST              63 ('audio')
+           2374 COMPARE_OP              40 (==)
+           2378 POP_JUMP_IF_FALSE       14 (to 2408)
+           2380 LOAD_FAST               27 (mkind)
+           2382 LOAD_CONST              64 (('audio', 'video'))
+           2384 CONTAINS_OP              1
+           2386 POP_JUMP_IF_FALSE       10 (to 2408)
+
+305        2388 PUSH_NULL
+           2390 LOAD_FAST               21 (_drop)
+           2392 LOAD_CONST              65 ('track tiếng không nhận nguồn ảnh/màu')
+           2394 CALL                     1
+           2402 POP_TOP
+
+306        2404 EXTENDED_ARG             2
+           2406 JUMP_BACKWARD          571 (to 1266)
+
+307     >> 2408 LOAD_GLOBAL             37 (NULL + min)
+           2418 LOAD_GLOBAL             46 (_SPEED_MAX)
+           2428 LOAD_GLOBAL             19 (NULL + max)
+           2438 LOAD_GLOBAL             48 (_SPEED_MIN)
+           2448 LOAD_GLOBAL             39 (NULL + _f)
+           2458 LOAD_FAST               19 (c)
+           2460 LOAD_ATTR               11 (NULL|self + get)
+           2480 LOAD_CONST              66 ('speed')
+           2482 CALL                     1
+           2490 LOAD_CONST              33 (1.0)
+           2492 CALL                     2
+           2500 CALL                     2
+           2508 CALL                     2
+           2516 STORE_FAST              33 (speed)
+
+308        2518 LOAD_GLOBAL             19 (NULL + max)
+           2528 LOAD_CONST               3 (0)
+           2530 LOAD_GLOBAL             13 (NULL + _i)
+           2540 LOAD_FAST               19 (c)
+           2542 LOAD_ATTR               11 (NULL|self + get)
+           2562 LOAD_CONST              67 ('src_in_ms')
+           2564 CALL                     1
+           2572 CALL                     1
+           2580 CALL                     2
+           2588 STORE_FAST              34 (src_in)
+
+309        2590 LOAD_GLOBAL             13 (NULL + _i)
+           2600 LOAD_FAST               19 (c)
+           2602 LOAD_ATTR               11 (NULL|self + get)
+           2622 LOAD_CONST              68 ('src_out_ms')
+           2624 CALL                     1
+           2632 LOAD_CONST              58 (-1)
+           2634 CALL                     2
+           2642 STORE_FAST              35 (src_out)
+
+310        2644 LOAD_FAST               18 (track)
+           2646 LOAD_ATTR               50 (clips)
+           2666 LOAD_ATTR               53 (NULL|self + append)
+           2686 LOAD_GLOBAL             55 (NULL + TlClip)
+           2696 LOAD_CONST              93 (())
+           2698 BUILD_MAP                0
+           2700 LOAD_CONST              24 ('id')
+
+311        2702 LOAD_GLOBAL             29 (NULL + str)
+           2712 LOAD_FAST               19 (c)
+           2714 LOAD_ATTR               11 (NULL|self + get)
+           2734 LOAD_CONST              24 ('id')
+           2736 CALL                     1
+           2744 COPY                     1
+           2746 POP_JUMP_IF_TRUE         5 (to 2758)
+           2748 POP_TOP
+           2750 LOAD_CONST              69 ('c')
+           2752 LOAD_FAST               22 (start)
+           2754 FORMAT_VALUE             0
+           2756 BUILD_STRING             2
+        >> 2758 CALL                     1
+           2766 MAP_ADD                  1
+
+310        2768 LOAD_CONST              70 ('source_type')
+
+312        2770 LOAD_FAST               25 (stype)
+           2772 MAP_ADD                  1
+
+310        2774 LOAD_CONST              71 ('media_path')
+
+312        2776 LOAD_FAST               26 (path)
+           2778 MAP_ADD                  1
+
+310        2780 LOAD_CONST              72 ('media_kind')
+
+312        2782 LOAD_FAST               27 (mkind)
+           2784 MAP_ADD                  1
+
+310        2786 LOAD_CONST              57 ('seq')
+
+312        2788 LOAD_FAST               29 (seq)
+           2790 MAP_ADD                  1
+
+310        2792 LOAD_CONST              73 ('hex')
+
+313        2794 LOAD_GLOBAL             29 (NULL + str)
+           2804 LOAD_FAST               24 (src)
+           2806 LOAD_ATTR               11 (NULL|self + get)
+           2826 LOAD_CONST              73 ('hex')
+           2828 CALL                     1
+           2836 COPY                     1
+           2838 POP_JUMP_IF_TRUE         2 (to 2844)
+           2840 POP_TOP
+           2842 LOAD_CONST              74 ('#000000')
+        >> 2844 CALL                     1
+           2852 MAP_ADD                  1
+
+310        2854 LOAD_CONST              40 ('start_ms')
+
+314        2856 LOAD_FAST               22 (start)
+           2858 MAP_ADD                  1
+
+310        2860 LOAD_CONST              41 ('end_ms')
+
+314        2862 LOAD_FAST               23 (end)
+           2864 MAP_ADD                  1
+
+310        2866 LOAD_CONST              67 ('src_in_ms')
+
+314        2868 LOAD_FAST               34 (src_in)
+           2870 MAP_ADD                  1
+
+310        2872 LOAD_CONST              68 ('src_out_ms')
+
+315        2874 LOAD_FAST               35 (src_out)
+           2876 LOAD_FAST               34 (src_in)
+           2878 COMPARE_OP              68 (>)
+           2882 POP_JUMP_IF_FALSE        2 (to 2888)
+           2884 LOAD_FAST               35 (src_out)
+           2886 JUMP_FORWARD             1 (to 2890)
+        >> 2888 LOAD_CONST               1 (None)
+        >> 2890 MAP_ADD                  1
+
+310        2892 LOAD_CONST              66 ('speed')
+
+316        2894 LOAD_FAST               33 (speed)
+           2896 MAP_ADD                  1
+
+310        2898 LOAD_CONST              75 ('transform')
+
+316        2900 LOAD_GLOBAL             57 (NULL + _clip_transform)
+           2910 LOAD_FAST               19 (c)
+           2912 LOAD_ATTR               11 (NULL|self + get)
+           2932 LOAD_CONST              75 ('transform')
+           2934 CALL                     1
+           2942 CALL                     1
+           2950 MAP_ADD                  1
+
+310        2952 LOAD_CONST              32 ('volume')
+
+317        2954 LOAD_GLOBAL             19 (NULL + max)
+           2964 LOAD_CONST              30 (0.0)
+           2966 LOAD_GLOBAL             37 (NULL + min)
+           2976 LOAD_CONST              31 (2.0)
+           2978 LOAD_GLOBAL             39 (NULL + _f)
+           2988 LOAD_FAST               19 (c)
+           2990 LOAD_ATTR               11 (NULL|self + get)
+           3010 LOAD_CONST              32 ('volume')
+           3012 CALL                     1
+           3020 LOAD_CONST              33 (1.0)
+           3022 CALL                     2
+           3030 CALL                     2
+           3038 CALL                     2
+           3046 MAP_ADD                  1
+
+310        3048 LOAD_CONST              27 ('muted')
+
+318        3050 LOAD_GLOBAL             15 (NULL + bool)
+           3060 LOAD_FAST               19 (c)
+           3062 LOAD_ATTR               11 (NULL|self + get)
+           3082 LOAD_CONST              27 ('muted')
+           3084 CALL                     1
+           3092 CALL                     1
+           3100 MAP_ADD                  1
+
+310        3102 LOAD_CONST              76 ('fade_in_ms')
+
+319        3104 LOAD_GLOBAL             19 (NULL + max)
+           3114 LOAD_CONST               3 (0)
+           3116 LOAD_GLOBAL             13 (NULL + _i)
+           3126 LOAD_FAST               19 (c)
+           3128 LOAD_ATTR               11 (NULL|self + get)
+           3148 LOAD_CONST              76 ('fade_in_ms')
+           3150 CALL                     1
+           3158 CALL                     1
+           3166 CALL                     2
+           3174 MAP_ADD                  1
+
+310        3176 LOAD_CONST              77 ('fade_out_ms')
+
+320        3178 LOAD_GLOBAL             19 (NULL + max)
+           3188 LOAD_CONST               3 (0)
+           3190 LOAD_GLOBAL             13 (NULL + _i)
+           3200 LOAD_FAST               19 (c)
+           3202 LOAD_ATTR               11 (NULL|self + get)
+           3222 LOAD_CONST              77 ('fade_out_ms')
+           3224 CALL                     1
+           3232 CALL                     1
+           3240 CALL                     2
+           3248 MAP_ADD                  1
+
+310        3250 LOAD_CONST              78 ('transition_out')
+
+321        3252 LOAD_GLOBAL             59 (NULL + _norm_transition)
+           3262 LOAD_FAST               19 (c)
+           3264 LOAD_ATTR               11 (NULL|self + get)
+           3284 LOAD_CONST              78 ('transition_out')
+           3286 CALL                     1
+           3294 CALL                     1
+           3302 MAP_ADD                  1
+
+310        3304 LOAD_CONST              55 ('has_audio')
+
+322        3306 LOAD_FAST               28 (has_audio)
+           3308 MAP_ADD                  1
+
+310        3310 LOAD_CONST              79 ('keyframes')
+
+323        3312 LOAD_GLOBAL             61 (NULL + _norm_keyframes)
+           3322 LOAD_FAST               19 (c)
+           3324 LOAD_ATTR               11 (NULL|self + get)
+           3344 LOAD_CONST              79 ('keyframes')
+           3346 CALL                     1
+           3354 LOAD_FAST               23 (end)
+           3356 LOAD_FAST               22 (start)
+           3358 BINARY_OP               10 (-)
+           3362 CALL                     2
+           3370 MAP_ADD                  1
+
+310        3372 LOAD_CONST              80 ('color_grade')
+
+325        3374 LOAD_GLOBAL             23 (NULL + isinstance)
+           3384 LOAD_FAST               19 (c)
+           3386 LOAD_ATTR               11 (NULL|self + get)
+           3406 LOAD_CONST              80 ('color_grade')
+           3408 CALL                     1
+           3416 LOAD_GLOBAL             24 (dict)
+           3426 CALL                     2
+           3434 POP_JUMP_IF_FALSE       37 (to 3510)
+
+326        3436 LOAD_FAST               19 (c)
+           3438 LOAD_CONST              80 ('color_grade')
+           3440 BINARY_SUBSCR
+           3444 LOAD_ATTR               11 (NULL|self + get)
+           3464 LOAD_CONST              81 ('enabled')
+           3466 CALL                     1
+           3474 POP_JUMP_IF_FALSE       17 (to 3510)
+
+324        3476 LOAD_FAST               19 (c)
+           3478 LOAD_ATTR               11 (NULL|self + get)
+           3498 LOAD_CONST              80 ('color_grade')
+           3500 CALL                     1
+           3508 JUMP_FORWARD             1 (to 3512)
+
+326     >> 3510 LOAD_CONST               1 (None)
+        >> 3512 MAP_ADD                  1
+
+310        3514 LOAD_CONST              82 ('chroma')
+
+327        3516 LOAD_GLOBAL             63 (NULL + _norm_chroma)
+           3526 LOAD_FAST               19 (c)
+           3528 LOAD_ATTR               11 (NULL|self + get)
+           3548 LOAD_CONST              82 ('chroma')
+           3550 CALL                     1
+           3558 CALL                     1
+           3566 MAP_ADD                  1
+
+310        3568 LOAD_CONST              83 ('mask')
+
+328        3570 LOAD_GLOBAL             65 (NULL + _norm_mask)
+           3580 LOAD_FAST               19 (c)
+           3582 LOAD_ATTR               11 (NULL|self + get)
+           3602 LOAD_CONST              83 ('mask')
+           3604 CALL                     1
+           3612 CALL                     1
+           3620 MAP_ADD                  1
+
+310        3622 LOAD_CONST              84 ('pitch_semitones')
+
+329        3624 LOAD_GLOBAL             19 (NULL + max)
+           3634 LOAD_CONST              85 (-12)
+           3636 LOAD_GLOBAL             37 (NULL + min)
+           3646 LOAD_CONST              86 (12)
+           3648 LOAD_GLOBAL             13 (NULL + _i)
+           3658 LOAD_FAST               19 (c)
+           3660 LOAD_ATTR               11 (NULL|self + get)
+           3680 LOAD_CONST              84 ('pitch_semitones')
+           3682 CALL                     1
+           3690 CALL                     1
+           3698 CALL                     2
+           3706 CALL                     2
+           3714 MAP_ADD                  1
+
+310        3716 LOAD_CONST              87 ('denoise')
+
+330        3718 LOAD_GLOBAL             15 (NULL + bool)
+           3728 LOAD_FAST               19 (c)
+           3730 LOAD_ATTR               11 (NULL|self + get)
+           3750 LOAD_CONST              87 ('denoise')
+           3752 CALL                     1
+           3760 CALL                     1
+           3768 MAP_ADD                  1
+
+310        3770 LOAD_CONST              88 ('normalize')
+
+331        3772 LOAD_GLOBAL             15 (NULL + bool)
+           3782 LOAD_FAST               19 (c)
+           3784 LOAD_ATTR               11 (NULL|self + get)
+           3804 LOAD_CONST              88 ('normalize')
+           3806 CALL                     1
+           3814 CALL                     1
+           3822 MAP_ADD                  1
+
+310        3824 CALL_FUNCTION_EX         1
+           3826 CALL                     1
+           3834 POP_TOP
+           3836 EXTENDED_ARG             5
+           3838 JUMP_BACKWARD         1287 (to 1266)
+
+249     >> 3840 END_FOR
+
+333        3842 LOAD_FAST               18 (track)
+           3844 LOAD_ATTR               50 (clips)
+           3864 LOAD_ATTR               67 (NULL|self + sort)
+           3884 LOAD_CONST              89 (<code object <lambda> at 0x7f6c92be2b10, file "app\render\timeline_model.py", line 333>)
+           3886 MAKE_FUNCTION            0
+           3888 KW_NAMES                90 (('key',))
+           3890 CALL                     1
+           3898 POP_TOP
+
+334        3900 LOAD_FAST               17 (kind)
+           3902 LOAD_CONST              54 ('video')
+           3904 COMPARE_OP              40 (==)
+           3908 POP_JUMP_IF_FALSE       29 (to 3968)
+
+335        3910 LOAD_DEREF              38 (out)
+           3912 LOAD_ATTR               32 (video_tracks)
+           3932 LOAD_ATTR               53 (NULL|self + append)
+           3952 LOAD_FAST               18 (track)
+           3954 CALL                     1
+           3962 POP_TOP
+           3964 EXTENDED_ARG             6
+           3966 JUMP_BACKWARD         1650 (to 668)
+
+337     >> 3968 LOAD_DEREF              38 (out)
+           3970 LOAD_ATTR               34 (audio_tracks)
+           3990 LOAD_ATTR               53 (NULL|self + append)
+           4010 LOAD_FAST               18 (track)
+           4012 CALL                     1
+           4020 POP_TOP
+           4022 EXTENDED_ARG             6
+           4024 JUMP_BACKWARD         1679 (to 668)
+
+236     >> 4026 END_FOR
+
+339        4028 LOAD_DEREF              38 (out)
+           4030 LOAD_ATTR               32 (video_tracks)
+           4050 LOAD_DEREF              38 (out)
+           4052 LOAD_ATTR               34 (audio_tracks)
+           4072 BINARY_OP                0 (+)
+           4076 GET_ITER
+           4078 LOAD_FAST_AND_CLEAR     36 (t)
+           4080 LOAD_FAST_AND_CLEAR     19 (c)
+           4082 SWAP                     3
+           4084 BUILD_LIST               0
+           4086 SWAP                     2
+        >> 4088 FOR_ITER                31 (to 4154)
+           4092 STORE_FAST              36 (t)
+           4094 LOAD_FAST               36 (t)
+           4096 LOAD_ATTR               50 (clips)
+           4116 GET_ITER
+        >> 4118 FOR_ITER                14 (to 4150)
+           4122 STORE_FAST              19 (c)
+           4124 LOAD_FAST               19 (c)
+           4126 LOAD_ATTR               68 (end_ms)
+           4146 LIST_APPEND              3
+           4148 JUMP_BACKWARD           16 (to 4118)
+        >> 4150 END_FOR
+           4152 JUMP_BACKWARD           33 (to 4088)
+        >> 4154 END_FOR
+           4156 STORE_FAST              37 (ends)
+           4158 STORE_FAST              36 (t)
+           4160 STORE_FAST              19 (c)
+
+340        4162 LOAD_FAST               37 (ends)
+           4164 POP_JUMP_IF_FALSE       11 (to 4188)
+           4166 LOAD_GLOBAL             19 (NULL + max)
+           4176 LOAD_FAST               37 (ends)
+           4178 CALL                     1
+           4186 JUMP_FORWARD             1 (to 4190)
+        >> 4188 LOAD_CONST               3 (0)
+        >> 4190 LOAD_DEREF              38 (out)
+           4192 STORE_ATTR              35 (duration_ms)
+
+341        4202 LOAD_FAST                3 (report)
+           4204 POP_JUMP_IF_NONE        27 (to 4260)
+
+342        4206 LOAD_FAST                3 (report)
+           4208 LOAD_ATTR               73 (NULL|self + extend)
+           4228 LOAD_DEREF              38 (out)
+           4230 LOAD_ATTR               74 (dropped)
+           4250 CALL                     1
+           4258 POP_TOP
+
+343     >> 4260 LOAD_DEREF              38 (out)
+           4262 LOAD_ATTR               70 (duration_ms)
+           4282 LOAD_CONST               3 (0)
+           4284 COMPARE_OP              26 (<=)
+           4288 POP_JUMP_IF_TRUE        28 (to 4346)
+           4290 LOAD_GLOBAL             77 (NULL + any)
+           4300 LOAD_CONST              91 (<code object <genexpr> at 0x7f6c92fd5730, file "app\render\timeline_model.py", line 343>)
+           4302 MAKE_FUNCTION            0
+           4304 LOAD_DEREF              38 (out)
+           4306 LOAD_ATTR               32 (video_tracks)
+           4326 GET_ITER
+           4328 CALL                     0
+           4336 CALL                     1
+           4344 POP_JUMP_IF_TRUE         1 (to 4348)
+
+344     >> 4346 RETURN_CONST             1 (None)
+
+345     >> 4348 LOAD_DEREF              38 (out)
+           4350 RETURN_VALUE
+        >> 4352 SWAP                     2
+           4354 POP_TOP
+
+339        4356 SWAP                     3
+           4358 STORE_FAST              19 (c)
+           4360 STORE_FAST              36 (t)
+           4362 RERAISE                  0
+ExceptionTable:
+  4084 to 4154 -> 4352 [3]
+
+Disassembly of <code object _drop at 0x7f6c81ad3510, file "app\render\timeline_model.py", line 254>:
+              0 COPY_FREE_VARS           1
+
+254           2 RESUME                   0
+
+255           4 LOAD_DEREF               3 (out)
+              6 LOAD_ATTR                0 (dropped)
+             26 LOAD_ATTR                3 (NULL|self + append)
+             46 LOAD_FAST                2 (_tr)
+             48 LOAD_ATTR                4 (name)
+             68 FORMAT_VALUE             0
+             70 LOAD_CONST               1 (' · ')
+             72 LOAD_FAST                1 (_lbl)
+             74 FORMAT_VALUE             0
+             76 LOAD_CONST               2 (': ')
+             78 LOAD_FAST                0 (why)
+             80 FORMAT_VALUE             0
+             82 BUILD_STRING             5
+             84 CALL                     1
+             92 POP_TOP
+             94 RETURN_CONST             0 (None)
+
+Disassembly of <code object <lambda> at 0x7f6c92be2b10, file "app\render\timeline_model.py", line 333>:
+333           0 RESUME                   0
+              2 LOAD_FAST                0 (x)
+              4 LOAD_ATTR                0 (start_ms)
+             24 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c92fd5730, file "app\render\timeline_model.py", line 343>:
+343           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                16 (to 44)
+             12 STORE_FAST               1 (t)
+             14 LOAD_FAST                1 (t)
+             16 LOAD_ATTR                0 (clips)
+             36 YIELD_VALUE              1
+             38 RESUME                   1
+             40 POP_TOP
+             42 JUMP_BACKWARD           18 (to 8)
+        >>   44 END_FOR
+             46 RETURN_CONST             0 (None)
+        >>   48 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             50 RERAISE                  1
+ExceptionTable:
+  4 to 46 -> 48 [0] lasti

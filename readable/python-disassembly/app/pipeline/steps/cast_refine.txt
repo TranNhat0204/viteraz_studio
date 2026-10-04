@@ -1,0 +1,716 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Step cast_refine — đối chiếu dàn nhân vật với KỊCH BẢN ĐÃ VIẾT rồi sửa cho khớp.\n\nChỉ nằm trong chuỗi khi kênh bật `channel_profile.cast_from_script` (mặc định TẮT). Đặt NGAY SAU\n`script` và TRƯỚC `tts`: lúc đó đã có đủ sự thật (research + kịch bản) mà `tts` — bước dài và tốn\ntiền nhất — thì chưa chạy, nên hỏng ở đây còn dừng rẻ.\n\nStep làm hai việc, tách bạch để hỏng cái nào chạy lại đúng cái đó:\n  1. một lượt LLM đối chiếu cast ↔ kịch bản (cast_refine_service.refine)\n  2. vẽ chân dung cho những người MỚI xuất hiện sau khi đối chiếu\n\nNgười đã khớp thì giữ nguyên `character_id` + `ref_path` nên KHÔNG tốn lượt vẽ nào — đó là lý do\nchọn "đối chiếu rồi sửa" thay vì "rút lại từ số 0". Xem docs/plan-cast-sau-kich-ban.md §5.4.\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 14           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 16          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (json)
+             24 STORE_NAME               3 (json)
+
+ 18          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               4 (('make_error', 'E'))
+             30 IMPORT_NAME              4 (app.core.errors)
+             32 IMPORT_FROM              5 (make_error)
+             34 STORE_NAME               5 (make_error)
+             36 IMPORT_FROM              6 (E)
+             38 STORE_NAME               6 (E)
+             40 POP_TOP
+
+ 19          42 LOAD_CONST               1 (0)
+             44 LOAD_CONST               5 (('ContentPlan',))
+             46 IMPORT_NAME              7 (app.db.models)
+             48 IMPORT_FROM              8 (ContentPlan)
+             50 STORE_NAME               8 (ContentPlan)
+             52 POP_TOP
+
+ 20          54 LOAD_CONST               1 (0)
+             56 LOAD_CONST               6 (('SessionLocal',))
+             58 IMPORT_NAME              9 (app.db.session)
+             60 IMPORT_FROM             10 (SessionLocal)
+             62 STORE_NAME              10 (SessionLocal)
+             64 POP_TOP
+
+ 21          66 LOAD_CONST               1 (0)
+             68 LOAD_CONST               7 (('BaseStep', 'StepContext'))
+             70 IMPORT_NAME             11 (app.pipeline.base)
+             72 IMPORT_FROM             12 (BaseStep)
+             74 STORE_NAME              12 (BaseStep)
+             76 IMPORT_FROM             13 (StepContext)
+             78 STORE_NAME              13 (StepContext)
+             80 POP_TOP
+
+ 22          82 LOAD_CONST               1 (0)
+             84 LOAD_CONST               8 (('cast_refine_service',))
+             86 IMPORT_NAME             14 (app.services)
+             88 IMPORT_FROM             15 (cast_refine_service)
+             90 STORE_NAME              15 (cast_refine_service)
+             92 POP_TOP
+
+ 25          94 PUSH_NULL
+             96 LOAD_BUILD_CLASS
+             98 LOAD_CONST               9 (<code object CastRefineStep at 0x7f6c92eebd20, file "app\pipeline\steps\cast_refine.py", line 25>)
+            100 MAKE_FUNCTION            0
+            102 LOAD_CONST              10 ('CastRefineStep')
+            104 LOAD_NAME               12 (BaseStep)
+            106 CALL                     3
+            114 STORE_NAME              16 (CastRefineStep)
+
+ 62         116 LOAD_CONST              13 (('video_id', 'str', 'return', 'str'))
+            118 LOAD_CONST              11 (<code object _script_from_subtitles at 0x7f6c81bcb690, file "app\pipeline\steps\cast_refine.py", line 62>)
+            120 MAKE_FUNCTION            4 (annotations)
+            122 STORE_NAME              17 (_script_from_subtitles)
+
+ 71         124 LOAD_CONST              14 (('ctx', 'StepContext', 'return', 'int'))
+            126 LOAD_CONST              12 (<code object _draw_missing at 0x290cd880, file "app\pipeline\steps\cast_refine.py", line 71>)
+            128 MAKE_FUNCTION            4 (annotations)
+            130 STORE_NAME              18 (_draw_missing)
+            132 RETURN_CONST             3 (None)
+
+Disassembly of <code object CastRefineStep at 0x7f6c92eebd20, file "app\pipeline\steps\cast_refine.py", line 25>:
+ 25           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('CastRefineStep')
+              8 STORE_NAME               2 (__qualname__)
+
+ 26          10 LOAD_CONST               1 ('cast_refine')
+             12 STORE_NAME               3 (name)
+
+ 27          14 LOAD_CONST               2 ('NET')
+             16 STORE_NAME               4 (resource)
+
+ 28          18 LOAD_CONST               3 ('cast')
+             20 BUILD_LIST               1
+             22 STORE_NAME               5 (produces)
+
+ 30          24 LOAD_CONST               6 (('ctx', 'StepContext', 'return', 'dict'))
+             26 LOAD_CONST               4 (<code object run at 0x290e7c80, file "app\pipeline\steps\cast_refine.py", line 30>)
+             28 MAKE_FUNCTION            4 (annotations)
+             30 STORE_NAME               6 (run)
+             32 RETURN_CONST             5 (None)
+
+Disassembly of <code object run at 0x290e7c80, file "app\pipeline\steps\cast_refine.py", line 30>:
+ 30           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 31           6 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             16 CALL                     0
+             24 BEFORE_WITH
+             26 STORE_FAST               2 (db)
+
+ 32          28 LOAD_FAST                2 (db)
+             30 LOAD_ATTR                3 (NULL|self + query)
+             50 LOAD_GLOBAL              4 (ContentPlan)
+             60 CALL                     1
+             68 LOAD_ATTR                7 (NULL|self + filter)
+             88 LOAD_GLOBAL              4 (ContentPlan)
+             98 LOAD_ATTR                8 (video_id)
+            118 LOAD_FAST                1 (ctx)
+            120 LOAD_ATTR                8 (video_id)
+            140 COMPARE_OP              40 (==)
+            144 CALL                     1
+            152 LOAD_ATTR               11 (NULL|self + first)
+            172 CALL                     0
+            180 STORE_FAST               3 (plan)
+
+ 33         182 LOAD_FAST                3 (plan)
+            184 POP_JUMP_IF_FALSE       24 (to 234)
+            186 LOAD_GLOBAL             13 (NULL + hasattr)
+            196 LOAD_FAST                3 (plan)
+            198 LOAD_CONST               1 ('script')
+            200 CALL                     2
+            208 POP_JUMP_IF_FALSE       12 (to 234)
+            210 LOAD_FAST                3 (plan)
+            212 LOAD_ATTR               14 (script)
+            232 JUMP_FORWARD             1 (to 236)
+        >>  234 LOAD_CONST               0 (None)
+        >>  236 COPY                     1
+            238 POP_JUMP_IF_TRUE         2 (to 244)
+            240 POP_TOP
+            242 LOAD_CONST               2 ('')
+        >>  244 STORE_FAST               4 (script)
+
+ 34         246 LOAD_FAST                4 (script)
+            248 POP_JUMP_IF_TRUE        22 (to 294)
+
+ 35         250 LOAD_GLOBAL             17 (NULL + _script_from_subtitles)
+            260 LOAD_FAST                2 (db)
+            262 LOAD_FAST                1 (ctx)
+            264 LOAD_ATTR                8 (video_id)
+            284 CALL                     2
+            292 STORE_FAST               4 (script)
+
+ 31     >>  294 LOAD_CONST               0 (None)
+            296 LOAD_CONST               0 (None)
+            298 LOAD_CONST               0 (None)
+            300 CALL                     2
+            308 POP_TOP
+
+ 37     >>  310 LOAD_FAST_CHECK          4 (script)
+            312 LOAD_ATTR               19 (NULL|self + strip)
+            332 CALL                     0
+            340 POP_JUMP_IF_TRUE        26 (to 394)
+
+ 38         342 LOAD_FAST                1 (ctx)
+            344 LOAD_ATTR               21 (NULL|self + emit_log)
+            364 LOAD_CONST               3 ('Chưa có kịch bản để đối chiếu nhân vật — bỏ qua.')
+            366 LOAD_CONST               4 ('warn')
+            368 KW_NAMES                 5 (('level',))
+            370 CALL                     2
+            378 POP_TOP
+
+ 39         380 LOAD_CONST               0 (None)
+            382 LOAD_CONST               6 ('skipped')
+            384 LOAD_CONST               7 (True)
+            386 BUILD_MAP                1
+            388 LOAD_CONST               8 (('cast', 'meta'))
+            390 BUILD_CONST_KEY_MAP      2
+            392 RETURN_VALUE
+
+ 41     >>  394 LOAD_FAST                1 (ctx)
+            396 LOAD_ATTR               23 (NULL|self + emit_progress)
+            416 LOAD_CONST               9 (0.1)
+            418 LOAD_CONST              10 ('Đối chiếu dàn nhân vật với kịch bản đã viết…')
+            420 CALL                     2
+            428 POP_TOP
+
+ 42         430 LOAD_GLOBAL             25 (NULL + cast_refine_service)
+            440 LOAD_ATTR               26 (refine)
+            460 LOAD_FAST                1 (ctx)
+            462 LOAD_ATTR                8 (video_id)
+            482 LOAD_FAST                4 (script)
+            484 CALL                     2
+            492 GET_AWAITABLE            0
+            494 LOAD_CONST               0 (None)
+        >>  496 SEND                     3 (to 506)
+            500 YIELD_VALUE              2
+            502 RESUME                   3
+            504 JUMP_BACKWARD_NO_INTERRUPT     5 (to 496)
+        >>  506 END_SEND
+            508 STORE_FAST               5 (res)
+
+ 43         510 LOAD_FAST                5 (res)
+            512 LOAD_ATTR               29 (NULL|self + get)
+            532 LOAD_CONST              11 ('mode')
+            534 CALL                     1
+            542 LOAD_CONST              12 ('skip')
+            544 COMPARE_OP              40 (==)
+            548 POP_JUMP_IF_FALSE       42 (to 634)
+
+ 44         550 LOAD_FAST                1 (ctx)
+            552 LOAD_ATTR               21 (NULL|self + emit_log)
+            572 LOAD_CONST              13 ('Bỏ qua đối chiếu nhân vật: ')
+            574 LOAD_FAST                5 (res)
+            576 LOAD_ATTR               29 (NULL|self + get)
+            596 LOAD_CONST              14 ('reason')
+            598 CALL                     1
+            606 FORMAT_VALUE             0
+            608 BUILD_STRING             2
+            610 LOAD_CONST               4 ('warn')
+            612 KW_NAMES                 5 (('level',))
+            614 CALL                     2
+            622 POP_TOP
+
+ 45         624 LOAD_CONST               0 (None)
+            626 LOAD_FAST                5 (res)
+            628 LOAD_CONST               8 (('cast', 'meta'))
+            630 BUILD_CONST_KEY_MAP      2
+            632 RETURN_VALUE
+
+ 47     >>  634 LOAD_FAST                5 (res)
+            636 LOAD_CONST              11 ('mode')
+            638 BINARY_SUBSCR
+            642 LOAD_CONST              15 ('archetype')
+            644 COMPARE_OP              40 (==)
+            648 POP_JUMP_IF_FALSE       25 (to 700)
+
+ 48         650 LOAD_FAST                1 (ctx)
+            652 LOAD_ATTR               21 (NULL|self + emit_log)
+            672 LOAD_CONST              16 ('Kịch bản nói với người xem, không gọi tên ai → giữ nguyên dàn nhân vật đại diện (')
+
+ 49         674 LOAD_FAST                5 (res)
+            676 LOAD_CONST              17 ('total')
+            678 BINARY_SUBSCR
+            682 FORMAT_VALUE             0
+            684 LOAD_CONST              18 (' người), chỉ làm rõ mô tả.')
+
+ 48         686 BUILD_STRING             3
+            688 CALL                     1
+            696 POP_TOP
+            698 JUMP_FORWARD            86 (to 872)
+
+ 51     >>  700 LOAD_FAST                1 (ctx)
+            702 LOAD_ATTR               21 (NULL|self + emit_log)
+            722 LOAD_CONST              19 ('Dàn nhân vật khớp kịch bản: ')
+            724 LOAD_FAST                5 (res)
+            726 LOAD_CONST              17 ('total')
+            728 BINARY_SUBSCR
+            732 FORMAT_VALUE             0
+            734 LOAD_CONST              20 (' người')
+            736 BUILD_STRING             3
+
+ 52         738 LOAD_FAST                5 (res)
+            740 LOAD_CONST              21 ('added')
+            742 BINARY_SUBSCR
+            746 POP_JUMP_IF_FALSE       23 (to 794)
+            748 LOAD_CONST              22 (' · thêm ')
+            750 LOAD_CONST              23 (', ')
+            752 LOAD_ATTR               31 (NULL|self + join)
+            772 LOAD_FAST                5 (res)
+            774 LOAD_CONST              21 ('added')
+            776 BINARY_SUBSCR
+            780 CALL                     1
+            788 FORMAT_VALUE             0
+            790 BUILD_STRING             2
+            792 JUMP_FORWARD             1 (to 796)
+        >>  794 LOAD_CONST               2 ('')
+
+ 51     >>  796 BINARY_OP                0 (+)
+
+ 53         800 LOAD_FAST                5 (res)
+            802 LOAD_CONST              24 ('removed')
+            804 BINARY_SUBSCR
+            808 POP_JUMP_IF_FALSE       23 (to 856)
+            810 LOAD_CONST              25 (' · bỏ ')
+            812 LOAD_CONST              23 (', ')
+            814 LOAD_ATTR               31 (NULL|self + join)
+            834 LOAD_FAST                5 (res)
+            836 LOAD_CONST              24 ('removed')
+            838 BINARY_SUBSCR
+            842 CALL                     1
+            850 FORMAT_VALUE             0
+            852 BUILD_STRING             2
+            854 JUMP_FORWARD             1 (to 858)
+        >>  856 LOAD_CONST               2 ('')
+
+ 51     >>  858 BINARY_OP                0 (+)
+            862 CALL                     1
+            870 POP_TOP
+
+ 56     >>  872 LOAD_FAST                1 (ctx)
+            874 LOAD_ATTR               23 (NULL|self + emit_progress)
+            894 LOAD_CONST              26 (0.5)
+            896 LOAD_CONST              27 ('Vẽ chân dung cho nhân vật mới…')
+            898 CALL                     2
+            906 POP_TOP
+
+ 57         908 LOAD_GLOBAL             33 (NULL + _draw_missing)
+            918 LOAD_FAST                1 (ctx)
+            920 CALL                     1
+            928 GET_AWAITABLE            0
+            930 LOAD_CONST               0 (None)
+        >>  932 SEND                     3 (to 942)
+            936 YIELD_VALUE              2
+            938 RESUME                   3
+            940 JUMP_BACKWARD_NO_INTERRUPT     5 (to 932)
+        >>  942 END_SEND
+            944 STORE_FAST               6 (drawn)
+
+ 58         946 LOAD_FAST                1 (ctx)
+            948 LOAD_ATTR               23 (NULL|self + emit_progress)
+            968 LOAD_CONST              28 (1.0)
+            970 LOAD_CONST              29 ('Xong nhân vật: ')
+            972 LOAD_FAST                5 (res)
+            974 LOAD_CONST              17 ('total')
+            976 BINARY_SUBSCR
+            980 FORMAT_VALUE             0
+            982 LOAD_CONST              30 (' người, vẽ mới ')
+            984 LOAD_FAST                6 (drawn)
+            986 FORMAT_VALUE             0
+            988 LOAD_CONST              31 ('.')
+            990 BUILD_STRING             5
+            992 CALL                     2
+           1000 POP_TOP
+
+ 59        1002 LOAD_CONST               0 (None)
+           1004 BUILD_MAP                0
+           1006 LOAD_FAST                5 (res)
+           1008 DICT_UPDATE              1
+           1010 LOAD_CONST              32 ('drawn')
+           1012 LOAD_FAST                6 (drawn)
+           1014 BUILD_MAP                1
+           1016 DICT_UPDATE              1
+           1018 LOAD_CONST               8 (('cast', 'meta'))
+           1020 BUILD_CONST_KEY_MAP      2
+           1022 RETURN_VALUE
+
+ 31     >> 1024 PUSH_EXC_INFO
+           1026 WITH_EXCEPT_START
+           1028 POP_JUMP_IF_TRUE         1 (to 1032)
+           1030 RERAISE                  2
+        >> 1032 POP_TOP
+           1034 POP_EXCEPT
+           1036 POP_TOP
+           1038 POP_TOP
+           1040 EXTENDED_ARG             1
+           1042 JUMP_BACKWARD          367 (to 310)
+        >> 1044 COPY                     3
+           1046 POP_EXCEPT
+           1048 RERAISE                  1
+
+ 42     >> 1050 CLEANUP_THROW
+           1052 EXTENDED_ARG             1
+           1054 JUMP_BACKWARD          275 (to 506)
+
+ 57     >> 1056 CLEANUP_THROW
+           1058 JUMP_BACKWARD           59 (to 942)
+        >> 1060 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1062 RERAISE                  1
+ExceptionTable:
+  4 to 24 -> 1060 [0] lasti
+  26 to 292 -> 1024 [1] lasti
+  294 to 498 -> 1060 [0] lasti
+  500 to 500 -> 1050 [2]
+  502 to 934 -> 1060 [0] lasti
+  936 to 936 -> 1056 [2]
+  938 to 1022 -> 1060 [0] lasti
+  1024 to 1032 -> 1044 [3] lasti
+  1034 to 1050 -> 1060 [0] lasti
+  1056 to 1056 -> 1060 [0] lasti
+
+Disassembly of <code object _script_from_subtitles at 0x7f6c81bcb690, file "app\pipeline\steps\cast_refine.py", line 62>:
+ 62           0 RESUME                   0
+
+ 64           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('SubtitleSegment',))
+              6 IMPORT_NAME              0 (app.db.models)
+              8 IMPORT_FROM              1 (SubtitleSegment)
+             10 STORE_FAST               2 (SubtitleSegment)
+             12 POP_TOP
+
+ 65          14 LOAD_FAST                0 (db)
+             16 LOAD_ATTR                5 (NULL|self + query)
+             36 LOAD_FAST                2 (SubtitleSegment)
+             38 CALL                     1
+
+ 66          46 LOAD_ATTR                7 (NULL|self + filter)
+             66 LOAD_FAST                2 (SubtitleSegment)
+             68 LOAD_ATTR                8 (video_id)
+             88 LOAD_FAST                1 (video_id)
+             90 COMPARE_OP              40 (==)
+             94 LOAD_FAST                2 (SubtitleSegment)
+             96 LOAD_ATTR               10 (kind)
+            116 LOAD_CONST               3 ('original')
+            118 COMPARE_OP              40 (==)
+            122 CALL                     2
+
+ 67         130 LOAD_ATTR               13 (NULL|self + order_by)
+            150 LOAD_FAST                2 (SubtitleSegment)
+            152 LOAD_ATTR               14 (seq)
+            172 CALL                     1
+            180 LOAD_ATTR               17 (NULL|self + all)
+            200 CALL                     0
+
+ 65         208 STORE_FAST               3 (rows)
+
+ 68         210 LOAD_CONST               4 ('\n')
+            212 LOAD_ATTR               19 (NULL|self + join)
+            232 LOAD_CONST               5 (<code object <genexpr> at 0x7f6c9333a550, file "app\pipeline\steps\cast_refine.py", line 68>)
+            234 MAKE_FUNCTION            0
+            236 LOAD_FAST                3 (rows)
+            238 GET_ITER
+            240 CALL                     0
+            248 CALL                     1
+            256 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c9333a550, file "app\pipeline\steps\cast_refine.py", line 68>:
+ 68           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                65 (to 142)
+             12 STORE_FAST               1 (r)
+             14 LOAD_FAST                1 (r)
+             16 LOAD_ATTR                0 (text)
+             36 COPY                     1
+             38 POP_JUMP_IF_TRUE         2 (to 44)
+             40 POP_TOP
+             42 LOAD_CONST               0 ('')
+        >>   44 LOAD_ATTR                3 (NULL|self + strip)
+             64 CALL                     0
+             72 POP_JUMP_IF_TRUE         1 (to 76)
+             74 JUMP_BACKWARD           34 (to 8)
+        >>   76 LOAD_FAST                1 (r)
+             78 LOAD_ATTR                0 (text)
+             98 COPY                     1
+            100 POP_JUMP_IF_TRUE         2 (to 106)
+            102 POP_TOP
+            104 LOAD_CONST               0 ('')
+        >>  106 LOAD_ATTR                3 (NULL|self + strip)
+            126 CALL                     0
+            134 YIELD_VALUE              1
+            136 RESUME                   1
+            138 POP_TOP
+            140 JUMP_BACKWARD           67 (to 8)
+        >>  142 END_FOR
+            144 RETURN_CONST             1 (None)
+        >>  146 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            148 RERAISE                  1
+ExceptionTable:
+  4 to 72 -> 146 [0] lasti
+  76 to 144 -> 146 [0] lasti
+
+Disassembly of <code object _draw_missing at 0x290cd880, file "app\pipeline\steps\cast_refine.py", line 71>:
+ 71           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 73           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('character_portrait_service',))
+             10 IMPORT_NAME              0 (app.services)
+             12 IMPORT_FROM              1 (character_portrait_service)
+             14 STORE_FAST               1 (portraits)
+             16 POP_TOP
+
+ 75          18 LOAD_GLOBAL              5 (NULL + SessionLocal)
+             28 CALL                     0
+             36 BEFORE_WITH
+             38 STORE_FAST               2 (db)
+
+ 76          40 LOAD_FAST                1 (portraits)
+             42 LOAD_ATTR                7 (NULL|self + get_video_cast)
+             62 LOAD_FAST                2 (db)
+             64 LOAD_FAST                0 (ctx)
+             66 LOAD_ATTR                8 (video_id)
+             86 CALL                     2
+             94 STORE_FAST               3 (cast)
+
+ 75          96 LOAD_CONST               3 (None)
+             98 LOAD_CONST               3 (None)
+            100 LOAD_CONST               3 (None)
+            102 CALL                     2
+            110 POP_TOP
+
+ 77     >>  112 LOAD_GLOBAL             11 (NULL + enumerate)
+            122 LOAD_FAST_CHECK          3 (cast)
+            124 CALL                     1
+            132 GET_ITER
+            134 LOAD_FAST_AND_CLEAR      4 (i)
+            136 LOAD_FAST_AND_CLEAR      5 (ch)
+            138 SWAP                     3
+            140 BUILD_LIST               0
+            142 SWAP                     2
+        >>  144 FOR_ITER                37 (to 222)
+            148 UNPACK_SEQUENCE          2
+            152 STORE_FAST               4 (i)
+            154 STORE_FAST               5 (ch)
+
+ 78         156 LOAD_FAST                1 (portraits)
+            158 LOAD_ATTR               13 (NULL|self + portrait_status)
+            178 LOAD_FAST                5 (ch)
+            180 CALL                     1
+            188 LOAD_FAST                1 (portraits)
+            190 LOAD_ATTR               14 (ST_READY)
+            210 COMPARE_OP              55 (!=)
+            214 POP_JUMP_IF_FALSE        2 (to 220)
+
+ 77         216 LOAD_FAST                4 (i)
+            218 LIST_APPEND              2
+        >>  220 JUMP_BACKWARD           39 (to 144)
+        >>  222 END_FOR
+            224 STORE_FAST               6 (todo)
+            226 STORE_FAST               4 (i)
+            228 STORE_FAST               5 (ch)
+
+ 79         230 LOAD_FAST                6 (todo)
+            232 POP_JUMP_IF_TRUE         1 (to 236)
+
+ 80         234 RETURN_CONST             1 (0)
+
+ 82     >>  236 LOAD_CONST               1 (0)
+            238 STORE_FAST               7 (drawn)
+
+ 83         240 BUILD_LIST               0
+            242 STORE_FAST               8 (errors)
+
+ 84         244 LOAD_FAST                6 (todo)
+            246 GET_ITER
+        >>  248 FOR_ITER                88 (to 428)
+            252 STORE_FAST               4 (i)
+
+ 85         254 LOAD_FAST                0 (ctx)
+            256 LOAD_ATTR               17 (NULL|self + is_cancelled)
+            276 CALL                     0
+            284 POP_JUMP_IF_FALSE       26 (to 338)
+
+ 86         286 LOAD_GLOBAL             19 (NULL + make_error)
+            296 LOAD_GLOBAL             20 (E)
+            306 LOAD_ATTR               22 (CANCELLED)
+            326 LOAD_CONST               4 ('Đã huỷ khi vẽ chân dung nhân vật.')
+            328 CALL                     2
+            336 RAISE_VARARGS            1
+
+ 87     >>  338 NOP
+
+ 90         340 LOAD_FAST                1 (portraits)
+            342 LOAD_ATTR               25 (NULL|self + stylize_video_character)
+            362 LOAD_FAST                0 (ctx)
+            364 LOAD_ATTR                8 (video_id)
+            384 LOAD_FAST                4 (i)
+            386 LOAD_CONST               5 (True)
+            388 KW_NAMES                 6 (('use_reference',))
+            390 CALL                     3
+            398 GET_AWAITABLE            0
+            400 LOAD_CONST               3 (None)
+        >>  402 SEND                     3 (to 412)
+            406 YIELD_VALUE              3
+            408 RESUME                   3
+            410 JUMP_BACKWARD_NO_INTERRUPT     5 (to 402)
+        >>  412 END_SEND
+            414 POP_TOP
+
+ 91         416 LOAD_FAST                7 (drawn)
+            418 LOAD_CONST               7 (1)
+            420 BINARY_OP               13 (+=)
+            424 STORE_FAST               7 (drawn)
+            426 JUMP_BACKWARD           90 (to 248)
+
+ 84     >>  428 END_FOR
+
+ 98         430 LOAD_FAST                8 (errors)
+            432 POP_JUMP_IF_FALSE       42 (to 518)
+            434 LOAD_FAST                7 (drawn)
+            436 POP_JUMP_IF_TRUE        40 (to 518)
+
+ 99         438 LOAD_FAST                0 (ctx)
+            440 LOAD_ATTR               35 (NULL|self + emit_log)
+            460 LOAD_CONST              15 ('Không vẽ được chân dung nào — ')
+            462 LOAD_CONST              16 ('; ')
+            464 LOAD_ATTR               37 (NULL|self + join)
+            484 LOAD_FAST                8 (errors)
+            486 LOAD_CONST               3 (None)
+            488 LOAD_CONST              17 (3)
+            490 BINARY_SLICE
+            492 CALL                     1
+            500 BINARY_OP                0 (+)
+            504 LOAD_CONST              13 ('warn')
+            506 KW_NAMES                14 (('level',))
+            508 CALL                     2
+            516 POP_TOP
+
+101     >>  518 LOAD_FAST                1 (portraits)
+            520 LOAD_ATTR               39 (NULL|self + resume_thumbnail_if_cast_ready)
+            540 LOAD_FAST                0 (ctx)
+            542 LOAD_ATTR                8 (video_id)
+            562 CALL                     1
+            570 POP_TOP
+
+102         572 LOAD_FAST                7 (drawn)
+            574 RETURN_VALUE
+
+ 75     >>  576 PUSH_EXC_INFO
+            578 WITH_EXCEPT_START
+            580 POP_JUMP_IF_TRUE         1 (to 584)
+            582 RERAISE                  2
+        >>  584 POP_TOP
+            586 POP_EXCEPT
+            588 POP_TOP
+            590 POP_TOP
+            592 JUMP_BACKWARD          241 (to 112)
+        >>  594 COPY                     3
+            596 POP_EXCEPT
+            598 RERAISE                  1
+        >>  600 SWAP                     2
+            602 POP_TOP
+
+ 77         604 SWAP                     3
+            606 STORE_FAST               5 (ch)
+            608 STORE_FAST               4 (i)
+            610 RERAISE                  0
+
+ 90     >>  612 CLEANUP_THROW
+            614 JUMP_BACKWARD          102 (to 412)
+        >>  616 PUSH_EXC_INFO
+
+ 92         618 LOAD_GLOBAL             26 (Exception)
+            628 CHECK_EXC_MATCH
+            630 POP_JUMP_IF_FALSE       97 (to 826)
+            632 STORE_FAST               9 (e)
+
+ 95         634 LOAD_FAST                4 (i)
+            636 LOAD_GLOBAL             29 (NULL + len)
+            646 LOAD_FAST                3 (cast)
+            648 CALL                     1
+            656 COMPARE_OP               2 (<)
+            660 POP_JUMP_IF_FALSE       20 (to 702)
+            662 LOAD_FAST                3 (cast)
+            664 LOAD_FAST                4 (i)
+            666 BINARY_SUBSCR
+            670 LOAD_ATTR               31 (NULL|self + get)
+            690 LOAD_CONST               8 ('name')
+            692 CALL                     1
+            700 JUMP_FORWARD             4 (to 710)
+        >>  702 LOAD_CONST               9 ('#')
+            704 LOAD_FAST                4 (i)
+            706 FORMAT_VALUE             0
+            708 BUILD_STRING             2
+        >>  710 STORE_FAST              10 (name)
+
+ 96         712 LOAD_FAST                8 (errors)
+            714 LOAD_ATTR               33 (NULL|self + append)
+            734 LOAD_FAST               10 (name)
+            736 FORMAT_VALUE             0
+            738 LOAD_CONST              10 (': ')
+            740 LOAD_FAST                9 (e)
+            742 FORMAT_VALUE             0
+            744 BUILD_STRING             3
+            746 CALL                     1
+            754 POP_TOP
+
+ 97         756 LOAD_FAST                0 (ctx)
+            758 LOAD_ATTR               35 (NULL|self + emit_log)
+            778 LOAD_CONST              11 ("Chưa vẽ được chân dung '")
+            780 LOAD_FAST               10 (name)
+            782 FORMAT_VALUE             0
+            784 LOAD_CONST              12 ("': ")
+            786 LOAD_FAST                9 (e)
+            788 FORMAT_VALUE             0
+            790 BUILD_STRING             4
+            792 LOAD_CONST              13 ('warn')
+            794 KW_NAMES                14 (('level',))
+            796 CALL                     2
+            804 POP_TOP
+            806 POP_EXCEPT
+            808 LOAD_CONST               3 (None)
+            810 STORE_FAST               9 (e)
+            812 DELETE_FAST              9 (e)
+            814 EXTENDED_ARG             1
+            816 JUMP_BACKWARD          285 (to 248)
+        >>  818 LOAD_CONST               3 (None)
+            820 STORE_FAST               9 (e)
+            822 DELETE_FAST              9 (e)
+            824 RERAISE                  1
+
+ 92     >>  826 RERAISE                  0
+        >>  828 COPY                     3
+            830 POP_EXCEPT
+            832 RERAISE                  1
+        >>  834 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            836 RERAISE                  1
+ExceptionTable:
+  4 to 36 -> 834 [0] lasti
+  38 to 94 -> 576 [1] lasti
+  96 to 138 -> 834 [0] lasti
+  140 to 222 -> 600 [3]
+  224 to 336 -> 834 [0] lasti
+  340 to 404 -> 616 [1]
+  406 to 406 -> 612 [3]
+  408 to 424 -> 616 [1]
+  426 to 574 -> 834 [0] lasti
+  576 to 584 -> 594 [3] lasti
+  586 to 610 -> 834 [0] lasti
+  612 to 612 -> 616 [1]
+  616 to 632 -> 828 [2] lasti
+  634 to 804 -> 818 [2] lasti
+  806 to 816 -> 834 [0] lasti
+  818 to 826 -> 828 [2] lasti
+  828 to 832 -> 834 [0] lasti

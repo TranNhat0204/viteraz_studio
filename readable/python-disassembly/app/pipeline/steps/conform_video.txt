@@ -1,0 +1,2491 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Step conform_video — KHỚP video↔giọng bằng GIÃN ĐỀU (uniform adaptive stretch).\n\nBài toán: tiếng Trung cô đọng → bản dịch VI/EN dài hơn. Giọng đọc tự nhiên (bước tts, conform_mode)\nthường DÀI hơn video gốc. Trước đây kéo/nén VIDEO theo TỪNG câu + nội suy bù chuyển động\n(minterpolate) → chạy trên CPU, hàng trăm lần ffmpeg → RẤT chậm dù máy có GPU (GPU chỉ dùng cho encode,\nminterpolate vẫn ở CPU). Người dùng bỏ tool vì lâu.\n\nCách mới — CHIA ĐÔI khoảng chênh, mỗi thứ "căn một nửa" (trung bình nhân):\n  V = độ dài video gốc, A = độ dài giọng mới. Chọn đích chung T sao cho video giãn & giọng nén CÙNG\n  một hệ số f = sqrt(A / V):\n    - VIDEO : setpts = f × PTS      (làm chậm video, ×f)  → dài thành T = V·f\n    - GIỌNG : atempo = A / T = f     (tăng tốc giọng, giữ cao độ) → ngắn thành T\n    - PHỤ ĐỀ: nhân mốc thời gian theo cùng tỉ lệ để khớp T.\n  Ví dụ V=10′, A=15′ → f=√1.5≈1.225 → gặp nhau ở T≈12.25′ (video chậm ~22.5%, giọng nhanh ~22.5%).\n\nNON-DESTRUCTIVE (2026-07-02): step này KHÔNG re-encode source.mp4 (encode nguyên phim là khâu chậm\nnhất — trước còn bị encode 2 lần vì Export encode lại). Nó chỉ: (1) nén GIỌNG về T (atempo, rẻ vì chỉ\naudio), (2) rescale PHỤ ĐỀ (số học), (3) ghi hệ số video-slow `kv` + `target_ms` vào conform.json.\nVIDEO được làm chậm ×kv KHI Export (engine chèn 1 setpts vào filtergraph, trước burn phụ đề) → chỉ\nencode DUY NHẤT 1 lần; preview áp playbackRate=1/kv cho video (giọng/bgm giữ tốc độ thường vì đã bake).\nRiêng biệt với `global_speedup` (tua nhanh toàn bộ) — hai cơ chế cộng dồn, không thay thế nhau.\nĐánh đổi: mất đồng bộ theo TỪNG cảnh (giãn đều thay vì từng câu) — chấp nhận được với recap vì lời dẫn\nbám phim theo trình tự và tổng thời lượng bằng nhau.\n\nTrần tăng tốc giọng (config `conform_voice_speed_max`, mặc định 1.5×) giữ giọng dễ nghe: nếu chênh lệch\nlớn tới mức giọng phải nhanh hơn trần → kẹp giọng, dồn phần dư cho video chậm thêm.\n\nIdempotent (chạy lại nhiều lần vẫn đúng):\n  - source.mp4 GIỮ nguyên (không đụng); nếu còn source.preconform.mp4 (bản destructive cũ) → tự khôi phục.\n  - voiceover.natural.wav   = snapshot GIỌNG tự nhiên → luôn nén TỪ bản này.\n  - conform.json (bước tts) = mốc câu gốc↔giọng (o_*/n_*) làm NGUỒN CHÂN LÝ để rescale phụ đề (không\n    bao giờ bị ghi đè bởi step này) — mỗi lần chỉ nhân tỉ lệ từ mốc tự nhiên, không cộng dồn sai số.\n  - subtitle.words.natural.json = snapshot karaoke tự nhiên → rescale từ bản này.\nTẮT (conform_mode off): khôi phục toàn bộ về trạng thái tự nhiên (video/giọng/phụ đề/karaoke).\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 36           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 38          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (asyncio)
+             24 STORE_NAME               3 (asyncio)
+
+ 39          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               3 (None)
+             30 IMPORT_NAME              4 (json)
+             32 STORE_NAME               4 (json)
+
+ 40          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               3 (None)
+             38 IMPORT_NAME              5 (math)
+             40 STORE_NAME               5 (math)
+
+ 41          42 LOAD_CONST               1 (0)
+             44 LOAD_CONST               3 (None)
+             46 IMPORT_NAME              6 (shutil)
+             48 STORE_NAME               6 (shutil)
+
+ 42          50 LOAD_CONST               1 (0)
+             52 LOAD_CONST               4 (('Path',))
+             54 IMPORT_NAME              7 (pathlib)
+             56 IMPORT_FROM              8 (Path)
+             58 STORE_NAME               8 (Path)
+             60 POP_TOP
+
+ 43          62 LOAD_CONST               1 (0)
+             64 LOAD_CONST               5 (('Callable',))
+             66 IMPORT_NAME              9 (typing)
+             68 IMPORT_FROM             10 (Callable)
+             70 STORE_NAME              10 (Callable)
+             72 POP_TOP
+
+ 45          74 LOAD_CONST               1 (0)
+             76 LOAD_CONST               6 (('make_error', 'E'))
+             78 IMPORT_NAME             11 (app.core.errors)
+             80 IMPORT_FROM             12 (make_error)
+             82 STORE_NAME              12 (make_error)
+             84 IMPORT_FROM             13 (E)
+             86 STORE_NAME              13 (E)
+             88 POP_TOP
+
+ 46          90 LOAD_CONST               1 (0)
+             92 LOAD_CONST               7 (('log',))
+             94 IMPORT_NAME             14 (app.core.logging)
+             96 IMPORT_FROM             15 (log)
+             98 STORE_NAME              15 (log)
+            100 POP_TOP
+
+ 47         102 LOAD_CONST               1 (0)
+            104 LOAD_CONST               8 (('require_advanced',))
+            106 IMPORT_NAME             16 (app.core.license)
+            108 IMPORT_FROM             17 (require_advanced)
+            110 STORE_NAME              17 (require_advanced)
+            112 POP_TOP
+
+ 48         114 LOAD_CONST               1 (0)
+            116 LOAD_CONST               9 (('ProjectFS',))
+            118 IMPORT_NAME             18 (app.core.fs)
+            120 IMPORT_FROM             19 (ProjectFS)
+            122 STORE_NAME              19 (ProjectFS)
+            124 POP_TOP
+
+ 49         126 LOAD_CONST               1 (0)
+            128 LOAD_CONST              10 (('no_window_kwargs', 'safe_wait_proc'))
+            130 IMPORT_NAME             20 (app.core.proc)
+            132 IMPORT_FROM             21 (no_window_kwargs)
+            134 STORE_NAME              21 (no_window_kwargs)
+            136 IMPORT_FROM             22 (safe_wait_proc)
+            138 STORE_NAME              22 (safe_wait_proc)
+            140 POP_TOP
+
+ 50         142 LOAD_CONST               1 (0)
+            144 LOAD_CONST              11 (('FFmpegRunner', 'get_ffmpeg_path'))
+            146 IMPORT_NAME             23 (app.adapters.ffmpeg)
+            148 IMPORT_FROM             24 (FFmpegRunner)
+            150 STORE_NAME              24 (FFmpegRunner)
+            152 IMPORT_FROM             25 (get_ffmpeg_path)
+            154 STORE_NAME              25 (get_ffmpeg_path)
+            156 POP_TOP
+
+ 51         158 LOAD_CONST               1 (0)
+            160 LOAD_CONST              12 (('SessionLocal',))
+            162 IMPORT_NAME             26 (app.db.session)
+            164 IMPORT_FROM             27 (SessionLocal)
+            166 STORE_NAME              27 (SessionLocal)
+            168 POP_TOP
+
+ 52         170 LOAD_CONST               1 (0)
+            172 LOAD_CONST              13 (('SubtitleSegment',))
+            174 IMPORT_NAME             28 (app.db.models)
+            176 IMPORT_FROM             29 (SubtitleSegment)
+            178 STORE_NAME              29 (SubtitleSegment)
+            180 POP_TOP
+
+ 53         182 LOAD_CONST               1 (0)
+            184 LOAD_CONST              14 (('BaseStep', 'StepContext'))
+            186 IMPORT_NAME             30 (app.pipeline.base)
+            188 IMPORT_FROM             31 (BaseStep)
+            190 STORE_NAME              31 (BaseStep)
+            192 IMPORT_FROM             32 (StepContext)
+            194 STORE_NAME              32 (StepContext)
+            196 POP_TOP
+
+ 55         198 LOAD_CONST              15 (30.0)
+            200 STORE_NAME              33 (_DEFAULT_FPS)
+
+ 56         202 LOAD_CONST              16 (0.02)
+            204 STORE_NAME              34 (_MIN_GAP)
+
+ 57         206 LOAD_CONST              17 (1.5)
+            208 STORE_NAME              35 (_DEFAULT_VOICE_SPEED_MAX)
+
+ 58         210 LOAD_CONST              18 (4.0)
+            212 STORE_NAME              36 (_VIDEO_SLOW_MAX)
+
+ 59         214 LOAD_CONST              19 ((0.5, 2.0))
+            216 UNPACK_SEQUENCE          2
+            220 STORE_NAME              37 (_ATEMPO_LO)
+            222 STORE_NAME              38 (_ATEMPO_HI)
+
+ 62         224 LOAD_CONST              29 (('config', 'dict', 'return', 'float'))
+            226 LOAD_CONST              20 (<code object _voice_speed_max at 0x7f6c92c2a130, file "app\pipeline\steps\conform_video.py", line 62>)
+            228 MAKE_FUNCTION            4 (annotations)
+            230 STORE_NAME              39 (_voice_speed_max)
+
+ 71         232 LOAD_CONST              30 (('v_dur', 'float', 'a_dur', 'float', 'voice_speed_max', 'float', 'return', 'tuple[float, float, float]'))
+            234 LOAD_CONST              21 (<code object _plan_stretch at 0x7f6c929f1450, file "app\pipeline\steps\conform_video.py", line 71>)
+            236 MAKE_FUNCTION            4 (annotations)
+            238 STORE_NAME              40 (_plan_stretch)
+
+ 91         240 LOAD_CONST              31 (('factor', 'float', 'return', 'str'))
+            242 LOAD_CONST              22 (<code object _atempo_filter at 0x7f6c92997630, file "app\pipeline\steps\conform_video.py", line 91>)
+            244 MAKE_FUNCTION            4 (annotations)
+            246 STORE_NAME              41 (_atempo_filter)
+
+107         248 NOP
+
+106         250 LOAD_CONST              32 ((None,))
+
+107         252 NOP
+
+106         254 NOP
+
+107         256 NOP
+
+106         258 LOAD_CONST              33 (('ffmpeg', 'str', 'src_wav', 'str', 'out_wav', 'str', 'ka', 'float', 'cancel_check', 'Callable[[], bool] | None', 'return', 'bool'))
+            260 LOAD_CONST              23 (<code object _stretch_voice at 0x26a3e840, file "app\pipeline\steps\conform_video.py", line 106>)
+            262 MAKE_FUNCTION            5 (defaults, annotations)
+            264 STORE_NAME              42 (_stretch_voice)
+
+127         266 NOP
+
+128         268 NOP
+
+127         270 NOP
+
+128         272 NOP
+
+127         274 NOP
+
+128         276 NOP
+
+127         278 LOAD_CONST              34 (('fs', 'ProjectFS', 'video_id', 'str', 'anchors', 'list[dict]', 'kv', 'float', 'ka', 'float', 'return', 'int'))
+            280 LOAD_CONST              24 (<code object _rescale_subtitles at 0x28b1a850, file "app\pipeline\steps\conform_video.py", line 127>)
+            282 MAKE_FUNCTION            4 (annotations)
+            284 STORE_NAME              43 (_rescale_subtitles)
+
+170         286 LOAD_CONST              35 (('cmap', 'Path', 'data', 'dict', 'kv', 'float', 'ka', 'float', 'a_dur', 'float', 'return', 'None'))
+            288 LOAD_CONST              25 (<code object _write_conform_factors at 0x7f6c92997430, file "app\pipeline\steps\conform_video.py", line 170>)
+            290 MAKE_FUNCTION            4 (annotations)
+            292 STORE_NAME              44 (_write_conform_factors)
+
+185         294 LOAD_CONST              36 (('fs', 'ProjectFS', 'video_id', 'str', 'scale', 'float', 'return', 'None'))
+            296 LOAD_CONST              26 (<code object _rescale_words at 0x26a2a700, file "app\pipeline\steps\conform_video.py", line 185>)
+            298 MAKE_FUNCTION            4 (annotations)
+            300 STORE_NAME              45 (_rescale_words)
+
+206         302 PUSH_NULL
+            304 LOAD_BUILD_CLASS
+            306 LOAD_CONST              27 (<code object ConformVideoStep at 0x7f6c81ad1a10, file "app\pipeline\steps\conform_video.py", line 206>)
+            308 MAKE_FUNCTION            0
+            310 LOAD_CONST              28 ('ConformVideoStep')
+            312 LOAD_NAME               31 (BaseStep)
+            314 CALL                     3
+            322 STORE_NAME              46 (ConformVideoStep)
+            324 RETURN_CONST             3 (None)
+
+Disassembly of <code object _voice_speed_max at 0x7f6c92c2a130, file "app\pipeline\steps\conform_video.py", line 62>:
+ 62           0 RESUME                   0
+
+ 63           2 NOP
+
+ 64           4 LOAD_GLOBAL              1 (NULL + float)
+             14 LOAD_FAST                0 (config)
+             16 COPY                     1
+             18 POP_JUMP_IF_TRUE         2 (to 24)
+             20 POP_TOP
+             22 BUILD_MAP                0
+        >>   24 LOAD_ATTR                3 (NULL|self + get)
+             44 LOAD_CONST               1 ('conform_voice_speed_max')
+             46 LOAD_GLOBAL              4 (_DEFAULT_VOICE_SPEED_MAX)
+             56 CALL                     2
+             64 COPY                     1
+             66 POP_JUMP_IF_TRUE         6 (to 80)
+             68 POP_TOP
+
+ 65          70 LOAD_GLOBAL              4 (_DEFAULT_VOICE_SPEED_MAX)
+
+ 64     >>   80 CALL                     1
+             88 STORE_FAST               1 (v)
+
+ 68     >>   90 LOAD_GLOBAL             11 (NULL + min)
+            100 LOAD_GLOBAL             13 (NULL + max)
+            110 LOAD_FAST                1 (v)
+            112 LOAD_CONST               2 (1.05)
+            114 CALL                     2
+            122 LOAD_CONST               3 (3.0)
+            124 CALL                     2
+            132 RETURN_VALUE
+        >>  134 PUSH_EXC_INFO
+
+ 66         136 LOAD_GLOBAL              6 (TypeError)
+            146 LOAD_GLOBAL              8 (ValueError)
+            156 BUILD_TUPLE              2
+            158 CHECK_EXC_MATCH
+            160 POP_JUMP_IF_FALSE        9 (to 180)
+            162 POP_TOP
+
+ 67         164 LOAD_GLOBAL              4 (_DEFAULT_VOICE_SPEED_MAX)
+            174 STORE_FAST               1 (v)
+            176 POP_EXCEPT
+            178 JUMP_BACKWARD           45 (to 90)
+
+ 66     >>  180 RERAISE                  0
+        >>  182 COPY                     3
+            184 POP_EXCEPT
+            186 RERAISE                  1
+ExceptionTable:
+  4 to 88 -> 134 [0]
+  134 to 174 -> 182 [1] lasti
+  180 to 180 -> 182 [1] lasti
+
+Disassembly of <code object _plan_stretch at 0x7f6c929f1450, file "app\pipeline\steps\conform_video.py", line 71>:
+ 71           0 RESUME                   0
+
+ 75           2 LOAD_GLOBAL              1 (NULL + math)
+             12 LOAD_ATTR                2 (sqrt)
+             32 LOAD_FAST                1 (a_dur)
+             34 LOAD_FAST                0 (v_dur)
+             36 BINARY_OP               11 (/)
+             40 CALL                     1
+             48 STORE_FAST               3 (f)
+
+ 76          50 LOAD_FAST                3 (f)
+             52 COPY                     1
+             54 STORE_FAST               4 (kv)
+             56 STORE_FAST               5 (ka)
+
+ 77          58 LOAD_FAST                0 (v_dur)
+             60 LOAD_FAST                4 (kv)
+             62 BINARY_OP                5 (*)
+             66 STORE_FAST               6 (T)
+
+ 79          68 LOAD_FAST                5 (ka)
+             70 LOAD_FAST                2 (voice_speed_max)
+             72 COMPARE_OP              68 (>)
+             76 POP_JUMP_IF_FALSE       12 (to 102)
+
+ 80          78 LOAD_FAST                2 (voice_speed_max)
+             80 STORE_FAST               5 (ka)
+
+ 81          82 LOAD_FAST                1 (a_dur)
+             84 LOAD_FAST                5 (ka)
+             86 BINARY_OP               11 (/)
+             90 STORE_FAST               6 (T)
+
+ 82          92 LOAD_FAST                6 (T)
+             94 LOAD_FAST                0 (v_dur)
+             96 BINARY_OP               11 (/)
+            100 STORE_FAST               4 (kv)
+
+ 84     >>  102 LOAD_FAST                4 (kv)
+            104 LOAD_GLOBAL              4 (_VIDEO_SLOW_MAX)
+            114 COMPARE_OP              68 (>)
+            118 POP_JUMP_IF_FALSE       16 (to 152)
+
+ 85         120 LOAD_GLOBAL              4 (_VIDEO_SLOW_MAX)
+            130 STORE_FAST               4 (kv)
+
+ 86         132 LOAD_FAST                0 (v_dur)
+            134 LOAD_FAST                4 (kv)
+            136 BINARY_OP                5 (*)
+            140 STORE_FAST               6 (T)
+
+ 87         142 LOAD_FAST                1 (a_dur)
+            144 LOAD_FAST                6 (T)
+            146 BINARY_OP               11 (/)
+            150 STORE_FAST               5 (ka)
+
+ 88     >>  152 LOAD_FAST                4 (kv)
+            154 LOAD_FAST                5 (ka)
+            156 LOAD_FAST                6 (T)
+            158 BUILD_TUPLE              3
+            160 RETURN_VALUE
+
+Disassembly of <code object _atempo_filter at 0x7f6c92997630, file "app\pipeline\steps\conform_video.py", line 91>:
+ 91           0 RESUME                   0
+
+ 93           2 LOAD_GLOBAL              1 (NULL + max)
+             12 LOAD_CONST               1 (0.25)
+             14 LOAD_FAST                0 (factor)
+             16 CALL                     2
+             24 STORE_FAST               0 (factor)
+
+ 94          26 BUILD_LIST               0
+             28 STORE_FAST               1 (stages)
+
+ 95          30 LOAD_FAST                0 (factor)
+             32 STORE_FAST               2 (f)
+
+ 96          34 LOAD_FAST                2 (f)
+             36 LOAD_GLOBAL              2 (_ATEMPO_HI)
+             46 COMPARE_OP              68 (>)
+             50 POP_JUMP_IF_FALSE       40 (to 132)
+
+ 97     >>   52 LOAD_FAST                1 (stages)
+             54 LOAD_ATTR                5 (NULL|self + append)
+             74 LOAD_GLOBAL              2 (_ATEMPO_HI)
+             84 CALL                     1
+             92 POP_TOP
+
+ 98          94 LOAD_FAST                2 (f)
+             96 LOAD_GLOBAL              2 (_ATEMPO_HI)
+            106 BINARY_OP               24 (/=)
+            110 STORE_FAST               2 (f)
+
+ 96         112 LOAD_FAST                2 (f)
+            114 LOAD_GLOBAL              2 (_ATEMPO_HI)
+            124 COMPARE_OP              68 (>)
+            128 POP_JUMP_IF_FALSE        1 (to 132)
+            130 JUMP_BACKWARD           40 (to 52)
+
+ 99     >>  132 LOAD_FAST                2 (f)
+            134 LOAD_GLOBAL              6 (_ATEMPO_LO)
+            144 COMPARE_OP               2 (<)
+            148 POP_JUMP_IF_FALSE       40 (to 230)
+
+100     >>  150 LOAD_FAST                1 (stages)
+            152 LOAD_ATTR                5 (NULL|self + append)
+            172 LOAD_GLOBAL              6 (_ATEMPO_LO)
+            182 CALL                     1
+            190 POP_TOP
+
+101         192 LOAD_FAST                2 (f)
+            194 LOAD_GLOBAL              6 (_ATEMPO_LO)
+            204 BINARY_OP               24 (/=)
+            208 STORE_FAST               2 (f)
+
+ 99         210 LOAD_FAST                2 (f)
+            212 LOAD_GLOBAL              6 (_ATEMPO_LO)
+            222 COMPARE_OP               2 (<)
+            226 POP_JUMP_IF_FALSE        1 (to 230)
+            228 JUMP_BACKWARD           40 (to 150)
+
+102     >>  230 LOAD_FAST                1 (stages)
+            232 LOAD_ATTR                5 (NULL|self + append)
+            252 LOAD_FAST                2 (f)
+            254 CALL                     1
+            262 POP_TOP
+
+103         264 LOAD_CONST               2 (',')
+            266 LOAD_ATTR                9 (NULL|self + join)
+            286 LOAD_CONST               3 (<code object <genexpr> at 0x7f6c92eeba50, file "app\pipeline\steps\conform_video.py", line 103>)
+            288 MAKE_FUNCTION            0
+            290 LOAD_FAST                1 (stages)
+            292 GET_ITER
+            294 CALL                     0
+            302 CALL                     1
+            310 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c92eeba50, file "app\pipeline\steps\conform_video.py", line 103>:
+103           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                10 (to 32)
+             12 STORE_FAST               1 (s)
+             14 LOAD_CONST               0 ('atempo=')
+             16 LOAD_FAST                1 (s)
+             18 LOAD_CONST               1 ('.6f')
+             20 FORMAT_VALUE             4 (with format)
+             22 BUILD_STRING             2
+             24 YIELD_VALUE              1
+             26 RESUME                   1
+             28 POP_TOP
+             30 JUMP_BACKWARD           12 (to 8)
+        >>   32 END_FOR
+             34 RETURN_CONST             2 (None)
+        >>   36 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             38 RERAISE                  1
+ExceptionTable:
+  4 to 34 -> 36 [0] lasti
+
+Disassembly of <code object _stretch_voice at 0x26a3e840, file "app\pipeline\steps\conform_video.py", line 106>:
+106           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+109           6 LOAD_GLOBAL              1 (NULL + abs)
+             16 LOAD_FAST                3 (ka)
+             18 LOAD_CONST               1 (1.0)
+             20 BINARY_OP               10 (-)
+             24 CALL                     1
+             32 LOAD_CONST               2 (0.001)
+             34 COMPARE_OP               2 (<)
+             38 POP_JUMP_IF_FALSE       23 (to 86)
+
+110          40 LOAD_GLOBAL              3 (NULL + shutil)
+             50 LOAD_ATTR                4 (copyfile)
+             70 LOAD_FAST                1 (src_wav)
+             72 LOAD_FAST                2 (out_wav)
+             74 CALL                     2
+             82 POP_TOP
+
+111          84 RETURN_CONST             3 (True)
+
+112     >>   86 LOAD_FAST                2 (out_wav)
+             88 LOAD_CONST               4 ('.tmp.wav')
+             90 BINARY_OP                0 (+)
+             94 STORE_FAST               5 (tmp)
+
+113          96 LOAD_GLOBAL              7 (NULL + asyncio)
+            106 LOAD_ATTR                8 (create_subprocess_exec)
+
+114         126 LOAD_FAST                0 (ffmpeg)
+            128 LOAD_CONST               5 ('-y')
+            130 LOAD_CONST               6 ('-hide_banner')
+            132 LOAD_CONST               7 ('-i')
+            134 LOAD_FAST                1 (src_wav)
+
+115         136 LOAD_CONST               8 ('-filter:a')
+            138 LOAD_GLOBAL             11 (NULL + _atempo_filter)
+            148 LOAD_FAST                3 (ka)
+            150 CALL                     1
+            158 LOAD_CONST               9 ('-c:a')
+            160 LOAD_CONST              10 ('pcm_s16le')
+            162 LOAD_FAST                5 (tmp)
+
+113         164 BUILD_TUPLE             10
+
+116         166 LOAD_GLOBAL              6 (asyncio)
+            176 LOAD_ATTR               12 (subprocess)
+            196 LOAD_ATTR               14 (DEVNULL)
+            216 LOAD_GLOBAL              6 (asyncio)
+            226 LOAD_ATTR               12 (subprocess)
+            246 LOAD_ATTR               14 (DEVNULL)
+
+113         266 LOAD_CONST              11 (('stdout', 'stderr'))
+            268 BUILD_CONST_KEY_MAP      2
+
+117         270 LOAD_GLOBAL             17 (NULL + no_window_kwargs)
+            280 CALL                     0
+
+113         288 DICT_MERGE               1
+            290 CALL_FUNCTION_EX         1
+            292 GET_AWAITABLE            0
+            294 LOAD_CONST              12 (None)
+        >>  296 SEND                     3 (to 306)
+            300 YIELD_VALUE              2
+            302 RESUME                   3
+            304 JUMP_BACKWARD_NO_INTERRUPT     5 (to 296)
+        >>  306 END_SEND
+            308 STORE_FAST               6 (proc)
+
+119         310 LOAD_GLOBAL             19 (NULL + safe_wait_proc)
+            320 LOAD_FAST                6 (proc)
+            322 LOAD_FAST                4 (cancel_check)
+            324 KW_NAMES                13 (('cancel_check',))
+            326 CALL                     2
+            334 GET_AWAITABLE            0
+            336 LOAD_CONST              12 (None)
+        >>  338 SEND                     3 (to 348)
+            342 YIELD_VALUE              2
+            344 RESUME                   3
+            346 JUMP_BACKWARD_NO_INTERRUPT     5 (to 338)
+        >>  348 END_SEND
+            350 POP_TOP
+
+120         352 LOAD_FAST                6 (proc)
+            354 LOAD_ATTR               20 (returncode)
+            374 LOAD_CONST              14 (0)
+            376 COMPARE_OP              40 (==)
+            380 POP_JUMP_IF_FALSE       48 (to 478)
+            382 LOAD_GLOBAL             23 (NULL + Path)
+            392 LOAD_FAST                5 (tmp)
+            394 CALL                     1
+            402 LOAD_ATTR               25 (NULL|self + exists)
+            422 CALL                     0
+            430 POP_JUMP_IF_FALSE       23 (to 478)
+
+121         432 LOAD_GLOBAL              3 (NULL + shutil)
+            442 LOAD_ATTR               26 (move)
+            462 LOAD_FAST                5 (tmp)
+            464 LOAD_FAST                2 (out_wav)
+            466 CALL                     2
+            474 POP_TOP
+
+122         476 RETURN_CONST             3 (True)
+
+123     >>  478 LOAD_GLOBAL             23 (NULL + Path)
+            488 LOAD_FAST                5 (tmp)
+            490 CALL                     1
+            498 LOAD_ATTR               29 (NULL|self + unlink)
+            518 LOAD_CONST               3 (True)
+            520 KW_NAMES                15 (('missing_ok',))
+            522 CALL                     1
+            530 POP_TOP
+
+124         532 RETURN_CONST            16 (False)
+
+113     >>  534 CLEANUP_THROW
+            536 JUMP_BACKWARD          116 (to 306)
+
+119     >>  538 CLEANUP_THROW
+            540 JUMP_BACKWARD           97 (to 348)
+        >>  542 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            544 RERAISE                  1
+ExceptionTable:
+  4 to 298 -> 542 [0] lasti
+  300 to 300 -> 534 [2]
+  302 to 340 -> 542 [0] lasti
+  342 to 342 -> 538 [2]
+  344 to 534 -> 542 [0] lasti
+  538 to 538 -> 542 [0] lasti
+
+Disassembly of <code object _rescale_subtitles at 0x28b1a850, file "app\pipeline\steps\conform_video.py", line 127>:
+127           0 RESUME                   0
+
+133           2 LOAD_FAST                2 (anchors)
+              4 POP_JUMP_IF_TRUE         1 (to 8)
+
+134           6 RETURN_CONST             1 (0)
+
+135     >>    8 LOAD_FAST                4 (ka)
+             10 POP_JUMP_IF_FALSE        5 (to 22)
+             12 LOAD_CONST               2 (1.0)
+             14 LOAD_FAST                4 (ka)
+             16 BINARY_OP               11 (/)
+             20 JUMP_FORWARD             1 (to 24)
+        >>   22 LOAD_CONST               2 (1.0)
+        >>   24 STORE_FAST               5 (s_voice)
+
+137          26 LOAD_FAST                2 (anchors)
+             28 GET_ITER
+             30 LOAD_FAST_AND_CLEAR      6 (a)
+             32 SWAP                     2
+             34 BUILD_MAP                0
+             36 SWAP                     2
+        >>   38 FOR_ITER                69 (to 180)
+             42 STORE_FAST               6 (a)
+             44 LOAD_GLOBAL              1 (NULL + int)
+             54 LOAD_FAST                6 (a)
+             56 LOAD_CONST               3 ('seq')
+             58 BINARY_SUBSCR
+             62 CALL                     1
+             70 LOAD_GLOBAL              1 (NULL + int)
+             80 LOAD_FAST                6 (a)
+             82 LOAD_ATTR                3 (NULL|self + get)
+            102 LOAD_CONST               4 ('n_start_ms')
+            104 LOAD_CONST               1 (0)
+            106 CALL                     2
+            114 CALL                     1
+            122 LOAD_GLOBAL              1 (NULL + int)
+            132 LOAD_FAST                6 (a)
+            134 LOAD_ATTR                3 (NULL|self + get)
+            154 LOAD_CONST               5 ('n_end_ms')
+            156 LOAD_CONST               1 (0)
+            158 CALL                     2
+            166 CALL                     1
+            174 BUILD_TUPLE              2
+            176 MAP_ADD                  2
+            178 JUMP_BACKWARD           71 (to 38)
+        >>  180 END_FOR
+            182 STORE_FAST               7 (n_by_seq)
+            184 STORE_FAST               6 (a)
+
+138         186 LOAD_FAST                2 (anchors)
+            188 GET_ITER
+            190 LOAD_FAST_AND_CLEAR      6 (a)
+            192 SWAP                     2
+            194 BUILD_MAP                0
+            196 SWAP                     2
+        >>  198 FOR_ITER                69 (to 340)
+            202 STORE_FAST               6 (a)
+            204 LOAD_GLOBAL              1 (NULL + int)
+            214 LOAD_FAST                6 (a)
+            216 LOAD_CONST               3 ('seq')
+            218 BINARY_SUBSCR
+            222 CALL                     1
+            230 LOAD_GLOBAL              1 (NULL + int)
+            240 LOAD_FAST                6 (a)
+            242 LOAD_ATTR                3 (NULL|self + get)
+            262 LOAD_CONST               6 ('o_start_ms')
+            264 LOAD_CONST               1 (0)
+            266 CALL                     2
+            274 CALL                     1
+            282 LOAD_GLOBAL              1 (NULL + int)
+            292 LOAD_FAST                6 (a)
+            294 LOAD_ATTR                3 (NULL|self + get)
+            314 LOAD_CONST               7 ('o_end_ms')
+            316 LOAD_CONST               1 (0)
+            318 CALL                     2
+            326 CALL                     1
+            334 BUILD_TUPLE              2
+            336 MAP_ADD                  2
+            338 JUMP_BACKWARD           71 (to 198)
+        >>  340 END_FOR
+            342 STORE_FAST               8 (o_by_seq)
+            344 STORE_FAST               6 (a)
+
+139         346 LOAD_CONST               1 (0)
+            348 STORE_FAST               9 (updated)
+
+140         350 LOAD_GLOBAL              5 (NULL + SessionLocal)
+            360 CALL                     0
+            368 BEFORE_WITH
+            370 STORE_FAST              10 (db)
+
+141         372 LOAD_FAST               10 (db)
+            374 LOAD_ATTR                7 (NULL|self + query)
+            394 LOAD_GLOBAL              8 (SubtitleSegment)
+            404 CALL                     1
+            412 LOAD_ATTR               11 (NULL|self + filter)
+            432 LOAD_GLOBAL              8 (SubtitleSegment)
+            442 LOAD_ATTR               12 (video_id)
+            462 LOAD_FAST                1 (video_id)
+            464 COMPARE_OP              40 (==)
+            468 CALL                     1
+            476 LOAD_ATTR               15 (NULL|self + all)
+            496 CALL                     0
+            504 STORE_FAST              11 (segs)
+
+142         506 LOAD_FAST               11 (segs)
+            508 GET_ITER
+        >>  510 FOR_ITER               224 (to 962)
+            514 STORE_FAST              12 (r)
+
+143         516 LOAD_FAST               12 (r)
+            518 LOAD_ATTR               16 (kind)
+            538 LOAD_CONST               8 (('translated', 'premium'))
+            540 CONTAINS_OP              0
+            542 POP_JUMP_IF_FALSE       99 (to 742)
+
+144         544 LOAD_FAST                7 (n_by_seq)
+            546 LOAD_ATTR                3 (NULL|self + get)
+            566 LOAD_FAST               12 (r)
+            568 LOAD_ATTR               18 (seq)
+            588 CALL                     1
+            596 STORE_FAST              13 (m)
+
+145         598 LOAD_FAST               13 (m)
+            600 POP_JUMP_IF_NOT_NONE     1 (to 604)
+            602 JUMP_BACKWARD           47 (to 510)
+
+146     >>  604 LOAD_GLOBAL              1 (NULL + int)
+            614 LOAD_GLOBAL             21 (NULL + round)
+            624 LOAD_FAST               13 (m)
+            626 LOAD_CONST               1 (0)
+            628 BINARY_SUBSCR
+            632 LOAD_FAST                5 (s_voice)
+            634 BINARY_OP                5 (*)
+            638 CALL                     1
+            646 CALL                     1
+            654 LOAD_GLOBAL              1 (NULL + int)
+            664 LOAD_GLOBAL             21 (NULL + round)
+            674 LOAD_FAST               13 (m)
+            676 LOAD_CONST              10 (1)
+            678 BINARY_SUBSCR
+            682 LOAD_FAST                5 (s_voice)
+            684 BINARY_OP                5 (*)
+            688 CALL                     1
+            696 CALL                     1
+            704 SWAP                     2
+            706 LOAD_FAST               12 (r)
+            708 STORE_ATTR              11 (start_ms)
+            718 LOAD_FAST               12 (r)
+            720 STORE_ATTR              12 (end_ms)
+
+147         730 LOAD_FAST                9 (updated)
+            732 LOAD_CONST              10 (1)
+            734 BINARY_OP               13 (+=)
+            738 STORE_FAST               9 (updated)
+            740 JUMP_BACKWARD          116 (to 510)
+
+148     >>  742 LOAD_FAST               12 (r)
+            744 LOAD_ATTR               16 (kind)
+            764 LOAD_CONST              11 ('original')
+            766 COMPARE_OP              40 (==)
+            770 POP_JUMP_IF_TRUE         1 (to 774)
+            772 JUMP_BACKWARD          132 (to 510)
+
+149     >>  774 LOAD_FAST                8 (o_by_seq)
+            776 LOAD_ATTR                3 (NULL|self + get)
+            796 LOAD_FAST               12 (r)
+            798 LOAD_ATTR               18 (seq)
+            818 CALL                     1
+            826 STORE_FAST              13 (m)
+
+150         828 LOAD_FAST               13 (m)
+            830 POP_JUMP_IF_NOT_NONE     1 (to 834)
+            832 JUMP_BACKWARD          162 (to 510)
+
+151     >>  834 LOAD_GLOBAL              1 (NULL + int)
+            844 LOAD_GLOBAL             21 (NULL + round)
+            854 LOAD_FAST               13 (m)
+            856 LOAD_CONST               1 (0)
+            858 BINARY_SUBSCR
+            862 LOAD_FAST                3 (kv)
+            864 BINARY_OP                5 (*)
+            868 CALL                     1
+            876 CALL                     1
+            884 LOAD_GLOBAL              1 (NULL + int)
+            894 LOAD_GLOBAL             21 (NULL + round)
+            904 LOAD_FAST               13 (m)
+            906 LOAD_CONST              10 (1)
+            908 BINARY_SUBSCR
+            912 LOAD_FAST                3 (kv)
+            914 BINARY_OP                5 (*)
+            918 CALL                     1
+            926 CALL                     1
+            934 SWAP                     2
+            936 LOAD_FAST               12 (r)
+            938 STORE_ATTR              11 (start_ms)
+            948 LOAD_FAST               12 (r)
+            950 STORE_ATTR              12 (end_ms)
+            960 JUMP_BACKWARD          226 (to 510)
+
+142     >>  962 END_FOR
+
+152         964 LOAD_FAST               10 (db)
+            966 LOAD_ATTR               27 (NULL|self + commit)
+            986 CALL                     0
+            994 POP_TOP
+
+154         996 NOP
+
+155         998 LOAD_CONST               1 (0)
+           1000 LOAD_CONST              12 (('_segments_to_srt', '_segments_to_vtt'))
+           1002 IMPORT_NAME             14 (app.adapters.deepseek)
+           1004 IMPORT_FROM             15 (_segments_to_srt)
+           1006 STORE_FAST              14 (_segments_to_srt)
+           1008 IMPORT_FROM             16 (_segments_to_vtt)
+           1010 STORE_FAST              15 (_segments_to_vtt)
+           1012 POP_TOP
+
+156        1014 LOAD_CONST               8 (('translated', 'premium'))
+           1016 GET_ITER
+        >> 1018 FOR_ITER               219 (to 1460)
+           1022 STORE_FAST              16 (kind)
+
+157        1024 LOAD_GLOBAL             35 (NULL + sorted)
+           1034 LOAD_FAST               11 (segs)
+           1036 GET_ITER
+           1038 LOAD_FAST_AND_CLEAR     12 (r)
+           1040 SWAP                     2
+           1042 BUILD_LIST               0
+           1044 SWAP                     2
+        >> 1046 FOR_ITER                20 (to 1090)
+           1050 STORE_FAST              12 (r)
+           1052 LOAD_FAST               12 (r)
+           1054 LOAD_ATTR               16 (kind)
+           1074 LOAD_FAST               16 (kind)
+           1076 COMPARE_OP              40 (==)
+           1080 POP_JUMP_IF_TRUE         1 (to 1084)
+           1082 JUMP_BACKWARD           19 (to 1046)
+        >> 1084 LOAD_FAST               12 (r)
+           1086 LIST_APPEND              2
+           1088 JUMP_BACKWARD           22 (to 1046)
+        >> 1090 END_FOR
+           1092 SWAP                     2
+           1094 STORE_FAST              12 (r)
+           1096 LOAD_CONST              13 (<code object <lambda> at 0x7f6c92be1370, file "app\pipeline\steps\conform_video.py", line 157>)
+           1098 MAKE_FUNCTION            0
+           1100 KW_NAMES                14 (('key',))
+           1102 CALL                     2
+           1110 STORE_FAST              17 (tr)
+
+158        1112 LOAD_FAST               17 (tr)
+           1114 POP_JUMP_IF_TRUE         1 (to 1118)
+           1116 JUMP_BACKWARD           50 (to 1018)
+
+159     >> 1118 LOAD_FAST               17 (tr)
+           1120 GET_ITER
+           1122 LOAD_FAST_AND_CLEAR     12 (r)
+           1124 SWAP                     2
+           1126 BUILD_LIST               0
+           1128 SWAP                     2
+        >> 1130 FOR_ITER                53 (to 1240)
+           1134 STORE_FAST              12 (r)
+           1136 LOAD_FAST               12 (r)
+           1138 LOAD_ATTR               18 (seq)
+           1158 LOAD_FAST               12 (r)
+           1160 LOAD_ATTR               22 (start_ms)
+           1180 LOAD_FAST               12 (r)
+           1182 LOAD_ATTR               24 (end_ms)
+           1202 LOAD_FAST               12 (r)
+           1204 LOAD_ATTR               36 (text)
+           1224 COPY                     1
+           1226 POP_JUMP_IF_TRUE         2 (to 1232)
+           1228 POP_TOP
+           1230 LOAD_CONST              15 ('')
+        >> 1232 LOAD_CONST              16 (('seq', 'start_ms', 'end_ms', 'text'))
+           1234 BUILD_CONST_KEY_MAP      4
+           1236 LIST_APPEND              2
+           1238 JUMP_BACKWARD           55 (to 1130)
+        >> 1240 END_FOR
+           1242 STORE_FAST              18 (srt_segs)
+           1244 STORE_FAST              12 (r)
+
+160        1246 LOAD_FAST               16 (kind)
+           1248 LOAD_CONST              17 ('premium')
+           1250 COMPARE_OP              40 (==)
+           1254 POP_JUMP_IF_FALSE       17 (to 1290)
+           1256 LOAD_FAST                0 (fs)
+           1258 LOAD_ATTR               39 (NULL|self + subtitle_premium)
+           1278 LOAD_FAST                1 (video_id)
+           1280 CALL                     1
+           1288 JUMP_FORWARD            16 (to 1322)
+        >> 1290 LOAD_FAST                0 (fs)
+           1292 LOAD_ATTR               41 (NULL|self + subtitle_translated)
+           1312 LOAD_FAST                1 (video_id)
+           1314 CALL                     1
+        >> 1322 STORE_FAST              19 (out_srt)
+
+161        1324 LOAD_FAST               19 (out_srt)
+           1326 LOAD_ATTR               43 (NULL|self + with_suffix)
+           1346 LOAD_CONST              18 ('.vtt')
+           1348 CALL                     1
+           1356 STORE_FAST              20 (out_vtt)
+
+162        1358 LOAD_FAST               19 (out_srt)
+           1360 LOAD_ATTR               45 (NULL|self + write_text)
+           1380 PUSH_NULL
+           1382 LOAD_FAST               14 (_segments_to_srt)
+           1384 LOAD_FAST               18 (srt_segs)
+           1386 CALL                     1
+           1394 LOAD_CONST              19 ('utf-8')
+           1396 KW_NAMES                20 (('encoding',))
+           1398 CALL                     2
+           1406 POP_TOP
+
+163        1408 LOAD_FAST               20 (out_vtt)
+           1410 LOAD_ATTR               45 (NULL|self + write_text)
+           1430 PUSH_NULL
+           1432 LOAD_FAST               15 (_segments_to_vtt)
+           1434 LOAD_FAST               18 (srt_segs)
+           1436 CALL                     1
+           1444 LOAD_CONST              19 ('utf-8')
+           1446 KW_NAMES                20 (('encoding',))
+           1448 CALL                     2
+           1456 POP_TOP
+           1458 JUMP_BACKWARD          221 (to 1018)
+
+156     >> 1460 END_FOR
+           1462 NOP
+
+140     >> 1464 LOAD_CONST               9 (None)
+           1466 LOAD_CONST               9 (None)
+           1468 LOAD_CONST               9 (None)
+           1470 CALL                     2
+           1478 POP_TOP
+
+166     >> 1480 LOAD_GLOBAL             49 (NULL + _rescale_words)
+           1490 LOAD_FAST                0 (fs)
+           1492 LOAD_FAST                1 (video_id)
+           1494 LOAD_FAST                5 (s_voice)
+           1496 CALL                     3
+           1504 POP_TOP
+
+167        1506 LOAD_FAST                9 (updated)
+           1508 RETURN_VALUE
+        >> 1510 SWAP                     2
+           1512 POP_TOP
+
+137        1514 SWAP                     2
+           1516 STORE_FAST               6 (a)
+           1518 RERAISE                  0
+        >> 1520 SWAP                     2
+           1522 POP_TOP
+
+138        1524 SWAP                     2
+           1526 STORE_FAST               6 (a)
+           1528 RERAISE                  0
+        >> 1530 SWAP                     2
+           1532 POP_TOP
+
+157        1534 SWAP                     2
+           1536 STORE_FAST              12 (r)
+           1538 RERAISE                  0
+        >> 1540 SWAP                     2
+           1542 POP_TOP
+
+159        1544 SWAP                     2
+           1546 STORE_FAST              12 (r)
+           1548 RERAISE                  0
+        >> 1550 PUSH_EXC_INFO
+
+164        1552 LOAD_GLOBAL             46 (Exception)
+           1562 CHECK_EXC_MATCH
+           1564 POP_JUMP_IF_FALSE        3 (to 1572)
+           1566 POP_TOP
+
+165        1568 POP_EXCEPT
+           1570 JUMP_BACKWARD           54 (to 1464)
+
+164     >> 1572 RERAISE                  0
+        >> 1574 COPY                     3
+           1576 POP_EXCEPT
+           1578 RERAISE                  1
+
+140     >> 1580 PUSH_EXC_INFO
+           1582 WITH_EXCEPT_START
+           1584 POP_JUMP_IF_TRUE         1 (to 1588)
+           1586 RERAISE                  2
+        >> 1588 POP_TOP
+           1590 POP_EXCEPT
+           1592 POP_TOP
+           1594 POP_TOP
+           1596 JUMP_BACKWARD           59 (to 1480)
+        >> 1598 COPY                     3
+           1600 POP_EXCEPT
+           1602 RERAISE                  1
+ExceptionTable:
+  34 to 180 -> 1510 [2]
+  194 to 340 -> 1520 [2]
+  370 to 600 -> 1580 [1] lasti
+  604 to 770 -> 1580 [1] lasti
+  774 to 830 -> 1580 [1] lasti
+  834 to 994 -> 1580 [1] lasti
+  998 to 1040 -> 1550 [1]
+  1042 to 1080 -> 1530 [6]
+  1084 to 1090 -> 1530 [6]
+  1092 to 1114 -> 1550 [1]
+  1118 to 1124 -> 1550 [1]
+  1126 to 1240 -> 1540 [4]
+  1242 to 1460 -> 1550 [1]
+  1462 to 1462 -> 1580 [1] lasti
+  1530 to 1548 -> 1550 [1]
+  1550 to 1566 -> 1574 [2] lasti
+  1568 to 1570 -> 1580 [1] lasti
+  1572 to 1572 -> 1574 [2] lasti
+  1574 to 1578 -> 1580 [1] lasti
+  1580 to 1588 -> 1598 [3] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c92be1370, file "app\pipeline\steps\conform_video.py", line 157>:
+157           0 RESUME                   0
+              2 LOAD_FAST                0 (x)
+              4 LOAD_ATTR                0 (seq)
+             24 RETURN_VALUE
+
+Disassembly of <code object _write_conform_factors at 0x7f6c92997430, file "app\pipeline\steps\conform_video.py", line 170>:
+170           0 RESUME                   0
+
+175           2 NOP
+
+176           4 LOAD_GLOBAL              1 (NULL + dict)
+             14 LOAD_FAST                1 (data)
+             16 COPY                     1
+             18 POP_JUMP_IF_TRUE         2 (to 24)
+             20 POP_TOP
+             22 BUILD_MAP                0
+        >>   24 CALL                     1
+             32 STORE_FAST               5 (out)
+
+177          34 LOAD_GLOBAL              3 (NULL + round)
+             44 LOAD_GLOBAL              5 (NULL + float)
+             54 LOAD_FAST                2 (kv)
+             56 CALL                     1
+             64 LOAD_CONST               1 (6)
+             66 CALL                     2
+             74 LOAD_FAST                5 (out)
+             76 LOAD_CONST               2 ('video_slow')
+             78 STORE_SUBSCR
+
+178          82 LOAD_GLOBAL              3 (NULL + round)
+             92 LOAD_GLOBAL              5 (NULL + float)
+            102 LOAD_FAST                3 (ka)
+            104 CALL                     1
+            112 LOAD_CONST               1 (6)
+            114 CALL                     2
+            122 LOAD_FAST                5 (out)
+            124 LOAD_CONST               3 ('voice_speed')
+            126 STORE_SUBSCR
+
+179         130 LOAD_GLOBAL              7 (NULL + int)
+            140 LOAD_GLOBAL              3 (NULL + round)
+            150 LOAD_FAST                3 (ka)
+            152 POP_JUMP_IF_FALSE        5 (to 164)
+            154 LOAD_FAST                4 (a_dur)
+            156 LOAD_FAST                3 (ka)
+            158 BINARY_OP               11 (/)
+            162 JUMP_FORWARD             1 (to 166)
+        >>  164 LOAD_FAST                4 (a_dur)
+        >>  166 LOAD_CONST               4 (1000)
+            168 BINARY_OP                5 (*)
+            172 CALL                     1
+            180 CALL                     1
+            188 LOAD_FAST                5 (out)
+            190 LOAD_CONST               5 ('target_ms')
+            192 STORE_SUBSCR
+
+180         196 LOAD_FAST                0 (cmap)
+            198 LOAD_ATTR                9 (NULL|self + write_text)
+            218 LOAD_GLOBAL             11 (NULL + json)
+            228 LOAD_ATTR               12 (dumps)
+            248 LOAD_FAST                5 (out)
+            250 LOAD_CONST               6 (False)
+            252 KW_NAMES                 7 (('ensure_ascii',))
+            254 CALL                     2
+            262 LOAD_CONST               8 ('utf-8')
+            264 KW_NAMES                 9 (('encoding',))
+            266 CALL                     2
+            274 POP_TOP
+            276 RETURN_CONST            10 (None)
+        >>  278 PUSH_EXC_INFO
+
+181         280 LOAD_GLOBAL             14 (Exception)
+            290 CHECK_EXC_MATCH
+            292 POP_JUMP_IF_FALSE        3 (to 300)
+            294 POP_TOP
+
+182         296 POP_EXCEPT
+            298 RETURN_CONST            10 (None)
+
+181     >>  300 RERAISE                  0
+        >>  302 COPY                     3
+            304 POP_EXCEPT
+            306 RERAISE                  1
+ExceptionTable:
+  4 to 274 -> 278 [0]
+  278 to 294 -> 302 [1] lasti
+  300 to 300 -> 302 [1] lasti
+
+Disassembly of <code object _rescale_words at 0x26a2a700, file "app\pipeline\steps\conform_video.py", line 185>:
+185           0 RESUME                   0
+
+187           2 LOAD_FAST                0 (fs)
+              4 LOAD_ATTR                1 (NULL|self + subtitle_words)
+             24 LOAD_FAST                1 (video_id)
+             26 CALL                     1
+             34 STORE_FAST               3 (words)
+
+188          36 LOAD_FAST                3 (words)
+             38 LOAD_ATTR                3 (NULL|self + with_name)
+             58 LOAD_CONST               1 ('subtitle.words.natural.json')
+             60 CALL                     1
+             68 STORE_FAST               4 (nat)
+
+189          70 NOP
+
+190          72 LOAD_FAST                4 (nat)
+             74 LOAD_ATTR                5 (NULL|self + exists)
+             94 CALL                     0
+            102 POP_JUMP_IF_TRUE        38 (to 180)
+            104 LOAD_FAST                3 (words)
+            106 LOAD_ATTR                5 (NULL|self + exists)
+            126 CALL                     0
+            134 POP_JUMP_IF_FALSE       22 (to 180)
+
+191         136 LOAD_GLOBAL              7 (NULL + shutil)
+            146 LOAD_ATTR                8 (copyfile)
+            166 LOAD_FAST                3 (words)
+            168 LOAD_FAST                4 (nat)
+            170 CALL                     2
+            178 POP_TOP
+
+192     >>  180 LOAD_FAST                4 (nat)
+            182 LOAD_ATTR                5 (NULL|self + exists)
+            202 CALL                     0
+            210 POP_JUMP_IF_TRUE         1 (to 214)
+
+193         212 RETURN_CONST             2 (None)
+
+194     >>  214 LOAD_GLOBAL             11 (NULL + json)
+            224 LOAD_ATTR               12 (loads)
+            244 LOAD_FAST                4 (nat)
+            246 LOAD_ATTR               15 (NULL|self + read_text)
+            266 LOAD_CONST               3 ('utf-8')
+            268 KW_NAMES                 4 (('encoding',))
+            270 CALL                     1
+            278 CALL                     1
+            286 STORE_FAST               5 (data)
+
+195         288 LOAD_FAST                5 (data)
+            290 LOAD_ATTR               17 (NULL|self + values)
+            310 CALL                     0
+            318 GET_ITER
+        >>  320 FOR_ITER                76 (to 476)
+            324 STORE_FAST               6 (spans)
+
+196         326 LOAD_FAST                6 (spans)
+            328 GET_ITER
+        >>  330 FOR_ITER                69 (to 472)
+            334 STORE_FAST               7 (w)
+
+197         336 LOAD_CONST               5 ('start_ms')
+            338 LOAD_FAST                7 (w)
+            340 CONTAINS_OP              0
+            342 POP_JUMP_IF_FALSE       29 (to 402)
+
+198         344 LOAD_GLOBAL             19 (NULL + int)
+            354 LOAD_GLOBAL             21 (NULL + round)
+            364 LOAD_FAST                7 (w)
+            366 LOAD_CONST               5 ('start_ms')
+            368 BINARY_SUBSCR
+            372 LOAD_FAST                2 (scale)
+            374 BINARY_OP                5 (*)
+            378 CALL                     1
+            386 CALL                     1
+            394 LOAD_FAST                7 (w)
+            396 LOAD_CONST               5 ('start_ms')
+            398 STORE_SUBSCR
+
+199     >>  402 LOAD_CONST               6 ('end_ms')
+            404 LOAD_FAST                7 (w)
+            406 CONTAINS_OP              0
+            408 POP_JUMP_IF_TRUE         1 (to 412)
+            410 JUMP_BACKWARD           41 (to 330)
+
+200     >>  412 LOAD_GLOBAL             19 (NULL + int)
+            422 LOAD_GLOBAL             21 (NULL + round)
+            432 LOAD_FAST                7 (w)
+            434 LOAD_CONST               6 ('end_ms')
+            436 BINARY_SUBSCR
+            440 LOAD_FAST                2 (scale)
+            442 BINARY_OP                5 (*)
+            446 CALL                     1
+            454 CALL                     1
+            462 LOAD_FAST                7 (w)
+            464 LOAD_CONST               6 ('end_ms')
+            466 STORE_SUBSCR
+            470 JUMP_BACKWARD           71 (to 330)
+
+196     >>  472 END_FOR
+            474 JUMP_BACKWARD           78 (to 320)
+
+195     >>  476 END_FOR
+
+201         478 LOAD_FAST                3 (words)
+            480 LOAD_ATTR               23 (NULL|self + write_text)
+            500 LOAD_GLOBAL             11 (NULL + json)
+            510 LOAD_ATTR               24 (dumps)
+            530 LOAD_FAST                5 (data)
+            532 LOAD_CONST               7 (False)
+            534 KW_NAMES                 8 (('ensure_ascii',))
+            536 CALL                     2
+            544 LOAD_CONST               3 ('utf-8')
+            546 KW_NAMES                 4 (('encoding',))
+            548 CALL                     2
+            556 POP_TOP
+            558 RETURN_CONST             2 (None)
+        >>  560 PUSH_EXC_INFO
+
+202         562 LOAD_GLOBAL             26 (Exception)
+            572 CHECK_EXC_MATCH
+            574 POP_JUMP_IF_FALSE        3 (to 582)
+            576 POP_TOP
+
+203         578 POP_EXCEPT
+            580 RETURN_CONST             2 (None)
+
+202     >>  582 RERAISE                  0
+        >>  584 COPY                     3
+            586 POP_EXCEPT
+            588 RERAISE                  1
+ExceptionTable:
+  72 to 210 -> 560 [0]
+  214 to 408 -> 560 [0]
+  412 to 556 -> 560 [0]
+  560 to 576 -> 584 [1] lasti
+  582 to 582 -> 584 [1] lasti
+
+Disassembly of <code object ConformVideoStep at 0x7f6c81ad1a10, file "app\pipeline\steps\conform_video.py", line 206>:
+206           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('ConformVideoStep')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+207          12 LOAD_CONST               1 ('conform_video')
+             14 STORE_NAME               3 (name)
+
+208          16 LOAD_CONST               2 ('CPU')
+             18 STORE_NAME               4 (resource)
+
+209          20 BUILD_LIST               0
+             22 STORE_NAME               5 (produces)
+             24 LOAD_CONST               3 ('list[str]')
+             26 LOAD_NAME                6 (__annotations__)
+             28 LOAD_CONST               4 ('produces')
+             30 STORE_SUBSCR
+
+211          34 LOAD_CONST               8 (('ctx', 'StepContext', 'return', 'dict'))
+             36 LOAD_CONST               5 (<code object run at 0x28b202b0, file "app\pipeline\steps\conform_video.py", line 211>)
+             38 MAKE_FUNCTION            4 (annotations)
+             40 STORE_NAME               7 (run)
+
+376          42 NOP
+
+377          44 NOP
+
+376          46 NOP
+
+377          48 NOP
+
+376          50 NOP
+
+377          52 NOP
+
+376          54 NOP
+
+377          56 NOP
+
+376          58 NOP
+
+378          60 NOP
+
+376          62 NOP
+
+378          64 NOP
+
+376          66 NOP
+
+378          68 NOP
+
+376          70 NOP
+
+379          72 NOP
+
+376          74 NOP
+
+379          76 NOP
+
+376          78 LOAD_CONST               9 (('ctx', 'StepContext', 'fs', 'ProjectFS', 'source', 'Path', 'pre', 'Path', 'voiceover', 'Path', 'vo_nat', 'Path', 'cmap', 'Path', 'data', 'dict', 'anchors', 'list[dict]', 'voice_total_ms', 'int', 'runner', 'FFmpegRunner', 'mode', 'str', 'return', 'dict'))
+             80 LOAD_CONST               6 (<code object _run_scene_conform at 0x28e372b0, file "app\pipeline\steps\conform_video.py", line 376>)
+             82 MAKE_FUNCTION            4 (annotations)
+             84 STORE_NAME               8 (_run_scene_conform)
+             86 RETURN_CONST             7 (None)
+
+Disassembly of <code object run at 0x28b202b0, file "app\pipeline\steps\conform_video.py", line 211>:
+              0 MAKE_CELL                1 (ctx)
+
+211           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+212           8 LOAD_GLOBAL              1 (NULL + ProjectFS)
+             18 LOAD_DEREF               1 (ctx)
+             20 LOAD_ATTR                2 (workdir)
+             40 CALL                     1
+             48 STORE_FAST               2 (fs)
+
+213          50 LOAD_FAST                2 (fs)
+             52 LOAD_ATTR                5 (NULL|self + source_mp4)
+             72 LOAD_DEREF               1 (ctx)
+             74 LOAD_ATTR                6 (video_id)
+             94 CALL                     1
+            102 STORE_FAST               3 (source)
+
+214         104 LOAD_FAST                3 (source)
+            106 LOAD_ATTR                9 (NULL|self + with_name)
+            126 LOAD_CONST               1 ('source.preconform.mp4')
+            128 CALL                     1
+            136 STORE_FAST               4 (pre)
+
+215         138 LOAD_FAST                2 (fs)
+            140 LOAD_ATTR               11 (NULL|self + voiceover)
+            160 LOAD_DEREF               1 (ctx)
+            162 LOAD_ATTR                6 (video_id)
+            182 CALL                     1
+            190 STORE_FAST               5 (voiceover)
+
+216         192 LOAD_FAST                5 (voiceover)
+            194 LOAD_ATTR                9 (NULL|self + with_name)
+            214 LOAD_CONST               2 ('voiceover.natural.wav')
+            216 CALL                     1
+            224 STORE_FAST               6 (vo_nat)
+
+217         226 LOAD_FAST                2 (fs)
+            228 LOAD_ATTR               13 (NULL|self + subtitle_words)
+            248 LOAD_DEREF               1 (ctx)
+            250 LOAD_ATTR                6 (video_id)
+            270 CALL                     1
+            278 LOAD_ATTR                9 (NULL|self + with_name)
+            298 LOAD_CONST               3 ('subtitle.words.natural.json')
+            300 CALL                     1
+            308 STORE_FAST               7 (words_nat)
+
+222         310 LOAD_CONST               4 (0)
+            312 LOAD_CONST               5 (('is_film_style',))
+            314 IMPORT_NAME              7 (app.pipeline.registry)
+            316 IMPORT_FROM              8 (is_film_style)
+            318 STORE_FAST               8 (is_film_style)
+            320 POP_TOP
+
+223         322 PUSH_NULL
+            324 LOAD_FAST                8 (is_film_style)
+            326 LOAD_DEREF               1 (ctx)
+            328 LOAD_ATTR               18 (config)
+            348 CALL                     1
+            356 POP_JUMP_IF_FALSE      154 (to 666)
+
+224         358 LOAD_FAST                4 (pre)
+            360 LOAD_ATTR               21 (NULL|self + exists)
+            380 CALL                     0
+            388 POP_JUMP_IF_FALSE       76 (to 542)
+
+225         390 NOP
+
+226         392 LOAD_FAST                3 (source)
+            394 LOAD_ATTR               23 (NULL|self + unlink)
+            414 LOAD_CONST               6 (True)
+            416 KW_NAMES                 7 (('missing_ok',))
+            418 CALL                     1
+            426 POP_TOP
+
+227         428 LOAD_GLOBAL             25 (NULL + shutil)
+            438 LOAD_ATTR               26 (move)
+            458 LOAD_GLOBAL             29 (NULL + str)
+            468 LOAD_FAST                4 (pre)
+            470 CALL                     1
+            478 LOAD_GLOBAL             29 (NULL + str)
+            488 LOAD_FAST                3 (source)
+            490 CALL                     1
+            498 CALL                     2
+            506 POP_TOP
+
+228         508 LOAD_DEREF               1 (ctx)
+            510 LOAD_ATTR               31 (NULL|self + emit_log)
+            530 LOAD_CONST               8 ('Chế độ Phim: đã khôi phục video gốc từ lần conform cũ.')
+            532 CALL                     1
+            540 POP_TOP
+
+231     >>  542 LOAD_FAST                2 (fs)
+            544 LOAD_ATTR               35 (NULL|self + conform_map)
+            564 LOAD_DEREF               1 (ctx)
+            566 LOAD_ATTR                6 (video_id)
+            586 CALL                     1
+            594 LOAD_ATTR               23 (NULL|self + unlink)
+            614 LOAD_CONST               6 (True)
+            616 KW_NAMES                 7 (('missing_ok',))
+            618 CALL                     1
+            626 POP_TOP
+
+232         628 LOAD_DEREF               1 (ctx)
+            630 LOAD_ATTR               31 (NULL|self + emit_log)
+            650 LOAD_CONST              12 ('Chế độ Phim (Lồng tiếng): không khớp hình — giọng đã khớp mốc sub gốc.')
+            652 CALL                     1
+            660 POP_TOP
+
+233         662 BUILD_MAP                0
+            664 RETURN_VALUE
+
+235     >>  666 LOAD_GLOBAL             37 (NULL + bool)
+            676 LOAD_DEREF               1 (ctx)
+            678 LOAD_ATTR               18 (config)
+            698 LOAD_ATTR               39 (NULL|self + get)
+            718 LOAD_CONST              13 ('conform_mode')
+            720 CALL                     1
+            728 CALL                     1
+            736 STORE_FAST              10 (conform_on)
+
+238         738 LOAD_FAST               10 (conform_on)
+            740 POP_JUMP_IF_FALSE       11 (to 764)
+
+239         742 LOAD_GLOBAL             41 (NULL + require_advanced)
+            752 LOAD_CONST              14 ('conform_video')
+            754 CALL                     1
+            762 POP_TOP
+
+241     >>  764 LOAD_GLOBAL             43 (NULL + get_ffmpeg_path)
+            774 CALL                     0
+            782 STORE_FAST              11 (ffmpeg)
+
+242         784 LOAD_GLOBAL             45 (NULL + FFmpegRunner)
+            794 CALL                     0
+            802 STORE_FAST              12 (runner)
+
+245         804 LOAD_FAST               10 (conform_on)
+            806 EXTENDED_ARG             1
+            808 POP_JUMP_IF_TRUE       322 (to 1454)
+
+246         810 LOAD_CONST              15 (False)
+            812 STORE_FAST              13 (restored)
+
+247         814 LOAD_FAST                4 (pre)
+            816 LOAD_ATTR               21 (NULL|self + exists)
+            836 CALL                     0
+            844 POP_JUMP_IF_FALSE       24 (to 894)
+
+248         846 LOAD_GLOBAL             25 (NULL + shutil)
+            856 LOAD_ATTR               46 (copyfile)
+            876 LOAD_FAST                4 (pre)
+            878 LOAD_FAST                3 (source)
+            880 CALL                     2
+            888 POP_TOP
+
+249         890 LOAD_CONST               6 (True)
+            892 STORE_FAST              13 (restored)
+
+250     >>  894 LOAD_FAST                6 (vo_nat)
+            896 LOAD_ATTR               21 (NULL|self + exists)
+            916 CALL                     0
+            924 POP_JUMP_IF_FALSE       40 (to 1006)
+            926 LOAD_FAST                5 (voiceover)
+            928 LOAD_ATTR               21 (NULL|self + exists)
+            948 CALL                     0
+            956 POP_JUMP_IF_FALSE       24 (to 1006)
+
+251         958 LOAD_GLOBAL             25 (NULL + shutil)
+            968 LOAD_ATTR               46 (copyfile)
+            988 LOAD_FAST                6 (vo_nat)
+            990 LOAD_FAST                5 (voiceover)
+            992 CALL                     2
+           1000 POP_TOP
+
+252        1002 LOAD_CONST               6 (True)
+           1004 STORE_FAST              13 (restored)
+
+253     >> 1006 LOAD_FAST                7 (words_nat)
+           1008 LOAD_ATTR               21 (NULL|self + exists)
+           1028 CALL                     0
+           1036 POP_JUMP_IF_FALSE       47 (to 1132)
+
+254        1038 LOAD_GLOBAL             25 (NULL + shutil)
+           1048 LOAD_ATTR               46 (copyfile)
+           1068 LOAD_FAST                7 (words_nat)
+           1070 LOAD_FAST                2 (fs)
+           1072 LOAD_ATTR               13 (NULL|self + subtitle_words)
+           1092 LOAD_DEREF               1 (ctx)
+           1094 LOAD_ATTR                6 (video_id)
+           1114 CALL                     1
+           1122 CALL                     2
+           1130 POP_TOP
+
+257     >> 1132 LOAD_FAST                2 (fs)
+           1134 LOAD_ATTR               35 (NULL|self + conform_map)
+           1154 LOAD_DEREF               1 (ctx)
+           1156 LOAD_ATTR                6 (video_id)
+           1176 CALL                     1
+           1184 STORE_FAST              14 (cmap)
+
+258        1186 LOAD_FAST               14 (cmap)
+           1188 LOAD_ATTR               21 (NULL|self + exists)
+           1208 CALL                     0
+           1216 POP_JUMP_IF_FALSE       97 (to 1412)
+
+259        1218 NOP
+
+260        1220 LOAD_GLOBAL             49 (NULL + json)
+           1230 LOAD_ATTR               50 (loads)
+           1250 LOAD_FAST               14 (cmap)
+           1252 LOAD_ATTR               53 (NULL|self + read_text)
+           1272 LOAD_CONST              16 ('utf-8')
+           1274 KW_NAMES                17 (('encoding',))
+           1276 CALL                     1
+           1284 CALL                     1
+           1292 STORE_FAST              15 (data)
+
+261        1294 LOAD_GLOBAL             55 (NULL + _rescale_subtitles)
+           1304 LOAD_FAST                2 (fs)
+           1306 LOAD_DEREF               1 (ctx)
+           1308 LOAD_ATTR                6 (video_id)
+           1328 LOAD_FAST               15 (data)
+           1330 LOAD_ATTR               39 (NULL|self + get)
+           1350 LOAD_CONST              18 ('anchors')
+           1352 CALL                     1
+           1360 COPY                     1
+           1362 POP_JUMP_IF_TRUE         2 (to 1368)
+           1364 POP_TOP
+           1366 BUILD_LIST               0
+        >> 1368 LOAD_CONST              19 (1.0)
+           1370 LOAD_CONST              19 (1.0)
+           1372 CALL                     5
+           1380 POP_TOP
+
+262        1382 LOAD_GLOBAL             57 (NULL + _write_conform_factors)
+           1392 LOAD_FAST               14 (cmap)
+           1394 LOAD_FAST               15 (data)
+           1396 LOAD_CONST              19 (1.0)
+           1398 LOAD_CONST              19 (1.0)
+           1400 LOAD_CONST              20 (0.0)
+           1402 CALL                     5
+           1410 POP_TOP
+
+265     >> 1412 LOAD_FAST               13 (restored)
+           1414 POP_JUMP_IF_FALSE       17 (to 1450)
+
+266        1416 LOAD_DEREF               1 (ctx)
+           1418 LOAD_ATTR               31 (NULL|self + emit_log)
+           1438 LOAD_CONST              21 ('Khớp hình theo giọng: TẮT → đã khôi phục video, giọng & phụ đề tốc độ thường.')
+           1440 CALL                     1
+           1448 POP_TOP
+
+267     >> 1450 BUILD_MAP                0
+           1452 RETURN_VALUE
+
+270     >> 1454 LOAD_FAST                2 (fs)
+           1456 LOAD_ATTR               35 (NULL|self + conform_map)
+           1476 LOAD_DEREF               1 (ctx)
+           1478 LOAD_ATTR                6 (video_id)
+           1498 CALL                     1
+           1506 STORE_FAST              14 (cmap)
+
+271        1508 LOAD_FAST               14 (cmap)
+           1510 LOAD_ATTR               21 (NULL|self + exists)
+           1530 CALL                     0
+           1538 POP_JUMP_IF_TRUE        21 (to 1582)
+
+272        1540 LOAD_DEREF               1 (ctx)
+           1542 LOAD_ATTR               31 (NULL|self + emit_log)
+           1562 LOAD_CONST              22 ('Không có dữ liệu mốc câu (conform.json) — bỏ qua khớp hình. Hãy chạy lại bước Tạo giọng ở chế độ conform.')
+
+273        1564 LOAD_CONST              10 ('warn')
+
+272        1566 KW_NAMES                11 (('level',))
+           1568 CALL                     2
+           1576 POP_TOP
+
+274        1578 BUILD_MAP                0
+           1580 RETURN_VALUE
+
+275     >> 1582 LOAD_FAST                3 (source)
+           1584 LOAD_ATTR               21 (NULL|self + exists)
+           1604 CALL                     0
+           1612 POP_JUMP_IF_TRUE        42 (to 1698)
+           1614 LOAD_FAST                4 (pre)
+           1616 LOAD_ATTR               21 (NULL|self + exists)
+           1636 CALL                     0
+           1644 POP_JUMP_IF_TRUE        26 (to 1698)
+
+276        1646 LOAD_GLOBAL             61 (NULL + make_error)
+           1656 LOAD_GLOBAL             62 (E)
+           1666 LOAD_ATTR               64 (PRECONDITION_MISSING)
+
+277        1686 LOAD_CONST              23 ('Thiếu file video gốc (source.mp4). Hãy chạy lại từ bước download.')
+
+276        1688 CALL                     2
+           1696 RAISE_VARARGS            1
+
+278     >> 1698 LOAD_FAST                5 (voiceover)
+           1700 LOAD_ATTR               21 (NULL|self + exists)
+           1720 CALL                     0
+           1728 POP_JUMP_IF_TRUE        37 (to 1804)
+           1730 LOAD_FAST                6 (vo_nat)
+           1732 LOAD_ATTR               21 (NULL|self + exists)
+           1752 CALL                     0
+           1760 POP_JUMP_IF_TRUE        21 (to 1804)
+
+279        1762 LOAD_DEREF               1 (ctx)
+           1764 LOAD_ATTR               31 (NULL|self + emit_log)
+           1784 LOAD_CONST              24 ('Thiếu file giọng đọc (voiceover.wav) — bỏ qua khớp hình.')
+           1786 LOAD_CONST              10 ('warn')
+           1788 KW_NAMES                11 (('level',))
+           1790 CALL                     2
+           1798 POP_TOP
+
+280        1800 BUILD_MAP                0
+           1802 RETURN_VALUE
+
+282     >> 1804 NOP
+
+283        1806 LOAD_GLOBAL             49 (NULL + json)
+           1816 LOAD_ATTR               50 (loads)
+           1836 LOAD_FAST               14 (cmap)
+           1838 LOAD_ATTR               53 (NULL|self + read_text)
+           1858 LOAD_CONST              16 ('utf-8')
+           1860 KW_NAMES                17 (('encoding',))
+           1862 CALL                     1
+           1870 CALL                     1
+           1878 STORE_FAST              15 (data)
+
+287        1880 LOAD_FAST               15 (data)
+           1882 LOAD_ATTR               39 (NULL|self + get)
+           1902 LOAD_CONST              18 ('anchors')
+           1904 CALL                     1
+           1912 COPY                     1
+           1914 POP_JUMP_IF_TRUE         2 (to 1920)
+           1916 POP_TOP
+           1918 BUILD_LIST               0
+        >> 1920 STORE_FAST              16 (anchors)
+
+288        1922 LOAD_GLOBAL             69 (NULL + int)
+           1932 LOAD_FAST               15 (data)
+           1934 LOAD_ATTR               39 (NULL|self + get)
+           1954 LOAD_CONST              27 ('voice_total_ms')
+           1956 CALL                     1
+           1964 COPY                     1
+           1966 POP_JUMP_IF_TRUE         2 (to 1972)
+           1968 POP_TOP
+           1970 LOAD_CONST               4 (0)
+        >> 1972 CALL                     1
+           1980 STORE_FAST              17 (voice_total_ms)
+
+294        1982 LOAD_GLOBAL             29 (NULL + str)
+           1992 LOAD_DEREF               1 (ctx)
+           1994 LOAD_ATTR               18 (config)
+           2014 LOAD_ATTR               39 (NULL|self + get)
+           2034 LOAD_CONST              28 ('conform_method')
+           2036 LOAD_CONST              29 ('uniform')
+           2038 CALL                     2
+           2046 COPY                     1
+           2048 POP_JUMP_IF_TRUE         2 (to 2054)
+           2050 POP_TOP
+           2052 LOAD_CONST              29 ('uniform')
+        >> 2054 CALL                     1
+           2062 LOAD_ATTR               71 (NULL|self + strip)
+           2082 CALL                     0
+           2090 LOAD_ATTR               73 (NULL|self + lower)
+           2110 CALL                     0
+           2118 STORE_FAST              18 (method)
+
+295        2120 LOAD_FAST               18 (method)
+           2122 LOAD_CONST              30 (('uniform', 'mci', 'piecewise'))
+           2124 CONTAINS_OP              1
+           2126 POP_JUMP_IF_FALSE        2 (to 2132)
+
+296        2128 LOAD_CONST              29 ('uniform')
+           2130 STORE_FAST              18 (method)
+
+301     >> 2132 LOAD_GLOBAL             29 (NULL + str)
+           2142 LOAD_DEREF               1 (ctx)
+           2144 LOAD_ATTR               18 (config)
+           2164 LOAD_ATTR               39 (NULL|self + get)
+           2184 LOAD_CONST              31 ('recap_style')
+           2186 CALL                     1
+           2194 COPY                     1
+           2196 POP_JUMP_IF_TRUE         2 (to 2202)
+           2198 POP_TOP
+           2200 LOAD_CONST              32 ('')
+        >> 2202 CALL                     1
+           2210 LOAD_ATTR               71 (NULL|self + strip)
+           2230 CALL                     0
+           2238 LOAD_ATTR               73 (NULL|self + lower)
+           2258 CALL                     0
+           2266 LOAD_CONST              33 ('film')
+           2268 COMPARE_OP              40 (==)
+           2272 COPY                     1
+           2274 POP_JUMP_IF_TRUE        33 (to 2342)
+           2276 POP_TOP
+
+302        2278 LOAD_GLOBAL             29 (NULL + str)
+           2288 LOAD_FAST               15 (data)
+           2290 LOAD_ATTR               39 (NULL|self + get)
+           2310 LOAD_CONST              34 ('style')
+           2312 CALL                     1
+           2320 COPY                     1
+           2322 POP_JUMP_IF_TRUE         2 (to 2328)
+           2324 POP_TOP
+           2326 LOAD_CONST              32 ('')
+        >> 2328 CALL                     1
+           2336 LOAD_CONST              33 ('film')
+           2338 COMPARE_OP              40 (==)
+
+301     >> 2342 STORE_FAST              19 (film_style)
+
+303        2344 LOAD_FAST               19 (film_style)
+           2346 POP_JUMP_IF_FALSE       66 (to 2480)
+
+304        2348 LOAD_FAST               18 (method)
+           2350 LOAD_CONST              29 ('uniform')
+           2352 COMPARE_OP              40 (==)
+           2356 POP_JUMP_IF_FALSE       19 (to 2396)
+
+305        2358 LOAD_CONST              35 ('piecewise')
+           2360 STORE_FAST              18 (method)
+
+306        2362 LOAD_DEREF               1 (ctx)
+           2364 LOAD_ATTR               31 (NULL|self + emit_log)
+           2384 LOAD_CONST              36 ("Chế độ Phim (Lồng tiếng): 'giãn đều' không áp dụng — chuyển sang khớp theo từng cảnh (piecewise).")
+           2386 CALL                     1
+           2394 POP_TOP
+
+308     >> 2396 LOAD_DEREF               1 (ctx)
+           2398 LOAD_ATTR               18 (config)
+           2418 LOAD_ATTR               39 (NULL|self + get)
+           2438 LOAD_CONST              37 ('conform_max_drift_ms')
+           2440 CALL                     1
+           2448 POP_JUMP_IF_TRUE        15 (to 2480)
+
+309        2450 LOAD_CONST              38 (200.0)
+           2452 LOAD_DEREF               1 (ctx)
+           2454 LOAD_ATTR               18 (config)
+           2474 LOAD_CONST              37 ('conform_max_drift_ms')
+           2476 STORE_SUBSCR
+
+310     >> 2480 LOAD_FAST               18 (method)
+           2482 LOAD_CONST              39 (('mci', 'piecewise'))
+           2484 CONTAINS_OP              0
+           2486 POP_JUMP_IF_FALSE       36 (to 2560)
+
+311        2488 LOAD_FAST                0 (self)
+           2490 LOAD_ATTR               75 (NULL|self + _run_scene_conform)
+           2510 LOAD_DEREF               1 (ctx)
+           2512 LOAD_FAST                2 (fs)
+           2514 LOAD_FAST                3 (source)
+           2516 LOAD_FAST                4 (pre)
+           2518 LOAD_FAST                5 (voiceover)
+           2520 LOAD_FAST                6 (vo_nat)
+           2522 LOAD_FAST               14 (cmap)
+           2524 LOAD_FAST               15 (data)
+
+312        2526 LOAD_FAST               16 (anchors)
+           2528 LOAD_FAST               17 (voice_total_ms)
+           2530 LOAD_FAST               12 (runner)
+           2532 LOAD_FAST               18 (method)
+
+311        2534 CALL                    12
+           2542 GET_AWAITABLE            0
+           2544 LOAD_CONST               0 (None)
+        >> 2546 SEND                     3 (to 2556)
+           2550 YIELD_VALUE              2
+           2552 RESUME                   3
+           2554 JUMP_BACKWARD_NO_INTERRUPT     5 (to 2546)
+        >> 2556 END_SEND
+           2558 RETURN_VALUE
+
+317     >> 2560 LOAD_FAST                4 (pre)
+           2562 LOAD_ATTR               21 (NULL|self + exists)
+           2582 CALL                     0
+           2590 POP_JUMP_IF_FALSE       40 (to 2672)
+
+318        2592 LOAD_GLOBAL             25 (NULL + shutil)
+           2602 LOAD_ATTR               46 (copyfile)
+           2622 LOAD_FAST                4 (pre)
+           2624 LOAD_FAST                3 (source)
+           2626 CALL                     2
+           2634 POP_TOP
+
+319        2636 LOAD_FAST                4 (pre)
+           2638 LOAD_ATTR               23 (NULL|self + unlink)
+           2658 LOAD_CONST               6 (True)
+           2660 KW_NAMES                 7 (('missing_ok',))
+           2662 CALL                     1
+           2670 POP_TOP
+
+320     >> 2672 LOAD_FAST                6 (vo_nat)
+           2674 LOAD_ATTR               21 (NULL|self + exists)
+           2694 CALL                     0
+           2702 POP_JUMP_IF_TRUE        38 (to 2780)
+           2704 LOAD_FAST                5 (voiceover)
+           2706 LOAD_ATTR               21 (NULL|self + exists)
+           2726 CALL                     0
+           2734 POP_JUMP_IF_FALSE       22 (to 2780)
+
+321        2736 LOAD_GLOBAL             25 (NULL + shutil)
+           2746 LOAD_ATTR               46 (copyfile)
+           2766 LOAD_FAST                5 (voiceover)
+           2768 LOAD_FAST                6 (vo_nat)
+           2770 CALL                     2
+           2778 POP_TOP
+
+323     >> 2780 LOAD_FAST               12 (runner)
+           2782 LOAD_ATTR               77 (NULL|self + probe)
+           2802 LOAD_GLOBAL             29 (NULL + str)
+           2812 LOAD_FAST                3 (source)
+           2814 CALL                     1
+           2822 CALL                     1
+           2830 GET_AWAITABLE            0
+           2832 LOAD_CONST               0 (None)
+        >> 2834 SEND                     3 (to 2844)
+           2838 YIELD_VALUE              2
+           2840 RESUME                   3
+           2842 JUMP_BACKWARD_NO_INTERRUPT     5 (to 2834)
+        >> 2844 END_SEND
+           2846 STORE_FAST              20 (v_probe)
+
+324        2848 LOAD_GLOBAL             79 (NULL + float)
+           2858 LOAD_FAST               20 (v_probe)
+           2860 LOAD_ATTR               39 (NULL|self + get)
+           2880 LOAD_CONST              40 ('duration_sec')
+           2882 CALL                     1
+           2890 COPY                     1
+           2892 POP_JUMP_IF_TRUE         2 (to 2898)
+           2894 POP_TOP
+           2896 LOAD_CONST              20 (0.0)
+        >> 2898 CALL                     1
+           2906 STORE_FAST              21 (v_dur)
+
+325        2908 LOAD_GLOBAL             79 (NULL + float)
+           2918 LOAD_FAST               20 (v_probe)
+           2920 LOAD_ATTR               39 (NULL|self + get)
+           2940 LOAD_CONST              41 ('fps')
+           2942 CALL                     1
+           2950 COPY                     1
+           2952 POP_JUMP_IF_TRUE         2 (to 2958)
+           2954 POP_TOP
+           2956 LOAD_CONST              20 (0.0)
+        >> 2958 CALL                     1
+           2966 COPY                     1
+           2968 POP_JUMP_IF_TRUE         6 (to 2982)
+           2970 POP_TOP
+           2972 LOAD_GLOBAL             80 (_DEFAULT_FPS)
+        >> 2982 STORE_FAST              22 (fps)
+
+326        2984 LOAD_FAST               22 (fps)
+           2986 LOAD_CONST              19 (1.0)
+           2988 COMPARE_OP               2 (<)
+           2992 POP_JUMP_IF_TRUE         5 (to 3004)
+           2994 LOAD_FAST               22 (fps)
+           2996 LOAD_CONST              42 (240.0)
+           2998 COMPARE_OP              68 (>)
+           3002 POP_JUMP_IF_FALSE        6 (to 3016)
+
+327     >> 3004 LOAD_GLOBAL             80 (_DEFAULT_FPS)
+           3014 STORE_FAST              22 (fps)
+
+328     >> 3016 LOAD_FAST               12 (runner)
+           3018 LOAD_ATTR               77 (NULL|self + probe)
+           3038 LOAD_GLOBAL             29 (NULL + str)
+           3048 LOAD_FAST                6 (vo_nat)
+           3050 CALL                     1
+           3058 CALL                     1
+           3066 GET_AWAITABLE            0
+           3068 LOAD_CONST               0 (None)
+        >> 3070 SEND                     3 (to 3080)
+           3074 YIELD_VALUE              2
+           3076 RESUME                   3
+           3078 JUMP_BACKWARD_NO_INTERRUPT     5 (to 3070)
+        >> 3080 END_SEND
+           3082 STORE_FAST              23 (a_probe)
+
+329        3084 LOAD_GLOBAL             79 (NULL + float)
+           3094 LOAD_FAST               23 (a_probe)
+           3096 LOAD_ATTR               39 (NULL|self + get)
+           3116 LOAD_CONST              40 ('duration_sec')
+           3118 CALL                     1
+           3126 COPY                     1
+           3128 POP_JUMP_IF_TRUE         2 (to 3134)
+           3130 POP_TOP
+           3132 LOAD_CONST              20 (0.0)
+        >> 3134 CALL                     1
+           3142 COPY                     1
+           3144 POP_JUMP_IF_TRUE         5 (to 3156)
+           3146 POP_TOP
+           3148 LOAD_FAST               17 (voice_total_ms)
+           3150 LOAD_CONST              43 (1000.0)
+           3152 BINARY_OP               11 (/)
+        >> 3156 STORE_FAST              24 (a_dur)
+
+330        3158 LOAD_FAST               21 (v_dur)
+           3160 LOAD_CONST               4 (0)
+           3162 COMPARE_OP              26 (<=)
+           3166 POP_JUMP_IF_TRUE         5 (to 3178)
+           3168 LOAD_FAST               24 (a_dur)
+           3170 LOAD_CONST               4 (0)
+           3172 COMPARE_OP              26 (<=)
+           3176 POP_JUMP_IF_FALSE       21 (to 3220)
+
+331     >> 3178 LOAD_DEREF               1 (ctx)
+           3180 LOAD_ATTR               31 (NULL|self + emit_log)
+           3200 LOAD_CONST              44 ('Không đọc được độ dài video/giọng — bỏ qua khớp hình.')
+           3202 LOAD_CONST              10 ('warn')
+           3204 KW_NAMES                11 (('level',))
+           3206 CALL                     2
+           3214 POP_TOP
+
+332        3216 BUILD_MAP                0
+           3218 RETURN_VALUE
+
+334     >> 3220 LOAD_GLOBAL             83 (NULL + _voice_speed_max)
+           3230 LOAD_DEREF               1 (ctx)
+           3232 LOAD_ATTR               18 (config)
+           3252 CALL                     1
+           3260 STORE_FAST              25 (voice_speed_max)
+
+335        3262 LOAD_GLOBAL             85 (NULL + _plan_stretch)
+           3272 LOAD_FAST               21 (v_dur)
+           3274 LOAD_FAST               24 (a_dur)
+           3276 LOAD_FAST               25 (voice_speed_max)
+           3278 CALL                     3
+           3286 UNPACK_SEQUENCE          3
+           3290 STORE_FAST              26 (kv)
+           3292 STORE_FAST              27 (ka)
+           3294 STORE_FAST              28 (T)
+
+338        3296 LOAD_GLOBAL             87 (NULL + abs)
+           3306 LOAD_FAST               24 (a_dur)
+           3308 LOAD_FAST               21 (v_dur)
+           3310 BINARY_OP               11 (/)
+           3314 LOAD_CONST              19 (1.0)
+           3316 BINARY_OP               10 (-)
+           3320 CALL                     1
+           3328 LOAD_GLOBAL             88 (_MIN_GAP)
+           3338 COMPARE_OP               2 (<)
+           3342 POP_JUMP_IF_FALSE      146 (to 3636)
+
+339        3344 LOAD_FAST                5 (voiceover)
+           3346 LOAD_ATTR               21 (NULL|self + exists)
+           3366 CALL                     0
+           3374 POP_JUMP_IF_FALSE       38 (to 3452)
+           3376 LOAD_FAST                6 (vo_nat)
+           3378 LOAD_ATTR               21 (NULL|self + exists)
+           3398 CALL                     0
+           3406 POP_JUMP_IF_FALSE       22 (to 3452)
+
+340        3408 LOAD_GLOBAL             25 (NULL + shutil)
+           3418 LOAD_ATTR               46 (copyfile)
+           3438 LOAD_FAST                6 (vo_nat)
+           3440 LOAD_FAST                5 (voiceover)
+           3442 CALL                     2
+           3450 POP_TOP
+
+341     >> 3452 LOAD_GLOBAL             55 (NULL + _rescale_subtitles)
+           3462 LOAD_FAST                2 (fs)
+           3464 LOAD_DEREF               1 (ctx)
+           3466 LOAD_ATTR                6 (video_id)
+           3486 LOAD_FAST               16 (anchors)
+           3488 LOAD_CONST              19 (1.0)
+           3490 LOAD_CONST              19 (1.0)
+           3492 CALL                     5
+           3500 POP_TOP
+
+342        3502 LOAD_GLOBAL             57 (NULL + _write_conform_factors)
+           3512 LOAD_FAST               14 (cmap)
+           3514 LOAD_FAST               15 (data)
+           3516 LOAD_CONST              19 (1.0)
+           3518 LOAD_CONST              19 (1.0)
+           3520 LOAD_FAST               24 (a_dur)
+           3522 CALL                     5
+           3530 POP_TOP
+
+343        3532 LOAD_DEREF               1 (ctx)
+           3534 LOAD_ATTR               31 (NULL|self + emit_log)
+           3554 LOAD_CONST              45 ('Video (')
+           3556 LOAD_FAST               21 (v_dur)
+           3558 LOAD_CONST              46 ('.1f')
+           3560 FORMAT_VALUE             4 (with format)
+           3562 LOAD_CONST              47 ('s) và giọng (')
+           3564 LOAD_FAST               24 (a_dur)
+           3566 LOAD_CONST              46 ('.1f')
+           3568 FORMAT_VALUE             4 (with format)
+           3570 LOAD_CONST              48 ('s) đã sát nhau — bỏ qua giãn/nén.')
+           3572 BUILD_STRING             5
+           3574 CALL                     1
+           3582 POP_TOP
+
+344        3584 LOAD_GLOBAL             69 (NULL + int)
+           3594 LOAD_GLOBAL             91 (NULL + round)
+           3604 LOAD_FAST               28 (T)
+           3606 LOAD_CONST              49 (1000)
+           3608 BINARY_OP                5 (*)
+           3612 CALL                     1
+           3620 CALL                     1
+           3628 LOAD_CONST              19 (1.0)
+           3630 LOAD_CONST              50 (('conformed_ms', 'video_slow'))
+           3632 BUILD_CONST_KEY_MAP      2
+           3634 RETURN_VALUE
+
+346     >> 3636 LOAD_DEREF               1 (ctx)
+           3638 LOAD_ATTR               31 (NULL|self + emit_log)
+
+347        3658 LOAD_CONST              51 ('Khớp hình (giãn đều, non-destructive): video ')
+           3660 LOAD_FAST               21 (v_dur)
+           3662 LOAD_CONST              46 ('.1f')
+           3664 FORMAT_VALUE             4 (with format)
+           3666 LOAD_CONST              52 ('s sẽ chậm ×')
+           3668 LOAD_FAST               26 (kv)
+           3670 LOAD_CONST              53 ('.3f')
+           3672 FORMAT_VALUE             4 (with format)
+           3674 LOAD_CONST              54 (' khi Export/preview · giọng ')
+
+348        3676 LOAD_FAST               24 (a_dur)
+           3678 LOAD_CONST              46 ('.1f')
+           3680 FORMAT_VALUE             4 (with format)
+           3682 LOAD_CONST              55 ('s tăng tốc ×')
+           3684 LOAD_FAST               27 (ka)
+           3686 LOAD_CONST              53 ('.3f')
+           3688 FORMAT_VALUE             4 (with format)
+           3690 LOAD_CONST              56 (' → cùng ')
+           3692 LOAD_FAST               28 (T)
+           3694 LOAD_CONST              46 ('.1f')
+           3696 FORMAT_VALUE             4 (with format)
+           3698 LOAD_CONST              57 ('s. Trần tốc độ giọng ×')
+           3700 LOAD_FAST               25 (voice_speed_max)
+           3702 LOAD_CONST              58 ('g')
+           3704 FORMAT_VALUE             4 (with format)
+           3706 LOAD_CONST              59 ('. KHÔNG re-encode phim → nhanh; video chỉ bake 1 lần lúc Export.')
+
+347        3708 BUILD_STRING            13
+
+346        3710 CALL                     1
+           3718 POP_TOP
+
+353        3720 LOAD_DEREF               1 (ctx)
+           3722 LOAD_ATTR               93 (NULL|self + emit_progress)
+           3742 LOAD_CONST              60 (0.3)
+           3744 LOAD_CONST              61 ('Đang tăng tốc giọng khớp video…')
+           3746 CALL                     2
+           3754 POP_TOP
+
+354        3756 LOAD_FAST                6 (vo_nat)
+           3758 LOAD_ATTR               21 (NULL|self + exists)
+           3778 CALL                     0
+           3786 POP_JUMP_IF_FALSE       88 (to 3964)
+
+355        3788 LOAD_GLOBAL             95 (NULL + _stretch_voice)
+           3798 LOAD_FAST               11 (ffmpeg)
+           3800 LOAD_GLOBAL             29 (NULL + str)
+           3810 LOAD_FAST                6 (vo_nat)
+           3812 CALL                     1
+           3820 LOAD_GLOBAL             29 (NULL + str)
+           3830 LOAD_FAST                5 (voiceover)
+           3832 CALL                     1
+           3840 LOAD_FAST               27 (ka)
+
+356        3842 LOAD_CLOSURE             1 (ctx)
+           3844 BUILD_TUPLE              1
+           3846 LOAD_CONST              62 (<code object <lambda> at 0x7f6c93093a50, file "app\pipeline\steps\conform_video.py", line 356>)
+           3848 MAKE_FUNCTION            8 (closure)
+
+355        3850 KW_NAMES                63 (('cancel_check',))
+           3852 CALL                     5
+           3860 GET_AWAITABLE            0
+           3862 LOAD_CONST               0 (None)
+        >> 3864 SEND                     3 (to 3874)
+           3868 YIELD_VALUE              2
+           3870 RESUME                   3
+           3872 JUMP_BACKWARD_NO_INTERRUPT     5 (to 3864)
+        >> 3874 END_SEND
+           3876 STORE_FAST              29 (ok)
+
+357        3878 LOAD_FAST               29 (ok)
+           3880 POP_JUMP_IF_TRUE        41 (to 3964)
+
+358        3882 LOAD_DEREF               1 (ctx)
+           3884 LOAD_ATTR               31 (NULL|self + emit_log)
+           3904 LOAD_CONST              64 ('Tăng tốc giọng thất bại — giữ giọng tự nhiên (có thể lệch nhẹ).')
+           3906 LOAD_CONST              10 ('warn')
+           3908 KW_NAMES                11 (('level',))
+           3910 CALL                     2
+           3918 POP_TOP
+
+359        3920 LOAD_GLOBAL             25 (NULL + shutil)
+           3930 LOAD_ATTR               46 (copyfile)
+           3950 LOAD_FAST                6 (vo_nat)
+           3952 LOAD_FAST                5 (voiceover)
+           3954 CALL                     2
+           3962 POP_TOP
+
+362     >> 3964 LOAD_DEREF               1 (ctx)
+           3966 LOAD_ATTR               93 (NULL|self + emit_progress)
+           3986 LOAD_CONST              65 (0.7)
+           3988 LOAD_CONST              66 ('Đang căn lại phụ đề khớp giọng…')
+           3990 CALL                     2
+           3998 POP_TOP
+
+363        4000 LOAD_GLOBAL             55 (NULL + _rescale_subtitles)
+           4010 LOAD_FAST                2 (fs)
+           4012 LOAD_DEREF               1 (ctx)
+           4014 LOAD_ATTR                6 (video_id)
+           4034 LOAD_FAST               16 (anchors)
+           4036 LOAD_FAST               26 (kv)
+           4038 LOAD_FAST               27 (ka)
+           4040 CALL                     5
+           4048 STORE_FAST              30 (n_sub)
+
+367        4050 LOAD_GLOBAL             57 (NULL + _write_conform_factors)
+           4060 LOAD_FAST               14 (cmap)
+           4062 LOAD_FAST               15 (data)
+           4064 LOAD_FAST               26 (kv)
+           4066 LOAD_FAST               27 (ka)
+           4068 LOAD_FAST               24 (a_dur)
+           4070 CALL                     5
+           4078 POP_TOP
+
+369        4080 LOAD_DEREF               1 (ctx)
+           4082 LOAD_ATTR               93 (NULL|self + emit_progress)
+           4102 LOAD_CONST              67 (0.98)
+           4104 LOAD_CONST              68 ('Xong — video sẽ khớp khi Export/preview.')
+           4106 CALL                     2
+           4114 POP_TOP
+
+370        4116 LOAD_DEREF               1 (ctx)
+           4118 LOAD_ATTR               31 (NULL|self + emit_log)
+
+371        4138 LOAD_CONST              69 ('Đã tính khớp hình (non-destructive): video ×')
+           4140 LOAD_FAST               26 (kv)
+           4142 LOAD_CONST              53 ('.3f')
+           4144 FORMAT_VALUE             4 (with format)
+           4146 LOAD_CONST              70 (' (bake lúc Export), giọng ×')
+           4148 LOAD_FAST               27 (ka)
+           4150 LOAD_CONST              53 ('.3f')
+           4152 FORMAT_VALUE             4 (with format)
+           4154 LOAD_CONST              71 (' → ')
+           4156 LOAD_FAST               28 (T)
+           4158 LOAD_CONST              46 ('.1f')
+           4160 FORMAT_VALUE             4 (with format)
+           4162 LOAD_CONST              72 ('s · ')
+
+372        4164 LOAD_FAST               30 (n_sub)
+           4166 FORMAT_VALUE             0
+           4168 LOAD_CONST              73 (' phụ đề đã căn lại.')
+
+371        4170 BUILD_STRING             9
+
+370        4172 CALL                     1
+           4180 POP_TOP
+
+374        4182 LOAD_GLOBAL             69 (NULL + int)
+           4192 LOAD_GLOBAL             91 (NULL + round)
+           4202 LOAD_FAST               28 (T)
+           4204 LOAD_CONST              49 (1000)
+           4206 BINARY_OP                5 (*)
+           4210 CALL                     1
+           4218 CALL                     1
+           4226 LOAD_GLOBAL             91 (NULL + round)
+           4236 LOAD_FAST               26 (kv)
+           4238 LOAD_CONST              74 (6)
+           4240 CALL                     2
+           4248 LOAD_CONST              50 (('conformed_ms', 'video_slow'))
+           4250 BUILD_CONST_KEY_MAP      2
+           4252 RETURN_VALUE
+        >> 4254 PUSH_EXC_INFO
+
+229        4256 LOAD_GLOBAL             32 (OSError)
+           4266 CHECK_EXC_MATCH
+           4268 POP_JUMP_IF_FALSE       33 (to 4336)
+           4270 STORE_FAST               9 (e)
+
+230        4272 LOAD_DEREF               1 (ctx)
+           4274 LOAD_ATTR               31 (NULL|self + emit_log)
+           4294 LOAD_CONST               9 ('Chế độ Phim: không khôi phục được video gốc: ')
+           4296 LOAD_FAST                9 (e)
+           4298 FORMAT_VALUE             0
+           4300 BUILD_STRING             2
+           4302 LOAD_CONST              10 ('warn')
+           4304 KW_NAMES                11 (('level',))
+           4306 CALL                     2
+           4314 POP_TOP
+           4316 POP_EXCEPT
+           4318 LOAD_CONST               0 (None)
+           4320 STORE_FAST               9 (e)
+           4322 DELETE_FAST              9 (e)
+           4324 EXTENDED_ARG             7
+           4326 JUMP_BACKWARD         1893 (to 542)
+        >> 4328 LOAD_CONST               0 (None)
+           4330 STORE_FAST               9 (e)
+           4332 DELETE_FAST              9 (e)
+           4334 RERAISE                  1
+
+229     >> 4336 RERAISE                  0
+        >> 4338 COPY                     3
+           4340 POP_EXCEPT
+           4342 RERAISE                  1
+        >> 4344 PUSH_EXC_INFO
+
+263        4346 LOAD_GLOBAL             58 (Exception)
+           4356 CHECK_EXC_MATCH
+           4358 POP_JUMP_IF_FALSE        4 (to 4368)
+           4360 POP_TOP
+
+264        4362 POP_EXCEPT
+           4364 EXTENDED_ARG             5
+           4366 JUMP_BACKWARD         1478 (to 1412)
+
+263     >> 4368 RERAISE                  0
+        >> 4370 COPY                     3
+           4372 POP_EXCEPT
+           4374 RERAISE                  1
+        >> 4376 PUSH_EXC_INFO
+
+284        4378 LOAD_GLOBAL             32 (OSError)
+           4388 LOAD_GLOBAL             48 (json)
+           4398 LOAD_ATTR               66 (JSONDecodeError)
+           4418 BUILD_TUPLE              2
+           4420 CHECK_EXC_MATCH
+           4422 POP_JUMP_IF_FALSE       35 (to 4494)
+           4424 STORE_FAST               9 (e)
+
+285        4426 LOAD_DEREF               1 (ctx)
+           4428 LOAD_ATTR               31 (NULL|self + emit_log)
+           4448 LOAD_CONST              25 ('Đọc conform.json lỗi (')
+           4450 LOAD_FAST                9 (e)
+           4452 FORMAT_VALUE             0
+           4454 LOAD_CONST              26 (') — bỏ qua khớp hình.')
+           4456 BUILD_STRING             3
+           4458 LOAD_CONST              10 ('warn')
+           4460 KW_NAMES                11 (('level',))
+           4462 CALL                     2
+           4470 POP_TOP
+
+286        4472 BUILD_MAP                0
+           4474 SWAP                     2
+           4476 POP_EXCEPT
+           4478 LOAD_CONST               0 (None)
+           4480 STORE_FAST               9 (e)
+           4482 DELETE_FAST              9 (e)
+           4484 RETURN_VALUE
+        >> 4486 LOAD_CONST               0 (None)
+           4488 STORE_FAST               9 (e)
+           4490 DELETE_FAST              9 (e)
+           4492 RERAISE                  1
+
+284     >> 4494 RERAISE                  0
+        >> 4496 COPY                     3
+           4498 POP_EXCEPT
+           4500 RERAISE                  1
+
+311     >> 4502 CLEANUP_THROW
+           4504 EXTENDED_ARG             3
+           4506 JUMP_BACKWARD          976 (to 2556)
+
+323     >> 4508 CLEANUP_THROW
+           4510 EXTENDED_ARG             3
+           4512 JUMP_BACKWARD          835 (to 2844)
+
+328     >> 4514 CLEANUP_THROW
+           4516 EXTENDED_ARG             2
+           4518 JUMP_BACKWARD          720 (to 3080)
+
+355     >> 4520 CLEANUP_THROW
+           4522 EXTENDED_ARG             1
+           4524 JUMP_BACKWARD          326 (to 3874)
+        >> 4526 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           4528 RERAISE                  1
+ExceptionTable:
+  6 to 388 -> 4526 [0] lasti
+  392 to 540 -> 4254 [0]
+  542 to 1216 -> 4526 [0] lasti
+  1220 to 1410 -> 4344 [0]
+  1412 to 1802 -> 4526 [0] lasti
+  1806 to 1878 -> 4376 [0]
+  1880 to 2548 -> 4526 [0] lasti
+  2550 to 2550 -> 4502 [2]
+  2552 to 2836 -> 4526 [0] lasti
+  2838 to 2838 -> 4508 [2]
+  2840 to 3072 -> 4526 [0] lasti
+  3074 to 3074 -> 4514 [2]
+  3076 to 3866 -> 4526 [0] lasti
+  3868 to 3868 -> 4520 [2]
+  3870 to 4252 -> 4526 [0] lasti
+  4254 to 4270 -> 4338 [1] lasti
+  4272 to 4314 -> 4328 [1] lasti
+  4316 to 4326 -> 4526 [0] lasti
+  4328 to 4336 -> 4338 [1] lasti
+  4338 to 4342 -> 4526 [0] lasti
+  4344 to 4360 -> 4370 [1] lasti
+  4362 to 4366 -> 4526 [0] lasti
+  4368 to 4368 -> 4370 [1] lasti
+  4370 to 4374 -> 4526 [0] lasti
+  4376 to 4424 -> 4496 [1] lasti
+  4426 to 4472 -> 4486 [1] lasti
+  4474 to 4474 -> 4496 [1] lasti
+  4476 to 4484 -> 4526 [0] lasti
+  4486 to 4494 -> 4496 [1] lasti
+  4496 to 4502 -> 4526 [0] lasti
+  4508 to 4508 -> 4526 [0] lasti
+  4514 to 4514 -> 4526 [0] lasti
+  4520 to 4520 -> 4526 [0] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c93093a50, file "app\pipeline\steps\conform_video.py", line 356>:
+              0 COPY_FREE_VARS           1
+
+356           2 RESUME                   0
+              4 LOAD_DEREF               0 (ctx)
+              6 LOAD_ATTR                1 (NULL|self + is_cancelled)
+             26 CALL                     0
+             34 RETURN_VALUE
+
+Disassembly of <code object _run_scene_conform at 0x28e372b0, file "app\pipeline\steps\conform_video.py", line 376>:
+376           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+384           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('conform_mci',))
+             10 IMPORT_NAME              0 (app.pipeline.steps)
+             12 IMPORT_FROM              1 (conform_mci)
+             14 STORE_FAST              13 (conform_mci)
+             16 POP_TOP
+
+385          18 LOAD_FAST                9 (anchors)
+             20 POP_JUMP_IF_FALSE        5 (to 32)
+             22 LOAD_FAST               10 (voice_total_ms)
+             24 LOAD_CONST               1 (0)
+             26 COMPARE_OP              26 (<=)
+             30 POP_JUMP_IF_FALSE       21 (to 74)
+
+386     >>   32 LOAD_FAST                1 (ctx)
+             34 LOAD_ATTR                5 (NULL|self + emit_log)
+             54 LOAD_CONST               3 ('conform.json rỗng — bỏ qua khớp hình.')
+             56 LOAD_CONST               4 ('warn')
+             58 KW_NAMES                 5 (('level',))
+             60 CALL                     2
+             68 POP_TOP
+
+387          70 BUILD_MAP                0
+             72 RETURN_VALUE
+
+389     >>   74 LOAD_FAST                4 (pre)
+             76 LOAD_ATTR                7 (NULL|self + exists)
+             96 CALL                     0
+            104 POP_JUMP_IF_TRUE        22 (to 150)
+
+390         106 LOAD_GLOBAL              9 (NULL + shutil)
+            116 LOAD_ATTR               10 (copyfile)
+            136 LOAD_FAST                3 (source)
+            138 LOAD_FAST                4 (pre)
+            140 CALL                     2
+            148 POP_TOP
+
+392     >>  150 LOAD_FAST                6 (vo_nat)
+            152 LOAD_ATTR                7 (NULL|self + exists)
+            172 CALL                     0
+            180 POP_JUMP_IF_FALSE       22 (to 226)
+
+393         182 LOAD_GLOBAL              9 (NULL + shutil)
+            192 LOAD_ATTR               10 (copyfile)
+            212 LOAD_FAST                6 (vo_nat)
+            214 LOAD_FAST                5 (voiceover)
+            216 CALL                     2
+            224 POP_TOP
+
+395     >>  226 LOAD_FAST               11 (runner)
+            228 LOAD_ATTR               13 (NULL|self + probe)
+            248 LOAD_GLOBAL             15 (NULL + str)
+            258 LOAD_FAST                4 (pre)
+            260 CALL                     1
+            268 CALL                     1
+            276 GET_AWAITABLE            0
+            278 LOAD_CONST               6 (None)
+        >>  280 SEND                     3 (to 290)
+            284 YIELD_VALUE              2
+            286 RESUME                   3
+            288 JUMP_BACKWARD_NO_INTERRUPT     5 (to 280)
+        >>  290 END_SEND
+            292 STORE_FAST              14 (probe)
+
+396         294 LOAD_GLOBAL             17 (NULL + int)
+            304 LOAD_GLOBAL             19 (NULL + float)
+            314 LOAD_FAST               14 (probe)
+            316 LOAD_ATTR               21 (NULL|self + get)
+            336 LOAD_CONST               7 ('duration_sec')
+            338 CALL                     1
+            346 COPY                     1
+            348 POP_JUMP_IF_TRUE         2 (to 354)
+            350 POP_TOP
+            352 LOAD_CONST               8 (0.0)
+        >>  354 CALL                     1
+            362 LOAD_CONST               9 (1000)
+            364 BINARY_OP                5 (*)
+            368 CALL                     1
+            376 STORE_FAST              15 (src_dur_ms)
+
+397         378 LOAD_GLOBAL             19 (NULL + float)
+            388 LOAD_FAST               14 (probe)
+            390 LOAD_ATTR               21 (NULL|self + get)
+            410 LOAD_CONST              10 ('fps')
+            412 CALL                     1
+            420 COPY                     1
+            422 POP_JUMP_IF_TRUE         2 (to 428)
+            424 POP_TOP
+            426 LOAD_CONST               8 (0.0)
+        >>  428 CALL                     1
+            436 COPY                     1
+            438 POP_JUMP_IF_TRUE         6 (to 452)
+            440 POP_TOP
+            442 LOAD_GLOBAL             22 (_DEFAULT_FPS)
+        >>  452 STORE_FAST              16 (fps)
+
+398         454 LOAD_FAST               16 (fps)
+            456 LOAD_CONST              11 (1.0)
+            458 COMPARE_OP               2 (<)
+            462 POP_JUMP_IF_TRUE         5 (to 474)
+            464 LOAD_FAST               16 (fps)
+            466 LOAD_CONST              12 (240.0)
+            468 COMPARE_OP              68 (>)
+            472 POP_JUMP_IF_FALSE        6 (to 486)
+
+399     >>  474 LOAD_GLOBAL             22 (_DEFAULT_FPS)
+            484 STORE_FAST              16 (fps)
+
+400     >>  486 LOAD_FAST               15 (src_dur_ms)
+            488 LOAD_CONST               1 (0)
+            490 COMPARE_OP              26 (<=)
+            494 POP_JUMP_IF_FALSE       21 (to 538)
+
+401         496 LOAD_FAST                1 (ctx)
+            498 LOAD_ATTR                5 (NULL|self + emit_log)
+            518 LOAD_CONST              13 ('Không đọc được độ dài video gốc — bỏ qua khớp hình.')
+            520 LOAD_CONST               4 ('warn')
+            522 KW_NAMES                 5 (('level',))
+            524 CALL                     2
+            532 POP_TOP
+
+402         534 BUILD_MAP                0
+            536 RETURN_VALUE
+
+404     >>  538 LOAD_FAST               12 (mode)
+            540 LOAD_CONST              14 ('piecewise')
+            542 COMPARE_OP              40 (==)
+            546 POP_JUMP_IF_FALSE       12 (to 572)
+            548 LOAD_FAST               13 (conform_mci)
+            550 LOAD_ATTR               24 (run_piecewise)
+            570 JUMP_FORWARD            11 (to 594)
+        >>  572 LOAD_FAST               13 (conform_mci)
+            574 LOAD_ATTR               26 (run_mci)
+        >>  594 STORE_FAST              17 (engine)
+
+405         596 PUSH_NULL
+            598 LOAD_FAST               17 (engine)
+            600 LOAD_FAST                1 (ctx)
+            602 LOAD_FAST                3 (source)
+            604 LOAD_FAST                4 (pre)
+            606 LOAD_FAST                9 (anchors)
+            608 LOAD_FAST               15 (src_dur_ms)
+            610 LOAD_FAST               10 (voice_total_ms)
+            612 LOAD_FAST               16 (fps)
+            614 LOAD_FAST                1 (ctx)
+            616 LOAD_ATTR               28 (config)
+            636 CALL                     8
+            644 GET_AWAITABLE            0
+            646 LOAD_CONST               6 (None)
+        >>  648 SEND                     3 (to 658)
+            652 YIELD_VALUE              2
+            654 RESUME                   3
+            656 JUMP_BACKWARD_NO_INTERRUPT     5 (to 648)
+        >>  658 END_SEND
+            660 STORE_FAST              18 (stats)
+
+408         662 LOAD_GLOBAL             31 (NULL + _rescale_subtitles)
+            672 LOAD_FAST                2 (fs)
+            674 LOAD_FAST                1 (ctx)
+            676 LOAD_ATTR               32 (video_id)
+            696 LOAD_FAST                9 (anchors)
+            698 LOAD_CONST              11 (1.0)
+            700 LOAD_CONST              11 (1.0)
+            702 CALL                     5
+            710 POP_TOP
+
+409         712 LOAD_GLOBAL             35 (NULL + _write_conform_factors)
+            722 LOAD_FAST                7 (cmap)
+            724 LOAD_FAST                8 (data)
+            726 LOAD_CONST              11 (1.0)
+            728 LOAD_CONST              11 (1.0)
+            730 LOAD_FAST               10 (voice_total_ms)
+            732 LOAD_CONST              15 (1000.0)
+            734 BINARY_OP               11 (/)
+            738 CALL                     5
+            746 POP_TOP
+
+410         748 LOAD_FAST               18 (stats)
+            750 COPY                     1
+            752 POP_JUMP_IF_TRUE         5 (to 764)
+            754 POP_TOP
+            756 LOAD_FAST               10 (voice_total_ms)
+            758 LOAD_CONST              11 (1.0)
+            760 LOAD_CONST              16 (('conformed_ms', 'video_slow'))
+            762 BUILD_CONST_KEY_MAP      2
+        >>  764 RETURN_VALUE
+
+395     >>  766 CLEANUP_THROW
+            768 JUMP_BACKWARD          240 (to 290)
+
+405     >>  770 CLEANUP_THROW
+            772 JUMP_BACKWARD           58 (to 658)
+        >>  774 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            776 RERAISE                  1
+ExceptionTable:
+  4 to 282 -> 774 [0] lasti
+  284 to 284 -> 766 [2]
+  286 to 650 -> 774 [0] lasti
+  652 to 652 -> 770 [2]
+  654 to 766 -> 774 [0] lasti
+  770 to 770 -> 774 [0] lasti

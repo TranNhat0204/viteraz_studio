@@ -1,0 +1,1227 @@
+  0           0 RESUME                   0
+
+  1           2 SETUP_ANNOTATIONS
+              4 LOAD_CONST               0 ('Dò tài nguyên máy (CPU / RAM / VRAM) → gợi ý cấu hình chạy song song.\n\nMục tiêu: tận dụng TỐI ĐA máy mà không làm nó lag hay tràn RAM (xem\ndocs/plan-recap-throughput-queue-gpu.md §5). Trước đây số slot là hằng số (gpu=1, net=6, cpu=n/2)\nnên máy mạnh thì bỏ phí, máy yếu thì tràn.\n\nKHÔNG phụ thuộc thư viện ngoài: RAM đọc qua GlobalMemoryStatusEx (Windows) / /proc/meminfo (Linux),\nVRAM qua nvidia-smi. Mọi hàm đều fail-safe → trả giá trị mặc định an toàn, không bao giờ ném lỗi.\n')
+              6 STORE_NAME               0 (__doc__)
+
+ 10           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('annotations',))
+             12 IMPORT_NAME              1 (__future__)
+             14 IMPORT_FROM              2 (annotations)
+             16 STORE_NAME               2 (annotations)
+             18 POP_TOP
+
+ 12          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               3 (None)
+             24 IMPORT_NAME              3 (os)
+             26 STORE_NAME               3 (os)
+
+ 13          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               3 (None)
+             32 IMPORT_NAME              4 (shutil)
+             34 STORE_NAME               4 (shutil)
+
+ 14          36 LOAD_CONST               1 (0)
+             38 LOAD_CONST               3 (None)
+             40 IMPORT_NAME              5 (subprocess)
+             42 STORE_NAME               5 (subprocess)
+
+ 15          44 LOAD_CONST               1 (0)
+             46 LOAD_CONST               3 (None)
+             48 IMPORT_NAME              6 (sys)
+             50 STORE_NAME               6 (sys)
+
+ 16          52 LOAD_CONST               1 (0)
+             54 LOAD_CONST               3 (None)
+             56 IMPORT_NAME              7 (time)
+             58 STORE_NAME               7 (time)
+
+ 17          60 LOAD_CONST               1 (0)
+             62 LOAD_CONST               4 (('dataclass', 'asdict'))
+             64 IMPORT_NAME              8 (dataclasses)
+             66 IMPORT_FROM              9 (dataclass)
+             68 STORE_NAME               9 (dataclass)
+             70 IMPORT_FROM             10 (asdict)
+             72 STORE_NAME              10 (asdict)
+             74 POP_TOP
+
+ 19          76 LOAD_CONST               1 (0)
+             78 LOAD_CONST               5 (('log',))
+             80 IMPORT_NAME             11 (app.core.logging)
+             82 IMPORT_FROM             12 (log)
+             84 STORE_NAME              12 (log)
+             86 POP_TOP
+
+ 20          88 LOAD_CONST               1 (0)
+             90 LOAD_CONST               6 (('no_window_kwargs',))
+             92 IMPORT_NAME             13 (app.core.proc)
+             94 IMPORT_FROM             14 (no_window_kwargs)
+             96 STORE_NAME              14 (no_window_kwargs)
+             98 POP_TOP
+
+ 23         100 LOAD_CONST               3 (None)
+            102 STORE_GLOBAL            15 (_STATIC_CACHE)
+            104 LOAD_CONST               7 ('dict | None')
+            106 LOAD_NAME               16 (__annotations__)
+            108 LOAD_CONST               8 ('_STATIC_CACHE')
+            110 STORE_SUBSCR
+
+ 25         114 LOAD_CONST               3 (None)
+            116 STORE_GLOBAL            17 (_DYN_CACHE)
+            118 LOAD_CONST               9 ('tuple[float, dict] | None')
+            120 LOAD_NAME               16 (__annotations__)
+            122 LOAD_CONST              10 ('_DYN_CACHE')
+            124 STORE_SUBSCR
+
+ 26         128 LOAD_CONST              11 (2.0)
+            130 STORE_NAME              18 (_DYN_TTL)
+
+ 29         132 LOAD_NAME                9 (dataclass)
+
+ 30         134 PUSH_NULL
+            136 LOAD_BUILD_CLASS
+            138 LOAD_CONST              12 (<code object MachineProfile at 0x7f6c92d639f0, file "app\core\resources.py", line 29>)
+            140 MAKE_FUNCTION            0
+            142 LOAD_CONST              13 ('MachineProfile')
+            144 CALL                     2
+
+ 29         152 CALL                     0
+
+ 30         160 STORE_NAME              19 (MachineProfile)
+
+ 50         162 LOAD_CONST              22 (('return', 'tuple[int, int]'))
+            164 LOAD_CONST              14 (<code object ram_info_mb at 0x28b78cd0, file "app\core\resources.py", line 50>)
+            166 MAKE_FUNCTION            4 (annotations)
+            168 STORE_NAME              20 (ram_info_mb)
+
+ 89         170 LOAD_CONST              23 (('query', 'str', 'return', 'list[str]'))
+            172 LOAD_CONST              15 (<code object _nvidia_smi at 0x28e475a0, file "app\core\resources.py", line 89>)
+            174 MAKE_FUNCTION            4 (annotations)
+            176 STORE_NAME              21 (_nvidia_smi)
+
+106         178 LOAD_CONST              24 (('return', 'tuple[int, str]'))
+            180 LOAD_CONST              16 (<code object gpu_static at 0x7f6c81bc9990, file "app\core\resources.py", line 106>)
+            182 MAKE_FUNCTION            4 (annotations)
+            184 STORE_NAME              22 (gpu_static)
+
+118         186 LOAD_CONST              25 (('return', 'dict'))
+            188 LOAD_CONST              17 (<code object gpu_dynamic at 0x26a1baa0, file "app\core\resources.py", line 118>)
+            190 MAKE_FUNCTION            4 (annotations)
+            192 STORE_NAME              23 (gpu_dynamic)
+
+133         194 LOAD_CONST              26 (('cpu_count', 'int', 'ram_total_mb', 'int', 'vram_mb', 'int', 'has_cuda', 'bool', 'return', 'dict'))
+            196 LOAD_CONST              18 (<code object _suggest_from at 0x28b77510, file "app\core\resources.py", line 133>)
+            198 MAKE_FUNCTION            4 (annotations)
+            200 STORE_NAME              24 (_suggest_from)
+
+187         202 LOAD_CONST              27 ((False,))
+            204 LOAD_CONST              28 (('refresh', 'bool', 'return', 'MachineProfile'))
+            206 LOAD_CONST              19 (<code object machine_profile at 0x26a24950, file "app\core\resources.py", line 187>)
+            208 MAKE_FUNCTION            5 (defaults, annotations)
+            210 STORE_NAME              25 (machine_profile)
+
+212         212 LOAD_CONST              25 (('return', 'dict'))
+            214 LOAD_CONST              20 (<code object snapshot at 0x7f6c81bc9f00, file "app\core\resources.py", line 212>)
+            216 MAKE_FUNCTION            4 (annotations)
+            218 STORE_NAME              26 (snapshot)
+
+230         220 LOAD_CONST              29 ((2048, 12.0))
+            222 LOAD_CONST              30 (('min_free_mb', 'int', 'min_free_pct', 'float', 'return', 'bool'))
+            224 LOAD_CONST              21 (<code object ram_pressure at 0x7f6c92b72120, file "app\core\resources.py", line 230>)
+            226 MAKE_FUNCTION            5 (defaults, annotations)
+            228 STORE_NAME              27 (ram_pressure)
+            230 RETURN_CONST             3 (None)
+
+Disassembly of <code object MachineProfile at 0x7f6c92d639f0, file "app\core\resources.py", line 29>:
+ 29           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('MachineProfile')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 31          12 LOAD_CONST               1 ('Ảnh chụp năng lực máy + gợi ý cấu hình chạy song song.')
+             14 STORE_NAME               3 (__doc__)
+
+ 32          16 LOAD_CONST               2 ('int')
+             18 LOAD_NAME                4 (__annotations__)
+             20 LOAD_CONST               3 ('cpu_count')
+             22 STORE_SUBSCR
+
+ 33          26 LOAD_CONST               2 ('int')
+             28 LOAD_NAME                4 (__annotations__)
+             30 LOAD_CONST               4 ('ram_total_mb')
+             32 STORE_SUBSCR
+
+ 34          36 LOAD_CONST               2 ('int')
+             38 LOAD_NAME                4 (__annotations__)
+             40 LOAD_CONST               5 ('vram_total_mb')
+             42 STORE_SUBSCR
+
+ 35          46 LOAD_CONST               6 ('str')
+             48 LOAD_NAME                4 (__annotations__)
+             50 LOAD_CONST               7 ('gpu_name')
+             52 STORE_SUBSCR
+
+ 36          56 LOAD_CONST               8 ('bool')
+             58 LOAD_NAME                4 (__annotations__)
+             60 LOAD_CONST               9 ('has_cuda')
+             62 STORE_SUBSCR
+
+ 38          66 LOAD_CONST               2 ('int')
+             68 LOAD_NAME                4 (__annotations__)
+             70 LOAD_CONST              10 ('gpu_slots')
+             72 STORE_SUBSCR
+
+ 39          76 LOAD_CONST               2 ('int')
+             78 LOAD_NAME                4 (__annotations__)
+             80 LOAD_CONST              11 ('net_slots')
+             82 STORE_SUBSCR
+
+ 40          86 LOAD_CONST               2 ('int')
+             88 LOAD_NAME                4 (__annotations__)
+             90 LOAD_CONST              12 ('cpu_slots')
+             92 STORE_SUBSCR
+
+ 41          96 LOAD_CONST               2 ('int')
+             98 LOAD_NAME                4 (__annotations__)
+            100 LOAD_CONST              13 ('gpu_concurrency')
+            102 STORE_SUBSCR
+
+ 42         106 LOAD_CONST               2 ('int')
+            108 LOAD_NAME                4 (__annotations__)
+            110 LOAD_CONST              14 ('whisper_batch_size')
+            112 STORE_SUBSCR
+
+ 43         116 LOAD_CONST               2 ('int')
+            118 LOAD_NAME                4 (__annotations__)
+            120 LOAD_CONST              15 ('whisper_cpu_threads')
+            122 STORE_SUBSCR
+
+ 45         126 LOAD_CONST              18 (('return', 'dict'))
+            128 LOAD_CONST              16 (<code object to_dict at 0x7f6c92eb7ad0, file "app\core\resources.py", line 45>)
+            130 MAKE_FUNCTION            4 (annotations)
+            132 STORE_NAME               5 (to_dict)
+            134 RETURN_CONST            17 (None)
+
+Disassembly of <code object to_dict at 0x7f6c92eb7ad0, file "app\core\resources.py", line 45>:
+ 45           0 RESUME                   0
+
+ 46           2 LOAD_GLOBAL              1 (NULL + asdict)
+             12 LOAD_FAST                0 (self)
+             14 CALL                     1
+             22 RETURN_VALUE
+
+Disassembly of <code object ram_info_mb at 0x28b78cd0, file "app\core\resources.py", line 50>:
+              0 MAKE_CELL                6 (ctypes)
+
+ 50           2 RESUME                   0
+
+ 52           4 LOAD_GLOBAL              0 (sys)
+             14 LOAD_ATTR                2 (platform)
+             34 LOAD_CONST               1 ('win32')
+             36 COMPARE_OP              40 (==)
+             40 POP_JUMP_IF_FALSE      159 (to 360)
+
+ 53          42 NOP
+
+ 54          44 LOAD_CONST               2 (0)
+             46 LOAD_CONST               3 (None)
+             48 IMPORT_NAME              2 (ctypes)
+             50 STORE_DEREF              6 (ctypes)
+
+ 56          52 PUSH_NULL
+             54 LOAD_BUILD_CLASS
+             56 LOAD_CLOSURE             6 (ctypes)
+             58 BUILD_TUPLE              1
+             60 LOAD_CONST               4 (<code object _MEMORYSTATUSEX at 0x7f6c81bcb2f0, file "app\core\resources.py", line 56>)
+             62 MAKE_FUNCTION            8 (closure)
+             64 LOAD_CONST               5 ('_MEMORYSTATUSEX')
+             66 LOAD_DEREF               6 (ctypes)
+             68 LOAD_ATTR                6 (Structure)
+             88 CALL                     3
+             96 STORE_FAST               0 (_MEMORYSTATUSEX)
+
+ 67          98 PUSH_NULL
+            100 LOAD_FAST                0 (_MEMORYSTATUSEX)
+            102 CALL                     0
+            110 STORE_FAST               1 (st)
+
+ 68         112 LOAD_DEREF               6 (ctypes)
+            114 LOAD_ATTR                9 (NULL|self + sizeof)
+            134 LOAD_FAST                0 (_MEMORYSTATUSEX)
+            136 CALL                     1
+            144 LOAD_FAST                1 (st)
+            146 STORE_ATTR               5 (dwLength)
+
+ 69         156 LOAD_DEREF               6 (ctypes)
+            158 LOAD_ATTR               12 (windll)
+            178 LOAD_ATTR               14 (kernel32)
+            198 LOAD_ATTR               17 (NULL|self + GlobalMemoryStatusEx)
+            218 LOAD_DEREF               6 (ctypes)
+            220 LOAD_ATTR               19 (NULL|self + byref)
+            240 LOAD_FAST                1 (st)
+            242 CALL                     1
+            250 CALL                     1
+            258 POP_JUMP_IF_FALSE       48 (to 356)
+
+ 70         260 LOAD_GLOBAL             21 (NULL + int)
+            270 LOAD_FAST                1 (st)
+            272 LOAD_ATTR               22 (ullTotalPhys)
+            292 LOAD_CONST               6 (1048576)
+            294 BINARY_OP                2 (//)
+            298 CALL                     1
+            306 LOAD_GLOBAL             21 (NULL + int)
+            316 LOAD_FAST                1 (st)
+            318 LOAD_ATTR               24 (ullAvailPhys)
+            338 LOAD_CONST               6 (1048576)
+            340 BINARY_OP                2 (//)
+            344 CALL                     1
+            352 BUILD_TUPLE              2
+            354 RETURN_VALUE
+
+ 69     >>  356 NOP
+
+ 73         358 RETURN_CONST             7 ((0, 0))
+
+ 74     >>  360 NOP
+
+ 75         362 LOAD_CONST               2 (0)
+            364 COPY                     1
+            366 STORE_FAST               2 (total)
+            368 STORE_FAST               3 (avail)
+
+ 76         370 LOAD_GLOBAL             29 (NULL + open)
+            380 LOAD_CONST               8 ('/proc/meminfo')
+            382 LOAD_CONST               9 ('r')
+            384 LOAD_CONST              10 ('utf-8')
+            386 KW_NAMES                11 (('encoding',))
+            388 CALL                     3
+            396 BEFORE_WITH
+            398 STORE_FAST               4 (f)
+
+ 77         400 LOAD_FAST                4 (f)
+            402 GET_ITER
+        >>  404 FOR_ITER               106 (to 620)
+            408 STORE_FAST               5 (line)
+
+ 78         410 LOAD_FAST                5 (line)
+            412 LOAD_ATTR               31 (NULL|self + startswith)
+            432 LOAD_CONST              12 ('MemTotal:')
+            434 CALL                     1
+            442 POP_JUMP_IF_FALSE       32 (to 508)
+
+ 79         444 LOAD_GLOBAL             21 (NULL + int)
+            454 LOAD_FAST                5 (line)
+            456 LOAD_ATTR               33 (NULL|self + split)
+            476 CALL                     0
+            484 LOAD_CONST              13 (1)
+            486 BINARY_SUBSCR
+            490 CALL                     1
+            498 LOAD_CONST              14 (1024)
+            500 BINARY_OP                2 (//)
+            504 STORE_FAST               2 (total)
+            506 JUMP_FORWARD            48 (to 604)
+
+ 80     >>  508 LOAD_FAST                5 (line)
+            510 LOAD_ATTR               31 (NULL|self + startswith)
+            530 LOAD_CONST              15 ('MemAvailable:')
+            532 CALL                     1
+            540 POP_JUMP_IF_FALSE       31 (to 604)
+
+ 81         542 LOAD_GLOBAL             21 (NULL + int)
+            552 LOAD_FAST                5 (line)
+            554 LOAD_ATTR               33 (NULL|self + split)
+            574 CALL                     0
+            582 LOAD_CONST              13 (1)
+            584 BINARY_SUBSCR
+            588 CALL                     1
+            596 LOAD_CONST              14 (1024)
+            598 BINARY_OP                2 (//)
+            602 STORE_FAST               3 (avail)
+
+ 82     >>  604 LOAD_FAST                2 (total)
+            606 POP_JUMP_IF_TRUE         1 (to 610)
+            608 JUMP_BACKWARD          103 (to 404)
+        >>  610 LOAD_FAST                3 (avail)
+            612 POP_JUMP_IF_TRUE         1 (to 616)
+            614 JUMP_BACKWARD          106 (to 404)
+
+ 83     >>  616 POP_TOP
+            618 JUMP_FORWARD             1 (to 622)
+
+ 77     >>  620 END_FOR
+
+ 76     >>  622 LOAD_CONST               3 (None)
+            624 LOAD_CONST               3 (None)
+            626 LOAD_CONST               3 (None)
+            628 CALL                     2
+            636 POP_TOP
+
+ 84     >>  638 LOAD_FAST                2 (total)
+            640 LOAD_FAST                3 (avail)
+            642 BUILD_TUPLE              2
+            644 RETURN_VALUE
+        >>  646 PUSH_EXC_INFO
+
+ 71         648 LOAD_GLOBAL             26 (Exception)
+            658 CHECK_EXC_MATCH
+            660 POP_JUMP_IF_FALSE        3 (to 668)
+            662 POP_TOP
+
+ 72         664 POP_EXCEPT
+
+ 73         666 RETURN_CONST             7 ((0, 0))
+
+ 71     >>  668 RERAISE                  0
+        >>  670 COPY                     3
+            672 POP_EXCEPT
+            674 RERAISE                  1
+
+ 76     >>  676 PUSH_EXC_INFO
+            678 WITH_EXCEPT_START
+            680 POP_JUMP_IF_TRUE         1 (to 684)
+            682 RERAISE                  2
+        >>  684 POP_TOP
+            686 POP_EXCEPT
+            688 POP_TOP
+            690 POP_TOP
+            692 JUMP_BACKWARD           28 (to 638)
+        >>  694 COPY                     3
+            696 POP_EXCEPT
+            698 RERAISE                  1
+        >>  700 PUSH_EXC_INFO
+
+ 85         702 LOAD_GLOBAL             26 (Exception)
+            712 CHECK_EXC_MATCH
+            714 POP_JUMP_IF_FALSE        3 (to 722)
+            716 POP_TOP
+
+ 86         718 POP_EXCEPT
+            720 RETURN_CONST             7 ((0, 0))
+
+ 85     >>  722 RERAISE                  0
+        >>  724 COPY                     3
+            726 POP_EXCEPT
+            728 RERAISE                  1
+ExceptionTable:
+  44 to 352 -> 646 [0]
+  362 to 396 -> 700 [0]
+  398 to 606 -> 676 [1] lasti
+  610 to 612 -> 676 [1] lasti
+  616 to 620 -> 676 [1] lasti
+  622 to 642 -> 700 [0]
+  646 to 662 -> 670 [1] lasti
+  668 to 668 -> 670 [1] lasti
+  676 to 684 -> 694 [3] lasti
+  686 to 698 -> 700 [0]
+  700 to 716 -> 724 [1] lasti
+  722 to 722 -> 724 [1] lasti
+
+Disassembly of <code object _MEMORYSTATUSEX at 0x7f6c81bcb2f0, file "app\core\resources.py", line 56>:
+              0 COPY_FREE_VARS           1
+
+ 56           2 RESUME                   0
+              4 LOAD_NAME                0 (__name__)
+              6 STORE_NAME               1 (__module__)
+              8 LOAD_CONST               0 ('ram_info_mb.<locals>._MEMORYSTATUSEX')
+             10 STORE_NAME               2 (__qualname__)
+
+ 57          12 LOAD_CONST               1 ('dwLength')
+             14 LOAD_LOCALS
+             16 LOAD_FROM_DICT_OR_DEREF     0 (ctypes)
+             18 LOAD_ATTR                6 (c_ulong)
+             38 BUILD_TUPLE              2
+
+ 58          40 LOAD_CONST               2 ('dwMemoryLoad')
+             42 LOAD_LOCALS
+             44 LOAD_FROM_DICT_OR_DEREF     0 (ctypes)
+             46 LOAD_ATTR                6 (c_ulong)
+             66 BUILD_TUPLE              2
+
+ 59          68 LOAD_CONST               3 ('ullTotalPhys')
+             70 LOAD_LOCALS
+             72 LOAD_FROM_DICT_OR_DEREF     0 (ctypes)
+             74 LOAD_ATTR                8 (c_ulonglong)
+             94 BUILD_TUPLE              2
+
+ 60          96 LOAD_CONST               4 ('ullAvailPhys')
+             98 LOAD_LOCALS
+            100 LOAD_FROM_DICT_OR_DEREF     0 (ctypes)
+            102 LOAD_ATTR                8 (c_ulonglong)
+            122 BUILD_TUPLE              2
+
+ 61         124 LOAD_CONST               5 ('ullTotalPageFile')
+            126 LOAD_LOCALS
+            128 LOAD_FROM_DICT_OR_DEREF     0 (ctypes)
+            130 LOAD_ATTR                8 (c_ulonglong)
+            150 BUILD_TUPLE              2
+
+ 62         152 LOAD_CONST               6 ('ullAvailPageFile')
+            154 LOAD_LOCALS
+            156 LOAD_FROM_DICT_OR_DEREF     0 (ctypes)
+            158 LOAD_ATTR                8 (c_ulonglong)
+            178 BUILD_TUPLE              2
+
+ 63         180 LOAD_CONST               7 ('ullTotalVirtual')
+            182 LOAD_LOCALS
+            184 LOAD_FROM_DICT_OR_DEREF     0 (ctypes)
+            186 LOAD_ATTR                8 (c_ulonglong)
+            206 BUILD_TUPLE              2
+
+ 64         208 LOAD_CONST               8 ('ullAvailVirtual')
+            210 LOAD_LOCALS
+            212 LOAD_FROM_DICT_OR_DEREF     0 (ctypes)
+            214 LOAD_ATTR                8 (c_ulonglong)
+            234 BUILD_TUPLE              2
+
+ 65         236 LOAD_CONST               9 ('ullAvailExtendedVirtual')
+            238 LOAD_LOCALS
+            240 LOAD_FROM_DICT_OR_DEREF     0 (ctypes)
+            242 LOAD_ATTR                8 (c_ulonglong)
+            262 BUILD_TUPLE              2
+
+ 57         264 BUILD_LIST               9
+            266 STORE_NAME               5 (_fields_)
+            268 RETURN_CONST            10 (None)
+
+Disassembly of <code object _nvidia_smi at 0x28e475a0, file "app\core\resources.py", line 89>:
+ 89           0 RESUME                   0
+
+ 91           2 LOAD_GLOBAL              1 (NULL + shutil)
+             12 LOAD_ATTR                2 (which)
+             32 LOAD_CONST               1 ('nvidia-smi')
+             34 CALL                     1
+             42 STORE_FAST               1 (exe)
+
+ 92          44 LOAD_FAST                1 (exe)
+             46 POP_JUMP_IF_TRUE         2 (to 52)
+
+ 93          48 BUILD_LIST               0
+             50 RETURN_VALUE
+
+ 94     >>   52 NOP
+
+ 95          54 LOAD_GLOBAL              5 (NULL + subprocess)
+             64 LOAD_ATTR                6 (run)
+
+ 96          84 LOAD_FAST                1 (exe)
+             86 LOAD_CONST               2 ('--query-gpu=')
+             88 LOAD_FAST                0 (query)
+             90 FORMAT_VALUE             0
+             92 BUILD_STRING             2
+             94 LOAD_CONST               3 ('--format=csv,noheader,nounits')
+             96 BUILD_LIST               3
+
+ 95          98 BUILD_TUPLE              1
+
+ 97         100 LOAD_CONST               4 (True)
+            102 LOAD_CONST               4 (True)
+            104 LOAD_CONST               5 (5)
+
+ 95         106 LOAD_CONST               6 (('capture_output', 'text', 'timeout'))
+            108 BUILD_CONST_KEY_MAP      3
+
+ 97         110 LOAD_GLOBAL              9 (NULL + no_window_kwargs)
+            120 CALL                     0
+
+ 95         128 DICT_MERGE               1
+            130 CALL_FUNCTION_EX         1
+            132 STORE_FAST               2 (out)
+
+ 99         134 LOAD_FAST                2 (out)
+            136 LOAD_ATTR               10 (returncode)
+            156 LOAD_CONST               7 (0)
+            158 COMPARE_OP              55 (!=)
+            162 POP_JUMP_IF_FALSE        2 (to 168)
+
+100         164 BUILD_LIST               0
+            166 RETURN_VALUE
+
+101     >>  168 LOAD_FAST                2 (out)
+            170 LOAD_ATTR               12 (stdout)
+            190 LOAD_ATTR               15 (NULL|self + splitlines)
+            210 CALL                     0
+            218 GET_ITER
+            220 LOAD_FAST_AND_CLEAR      3 (ln)
+            222 SWAP                     2
+            224 BUILD_LIST               0
+            226 SWAP                     2
+        >>  228 FOR_ITER                35 (to 302)
+            232 STORE_FAST               3 (ln)
+            234 LOAD_FAST                3 (ln)
+            236 LOAD_ATTR               17 (NULL|self + strip)
+            256 CALL                     0
+            264 POP_JUMP_IF_TRUE         1 (to 268)
+            266 JUMP_BACKWARD           20 (to 228)
+        >>  268 LOAD_FAST                3 (ln)
+            270 LOAD_ATTR               17 (NULL|self + strip)
+            290 CALL                     0
+            298 LIST_APPEND              2
+            300 JUMP_BACKWARD           37 (to 228)
+        >>  302 END_FOR
+            304 SWAP                     2
+            306 STORE_FAST               3 (ln)
+            308 RETURN_VALUE
+        >>  310 SWAP                     2
+            312 POP_TOP
+            314 SWAP                     2
+            316 STORE_FAST               3 (ln)
+            318 RERAISE                  0
+        >>  320 PUSH_EXC_INFO
+
+102         322 LOAD_GLOBAL             18 (Exception)
+            332 CHECK_EXC_MATCH
+            334 POP_JUMP_IF_FALSE        5 (to 346)
+            336 POP_TOP
+
+103         338 BUILD_LIST               0
+            340 SWAP                     2
+            342 POP_EXCEPT
+            344 RETURN_VALUE
+
+102     >>  346 RERAISE                  0
+        >>  348 COPY                     3
+            350 POP_EXCEPT
+            352 RERAISE                  1
+ExceptionTable:
+  54 to 164 -> 320 [0]
+  168 to 222 -> 320 [0]
+  224 to 264 -> 310 [2]
+  268 to 302 -> 310 [2]
+  304 to 306 -> 320 [0]
+  310 to 318 -> 320 [0]
+  320 to 340 -> 348 [1] lasti
+  346 to 346 -> 348 [1] lasti
+
+Disassembly of <code object gpu_static at 0x7f6c81bc9990, file "app\core\resources.py", line 106>:
+106           0 RESUME                   0
+
+108           2 LOAD_GLOBAL              1 (NULL + _nvidia_smi)
+             12 LOAD_CONST               1 ('memory.total,name')
+             14 CALL                     1
+             22 STORE_FAST               0 (rows)
+
+109          24 LOAD_FAST                0 (rows)
+             26 POP_JUMP_IF_TRUE         1 (to 30)
+
+110          28 RETURN_CONST             2 ((0, ''))
+
+111     >>   30 LOAD_FAST                0 (rows)
+             32 LOAD_CONST               3 (0)
+             34 BINARY_SUBSCR
+             38 LOAD_ATTR                3 (NULL|self + split)
+             58 LOAD_CONST               4 (',')
+             60 CALL                     1
+             68 GET_ITER
+             70 LOAD_FAST_AND_CLEAR      1 (p)
+             72 SWAP                     2
+             74 BUILD_LIST               0
+             76 SWAP                     2
+        >>   78 FOR_ITER                18 (to 118)
+             82 STORE_FAST               1 (p)
+             84 LOAD_FAST                1 (p)
+             86 LOAD_ATTR                5 (NULL|self + strip)
+            106 CALL                     0
+            114 LIST_APPEND              2
+            116 JUMP_BACKWARD           20 (to 78)
+        >>  118 END_FOR
+            120 STORE_FAST               2 (parts)
+            122 STORE_FAST               1 (p)
+
+112         124 NOP
+
+113         126 LOAD_GLOBAL              7 (NULL + int)
+            136 LOAD_GLOBAL              9 (NULL + float)
+            146 LOAD_FAST                2 (parts)
+            148 LOAD_CONST               3 (0)
+            150 BINARY_SUBSCR
+            154 CALL                     1
+            162 CALL                     1
+            170 LOAD_GLOBAL             11 (NULL + len)
+            180 LOAD_FAST                2 (parts)
+            182 CALL                     1
+            190 LOAD_CONST               5 (1)
+            192 COMPARE_OP              68 (>)
+            196 POP_JUMP_IF_FALSE        6 (to 210)
+            198 LOAD_FAST                2 (parts)
+            200 LOAD_CONST               5 (1)
+            202 BINARY_SUBSCR
+            206 BUILD_TUPLE              2
+            208 RETURN_VALUE
+        >>  210 LOAD_CONST               6 ('')
+            212 BUILD_TUPLE              2
+            214 RETURN_VALUE
+        >>  216 SWAP                     2
+            218 POP_TOP
+
+111         220 SWAP                     2
+            222 STORE_FAST               1 (p)
+            224 RERAISE                  0
+        >>  226 PUSH_EXC_INFO
+
+114         228 LOAD_GLOBAL             12 (ValueError)
+            238 LOAD_GLOBAL             14 (IndexError)
+            248 BUILD_TUPLE              2
+            250 CHECK_EXC_MATCH
+            252 POP_JUMP_IF_FALSE        3 (to 260)
+            254 POP_TOP
+
+115         256 POP_EXCEPT
+            258 RETURN_CONST             2 ((0, ''))
+
+114     >>  260 RERAISE                  0
+        >>  262 COPY                     3
+            264 POP_EXCEPT
+            266 RERAISE                  1
+ExceptionTable:
+  74 to 118 -> 216 [2]
+  126 to 206 -> 226 [0]
+  210 to 212 -> 226 [0]
+  226 to 254 -> 262 [1] lasti
+  260 to 260 -> 262 [1] lasti
+
+Disassembly of <code object gpu_dynamic at 0x26a1baa0, file "app\core\resources.py", line 118>:
+118           0 RESUME                   0
+
+120           2 LOAD_GLOBAL              1 (NULL + _nvidia_smi)
+             12 LOAD_CONST               1 ('utilization.gpu,memory.used,memory.total')
+             14 CALL                     1
+             22 STORE_FAST               0 (rows)
+
+121          24 LOAD_FAST                0 (rows)
+             26 POP_JUMP_IF_TRUE         2 (to 32)
+
+122          28 BUILD_MAP                0
+             30 RETURN_VALUE
+
+123     >>   32 LOAD_FAST                0 (rows)
+             34 LOAD_CONST               2 (0)
+             36 BINARY_SUBSCR
+             40 LOAD_ATTR                3 (NULL|self + split)
+             60 LOAD_CONST               3 (',')
+             62 CALL                     1
+             70 GET_ITER
+             72 LOAD_FAST_AND_CLEAR      1 (p)
+             74 SWAP                     2
+             76 BUILD_LIST               0
+             78 SWAP                     2
+        >>   80 FOR_ITER                18 (to 120)
+             84 STORE_FAST               1 (p)
+             86 LOAD_FAST                1 (p)
+             88 LOAD_ATTR                5 (NULL|self + strip)
+            108 CALL                     0
+            116 LIST_APPEND              2
+            118 JUMP_BACKWARD           20 (to 80)
+        >>  120 END_FOR
+            122 STORE_FAST               2 (parts)
+            124 STORE_FAST               1 (p)
+
+124         126 NOP
+
+125         128 LOAD_GLOBAL              7 (NULL + int)
+            138 LOAD_GLOBAL              9 (NULL + float)
+            148 LOAD_FAST                2 (parts)
+            150 LOAD_CONST               2 (0)
+            152 BINARY_SUBSCR
+            156 CALL                     1
+            164 CALL                     1
+
+126         172 LOAD_GLOBAL              7 (NULL + int)
+            182 LOAD_GLOBAL              9 (NULL + float)
+            192 LOAD_FAST                2 (parts)
+            194 LOAD_CONST               4 (1)
+            196 BINARY_SUBSCR
+            200 CALL                     1
+            208 CALL                     1
+
+127         216 LOAD_GLOBAL              7 (NULL + int)
+            226 LOAD_GLOBAL              9 (NULL + float)
+            236 LOAD_FAST                2 (parts)
+            238 LOAD_CONST               5 (2)
+            240 BINARY_SUBSCR
+            244 CALL                     1
+            252 CALL                     1
+
+125         260 LOAD_CONST               6 (('util_pct', 'vram_used_mb', 'vram_total_mb'))
+            262 BUILD_CONST_KEY_MAP      3
+            264 RETURN_VALUE
+        >>  266 SWAP                     2
+            268 POP_TOP
+
+123         270 SWAP                     2
+            272 STORE_FAST               1 (p)
+            274 RERAISE                  0
+        >>  276 PUSH_EXC_INFO
+
+128         278 LOAD_GLOBAL             10 (ValueError)
+            288 LOAD_GLOBAL             12 (IndexError)
+            298 BUILD_TUPLE              2
+            300 CHECK_EXC_MATCH
+            302 POP_JUMP_IF_FALSE        5 (to 314)
+            304 POP_TOP
+
+129         306 BUILD_MAP                0
+            308 SWAP                     2
+            310 POP_EXCEPT
+            312 RETURN_VALUE
+
+128     >>  314 RERAISE                  0
+        >>  316 COPY                     3
+            318 POP_EXCEPT
+            320 RERAISE                  1
+ExceptionTable:
+  76 to 120 -> 266 [2]
+  128 to 262 -> 276 [0]
+  276 to 308 -> 316 [1] lasti
+  314 to 314 -> 316 [1] lasti
+
+Disassembly of <code object _suggest_from at 0x28b77510, file "app\core\resources.py", line 133>:
+133           0 RESUME                   0
+
+136           2 LOAD_GLOBAL              1 (NULL + max)
+             12 LOAD_CONST               1 (2)
+             14 LOAD_GLOBAL              3 (NULL + min)
+             24 LOAD_FAST                0 (cpu_count)
+             26 LOAD_CONST               1 (2)
+             28 BINARY_OP                2 (//)
+             32 LOAD_CONST               2 (8)
+             34 CALL                     2
+             42 CALL                     2
+             50 STORE_FAST               4 (cpu_slots)
+
+138          52 LOAD_FAST                1 (ram_total_mb)
+             54 POP_JUMP_IF_FALSE       25 (to 106)
+
+139          56 LOAD_GLOBAL              1 (NULL + max)
+             66 LOAD_CONST               1 (2)
+             68 LOAD_GLOBAL              3 (NULL + min)
+             78 LOAD_FAST                4 (cpu_slots)
+             80 LOAD_FAST                1 (ram_total_mb)
+             82 LOAD_CONST               3 (1536)
+             84 BINARY_OP                2 (//)
+             88 CALL                     2
+             96 CALL                     2
+            104 STORE_FAST               4 (cpu_slots)
+
+141     >>  106 LOAD_GLOBAL              1 (NULL + max)
+            116 LOAD_CONST               4 (4)
+            118 LOAD_GLOBAL              3 (NULL + min)
+            128 LOAD_FAST                0 (cpu_count)
+            130 LOAD_CONST               5 (12)
+            132 CALL                     2
+            140 CALL                     2
+            148 STORE_FAST               5 (net_slots)
+
+143         150 LOAD_FAST                3 (has_cuda)
+            152 POP_JUMP_IF_FALSE        5 (to 164)
+            154 LOAD_FAST                2 (vram_mb)
+            156 LOAD_CONST               6 (0)
+            158 COMPARE_OP              26 (<=)
+            162 POP_JUMP_IF_FALSE       29 (to 222)
+
+145     >>  164 LOAD_CONST               7 (1)
+            166 LOAD_FAST                5 (net_slots)
+            168 LOAD_FAST                4 (cpu_slots)
+
+146         170 LOAD_CONST               7 (1)
+            172 LOAD_CONST               7 (1)
+
+147         174 LOAD_GLOBAL              1 (NULL + max)
+            184 LOAD_CONST               4 (4)
+            186 LOAD_GLOBAL              3 (NULL + min)
+            196 LOAD_FAST                0 (cpu_count)
+            198 LOAD_CONST               5 (12)
+            200 CALL                     2
+            208 CALL                     2
+
+145         216 LOAD_CONST               8 (('gpu_slots', 'net_slots', 'cpu_slots', 'gpu_concurrency', 'whisper_batch_size', 'whisper_cpu_threads'))
+            218 BUILD_CONST_KEY_MAP      6
+            220 RETURN_VALUE
+
+157     >>  222 LOAD_FAST                2 (vram_mb)
+            224 LOAD_CONST               9 (12000)
+            226 COMPARE_OP              92 (>=)
+            230 POP_JUMP_IF_FALSE        7 (to 246)
+
+158         232 LOAD_CONST              10 ((3, 3, 24))
+            234 UNPACK_SEQUENCE          3
+            238 STORE_FAST               6 (gpu_slots)
+            240 STORE_FAST               7 (gpu_conc)
+            242 STORE_FAST               8 (batch)
+            244 JUMP_FORWARD            42 (to 330)
+
+159     >>  246 LOAD_FAST                2 (vram_mb)
+            248 LOAD_CONST              11 (8000)
+            250 COMPARE_OP              92 (>=)
+            254 POP_JUMP_IF_FALSE        7 (to 270)
+
+160         256 LOAD_CONST              12 ((3, 2, 16))
+            258 UNPACK_SEQUENCE          3
+            262 STORE_FAST               6 (gpu_slots)
+            264 STORE_FAST               7 (gpu_conc)
+            266 STORE_FAST               8 (batch)
+            268 JUMP_FORWARD            30 (to 330)
+
+161     >>  270 LOAD_FAST                2 (vram_mb)
+            272 LOAD_CONST              13 (6000)
+            274 COMPARE_OP              92 (>=)
+            278 POP_JUMP_IF_FALSE        7 (to 294)
+
+162         280 LOAD_CONST              14 ((2, 2, 8))
+            282 UNPACK_SEQUENCE          3
+            286 STORE_FAST               6 (gpu_slots)
+            288 STORE_FAST               7 (gpu_conc)
+            290 STORE_FAST               8 (batch)
+            292 JUMP_FORWARD            18 (to 330)
+
+163     >>  294 LOAD_FAST                2 (vram_mb)
+            296 LOAD_CONST              15 (4000)
+            298 COMPARE_OP              92 (>=)
+            302 POP_JUMP_IF_FALSE        7 (to 318)
+
+164         304 LOAD_CONST              16 ((1, 1, 4))
+            306 UNPACK_SEQUENCE          3
+            310 STORE_FAST               6 (gpu_slots)
+            312 STORE_FAST               7 (gpu_conc)
+            314 STORE_FAST               8 (batch)
+            316 JUMP_FORWARD             6 (to 330)
+
+166     >>  318 LOAD_CONST              17 ((1, 1, 1))
+            320 UNPACK_SEQUENCE          3
+            324 STORE_FAST               6 (gpu_slots)
+            326 STORE_FAST               7 (gpu_conc)
+            328 STORE_FAST               8 (batch)
+
+173     >>  330 LOAD_FAST                1 (ram_total_mb)
+            332 POP_JUMP_IF_FALSE       98 (to 530)
+
+174         334 LOAD_GLOBAL              1 (NULL + max)
+            344 LOAD_CONST               7 (1)
+            346 LOAD_GLOBAL              5 (NULL + int)
+            356 LOAD_FAST                1 (ram_total_mb)
+            358 LOAD_CONST              18 (4096)
+            360 BINARY_OP               10 (-)
+            364 LOAD_CONST              19 (2560)
+            366 BINARY_OP                2 (//)
+            370 CALL                     1
+            378 CALL                     2
+            386 STORE_FAST               9 (ram_cap)
+
+175         388 LOAD_FAST                9 (ram_cap)
+            390 LOAD_FAST                7 (gpu_conc)
+            392 COMPARE_OP               2 (<)
+            396 POP_JUMP_IF_TRUE         5 (to 408)
+            398 LOAD_FAST                9 (ram_cap)
+            400 LOAD_FAST                6 (gpu_slots)
+            402 COMPARE_OP               2 (<)
+            406 POP_JUMP_IF_FALSE       37 (to 482)
+
+176     >>  408 LOAD_GLOBAL              7 (NULL + log)
+            418 LOAD_ATTR                8 (info)
+            438 LOAD_CONST              20 ('[resources] RAM ')
+            440 LOAD_FAST                1 (ram_total_mb)
+            442 FORMAT_VALUE             0
+            444 LOAD_CONST              21 ('MB giới hạn số tác vụ song song xuống ')
+            446 LOAD_FAST                9 (ram_cap)
+            448 FORMAT_VALUE             0
+            450 LOAD_CONST              22 (' (VRAM ')
+
+177         452 LOAD_FAST                2 (vram_mb)
+            454 FORMAT_VALUE             0
+            456 LOAD_CONST              23 ('MB cho phép gpu_conc=')
+            458 LOAD_FAST                7 (gpu_conc)
+            460 FORMAT_VALUE             0
+            462 LOAD_CONST              24 (', gpu_slots=')
+            464 LOAD_FAST                6 (gpu_slots)
+            466 FORMAT_VALUE             0
+            468 LOAD_CONST              25 (').')
+
+176         470 BUILD_STRING            11
+            472 CALL                     1
+            480 POP_TOP
+
+178     >>  482 LOAD_GLOBAL              3 (NULL + min)
+            492 LOAD_FAST                7 (gpu_conc)
+            494 LOAD_FAST                9 (ram_cap)
+            496 CALL                     2
+            504 STORE_FAST               7 (gpu_conc)
+
+179         506 LOAD_GLOBAL              3 (NULL + min)
+            516 LOAD_FAST                6 (gpu_slots)
+            518 LOAD_FAST                9 (ram_cap)
+            520 CALL                     2
+            528 STORE_FAST               6 (gpu_slots)
+
+181     >>  530 LOAD_FAST                6 (gpu_slots)
+            532 LOAD_FAST                5 (net_slots)
+            534 LOAD_FAST                4 (cpu_slots)
+
+182         536 LOAD_FAST                7 (gpu_conc)
+            538 LOAD_FAST                8 (batch)
+
+184         540 LOAD_GLOBAL              1 (NULL + max)
+            550 LOAD_CONST               4 (4)
+            552 LOAD_GLOBAL              3 (NULL + min)
+            562 LOAD_FAST                0 (cpu_count)
+            564 LOAD_CONST               1 (2)
+            566 BINARY_OP                2 (//)
+            570 LOAD_CONST               2 (8)
+            572 CALL                     2
+            580 CALL                     2
+
+181         588 LOAD_CONST               8 (('gpu_slots', 'net_slots', 'cpu_slots', 'gpu_concurrency', 'whisper_batch_size', 'whisper_cpu_threads'))
+            590 BUILD_CONST_KEY_MAP      6
+            592 RETURN_VALUE
+
+Disassembly of <code object machine_profile at 0x26a24950, file "app\core\resources.py", line 187>:
+187           0 RESUME                   0
+
+190           2 LOAD_GLOBAL              0 (_STATIC_CACHE)
+             12 POP_JUMP_IF_NONE         2 (to 18)
+             14 LOAD_FAST                0 (refresh)
+             16 POP_JUMP_IF_FALSE      180 (to 378)
+
+191     >>   18 LOAD_GLOBAL              3 (NULL + os)
+             28 LOAD_ATTR                4 (cpu_count)
+             48 CALL                     0
+             56 COPY                     1
+             58 POP_JUMP_IF_TRUE         2 (to 64)
+             60 POP_TOP
+             62 LOAD_CONST               1 (4)
+        >>   64 STORE_FAST               1 (cpu_count)
+
+192          66 LOAD_GLOBAL              7 (NULL + ram_info_mb)
+             76 CALL                     0
+             84 UNPACK_SEQUENCE          2
+             88 STORE_FAST               2 (ram_total)
+             90 STORE_FAST               3 (_)
+
+193          92 LOAD_GLOBAL              9 (NULL + gpu_static)
+            102 CALL                     0
+            110 UNPACK_SEQUENCE          2
+            114 STORE_FAST               4 (vram)
+            116 STORE_FAST               5 (gpu_name)
+
+194         118 LOAD_CONST               2 (False)
+            120 STORE_FAST               6 (has_cuda)
+
+195         122 NOP
+
+196         124 LOAD_CONST               3 (0)
+            126 LOAD_CONST               4 (('probe_cuda',))
+            128 IMPORT_NAME              5 (app.core.gpu)
+            130 IMPORT_FROM              6 (probe_cuda)
+            132 STORE_FAST               7 (probe_cuda)
+            134 POP_TOP
+
+197         136 LOAD_GLOBAL             15 (NULL + bool)
+            146 PUSH_NULL
+            148 LOAD_FAST                7 (probe_cuda)
+            150 CALL                     0
+            158 LOAD_ATTR               17 (NULL|self + get)
+            178 LOAD_CONST               5 ('usable')
+            180 CALL                     1
+            188 CALL                     1
+            196 STORE_FAST               6 (has_cuda)
+
+200     >>  198 LOAD_GLOBAL             21 (NULL + _suggest_from)
+            208 LOAD_FAST                1 (cpu_count)
+            210 LOAD_FAST                2 (ram_total)
+            212 LOAD_FAST                4 (vram)
+            214 LOAD_FAST                6 (has_cuda)
+            216 CALL                     4
+            224 STORE_FAST               8 (sug)
+
+202         226 LOAD_FAST                1 (cpu_count)
+            228 LOAD_FAST                2 (ram_total)
+            230 LOAD_FAST                4 (vram)
+
+203         232 LOAD_FAST                5 (gpu_name)
+            234 LOAD_FAST                6 (has_cuda)
+
+201         236 LOAD_CONST               6 (('cpu_count', 'ram_total_mb', 'vram_total_mb', 'gpu_name', 'has_cuda'))
+            238 BUILD_CONST_KEY_MAP      5
+
+203         240 LOAD_FAST                8 (sug)
+
+201         242 DICT_UPDATE              1
+            244 STORE_GLOBAL             0 (_STATIC_CACHE)
+
+205         246 LOAD_GLOBAL             23 (NULL + log)
+            256 LOAD_ATTR               24 (info)
+            276 LOAD_CONST               7 ('[resources] CPU=')
+            278 LOAD_FAST                1 (cpu_count)
+            280 FORMAT_VALUE             0
+            282 LOAD_CONST               8 (' RAM=')
+            284 LOAD_FAST                2 (ram_total)
+            286 FORMAT_VALUE             0
+            288 LOAD_CONST               9 ("MB GPU='")
+            290 LOAD_FAST                5 (gpu_name)
+            292 FORMAT_VALUE             0
+            294 LOAD_CONST              10 ("' VRAM=")
+            296 LOAD_FAST                4 (vram)
+            298 FORMAT_VALUE             0
+            300 LOAD_CONST              11 ('MB cuda=')
+
+206         302 LOAD_FAST                6 (has_cuda)
+            304 FORMAT_VALUE             0
+            306 LOAD_CONST              12 (' → gpu_slots=')
+            308 LOAD_FAST                8 (sug)
+            310 LOAD_CONST              13 ('gpu_slots')
+            312 BINARY_SUBSCR
+            316 FORMAT_VALUE             0
+            318 LOAD_CONST              14 (' net=')
+            320 LOAD_FAST                8 (sug)
+            322 LOAD_CONST              15 ('net_slots')
+            324 BINARY_SUBSCR
+            328 FORMAT_VALUE             0
+            330 LOAD_CONST              16 (' cpu=')
+
+207         332 LOAD_FAST                8 (sug)
+            334 LOAD_CONST              17 ('cpu_slots')
+            336 BINARY_SUBSCR
+            340 FORMAT_VALUE             0
+            342 LOAD_CONST              18 (' gpu_conc=')
+            344 LOAD_FAST                8 (sug)
+            346 LOAD_CONST              19 ('gpu_concurrency')
+            348 BINARY_SUBSCR
+            352 FORMAT_VALUE             0
+            354 LOAD_CONST              20 (' whisper_batch=')
+
+208         356 LOAD_FAST                8 (sug)
+            358 LOAD_CONST              21 ('whisper_batch_size')
+            360 BINARY_SUBSCR
+            364 FORMAT_VALUE             0
+
+205         366 BUILD_STRING            20
+            368 CALL                     1
+            376 POP_TOP
+
+209     >>  378 LOAD_GLOBAL             27 (NULL + MachineProfile)
+            388 LOAD_CONST              22 (())
+            390 BUILD_MAP                0
+            392 LOAD_GLOBAL              0 (_STATIC_CACHE)
+            402 DICT_MERGE               1
+            404 CALL_FUNCTION_EX         1
+            406 RETURN_VALUE
+        >>  408 PUSH_EXC_INFO
+
+198         410 LOAD_GLOBAL             18 (Exception)
+            420 CHECK_EXC_MATCH
+            422 POP_JUMP_IF_FALSE        8 (to 440)
+            424 POP_TOP
+
+199         426 LOAD_FAST                4 (vram)
+            428 LOAD_CONST               3 (0)
+            430 COMPARE_OP              68 (>)
+            434 STORE_FAST               6 (has_cuda)
+            436 POP_EXCEPT
+            438 JUMP_BACKWARD          121 (to 198)
+
+198     >>  440 RERAISE                  0
+        >>  442 COPY                     3
+            444 POP_EXCEPT
+            446 RERAISE                  1
+ExceptionTable:
+  124 to 196 -> 408 [0]
+  408 to 434 -> 442 [1] lasti
+  440 to 440 -> 442 [1] lasti
+
+Disassembly of <code object snapshot at 0x7f6c81bc9f00, file "app\core\resources.py", line 212>:
+212           0 RESUME                   0
+
+215           2 LOAD_GLOBAL              1 (NULL + time)
+             12 LOAD_ATTR                2 (monotonic)
+             32 CALL                     0
+             40 STORE_FAST               0 (now)
+
+216          42 LOAD_GLOBAL              4 (_DYN_CACHE)
+             52 POP_JUMP_IF_FALSE       28 (to 110)
+             54 LOAD_FAST                0 (now)
+             56 LOAD_GLOBAL              4 (_DYN_CACHE)
+             66 LOAD_CONST               1 (0)
+             68 BINARY_SUBSCR
+             72 BINARY_OP               10 (-)
+             76 LOAD_GLOBAL              6 (_DYN_TTL)
+             86 COMPARE_OP               2 (<)
+             90 POP_JUMP_IF_FALSE        9 (to 110)
+
+217          92 LOAD_GLOBAL              4 (_DYN_CACHE)
+            102 LOAD_CONST               2 (1)
+            104 BINARY_SUBSCR
+            108 RETURN_VALUE
+
+218     >>  110 LOAD_GLOBAL              9 (NULL + ram_info_mb)
+            120 CALL                     0
+            128 UNPACK_SEQUENCE          2
+            132 STORE_FAST               1 (ram_total)
+            134 STORE_FAST               2 (ram_avail)
+
+220         136 LOAD_GLOBAL             11 (NULL + os)
+            146 LOAD_ATTR               12 (cpu_count)
+            166 CALL                     0
+            174 COPY                     1
+            176 POP_JUMP_IF_TRUE         2 (to 182)
+            178 POP_TOP
+            180 LOAD_CONST               1 (0)
+
+221     >>  182 LOAD_FAST                1 (ram_total)
+
+222         184 LOAD_FAST                2 (ram_avail)
+
+223         186 LOAD_FAST                1 (ram_total)
+            188 POP_JUMP_IF_FALSE       21 (to 232)
+            190 LOAD_GLOBAL             15 (NULL + round)
+            200 LOAD_CONST               3 (100.0)
+            202 LOAD_FAST                1 (ram_total)
+            204 LOAD_FAST                2 (ram_avail)
+            206 BINARY_OP               10 (-)
+            210 BINARY_OP                5 (*)
+            214 LOAD_FAST                1 (ram_total)
+            216 BINARY_OP               11 (/)
+            220 LOAD_CONST               2 (1)
+            222 CALL                     2
+            230 JUMP_FORWARD             1 (to 234)
+        >>  232 LOAD_CONST               4 (0.0)
+
+224     >>  234 LOAD_GLOBAL             17 (NULL + gpu_dynamic)
+            244 CALL                     0
+
+219         252 LOAD_CONST               5 (('cpu_count', 'ram_total_mb', 'ram_available_mb', 'ram_used_pct', 'gpu'))
+            254 BUILD_CONST_KEY_MAP      5
+            256 STORE_FAST               3 (data)
+
+226         258 LOAD_FAST                0 (now)
+            260 LOAD_FAST                3 (data)
+            262 BUILD_TUPLE              2
+            264 STORE_GLOBAL             2 (_DYN_CACHE)
+
+227         266 LOAD_FAST                3 (data)
+            268 RETURN_VALUE
+
+Disassembly of <code object ram_pressure at 0x7f6c92b72120, file "app\core\resources.py", line 230>:
+230           0 RESUME                   0
+
+232           2 LOAD_GLOBAL              1 (NULL + ram_info_mb)
+             12 CALL                     0
+             20 UNPACK_SEQUENCE          2
+             24 STORE_FAST               2 (total)
+             26 STORE_FAST               3 (avail)
+
+233          28 LOAD_FAST                2 (total)
+             30 POP_JUMP_IF_TRUE         1 (to 34)
+
+234          32 RETURN_CONST             1 (False)
+
+235     >>   34 LOAD_FAST                3 (avail)
+             36 LOAD_GLOBAL              3 (NULL + max)
+             46 LOAD_FAST                0 (min_free_mb)
+             48 LOAD_FAST                2 (total)
+             50 LOAD_FAST                1 (min_free_pct)
+             52 BINARY_OP                5 (*)
+             56 LOAD_CONST               2 (100.0)
+             58 BINARY_OP               11 (/)
+             62 CALL                     2
+             70 COMPARE_OP               2 (<)
+             74 RETURN_VALUE

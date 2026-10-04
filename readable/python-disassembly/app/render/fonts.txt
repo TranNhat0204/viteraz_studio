@@ -1,0 +1,210 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Quản lý font cho libass (doc 13 §13.2).\n\nE1: ưu tiên font bundle ở {data_dir}/resources/fonts; nếu trống → dùng font hệ thống\n(family mặc định "Arial" có sẵn trên Windows + hỗ trợ tiếng Việt).\n')
+              4 STORE_NAME               0 (__doc__)
+
+  6           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+  8          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('Path',))
+             22 IMPORT_NAME              3 (pathlib)
+             24 IMPORT_FROM              4 (Path)
+             26 STORE_NAME               4 (Path)
+             28 POP_TOP
+
+ 10          30 LOAD_CONST               1 (0)
+             32 LOAD_CONST               4 (('get_settings',))
+             34 IMPORT_NAME              5 (app.config)
+             36 IMPORT_FROM              6 (get_settings)
+             38 STORE_NAME               6 (get_settings)
+             40 POP_TOP
+
+ 12          42 LOAD_CONST               5 (('.ttf', '.otf', '.ttc'))
+             44 STORE_NAME               7 (_FONT_EXTS)
+
+ 15          46 LOAD_CONST              10 (('return', 'Path | None'))
+             48 LOAD_CONST               6 (<code object get_fonts_dir at 0x7f6c92c2a5b0, file "app\render\fonts.py", line 15>)
+             50 MAKE_FUNCTION            4 (annotations)
+             52 STORE_NAME               8 (get_fonts_dir)
+
+ 26          54 LOAD_CONST              11 (('return', 'list[str]'))
+             56 LOAD_CONST               7 (<code object available_families at 0x7f6c92b96290, file "app\render\fonts.py", line 26>)
+             58 MAKE_FUNCTION            4 (annotations)
+             60 STORE_NAME               9 (available_families)
+
+ 34          62 LOAD_CONST              12 (('return', 'str'))
+             64 LOAD_CONST               8 (<code object default_family at 0x7f6c930b9f00, file "app\render\fonts.py", line 34>)
+             66 MAKE_FUNCTION            4 (annotations)
+             68 STORE_NAME              10 (default_family)
+             70 RETURN_CONST             9 (None)
+
+Disassembly of <code object get_fonts_dir at 0x7f6c92c2a5b0, file "app\render\fonts.py", line 15>:
+ 15           0 RESUME                   0
+
+ 17           2 NOP
+
+ 18           4 LOAD_GLOBAL              1 (NULL + get_settings)
+             14 CALL                     0
+             22 LOAD_ATTR                2 (data_dir)
+             42 LOAD_CONST               1 ('resources')
+             44 BINARY_OP               11 (/)
+             48 LOAD_CONST               2 ('fonts')
+             50 BINARY_OP               11 (/)
+             54 STORE_FAST               0 (d)
+
+ 21          56 LOAD_FAST                0 (d)
+             58 LOAD_ATTR                7 (NULL|self + exists)
+             78 CALL                     0
+             86 POP_JUMP_IF_FALSE       34 (to 156)
+             88 LOAD_GLOBAL              9 (NULL + any)
+             98 LOAD_CONST               4 (<code object <genexpr> at 0x7f6c930f2ab0, file "app\render\fonts.py", line 21>)
+            100 MAKE_FUNCTION            0
+            102 LOAD_FAST                0 (d)
+            104 LOAD_ATTR               11 (NULL|self + iterdir)
+            124 CALL                     0
+            132 GET_ITER
+            134 CALL                     0
+            142 CALL                     1
+            150 POP_JUMP_IF_FALSE        2 (to 156)
+
+ 22         152 LOAD_FAST                0 (d)
+            154 RETURN_VALUE
+
+ 23     >>  156 RETURN_CONST             3 (None)
+        >>  158 PUSH_EXC_INFO
+
+ 19         160 LOAD_GLOBAL              4 (Exception)
+            170 CHECK_EXC_MATCH
+            172 POP_JUMP_IF_FALSE        3 (to 180)
+            174 POP_TOP
+
+ 20         176 POP_EXCEPT
+            178 RETURN_CONST             3 (None)
+
+ 19     >>  180 RERAISE                  0
+        >>  182 COPY                     3
+            184 POP_EXCEPT
+            186 RERAISE                  1
+ExceptionTable:
+  4 to 54 -> 158 [0]
+  158 to 174 -> 182 [1] lasti
+  180 to 180 -> 182 [1] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c930f2ab0, file "app\render\fonts.py", line 21>:
+ 21           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                53 (to 118)
+             12 STORE_FAST               1 (p)
+             14 LOAD_FAST                1 (p)
+             16 LOAD_ATTR                1 (NULL|self + is_file)
+             36 CALL                     0
+             44 POP_JUMP_IF_TRUE         1 (to 48)
+             46 JUMP_BACKWARD           20 (to 8)
+        >>   48 LOAD_FAST                1 (p)
+             50 LOAD_ATTR                2 (suffix)
+             70 LOAD_ATTR                5 (NULL|self + lower)
+             90 CALL                     0
+             98 LOAD_GLOBAL              6 (_FONT_EXTS)
+            108 CONTAINS_OP              0
+            110 YIELD_VALUE              1
+            112 RESUME                   1
+            114 POP_TOP
+            116 JUMP_BACKWARD           55 (to 8)
+        >>  118 END_FOR
+            120 RETURN_CONST             0 (None)
+        >>  122 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            124 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 122 [0] lasti
+  48 to 120 -> 122 [0] lasti
+
+Disassembly of <code object available_families at 0x7f6c92b96290, file "app\render\fonts.py", line 26>:
+ 26           0 RESUME                   0
+
+ 28           2 LOAD_GLOBAL              1 (NULL + get_fonts_dir)
+             12 CALL                     0
+             20 STORE_FAST               0 (d)
+
+ 29          22 LOAD_FAST                0 (d)
+             24 POP_JUMP_IF_TRUE         2 (to 30)
+
+ 30          26 BUILD_LIST               0
+             28 RETURN_VALUE
+
+ 31     >>   30 LOAD_GLOBAL              3 (NULL + sorted)
+             40 LOAD_FAST                0 (d)
+             42 LOAD_ATTR                5 (NULL|self + iterdir)
+             62 CALL                     0
+             70 GET_ITER
+             72 LOAD_FAST_AND_CLEAR      1 (p)
+             74 SWAP                     2
+             76 BUILD_SET                0
+             78 SWAP                     2
+        >>   80 FOR_ITER                47 (to 178)
+             84 STORE_FAST               1 (p)
+             86 LOAD_FAST                1 (p)
+             88 LOAD_ATTR                6 (suffix)
+            108 LOAD_ATTR                9 (NULL|self + lower)
+            128 CALL                     0
+            136 LOAD_GLOBAL             10 (_FONT_EXTS)
+            146 CONTAINS_OP              0
+            148 POP_JUMP_IF_TRUE         1 (to 152)
+            150 JUMP_BACKWARD           36 (to 80)
+        >>  152 LOAD_FAST                1 (p)
+            154 LOAD_ATTR               12 (stem)
+            174 SET_ADD                  2
+            176 JUMP_BACKWARD           49 (to 80)
+        >>  178 END_FOR
+            180 SWAP                     2
+            182 STORE_FAST               1 (p)
+            184 CALL                     1
+            192 RETURN_VALUE
+        >>  194 SWAP                     2
+            196 POP_TOP
+            198 SWAP                     2
+            200 STORE_FAST               1 (p)
+            202 RERAISE                  0
+ExceptionTable:
+  76 to 148 -> 194 [4]
+  152 to 178 -> 194 [4]
+
+Disassembly of <code object default_family at 0x7f6c930b9f00, file "app\render\fonts.py", line 34>:
+ 34           0 RESUME                   0
+
+ 35           2 LOAD_GLOBAL              1 (NULL + available_families)
+             12 CALL                     0
+             20 STORE_FAST               0 (fams)
+
+ 37          22 LOAD_CONST               1 (('Be Vietnam Pro', 'Montserrat', 'Inter'))
+             24 GET_ITER
+        >>   26 FOR_ITER                10 (to 50)
+             30 STORE_FAST               1 (pref)
+
+ 38          32 LOAD_FAST                1 (pref)
+             34 LOAD_FAST                0 (fams)
+             36 CONTAINS_OP              0
+             38 POP_JUMP_IF_TRUE         1 (to 42)
+             40 JUMP_BACKWARD            8 (to 26)
+
+ 39     >>   42 LOAD_FAST                1 (pref)
+             44 SWAP                     2
+             46 POP_TOP
+             48 RETURN_VALUE
+
+ 37     >>   50 END_FOR
+
+ 40          52 LOAD_FAST                0 (fams)
+             54 POP_JUMP_IF_FALSE        5 (to 66)
+             56 LOAD_FAST                0 (fams)
+             58 LOAD_CONST               2 (0)
+             60 BINARY_SUBSCR
+             64 RETURN_VALUE
+        >>   66 LOAD_CONST               3 ('Arial')
+             68 RETURN_VALUE

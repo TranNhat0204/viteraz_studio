@@ -1,0 +1,4553 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Adapter YouTube (đọc-thời) cho tính năng "Phân tích đối thủ".\n\nKhác `ytdlp_client` (tải + merge video để SẢN XUẤT): ở đây chỉ ĐỌC metadata công khai của kênh/\nvideo đối thủ để tính outlier + lấy transcript làm nguyên liệu bóc "sườn content". KHÔNG tải video.\n\nBa khả năng:\n  - list_channel_videos(url): liệt kê nhanh (flat-playlist) → id/title/duration (KHÔNG có view_count).\n  - fetch_video_meta(id/url): extract đầy đủ 1 video → view_count/like/upload_date/subs (~2s/video).\n  - fetch_transcript(id/url): lấy phụ đề (json3) → text thô để LLM đọc hiểu.\n\nDùng lại YtDlpClient._require() (nạp yt-dlp lười + hỗ trợ bản cài ngoài qua Settings). yt-dlp là dep\nTÙY CHỌN → thiếu sẽ ném StudioError(YTDLP_NOT_AVAILABLE) có hint (giống luồng tải).\n\nLưu ý ToS/anti-crawl: chỉ đọc dữ liệu CÔNG KHAI, giới hạn số video + đồng thời (semaphore) để tránh\nbị YouTube tiết lưu (rate-limit). KHÔNG scrape trang nguồn.\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 17           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 19          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (asyncio)
+             24 STORE_NAME               3 (asyncio)
+
+ 20          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               3 (None)
+             30 IMPORT_NAME              4 (re)
+             32 STORE_NAME               4 (re)
+
+ 21          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               4 (('datetime', 'timezone'))
+             38 IMPORT_NAME              5 (datetime)
+             40 IMPORT_FROM              5 (datetime)
+             42 STORE_NAME               5 (datetime)
+             44 IMPORT_FROM              6 (timezone)
+             46 STORE_NAME               6 (timezone)
+             48 POP_TOP
+
+ 22          50 LOAD_CONST               1 (0)
+             52 LOAD_CONST               5 (('urlparse',))
+             54 IMPORT_NAME              7 (urllib.parse)
+             56 IMPORT_FROM              8 (urlparse)
+             58 STORE_NAME               8 (urlparse)
+             60 POP_TOP
+
+ 24          62 LOAD_CONST               1 (0)
+             64 LOAD_CONST               3 (None)
+             66 IMPORT_NAME              9 (httpx)
+             68 STORE_NAME               9 (httpx)
+
+ 26          70 LOAD_CONST               1 (0)
+             72 LOAD_CONST               6 (('YtDlpClient',))
+             74 IMPORT_NAME             10 (app.adapters.ytdlp_client)
+             76 IMPORT_FROM             11 (YtDlpClient)
+             78 STORE_NAME              11 (YtDlpClient)
+             80 POP_TOP
+
+ 27          82 LOAD_CONST               1 (0)
+             84 LOAD_CONST               7 (('youtube_data_api',))
+             86 IMPORT_NAME             12 (app.adapters)
+             88 IMPORT_FROM             13 (youtube_data_api)
+             90 STORE_NAME              14 (data_api)
+             92 POP_TOP
+
+ 28          94 LOAD_CONST               1 (0)
+             96 LOAD_CONST               8 (('make_error', 'E', 'StudioError'))
+             98 IMPORT_NAME             15 (app.core.errors)
+            100 IMPORT_FROM             16 (make_error)
+            102 STORE_NAME              16 (make_error)
+            104 IMPORT_FROM             17 (E)
+            106 STORE_NAME              17 (E)
+            108 IMPORT_FROM             18 (StudioError)
+            110 STORE_NAME              18 (StudioError)
+            112 POP_TOP
+
+ 29         114 LOAD_CONST               1 (0)
+            116 LOAD_CONST               9 (('log',))
+            118 IMPORT_NAME             19 (app.core.logging)
+            120 IMPORT_FROM             20 (log)
+            122 STORE_NAME              20 (log)
+            124 POP_TOP
+
+ 33         126 LOAD_CONST              10 (2)
+            128 STORE_NAME              21 (_META_CONCURRENCY)
+
+ 34         130 LOAD_CONST              11 (('vi', 'en', 'en-US', 'en-orig'))
+            132 STORE_NAME              22 (_TRANSCRIPT_LANG_PREF)
+
+ 38         134 LOAD_NAME               14 (data_api)
+            136 LOAD_ATTR               46 (_SHORT_SURE_S)
+            156 STORE_NAME              24 (SHORT_SURE_S)
+
+ 39         158 LOAD_NAME               14 (data_api)
+            160 LOAD_ATTR               50 (_SHORT_MAX_S)
+            180 STORE_NAME              26 (SHORT_MAX_S)
+
+ 42         182 LOAD_CONST              56 (('return', 'bool'))
+            184 LOAD_CONST              12 (<code object is_available at 0x7f6c81b7d470, file "app\adapters\youtube_channel.py", line 42>)
+            186 MAKE_FUNCTION            4 (annotations)
+            188 STORE_NAME              27 (is_available)
+
+ 47         190 LOAD_CONST              13 (<code object _try_data_api at 0x7f6c92eb8830, file "app\adapters\youtube_channel.py", line 47>)
+            192 MAKE_FUNCTION            0
+            194 STORE_NAME              28 (_try_data_api)
+
+ 67         196 PUSH_NULL
+            198 LOAD_NAME                4 (re)
+            200 LOAD_ATTR               58 (compile)
+            220 LOAD_CONST              14 ('^/(@[^/]+|channel/[^/]+|c/[^/]+|user/[^/]+)/?$')
+            222 LOAD_NAME                4 (re)
+            224 LOAD_ATTR               60 (IGNORECASE)
+            244 CALL                     2
+            252 STORE_NAME              31 (_CHANNEL_PATH_RE)
+
+ 70         254 LOAD_CONST              57 (('url', 'str', 'return', 'str'))
+            256 LOAD_CONST              15 (<code object normalize_channel_url at 0x29084fe0, file "app\adapters\youtube_channel.py", line 70>)
+            258 MAKE_FUNCTION            4 (annotations)
+            260 STORE_NAME              32 (normalize_channel_url)
+
+ 92         262 LOAD_CONST              58 (('video_id_or_url', 'str', 'return', 'str'))
+            264 LOAD_CONST              16 (<code object video_url at 0x7f6c81b7d350, file "app\adapters\youtube_channel.py", line 92>)
+            266 MAKE_FUNCTION            4 (annotations)
+            268 STORE_NAME              33 (video_url)
+
+ 99         270 LOAD_CONST              59 (('info', 'dict', 'return', 'str | None'))
+            272 LOAD_CONST              17 (<code object _extract_channel_avatar at 0x26a17120, file "app\adapters\youtube_channel.py", line 99>)
+            274 MAKE_FUNCTION            4 (annotations)
+            276 STORE_NAME              34 (_extract_channel_avatar)
+
+118         278 LOAD_CONST              60 (('url', 'str', 'limit', 'int', 'return', 'dict'))
+            280 LOAD_CONST              18 (<code object _flat_list at 0x28e54e90, file "app\adapters\youtube_channel.py", line 118>)
+            282 MAKE_FUNCTION            4 (annotations)
+            284 STORE_NAME              35 (_flat_list)
+
+143         286 LOAD_CONST              19 (30)
+            288 LOAD_CONST              20 (('limit',))
+            290 BUILD_CONST_KEY_MAP      1
+            292 LOAD_CONST              61 (('channel_url', 'str', 'limit', 'int', 'return', 'dict'))
+            294 LOAD_CONST              21 (<code object list_channel_videos at 0x28e5a1d0, file "app\adapters\youtube_channel.py", line 143>)
+            296 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            298 STORE_NAME              36 (list_channel_videos)
+
+207         300 LOAD_CONST              22 (False)
+            302 LOAD_CONST              23 (('popular',))
+            304 BUILD_CONST_KEY_MAP      1
+            306 LOAD_CONST              62 (('channel_url', 'str', 'popular', 'bool', 'return', 'str'))
+            308 LOAD_CONST              24 (<code object _channel_videos_url at 0x7f6c93426230, file "app\adapters\youtube_channel.py", line 207>)
+            310 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            312 STORE_NAME              37 (_channel_videos_url)
+
+220         314 LOAD_CONST              25 (5)
+
+221         316 LOAD_CONST              22 (False)
+
+222         318 LOAD_CONST              26 (50)
+
+220         320 LOAD_CONST              27 (('limit', 'recent_only', 'recent_sample'))
+            322 BUILD_CONST_KEY_MAP      3
+
+221         324 NOP
+
+220         326 NOP
+
+222         328 NOP
+
+220         330 NOP
+
+222         332 NOP
+
+220         334 LOAD_CONST              63 (('channel_url', 'str', 'limit', 'int', 'recent_only', 'bool', 'recent_sample', 'int', 'return', 'dict'))
+            336 LOAD_CONST              28 (<code object list_channel_top_videos at 0x26a393e0, file "app\adapters\youtube_channel.py", line 220>)
+            338 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            340 STORE_NAME              38 (list_channel_top_videos)
+
+304         342 LOAD_CONST              64 (('url', 'str', 'return', 'dict'))
+            344 LOAD_CONST              29 (<code object _extract_full at 0x2908c170, file "app\adapters\youtube_channel.py", line 304>)
+            346 MAKE_FUNCTION            4 (annotations)
+            348 STORE_NAME              39 (_extract_full)
+
+322         350 LOAD_CONST              65 (('d', 'dict', 'return', 'dict'))
+            352 LOAD_CONST              30 (<code object _to_meta at 0x2907b9d0, file "app\adapters\youtube_channel.py", line 322>)
+            354 MAKE_FUNCTION            4 (annotations)
+            356 STORE_NAME              40 (_to_meta)
+
+346         358 LOAD_CONST              66 (('d', 'dict', 'return', 'bool'))
+            360 LOAD_CONST              31 (<code object _is_short at 0x7f6c9343ba50, file "app\adapters\youtube_channel.py", line 346>)
+            362 MAKE_FUNCTION            4 (annotations)
+            364 STORE_NAME              41 (_is_short)
+
+366         366 LOAD_CONST              67 (('video_id_or_url', 'str', 'return', 'dict'))
+            368 LOAD_CONST              32 (<code object fetch_video_meta at 0x7f6c92ea4670, file "app\adapters\youtube_channel.py", line 366>)
+            370 MAKE_FUNCTION            4 (annotations)
+            372 STORE_NAME              42 (fetch_video_meta)
+
+372         374 LOAD_NAME               21 (_META_CONCURRENCY)
+            376 LOAD_CONST              33 (('concurrency',))
+            378 BUILD_CONST_KEY_MAP      1
+            380 LOAD_CONST              68 (('video_ids', 'list[str]', 'concurrency', 'int', 'return', 'list[dict]'))
+            382 LOAD_CONST              34 (<code object fetch_many_metas at 0x7f6c9326da70, file "app\adapters\youtube_channel.py", line 372>)
+            384 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            386 STORE_NAME              43 (fetch_many_metas)
+
+396         388 LOAD_CONST              56 (('return', 'bool'))
+            390 LOAD_CONST              35 (<code object _is_translated at 0x7f6c81c20d40, file "app\adapters\youtube_channel.py", line 396>)
+            392 MAKE_FUNCTION            4 (annotations)
+            394 STORE_NAME              44 (_is_translated)
+
+409         396 LOAD_CONST              69 (('meta', 'dict', 'return', 'str'))
+            398 LOAD_CONST              36 (<code object _original_lang at 0x7f6c92e4bdf0, file "app\adapters\youtube_channel.py", line 409>)
+            400 MAKE_FUNCTION            4 (annotations)
+            402 STORE_NAME              45 (_original_lang)
+
+424         404 LOAD_CONST              70 (('capmap', 'dict', 'lang', 'str'))
+            406 LOAD_CONST              37 (<code object _lang_first at 0x7f6c9326e790, file "app\adapters\youtube_channel.py", line 424>)
+            408 MAKE_FUNCTION            4 (annotations)
+            410 STORE_NAME              46 (_lang_first)
+
+437         412 LOAD_NAME               22 (_TRANSCRIPT_LANG_PREF)
+            414 BUILD_TUPLE              1
+            416 LOAD_CONST              71 (('capmap', 'dict'))
+            418 LOAD_CONST              38 (<code object _pick_track at 0x7f6c93426430, file "app\adapters\youtube_channel.py", line 437>)
+            420 MAKE_FUNCTION            5 (defaults, annotations)
+            422 STORE_NAME              47 (_pick_track)
+
+461         424 LOAD_CONST              72 (('raw', 'str', 'return', 'list[tuple[float, str]]'))
+            426 LOAD_CONST              39 (<code object parse_json3_segments at 0x2908ec30, file "app\adapters\youtube_channel.py", line 461>)
+            428 MAKE_FUNCTION            4 (annotations)
+            430 STORE_NAME              48 (parse_json3_segments)
+
+488         432 LOAD_CONST              40 (15)
+            434 LOAD_CONST              41 (('bucket_s',))
+            436 BUILD_CONST_KEY_MAP      1
+            438 LOAD_CONST              73 (('segments', 'list[tuple[float, str]]', 'bucket_s', 'int', 'return', 'str'))
+            440 LOAD_CONST              42 (<code object format_transcript_beats at 0x7f6c93426630, file "app\adapters\youtube_channel.py", line 488>)
+            442 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            444 STORE_NAME              49 (format_transcript_beats)
+
+509         446 LOAD_CONST              43 (90.0)
+            448 STORE_NAME              50 (_BEATS_HEAD_S)
+
+510         450 LOAD_CONST              44 (60.0)
+            452 STORE_NAME              51 (_BEATS_TAIL_S)
+
+512         454 LOAD_CONST              45 (200)
+            456 STORE_NAME              52 (_MIN_END_CHARS)
+
+513         458 LOAD_CONST              46 (0.3)
+            460 STORE_NAME              53 (_TAIL_SHARE)
+
+517         462 LOAD_CONST              40 (15)
+
+516         464 LOAD_CONST              41 (('bucket_s',))
+            466 BUILD_CONST_KEY_MAP      1
+
+517         468 NOP
+
+516         470 NOP
+
+517         472 NOP
+
+516         474 LOAD_CONST              74 (('segments', 'list[tuple[float, str]]', 'max_chars', 'int', 'bucket_s', 'int', 'return', 'str'))
+            476 LOAD_CONST              47 (<code object compress_transcript_beats at 0x28e41fc0, file "app\adapters\youtube_channel.py", line 516>)
+            478 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            480 STORE_NAME              54 (compress_transcript_beats)
+
+561         482 LOAD_CONST              75 (('raw', 'str', 'return', 'str'))
+            484 LOAD_CONST              48 (<code object _parse_json3 at 0x7f6c92d62b80, file "app\adapters\youtube_channel.py", line 561>)
+            486 MAKE_FUNCTION            4 (annotations)
+            488 STORE_NAME              55 (_parse_json3)
+
+568         490 LOAD_CONST              49 ((2.0, 5.0, 12.0))
+            492 STORE_NAME              56 (_TIMEDTEXT_RETRY_WAITS)
+
+571         494 LOAD_CONST               3 (None)
+
+572         496 LOAD_CONST              50 (16000)
+            498 LOAD_CONST              22 (False)
+
+573         500 LOAD_CONST              22 (False)
+            502 LOAD_CONST               3 (None)
+
+571         504 LOAD_CONST              51 (('meta', 'max_chars', 'preserve_ends', 'timestamps', 'report'))
+            506 BUILD_CONST_KEY_MAP      5
+
+572         508 NOP
+
+571         510 NOP
+
+572         512 NOP
+
+571         514 NOP
+
+573         516 NOP
+
+571         518 NOP
+
+573         520 NOP
+
+571         522 NOP
+
+573         524 NOP
+
+571         526 LOAD_CONST              76 (('video_id_or_url', 'str', 'meta', 'dict | None', 'max_chars', 'int', 'preserve_ends', 'bool', 'timestamps', 'bool', 'report', 'dict | None', 'return', 'str'))
+            528 LOAD_CONST              52 (<code object fetch_transcript at 0x26a39bd0, file "app\adapters\youtube_channel.py", line 571>)
+            530 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            532 STORE_NAME              57 (fetch_transcript)
+
+653         534 LOAD_CONST              77 (('video_id', 'str', 'max_chars', 'int', 'preserve_ends', 'bool', 'return', 'str'))
+            536 LOAD_CONST              53 (<code object _transcript_via_lib at 0x7f6c9326e970, file "app\adapters\youtube_channel.py", line 653>)
+            538 MAKE_FUNCTION            4 (annotations)
+            540 STORE_NAME              58 (_transcript_via_lib)
+
+683         542 LOAD_CONST              78 (('text', 'str', 'max_chars', 'int', 'preserve_ends', 'bool', 'return', 'str'))
+            544 LOAD_CONST              54 (<code object _truncate_transcript at 0x7f6c933db2d0, file "app\adapters\youtube_channel.py", line 683>)
+            546 MAKE_FUNCTION            4 (annotations)
+            548 STORE_NAME              59 (_truncate_transcript)
+
+696         550 LOAD_CONST              75 (('raw', 'str', 'return', 'str'))
+            552 LOAD_CONST              55 (<code object _strip_vtt at 0x28e51610, file "app\adapters\youtube_channel.py", line 696>)
+            554 MAKE_FUNCTION            4 (annotations)
+            556 STORE_NAME              60 (_strip_vtt)
+            558 RETURN_CONST             3 (None)
+
+Disassembly of <code object is_available at 0x7f6c81b7d470, file "app\adapters\youtube_channel.py", line 42>:
+ 42           0 RESUME                   0
+
+ 44           2 LOAD_GLOBAL              1 (NULL + YtDlpClient)
+             12 LOAD_ATTR                2 (is_available)
+             32 CALL                     0
+             40 COPY                     1
+             42 POP_JUMP_IF_TRUE        20 (to 84)
+             44 POP_TOP
+             46 LOAD_GLOBAL              5 (NULL + data_api)
+             56 LOAD_ATTR                6 (is_configured)
+             76 CALL                     0
+        >>   84 RETURN_VALUE
+
+Disassembly of <code object _try_data_api at 0x7f6c92eb8830, file "app\adapters\youtube_channel.py", line 47>:
+ 47           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 53           6 LOAD_GLOBAL              1 (NULL + data_api)
+             16 LOAD_ATTR                2 (is_configured)
+             36 CALL                     0
+             44 POP_JUMP_IF_TRUE         1 (to 48)
+
+ 54          46 RETURN_CONST             1 (None)
+
+ 55     >>   48 NOP
+
+ 56          50 PUSH_NULL
+             52 LOAD_FAST                0 (fn)
+             54 LOAD_FAST                1 (args)
+             56 BUILD_MAP                0
+             58 LOAD_FAST                2 (kwargs)
+             60 DICT_MERGE               1
+             62 CALL_FUNCTION_EX         1
+             64 GET_AWAITABLE            0
+             66 LOAD_CONST               1 (None)
+        >>   68 SEND                     3 (to 78)
+             72 YIELD_VALUE              3
+             74 RESUME                   3
+             76 JUMP_BACKWARD_NO_INTERRUPT     5 (to 68)
+        >>   78 END_SEND
+             80 RETURN_VALUE
+        >>   82 CLEANUP_THROW
+             84 JUMP_BACKWARD            4 (to 78)
+        >>   86 PUSH_EXC_INFO
+
+ 57          88 LOAD_GLOBAL              0 (data_api)
+             98 LOAD_ATTR                4 (ChannelUrlUnsupported)
+            118 CHECK_EXC_MATCH
+            120 POP_JUMP_IF_FALSE       24 (to 170)
+            122 POP_TOP
+
+ 58         124 LOAD_GLOBAL              7 (NULL + log)
+            134 LOAD_ATTR                8 (info)
+            154 LOAD_CONST               2 ('[youtube_channel] URL kiểu /c/... không resolve được qua Data API → dùng yt-dlp')
+            156 CALL                     1
+            164 POP_TOP
+
+ 59         166 POP_EXCEPT
+            168 RETURN_CONST             1 (None)
+
+ 60     >>  170 LOAD_GLOBAL             10 (StudioError)
+            180 CHECK_EXC_MATCH
+            182 POP_JUMP_IF_FALSE       57 (to 298)
+            184 STORE_FAST               3 (exc)
+
+ 61         186 LOAD_GLOBAL              7 (NULL + log)
+            196 LOAD_ATTR               12 (warning)
+            216 LOAD_CONST               3 ('[youtube_channel] Data API lỗi (')
+            218 LOAD_FAST                3 (exc)
+            220 LOAD_ATTR               14 (code)
+            240 FORMAT_VALUE             0
+            242 LOAD_CONST               4 (') → fallback yt-dlp: ')
+            244 LOAD_FAST                3 (exc)
+            246 LOAD_ATTR               16 (message)
+            266 FORMAT_VALUE             0
+            268 BUILD_STRING             4
+            270 CALL                     1
+            278 POP_TOP
+
+ 62         280 POP_EXCEPT
+            282 LOAD_CONST               1 (None)
+            284 STORE_FAST               3 (exc)
+            286 DELETE_FAST              3 (exc)
+            288 RETURN_CONST             1 (None)
+        >>  290 LOAD_CONST               1 (None)
+            292 STORE_FAST               3 (exc)
+            294 DELETE_FAST              3 (exc)
+            296 RERAISE                  1
+
+ 60     >>  298 RERAISE                  0
+        >>  300 COPY                     3
+            302 POP_EXCEPT
+            304 RERAISE                  1
+        >>  306 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            308 RERAISE                  1
+ExceptionTable:
+  4 to 46 -> 306 [0] lasti
+  50 to 70 -> 86 [0]
+  72 to 72 -> 82 [2]
+  74 to 78 -> 86 [0]
+  80 to 80 -> 306 [0] lasti
+  82 to 82 -> 86 [0]
+  86 to 164 -> 300 [1] lasti
+  166 to 168 -> 306 [0] lasti
+  170 to 184 -> 300 [1] lasti
+  186 to 278 -> 290 [1] lasti
+  280 to 288 -> 306 [0] lasti
+  290 to 298 -> 300 [1] lasti
+  300 to 304 -> 306 [0] lasti
+
+Disassembly of <code object normalize_channel_url at 0x29084fe0, file "app\adapters\youtube_channel.py", line 70>:
+ 70           0 RESUME                   0
+
+ 76           2 LOAD_FAST                0 (url)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 LOAD_CONST               1 ('')
+        >>   12 LOAD_ATTR                1 (NULL|self + strip)
+             32 CALL                     0
+             40 STORE_FAST               1 (u)
+
+ 77          42 LOAD_FAST                1 (u)
+             44 POP_JUMP_IF_TRUE        26 (to 98)
+
+ 78          46 LOAD_GLOBAL              3 (NULL + make_error)
+             56 LOAD_GLOBAL              4 (E)
+             66 LOAD_ATTR                6 (UNKNOWN)
+             86 LOAD_CONST               2 ('Thiếu URL kênh/video YouTube')
+             88 CALL                     2
+             96 RAISE_VARARGS            1
+
+ 80     >>   98 LOAD_FAST                1 (u)
+            100 LOAD_ATTR                9 (NULL|self + startswith)
+            120 LOAD_CONST               3 ('@')
+            122 CALL                     1
+            130 POP_JUMP_IF_FALSE        6 (to 144)
+
+ 81         132 LOAD_CONST               4 ('https://www.youtube.com/')
+            134 LOAD_FAST                1 (u)
+            136 FORMAT_VALUE             0
+            138 LOAD_CONST               5 ('/videos')
+            140 BUILD_STRING             3
+            142 RETURN_VALUE
+
+ 82     >>  144 LOAD_FAST                1 (u)
+            146 LOAD_ATTR                9 (NULL|self + startswith)
+            166 LOAD_CONST               6 (('http://', 'https://'))
+            168 CALL                     1
+            176 POP_JUMP_IF_TRUE         5 (to 188)
+
+ 83         178 LOAD_CONST               7 ('https://')
+            180 LOAD_FAST                1 (u)
+            182 BINARY_OP                0 (+)
+            186 STORE_FAST               1 (u)
+
+ 84     >>  188 LOAD_GLOBAL             11 (NULL + urlparse)
+            198 LOAD_FAST                1 (u)
+            200 CALL                     1
+            208 STORE_FAST               2 (parsed)
+
+ 85         210 LOAD_FAST                2 (parsed)
+            212 LOAD_ATTR               12 (path)
+            232 LOAD_ATTR               15 (NULL|self + rstrip)
+            252 LOAD_CONST               8 ('/')
+            254 CALL                     1
+            262 STORE_FAST               3 (path)
+
+ 86         264 LOAD_GLOBAL             16 (_CHANNEL_PATH_RE)
+            274 LOAD_ATTR               19 (NULL|self + match)
+            294 LOAD_FAST                3 (path)
+            296 LOAD_CONST               8 ('/')
+            298 BINARY_OP                0 (+)
+            302 CALL                     1
+            310 STORE_FAST               4 (m)
+
+ 87         312 LOAD_FAST                4 (m)
+            314 POP_JUMP_IF_FALSE       23 (to 362)
+            316 LOAD_FAST                3 (path)
+            318 LOAD_ATTR               21 (NULL|self + endswith)
+            338 LOAD_CONST               9 (('/videos', '/streams', '/shorts'))
+            340 CALL                     1
+            348 POP_JUMP_IF_TRUE         6 (to 362)
+
+ 88         350 LOAD_CONST              10 ('https://www.youtube.com')
+            352 LOAD_FAST                3 (path)
+            354 FORMAT_VALUE             0
+            356 LOAD_CONST               5 ('/videos')
+            358 BUILD_STRING             3
+            360 RETURN_VALUE
+
+ 89     >>  362 LOAD_FAST                1 (u)
+            364 RETURN_VALUE
+
+Disassembly of <code object video_url at 0x7f6c81b7d350, file "app\adapters\youtube_channel.py", line 92>:
+ 92           0 RESUME                   0
+
+ 93           2 LOAD_FAST                0 (video_id_or_url)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 LOAD_CONST               1 ('')
+        >>   12 LOAD_ATTR                1 (NULL|self + strip)
+             32 CALL                     0
+             40 STORE_FAST               1 (s)
+
+ 94          42 LOAD_FAST                1 (s)
+             44 LOAD_ATTR                3 (NULL|self + startswith)
+             64 LOAD_CONST               2 (('http://', 'https://'))
+             66 CALL                     1
+             74 POP_JUMP_IF_FALSE        2 (to 80)
+
+ 95          76 LOAD_FAST                1 (s)
+             78 RETURN_VALUE
+
+ 96     >>   80 LOAD_CONST               3 ('https://www.youtube.com/watch?v=')
+             82 LOAD_FAST                1 (s)
+             84 FORMAT_VALUE             0
+             86 BUILD_STRING             2
+             88 RETURN_VALUE
+
+Disassembly of <code object _extract_channel_avatar at 0x26a17120, file "app\adapters\youtube_channel.py", line 99>:
+ 99           0 RESUME                   0
+
+100           2 LOAD_FAST                0 (info)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_CONST               1 ('thumbnails')
+             26 CALL                     1
+             34 COPY                     1
+             36 POP_JUMP_IF_TRUE         2 (to 42)
+             38 POP_TOP
+             40 BUILD_LIST               0
+        >>   42 STORE_FAST               1 (thumbnails)
+
+102          44 LOAD_FAST                1 (thumbnails)
+             46 GET_ITER
+        >>   48 FOR_ITER                58 (to 168)
+             52 STORE_FAST               2 (t)
+
+103          54 LOAD_GLOBAL              3 (NULL + isinstance)
+             64 LOAD_FAST                2 (t)
+             66 LOAD_GLOBAL              4 (dict)
+             76 CALL                     2
+             84 POP_JUMP_IF_TRUE         1 (to 88)
+             86 JUMP_BACKWARD           20 (to 48)
+        >>   88 LOAD_FAST                2 (t)
+             90 LOAD_ATTR                1 (NULL|self + get)
+            110 LOAD_CONST               2 ('id')
+            112 CALL                     1
+            120 LOAD_CONST               3 ('avatar_uncropped')
+            122 COMPARE_OP              40 (==)
+            126 POP_JUMP_IF_TRUE         1 (to 130)
+            128 JUMP_BACKWARD           41 (to 48)
+
+104     >>  130 LOAD_FAST                2 (t)
+            132 LOAD_ATTR                1 (NULL|self + get)
+            152 LOAD_CONST               4 ('url')
+            154 CALL                     1
+            162 SWAP                     2
+            164 POP_TOP
+            166 RETURN_VALUE
+
+102     >>  168 END_FOR
+
+106         170 LOAD_FAST                1 (thumbnails)
+            172 GET_ITER
+        >>  174 FOR_ITER                81 (to 340)
+            178 STORE_FAST               2 (t)
+
+107         180 LOAD_GLOBAL              3 (NULL + isinstance)
+            190 LOAD_FAST                2 (t)
+            192 LOAD_GLOBAL              4 (dict)
+            202 CALL                     2
+            210 POP_JUMP_IF_TRUE         1 (to 214)
+            212 JUMP_BACKWARD           20 (to 174)
+        >>  214 LOAD_CONST               5 ('avatar')
+            216 LOAD_GLOBAL              7 (NULL + str)
+            226 LOAD_FAST                2 (t)
+            228 LOAD_ATTR                1 (NULL|self + get)
+            248 LOAD_CONST               2 ('id')
+            250 LOAD_CONST               6 ('')
+            252 CALL                     2
+            260 CALL                     1
+            268 LOAD_ATTR                9 (NULL|self + lower)
+            288 CALL                     0
+            296 CONTAINS_OP              0
+            298 POP_JUMP_IF_TRUE         1 (to 302)
+            300 JUMP_BACKWARD           64 (to 174)
+
+108     >>  302 LOAD_FAST                2 (t)
+            304 LOAD_ATTR                1 (NULL|self + get)
+            324 LOAD_CONST               4 ('url')
+            326 CALL                     1
+            334 SWAP                     2
+            336 POP_TOP
+            338 RETURN_VALUE
+
+106     >>  340 END_FOR
+
+110         342 LOAD_GLOBAL             11 (NULL + reversed)
+            352 LOAD_FAST                1 (thumbnails)
+            354 CALL                     1
+            362 GET_ITER
+        >>  364 FOR_ITER                95 (to 558)
+            368 STORE_FAST               2 (t)
+
+111         370 LOAD_GLOBAL              3 (NULL + isinstance)
+            380 LOAD_FAST                2 (t)
+            382 LOAD_GLOBAL              4 (dict)
+            392 CALL                     2
+            400 POP_JUMP_IF_TRUE         1 (to 404)
+            402 JUMP_BACKWARD           20 (to 364)
+        >>  404 LOAD_FAST                2 (t)
+            406 LOAD_ATTR                1 (NULL|self + get)
+            426 LOAD_CONST               7 ('width')
+            428 CALL                     1
+            436 LOAD_FAST                2 (t)
+            438 LOAD_ATTR                1 (NULL|self + get)
+            458 LOAD_CONST               8 ('height')
+            460 CALL                     1
+            468 COMPARE_OP              40 (==)
+            472 POP_JUMP_IF_TRUE         1 (to 476)
+            474 JUMP_BACKWARD           56 (to 364)
+        >>  476 LOAD_FAST                2 (t)
+            478 LOAD_ATTR                1 (NULL|self + get)
+            498 LOAD_CONST               7 ('width')
+            500 LOAD_CONST               9 (0)
+            502 CALL                     2
+            510 LOAD_CONST               9 (0)
+            512 COMPARE_OP              68 (>)
+            516 POP_JUMP_IF_TRUE         1 (to 520)
+            518 JUMP_BACKWARD           78 (to 364)
+
+112     >>  520 LOAD_FAST                2 (t)
+            522 LOAD_ATTR                1 (NULL|self + get)
+            542 LOAD_CONST               4 ('url')
+            544 CALL                     1
+            552 SWAP                     2
+            554 POP_TOP
+            556 RETURN_VALUE
+
+110     >>  558 END_FOR
+
+113         560 RETURN_CONST             0 (None)
+
+Disassembly of <code object _flat_list at 0x28e54e90, file "app\adapters\youtube_channel.py", line 118>:
+118           0 RESUME                   0
+
+119           2 LOAD_GLOBAL              1 (NULL + YtDlpClient)
+             12 LOAD_ATTR                2 (_require)
+             32 CALL                     0
+             40 STORE_FAST               2 (yt_dlp)
+
+120          42 LOAD_CONST               0 (None)
+             44 STORE_FAST               3 (last_exc)
+
+121          46 LOAD_CONST               1 (('chrome', 'edge', 'firefox', None))
+             48 GET_ITER
+        >>   50 FOR_ITER                75 (to 204)
+             54 STORE_FAST               4 (browser)
+
+123          56 LOAD_CONST               2 (True)
+
+124          58 LOAD_CONST               2 (True)
+
+125          60 LOAD_CONST               2 (True)
+
+126          62 LOAD_FAST                1 (limit)
+
+127          64 LOAD_CONST               2 (True)
+
+128          66 LOAD_CONST               3 ('youtubetab')
+             68 LOAD_CONST               4 ('approximate_date')
+             70 LOAD_CONST               5 ('')
+             72 BUILD_LIST               1
+             74 BUILD_MAP                1
+             76 BUILD_MAP                1
+
+122          78 LOAD_CONST               6 (('quiet', 'no_warnings', 'extract_flat', 'playlistend', 'skip_download', 'extractor_args'))
+             80 BUILD_CONST_KEY_MAP      6
+             82 STORE_FAST               5 (opts)
+
+130          84 LOAD_FAST                4 (browser)
+             86 POP_JUMP_IF_FALSE        5 (to 98)
+
+131          88 LOAD_FAST                4 (browser)
+             90 LOAD_FAST                5 (opts)
+             92 LOAD_CONST               7 ('cookiesfrombrowser')
+             94 STORE_SUBSCR
+
+132     >>   98 NOP
+
+133         100 LOAD_FAST                2 (yt_dlp)
+            102 LOAD_ATTR                5 (NULL|self + YoutubeDL)
+            122 LOAD_FAST                5 (opts)
+            124 CALL                     1
+            132 BEFORE_WITH
+            134 STORE_FAST               6 (ydl)
+
+134         136 LOAD_FAST                6 (ydl)
+            138 LOAD_ATTR                7 (NULL|self + extract_info)
+            158 LOAD_FAST                0 (url)
+            160 LOAD_CONST               8 (False)
+            162 KW_NAMES                 9 (('download',))
+            164 CALL                     2
+            172 COPY                     1
+            174 POP_JUMP_IF_TRUE         2 (to 180)
+            176 POP_TOP
+            178 BUILD_MAP                0
+
+133     >>  180 SWAP                     2
+            182 LOAD_CONST               0 (None)
+            184 LOAD_CONST               0 (None)
+            186 LOAD_CONST               0 (None)
+            188 CALL                     2
+            196 POP_TOP
+            198 SWAP                     2
+            200 POP_TOP
+            202 RETURN_VALUE
+
+121     >>  204 END_FOR
+
+138         206 LOAD_FAST                3 (last_exc)
+            208 POP_JUMP_IF_FALSE        2 (to 214)
+
+139         210 LOAD_FAST                3 (last_exc)
+            212 RAISE_VARARGS            1
+
+140     >>  214 BUILD_MAP                0
+            216 RETURN_VALUE
+
+133     >>  218 PUSH_EXC_INFO
+            220 WITH_EXCEPT_START
+            222 POP_JUMP_IF_TRUE         1 (to 226)
+            224 RERAISE                  2
+        >>  226 POP_TOP
+            228 POP_EXCEPT
+            230 POP_TOP
+            232 POP_TOP
+            234 JUMP_FORWARD             3 (to 242)
+        >>  236 COPY                     3
+            238 POP_EXCEPT
+            240 RERAISE                  1
+        >>  242 JUMP_BACKWARD           97 (to 50)
+        >>  244 PUSH_EXC_INFO
+
+135         246 LOAD_GLOBAL              8 (Exception)
+            256 CHECK_EXC_MATCH
+            258 POP_JUMP_IF_FALSE       39 (to 338)
+            260 STORE_FAST               7 (e)
+
+136         262 LOAD_FAST                7 (e)
+            264 STORE_FAST               3 (last_exc)
+
+137         266 LOAD_GLOBAL             11 (NULL + log)
+            276 LOAD_ATTR               12 (info)
+            296 LOAD_CONST              10 ('[youtube_channel] Flat list cookies from ')
+            298 LOAD_FAST                4 (browser)
+            300 FORMAT_VALUE             0
+            302 LOAD_CONST              11 (' failed/skipped: ')
+            304 LOAD_FAST                7 (e)
+            306 FORMAT_VALUE             0
+            308 BUILD_STRING             4
+            310 CALL                     1
+            318 POP_TOP
+            320 POP_EXCEPT
+            322 LOAD_CONST               0 (None)
+            324 STORE_FAST               7 (e)
+            326 DELETE_FAST              7 (e)
+            328 JUMP_BACKWARD          140 (to 50)
+        >>  330 LOAD_CONST               0 (None)
+            332 STORE_FAST               7 (e)
+            334 DELETE_FAST              7 (e)
+            336 RERAISE                  1
+
+135     >>  338 RERAISE                  0
+        >>  340 COPY                     3
+            342 POP_EXCEPT
+            344 RERAISE                  1
+ExceptionTable:
+  100 to 132 -> 244 [1]
+  134 to 178 -> 218 [2] lasti
+  180 to 196 -> 244 [1]
+  218 to 226 -> 236 [4] lasti
+  228 to 240 -> 244 [1]
+  244 to 260 -> 340 [2] lasti
+  262 to 318 -> 330 [2] lasti
+  330 to 338 -> 340 [2] lasti
+
+Disassembly of <code object list_channel_videos at 0x28e5a1d0, file "app\adapters\youtube_channel.py", line 143>:
+143           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+152           6 LOAD_GLOBAL              1 (NULL + _try_data_api)
+             16 LOAD_GLOBAL              2 (data_api)
+             26 LOAD_ATTR                4 (list_channel_videos_api)
+             46 LOAD_FAST                0 (channel_url)
+             48 LOAD_FAST                1 (limit)
+             50 KW_NAMES                 1 (('limit',))
+             52 CALL                     3
+             60 GET_AWAITABLE            0
+             62 LOAD_CONST               2 (None)
+        >>   64 SEND                     3 (to 74)
+             68 YIELD_VALUE              2
+             70 RESUME                   3
+             72 JUMP_BACKWARD_NO_INTERRUPT     5 (to 64)
+        >>   74 END_SEND
+             76 STORE_FAST               2 (got)
+
+153          78 LOAD_FAST                2 (got)
+             80 POP_JUMP_IF_NONE         2 (to 86)
+
+154          82 LOAD_FAST                2 (got)
+             84 RETURN_VALUE
+
+155     >>   86 LOAD_GLOBAL              7 (NULL + normalize_channel_url)
+             96 LOAD_FAST                0 (channel_url)
+             98 CALL                     1
+            106 STORE_FAST               3 (url)
+
+156         108 LOAD_GLOBAL              9 (NULL + asyncio)
+            118 LOAD_ATTR               10 (to_thread)
+            138 LOAD_GLOBAL             12 (_flat_list)
+            148 LOAD_FAST                3 (url)
+            150 LOAD_FAST                1 (limit)
+            152 CALL                     3
+            160 GET_AWAITABLE            0
+            162 LOAD_CONST               2 (None)
+        >>  164 SEND                     3 (to 174)
+            168 YIELD_VALUE              2
+            170 RESUME                   3
+            172 JUMP_BACKWARD_NO_INTERRUPT     5 (to 164)
+        >>  174 END_SEND
+            176 STORE_FAST               4 (info)
+
+157         178 LOAD_FAST                4 (info)
+            180 LOAD_ATTR               15 (NULL|self + get)
+            200 LOAD_CONST               3 ('entries')
+            202 CALL                     1
+            210 COPY                     1
+            212 POP_JUMP_IF_TRUE         2 (to 218)
+            214 POP_TOP
+            216 BUILD_LIST               0
+        >>  218 STORE_FAST               5 (entries)
+
+158         220 BUILD_LIST               0
+            222 STORE_FAST               6 (flat)
+
+159         224 LOAD_FAST                5 (entries)
+            226 GET_ITER
+        >>  228 FOR_ITER                62 (to 356)
+            232 STORE_FAST               7 (e)
+
+160         234 LOAD_FAST                7 (e)
+            236 POP_JUMP_IF_FALSE       38 (to 314)
+            238 LOAD_FAST                7 (e)
+            240 LOAD_ATTR               15 (NULL|self + get)
+            260 LOAD_CONST               3 ('entries')
+            262 CALL                     1
+            270 POP_JUMP_IF_FALSE       21 (to 314)
+
+161         272 LOAD_FAST                6 (flat)
+            274 LOAD_ATTR               17 (NULL|self + extend)
+            294 LOAD_FAST                7 (e)
+            296 LOAD_CONST               3 ('entries')
+            298 BINARY_SUBSCR
+            302 CALL                     1
+            310 POP_TOP
+            312 JUMP_BACKWARD           43 (to 228)
+
+162     >>  314 LOAD_FAST                7 (e)
+            316 POP_JUMP_IF_TRUE         1 (to 320)
+            318 JUMP_BACKWARD           46 (to 228)
+
+163     >>  320 LOAD_FAST                6 (flat)
+            322 LOAD_ATTR               19 (NULL|self + append)
+            342 LOAD_FAST                7 (e)
+            344 CALL                     1
+            352 POP_TOP
+            354 JUMP_BACKWARD           64 (to 228)
+
+159     >>  356 END_FOR
+
+164         358 BUILD_LIST               0
+            360 STORE_FAST               8 (videos)
+
+165         362 LOAD_FAST                6 (flat)
+            364 LOAD_CONST               2 (None)
+            366 LOAD_FAST                1 (limit)
+            368 BINARY_SLICE
+            370 GET_ITER
+        >>  372 EXTENDED_ARG             1
+            374 FOR_ITER               483 (to 1344)
+            378 STORE_FAST               7 (e)
+
+166         380 LOAD_FAST                7 (e)
+            382 LOAD_ATTR               15 (NULL|self + get)
+            402 LOAD_CONST               4 ('id')
+            404 CALL                     1
+            412 STORE_FAST               9 (vid)
+
+167         414 LOAD_FAST                9 (vid)
+            416 POP_JUMP_IF_TRUE         1 (to 420)
+
+168         418 JUMP_BACKWARD           24 (to 372)
+
+169     >>  420 LOAD_FAST                7 (e)
+            422 LOAD_ATTR               15 (NULL|self + get)
+            442 LOAD_CONST               5 ('webpage_url')
+            444 CALL                     1
+            452 COPY                     1
+            454 POP_JUMP_IF_TRUE        30 (to 516)
+            456 POP_TOP
+            458 LOAD_FAST                7 (e)
+            460 LOAD_ATTR               15 (NULL|self + get)
+            480 LOAD_CONST               6 ('url')
+            482 CALL                     1
+            490 COPY                     1
+            492 POP_JUMP_IF_TRUE        11 (to 516)
+            494 POP_TOP
+            496 LOAD_GLOBAL             21 (NULL + video_url)
+            506 LOAD_FAST                9 (vid)
+            508 CALL                     1
+        >>  516 STORE_FAST              10 (entry_url)
+
+170         518 LOAD_GLOBAL             23 (NULL + str)
+            528 LOAD_FAST               10 (entry_url)
+            530 CALL                     1
+            538 LOAD_ATTR               25 (NULL|self + startswith)
+            558 LOAD_CONST               7 (('http://', 'https://'))
+            560 CALL                     1
+            568 POP_JUMP_IF_TRUE        11 (to 592)
+
+171         570 LOAD_GLOBAL             21 (NULL + video_url)
+            580 LOAD_FAST                9 (vid)
+            582 CALL                     1
+            590 STORE_FAST              10 (entry_url)
+
+172     >>  592 LOAD_FAST                7 (e)
+            594 LOAD_ATTR               15 (NULL|self + get)
+            614 LOAD_CONST               8 ('thumbnails')
+            616 CALL                     1
+            624 COPY                     1
+            626 POP_JUMP_IF_TRUE         2 (to 632)
+            628 POP_TOP
+            630 BUILD_LIST               0
+        >>  632 STORE_FAST              11 (thumbnails)
+
+173         634 LOAD_FAST                7 (e)
+            636 LOAD_ATTR               15 (NULL|self + get)
+            656 LOAD_CONST               9 ('thumbnail')
+            658 CALL                     1
+            666 COPY                     1
+            668 POP_JUMP_IF_TRUE        28 (to 726)
+            670 POP_TOP
+            672 LOAD_GLOBAL             27 (NULL + next)
+
+174         682 LOAD_CONST              10 (<code object <genexpr> at 0x7f6c92d62100, file "app\adapters\youtube_channel.py", line 174>)
+            684 MAKE_FUNCTION            0
+            686 LOAD_GLOBAL             29 (NULL + reversed)
+            696 LOAD_FAST               11 (thumbnails)
+            698 CALL                     1
+            706 GET_ITER
+            708 CALL                     0
+
+175         716 LOAD_CONST               2 (None)
+
+173         718 CALL                     2
+        >>  726 STORE_FAST              12 (thumbnail)
+
+177         728 LOAD_FAST                8 (videos)
+            730 LOAD_ATTR               19 (NULL|self + append)
+
+178         750 LOAD_FAST                9 (vid)
+
+179         752 LOAD_FAST                7 (e)
+            754 LOAD_ATTR               15 (NULL|self + get)
+            774 LOAD_CONST              11 ('title')
+            776 CALL                     1
+            784 COPY                     1
+            786 POP_JUMP_IF_TRUE         2 (to 792)
+            788 POP_TOP
+            790 LOAD_CONST              12 ('')
+
+180     >>  792 LOAD_FAST                7 (e)
+            794 LOAD_ATTR               15 (NULL|self + get)
+            814 LOAD_CONST              13 ('view_count')
+            816 CALL                     1
+
+181         824 LOAD_FAST                7 (e)
+            826 LOAD_ATTR               15 (NULL|self + get)
+            846 LOAD_CONST              14 ('like_count')
+            848 CALL                     1
+
+182         856 LOAD_FAST                7 (e)
+            858 LOAD_ATTR               15 (NULL|self + get)
+            878 LOAD_CONST              15 ('comment_count')
+            880 CALL                     1
+
+183         888 LOAD_FAST                7 (e)
+            890 LOAD_ATTR               15 (NULL|self + get)
+            910 LOAD_CONST              16 ('duration')
+            912 CALL                     1
+
+184         920 LOAD_FAST                7 (e)
+            922 LOAD_ATTR               15 (NULL|self + get)
+            942 LOAD_CONST              17 ('upload_date')
+            944 CALL                     1
+
+185         952 LOAD_FAST                7 (e)
+            954 LOAD_ATTR               15 (NULL|self + get)
+            974 LOAD_CONST              18 ('timestamp')
+            976 CALL                     1
+
+186         984 LOAD_FAST                7 (e)
+            986 LOAD_ATTR               15 (NULL|self + get)
+           1006 LOAD_CONST              19 ('channel')
+           1008 CALL                     1
+           1016 COPY                     1
+           1018 POP_JUMP_IF_TRUE        36 (to 1092)
+           1020 POP_TOP
+           1022 LOAD_FAST                7 (e)
+           1024 LOAD_ATTR               15 (NULL|self + get)
+           1044 LOAD_CONST              20 ('uploader')
+           1046 CALL                     1
+           1054 COPY                     1
+           1056 POP_JUMP_IF_TRUE        17 (to 1092)
+           1058 POP_TOP
+           1060 LOAD_FAST                4 (info)
+           1062 LOAD_ATTR               15 (NULL|self + get)
+           1082 LOAD_CONST              11 ('title')
+           1084 CALL                     1
+
+187     >> 1092 LOAD_FAST                7 (e)
+           1094 LOAD_ATTR               15 (NULL|self + get)
+           1114 LOAD_CONST              21 ('channel_id')
+           1116 CALL                     1
+           1124 COPY                     1
+           1126 POP_JUMP_IF_TRUE        36 (to 1200)
+           1128 POP_TOP
+           1130 LOAD_FAST                4 (info)
+           1132 LOAD_ATTR               15 (NULL|self + get)
+           1152 LOAD_CONST              21 ('channel_id')
+           1154 CALL                     1
+           1162 COPY                     1
+           1164 POP_JUMP_IF_TRUE        17 (to 1200)
+           1166 POP_TOP
+           1168 LOAD_FAST                4 (info)
+           1170 LOAD_ATTR               15 (NULL|self + get)
+           1190 LOAD_CONST               4 ('id')
+           1192 CALL                     1
+
+188     >> 1200 LOAD_FAST                7 (e)
+           1202 LOAD_ATTR               15 (NULL|self + get)
+           1222 LOAD_CONST              22 ('channel_follower_count')
+           1224 CALL                     1
+           1232 COPY                     1
+           1234 POP_JUMP_IF_TRUE        17 (to 1270)
+           1236 POP_TOP
+           1238 LOAD_FAST                4 (info)
+           1240 LOAD_ATTR               15 (NULL|self + get)
+           1260 LOAD_CONST              22 ('channel_follower_count')
+           1262 CALL                     1
+
+189     >> 1270 LOAD_FAST               12 (thumbnail)
+
+190        1272 LOAD_FAST               10 (entry_url)
+
+191        1274 LOAD_FAST               10 (entry_url)
+
+192        1276 LOAD_CONST              23 ('/shorts/')
+           1278 LOAD_GLOBAL             23 (NULL + str)
+           1288 LOAD_FAST               10 (entry_url)
+           1290 CALL                     1
+           1298 CONTAINS_OP              0
+           1300 COPY                     1
+           1302 POP_JUMP_IF_TRUE        11 (to 1326)
+           1304 POP_TOP
+           1306 LOAD_GLOBAL             31 (NULL + _is_short)
+           1316 LOAD_FAST                7 (e)
+           1318 CALL                     1
+
+177     >> 1326 LOAD_CONST              24 (('id', 'title', 'view_count', 'like_count', 'comment_count', 'duration', 'upload_date', 'timestamp', 'channel', 'channel_id', 'channel_follower_count', 'thumbnail', 'webpage_url', 'url', 'is_short'))
+           1328 BUILD_CONST_KEY_MAP     15
+           1330 CALL                     1
+           1338 POP_TOP
+           1340 EXTENDED_ARG             1
+           1342 JUMP_BACKWARD          486 (to 372)
+
+165     >> 1344 END_FOR
+
+194        1346 LOAD_FAST                8 (videos)
+           1348 POP_JUMP_IF_TRUE        26 (to 1402)
+
+195        1350 LOAD_GLOBAL             33 (NULL + make_error)
+           1360 LOAD_GLOBAL             34 (E)
+           1370 LOAD_ATTR               36 (UNKNOWN)
+
+196        1390 LOAD_CONST              25 ('Không liệt kê được video của kênh (URL sai hoặc kênh ẩn video?).')
+
+195        1392 CALL                     2
+           1400 RAISE_VARARGS            1
+
+198     >> 1402 LOAD_FAST                4 (info)
+           1404 LOAD_ATTR               15 (NULL|self + get)
+           1424 LOAD_CONST              11 ('title')
+           1426 CALL                     1
+           1434 COPY                     1
+           1436 POP_JUMP_IF_TRUE        17 (to 1472)
+           1438 POP_TOP
+           1440 LOAD_FAST                4 (info)
+           1442 LOAD_ATTR               15 (NULL|self + get)
+           1462 LOAD_CONST              19 ('channel')
+           1464 CALL                     1
+
+199     >> 1472 LOAD_FAST                4 (info)
+           1474 LOAD_ATTR               15 (NULL|self + get)
+           1494 LOAD_CONST              21 ('channel_id')
+           1496 CALL                     1
+           1504 COPY                     1
+           1506 POP_JUMP_IF_TRUE        17 (to 1542)
+           1508 POP_TOP
+           1510 LOAD_FAST                4 (info)
+           1512 LOAD_ATTR               15 (NULL|self + get)
+           1532 LOAD_CONST               4 ('id')
+           1534 CALL                     1
+
+200     >> 1542 LOAD_FAST                4 (info)
+           1544 LOAD_ATTR               15 (NULL|self + get)
+           1564 LOAD_CONST              22 ('channel_follower_count')
+           1566 CALL                     1
+
+201        1574 LOAD_GLOBAL             39 (NULL + _extract_channel_avatar)
+           1584 LOAD_FAST                4 (info)
+           1586 CALL                     1
+
+202        1594 LOAD_FAST                8 (videos)
+
+203        1596 LOAD_CONST              26 ('ytdlp')
+
+197        1598 LOAD_CONST              27 (('channel_title', 'channel_id', 'channel_follower_count', 'channel_avatar', 'videos', 'source'))
+           1600 BUILD_CONST_KEY_MAP      6
+           1602 RETURN_VALUE
+
+152     >> 1604 CLEANUP_THROW
+           1606 EXTENDED_ARG             3
+           1608 JUMP_BACKWARD          768 (to 74)
+
+156     >> 1610 CLEANUP_THROW
+           1612 EXTENDED_ARG             2
+           1614 JUMP_BACKWARD          721 (to 174)
+        >> 1616 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1618 RERAISE                  1
+ExceptionTable:
+  4 to 66 -> 1616 [0] lasti
+  68 to 68 -> 1604 [2]
+  70 to 166 -> 1616 [0] lasti
+  168 to 168 -> 1610 [2]
+  170 to 316 -> 1616 [0] lasti
+  320 to 1604 -> 1616 [0] lasti
+  1610 to 1610 -> 1616 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c92d62100, file "app\adapters\youtube_channel.py", line 174>:
+174           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                56 (to 124)
+             12 STORE_FAST               1 (item)
+             14 LOAD_GLOBAL              1 (NULL + isinstance)
+             24 LOAD_FAST                1 (item)
+             26 LOAD_GLOBAL              2 (dict)
+             36 CALL                     2
+             44 POP_JUMP_IF_TRUE         1 (to 48)
+             46 JUMP_BACKWARD           20 (to 8)
+        >>   48 LOAD_FAST                1 (item)
+             50 LOAD_ATTR                5 (NULL|self + get)
+             70 LOAD_CONST               0 ('url')
+             72 CALL                     1
+             80 POP_JUMP_IF_TRUE         1 (to 84)
+             82 JUMP_BACKWARD           38 (to 8)
+        >>   84 LOAD_FAST                1 (item)
+             86 LOAD_ATTR                5 (NULL|self + get)
+            106 LOAD_CONST               0 ('url')
+            108 CALL                     1
+            116 YIELD_VALUE              1
+            118 RESUME                   1
+            120 POP_TOP
+            122 JUMP_BACKWARD           58 (to 8)
+        >>  124 END_FOR
+            126 RETURN_CONST             1 (None)
+        >>  128 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            130 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 128 [0] lasti
+  48 to 80 -> 128 [0] lasti
+  84 to 126 -> 128 [0] lasti
+
+Disassembly of <code object _channel_videos_url at 0x7f6c93426230, file "app\adapters\youtube_channel.py", line 207>:
+207           0 RESUME                   0
+
+209           2 LOAD_GLOBAL              1 (NULL + normalize_channel_url)
+             12 LOAD_FAST                0 (channel_url)
+             14 CALL                     1
+             22 STORE_FAST               2 (normalized)
+
+210          24 LOAD_GLOBAL              3 (NULL + urlparse)
+             34 LOAD_FAST                2 (normalized)
+             36 CALL                     1
+             44 STORE_FAST               3 (parsed)
+
+211          46 LOAD_FAST                3 (parsed)
+             48 LOAD_ATTR                4 (path)
+             68 LOAD_ATTR                7 (NULL|self + rstrip)
+             88 LOAD_CONST               1 ('/')
+             90 CALL                     1
+             98 STORE_FAST               4 (path)
+
+212         100 LOAD_CONST               2 (('/videos', '/shorts', '/streams'))
+            102 GET_ITER
+        >>  104 FOR_ITER                50 (to 208)
+            108 STORE_FAST               5 (suffix)
+
+213         110 LOAD_FAST                4 (path)
+            112 LOAD_ATTR                9 (NULL|self + lower)
+            132 CALL                     0
+            140 LOAD_ATTR               11 (NULL|self + endswith)
+            160 LOAD_FAST                5 (suffix)
+            162 CALL                     1
+            170 POP_JUMP_IF_TRUE         1 (to 174)
+            172 JUMP_BACKWARD           35 (to 104)
+
+214     >>  174 LOAD_FAST                4 (path)
+            176 LOAD_CONST               3 (None)
+            178 LOAD_GLOBAL             13 (NULL + len)
+            188 LOAD_FAST                5 (suffix)
+            190 CALL                     1
+            198 UNARY_NEGATIVE
+            200 BINARY_SLICE
+            202 STORE_FAST               4 (path)
+
+215         204 POP_TOP
+            206 JUMP_FORWARD             1 (to 210)
+
+212     >>  208 END_FOR
+
+216     >>  210 LOAD_FAST                3 (parsed)
+            212 LOAD_ATTR               14 (scheme)
+            232 COPY                     1
+            234 POP_JUMP_IF_TRUE         2 (to 240)
+            236 POP_TOP
+            238 LOAD_CONST               4 ('https')
+        >>  240 FORMAT_VALUE             0
+            242 LOAD_CONST               5 ('://')
+            244 LOAD_FAST                3 (parsed)
+            246 LOAD_ATTR               16 (netloc)
+            266 COPY                     1
+            268 POP_JUMP_IF_TRUE         2 (to 274)
+            270 POP_TOP
+            272 LOAD_CONST               6 ('www.youtube.com')
+        >>  274 FORMAT_VALUE             0
+            276 LOAD_FAST                4 (path)
+            278 FORMAT_VALUE             0
+            280 LOAD_CONST               7 ('/videos')
+            282 BUILD_STRING             5
+            284 STORE_FAST               6 (base)
+
+217         286 LOAD_FAST                6 (base)
+            288 LOAD_FAST                1 (popular)
+            290 POP_JUMP_IF_FALSE        4 (to 300)
+            292 LOAD_CONST               8 ('?view=0&sort=p&flow=grid')
+            294 BINARY_OP                0 (+)
+            298 RETURN_VALUE
+        >>  300 LOAD_CONST               9 ('')
+            302 BINARY_OP                0 (+)
+            306 RETURN_VALUE
+
+Disassembly of <code object list_channel_top_videos at 0x26a393e0, file "app\adapters\youtube_channel.py", line 220>:
+              0 MAKE_CELL               22 (now)
+              2 MAKE_CELL               23 (one_year)
+
+220           4 RETURN_GENERATOR
+              6 POP_TOP
+              8 RESUME                   0
+
+232          10 LOAD_GLOBAL              1 (NULL + _try_data_api)
+             20 LOAD_GLOBAL              2 (data_api)
+             30 LOAD_ATTR                4 (list_channel_top_videos_api)
+             50 LOAD_FAST                0 (channel_url)
+
+233          52 LOAD_FAST                1 (limit)
+             54 LOAD_FAST                2 (recent_only)
+
+232          56 KW_NAMES                 1 (('limit', 'recent_only'))
+             58 CALL                     4
+             66 GET_AWAITABLE            0
+             68 LOAD_CONST               2 (None)
+        >>   70 SEND                     3 (to 80)
+             74 YIELD_VALUE              2
+             76 RESUME                   3
+             78 JUMP_BACKWARD_NO_INTERRUPT     5 (to 70)
+        >>   80 END_SEND
+             82 STORE_FAST               4 (got)
+
+234          84 LOAD_FAST                4 (got)
+             86 POP_JUMP_IF_NONE         2 (to 92)
+
+235          88 LOAD_FAST                4 (got)
+             90 RETURN_VALUE
+
+236     >>   92 LOAD_GLOBAL              7 (NULL + max)
+            102 LOAD_CONST               3 (1)
+            104 LOAD_GLOBAL              9 (NULL + min)
+            114 LOAD_CONST               4 (10)
+            116 LOAD_GLOBAL             11 (NULL + int)
+            126 LOAD_FAST                1 (limit)
+            128 COPY                     1
+            130 POP_JUMP_IF_TRUE         2 (to 136)
+            132 POP_TOP
+            134 LOAD_CONST               5 (5)
+        >>  136 CALL                     1
+            144 CALL                     2
+            152 CALL                     2
+            160 STORE_FAST               1 (limit)
+
+237         162 LOAD_GLOBAL              7 (NULL + max)
+            172 LOAD_FAST                1 (limit)
+            174 LOAD_GLOBAL              9 (NULL + min)
+            184 LOAD_CONST               6 (100)
+            186 LOAD_GLOBAL             11 (NULL + int)
+            196 LOAD_FAST                3 (recent_sample)
+            198 COPY                     1
+            200 POP_JUMP_IF_TRUE         2 (to 206)
+            202 POP_TOP
+            204 LOAD_CONST               7 (50)
+        >>  206 CALL                     1
+            214 CALL                     2
+            222 CALL                     2
+            230 STORE_FAST               5 (sample_n)
+
+238         232 LOAD_CONST               2 (None)
+            234 STORE_FAST               6 (listing)
+
+239         236 LOAD_CONST               8 ('all_time_popular')
+            238 STORE_FAST               7 (scope)
+
+240         240 LOAD_CONST               9 (False)
+            242 STORE_FAST               8 (fallback)
+
+242         244 LOAD_FAST                2 (recent_only)
+            246 EXTENDED_ARG             1
+            248 POP_JUMP_IF_TRUE       325 (to 900)
+
+243         250 NOP
+
+244         252 LOAD_GLOBAL             13 (NULL + _channel_videos_url)
+            262 LOAD_FAST                0 (channel_url)
+            264 LOAD_CONST              10 (True)
+            266 KW_NAMES                11 (('popular',))
+            268 CALL                     2
+            276 STORE_FAST               9 (popular_url)
+
+245         278 LOAD_GLOBAL             15 (NULL + asyncio)
+            288 LOAD_ATTR               16 (to_thread)
+            308 LOAD_GLOBAL             18 (_flat_list)
+            318 LOAD_FAST                9 (popular_url)
+            320 LOAD_GLOBAL              7 (NULL + max)
+            330 LOAD_FAST                1 (limit)
+            332 LOAD_CONST              12 (3)
+            334 BINARY_OP                5 (*)
+            338 LOAD_CONST              13 (15)
+            340 CALL                     2
+            348 CALL                     3
+            356 GET_AWAITABLE            0
+            358 LOAD_CONST               2 (None)
+        >>  360 SEND                     3 (to 370)
+            364 YIELD_VALUE              3
+            366 RESUME                   3
+            368 JUMP_BACKWARD_NO_INTERRUPT     5 (to 360)
+        >>  370 END_SEND
+            372 STORE_FAST              10 (info)
+
+246         374 LOAD_FAST               10 (info)
+            376 LOAD_ATTR               21 (NULL|self + get)
+            396 LOAD_CONST              14 ('entries')
+            398 CALL                     1
+            406 COPY                     1
+            408 POP_JUMP_IF_TRUE         2 (to 414)
+            410 POP_TOP
+            412 BUILD_LIST               0
+        >>  414 STORE_FAST              11 (entries)
+
+247         416 BUILD_LIST               0
+            418 STORE_FAST              12 (flat)
+
+248         420 LOAD_FAST               11 (entries)
+            422 GET_ITER
+        >>  424 FOR_ITER                62 (to 552)
+            428 STORE_FAST              13 (e)
+
+249         430 LOAD_FAST               13 (e)
+            432 POP_JUMP_IF_FALSE       38 (to 510)
+            434 LOAD_FAST               13 (e)
+            436 LOAD_ATTR               21 (NULL|self + get)
+            456 LOAD_CONST              14 ('entries')
+            458 CALL                     1
+            466 POP_JUMP_IF_FALSE       21 (to 510)
+
+250         468 LOAD_FAST               12 (flat)
+            470 LOAD_ATTR               23 (NULL|self + extend)
+            490 LOAD_FAST               13 (e)
+            492 LOAD_CONST              14 ('entries')
+            494 BINARY_SUBSCR
+            498 CALL                     1
+            506 POP_TOP
+            508 JUMP_BACKWARD           43 (to 424)
+
+251     >>  510 LOAD_FAST               13 (e)
+            512 POP_JUMP_IF_TRUE         1 (to 516)
+            514 JUMP_BACKWARD           46 (to 424)
+
+252     >>  516 LOAD_FAST               12 (flat)
+            518 LOAD_ATTR               25 (NULL|self + append)
+            538 LOAD_FAST               13 (e)
+            540 CALL                     1
+            548 POP_TOP
+            550 JUMP_BACKWARD           64 (to 424)
+
+248     >>  552 END_FOR
+
+254         554 LOAD_FAST               12 (flat)
+            556 GET_ITER
+
+253         558 LOAD_FAST_AND_CLEAR     13 (e)
+            560 SWAP                     2
+            562 BUILD_LIST               0
+            564 SWAP                     2
+
+254     >>  566 FOR_ITER                60 (to 690)
+            570 STORE_FAST              13 (e)
+            572 LOAD_FAST               13 (e)
+            574 POP_JUMP_IF_FALSE       56 (to 688)
+            576 LOAD_FAST               13 (e)
+            578 LOAD_ATTR               21 (NULL|self + get)
+            598 LOAD_CONST              15 ('id')
+            600 CALL                     1
+            608 POP_JUMP_IF_FALSE       39 (to 688)
+
+253         610 LOAD_FAST               13 (e)
+            612 LOAD_ATTR               21 (NULL|self + get)
+            632 LOAD_CONST              15 ('id')
+            634 CALL                     1
+            642 LOAD_FAST               13 (e)
+            644 LOAD_ATTR               21 (NULL|self + get)
+            664 LOAD_CONST              16 ('title')
+            666 CALL                     1
+            674 COPY                     1
+            676 POP_JUMP_IF_TRUE         2 (to 682)
+            678 POP_TOP
+            680 LOAD_CONST              17 ('')
+        >>  682 LOAD_CONST              18 (('id', 'title'))
+            684 BUILD_CONST_KEY_MAP      2
+            686 LIST_APPEND              2
+        >>  688 JUMP_BACKWARD           62 (to 566)
+
+254     >>  690 END_FOR
+
+253         692 STORE_FAST              14 (vids)
+            694 STORE_FAST              13 (e)
+
+255         696 LOAD_FAST               14 (vids)
+            698 POP_JUMP_IF_FALSE      100 (to 900)
+
+257         700 LOAD_FAST               10 (info)
+            702 LOAD_ATTR               21 (NULL|self + get)
+            722 LOAD_CONST              16 ('title')
+            724 CALL                     1
+            732 COPY                     1
+            734 POP_JUMP_IF_TRUE        17 (to 770)
+            736 POP_TOP
+            738 LOAD_FAST               10 (info)
+            740 LOAD_ATTR               21 (NULL|self + get)
+            760 LOAD_CONST              19 ('channel')
+            762 CALL                     1
+
+258     >>  770 LOAD_FAST               10 (info)
+            772 LOAD_ATTR               21 (NULL|self + get)
+            792 LOAD_CONST              20 ('channel_id')
+            794 CALL                     1
+            802 COPY                     1
+            804 POP_JUMP_IF_TRUE        17 (to 840)
+            806 POP_TOP
+            808 LOAD_FAST               10 (info)
+            810 LOAD_ATTR               21 (NULL|self + get)
+            830 LOAD_CONST              15 ('id')
+            832 CALL                     1
+
+259     >>  840 LOAD_FAST               10 (info)
+            842 LOAD_ATTR               21 (NULL|self + get)
+            862 LOAD_CONST              21 ('channel_follower_count')
+            864 CALL                     1
+
+260         872 LOAD_GLOBAL             27 (NULL + _extract_channel_avatar)
+            882 LOAD_FAST               10 (info)
+            884 CALL                     1
+
+261         892 LOAD_FAST               14 (vids)
+
+256         894 LOAD_CONST              22 (('channel_title', 'channel_id', 'channel_follower_count', 'channel_avatar', 'videos'))
+            896 BUILD_CONST_KEY_MAP      5
+            898 STORE_FAST               6 (listing)
+
+266     >>  900 LOAD_FAST                6 (listing)
+            902 POP_JUMP_IF_NOT_NONE    30 (to 964)
+
+267         904 LOAD_GLOBAL             35 (NULL + list_channel_videos)
+            914 LOAD_FAST                0 (channel_url)
+            916 LOAD_FAST                5 (sample_n)
+            918 KW_NAMES                24 (('limit',))
+            920 CALL                     2
+            928 GET_AWAITABLE            0
+            930 LOAD_CONST               2 (None)
+        >>  932 SEND                     3 (to 942)
+            936 YIELD_VALUE              2
+            938 RESUME                   3
+            940 JUMP_BACKWARD_NO_INTERRUPT     5 (to 932)
+        >>  942 END_SEND
+            944 STORE_FAST               6 (listing)
+
+268         946 LOAD_FAST                2 (recent_only)
+            948 POP_JUMP_IF_FALSE        2 (to 954)
+            950 LOAD_CONST              25 ('recent_12_months')
+            952 JUMP_FORWARD             1 (to 956)
+        >>  954 LOAD_CONST              26 ('recent_sample')
+        >>  956 STORE_FAST               7 (scope)
+
+269         958 LOAD_FAST                2 (recent_only)
+            960 UNARY_NOT
+            962 STORE_FAST               8 (fallback)
+
+271     >>  964 LOAD_FAST                6 (listing)
+            966 LOAD_ATTR               21 (NULL|self + get)
+            986 LOAD_CONST              27 ('videos')
+            988 CALL                     1
+            996 COPY                     1
+            998 POP_JUMP_IF_TRUE         2 (to 1004)
+           1000 POP_TOP
+           1002 BUILD_LIST               0
+        >> 1004 GET_ITER
+           1006 LOAD_FAST_AND_CLEAR     16 (v)
+           1008 SWAP                     2
+           1010 BUILD_LIST               0
+           1012 SWAP                     2
+        >> 1014 FOR_ITER                25 (to 1068)
+           1018 STORE_FAST              16 (v)
+           1020 LOAD_FAST               16 (v)
+           1022 LOAD_ATTR               21 (NULL|self + get)
+           1042 LOAD_CONST              15 ('id')
+           1044 CALL                     1
+           1052 POP_JUMP_IF_TRUE         1 (to 1056)
+           1054 JUMP_BACKWARD           21 (to 1014)
+        >> 1056 LOAD_FAST               16 (v)
+           1058 LOAD_CONST              15 ('id')
+           1060 BINARY_SUBSCR
+           1064 LIST_APPEND              2
+           1066 JUMP_BACKWARD           27 (to 1014)
+        >> 1068 END_FOR
+           1070 STORE_FAST              17 (ids)
+           1072 STORE_FAST              16 (v)
+
+272        1074 LOAD_GLOBAL             37 (NULL + fetch_many_metas)
+           1084 LOAD_FAST               17 (ids)
+           1086 CALL                     1
+           1094 GET_AWAITABLE            0
+           1096 LOAD_CONST               2 (None)
+        >> 1098 SEND                     3 (to 1108)
+           1102 YIELD_VALUE              2
+           1104 RESUME                   3
+           1106 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1098)
+        >> 1108 END_SEND
+           1110 STORE_FAST              18 (metas)
+
+273        1112 LOAD_FAST                2 (recent_only)
+           1114 POP_JUMP_IF_FALSE       82 (to 1280)
+
+274        1116 LOAD_GLOBAL             39 (NULL + datetime)
+           1126 LOAD_ATTR               40 (now)
+           1146 LOAD_GLOBAL             42 (timezone)
+           1156 LOAD_ATTR               44 (utc)
+           1176 CALL                     1
+           1184 LOAD_ATTR               47 (NULL|self + timestamp)
+           1204 CALL                     0
+           1212 STORE_DEREF             22 (now)
+
+275        1214 LOAD_CONST              28 (31536000)
+           1216 STORE_DEREF             23 (one_year)
+
+276        1218 LOAD_CONST              37 (('m', 'dict', 'return', 'bool'))
+           1220 LOAD_CLOSURE            22 (now)
+           1222 LOAD_CLOSURE            23 (one_year)
+           1224 BUILD_TUPLE              2
+           1226 LOAD_CONST              29 (<code object is_recent at 0x269ff930, file "app\adapters\youtube_channel.py", line 276>)
+           1228 MAKE_FUNCTION           12 (annotations, closure)
+           1230 STORE_FAST              19 (is_recent)
+
+285        1232 LOAD_FAST               18 (metas)
+           1234 GET_ITER
+           1236 LOAD_FAST_AND_CLEAR     20 (m)
+           1238 SWAP                     2
+           1240 BUILD_LIST               0
+           1242 SWAP                     2
+        >> 1244 FOR_ITER                13 (to 1274)
+           1248 STORE_FAST              20 (m)
+           1250 PUSH_NULL
+           1252 LOAD_FAST               19 (is_recent)
+           1254 LOAD_FAST               20 (m)
+           1256 CALL                     1
+           1264 POP_JUMP_IF_TRUE         1 (to 1268)
+           1266 JUMP_BACKWARD           12 (to 1244)
+        >> 1268 LOAD_FAST               20 (m)
+           1270 LIST_APPEND              2
+           1272 JUMP_BACKWARD           15 (to 1244)
+        >> 1274 END_FOR
+           1276 STORE_FAST              18 (metas)
+           1278 STORE_FAST              20 (m)
+
+286     >> 1280 LOAD_FAST               18 (metas)
+           1282 LOAD_ATTR               49 (NULL|self + sort)
+           1302 LOAD_CONST              30 (<code object <lambda> at 0x7f6c81b7d590, file "app\adapters\youtube_channel.py", line 286>)
+           1304 MAKE_FUNCTION            0
+           1306 LOAD_CONST              10 (True)
+           1308 KW_NAMES                31 (('key', 'reverse'))
+           1310 CALL                     2
+           1318 POP_TOP
+
+287        1320 LOAD_FAST               18 (metas)
+           1322 LOAD_CONST               2 (None)
+           1324 LOAD_FAST                1 (limit)
+           1326 BINARY_SLICE
+           1328 STORE_FAST              21 (selected)
+
+288        1330 LOAD_FAST               21 (selected)
+           1332 POP_JUMP_IF_TRUE        26 (to 1386)
+
+289        1334 LOAD_GLOBAL             51 (NULL + make_error)
+           1344 LOAD_GLOBAL             52 (E)
+           1354 LOAD_ATTR               54 (UNKNOWN)
+           1374 LOAD_CONST              32 ('Không lấy được video công khai phù hợp để học DNA kênh.')
+           1376 CALL                     2
+           1384 RAISE_VARARGS            1
+
+291     >> 1386 LOAD_FAST                6 (listing)
+           1388 LOAD_ATTR               21 (NULL|self + get)
+           1408 LOAD_CONST              33 ('channel_title')
+           1410 CALL                     1
+           1418 COPY                     1
+           1420 POP_JUMP_IF_TRUE        20 (to 1462)
+           1422 POP_TOP
+           1424 LOAD_FAST               21 (selected)
+           1426 LOAD_CONST              34 (0)
+           1428 BINARY_SUBSCR
+           1432 LOAD_ATTR               21 (NULL|self + get)
+           1452 LOAD_CONST              19 ('channel')
+           1454 CALL                     1
+
+292     >> 1462 LOAD_FAST                6 (listing)
+           1464 LOAD_ATTR               21 (NULL|self + get)
+           1484 LOAD_CONST              20 ('channel_id')
+           1486 CALL                     1
+           1494 COPY                     1
+           1496 POP_JUMP_IF_TRUE        20 (to 1538)
+           1498 POP_TOP
+           1500 LOAD_FAST               21 (selected)
+           1502 LOAD_CONST              34 (0)
+           1504 BINARY_SUBSCR
+           1508 LOAD_ATTR               21 (NULL|self + get)
+           1528 LOAD_CONST              20 ('channel_id')
+           1530 CALL                     1
+
+293     >> 1538 LOAD_FAST                6 (listing)
+           1540 LOAD_ATTR               21 (NULL|self + get)
+           1560 LOAD_CONST              21 ('channel_follower_count')
+           1562 CALL                     1
+           1570 COPY                     1
+           1572 POP_JUMP_IF_TRUE        20 (to 1614)
+           1574 POP_TOP
+           1576 LOAD_FAST               21 (selected)
+           1578 LOAD_CONST              34 (0)
+           1580 BINARY_SUBSCR
+           1584 LOAD_ATTR               21 (NULL|self + get)
+           1604 LOAD_CONST              21 ('channel_follower_count')
+           1606 CALL                     1
+
+294     >> 1614 LOAD_FAST                6 (listing)
+           1616 LOAD_ATTR               21 (NULL|self + get)
+           1636 LOAD_CONST              35 ('channel_avatar')
+           1638 CALL                     1
+
+295        1646 LOAD_FAST               21 (selected)
+
+296        1648 LOAD_FAST                7 (scope)
+
+297        1650 LOAD_FAST                8 (fallback)
+
+298        1652 LOAD_GLOBAL             57 (NULL + len)
+           1662 LOAD_FAST               18 (metas)
+           1664 CALL                     1
+
+290        1672 LOAD_CONST              36 (('channel_title', 'channel_id', 'channel_follower_count', 'channel_avatar', 'videos', 'selection_scope', 'fallback', 'sample_size'))
+           1674 BUILD_CONST_KEY_MAP      8
+           1676 RETURN_VALUE
+
+232     >> 1678 CLEANUP_THROW
+           1680 EXTENDED_ARG             3
+           1682 JUMP_BACKWARD          802 (to 80)
+
+245     >> 1684 CLEANUP_THROW
+           1686 EXTENDED_ARG             2
+           1688 JUMP_BACKWARD          660 (to 370)
+        >> 1690 SWAP                     2
+           1692 POP_TOP
+
+253        1694 SWAP                     2
+           1696 STORE_FAST              13 (e)
+           1698 RERAISE                  0
+        >> 1700 PUSH_EXC_INFO
+
+263        1702 LOAD_GLOBAL             28 (Exception)
+           1712 CHECK_EXC_MATCH
+           1714 POP_JUMP_IF_FALSE       35 (to 1786)
+           1716 STORE_FAST              15 (exc)
+
+264        1718 LOAD_GLOBAL             31 (NULL + log)
+           1728 LOAD_ATTR               32 (info)
+           1748 LOAD_CONST              23 ('[youtube_channel] tab popular không dùng được, fallback recent: ')
+           1750 LOAD_FAST               15 (exc)
+           1752 FORMAT_VALUE             0
+           1754 BUILD_STRING             2
+           1756 CALL                     1
+           1764 POP_TOP
+           1766 POP_EXCEPT
+           1768 LOAD_CONST               2 (None)
+           1770 STORE_FAST              15 (exc)
+           1772 DELETE_FAST             15 (exc)
+           1774 EXTENDED_ARG             1
+           1776 JUMP_BACKWARD          439 (to 900)
+        >> 1778 LOAD_CONST               2 (None)
+           1780 STORE_FAST              15 (exc)
+           1782 DELETE_FAST             15 (exc)
+           1784 RERAISE                  1
+
+263     >> 1786 RERAISE                  0
+        >> 1788 COPY                     3
+           1790 POP_EXCEPT
+           1792 RERAISE                  1
+
+267     >> 1794 CLEANUP_THROW
+           1796 EXTENDED_ARG             1
+           1798 JUMP_BACKWARD          429 (to 942)
+        >> 1800 SWAP                     2
+           1802 POP_TOP
+
+271        1804 SWAP                     2
+           1806 STORE_FAST              16 (v)
+           1808 RERAISE                  0
+
+272     >> 1810 CLEANUP_THROW
+           1812 EXTENDED_ARG             1
+           1814 JUMP_BACKWARD          354 (to 1108)
+        >> 1816 SWAP                     2
+           1818 POP_TOP
+
+285        1820 SWAP                     2
+           1822 STORE_FAST              20 (m)
+           1824 RERAISE                  0
+        >> 1826 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1828 RERAISE                  1
+ExceptionTable:
+  8 to 72 -> 1826 [0] lasti
+  74 to 74 -> 1678 [2]
+  76 to 248 -> 1826 [0] lasti
+  252 to 362 -> 1700 [0]
+  364 to 364 -> 1684 [2]
+  366 to 512 -> 1700 [0]
+  516 to 560 -> 1700 [0]
+  562 to 690 -> 1690 [2]
+  692 to 898 -> 1700 [0]
+  900 to 934 -> 1826 [0] lasti
+  936 to 936 -> 1794 [2]
+  938 to 1008 -> 1826 [0] lasti
+  1010 to 1052 -> 1800 [2]
+  1056 to 1068 -> 1800 [2]
+  1070 to 1100 -> 1826 [0] lasti
+  1102 to 1102 -> 1810 [2]
+  1104 to 1238 -> 1826 [0] lasti
+  1240 to 1264 -> 1816 [2]
+  1268 to 1274 -> 1816 [2]
+  1276 to 1678 -> 1826 [0] lasti
+  1684 to 1684 -> 1700 [0]
+  1690 to 1698 -> 1700 [0]
+  1700 to 1716 -> 1788 [1] lasti
+  1718 to 1764 -> 1778 [1] lasti
+  1766 to 1776 -> 1826 [0] lasti
+  1778 to 1786 -> 1788 [1] lasti
+  1788 to 1794 -> 1826 [0] lasti
+  1800 to 1810 -> 1826 [0] lasti
+  1816 to 1824 -> 1826 [0] lasti
+
+Disassembly of <code object is_recent at 0x269ff930, file "app\adapters\youtube_channel.py", line 276>:
+              0 COPY_FREE_VARS           2
+
+276           2 RESUME                   0
+
+277           4 LOAD_FAST                0 (m)
+              6 LOAD_ATTR                1 (NULL|self + get)
+             26 LOAD_CONST               1 ('timestamp')
+             28 CALL                     1
+             36 STORE_FAST               1 (ts)
+
+278          38 LOAD_GLOBAL              3 (NULL + isinstance)
+             48 LOAD_FAST                1 (ts)
+             50 LOAD_GLOBAL              4 (int)
+             60 LOAD_GLOBAL              6 (float)
+             70 BUILD_TUPLE              2
+             72 CALL                     2
+             80 POP_JUMP_IF_TRUE        95 (to 272)
+
+279          82 NOP
+
+280          84 LOAD_GLOBAL              9 (NULL + datetime)
+             94 LOAD_ATTR               10 (strptime)
+            114 LOAD_GLOBAL             13 (NULL + str)
+            124 LOAD_FAST                0 (m)
+            126 LOAD_ATTR                1 (NULL|self + get)
+            146 LOAD_CONST               2 ('upload_date')
+            148 CALL                     1
+            156 COPY                     1
+            158 POP_JUMP_IF_TRUE         2 (to 164)
+            160 POP_TOP
+            162 LOAD_CONST               3 ('')
+        >>  164 CALL                     1
+            172 LOAD_CONST               4 ('%Y%m%d')
+            174 CALL                     2
+            182 LOAD_ATTR               15 (NULL|self + replace)
+
+281         202 LOAD_GLOBAL             16 (timezone)
+            212 LOAD_ATTR               18 (utc)
+
+280         232 KW_NAMES                 5 (('tzinfo',))
+            234 CALL                     1
+
+281         242 LOAD_ATTR               21 (NULL|self + timestamp)
+            262 CALL                     0
+
+280         270 STORE_FAST               1 (ts)
+
+284     >>  272 LOAD_CONST               7 (0)
+            274 LOAD_DEREF               2 (now)
+            276 LOAD_GLOBAL              7 (NULL + float)
+            286 LOAD_FAST                1 (ts)
+            288 CALL                     1
+            296 BINARY_OP               10 (-)
+            300 SWAP                     2
+            302 COPY                     2
+            304 COMPARE_OP              26 (<=)
+            308 COPY                     1
+            310 POP_JUMP_IF_FALSE        5 (to 322)
+            312 POP_TOP
+            314 LOAD_DEREF               3 (one_year)
+            316 COMPARE_OP              26 (<=)
+            320 RETURN_VALUE
+        >>  322 SWAP                     2
+            324 POP_TOP
+            326 RETURN_VALUE
+        >>  328 PUSH_EXC_INFO
+
+282         330 LOAD_GLOBAL             22 (ValueError)
+            340 CHECK_EXC_MATCH
+            342 POP_JUMP_IF_FALSE        3 (to 350)
+            344 POP_TOP
+
+283         346 POP_EXCEPT
+            348 RETURN_CONST             6 (False)
+
+282     >>  350 RERAISE                  0
+        >>  352 COPY                     3
+            354 POP_EXCEPT
+            356 RERAISE                  1
+ExceptionTable:
+  84 to 270 -> 328 [0]
+  328 to 344 -> 352 [1] lasti
+  350 to 350 -> 352 [1] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c81b7d590, file "app\adapters\youtube_channel.py", line 286>:
+286           0 RESUME                   0
+              2 LOAD_FAST                0 (m)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_CONST               1 ('view_count')
+             26 CALL                     1
+             34 LOAD_CONST               0 (None)
+             36 IS_OP                    1
+             38 LOAD_FAST                0 (m)
+             40 LOAD_ATTR                1 (NULL|self + get)
+             60 LOAD_CONST               1 ('view_count')
+             62 CALL                     1
+             70 COPY                     1
+             72 POP_JUMP_IF_TRUE         2 (to 78)
+             74 POP_TOP
+             76 LOAD_CONST               2 (0)
+        >>   78 BUILD_TUPLE              2
+             80 RETURN_VALUE
+
+Disassembly of <code object _extract_full at 0x2908c170, file "app\adapters\youtube_channel.py", line 304>:
+304           0 RESUME                   0
+
+305           2 LOAD_GLOBAL              1 (NULL + YtDlpClient)
+             12 LOAD_ATTR                2 (_require)
+             32 CALL                     0
+             40 STORE_FAST               1 (yt_dlp)
+
+306          42 LOAD_CONST               0 (None)
+             44 STORE_FAST               2 (last_exc)
+
+307          46 LOAD_CONST               1 (('chrome', 'edge', 'firefox', None))
+             48 GET_ITER
+        >>   50 FOR_ITER                68 (to 190)
+             54 STORE_FAST               3 (browser)
+
+308          56 LOAD_CONST               2 (True)
+             58 LOAD_CONST               2 (True)
+             60 LOAD_CONST               2 (True)
+             62 LOAD_CONST               2 (True)
+             64 LOAD_CONST               3 (('quiet', 'no_warnings', 'skip_download', 'noplaylist'))
+             66 BUILD_CONST_KEY_MAP      4
+             68 STORE_FAST               4 (opts)
+
+309          70 LOAD_FAST                3 (browser)
+             72 POP_JUMP_IF_FALSE        5 (to 84)
+
+310          74 LOAD_FAST                3 (browser)
+             76 LOAD_FAST                4 (opts)
+             78 LOAD_CONST               4 ('cookiesfrombrowser')
+             80 STORE_SUBSCR
+
+311     >>   84 NOP
+
+312          86 LOAD_FAST                1 (yt_dlp)
+             88 LOAD_ATTR                5 (NULL|self + YoutubeDL)
+            108 LOAD_FAST                4 (opts)
+            110 CALL                     1
+            118 BEFORE_WITH
+            120 STORE_FAST               5 (ydl)
+
+313         122 LOAD_FAST                5 (ydl)
+            124 LOAD_ATTR                7 (NULL|self + extract_info)
+            144 LOAD_FAST                0 (url)
+            146 LOAD_CONST               5 (False)
+            148 KW_NAMES                 6 (('download',))
+            150 CALL                     2
+            158 COPY                     1
+            160 POP_JUMP_IF_TRUE         2 (to 166)
+            162 POP_TOP
+            164 BUILD_MAP                0
+
+312     >>  166 SWAP                     2
+            168 LOAD_CONST               0 (None)
+            170 LOAD_CONST               0 (None)
+            172 LOAD_CONST               0 (None)
+            174 CALL                     2
+            182 POP_TOP
+            184 SWAP                     2
+            186 POP_TOP
+            188 RETURN_VALUE
+
+307     >>  190 END_FOR
+
+317         192 LOAD_FAST                2 (last_exc)
+            194 POP_JUMP_IF_FALSE        2 (to 200)
+
+318         196 LOAD_FAST                2 (last_exc)
+            198 RAISE_VARARGS            1
+
+319     >>  200 BUILD_MAP                0
+            202 RETURN_VALUE
+
+312     >>  204 PUSH_EXC_INFO
+            206 WITH_EXCEPT_START
+            208 POP_JUMP_IF_TRUE         1 (to 212)
+            210 RERAISE                  2
+        >>  212 POP_TOP
+            214 POP_EXCEPT
+            216 POP_TOP
+            218 POP_TOP
+            220 JUMP_FORWARD             3 (to 228)
+        >>  222 COPY                     3
+            224 POP_EXCEPT
+            226 RERAISE                  1
+        >>  228 JUMP_BACKWARD           90 (to 50)
+        >>  230 PUSH_EXC_INFO
+
+314         232 LOAD_GLOBAL              8 (Exception)
+            242 CHECK_EXC_MATCH
+            244 POP_JUMP_IF_FALSE       39 (to 324)
+            246 STORE_FAST               6 (e)
+
+315         248 LOAD_FAST                6 (e)
+            250 STORE_FAST               2 (last_exc)
+
+316         252 LOAD_GLOBAL             11 (NULL + log)
+            262 LOAD_ATTR               12 (info)
+            282 LOAD_CONST               7 ('[youtube_channel] Extract full cookies from ')
+            284 LOAD_FAST                3 (browser)
+            286 FORMAT_VALUE             0
+            288 LOAD_CONST               8 (' failed/skipped: ')
+            290 LOAD_FAST                6 (e)
+            292 FORMAT_VALUE             0
+            294 BUILD_STRING             4
+            296 CALL                     1
+            304 POP_TOP
+            306 POP_EXCEPT
+            308 LOAD_CONST               0 (None)
+            310 STORE_FAST               6 (e)
+            312 DELETE_FAST              6 (e)
+            314 JUMP_BACKWARD          133 (to 50)
+        >>  316 LOAD_CONST               0 (None)
+            318 STORE_FAST               6 (e)
+            320 DELETE_FAST              6 (e)
+            322 RERAISE                  1
+
+314     >>  324 RERAISE                  0
+        >>  326 COPY                     3
+            328 POP_EXCEPT
+            330 RERAISE                  1
+ExceptionTable:
+  86 to 118 -> 230 [1]
+  120 to 164 -> 204 [2] lasti
+  166 to 182 -> 230 [1]
+  204 to 212 -> 222 [4] lasti
+  214 to 226 -> 230 [1]
+  230 to 246 -> 326 [2] lasti
+  248 to 304 -> 316 [2] lasti
+  316 to 324 -> 326 [2] lasti
+
+Disassembly of <code object _to_meta at 0x2907b9d0, file "app\adapters\youtube_channel.py", line 322>:
+322           0 RESUME                   0
+
+323           2 LOAD_FAST                0 (d)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_CONST               1 ('duration')
+             26 CALL                     1
+             34 STORE_FAST               1 (dur)
+
+324          36 BUILD_MAP                0
+
+325          38 LOAD_CONST               2 ('id')
+             40 LOAD_FAST                0 (d)
+             42 LOAD_ATTR                1 (NULL|self + get)
+             62 LOAD_CONST               2 ('id')
+             64 CALL                     1
+
+324          72 MAP_ADD                  1
+
+326          74 LOAD_CONST               3 ('title')
+             76 LOAD_FAST                0 (d)
+             78 LOAD_ATTR                1 (NULL|self + get)
+             98 LOAD_CONST               3 ('title')
+            100 CALL                     1
+            108 COPY                     1
+            110 POP_JUMP_IF_TRUE        21 (to 154)
+            112 POP_TOP
+            114 LOAD_FAST                0 (d)
+            116 LOAD_ATTR                1 (NULL|self + get)
+            136 LOAD_CONST               4 ('fulltitle')
+            138 CALL                     1
+            146 COPY                     1
+            148 POP_JUMP_IF_TRUE         2 (to 154)
+            150 POP_TOP
+            152 LOAD_CONST               5 ('')
+
+324     >>  154 MAP_ADD                  1
+
+327         156 LOAD_CONST               6 ('view_count')
+            158 LOAD_FAST                0 (d)
+            160 LOAD_ATTR                1 (NULL|self + get)
+            180 LOAD_CONST               6 ('view_count')
+            182 CALL                     1
+
+324         190 MAP_ADD                  1
+
+328         192 LOAD_CONST               7 ('like_count')
+            194 LOAD_FAST                0 (d)
+            196 LOAD_ATTR                1 (NULL|self + get)
+            216 LOAD_CONST               7 ('like_count')
+            218 CALL                     1
+
+324         226 MAP_ADD                  1
+
+329         228 LOAD_CONST               8 ('comment_count')
+            230 LOAD_FAST                0 (d)
+            232 LOAD_ATTR                1 (NULL|self + get)
+            252 LOAD_CONST               8 ('comment_count')
+            254 CALL                     1
+
+324         262 MAP_ADD                  1
+
+330         264 LOAD_CONST               1 ('duration')
+            266 LOAD_GLOBAL              3 (NULL + isinstance)
+            276 LOAD_FAST                1 (dur)
+            278 LOAD_GLOBAL              4 (int)
+            288 LOAD_GLOBAL              6 (float)
+            298 BUILD_TUPLE              2
+            300 CALL                     2
+            308 POP_JUMP_IF_FALSE       11 (to 332)
+            310 LOAD_GLOBAL              5 (NULL + int)
+            320 LOAD_FAST                1 (dur)
+            322 CALL                     1
+            330 JUMP_FORWARD             1 (to 334)
+        >>  332 LOAD_CONST               0 (None)
+
+324     >>  334 MAP_ADD                  1
+
+331         336 LOAD_CONST               9 ('upload_date')
+            338 LOAD_FAST                0 (d)
+            340 LOAD_ATTR                1 (NULL|self + get)
+            360 LOAD_CONST               9 ('upload_date')
+            362 CALL                     1
+
+324         370 MAP_ADD                  1
+
+332         372 LOAD_CONST              10 ('timestamp')
+            374 LOAD_FAST                0 (d)
+            376 LOAD_ATTR                1 (NULL|self + get)
+            396 LOAD_CONST              10 ('timestamp')
+            398 CALL                     1
+
+324         406 MAP_ADD                  1
+
+333         408 LOAD_CONST              11 ('channel')
+            410 LOAD_FAST                0 (d)
+            412 LOAD_ATTR                1 (NULL|self + get)
+            432 LOAD_CONST              11 ('channel')
+            434 CALL                     1
+            442 COPY                     1
+            444 POP_JUMP_IF_TRUE        17 (to 480)
+            446 POP_TOP
+            448 LOAD_FAST                0 (d)
+            450 LOAD_ATTR                1 (NULL|self + get)
+            470 LOAD_CONST              12 ('uploader')
+            472 CALL                     1
+
+324     >>  480 MAP_ADD                  1
+
+334         482 LOAD_CONST              13 ('channel_id')
+            484 LOAD_FAST                0 (d)
+            486 LOAD_ATTR                1 (NULL|self + get)
+            506 LOAD_CONST              13 ('channel_id')
+            508 CALL                     1
+
+324         516 MAP_ADD                  1
+
+335         518 LOAD_CONST              14 ('channel_follower_count')
+            520 LOAD_FAST                0 (d)
+            522 LOAD_ATTR                1 (NULL|self + get)
+            542 LOAD_CONST              14 ('channel_follower_count')
+            544 CALL                     1
+
+324         552 MAP_ADD                  1
+
+336         554 LOAD_CONST              15 ('thumbnail')
+            556 LOAD_FAST                0 (d)
+            558 LOAD_ATTR                1 (NULL|self + get)
+            578 LOAD_CONST              15 ('thumbnail')
+            580 CALL                     1
+
+324         588 MAP_ADD                  1
+
+337         590 LOAD_CONST              16 ('webpage_url')
+            592 LOAD_FAST                0 (d)
+            594 LOAD_ATTR                1 (NULL|self + get)
+            614 LOAD_CONST              16 ('webpage_url')
+            616 CALL                     1
+            624 COPY                     1
+            626 POP_JUMP_IF_TRUE        30 (to 688)
+            628 POP_TOP
+            630 LOAD_GLOBAL              9 (NULL + video_url)
+            640 LOAD_FAST                0 (d)
+            642 LOAD_ATTR                1 (NULL|self + get)
+            662 LOAD_CONST               2 ('id')
+            664 CALL                     1
+            672 COPY                     1
+            674 POP_JUMP_IF_TRUE         2 (to 680)
+            676 POP_TOP
+            678 LOAD_CONST               5 ('')
+        >>  680 CALL                     1
+
+324     >>  688 MAP_ADD                  1
+
+339         690 LOAD_CONST              17 ('is_short')
+            692 LOAD_GLOBAL             11 (NULL + _is_short)
+            702 LOAD_FAST                0 (d)
+            704 CALL                     1
+
+324         712 MAP_ADD                  1
+
+341         714 LOAD_CONST              18 ('_subtitles')
+            716 LOAD_FAST                0 (d)
+            718 LOAD_ATTR                1 (NULL|self + get)
+            738 LOAD_CONST              19 ('subtitles')
+            740 CALL                     1
+            748 COPY                     1
+            750 POP_JUMP_IF_TRUE         2 (to 756)
+            752 POP_TOP
+            754 BUILD_MAP                0
+
+324     >>  756 MAP_ADD                  1
+
+342         758 LOAD_CONST              20 ('_automatic_captions')
+            760 LOAD_FAST                0 (d)
+            762 LOAD_ATTR                1 (NULL|self + get)
+            782 LOAD_CONST              21 ('automatic_captions')
+            784 CALL                     1
+            792 COPY                     1
+            794 POP_JUMP_IF_TRUE         2 (to 800)
+            796 POP_TOP
+            798 BUILD_MAP                0
+
+324     >>  800 MAP_ADD                  1
+            802 RETURN_VALUE
+
+Disassembly of <code object _is_short at 0x7f6c9343ba50, file "app\adapters\youtube_channel.py", line 346>:
+346           0 RESUME                   0
+
+358           2 LOAD_FAST                0 (d)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_CONST               1 ('duration')
+             26 CALL                     1
+             34 STORE_FAST               1 (dur)
+
+359          36 LOAD_FAST                0 (d)
+             38 LOAD_ATTR                1 (NULL|self + get)
+             58 LOAD_CONST               2 ('width')
+             60 CALL                     1
+             68 LOAD_FAST                0 (d)
+             70 LOAD_ATTR                1 (NULL|self + get)
+             90 LOAD_CONST               3 ('height')
+             92 CALL                     1
+            100 STORE_FAST               3 (h)
+            102 STORE_FAST               2 (w)
+
+360         104 LOAD_GLOBAL              3 (NULL + bool)
+            114 LOAD_FAST                2 (w)
+            116 COPY                     1
+            118 POP_JUMP_IF_FALSE        9 (to 138)
+            120 POP_TOP
+            122 LOAD_FAST                3 (h)
+            124 COPY                     1
+            126 POP_JUMP_IF_FALSE        5 (to 138)
+            128 POP_TOP
+            130 LOAD_FAST                3 (h)
+            132 LOAD_FAST                2 (w)
+            134 COMPARE_OP              68 (>)
+        >>  138 CALL                     1
+            146 STORE_FAST               4 (vertical)
+
+361         148 LOAD_FAST                4 (vertical)
+            150 POP_JUMP_IF_FALSE       32 (to 216)
+            152 LOAD_GLOBAL              5 (NULL + isinstance)
+            162 LOAD_FAST                1 (dur)
+            164 LOAD_GLOBAL              6 (int)
+            174 LOAD_GLOBAL              8 (float)
+            184 BUILD_TUPLE              2
+            186 CALL                     2
+            194 POP_JUMP_IF_FALSE       10 (to 216)
+            196 LOAD_FAST                1 (dur)
+            198 LOAD_GLOBAL             10 (SHORT_MAX_S)
+            208 COMPARE_OP              26 (<=)
+            212 POP_JUMP_IF_FALSE        1 (to 216)
+
+362         214 RETURN_CONST             4 (True)
+
+363     >>  216 LOAD_GLOBAL              3 (NULL + bool)
+            226 LOAD_GLOBAL              5 (NULL + isinstance)
+            236 LOAD_FAST                1 (dur)
+            238 LOAD_GLOBAL              6 (int)
+            248 LOAD_GLOBAL              8 (float)
+            258 BUILD_TUPLE              2
+            260 CALL                     2
+            268 COPY                     1
+            270 POP_JUMP_IF_FALSE        9 (to 290)
+            272 POP_TOP
+            274 LOAD_FAST                1 (dur)
+            276 LOAD_GLOBAL             12 (SHORT_SURE_S)
+            286 COMPARE_OP              26 (<=)
+        >>  290 CALL                     1
+            298 RETURN_VALUE
+
+Disassembly of <code object fetch_video_meta at 0x7f6c92ea4670, file "app\adapters\youtube_channel.py", line 366>:
+366           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+368           6 LOAD_GLOBAL              1 (NULL + asyncio)
+             16 LOAD_ATTR                2 (to_thread)
+             36 LOAD_GLOBAL              4 (_extract_full)
+             46 LOAD_GLOBAL              7 (NULL + video_url)
+             56 LOAD_FAST                0 (video_id_or_url)
+             58 CALL                     1
+             66 CALL                     2
+             74 GET_AWAITABLE            0
+             76 LOAD_CONST               1 (None)
+        >>   78 SEND                     3 (to 88)
+             82 YIELD_VALUE              2
+             84 RESUME                   3
+             86 JUMP_BACKWARD_NO_INTERRUPT     5 (to 78)
+        >>   88 END_SEND
+             90 STORE_FAST               1 (d)
+
+369          92 LOAD_GLOBAL              9 (NULL + _to_meta)
+            102 LOAD_FAST                1 (d)
+            104 CALL                     1
+            112 RETURN_VALUE
+
+368     >>  114 CLEANUP_THROW
+            116 JUMP_BACKWARD           15 (to 88)
+        >>  118 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            120 RERAISE                  1
+ExceptionTable:
+  4 to 80 -> 118 [0] lasti
+  82 to 82 -> 114 [2]
+  84 to 114 -> 118 [0] lasti
+
+Disassembly of <code object fetch_many_metas at 0x7f6c9326da70, file "app\adapters\youtube_channel.py", line 372>:
+              0 MAKE_CELL                5 (one)
+              2 MAKE_CELL                6 (sem)
+
+372           4 RETURN_GENERATOR
+              6 POP_TOP
+              8 RESUME                   0
+
+377          10 LOAD_GLOBAL              1 (NULL + _try_data_api)
+             20 LOAD_GLOBAL              2 (data_api)
+             30 LOAD_ATTR                4 (fetch_videos_meta)
+             50 LOAD_GLOBAL              7 (NULL + list)
+             60 LOAD_FAST                0 (video_ids)
+             62 CALL                     1
+             70 CALL                     2
+             78 GET_AWAITABLE            0
+             80 LOAD_CONST               1 (None)
+        >>   82 SEND                     3 (to 92)
+             86 YIELD_VALUE              2
+             88 RESUME                   3
+             90 JUMP_BACKWARD_NO_INTERRUPT     5 (to 82)
+        >>   92 END_SEND
+             94 STORE_FAST               2 (got)
+
+378          96 LOAD_FAST                2 (got)
+             98 POP_JUMP_IF_NONE         2 (to 104)
+
+379         100 LOAD_FAST                2 (got)
+            102 RETURN_VALUE
+
+380     >>  104 LOAD_GLOBAL              9 (NULL + asyncio)
+            114 LOAD_ATTR               10 (Semaphore)
+            134 LOAD_FAST                1 (concurrency)
+            136 CALL                     1
+            144 STORE_DEREF              6 (sem)
+
+382         146 LOAD_CONST               4 (('vid', 'str', 'return', 'dict | None'))
+            148 LOAD_CLOSURE             6 (sem)
+            150 BUILD_TUPLE              1
+            152 LOAD_CONST               2 (<code object one at 0x7f6c9343bc40, file "app\adapters\youtube_channel.py", line 382>)
+            154 MAKE_FUNCTION           12 (annotations, closure)
+            156 STORE_DEREF              5 (one)
+
+390         158 LOAD_GLOBAL              9 (NULL + asyncio)
+            168 LOAD_ATTR               12 (gather)
+            188 LOAD_CLOSURE             5 (one)
+            190 BUILD_TUPLE              1
+            192 LOAD_CONST               3 (<code object <genexpr> at 0x7f6c92e584e0, file "app\adapters\youtube_channel.py", line 390>)
+            194 MAKE_FUNCTION            8 (closure)
+            196 LOAD_FAST                0 (video_ids)
+            198 GET_ITER
+            200 CALL                     0
+            208 CALL_FUNCTION_EX         0
+            210 GET_AWAITABLE            0
+            212 LOAD_CONST               1 (None)
+        >>  214 SEND                     3 (to 224)
+            218 YIELD_VALUE              2
+            220 RESUME                   3
+            222 JUMP_BACKWARD_NO_INTERRUPT     5 (to 214)
+        >>  224 END_SEND
+            226 STORE_FAST               3 (results)
+
+391         228 LOAD_FAST                3 (results)
+            230 GET_ITER
+            232 LOAD_FAST_AND_CLEAR      4 (r)
+            234 SWAP                     2
+            236 BUILD_LIST               0
+            238 SWAP                     2
+        >>  240 FOR_ITER                 7 (to 258)
+            244 STORE_FAST               4 (r)
+            246 LOAD_FAST                4 (r)
+            248 POP_JUMP_IF_TRUE         1 (to 252)
+            250 JUMP_BACKWARD            6 (to 240)
+        >>  252 LOAD_FAST                4 (r)
+            254 LIST_APPEND              2
+            256 JUMP_BACKWARD            9 (to 240)
+        >>  258 END_FOR
+            260 SWAP                     2
+            262 STORE_FAST               4 (r)
+            264 RETURN_VALUE
+
+377     >>  266 CLEANUP_THROW
+            268 JUMP_BACKWARD           89 (to 92)
+
+390     >>  270 CLEANUP_THROW
+            272 JUMP_BACKWARD           25 (to 224)
+        >>  274 SWAP                     2
+            276 POP_TOP
+
+391         278 SWAP                     2
+            280 STORE_FAST               4 (r)
+            282 RERAISE                  0
+        >>  284 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            286 RERAISE                  1
+ExceptionTable:
+  8 to 84 -> 284 [0] lasti
+  86 to 86 -> 266 [2]
+  88 to 216 -> 284 [0] lasti
+  218 to 218 -> 270 [2]
+  220 to 234 -> 284 [0] lasti
+  236 to 248 -> 274 [2]
+  252 to 258 -> 274 [2]
+  260 to 266 -> 284 [0] lasti
+  270 to 270 -> 284 [0] lasti
+  274 to 282 -> 284 [0] lasti
+
+Disassembly of <code object one at 0x7f6c9343bc40, file "app\adapters\youtube_channel.py", line 382>:
+              0 COPY_FREE_VARS           1
+
+382           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+383           8 LOAD_DEREF               2 (sem)
+             10 BEFORE_ASYNC_WITH
+             12 GET_AWAITABLE            1
+             14 LOAD_CONST               0 (None)
+        >>   16 SEND                     3 (to 26)
+             20 YIELD_VALUE              2
+             22 RESUME                   3
+             24 JUMP_BACKWARD_NO_INTERRUPT     5 (to 16)
+        >>   26 END_SEND
+             28 POP_TOP
+
+384          30 NOP
+
+385          32 LOAD_GLOBAL              1 (NULL + fetch_video_meta)
+             42 LOAD_FAST                0 (vid)
+             44 CALL                     1
+             52 GET_AWAITABLE            0
+             54 LOAD_CONST               0 (None)
+        >>   56 SEND                     3 (to 66)
+             60 YIELD_VALUE              4
+             62 RESUME                   3
+             64 JUMP_BACKWARD_NO_INTERRUPT     5 (to 56)
+        >>   66 END_SEND
+
+383          68 SWAP                     2
+             70 LOAD_CONST               0 (None)
+             72 LOAD_CONST               0 (None)
+             74 LOAD_CONST               0 (None)
+             76 CALL                     2
+             84 GET_AWAITABLE            2
+             86 LOAD_CONST               0 (None)
+        >>   88 SEND                     3 (to 98)
+             92 YIELD_VALUE              2
+             94 RESUME                   3
+             96 JUMP_BACKWARD_NO_INTERRUPT     5 (to 88)
+        >>   98 END_SEND
+            100 POP_TOP
+            102 RETURN_VALUE
+        >>  104 CLEANUP_THROW
+            106 JUMP_BACKWARD           41 (to 26)
+
+385     >>  108 CLEANUP_THROW
+            110 JUMP_BACKWARD           23 (to 66)
+
+383     >>  112 CLEANUP_THROW
+            114 JUMP_BACKWARD            9 (to 98)
+        >>  116 PUSH_EXC_INFO
+
+386         118 LOAD_GLOBAL              2 (Exception)
+            128 CHECK_EXC_MATCH
+            130 POP_JUMP_IF_FALSE       54 (to 240)
+            132 STORE_FAST               1 (e)
+
+387         134 LOAD_GLOBAL              5 (NULL + log)
+            144 LOAD_ATTR                6 (info)
+            164 LOAD_CONST               1 ('[youtube_channel] bỏ qua video ')
+            166 LOAD_FAST                0 (vid)
+            168 FORMAT_VALUE             0
+            170 LOAD_CONST               2 (': ')
+            172 LOAD_FAST                1 (e)
+            174 FORMAT_VALUE             0
+            176 BUILD_STRING             4
+            178 CALL                     1
+            186 POP_TOP
+
+388         188 POP_EXCEPT
+            190 LOAD_CONST               0 (None)
+            192 STORE_FAST               1 (e)
+            194 DELETE_FAST              1 (e)
+
+383         196 LOAD_CONST               0 (None)
+            198 LOAD_CONST               0 (None)
+            200 LOAD_CONST               0 (None)
+            202 CALL                     2
+            210 GET_AWAITABLE            2
+            212 LOAD_CONST               0 (None)
+        >>  214 SEND                     4 (to 226)
+            218 YIELD_VALUE              2
+            220 RESUME                   3
+            222 JUMP_BACKWARD_NO_INTERRUPT     5 (to 214)
+        >>  224 CLEANUP_THROW
+        >>  226 END_SEND
+            228 POP_TOP
+            230 RETURN_CONST             0 (None)
+        >>  232 LOAD_CONST               0 (None)
+            234 STORE_FAST               1 (e)
+            236 DELETE_FAST              1 (e)
+            238 RERAISE                  1
+
+386     >>  240 RERAISE                  0
+        >>  242 COPY                     3
+            244 POP_EXCEPT
+            246 RERAISE                  1
+
+383     >>  248 PUSH_EXC_INFO
+            250 WITH_EXCEPT_START
+            252 GET_AWAITABLE            2
+            254 LOAD_CONST               0 (None)
+        >>  256 SEND                     4 (to 268)
+            260 YIELD_VALUE              3
+            262 RESUME                   3
+            264 JUMP_BACKWARD_NO_INTERRUPT     5 (to 256)
+        >>  266 CLEANUP_THROW
+        >>  268 END_SEND
+            270 POP_JUMP_IF_TRUE         1 (to 274)
+            272 RERAISE                  2
+        >>  274 POP_TOP
+            276 POP_EXCEPT
+            278 POP_TOP
+            280 POP_TOP
+            282 RETURN_CONST             0 (None)
+        >>  284 COPY                     3
+            286 POP_EXCEPT
+            288 RERAISE                  1
+        >>  290 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            292 RERAISE                  1
+ExceptionTable:
+  6 to 18 -> 290 [0] lasti
+  20 to 20 -> 104 [3]
+  22 to 26 -> 290 [0] lasti
+  28 to 28 -> 248 [1] lasti
+  32 to 58 -> 116 [1]
+  60 to 60 -> 108 [3]
+  62 to 66 -> 116 [1]
+  68 to 90 -> 290 [0] lasti
+  92 to 92 -> 112 [3]
+  94 to 104 -> 290 [0] lasti
+  108 to 108 -> 116 [1]
+  112 to 112 -> 290 [0] lasti
+  116 to 132 -> 242 [2] lasti
+  134 to 186 -> 232 [2] lasti
+  188 to 194 -> 248 [1] lasti
+  196 to 216 -> 290 [0] lasti
+  218 to 218 -> 224 [2]
+  220 to 230 -> 290 [0] lasti
+  232 to 240 -> 242 [2] lasti
+  242 to 246 -> 248 [1] lasti
+  248 to 258 -> 284 [3] lasti
+  260 to 260 -> 266 [6]
+  262 to 274 -> 284 [3] lasti
+  276 to 288 -> 290 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c92e584e0, file "app\adapters\youtube_channel.py", line 390>:
+              0 COPY_FREE_VARS           1
+
+390           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                12 (to 38)
+             14 STORE_FAST               1 (v)
+             16 PUSH_NULL
+             18 LOAD_DEREF               2 (one)
+             20 LOAD_FAST                1 (v)
+             22 CALL                     1
+             30 YIELD_VALUE              1
+             32 RESUME                   1
+             34 POP_TOP
+             36 JUMP_BACKWARD           14 (to 10)
+        >>   38 END_FOR
+             40 RETURN_CONST             0 (None)
+        >>   42 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             44 RERAISE                  1
+ExceptionTable:
+  6 to 40 -> 42 [0] lasti
+
+Disassembly of <code object _is_translated at 0x7f6c81c20d40, file "app\adapters\youtube_channel.py", line 396>:
+396           0 RESUME                   0
+
+402           2 LOAD_FAST                0 (tracks)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 BUILD_LIST               0
+        >>   12 GET_ITER
+        >>   14 FOR_ITER                40 (to 98)
+             18 STORE_FAST               1 (t)
+
+403          20 LOAD_GLOBAL              1 (NULL + str)
+             30 LOAD_FAST                1 (t)
+             32 LOAD_ATTR                3 (NULL|self + get)
+             52 LOAD_CONST               1 ('url')
+             54 CALL                     1
+             62 COPY                     1
+             64 POP_JUMP_IF_TRUE         2 (to 70)
+             66 POP_TOP
+             68 LOAD_CONST               2 ('')
+        >>   70 CALL                     1
+             78 STORE_FAST               2 (url)
+
+404          80 LOAD_FAST                2 (url)
+             82 POP_JUMP_IF_TRUE         1 (to 86)
+             84 JUMP_BACKWARD           36 (to 14)
+
+405     >>   86 LOAD_CONST               3 ('tlang=')
+             88 LOAD_FAST                2 (url)
+             90 CONTAINS_OP              0
+             92 SWAP                     2
+             94 POP_TOP
+             96 RETURN_VALUE
+
+402     >>   98 END_FOR
+
+406         100 RETURN_CONST             4 (False)
+
+Disassembly of <code object _original_lang at 0x7f6c92e4bdf0, file "app\adapters\youtube_channel.py", line 409>:
+409           0 RESUME                   0
+
+415           2 LOAD_GLOBAL              1 (NULL + str)
+             12 LOAD_FAST                0 (meta)
+             14 LOAD_ATTR                3 (NULL|self + get)
+             34 LOAD_CONST               1 ('language')
+             36 CALL                     1
+             44 COPY                     1
+             46 POP_JUMP_IF_TRUE         2 (to 52)
+             48 POP_TOP
+             50 LOAD_CONST               2 ('')
+        >>   52 CALL                     1
+             60 LOAD_ATTR                5 (NULL|self + strip)
+             80 CALL                     0
+             88 STORE_FAST               1 (lang)
+
+416          90 LOAD_FAST                1 (lang)
+             92 POP_JUMP_IF_FALSE        2 (to 98)
+
+417          94 LOAD_FAST                1 (lang)
+             96 RETURN_VALUE
+
+418     >>   98 LOAD_FAST                0 (meta)
+            100 LOAD_ATTR                3 (NULL|self + get)
+            120 LOAD_CONST               3 ('_automatic_captions')
+            122 CALL                     1
+            130 COPY                     1
+            132 POP_JUMP_IF_TRUE         2 (to 138)
+            134 POP_TOP
+            136 BUILD_MAP                0
+        >>  138 LOAD_ATTR                7 (NULL|self + items)
+            158 CALL                     0
+            166 GET_ITER
+        >>  168 FOR_ITER                23 (to 218)
+            172 UNPACK_SEQUENCE          2
+            176 STORE_FAST               2 (lg)
+            178 STORE_FAST               3 (tracks)
+
+419         180 LOAD_FAST                3 (tracks)
+            182 POP_JUMP_IF_TRUE         1 (to 186)
+            184 JUMP_BACKWARD            9 (to 168)
+        >>  186 LOAD_GLOBAL              9 (NULL + _is_translated)
+            196 LOAD_FAST                3 (tracks)
+            198 CALL                     1
+            206 POP_JUMP_IF_FALSE        1 (to 210)
+            208 JUMP_BACKWARD           21 (to 168)
+
+420     >>  210 LOAD_FAST                2 (lg)
+            212 SWAP                     2
+            214 POP_TOP
+            216 RETURN_VALUE
+
+418     >>  218 END_FOR
+
+421         220 RETURN_CONST             2 ('')
+
+Disassembly of <code object _lang_first at 0x7f6c9326e790, file "app\adapters\youtube_channel.py", line 424>:
+424           0 RESUME                   0
+
+426           2 LOAD_FAST                1 (lang)
+              4 POP_JUMP_IF_TRUE         1 (to 8)
+
+427           6 RETURN_CONST             1 (None)
+
+428     >>    8 LOAD_FAST                0 (capmap)
+             10 LOAD_ATTR                1 (NULL|self + get)
+             30 LOAD_FAST                1 (lang)
+             32 CALL                     1
+             40 POP_JUMP_IF_FALSE        5 (to 52)
+
+429          42 LOAD_FAST                0 (capmap)
+             44 LOAD_FAST                1 (lang)
+             46 BINARY_SUBSCR
+             50 RETURN_VALUE
+
+430     >>   52 LOAD_FAST                1 (lang)
+             54 LOAD_ATTR                3 (NULL|self + split)
+             74 LOAD_CONST               2 ('-')
+             76 CALL                     1
+             84 LOAD_CONST               3 (0)
+             86 BINARY_SUBSCR
+             90 LOAD_ATTR                5 (NULL|self + lower)
+            110 CALL                     0
+            118 STORE_FAST               2 (base)
+
+431         120 LOAD_FAST                0 (capmap)
+            122 LOAD_ATTR                7 (NULL|self + items)
+            142 CALL                     0
+            150 GET_ITER
+        >>  152 FOR_ITER                58 (to 272)
+            156 UNPACK_SEQUENCE          2
+            160 STORE_FAST               3 (lg)
+            162 STORE_FAST               4 (tracks)
+
+432         164 LOAD_FAST                4 (tracks)
+            166 POP_JUMP_IF_TRUE         1 (to 170)
+            168 JUMP_BACKWARD            9 (to 152)
+        >>  170 LOAD_GLOBAL              9 (NULL + str)
+            180 LOAD_FAST                3 (lg)
+            182 CALL                     1
+            190 LOAD_ATTR                3 (NULL|self + split)
+            210 LOAD_CONST               2 ('-')
+            212 CALL                     1
+            220 LOAD_CONST               3 (0)
+            222 BINARY_SUBSCR
+            226 LOAD_ATTR                5 (NULL|self + lower)
+            246 CALL                     0
+            254 LOAD_FAST                2 (base)
+            256 COMPARE_OP              40 (==)
+            260 POP_JUMP_IF_TRUE         1 (to 264)
+            262 JUMP_BACKWARD           56 (to 152)
+
+433     >>  264 LOAD_FAST                4 (tracks)
+            266 SWAP                     2
+            268 POP_TOP
+            270 RETURN_VALUE
+
+431     >>  272 END_FOR
+
+434         274 RETURN_CONST             1 (None)
+
+Disassembly of <code object _pick_track at 0x7f6c93426430, file "app\adapters\youtube_channel.py", line 437>:
+437           0 RESUME                   0
+
+446           2 LOAD_FAST                0 (capmap)
+              4 LOAD_ATTR                1 (NULL|self + items)
+             24 CALL                     0
+             32 GET_ITER
+             34 LOAD_FAST_AND_CLEAR      2 (lg)
+             36 LOAD_FAST_AND_CLEAR      3 (tr)
+             38 SWAP                     3
+             40 BUILD_MAP                0
+             42 SWAP                     2
+        >>   44 FOR_ITER                23 (to 94)
+             48 UNPACK_SEQUENCE          2
+             52 STORE_FAST               2 (lg)
+             54 STORE_FAST               3 (tr)
+             56 LOAD_FAST                3 (tr)
+             58 POP_JUMP_IF_TRUE         1 (to 62)
+             60 JUMP_BACKWARD            9 (to 44)
+        >>   62 LOAD_GLOBAL              3 (NULL + _is_translated)
+             72 LOAD_FAST                3 (tr)
+             74 CALL                     1
+             82 POP_JUMP_IF_FALSE        1 (to 86)
+             84 JUMP_BACKWARD           21 (to 44)
+        >>   86 LOAD_FAST                2 (lg)
+             88 LOAD_FAST                3 (tr)
+             90 MAP_ADD                  2
+             92 JUMP_BACKWARD           25 (to 44)
+        >>   94 END_FOR
+             96 STORE_FAST               4 (originals)
+             98 STORE_FAST               2 (lg)
+            100 STORE_FAST               3 (tr)
+
+447         102 LOAD_FAST                1 (langs)
+            104 GET_ITER
+        >>  106 FOR_ITER                13 (to 136)
+            110 STORE_FAST               2 (lg)
+
+448         112 LOAD_FAST                2 (lg)
+            114 LOAD_FAST                4 (originals)
+            116 CONTAINS_OP              0
+            118 POP_JUMP_IF_TRUE         1 (to 122)
+            120 JUMP_BACKWARD            8 (to 106)
+
+449     >>  122 LOAD_FAST                4 (originals)
+            124 LOAD_FAST                2 (lg)
+            126 BINARY_SUBSCR
+            130 SWAP                     2
+            132 POP_TOP
+            134 RETURN_VALUE
+
+447     >>  136 END_FOR
+
+450         138 LOAD_FAST                4 (originals)
+            140 LOAD_ATTR                1 (NULL|self + items)
+            160 CALL                     0
+            168 GET_ITER
+            170 FOR_ITER                 8 (to 190)
+            174 UNPACK_SEQUENCE          2
+            178 STORE_FAST               5 (_lg)
+            180 STORE_FAST               6 (tracks)
+
+451         182 LOAD_FAST                6 (tracks)
+            184 SWAP                     2
+            186 POP_TOP
+            188 RETURN_VALUE
+
+450     >>  190 END_FOR
+
+452         192 LOAD_FAST                1 (langs)
+            194 GET_ITER
+        >>  196 FOR_ITER                19 (to 238)
+            200 STORE_FAST               2 (lg)
+
+453         202 LOAD_FAST                2 (lg)
+            204 LOAD_FAST                0 (capmap)
+            206 CONTAINS_OP              0
+            208 POP_JUMP_IF_TRUE         1 (to 212)
+            210 JUMP_BACKWARD            8 (to 196)
+        >>  212 LOAD_FAST                0 (capmap)
+            214 LOAD_FAST                2 (lg)
+            216 BINARY_SUBSCR
+            220 POP_JUMP_IF_TRUE         1 (to 224)
+            222 JUMP_BACKWARD           14 (to 196)
+
+454     >>  224 LOAD_FAST                0 (capmap)
+            226 LOAD_FAST                2 (lg)
+            228 BINARY_SUBSCR
+            232 SWAP                     2
+            234 POP_TOP
+            236 RETURN_VALUE
+
+452     >>  238 END_FOR
+
+455         240 LOAD_FAST                0 (capmap)
+            242 LOAD_ATTR                1 (NULL|self + items)
+            262 CALL                     0
+            270 GET_ITER
+        >>  272 FOR_ITER                11 (to 298)
+            276 UNPACK_SEQUENCE          2
+            280 STORE_FAST               5 (_lg)
+            282 STORE_FAST               6 (tracks)
+
+456         284 LOAD_FAST                6 (tracks)
+            286 POP_JUMP_IF_TRUE         1 (to 290)
+            288 JUMP_BACKWARD            9 (to 272)
+
+457     >>  290 LOAD_FAST                6 (tracks)
+            292 SWAP                     2
+            294 POP_TOP
+            296 RETURN_VALUE
+
+455     >>  298 END_FOR
+
+458         300 RETURN_CONST             1 (None)
+        >>  302 SWAP                     2
+            304 POP_TOP
+
+446         306 SWAP                     3
+            308 STORE_FAST               3 (tr)
+            310 STORE_FAST               2 (lg)
+            312 RERAISE                  0
+ExceptionTable:
+  40 to 58 -> 302 [3]
+  62 to 82 -> 302 [3]
+  86 to 94 -> 302 [3]
+
+Disassembly of <code object parse_json3_segments at 0x2908ec30, file "app\adapters\youtube_channel.py", line 461>:
+461           0 RESUME                   0
+
+468           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (None)
+              6 IMPORT_NAME              0 (json)
+              8 STORE_FAST               1 (json)
+
+470          10 NOP
+
+471          12 LOAD_FAST                1 (json)
+             14 LOAD_ATTR                3 (NULL|self + loads)
+             34 LOAD_FAST                0 (raw)
+             36 CALL                     1
+             44 STORE_FAST               2 (data)
+
+474          46 BUILD_LIST               0
+             48 STORE_FAST               3 (out)
+
+475          50 LOAD_FAST                2 (data)
+             52 LOAD_ATTR                7 (NULL|self + get)
+             72 LOAD_CONST               3 ('events')
+             74 CALL                     1
+             82 COPY                     1
+             84 POP_JUMP_IF_TRUE         2 (to 90)
+             86 POP_TOP
+             88 BUILD_LIST               0
+        >>   90 GET_ITER
+        >>   92 FOR_ITER               182 (to 460)
+             96 STORE_FAST               4 (ev)
+
+476          98 LOAD_FAST                4 (ev)
+            100 LOAD_ATTR                7 (NULL|self + get)
+            120 LOAD_CONST               4 ('tStartMs')
+            122 CALL                     1
+            130 STORE_FAST               5 (start_ms)
+
+477         132 LOAD_GLOBAL              9 (NULL + isinstance)
+            142 LOAD_FAST                5 (start_ms)
+            144 LOAD_GLOBAL             10 (int)
+            154 LOAD_GLOBAL             12 (float)
+            164 BUILD_TUPLE              2
+            166 CALL                     2
+            174 POP_JUMP_IF_TRUE         1 (to 178)
+
+478         176 JUMP_BACKWARD           43 (to 92)
+
+479     >>  178 LOAD_FAST                4 (ev)
+            180 LOAD_ATTR                7 (NULL|self + get)
+            200 LOAD_CONST               5 ('segs')
+            202 CALL                     1
+            210 COPY                     1
+            212 POP_JUMP_IF_TRUE         2 (to 218)
+            214 POP_TOP
+            216 BUILD_LIST               0
+        >>  218 GET_ITER
+        >>  220 FOR_ITER               116 (to 456)
+            224 STORE_FAST               6 (seg)
+
+480         226 LOAD_GLOBAL             15 (NULL + re)
+            236 LOAD_ATTR               16 (sub)
+            256 LOAD_CONST               6 ('\\s+')
+            258 LOAD_CONST               7 (' ')
+            260 LOAD_GLOBAL             19 (NULL + str)
+            270 LOAD_FAST                6 (seg)
+            272 LOAD_ATTR                7 (NULL|self + get)
+            292 LOAD_CONST               8 ('utf8')
+            294 CALL                     1
+            302 COPY                     1
+            304 POP_JUMP_IF_TRUE         2 (to 310)
+            306 POP_TOP
+            308 LOAD_CONST               9 ('')
+        >>  310 CALL                     1
+            318 CALL                     3
+            326 LOAD_ATTR               21 (NULL|self + strip)
+            346 CALL                     0
+            354 STORE_FAST               7 (text)
+
+481         356 LOAD_FAST                7 (text)
+            358 POP_JUMP_IF_TRUE         1 (to 362)
+
+482         360 JUMP_BACKWARD           71 (to 220)
+
+483     >>  362 LOAD_FAST                6 (seg)
+            364 LOAD_ATTR                7 (NULL|self + get)
+            384 LOAD_CONST              10 ('tOffsetMs')
+            386 CALL                     1
+            394 COPY                     1
+            396 POP_JUMP_IF_TRUE         2 (to 402)
+            398 POP_TOP
+            400 LOAD_CONST               1 (0)
+        >>  402 STORE_FAST               8 (offset)
+
+484         404 LOAD_FAST                3 (out)
+            406 LOAD_ATTR               23 (NULL|self + append)
+            426 LOAD_FAST                5 (start_ms)
+            428 LOAD_FAST                8 (offset)
+            430 BINARY_OP                0 (+)
+            434 LOAD_CONST              11 (1000.0)
+            436 BINARY_OP               11 (/)
+            440 LOAD_FAST                7 (text)
+            442 BUILD_TUPLE              2
+            444 CALL                     1
+            452 POP_TOP
+            454 JUMP_BACKWARD          118 (to 220)
+
+479     >>  456 END_FOR
+            458 JUMP_BACKWARD          184 (to 92)
+
+475     >>  460 END_FOR
+
+485         462 LOAD_FAST                3 (out)
+            464 RETURN_VALUE
+        >>  466 PUSH_EXC_INFO
+
+472         468 LOAD_FAST                1 (json)
+            470 LOAD_ATTR                4 (JSONDecodeError)
+            490 CHECK_EXC_MATCH
+            492 POP_JUMP_IF_FALSE        5 (to 504)
+            494 POP_TOP
+
+473         496 BUILD_LIST               0
+            498 SWAP                     2
+            500 POP_EXCEPT
+            502 RETURN_VALUE
+
+472     >>  504 RERAISE                  0
+        >>  506 COPY                     3
+            508 POP_EXCEPT
+            510 RERAISE                  1
+ExceptionTable:
+  12 to 44 -> 466 [0]
+  466 to 498 -> 506 [1] lasti
+  504 to 504 -> 506 [1] lasti
+
+Disassembly of <code object format_transcript_beats at 0x7f6c93426630, file "app\adapters\youtube_channel.py", line 488>:
+488           0 RESUME                   0
+
+494           2 LOAD_FAST                0 (segments)
+              4 POP_JUMP_IF_TRUE         1 (to 8)
+
+495           6 RETURN_CONST             1 ('')
+
+496     >>    8 BUILD_MAP                0
+             10 STORE_FAST               2 (buckets)
+
+497          12 LOAD_FAST                0 (segments)
+             14 GET_ITER
+        >>   16 FOR_ITER                52 (to 124)
+             20 UNPACK_SEQUENCE          2
+             24 STORE_FAST               3 (start_s)
+             26 STORE_FAST               4 (text)
+
+498          28 LOAD_GLOBAL              1 (NULL + int)
+             38 LOAD_FAST                3 (start_s)
+             40 LOAD_FAST                1 (bucket_s)
+             42 BINARY_OP                2 (//)
+             46 CALL                     1
+             54 STORE_FAST               5 (idx)
+
+499          56 LOAD_FAST                2 (buckets)
+             58 LOAD_ATTR                3 (NULL|self + setdefault)
+             78 LOAD_FAST                5 (idx)
+             80 BUILD_LIST               0
+             82 CALL                     2
+             90 LOAD_ATTR                5 (NULL|self + append)
+            110 LOAD_FAST                4 (text)
+            112 CALL                     1
+            120 POP_TOP
+            122 JUMP_BACKWARD           54 (to 16)
+
+497     >>  124 END_FOR
+
+500         126 BUILD_LIST               0
+            128 STORE_FAST               6 (lines)
+
+501         130 LOAD_GLOBAL              7 (NULL + sorted)
+            140 LOAD_FAST                2 (buckets)
+            142 CALL                     1
+            150 GET_ITER
+        >>  152 FOR_ITER                60 (to 276)
+            156 STORE_FAST               5 (idx)
+
+502         158 LOAD_FAST                5 (idx)
+            160 LOAD_FAST                1 (bucket_s)
+            162 BINARY_OP                5 (*)
+            166 STORE_FAST               7 (total)
+
+503         168 LOAD_FAST                6 (lines)
+            170 LOAD_ATTR                5 (NULL|self + append)
+            190 LOAD_CONST               2 ('[')
+            192 LOAD_FAST                7 (total)
+            194 LOAD_CONST               3 (60)
+            196 BINARY_OP                2 (//)
+            200 LOAD_CONST               4 ('02d')
+            202 FORMAT_VALUE             4 (with format)
+            204 LOAD_CONST               5 (':')
+            206 LOAD_FAST                7 (total)
+            208 LOAD_CONST               3 (60)
+            210 BINARY_OP                6 (%)
+            214 LOAD_CONST               4 ('02d')
+            216 FORMAT_VALUE             4 (with format)
+            218 LOAD_CONST               6 ('] ')
+            220 BUILD_STRING             5
+            222 LOAD_CONST               7 (' ')
+            224 LOAD_ATTR                9 (NULL|self + join)
+            244 LOAD_FAST                2 (buckets)
+            246 LOAD_FAST                5 (idx)
+            248 BINARY_SUBSCR
+            252 CALL                     1
+            260 BINARY_OP                0 (+)
+            264 CALL                     1
+            272 POP_TOP
+            274 JUMP_BACKWARD           62 (to 152)
+
+501     >>  276 END_FOR
+
+504         278 LOAD_CONST               8 ('\n')
+            280 LOAD_ATTR                9 (NULL|self + join)
+            300 LOAD_FAST                6 (lines)
+            302 CALL                     1
+            310 RETURN_VALUE
+
+Disassembly of <code object compress_transcript_beats at 0x28e41fc0, file "app\adapters\youtube_channel.py", line 516>:
+516           0 RESUME                   0
+
+523           2 LOAD_FAST                0 (segments)
+              4 POP_JUMP_IF_TRUE         1 (to 8)
+
+524           6 RETURN_CONST             1 ('')
+
+525     >>    8 LOAD_GLOBAL              1 (NULL + format_transcript_beats)
+             18 LOAD_FAST                0 (segments)
+             20 LOAD_FAST                2 (bucket_s)
+             22 KW_NAMES                 2 (('bucket_s',))
+             24 CALL                     2
+             32 STORE_FAST               3 (full)
+
+526          34 LOAD_GLOBAL              3 (NULL + len)
+             44 LOAD_FAST                3 (full)
+             46 CALL                     1
+             54 LOAD_FAST                1 (max_chars)
+             56 COMPARE_OP              26 (<=)
+             60 POP_JUMP_IF_FALSE        2 (to 66)
+
+527          62 LOAD_FAST                3 (full)
+             64 RETURN_VALUE
+
+529     >>   66 LOAD_FAST                0 (segments)
+             68 LOAD_CONST               3 (-1)
+             70 BINARY_SUBSCR
+             74 LOAD_CONST               4 (0)
+             76 BINARY_SUBSCR
+             80 STORE_FAST               4 (end_s)
+
+530          82 LOAD_FAST                0 (segments)
+             84 GET_ITER
+             86 LOAD_FAST_AND_CLEAR      5 (s)
+             88 SWAP                     2
+             90 BUILD_LIST               0
+             92 SWAP                     2
+        >>   94 FOR_ITER                17 (to 132)
+             98 STORE_FAST               5 (s)
+            100 LOAD_FAST                5 (s)
+            102 LOAD_CONST               4 (0)
+            104 BINARY_SUBSCR
+            108 LOAD_GLOBAL              4 (_BEATS_HEAD_S)
+            118 COMPARE_OP              26 (<=)
+            122 POP_JUMP_IF_TRUE         1 (to 126)
+            124 JUMP_BACKWARD           16 (to 94)
+        >>  126 LOAD_FAST                5 (s)
+            128 LIST_APPEND              2
+            130 JUMP_BACKWARD           19 (to 94)
+        >>  132 END_FOR
+            134 STORE_FAST               6 (head)
+            136 STORE_FAST               5 (s)
+
+531         138 LOAD_FAST                0 (segments)
+            140 GET_ITER
+            142 LOAD_FAST_AND_CLEAR      5 (s)
+            144 SWAP                     2
+            146 BUILD_LIST               0
+            148 SWAP                     2
+        >>  150 FOR_ITER                20 (to 194)
+            154 STORE_FAST               5 (s)
+            156 LOAD_FAST                5 (s)
+            158 LOAD_CONST               4 (0)
+            160 BINARY_SUBSCR
+            164 LOAD_FAST                4 (end_s)
+            166 LOAD_GLOBAL              6 (_BEATS_TAIL_S)
+            176 BINARY_OP               10 (-)
+            180 COMPARE_OP              92 (>=)
+            184 POP_JUMP_IF_TRUE         1 (to 188)
+            186 JUMP_BACKWARD           19 (to 150)
+        >>  188 LOAD_FAST                5 (s)
+            190 LIST_APPEND              2
+            192 JUMP_BACKWARD           22 (to 150)
+        >>  194 END_FOR
+            196 STORE_FAST               7 (tail)
+            198 STORE_FAST               5 (s)
+
+532         200 LOAD_FAST                0 (segments)
+            202 GET_ITER
+            204 LOAD_FAST_AND_CLEAR      5 (s)
+            206 SWAP                     2
+            208 BUILD_LIST               0
+            210 SWAP                     2
+        >>  212 FOR_ITER                33 (to 282)
+            216 STORE_FAST               5 (s)
+            218 LOAD_GLOBAL              4 (_BEATS_HEAD_S)
+            228 LOAD_FAST                5 (s)
+            230 LOAD_CONST               4 (0)
+            232 BINARY_SUBSCR
+            236 SWAP                     2
+            238 COPY                     2
+            240 COMPARE_OP               2 (<)
+            244 POP_JUMP_IF_FALSE       13 (to 272)
+            246 LOAD_FAST                4 (end_s)
+            248 LOAD_GLOBAL              6 (_BEATS_TAIL_S)
+            258 BINARY_OP               10 (-)
+            262 COMPARE_OP               2 (<)
+            266 POP_JUMP_IF_TRUE         1 (to 270)
+            268 JUMP_BACKWARD           29 (to 212)
+        >>  270 JUMP_FORWARD             2 (to 276)
+        >>  272 POP_TOP
+            274 JUMP_FORWARD             2 (to 280)
+        >>  276 LOAD_FAST                5 (s)
+            278 LIST_APPEND              2
+        >>  280 JUMP_BACKWARD           35 (to 212)
+        >>  282 END_FOR
+            284 STORE_FAST               8 (middle)
+            286 STORE_FAST               5 (s)
+
+534         288 LOAD_CONST               5 ('\n[… phần giữa đã lược bớt …]\n')
+            290 STORE_FAST               9 (marker)
+
+535         292 LOAD_GLOBAL              1 (NULL + format_transcript_beats)
+            302 LOAD_FAST                6 (head)
+            304 LOAD_FAST                2 (bucket_s)
+            306 KW_NAMES                 2 (('bucket_s',))
+            308 CALL                     2
+            316 STORE_FAST              10 (head_text)
+
+536         318 LOAD_GLOBAL              1 (NULL + format_transcript_beats)
+            328 LOAD_FAST                7 (tail)
+            330 LOAD_FAST                2 (bucket_s)
+            332 KW_NAMES                 2 (('bucket_s',))
+            334 CALL                     2
+            342 STORE_FAST              11 (tail_text)
+
+540         344 LOAD_GLOBAL              3 (NULL + len)
+            354 LOAD_FAST               10 (head_text)
+            356 CALL                     1
+            364 LOAD_GLOBAL              3 (NULL + len)
+            374 LOAD_FAST               11 (tail_text)
+            376 CALL                     1
+            384 BINARY_OP                0 (+)
+            388 LOAD_GLOBAL              3 (NULL + len)
+            398 LOAD_FAST                9 (marker)
+            400 CALL                     1
+            408 BINARY_OP                0 (+)
+            412 LOAD_FAST                1 (max_chars)
+            414 COMPARE_OP              92 (>=)
+            418 POP_JUMP_IF_FALSE      115 (to 650)
+
+541         420 LOAD_FAST                1 (max_chars)
+            422 LOAD_GLOBAL              3 (NULL + len)
+            432 LOAD_FAST                9 (marker)
+            434 CALL                     1
+            442 LOAD_CONST               6 (2)
+            444 LOAD_GLOBAL              8 (_MIN_END_CHARS)
+            454 BINARY_OP                5 (*)
+            458 BINARY_OP                0 (+)
+            462 COMPARE_OP              26 (<=)
+            466 POP_JUMP_IF_FALSE       12 (to 492)
+
+542         468 LOAD_FAST               10 (head_text)
+            470 LOAD_CONST               7 (None)
+            472 LOAD_FAST                1 (max_chars)
+            474 BINARY_SLICE
+            476 COPY                     1
+            478 POP_JUMP_IF_TRUE         5 (to 490)
+            480 POP_TOP
+            482 LOAD_FAST                3 (full)
+            484 LOAD_CONST               7 (None)
+            486 LOAD_FAST                1 (max_chars)
+            488 BINARY_SLICE
+        >>  490 RETURN_VALUE
+
+543     >>  492 LOAD_GLOBAL             11 (NULL + max)
+            502 LOAD_GLOBAL              8 (_MIN_END_CHARS)
+            512 LOAD_GLOBAL             13 (NULL + int)
+            522 LOAD_FAST                1 (max_chars)
+            524 LOAD_GLOBAL              3 (NULL + len)
+            534 LOAD_FAST                9 (marker)
+            536 CALL                     1
+            544 BINARY_OP               10 (-)
+            548 LOAD_GLOBAL             14 (_TAIL_SHARE)
+            558 BINARY_OP                5 (*)
+            562 CALL                     1
+            570 CALL                     2
+            578 STORE_FAST              12 (tail_budget)
+
+544         580 LOAD_FAST                1 (max_chars)
+            582 LOAD_GLOBAL              3 (NULL + len)
+            592 LOAD_FAST                9 (marker)
+            594 CALL                     1
+            602 BINARY_OP               10 (-)
+            606 LOAD_FAST               12 (tail_budget)
+            608 BINARY_OP               10 (-)
+            612 STORE_FAST              13 (head_budget)
+
+545         614 LOAD_FAST               10 (head_text)
+            616 LOAD_CONST               7 (None)
+            618 LOAD_FAST               13 (head_budget)
+            620 BINARY_SLICE
+            622 LOAD_FAST                9 (marker)
+            624 BINARY_OP                0 (+)
+            628 LOAD_FAST               11 (tail_text)
+            630 LOAD_FAST               12 (tail_budget)
+            632 UNARY_NEGATIVE
+            634 LOAD_CONST               7 (None)
+            636 BINARY_SLICE
+            638 BINARY_OP                0 (+)
+            642 LOAD_CONST               7 (None)
+            644 LOAD_FAST                1 (max_chars)
+            646 BINARY_SLICE
+            648 RETURN_VALUE
+
+547     >>  650 LOAD_FAST                1 (max_chars)
+            652 LOAD_GLOBAL              3 (NULL + len)
+            662 LOAD_FAST               10 (head_text)
+            664 CALL                     1
+            672 BINARY_OP               10 (-)
+            676 LOAD_GLOBAL              3 (NULL + len)
+            686 LOAD_FAST               11 (tail_text)
+            688 CALL                     1
+            696 BINARY_OP               10 (-)
+            700 LOAD_GLOBAL              3 (NULL + len)
+            710 LOAD_FAST                9 (marker)
+            712 CALL                     1
+            720 BINARY_OP               10 (-)
+            724 STORE_FAST              14 (budget)
+
+548         726 BUILD_LIST               0
+            728 STORE_FAST              15 (kept)
+
+549         730 LOAD_CONST               4 (0)
+            732 STORE_FAST              16 (used)
+
+550         734 LOAD_GLOBAL             11 (NULL + max)
+            744 LOAD_CONST               8 (1)
+            746 LOAD_GLOBAL              3 (NULL + len)
+            756 LOAD_FAST                8 (middle)
+            758 CALL                     1
+            766 LOAD_GLOBAL             11 (NULL + max)
+            776 LOAD_CONST               8 (1)
+            778 LOAD_FAST               14 (budget)
+            780 LOAD_CONST               9 (40)
+            782 BINARY_OP                2 (//)
+            786 CALL                     2
+            794 BINARY_OP                2 (//)
+            798 CALL                     2
+            806 STORE_FAST              17 (step)
+
+551         808 LOAD_FAST                8 (middle)
+            810 LOAD_CONST               7 (None)
+            812 LOAD_CONST               7 (None)
+            814 LOAD_FAST               17 (step)
+            816 BUILD_SLICE              3
+            818 BINARY_SUBSCR
+            822 GET_ITER
+        >>  824 FOR_ITER                51 (to 930)
+            828 STORE_FAST              18 (seg)
+
+552         830 LOAD_GLOBAL              3 (NULL + len)
+            840 LOAD_FAST               18 (seg)
+            842 LOAD_CONST               8 (1)
+            844 BINARY_SUBSCR
+            848 CALL                     1
+            856 LOAD_CONST              10 (10)
+            858 BINARY_OP                0 (+)
+            862 STORE_FAST              19 (cost)
+
+553         864 LOAD_FAST               16 (used)
+            866 LOAD_FAST               19 (cost)
+            868 BINARY_OP                0 (+)
+            872 LOAD_FAST               14 (budget)
+            874 COMPARE_OP              68 (>)
+            878 POP_JUMP_IF_FALSE        2 (to 884)
+
+554         880 POP_TOP
+            882 JUMP_FORWARD            24 (to 932)
+
+555     >>  884 LOAD_FAST               15 (kept)
+            886 LOAD_ATTR               17 (NULL|self + append)
+            906 LOAD_FAST               18 (seg)
+            908 CALL                     1
+            916 POP_TOP
+
+556         918 LOAD_FAST               16 (used)
+            920 LOAD_FAST               19 (cost)
+            922 BINARY_OP               13 (+=)
+            926 STORE_FAST              16 (used)
+            928 JUMP_BACKWARD           53 (to 824)
+
+551     >>  930 END_FOR
+
+557     >>  932 LOAD_GLOBAL              1 (NULL + format_transcript_beats)
+            942 LOAD_FAST               15 (kept)
+            944 LOAD_FAST                2 (bucket_s)
+            946 KW_NAMES                 2 (('bucket_s',))
+            948 CALL                     2
+            956 STORE_FAST              20 (middle_text)
+
+558         958 LOAD_FAST               10 (head_text)
+            960 FORMAT_VALUE             0
+            962 LOAD_FAST                9 (marker)
+            964 FORMAT_VALUE             0
+            966 LOAD_FAST               20 (middle_text)
+            968 FORMAT_VALUE             0
+            970 LOAD_FAST                9 (marker)
+            972 FORMAT_VALUE             0
+            974 LOAD_FAST               11 (tail_text)
+            976 FORMAT_VALUE             0
+            978 BUILD_STRING             5
+            980 LOAD_CONST               7 (None)
+            982 LOAD_FAST                1 (max_chars)
+            984 BINARY_SLICE
+            986 RETURN_VALUE
+        >>  988 SWAP                     2
+            990 POP_TOP
+
+530         992 SWAP                     2
+            994 STORE_FAST               5 (s)
+            996 RERAISE                  0
+        >>  998 SWAP                     2
+           1000 POP_TOP
+
+531        1002 SWAP                     2
+           1004 STORE_FAST               5 (s)
+           1006 RERAISE                  0
+        >> 1008 SWAP                     2
+           1010 POP_TOP
+
+532        1012 SWAP                     2
+           1014 STORE_FAST               5 (s)
+           1016 RERAISE                  0
+ExceptionTable:
+  90 to 122 -> 988 [2]
+  126 to 132 -> 988 [2]
+  146 to 184 -> 998 [2]
+  188 to 194 -> 998 [2]
+  208 to 266 -> 1008 [2]
+  270 to 282 -> 1008 [2]
+
+Disassembly of <code object _parse_json3 at 0x7f6c92d62b80, file "app\adapters\youtube_channel.py", line 561>:
+561           0 RESUME                   0
+
+563           2 LOAD_GLOBAL              1 (NULL + re)
+             12 LOAD_ATTR                2 (sub)
+             32 LOAD_CONST               1 ('\\s+')
+             34 LOAD_CONST               2 (' ')
+             36 LOAD_CONST               2 (' ')
+             38 LOAD_ATTR                5 (NULL|self + join)
+             58 LOAD_CONST               3 (<code object <genexpr> at 0x7f6c92e586c0, file "app\adapters\youtube_channel.py", line 563>)
+             60 MAKE_FUNCTION            0
+             62 LOAD_GLOBAL              7 (NULL + parse_json3_segments)
+             72 LOAD_FAST                0 (raw)
+             74 CALL                     1
+             82 GET_ITER
+             84 CALL                     0
+             92 CALL                     1
+            100 CALL                     3
+            108 LOAD_ATTR                9 (NULL|self + strip)
+            128 CALL                     0
+            136 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c92e586c0, file "app\adapters\youtube_channel.py", line 563>:
+563           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                 9 (to 30)
+             12 UNPACK_SEQUENCE          2
+             16 STORE_FAST               1 (_s)
+             18 STORE_FAST               2 (t)
+             20 LOAD_FAST                2 (t)
+             22 YIELD_VALUE              1
+             24 RESUME                   1
+             26 POP_TOP
+             28 JUMP_BACKWARD           11 (to 8)
+        >>   30 END_FOR
+             32 RETURN_CONST             0 (None)
+        >>   34 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             36 RERAISE                  1
+ExceptionTable:
+  4 to 32 -> 34 [0] lasti
+
+Disassembly of <code object fetch_transcript at 0x26a39bd0, file "app\adapters\youtube_channel.py", line 571>:
+571           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+586           6 LOAD_FAST                5 (report)
+              8 POP_JUMP_IF_NONE         5 (to 20)
+
+587          10 LOAD_CONST               2 ('')
+             12 LOAD_FAST                5 (report)
+             14 LOAD_CONST               3 ('reason')
+             16 STORE_SUBSCR
+
+588     >>   20 LOAD_FAST                1 (meta)
+             22 POP_JUMP_IF_NONE         8 (to 40)
+             24 LOAD_CONST               4 ('_subtitles')
+             26 LOAD_FAST                1 (meta)
+             28 CONTAINS_OP              1
+             30 POP_JUMP_IF_FALSE       49 (to 130)
+             32 LOAD_CONST               5 ('_automatic_captions')
+             34 LOAD_FAST                1 (meta)
+             36 CONTAINS_OP              1
+             38 POP_JUMP_IF_FALSE       45 (to 130)
+
+589     >>   40 LOAD_FAST                1 (meta)
+             42 COPY                     1
+             44 POP_JUMP_IF_TRUE         2 (to 50)
+             46 POP_TOP
+             48 BUILD_MAP                0
+        >>   50 LOAD_ATTR                1 (NULL|self + get)
+             70 LOAD_CONST               6 ('id')
+             72 CALL                     1
+             80 COPY                     1
+             82 POP_JUMP_IF_TRUE         2 (to 88)
+             84 POP_TOP
+             86 LOAD_FAST                0 (video_id_or_url)
+        >>   88 STORE_FAST               6 (vid)
+
+590          90 NOP
+
+591          92 LOAD_GLOBAL              3 (NULL + fetch_video_meta)
+            102 LOAD_FAST                6 (vid)
+            104 CALL                     1
+            112 GET_AWAITABLE            0
+            114 LOAD_CONST               1 (None)
+        >>  116 SEND                     3 (to 126)
+            120 YIELD_VALUE              3
+            122 RESUME                   3
+            124 JUMP_BACKWARD_NO_INTERRUPT     5 (to 116)
+        >>  126 END_SEND
+            128 STORE_FAST               1 (meta)
+
+595     >>  130 LOAD_FAST                1 (meta)
+            132 LOAD_ATTR                1 (NULL|self + get)
+            152 LOAD_CONST               4 ('_subtitles')
+            154 CALL                     1
+            162 COPY                     1
+            164 POP_JUMP_IF_TRUE         2 (to 170)
+            166 POP_TOP
+            168 BUILD_MAP                0
+        >>  170 STORE_FAST               8 (subs)
+
+596         172 LOAD_FAST                1 (meta)
+            174 LOAD_ATTR                1 (NULL|self + get)
+            194 LOAD_CONST               5 ('_automatic_captions')
+            196 CALL                     1
+            204 COPY                     1
+            206 POP_JUMP_IF_TRUE         2 (to 212)
+            208 POP_TOP
+            210 BUILD_MAP                0
+        >>  212 STORE_FAST               9 (auto)
+
+598         214 LOAD_GLOBAL             15 (NULL + _original_lang)
+            224 LOAD_FAST                1 (meta)
+            226 CALL                     1
+            234 STORE_FAST              10 (orig)
+
+599         236 LOAD_GLOBAL             17 (NULL + _lang_first)
+            246 LOAD_FAST                8 (subs)
+            248 LOAD_FAST               10 (orig)
+            250 CALL                     2
+            258 COPY                     1
+            260 POP_JUMP_IF_TRUE        38 (to 338)
+            262 POP_TOP
+            264 LOAD_GLOBAL             17 (NULL + _lang_first)
+            274 LOAD_FAST                9 (auto)
+            276 LOAD_FAST               10 (orig)
+            278 CALL                     2
+            286 COPY                     1
+            288 POP_JUMP_IF_TRUE        24 (to 338)
+            290 POP_TOP
+
+600         292 LOAD_GLOBAL             19 (NULL + _pick_track)
+            302 LOAD_FAST                8 (subs)
+            304 CALL                     1
+
+599         312 COPY                     1
+            314 POP_JUMP_IF_TRUE        11 (to 338)
+            316 POP_TOP
+
+600         318 LOAD_GLOBAL             19 (NULL + _pick_track)
+            328 LOAD_FAST                9 (auto)
+            330 CALL                     1
+
+599     >>  338 STORE_FAST              11 (tracks)
+
+601         340 LOAD_FAST               11 (tracks)
+            342 POP_JUMP_IF_TRUE        57 (to 458)
+
+602         344 LOAD_FAST                5 (report)
+            346 POP_JUMP_IF_NONE         5 (to 358)
+
+603         348 LOAD_CONST              10 ('no_captions')
+            350 LOAD_FAST                5 (report)
+            352 LOAD_CONST               3 ('reason')
+            354 STORE_SUBSCR
+
+604     >>  358 LOAD_GLOBAL             11 (NULL + _transcript_via_lib)
+            368 LOAD_GLOBAL             13 (NULL + str)
+            378 LOAD_FAST                1 (meta)
+            380 LOAD_ATTR                1 (NULL|self + get)
+            400 LOAD_CONST               6 ('id')
+            402 CALL                     1
+            410 COPY                     1
+            412 POP_JUMP_IF_TRUE         2 (to 418)
+            414 POP_TOP
+            416 LOAD_FAST                0 (video_id_or_url)
+        >>  418 CALL                     1
+
+605         426 LOAD_FAST                2 (max_chars)
+            428 LOAD_FAST                3 (preserve_ends)
+
+604         430 KW_NAMES                 9 (('max_chars', 'preserve_ends'))
+            432 CALL                     3
+            440 GET_AWAITABLE            0
+            442 LOAD_CONST               1 (None)
+        >>  444 SEND                     3 (to 454)
+            448 YIELD_VALUE              2
+            450 RESUME                   3
+            452 JUMP_BACKWARD_NO_INTERRUPT     5 (to 444)
+        >>  454 END_SEND
+            456 RETURN_VALUE
+
+606     >>  458 LOAD_GLOBAL             21 (NULL + next)
+            468 LOAD_CONST              11 (<code object <genexpr> at 0x7f6c92a3b550, file "app\adapters\youtube_channel.py", line 606>)
+            470 MAKE_FUNCTION            0
+            472 LOAD_FAST               11 (tracks)
+            474 GET_ITER
+            476 CALL                     0
+            484 LOAD_FAST               11 (tracks)
+            486 LOAD_CONST              12 (0)
+            488 BINARY_SUBSCR
+            492 CALL                     2
+            500 STORE_FAST              12 (track)
+
+607         502 LOAD_FAST               12 (track)
+            504 LOAD_ATTR                1 (NULL|self + get)
+            524 LOAD_CONST              13 ('url')
+            526 CALL                     1
+            534 STORE_FAST              13 (url)
+
+608         536 LOAD_FAST               13 (url)
+            538 POP_JUMP_IF_TRUE         8 (to 556)
+
+609         540 LOAD_FAST                5 (report)
+            542 POP_JUMP_IF_NONE         5 (to 554)
+
+610         544 LOAD_CONST              10 ('no_captions')
+            546 LOAD_FAST                5 (report)
+            548 LOAD_CONST               3 ('reason')
+            550 STORE_SUBSCR
+
+611     >>  554 RETURN_CONST             2 ('')
+
+612     >>  556 LOAD_FAST               12 (track)
+            558 LOAD_ATTR                1 (NULL|self + get)
+            578 LOAD_CONST              14 ('ext')
+            580 CALL                     1
+            588 LOAD_CONST              15 ('json3')
+            590 COMPARE_OP              40 (==)
+            594 STORE_FAST              14 (is_json3)
+
+613         596 LOAD_CONST               2 ('')
+            598 STORE_FAST              15 (raw)
+
+614         600 LOAD_GLOBAL             23 (NULL + enumerate)
+            610 BUILD_LIST               0
+            612 LOAD_GLOBAL             24 (_TIMEDTEXT_RETRY_WAITS)
+            622 LIST_EXTEND              1
+            624 LOAD_CONST               1 (None)
+            626 LIST_APPEND              1
+            628 CALL_INTRINSIC_1         6 (INTRINSIC_LIST_TO_TUPLE)
+            630 CALL                     1
+            638 GET_ITER
+        >>  640 FOR_ITER               218 (to 1080)
+            644 UNPACK_SEQUENCE          2
+            648 STORE_FAST              16 (attempt)
+            650 STORE_FAST              17 (wait)
+
+615         652 NOP
+
+616         654 LOAD_GLOBAL             27 (NULL + httpx)
+            664 LOAD_ATTR               28 (AsyncClient)
+            684 LOAD_CONST              16 (20.0)
+            686 LOAD_CONST              17 (True)
+            688 KW_NAMES                18 (('timeout', 'follow_redirects'))
+            690 CALL                     2
+            698 BEFORE_ASYNC_WITH
+            700 GET_AWAITABLE            1
+            702 LOAD_CONST               1 (None)
+        >>  704 SEND                     3 (to 714)
+            708 YIELD_VALUE              3
+            710 RESUME                   3
+            712 JUMP_BACKWARD_NO_INTERRUPT     5 (to 704)
+        >>  714 END_SEND
+            716 STORE_FAST              18 (client)
+
+617         718 LOAD_FAST               18 (client)
+            720 LOAD_ATTR                1 (NULL|self + get)
+            740 LOAD_FAST               13 (url)
+            742 LOAD_CONST              19 ('User-Agent')
+            744 LOAD_CONST              20 ('Mozilla/5.0')
+            746 BUILD_MAP                1
+            748 KW_NAMES                21 (('headers',))
+            750 CALL                     2
+            758 GET_AWAITABLE            0
+            760 LOAD_CONST               1 (None)
+        >>  762 SEND                     3 (to 772)
+            766 YIELD_VALUE              4
+            768 RESUME                   3
+            770 JUMP_BACKWARD_NO_INTERRUPT     5 (to 762)
+        >>  772 END_SEND
+            774 STORE_FAST              19 (resp)
+
+616         776 LOAD_CONST               1 (None)
+            778 LOAD_CONST               1 (None)
+            780 LOAD_CONST               1 (None)
+            782 CALL                     2
+            790 GET_AWAITABLE            2
+            792 LOAD_CONST               1 (None)
+        >>  794 SEND                     3 (to 804)
+            798 YIELD_VALUE              3
+            800 RESUME                   3
+            802 JUMP_BACKWARD_NO_INTERRUPT     5 (to 794)
+        >>  804 END_SEND
+            806 POP_TOP
+
+618     >>  808 LOAD_FAST_CHECK         19 (resp)
+            810 LOAD_ATTR               30 (status_code)
+            830 LOAD_CONST              22 (429)
+            832 COMPARE_OP              40 (==)
+            836 POP_JUMP_IF_FALSE       91 (to 1020)
+
+621         838 LOAD_FAST               17 (wait)
+            840 POP_JUMP_IF_NOT_NONE    34 (to 910)
+
+622         842 LOAD_GLOBAL              7 (NULL + log)
+            852 LOAD_ATTR                8 (info)
+            872 LOAD_CONST              23 ('[youtube_channel] timedtext 429 sau ')
+            874 LOAD_FAST               16 (attempt)
+            876 FORMAT_VALUE             0
+            878 LOAD_CONST              24 (' lần thử — bị chặn tạm thời')
+            880 BUILD_STRING             3
+            882 CALL                     1
+            890 POP_TOP
+
+623         892 LOAD_FAST                5 (report)
+            894 POP_JUMP_IF_NONE         5 (to 906)
+
+624         896 LOAD_CONST              25 ('blocked')
+            898 LOAD_FAST                5 (report)
+            900 LOAD_CONST               3 ('reason')
+            902 STORE_SUBSCR
+
+625     >>  906 POP_TOP
+            908 RETURN_CONST             2 ('')
+
+626     >>  910 LOAD_GLOBAL              7 (NULL + log)
+            920 LOAD_ATTR                8 (info)
+            940 LOAD_CONST              26 ('[youtube_channel] timedtext 429, đợi ')
+            942 LOAD_FAST               17 (wait)
+            944 FORMAT_VALUE             0
+            946 LOAD_CONST              27 ('s rồi thử lại…')
+            948 BUILD_STRING             3
+            950 CALL                     1
+            958 POP_TOP
+
+627         960 LOAD_GLOBAL             33 (NULL + asyncio)
+            970 LOAD_ATTR               34 (sleep)
+            990 LOAD_FAST               17 (wait)
+            992 CALL                     1
+           1000 GET_AWAITABLE            0
+           1002 LOAD_CONST               1 (None)
+        >> 1004 SEND                     3 (to 1014)
+           1008 YIELD_VALUE              3
+           1010 RESUME                   3
+           1012 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1004)
+        >> 1014 END_SEND
+           1016 POP_TOP
+
+628        1018 JUMP_BACKWARD          190 (to 640)
+
+629     >> 1020 LOAD_FAST               19 (resp)
+           1022 LOAD_ATTR               37 (NULL|self + raise_for_status)
+           1042 CALL                     0
+           1050 POP_TOP
+
+630        1052 LOAD_FAST               19 (resp)
+           1054 LOAD_ATTR               38 (text)
+           1074 STORE_FAST              15 (raw)
+
+631        1076 POP_TOP
+           1078 JUMP_FORWARD             1 (to 1082)
+
+614     >> 1080 END_FOR
+
+637     >> 1082 NOP
+
+638        1084 LOAD_FAST                4 (timestamps)
+           1086 POP_JUMP_IF_FALSE       28 (to 1144)
+           1088 LOAD_FAST               14 (is_json3)
+           1090 POP_JUMP_IF_FALSE       26 (to 1144)
+
+639        1092 LOAD_GLOBAL             41 (NULL + parse_json3_segments)
+           1102 LOAD_FAST               15 (raw)
+           1104 CALL                     1
+           1112 STORE_FAST              20 (segments)
+
+640        1114 LOAD_FAST               20 (segments)
+           1116 POP_JUMP_IF_FALSE       13 (to 1144)
+
+641        1118 LOAD_GLOBAL             43 (NULL + compress_transcript_beats)
+           1128 LOAD_FAST               20 (segments)
+           1130 LOAD_FAST                2 (max_chars)
+           1132 KW_NAMES                29 (('max_chars',))
+           1134 CALL                     2
+           1142 RETURN_VALUE
+
+642     >> 1144 LOAD_FAST               14 (is_json3)
+           1146 POP_JUMP_IF_FALSE       11 (to 1170)
+           1148 LOAD_GLOBAL             45 (NULL + _parse_json3)
+           1158 LOAD_FAST               15 (raw)
+           1160 CALL                     1
+           1168 JUMP_FORWARD            10 (to 1190)
+        >> 1170 LOAD_GLOBAL             47 (NULL + _strip_vtt)
+           1180 LOAD_FAST               15 (raw)
+           1182 CALL                     1
+        >> 1190 STORE_FAST              21 (text)
+
+648        1192 LOAD_FAST               21 (text)
+           1194 LOAD_ATTR               49 (NULL|self + strip)
+           1214 CALL                     0
+           1222 POP_JUMP_IF_TRUE         7 (to 1238)
+           1224 LOAD_FAST                5 (report)
+           1226 POP_JUMP_IF_NONE         5 (to 1238)
+
+649        1228 LOAD_CONST              10 ('no_captions')
+           1230 LOAD_FAST                5 (report)
+           1232 LOAD_CONST               3 ('reason')
+           1234 STORE_SUBSCR
+
+650     >> 1238 LOAD_GLOBAL             51 (NULL + _truncate_transcript)
+           1248 LOAD_FAST               21 (text)
+           1250 LOAD_FAST                2 (max_chars)
+           1252 LOAD_FAST                3 (preserve_ends)
+           1254 KW_NAMES                 9 (('max_chars', 'preserve_ends'))
+           1256 CALL                     3
+           1264 RETURN_VALUE
+
+591     >> 1266 CLEANUP_THROW
+           1268 EXTENDED_ARG             2
+           1270 JUMP_BACKWARD          573 (to 126)
+        >> 1272 PUSH_EXC_INFO
+
+592        1274 LOAD_GLOBAL              4 (Exception)
+           1284 CHECK_EXC_MATCH
+           1286 POP_JUMP_IF_FALSE       69 (to 1426)
+           1288 STORE_FAST               7 (e)
+
+593        1290 LOAD_GLOBAL              7 (NULL + log)
+           1300 LOAD_ATTR                8 (info)
+           1320 LOAD_CONST               7 ('[youtube_channel] extract caption map lỗi (')
+           1322 LOAD_FAST                6 (vid)
+           1324 FORMAT_VALUE             0
+           1326 LOAD_CONST               8 ('): ')
+           1328 LOAD_FAST                7 (e)
+           1330 FORMAT_VALUE             0
+           1332 BUILD_STRING             4
+           1334 CALL                     1
+           1342 POP_TOP
+
+594        1344 LOAD_GLOBAL             11 (NULL + _transcript_via_lib)
+           1354 LOAD_GLOBAL             13 (NULL + str)
+           1364 LOAD_FAST                6 (vid)
+           1366 CALL                     1
+           1374 LOAD_FAST                2 (max_chars)
+           1376 LOAD_FAST                3 (preserve_ends)
+           1378 KW_NAMES                 9 (('max_chars', 'preserve_ends'))
+           1380 CALL                     3
+           1388 GET_AWAITABLE            0
+           1390 LOAD_CONST               1 (None)
+        >> 1392 SEND                     4 (to 1404)
+           1396 YIELD_VALUE              4
+           1398 RESUME                   3
+           1400 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1392)
+        >> 1402 CLEANUP_THROW
+        >> 1404 END_SEND
+           1406 SWAP                     2
+           1408 POP_EXCEPT
+           1410 LOAD_CONST               1 (None)
+           1412 STORE_FAST               7 (e)
+           1414 DELETE_FAST              7 (e)
+           1416 RETURN_VALUE
+        >> 1418 LOAD_CONST               1 (None)
+           1420 STORE_FAST               7 (e)
+           1422 DELETE_FAST              7 (e)
+           1424 RERAISE                  1
+
+592     >> 1426 RERAISE                  0
+        >> 1428 COPY                     3
+           1430 POP_EXCEPT
+           1432 RERAISE                  1
+
+604     >> 1434 CLEANUP_THROW
+           1436 EXTENDED_ARG             1
+           1438 JUMP_BACKWARD          493 (to 454)
+
+616     >> 1440 CLEANUP_THROW
+           1442 EXTENDED_ARG             1
+           1444 JUMP_BACKWARD          366 (to 714)
+
+617     >> 1446 CLEANUP_THROW
+           1448 EXTENDED_ARG             1
+           1450 JUMP_BACKWARD          340 (to 772)
+
+616     >> 1452 CLEANUP_THROW
+           1454 EXTENDED_ARG             1
+           1456 JUMP_BACKWARD          327 (to 804)
+        >> 1458 PUSH_EXC_INFO
+           1460 WITH_EXCEPT_START
+           1462 GET_AWAITABLE            2
+           1464 LOAD_CONST               1 (None)
+        >> 1466 SEND                     4 (to 1478)
+           1470 YIELD_VALUE              4
+           1472 RESUME                   3
+           1474 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1466)
+        >> 1476 CLEANUP_THROW
+        >> 1478 END_SEND
+           1480 POP_JUMP_IF_TRUE         1 (to 1484)
+           1482 RERAISE                  2
+        >> 1484 POP_TOP
+           1486 POP_EXCEPT
+           1488 POP_TOP
+           1490 POP_TOP
+           1492 EXTENDED_ARG             1
+           1494 JUMP_BACKWARD          344 (to 808)
+        >> 1496 COPY                     3
+           1498 POP_EXCEPT
+           1500 RERAISE                  1
+
+627     >> 1502 CLEANUP_THROW
+           1504 JUMP_BACKWARD          246 (to 1014)
+        >> 1506 PUSH_EXC_INFO
+
+632        1508 LOAD_GLOBAL              4 (Exception)
+           1518 CHECK_EXC_MATCH
+           1520 POP_JUMP_IF_FALSE       42 (to 1606)
+           1522 STORE_FAST               7 (e)
+
+633        1524 LOAD_GLOBAL              7 (NULL + log)
+           1534 LOAD_ATTR                8 (info)
+           1554 LOAD_CONST              28 ('[youtube_channel] tải transcript lỗi: ')
+           1556 LOAD_FAST                7 (e)
+           1558 FORMAT_VALUE             0
+           1560 BUILD_STRING             2
+           1562 CALL                     1
+           1570 POP_TOP
+
+634        1572 LOAD_FAST                5 (report)
+           1574 POP_JUMP_IF_NONE         5 (to 1586)
+
+635        1576 LOAD_CONST              25 ('blocked')
+           1578 LOAD_FAST                5 (report)
+           1580 LOAD_CONST               3 ('reason')
+           1582 STORE_SUBSCR
+
+636     >> 1586 POP_EXCEPT
+           1588 LOAD_CONST               1 (None)
+           1590 STORE_FAST               7 (e)
+           1592 DELETE_FAST              7 (e)
+           1594 POP_TOP
+           1596 RETURN_CONST             2 ('')
+        >> 1598 LOAD_CONST               1 (None)
+           1600 STORE_FAST               7 (e)
+           1602 DELETE_FAST              7 (e)
+           1604 RERAISE                  1
+
+632     >> 1606 RERAISE                  0
+        >> 1608 COPY                     3
+           1610 POP_EXCEPT
+           1612 RERAISE                  1
+        >> 1614 PUSH_EXC_INFO
+
+643        1616 LOAD_GLOBAL              4 (Exception)
+           1626 CHECK_EXC_MATCH
+           1628 POP_JUMP_IF_FALSE       41 (to 1712)
+           1630 STORE_FAST               7 (e)
+
+644        1632 LOAD_GLOBAL              7 (NULL + log)
+           1642 LOAD_ATTR                8 (info)
+           1662 LOAD_CONST              30 ('[youtube_channel] đọc transcript lỗi: ')
+           1664 LOAD_FAST                7 (e)
+           1666 FORMAT_VALUE             0
+           1668 BUILD_STRING             2
+           1670 CALL                     1
+           1678 POP_TOP
+
+645        1680 LOAD_FAST                5 (report)
+           1682 POP_JUMP_IF_NONE         5 (to 1694)
+
+646        1684 LOAD_CONST              25 ('blocked')
+           1686 LOAD_FAST                5 (report)
+           1688 LOAD_CONST               3 ('reason')
+           1690 STORE_SUBSCR
+
+647     >> 1694 POP_EXCEPT
+           1696 LOAD_CONST               1 (None)
+           1698 STORE_FAST               7 (e)
+           1700 DELETE_FAST              7 (e)
+           1702 RETURN_CONST             2 ('')
+        >> 1704 LOAD_CONST               1 (None)
+           1706 STORE_FAST               7 (e)
+           1708 DELETE_FAST              7 (e)
+           1710 RERAISE                  1
+
+643     >> 1712 RERAISE                  0
+        >> 1714 COPY                     3
+           1716 POP_EXCEPT
+           1718 RERAISE                  1
+        >> 1720 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1722 RERAISE                  1
+ExceptionTable:
+  4 to 88 -> 1720 [0] lasti
+  92 to 118 -> 1272 [0]
+  120 to 120 -> 1266 [2]
+  122 to 128 -> 1272 [0]
+  130 to 446 -> 1720 [0] lasti
+  448 to 448 -> 1434 [2]
+  450 to 650 -> 1720 [0] lasti
+  654 to 706 -> 1506 [1]
+  708 to 708 -> 1440 [4]
+  710 to 714 -> 1506 [1]
+  716 to 764 -> 1458 [2] lasti
+  766 to 766 -> 1446 [4]
+  768 to 774 -> 1458 [2] lasti
+  776 to 796 -> 1506 [1]
+  798 to 798 -> 1452 [3]
+  800 to 904 -> 1506 [1]
+  906 to 908 -> 1720 [0] lasti
+  910 to 1006 -> 1506 [1]
+  1008 to 1008 -> 1502 [3]
+  1010 to 1016 -> 1506 [1]
+  1018 to 1018 -> 1720 [0] lasti
+  1020 to 1074 -> 1506 [1]
+  1076 to 1080 -> 1720 [0] lasti
+  1084 to 1140 -> 1614 [0]
+  1142 to 1142 -> 1720 [0] lasti
+  1144 to 1190 -> 1614 [0]
+  1192 to 1264 -> 1720 [0] lasti
+  1266 to 1266 -> 1272 [0]
+  1272 to 1288 -> 1428 [1] lasti
+  1290 to 1394 -> 1418 [1] lasti
+  1396 to 1396 -> 1402 [3]
+  1398 to 1404 -> 1418 [1] lasti
+  1406 to 1406 -> 1428 [1] lasti
+  1408 to 1416 -> 1720 [0] lasti
+  1418 to 1426 -> 1428 [1] lasti
+  1428 to 1434 -> 1720 [0] lasti
+  1440 to 1440 -> 1506 [1]
+  1446 to 1446 -> 1458 [2] lasti
+  1452 to 1452 -> 1506 [1]
+  1458 to 1468 -> 1496 [4] lasti
+  1470 to 1470 -> 1476 [7]
+  1472 to 1484 -> 1496 [4] lasti
+  1486 to 1502 -> 1506 [1]
+  1506 to 1522 -> 1608 [2] lasti
+  1524 to 1584 -> 1598 [2] lasti
+  1586 to 1596 -> 1720 [0] lasti
+  1598 to 1606 -> 1608 [2] lasti
+  1608 to 1612 -> 1720 [0] lasti
+  1614 to 1630 -> 1714 [1] lasti
+  1632 to 1692 -> 1704 [1] lasti
+  1694 to 1702 -> 1720 [0] lasti
+  1704 to 1712 -> 1714 [1] lasti
+  1714 to 1718 -> 1720 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c92a3b550, file "app\adapters\youtube_channel.py", line 606>:
+606           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                27 (to 66)
+             12 STORE_FAST               1 (t)
+             14 LOAD_FAST                1 (t)
+             16 LOAD_ATTR                1 (NULL|self + get)
+             36 LOAD_CONST               0 ('ext')
+             38 CALL                     1
+             46 LOAD_CONST               1 ('json3')
+             48 COMPARE_OP              40 (==)
+             52 POP_JUMP_IF_TRUE         1 (to 56)
+             54 JUMP_BACKWARD           24 (to 8)
+        >>   56 LOAD_FAST                1 (t)
+             58 YIELD_VALUE              1
+             60 RESUME                   1
+             62 POP_TOP
+             64 JUMP_BACKWARD           29 (to 8)
+        >>   66 END_FOR
+             68 RETURN_CONST             2 (None)
+        >>   70 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             72 RERAISE                  1
+ExceptionTable:
+  4 to 52 -> 70 [0] lasti
+  56 to 68 -> 70 [0] lasti
+
+Disassembly of <code object _transcript_via_lib at 0x7f6c9326e970, file "app\adapters\youtube_channel.py", line 653>:
+              0 MAKE_CELL                5 (vid)
+
+653           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+655           8 LOAD_FAST                0 (video_id)
+             10 LOAD_ATTR                1 (NULL|self + rsplit)
+             30 LOAD_CONST               1 ('v=')
+             32 LOAD_CONST               2 (1)
+             34 CALL                     2
+             42 LOAD_CONST               3 (-1)
+             44 BINARY_SUBSCR
+             48 LOAD_ATTR                1 (NULL|self + rsplit)
+             68 LOAD_CONST               4 ('/')
+             70 LOAD_CONST               2 (1)
+             72 CALL                     2
+             80 LOAD_CONST               3 (-1)
+             82 BINARY_SUBSCR
+             86 LOAD_ATTR                3 (NULL|self + split)
+            106 LOAD_CONST               5 ('?')
+            108 CALL                     1
+            116 LOAD_CONST               6 (0)
+            118 BINARY_SUBSCR
+            122 LOAD_ATTR                3 (NULL|self + split)
+            142 LOAD_CONST               7 ('&')
+            144 CALL                     1
+            152 LOAD_CONST               6 (0)
+            154 BINARY_SUBSCR
+            158 STORE_DEREF              5 (vid)
+
+656         160 LOAD_DEREF               5 (vid)
+            162 POP_JUMP_IF_TRUE         1 (to 166)
+
+657         164 RETURN_CONST             8 ('')
+
+659     >>  166 LOAD_CONST              12 (('return', 'str'))
+            168 LOAD_CLOSURE             5 (vid)
+            170 BUILD_TUPLE              1
+            172 LOAD_CONST               9 (<code object _pull at 0x269aa980, file "app\adapters\youtube_channel.py", line 659>)
+            174 MAKE_FUNCTION           12 (annotations, closure)
+            176 STORE_FAST               3 (_pull)
+
+679         178 LOAD_GLOBAL              5 (NULL + asyncio)
+            188 LOAD_ATTR                6 (to_thread)
+            208 LOAD_FAST                3 (_pull)
+            210 CALL                     1
+            218 GET_AWAITABLE            0
+            220 LOAD_CONST              10 (None)
+        >>  222 SEND                     3 (to 232)
+            226 YIELD_VALUE              2
+            228 RESUME                   3
+            230 JUMP_BACKWARD_NO_INTERRUPT     5 (to 222)
+        >>  232 END_SEND
+            234 STORE_FAST               4 (text)
+
+680         236 LOAD_FAST                4 (text)
+            238 POP_JUMP_IF_FALSE       14 (to 268)
+            240 LOAD_GLOBAL              9 (NULL + _truncate_transcript)
+            250 LOAD_FAST                4 (text)
+            252 LOAD_FAST                1 (max_chars)
+            254 LOAD_FAST                2 (preserve_ends)
+            256 KW_NAMES                11 (('max_chars', 'preserve_ends'))
+            258 CALL                     3
+            266 RETURN_VALUE
+        >>  268 LOAD_CONST               8 ('')
+            270 RETURN_VALUE
+
+679     >>  272 CLEANUP_THROW
+            274 JUMP_BACKWARD           22 (to 232)
+        >>  276 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            278 RERAISE                  1
+ExceptionTable:
+  6 to 224 -> 276 [0] lasti
+  226 to 226 -> 272 [2]
+  228 to 272 -> 276 [0] lasti
+
+Disassembly of <code object _pull at 0x269aa980, file "app\adapters\youtube_channel.py", line 659>:
+              0 COPY_FREE_VARS           1
+
+659           2 RESUME                   0
+
+660           4 NOP
+
+661           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('YouTubeTranscriptApi',))
+             10 IMPORT_NAME              0 (youtube_transcript_api)
+             12 IMPORT_FROM              1 (YouTubeTranscriptApi)
+             14 STORE_FAST               0 (YouTubeTranscriptApi)
+             16 POP_TOP
+
+664          18 NOP
+
+665          20 PUSH_NULL
+             22 LOAD_FAST                0 (YouTubeTranscriptApi)
+             24 CALL                     0
+             32 STORE_FAST               1 (api)
+
+666          34 LOAD_FAST                1 (api)
+             36 LOAD_ATTR                7 (NULL|self + list)
+             56 LOAD_DEREF               7 (vid)
+             58 CALL                     1
+             66 STORE_FAST               2 (listing)
+
+667          68 NOP
+
+668          70 LOAD_FAST                2 (listing)
+             72 LOAD_ATTR                9 (NULL|self + find_transcript)
+             92 LOAD_GLOBAL              7 (NULL + list)
+            102 LOAD_GLOBAL             10 (_TRANSCRIPT_LANG_PREF)
+            112 CALL                     1
+            120 CALL                     1
+            128 STORE_FAST               3 (tr)
+
+671     >>  130 LOAD_FAST                3 (tr)
+            132 POP_JUMP_IF_NOT_NONE     1 (to 136)
+
+672         134 RETURN_CONST             3 ('')
+
+673     >>  136 LOAD_FAST                3 (tr)
+            138 LOAD_ATTR               19 (NULL|self + fetch)
+            158 CALL                     0
+            166 GET_ITER
+            168 LOAD_FAST_AND_CLEAR      4 (s)
+            170 SWAP                     2
+            172 BUILD_LIST               0
+            174 SWAP                     2
+        >>  176 FOR_ITER                19 (to 218)
+            180 STORE_FAST               4 (s)
+            182 LOAD_GLOBAL             21 (NULL + getattr)
+            192 LOAD_FAST                4 (s)
+            194 LOAD_CONST               4 ('text')
+            196 LOAD_CONST               3 ('')
+            198 CALL                     3
+            206 COPY                     1
+            208 POP_JUMP_IF_TRUE         2 (to 214)
+            210 POP_TOP
+            212 LOAD_CONST               3 ('')
+        >>  214 LIST_APPEND              2
+            216 JUMP_BACKWARD           21 (to 176)
+        >>  218 END_FOR
+            220 STORE_FAST               5 (parts)
+            222 STORE_FAST               4 (s)
+
+674         224 LOAD_GLOBAL             23 (NULL + re)
+            234 LOAD_ATTR               24 (sub)
+            254 LOAD_CONST               5 ('\\s+')
+            256 LOAD_CONST               6 (' ')
+            258 LOAD_CONST               6 (' ')
+            260 LOAD_ATTR               27 (NULL|self + join)
+            280 LOAD_CONST               7 (<code object <genexpr> at 0x7f6c92e587b0, file "app\adapters\youtube_channel.py", line 674>)
+            282 MAKE_FUNCTION            0
+            284 LOAD_FAST                5 (parts)
+            286 GET_ITER
+            288 CALL                     0
+            296 CALL                     1
+            304 CALL                     3
+            312 LOAD_ATTR               29 (NULL|self + strip)
+            332 CALL                     0
+            340 RETURN_VALUE
+        >>  342 PUSH_EXC_INFO
+
+662         344 LOAD_GLOBAL              4 (ImportError)
+            354 CHECK_EXC_MATCH
+            356 POP_JUMP_IF_FALSE        3 (to 364)
+            358 POP_TOP
+
+663         360 POP_EXCEPT
+            362 RETURN_CONST             3 ('')
+
+662     >>  364 RERAISE                  0
+        >>  366 COPY                     3
+            368 POP_EXCEPT
+            370 RERAISE                  1
+        >>  372 PUSH_EXC_INFO
+
+669         374 LOAD_GLOBAL             12 (Exception)
+            384 CHECK_EXC_MATCH
+            386 POP_JUMP_IF_FALSE       24 (to 436)
+            388 POP_TOP
+
+670         390 LOAD_GLOBAL             15 (NULL + next)
+            400 LOAD_GLOBAL             17 (NULL + iter)
+            410 LOAD_FAST                2 (listing)
+            412 CALL                     1
+            420 LOAD_CONST               0 (None)
+            422 CALL                     2
+            430 STORE_FAST               3 (tr)
+            432 POP_EXCEPT
+            434 JUMP_BACKWARD          153 (to 130)
+
+669     >>  436 RERAISE                  0
+        >>  438 COPY                     3
+            440 POP_EXCEPT
+            442 RERAISE                  1
+        >>  444 SWAP                     2
+            446 POP_TOP
+
+673         448 SWAP                     2
+            450 STORE_FAST               4 (s)
+            452 RERAISE                  0
+        >>  454 PUSH_EXC_INFO
+
+675         456 LOAD_GLOBAL             12 (Exception)
+            466 CHECK_EXC_MATCH
+            468 POP_JUMP_IF_FALSE       37 (to 544)
+            470 STORE_FAST               6 (e)
+
+676         472 LOAD_GLOBAL             31 (NULL + log)
+            482 LOAD_ATTR               32 (info)
+            502 LOAD_CONST               8 ('[youtube_channel] youtube-transcript-api ')
+            504 LOAD_DEREF               7 (vid)
+            506 FORMAT_VALUE             0
+            508 LOAD_CONST               9 (' bỏ qua: ')
+            510 LOAD_FAST                6 (e)
+            512 FORMAT_VALUE             0
+            514 BUILD_STRING             4
+            516 CALL                     1
+            524 POP_TOP
+
+677         526 POP_EXCEPT
+            528 LOAD_CONST               0 (None)
+            530 STORE_FAST               6 (e)
+            532 DELETE_FAST              6 (e)
+            534 RETURN_CONST             3 ('')
+        >>  536 LOAD_CONST               0 (None)
+            538 STORE_FAST               6 (e)
+            540 DELETE_FAST              6 (e)
+            542 RERAISE                  1
+
+675     >>  544 RERAISE                  0
+        >>  546 COPY                     3
+            548 POP_EXCEPT
+            550 RERAISE                  1
+ExceptionTable:
+  6 to 16 -> 342 [0]
+  20 to 66 -> 454 [0]
+  70 to 128 -> 372 [0]
+  130 to 132 -> 454 [0]
+  136 to 170 -> 454 [0]
+  172 to 218 -> 444 [2]
+  220 to 338 -> 454 [0]
+  342 to 358 -> 366 [1] lasti
+  364 to 364 -> 366 [1] lasti
+  372 to 430 -> 438 [1] lasti
+  432 to 434 -> 454 [0]
+  436 to 436 -> 438 [1] lasti
+  438 to 452 -> 454 [0]
+  454 to 470 -> 546 [1] lasti
+  472 to 524 -> 536 [1] lasti
+  536 to 544 -> 546 [1] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c92e587b0, file "app\adapters\youtube_channel.py", line 674>:
+674           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                 9 (to 30)
+             12 STORE_FAST               1 (p)
+             14 LOAD_FAST                1 (p)
+             16 POP_JUMP_IF_TRUE         1 (to 20)
+             18 JUMP_BACKWARD            6 (to 8)
+        >>   20 LOAD_FAST                1 (p)
+             22 YIELD_VALUE              1
+             24 RESUME                   1
+             26 POP_TOP
+             28 JUMP_BACKWARD           11 (to 8)
+        >>   30 END_FOR
+             32 RETURN_CONST             0 (None)
+        >>   34 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             36 RERAISE                  1
+ExceptionTable:
+  4 to 16 -> 34 [0] lasti
+  20 to 32 -> 34 [0] lasti
+
+Disassembly of <code object _truncate_transcript at 0x7f6c933db2d0, file "app\adapters\youtube_channel.py", line 683>:
+683           0 RESUME                   0
+
+685           2 LOAD_FAST                1 (max_chars)
+              4 LOAD_CONST               1 (0)
+              6 COMPARE_OP              26 (<=)
+             10 POP_JUMP_IF_TRUE        14 (to 40)
+             12 LOAD_GLOBAL              1 (NULL + len)
+             22 LOAD_FAST                0 (text)
+             24 CALL                     1
+             32 LOAD_FAST                1 (max_chars)
+             34 COMPARE_OP              26 (<=)
+             38 POP_JUMP_IF_FALSE        2 (to 44)
+
+686     >>   40 LOAD_FAST                0 (text)
+             42 RETURN_VALUE
+
+687     >>   44 LOAD_FAST                2 (preserve_ends)
+             46 POP_JUMP_IF_TRUE         5 (to 58)
+
+688          48 LOAD_FAST                0 (text)
+             50 LOAD_CONST               2 (None)
+             52 LOAD_FAST                1 (max_chars)
+             54 BINARY_SLICE
+             56 RETURN_VALUE
+
+689     >>   58 LOAD_CONST               3 ('\n[… middle omitted for context window …]\n')
+             60 STORE_FAST               3 (marker)
+
+690          62 LOAD_GLOBAL              3 (NULL + max)
+             72 LOAD_CONST               1 (0)
+             74 LOAD_FAST                1 (max_chars)
+             76 LOAD_GLOBAL              1 (NULL + len)
+             86 LOAD_FAST                3 (marker)
+             88 CALL                     1
+             96 BINARY_OP               10 (-)
+            100 CALL                     2
+            108 STORE_FAST               4 (budget)
+
+691         110 LOAD_GLOBAL              5 (NULL + int)
+            120 LOAD_FAST                4 (budget)
+            122 LOAD_CONST               4 (0.6)
+            124 BINARY_OP                5 (*)
+            128 CALL                     1
+            136 STORE_FAST               5 (head_n)
+
+692         138 LOAD_FAST                4 (budget)
+            140 LOAD_FAST                5 (head_n)
+            142 BINARY_OP               10 (-)
+            146 STORE_FAST               6 (tail_n)
+
+693         148 LOAD_FAST                0 (text)
+            150 LOAD_CONST               2 (None)
+            152 LOAD_FAST                5 (head_n)
+            154 BINARY_SLICE
+            156 LOAD_ATTR                7 (NULL|self + rstrip)
+            176 CALL                     0
+            184 LOAD_FAST                3 (marker)
+            186 BINARY_OP                0 (+)
+            190 LOAD_FAST                0 (text)
+            192 LOAD_FAST                6 (tail_n)
+            194 UNARY_NEGATIVE
+            196 LOAD_CONST               2 (None)
+            198 BINARY_SLICE
+            200 LOAD_ATTR                9 (NULL|self + lstrip)
+            220 CALL                     0
+            228 BINARY_OP                0 (+)
+            232 RETURN_VALUE
+
+Disassembly of <code object _strip_vtt at 0x28e51610, file "app\adapters\youtube_channel.py", line 696>:
+696           0 RESUME                   0
+
+698           2 BUILD_LIST               0
+              4 STORE_FAST               1 (lines)
+
+699           6 LOAD_FAST                0 (raw)
+              8 COPY                     1
+             10 POP_JUMP_IF_TRUE         2 (to 16)
+             12 POP_TOP
+             14 LOAD_CONST               1 ('')
+        >>   16 LOAD_ATTR                1 (NULL|self + splitlines)
+             36 CALL                     0
+             44 GET_ITER
+        >>   46 FOR_ITER               110 (to 270)
+             50 STORE_FAST               2 (ln)
+
+700          52 LOAD_FAST                2 (ln)
+             54 LOAD_ATTR                3 (NULL|self + strip)
+             74 CALL                     0
+             82 STORE_FAST               2 (ln)
+
+701          84 LOAD_FAST                2 (ln)
+             86 POP_JUMP_IF_FALSE       51 (to 190)
+             88 LOAD_CONST               2 ('-->')
+             90 LOAD_FAST                2 (ln)
+             92 CONTAINS_OP              0
+             94 POP_JUMP_IF_TRUE        47 (to 190)
+             96 LOAD_FAST                2 (ln)
+             98 LOAD_ATTR                5 (NULL|self + isdigit)
+            118 CALL                     0
+            126 POP_JUMP_IF_TRUE        31 (to 190)
+            128 LOAD_FAST                2 (ln)
+            130 LOAD_ATTR                7 (NULL|self + upper)
+            150 CALL                     0
+            158 LOAD_ATTR                9 (NULL|self + startswith)
+            178 LOAD_CONST               3 ('WEBVTT')
+            180 CALL                     1
+            188 POP_JUMP_IF_FALSE        1 (to 192)
+
+702     >>  190 JUMP_BACKWARD           73 (to 46)
+
+703     >>  192 LOAD_FAST                1 (lines)
+            194 LOAD_ATTR               11 (NULL|self + append)
+            214 LOAD_GLOBAL             13 (NULL + re)
+            224 LOAD_ATTR               14 (sub)
+            244 LOAD_CONST               4 ('<[^>]+>')
+            246 LOAD_CONST               1 ('')
+            248 LOAD_FAST                2 (ln)
+            250 CALL                     3
+            258 CALL                     1
+            266 POP_TOP
+            268 JUMP_BACKWARD          112 (to 46)
+
+699     >>  270 END_FOR
+
+704         272 LOAD_GLOBAL             13 (NULL + re)
+            282 LOAD_ATTR               14 (sub)
+            302 LOAD_CONST               5 ('\\s+')
+            304 LOAD_CONST               6 (' ')
+            306 LOAD_CONST               6 (' ')
+            308 LOAD_ATTR               17 (NULL|self + join)
+            328 LOAD_FAST                1 (lines)
+            330 CALL                     1
+            338 CALL                     3
+            346 LOAD_ATTR                3 (NULL|self + strip)
+            366 CALL                     0
+            374 RETURN_VALUE

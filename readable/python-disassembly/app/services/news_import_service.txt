@@ -1,0 +1,2984 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Service import bài báo đã crawl → IdeaCard AI Studio + auto-approve chạy script pipeline.\n\nFlow:\n1. Lấy bài báo (full_text) + cấu hình kênh (engine, profile, language)\n2. Trích xuất ảnh bài báo (URL + caption + context) → tải về local\n3. LLM sinh IdeaCard (title SEO, hook, angle, outline, characters, thumbnail_prompt)\n4. Lưu IdeaCard source="news_import" kèm news_source_content + news_images\n5. Auto-approve → pipeline chạy research → script → storyboard gán ảnh báo vào scene\n\nKHÔNG ảnh hưởng pipeline AI thường: mọi thay đổi gated bởi field news_source_content.\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 12           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 14          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (asyncio)
+             24 STORE_NAME               3 (asyncio)
+
+ 15          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               3 (None)
+             30 IMPORT_NAME              4 (io)
+             32 STORE_NAME               4 (io)
+
+ 16          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               3 (None)
+             38 IMPORT_NAME              5 (json)
+             40 STORE_NAME               5 (json)
+
+ 17          42 LOAD_CONST               1 (0)
+             44 LOAD_CONST               3 (None)
+             46 IMPORT_NAME              6 (re)
+             48 STORE_NAME               6 (re)
+
+ 18          50 LOAD_CONST               1 (0)
+             52 LOAD_CONST               4 (('Path',))
+             54 IMPORT_NAME              7 (pathlib)
+             56 IMPORT_FROM              8 (Path)
+             58 STORE_NAME               8 (Path)
+             60 POP_TOP
+
+ 19          62 LOAD_CONST               1 (0)
+             64 LOAD_CONST               5 (('Any',))
+             66 IMPORT_NAME              9 (typing)
+             68 IMPORT_FROM             10 (Any)
+             70 STORE_NAME              10 (Any)
+             72 POP_TOP
+
+ 21          74 LOAD_CONST               1 (0)
+             76 LOAD_CONST               3 (None)
+             78 IMPORT_NAME             11 (httpx)
+             80 STORE_NAME              11 (httpx)
+
+ 23          82 LOAD_CONST               1 (0)
+             84 LOAD_CONST               6 (('complete_text',))
+             86 IMPORT_NAME             12 (app.adapters.ai_provider)
+             88 IMPORT_FROM             13 (complete_text)
+             90 STORE_NAME              13 (complete_text)
+             92 POP_TOP
+
+ 24          94 LOAD_CONST               1 (0)
+             96 LOAD_CONST               7 (('StudioError', 'E'))
+             98 IMPORT_NAME             14 (app.core.errors)
+            100 IMPORT_FROM             15 (StudioError)
+            102 STORE_NAME              15 (StudioError)
+            104 IMPORT_FROM             16 (E)
+            106 STORE_NAME              16 (E)
+            108 POP_TOP
+
+ 25         110 LOAD_CONST               1 (0)
+            112 LOAD_CONST               8 (('log',))
+            114 IMPORT_NAME             17 (app.core.logging)
+            116 IMPORT_FROM             18 (log)
+            118 STORE_NAME              18 (log)
+            120 POP_TOP
+
+ 26         122 LOAD_CONST               1 (0)
+            124 LOAD_CONST               9 (('NewsArticle', 'ScheduleConfig'))
+            126 IMPORT_NAME             19 (app.db.models)
+            128 IMPORT_FROM             20 (NewsArticle)
+            130 STORE_NAME              20 (NewsArticle)
+            132 IMPORT_FROM             21 (ScheduleConfig)
+            134 STORE_NAME              21 (ScheduleConfig)
+            136 POP_TOP
+
+ 27         138 LOAD_CONST               1 (0)
+            140 LOAD_CONST              10 (('SessionLocal',))
+            142 IMPORT_NAME             22 (app.db.session)
+            144 IMPORT_FROM             23 (SessionLocal)
+            146 STORE_NAME              23 (SessionLocal)
+            148 POP_TOP
+
+ 28         150 LOAD_CONST               1 (0)
+            152 LOAD_CONST              11 (('ai_studio_service', 'channel_engines', 'ideation_service'))
+            154 IMPORT_NAME             24 (app.services)
+            156 IMPORT_FROM             25 (ai_studio_service)
+            158 STORE_NAME              26 (svc)
+            160 IMPORT_FROM             27 (channel_engines)
+            162 STORE_NAME              27 (channel_engines)
+            164 IMPORT_FROM             28 (ideation_service)
+            166 STORE_NAME              28 (ideation_service)
+            168 POP_TOP
+
+ 33         170 LOAD_CONST               1 (0)
+            172 LOAD_CONST              12 (('ANTI_SLOP_NOTE', 'ENGAGEMENT_NOTE', 'extract_json_object', 'format_channel_override'))
+            174 IMPORT_NAME             29 (app.services.ideation_service)
+            176 IMPORT_FROM             30 (ANTI_SLOP_NOTE)
+            178 STORE_NAME              30 (ANTI_SLOP_NOTE)
+            180 IMPORT_FROM             31 (ENGAGEMENT_NOTE)
+            182 STORE_NAME              31 (ENGAGEMENT_NOTE)
+            184 IMPORT_FROM             32 (extract_json_object)
+            186 STORE_NAME              32 (extract_json_object)
+            188 IMPORT_FROM             33 (format_channel_override)
+            190 STORE_NAME              33 (format_channel_override)
+            192 POP_TOP
+
+ 39         194 LOAD_CONST               1 (0)
+            196 LOAD_CONST              13 (('video_format',))
+            198 IMPORT_NAME             24 (app.services)
+            200 IMPORT_FROM             34 (video_format)
+            202 STORE_NAME              35 (vfmt)
+            204 POP_TOP
+
+ 44         206 LOAD_CONST              29 (('html_content', 'str', 'return', 'list[dict]'))
+            208 LOAD_CONST              14 (<code object _extract_images_from_html at 0x28d68ec0, file "app\services\news_import_service.py", line 44>)
+            210 MAKE_FUNCTION            4 (annotations)
+            212 STORE_NAME              36 (_extract_images_from_html)
+
+118         214 LOAD_CONST              30 ((300,))
+            216 LOAD_CONST              31 (('html', 'str', 'pos', 'int', 'radius', 'int', 'return', 'str'))
+            218 LOAD_CONST              15 (<code object _extract_surrounding_text at 0x7f6c927a5890, file "app\services\news_import_service.py", line 118>)
+            220 MAKE_FUNCTION            5 (defaults, annotations)
+            222 STORE_NAME              37 (_extract_surrounding_text)
+
+130         224 LOAD_CONST              16 (480)
+            226 STORE_NAME              38 (_MIN_LONG_EDGE)
+
+131         228 LOAD_CONST              17 (2.5)
+            230 STORE_NAME              39 (_MAX_ASPECT)
+
+134         232 LOAD_CONST              32 (('data', 'bytes', 'return', 'tuple[int, int] | None'))
+            234 LOAD_CONST              18 (<code object _usable_image_size at 0x28d63e10, file "app\services\news_import_service.py", line 134>)
+            236 MAKE_FUNCTION            4 (annotations)
+            238 STORE_NAME              40 (_usable_image_size)
+
+162         240 LOAD_CONST              19 (10)
+
+163         242 LOAD_CONST              20 (15.0)
+
+164         244 LOAD_CONST              21 ('')
+
+158         246 LOAD_CONST              22 (('max_images', 'timeout', 'referer'))
+            248 BUILD_CONST_KEY_MAP      3
+
+159         250 NOP
+
+158         252 NOP
+
+160         254 NOP
+
+158         256 NOP
+
+162         258 NOP
+
+158         260 NOP
+
+163         262 NOP
+
+158         264 NOP
+
+164         266 NOP
+
+158         268 NOP
+
+165         270 NOP
+
+158         272 LOAD_CONST              33 (('images', 'list[dict]', 'save_dir', 'Path', 'max_images', 'int', 'timeout', 'float', 'referer', 'str', 'return', 'list[dict]'))
+            274 LOAD_CONST              23 (<code object _download_article_images at 0x28d88110, file "app\services\news_import_service.py", line 158>)
+            276 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            278 STORE_NAME              41 (_download_article_images)
+
+254         280 LOAD_CONST              24 ('{\n  "title": "SEO video title (catchy, click-worthy, based on the article)",\n  "hook": "first 3 seconds, the retention hook derived from the article\'s most gripping point",\n  "angle": "the distinctive angle to cover this news story",\n  "format": "one of the channel formats",\n  "outline": ["Hook", "Body beat 1", "Body beat 2", "...", "CTA"],\n  "thumbnail_concept": "one strong thumbnail story moment from the article + optional short overlay text",\n  "thumbnail_text": "2-4 word PUNCHY overlay phrase in the channel language",\n  "thumbnail_prompt": "ONE detailed text-to-image prompt for a scroll-stopping thumbnail (one dominant expressive subject performing a clear story action, dramatic composition and light; avoid generic icon collages; any text area uses at most 18% of the frame) in the channel language, wrapped with the style anchor + lock",\n  "characters": [{"name": "short stable name", "is_main": true, "role": "main or support", "description": "detailed visual prompt of this recurring character in the channel language (age, gender, ethnicity, hair, face, build, signature clothing) precise enough to redraw identically, wrapped with the style anchor + lock"}],\n  "series_link": "how this episode connects to the channel series",\n  "est_duration_sec": 90,\n  "visual_style": "short visual-style tag",\n  "score_predicted": 0.0,\n  "rationale": "why this article makes a good video for this channel"\n}')
+
+253         282 STORE_NAME              42 (_NEWS_IDEA_JSON_SPEC)
+
+279         284 LOAD_CONST              34 (('html_content', 'str', 'return', 'str'))
+            286 LOAD_CONST              25 (<code object _strip_html_to_text at 0x28ad6b60, file "app\services\news_import_service.py", line 279>)
+            288 MAKE_FUNCTION            4 (annotations)
+            290 STORE_NAME              43 (_strip_html_to_text)
+
+308         292 LOAD_CONST               3 (None)
+
+298         294 LOAD_CONST              13 (('video_format',))
+            296 BUILD_CONST_KEY_MAP      1
+
+301         298 NOP
+
+298         300 NOP
+
+302         302 NOP
+
+298         304 NOP
+
+303         306 NOP
+
+298         308 NOP
+
+304         310 NOP
+
+298         312 NOP
+
+305         314 NOP
+
+298         316 NOP
+
+306         318 NOP
+
+298         320 NOP
+
+307         322 NOP
+
+298         324 NOP
+
+308         326 NOP
+
+298         328 NOP
+
+309         330 NOP
+
+298         332 LOAD_CONST              35 (('article_text', 'str', 'article_title', 'str', 'article_url', 'str', 'language', 'str', 'profile', 'dict | None', 'recent_titles', 'list[str] | None', 'existing_titles', 'list[str] | None', 'video_format', "'vfmt.VideoFormat | None'", 'return', 'tuple[str, str]'))
+            334 LOAD_CONST              26 (<code object _build_news_idea_prompt at 0x28d887d0, file "app\services\news_import_service.py", line 298>)
+            336 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            338 STORE_NAME              44 (_build_news_idea_prompt)
+
+405         340 NOP
+
+402         342 LOAD_CONST              36 (('long',))
+
+407         344 LOAD_CONST               3 (None)
+
+408         346 LOAD_CONST               3 (None)
+
+402         348 LOAD_CONST              27 (('progress', 'cancel_check'))
+            350 BUILD_CONST_KEY_MAP      2
+
+403         352 NOP
+
+402         354 NOP
+
+404         356 NOP
+
+402         358 NOP
+
+405         360 NOP
+
+402         362 NOP
+
+409         364 NOP
+
+402         366 LOAD_CONST              37 (('article_id', 'str', 'project_id', 'str', 'video_format_str', 'str | None', 'return', 'dict[str, Any]'))
+            368 LOAD_CONST              28 (<code object import_article_to_channel at 0x28c39440, file "app\services\news_import_service.py", line 402>)
+            370 MAKE_FUNCTION            7 (defaults, kwdefaults, annotations)
+            372 STORE_NAME              45 (import_article_to_channel)
+            374 RETURN_CONST             3 (None)
+
+Disassembly of <code object _extract_images_from_html at 0x28d68ec0, file "app\services\news_import_service.py", line 44>:
+ 44           0 RESUME                   0
+
+ 52           2 LOAD_FAST                0 (html_content)
+              4 POP_JUMP_IF_TRUE         2 (to 10)
+
+ 53           6 BUILD_LIST               0
+              8 RETURN_VALUE
+
+ 54     >>   10 LOAD_GLOBAL              1 (NULL + max)
+             20 LOAD_CONST               1 (1)
+             22 LOAD_GLOBAL              3 (NULL + len)
+             32 LOAD_FAST                0 (html_content)
+             34 CALL                     1
+             42 CALL                     2
+             50 STORE_FAST               1 (total_len)
+
+ 56          52 BUILD_LIST               0
+             54 STORE_FAST               2 (images)
+
+ 58          56 LOAD_GLOBAL              5 (NULL + re)
+             66 LOAD_ATTR                6 (compile)
+
+ 59          86 LOAD_CONST               2 ('<figure[^>]*>(.*?)</figure>')
+             88 LOAD_GLOBAL              4 (re)
+             98 LOAD_ATTR                8 (DOTALL)
+            118 LOAD_GLOBAL              4 (re)
+            128 LOAD_ATTR               10 (IGNORECASE)
+            148 BINARY_OP                7 (|)
+
+ 58         152 CALL                     2
+            160 STORE_FAST               3 (figure_pattern)
+
+ 61         162 LOAD_GLOBAL              5 (NULL + re)
+            172 LOAD_ATTR                6 (compile)
+
+ 62         192 LOAD_CONST               3 ('<img[^>]*\\bsrc=["\\\']([^"\\\']+)["\\\'][^>]*/?\\s*>')
+            194 LOAD_GLOBAL              4 (re)
+            204 LOAD_ATTR               10 (IGNORECASE)
+
+ 61         224 CALL                     2
+            232 STORE_FAST               4 (img_pattern)
+
+ 64         234 LOAD_GLOBAL              5 (NULL + re)
+            244 LOAD_ATTR                6 (compile)
+
+ 65         264 LOAD_CONST               4 ('<figcaption[^>]*>(.*?)</figcaption>')
+            266 LOAD_GLOBAL              4 (re)
+            276 LOAD_ATTR                8 (DOTALL)
+            296 LOAD_GLOBAL              4 (re)
+            306 LOAD_ATTR               10 (IGNORECASE)
+            326 BINARY_OP                7 (|)
+
+ 64         330 CALL                     2
+            338 STORE_FAST               5 (caption_pattern)
+
+ 69         340 LOAD_FAST                3 (figure_pattern)
+            342 LOAD_ATTR               13 (NULL|self + finditer)
+            362 LOAD_FAST                0 (html_content)
+            364 CALL                     1
+            372 GET_ITER
+        >>  374 FOR_ITER               238 (to 854)
+            378 STORE_FAST               6 (match)
+
+ 70         380 LOAD_FAST                6 (match)
+            382 LOAD_ATTR               15 (NULL|self + group)
+            402 LOAD_CONST               1 (1)
+            404 CALL                     1
+            412 STORE_FAST               7 (figure_html)
+
+ 71         414 LOAD_FAST                6 (match)
+            416 LOAD_ATTR               17 (NULL|self + start)
+            436 CALL                     0
+            444 STORE_FAST               8 (figure_pos)
+
+ 73         446 LOAD_FAST                4 (img_pattern)
+            448 LOAD_ATTR               19 (NULL|self + search)
+            468 LOAD_FAST                7 (figure_html)
+            470 CALL                     1
+            478 STORE_FAST               9 (img_match)
+
+ 74         480 LOAD_FAST                9 (img_match)
+            482 POP_JUMP_IF_TRUE         1 (to 486)
+
+ 75         484 JUMP_BACKWARD           56 (to 374)
+
+ 76     >>  486 LOAD_FAST                9 (img_match)
+            488 LOAD_ATTR               15 (NULL|self + group)
+            508 LOAD_CONST               1 (1)
+            510 CALL                     1
+            518 LOAD_ATTR               21 (NULL|self + strip)
+            538 CALL                     0
+            546 STORE_FAST              10 (url)
+
+ 77         548 LOAD_FAST               10 (url)
+            550 POP_JUMP_IF_FALSE       17 (to 586)
+            552 LOAD_FAST               10 (url)
+            554 LOAD_ATTR               23 (NULL|self + startswith)
+            574 LOAD_CONST               5 ('data:')
+            576 CALL                     1
+            584 POP_JUMP_IF_FALSE        1 (to 588)
+
+ 78     >>  586 JUMP_BACKWARD          107 (to 374)
+
+ 81     >>  588 LOAD_FAST                5 (caption_pattern)
+            590 LOAD_ATTR               19 (NULL|self + search)
+            610 LOAD_FAST                7 (figure_html)
+            612 CALL                     1
+            620 STORE_FAST              11 (cap_match)
+
+ 82         622 LOAD_CONST               6 ('')
+            624 STORE_FAST              12 (caption)
+
+ 83         626 LOAD_FAST               11 (cap_match)
+            628 POP_JUMP_IF_FALSE       52 (to 734)
+
+ 84         630 LOAD_GLOBAL              5 (NULL + re)
+            640 LOAD_ATTR               24 (sub)
+            660 LOAD_CONST               7 ('<[^>]+>')
+            662 LOAD_CONST               6 ('')
+            664 LOAD_FAST               11 (cap_match)
+            666 LOAD_ATTR               15 (NULL|self + group)
+            686 LOAD_CONST               1 (1)
+            688 CALL                     1
+            696 CALL                     3
+            704 LOAD_ATTR               21 (NULL|self + strip)
+            724 CALL                     0
+            732 STORE_FAST              12 (caption)
+
+ 87     >>  734 LOAD_GLOBAL             27 (NULL + _extract_surrounding_text)
+            744 LOAD_FAST                0 (html_content)
+            746 LOAD_FAST                8 (figure_pos)
+            748 LOAD_CONST               8 (300)
+            750 KW_NAMES                 9 (('radius',))
+            752 CALL                     3
+            760 STORE_FAST              13 (context)
+
+ 89         762 LOAD_FAST                2 (images)
+            764 LOAD_ATTR               29 (NULL|self + append)
+
+ 90         784 LOAD_FAST               10 (url)
+
+ 91         786 LOAD_FAST               12 (caption)
+
+ 92         788 LOAD_FAST               13 (context)
+
+ 93         790 LOAD_GLOBAL              3 (NULL + len)
+            800 LOAD_FAST                2 (images)
+            802 CALL                     1
+
+ 94         810 LOAD_GLOBAL             31 (NULL + round)
+            820 LOAD_FAST                8 (figure_pos)
+            822 LOAD_FAST                1 (total_len)
+            824 BINARY_OP               11 (/)
+            828 LOAD_CONST              10 (4)
+            830 CALL                     2
+
+ 89         838 LOAD_CONST              11 (('url', 'caption', 'context', 'index', 'pos_ratio'))
+            840 BUILD_CONST_KEY_MAP      5
+            842 CALL                     1
+            850 POP_TOP
+            852 JUMP_BACKWARD          240 (to 374)
+
+ 69     >>  854 END_FOR
+
+ 98         856 LOAD_FAST                2 (images)
+            858 EXTENDED_ARG             1
+            860 POP_JUMP_IF_TRUE       285 (to 1432)
+
+ 99         862 LOAD_FAST                4 (img_pattern)
+            864 LOAD_ATTR               13 (NULL|self + finditer)
+            884 LOAD_FAST                0 (html_content)
+            886 CALL                     1
+            894 GET_ITER
+        >>  896 EXTENDED_ARG             1
+            898 FOR_ITER               264 (to 1430)
+            902 STORE_FAST               6 (match)
+
+100         904 LOAD_FAST                6 (match)
+            906 LOAD_ATTR               15 (NULL|self + group)
+            926 LOAD_CONST               1 (1)
+            928 CALL                     1
+            936 LOAD_ATTR               21 (NULL|self + strip)
+            956 CALL                     0
+            964 STORE_FAST              10 (url)
+
+101         966 LOAD_FAST               10 (url)
+            968 POP_JUMP_IF_FALSE       53 (to 1076)
+            970 LOAD_FAST               10 (url)
+            972 LOAD_ATTR               23 (NULL|self + startswith)
+            992 LOAD_CONST               5 ('data:')
+            994 CALL                     1
+           1002 POP_JUMP_IF_TRUE        36 (to 1076)
+           1004 LOAD_CONST              12 ('icon')
+           1006 LOAD_FAST               10 (url)
+           1008 LOAD_ATTR               33 (NULL|self + lower)
+           1028 CALL                     0
+           1036 CONTAINS_OP              0
+           1038 POP_JUMP_IF_TRUE        18 (to 1076)
+           1040 LOAD_CONST              13 ('logo')
+           1042 LOAD_FAST               10 (url)
+           1044 LOAD_ATTR               33 (NULL|self + lower)
+           1064 CALL                     0
+           1072 CONTAINS_OP              0
+           1074 POP_JUMP_IF_FALSE        1 (to 1078)
+
+102     >> 1076 JUMP_BACKWARD           91 (to 896)
+
+104     >> 1078 LOAD_GLOBAL              5 (NULL + re)
+           1088 LOAD_ATTR               18 (search)
+           1108 LOAD_CONST              14 ('alt=["\\\']([^"\\\']*)["\\\']')
+           1110 LOAD_FAST                6 (match)
+           1112 LOAD_ATTR               15 (NULL|self + group)
+           1132 LOAD_CONST              15 (0)
+           1134 CALL                     1
+           1142 LOAD_GLOBAL              4 (re)
+           1152 LOAD_ATTR               10 (IGNORECASE)
+           1172 CALL                     3
+           1180 STORE_FAST              14 (alt_match)
+
+105        1182 LOAD_FAST               14 (alt_match)
+           1184 POP_JUMP_IF_FALSE       31 (to 1248)
+           1186 LOAD_FAST               14 (alt_match)
+           1188 LOAD_ATTR               15 (NULL|self + group)
+           1208 LOAD_CONST               1 (1)
+           1210 CALL                     1
+           1218 LOAD_ATTR               21 (NULL|self + strip)
+           1238 CALL                     0
+           1246 JUMP_FORWARD             1 (to 1250)
+        >> 1248 LOAD_CONST               6 ('')
+        >> 1250 STORE_FAST              12 (caption)
+
+106        1252 LOAD_GLOBAL             27 (NULL + _extract_surrounding_text)
+           1262 LOAD_FAST                0 (html_content)
+           1264 LOAD_FAST                6 (match)
+           1266 LOAD_ATTR               17 (NULL|self + start)
+           1286 CALL                     0
+           1294 LOAD_CONST               8 (300)
+           1296 KW_NAMES                 9 (('radius',))
+           1298 CALL                     3
+           1306 STORE_FAST              13 (context)
+
+107        1308 LOAD_FAST                2 (images)
+           1310 LOAD_ATTR               29 (NULL|self + append)
+
+108        1330 LOAD_FAST               10 (url)
+
+109        1332 LOAD_FAST               12 (caption)
+
+110        1334 LOAD_FAST               13 (context)
+
+111        1336 LOAD_GLOBAL              3 (NULL + len)
+           1346 LOAD_FAST                2 (images)
+           1348 CALL                     1
+
+112        1356 LOAD_GLOBAL             31 (NULL + round)
+           1366 LOAD_FAST                6 (match)
+           1368 LOAD_ATTR               17 (NULL|self + start)
+           1388 CALL                     0
+           1396 LOAD_FAST                1 (total_len)
+           1398 BINARY_OP               11 (/)
+           1402 LOAD_CONST              10 (4)
+           1404 CALL                     2
+
+107        1412 LOAD_CONST              11 (('url', 'caption', 'context', 'index', 'pos_ratio'))
+           1414 BUILD_CONST_KEY_MAP      5
+           1416 CALL                     1
+           1424 POP_TOP
+           1426 EXTENDED_ARG             1
+           1428 JUMP_BACKWARD          267 (to 896)
+
+ 99     >> 1430 END_FOR
+
+115     >> 1432 LOAD_FAST                2 (images)
+           1434 RETURN_VALUE
+
+Disassembly of <code object _extract_surrounding_text at 0x7f6c927a5890, file "app\services\news_import_service.py", line 118>:
+118           0 RESUME                   0
+
+120           2 LOAD_GLOBAL              1 (NULL + max)
+             12 LOAD_CONST               1 (0)
+             14 LOAD_FAST                1 (pos)
+             16 LOAD_FAST                2 (radius)
+             18 BINARY_OP               10 (-)
+             22 CALL                     2
+             30 STORE_FAST               3 (start)
+
+121          32 LOAD_GLOBAL              3 (NULL + min)
+             42 LOAD_GLOBAL              5 (NULL + len)
+             52 LOAD_FAST                0 (html)
+             54 CALL                     1
+             62 LOAD_FAST                1 (pos)
+             64 LOAD_FAST                2 (radius)
+             66 BINARY_OP                0 (+)
+             70 CALL                     2
+             78 STORE_FAST               4 (end)
+
+122          80 LOAD_FAST                0 (html)
+             82 LOAD_FAST                3 (start)
+             84 LOAD_FAST                4 (end)
+             86 BINARY_SLICE
+             88 STORE_FAST               5 (chunk)
+
+124          90 LOAD_GLOBAL              7 (NULL + re)
+            100 LOAD_ATTR                8 (sub)
+            120 LOAD_CONST               2 ('<[^>]+>')
+            122 LOAD_CONST               3 (' ')
+            124 LOAD_FAST                5 (chunk)
+            126 CALL                     3
+            134 STORE_FAST               6 (text)
+
+125         136 LOAD_GLOBAL              7 (NULL + re)
+            146 LOAD_ATTR                8 (sub)
+            166 LOAD_CONST               4 ('\\s+')
+            168 LOAD_CONST               3 (' ')
+            170 LOAD_FAST                6 (text)
+            172 CALL                     3
+            180 LOAD_ATTR               11 (NULL|self + strip)
+            200 CALL                     0
+            208 STORE_FAST               6 (text)
+
+126         210 LOAD_FAST                6 (text)
+            212 LOAD_CONST               5 (None)
+            214 LOAD_CONST               6 (400)
+            216 BINARY_SLICE
+            218 RETURN_VALUE
+
+Disassembly of <code object _usable_image_size at 0x28d63e10, file "app\services\news_import_service.py", line 134>:
+134           0 RESUME                   0
+
+140           2 NOP
+
+141           4 LOAD_CONST               1 (0)
+              6 LOAD_CONST               2 (('Image',))
+              8 IMPORT_NAME              0 (PIL)
+             10 IMPORT_FROM              1 (Image)
+             12 STORE_FAST               1 (Image)
+             14 POP_TOP
+
+144          16 NOP
+
+145          18 LOAD_FAST                1 (Image)
+             20 LOAD_ATTR                7 (NULL|self + open)
+             40 LOAD_GLOBAL              9 (NULL + io)
+             50 LOAD_ATTR               10 (BytesIO)
+             70 LOAD_FAST                0 (data)
+             72 CALL                     1
+             80 CALL                     1
+             88 BEFORE_WITH
+             90 STORE_FAST               2 (im)
+
+146          92 LOAD_FAST                2 (im)
+             94 LOAD_ATTR               12 (size)
+            114 UNPACK_SEQUENCE          2
+            118 STORE_FAST               3 (w)
+            120 STORE_FAST               4 (h)
+
+145         122 LOAD_CONST               4 (None)
+            124 LOAD_CONST               4 (None)
+            126 LOAD_CONST               4 (None)
+            128 CALL                     2
+            136 POP_TOP
+
+149     >>  138 LOAD_FAST_CHECK          3 (w)
+            140 POP_JUMP_IF_FALSE        2 (to 146)
+            142 LOAD_FAST_CHECK          4 (h)
+            144 POP_JUMP_IF_TRUE         1 (to 148)
+
+150     >>  146 RETURN_CONST             4 (None)
+
+151     >>  148 LOAD_GLOBAL             17 (NULL + max)
+            158 LOAD_FAST                3 (w)
+            160 LOAD_FAST                4 (h)
+            162 CALL                     2
+            170 LOAD_GLOBAL             18 (_MIN_LONG_EDGE)
+            180 COMPARE_OP               2 (<)
+            184 POP_JUMP_IF_FALSE        1 (to 188)
+
+152         186 RETURN_CONST             4 (None)
+
+153     >>  188 LOAD_CONST               5 (1)
+            190 LOAD_GLOBAL             20 (_MAX_ASPECT)
+            200 BINARY_OP               11 (/)
+            204 LOAD_FAST                3 (w)
+            206 LOAD_FAST                4 (h)
+            208 BINARY_OP               11 (/)
+            212 SWAP                     2
+            214 COPY                     2
+            216 COMPARE_OP              26 (<=)
+            220 POP_JUMP_IF_FALSE        9 (to 240)
+            222 LOAD_GLOBAL             20 (_MAX_ASPECT)
+            232 COMPARE_OP              26 (<=)
+            236 POP_JUMP_IF_TRUE         3 (to 244)
+
+154         238 RETURN_CONST             4 (None)
+
+153     >>  240 POP_TOP
+
+154         242 RETURN_CONST             4 (None)
+
+155     >>  244 LOAD_FAST                3 (w)
+            246 LOAD_FAST                4 (h)
+            248 BUILD_TUPLE              2
+            250 RETURN_VALUE
+        >>  252 PUSH_EXC_INFO
+
+142         254 LOAD_GLOBAL              4 (ImportError)
+            264 CHECK_EXC_MATCH
+            266 POP_JUMP_IF_FALSE        3 (to 274)
+            268 POP_TOP
+
+143         270 POP_EXCEPT
+            272 RETURN_CONST             3 ((0, 0))
+
+142     >>  274 RERAISE                  0
+        >>  276 COPY                     3
+            278 POP_EXCEPT
+            280 RERAISE                  1
+
+145     >>  282 PUSH_EXC_INFO
+            284 WITH_EXCEPT_START
+            286 POP_JUMP_IF_TRUE         1 (to 290)
+            288 RERAISE                  2
+        >>  290 POP_TOP
+            292 POP_EXCEPT
+            294 POP_TOP
+            296 POP_TOP
+            298 JUMP_BACKWARD           81 (to 138)
+        >>  300 COPY                     3
+            302 POP_EXCEPT
+            304 RERAISE                  1
+        >>  306 PUSH_EXC_INFO
+
+147         308 LOAD_GLOBAL             14 (Exception)
+            318 CHECK_EXC_MATCH
+            320 POP_JUMP_IF_FALSE        3 (to 328)
+            322 POP_TOP
+
+148         324 POP_EXCEPT
+            326 RETURN_CONST             4 (None)
+
+147     >>  328 RERAISE                  0
+        >>  330 COPY                     3
+            332 POP_EXCEPT
+            334 RERAISE                  1
+ExceptionTable:
+  4 to 14 -> 252 [0]
+  18 to 88 -> 306 [0]
+  90 to 120 -> 282 [1] lasti
+  122 to 136 -> 306 [0]
+  252 to 268 -> 276 [1] lasti
+  274 to 274 -> 276 [1] lasti
+  282 to 290 -> 300 [3] lasti
+  292 to 304 -> 306 [0]
+  306 to 322 -> 330 [1] lasti
+  328 to 328 -> 330 [1] lasti
+
+Disassembly of <code object _download_article_images at 0x28d88110, file "app\services\news_import_service.py", line 158>:
+158           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+174           6 LOAD_FAST                1 (save_dir)
+              8 LOAD_ATTR                1 (NULL|self + mkdir)
+             28 LOAD_CONST               1 (True)
+             30 LOAD_CONST               1 (True)
+             32 KW_NAMES                 2 (('parents', 'exist_ok'))
+             34 CALL                     2
+             42 POP_TOP
+
+175          44 BUILD_LIST               0
+             46 STORE_FAST               5 (downloaded)
+
+178          48 LOAD_GLOBAL              3 (NULL + sorted)
+             58 LOAD_FAST                0 (images)
+             60 LOAD_CONST               3 (<code object <lambda> at 0x7f6c92152d30, file "app\services\news_import_service.py", line 178>)
+             62 MAKE_FUNCTION            0
+             64 KW_NAMES                 4 (('key',))
+             66 CALL                     2
+             74 STORE_FAST               6 (candidates)
+
+183          76 LOAD_CONST               5 ('User-Agent')
+             78 LOAD_CONST               6 ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) RevoStudio/1.0')
+             80 BUILD_MAP                1
+             82 STORE_FAST               7 (headers)
+
+184          84 LOAD_FAST                4 (referer)
+             86 POP_JUMP_IF_FALSE        5 (to 98)
+
+185          88 LOAD_FAST                4 (referer)
+             90 LOAD_FAST                7 (headers)
+             92 LOAD_CONST               7 ('Referer')
+             94 STORE_SUBSCR
+
+187     >>   98 LOAD_GLOBAL              5 (NULL + httpx)
+            108 LOAD_ATTR                6 (AsyncClient)
+
+188         128 LOAD_FAST                3 (timeout)
+
+189         130 LOAD_CONST               1 (True)
+
+190         132 LOAD_FAST                7 (headers)
+
+187         134 KW_NAMES                 8 (('timeout', 'follow_redirects', 'headers'))
+            136 CALL                     3
+            144 BEFORE_ASYNC_WITH
+            146 GET_AWAITABLE            1
+            148 LOAD_CONST               9 (None)
+        >>  150 SEND                     3 (to 160)
+            154 YIELD_VALUE              2
+            156 RESUME                   3
+            158 JUMP_BACKWARD_NO_INTERRUPT     5 (to 150)
+        >>  160 END_SEND
+
+191         162 STORE_FAST               8 (client)
+
+192         164 LOAD_FAST                6 (candidates)
+            166 GET_ITER
+        >>  168 EXTENDED_ARG             2
+            170 FOR_ITER               555 (to 1284)
+            174 STORE_FAST               9 (img)
+
+193         176 LOAD_GLOBAL              9 (NULL + len)
+            186 LOAD_FAST                5 (downloaded)
+            188 CALL                     1
+            196 LOAD_FAST                2 (max_images)
+            198 COMPARE_OP              92 (>=)
+            202 POP_JUMP_IF_FALSE        3 (to 210)
+
+194         204 POP_TOP
+            206 EXTENDED_ARG             2
+            208 JUMP_FORWARD           538 (to 1286)
+
+195     >>  210 LOAD_FAST                9 (img)
+            212 LOAD_CONST              10 ('url')
+            214 BINARY_SUBSCR
+            218 STORE_FAST              10 (url)
+
+196         220 NOP
+
+197         222 LOAD_FAST                8 (client)
+            224 LOAD_ATTR               11 (NULL|self + get)
+            244 LOAD_FAST               10 (url)
+            246 CALL                     1
+            254 GET_AWAITABLE            0
+            256 LOAD_CONST               9 (None)
+        >>  258 SEND                     3 (to 268)
+            262 YIELD_VALUE              4
+            264 RESUME                   3
+            266 JUMP_BACKWARD_NO_INTERRUPT     5 (to 258)
+        >>  268 END_SEND
+            270 STORE_FAST              11 (resp)
+
+198         272 LOAD_FAST               11 (resp)
+            274 LOAD_ATTR               12 (status_code)
+            294 LOAD_CONST              11 (200)
+            296 COMPARE_OP              55 (!=)
+            300 POP_JUMP_IF_FALSE       41 (to 384)
+
+199         302 LOAD_GLOBAL             15 (NULL + log)
+            312 LOAD_ATTR               16 (info)
+            332 LOAD_CONST              12 ('[news_import] skip ảnh ')
+            334 LOAD_FAST               10 (url)
+            336 LOAD_CONST               9 (None)
+            338 LOAD_CONST              13 (80)
+            340 BINARY_SLICE
+            342 FORMAT_VALUE             0
+            344 LOAD_CONST              14 (': HTTP ')
+            346 LOAD_FAST               11 (resp)
+            348 LOAD_ATTR               12 (status_code)
+            368 FORMAT_VALUE             0
+            370 BUILD_STRING             4
+            372 CALL                     1
+            380 POP_TOP
+
+200         382 JUMP_BACKWARD          108 (to 168)
+
+202     >>  384 LOAD_FAST               11 (resp)
+            386 LOAD_ATTR               18 (headers)
+            406 LOAD_ATTR               11 (NULL|self + get)
+            426 LOAD_CONST              15 ('content-type')
+            428 LOAD_CONST              16 ('')
+            430 CALL                     2
+            438 STORE_FAST              12 (content_type)
+
+203         440 LOAD_CONST              17 ('image')
+            442 LOAD_FAST               12 (content_type)
+            444 CONTAINS_OP              1
+            446 POP_JUMP_IF_FALSE       62 (to 572)
+            448 LOAD_FAST               10 (url)
+            450 LOAD_ATTR               21 (NULL|self + lower)
+            470 CALL                     0
+            478 LOAD_ATTR               23 (NULL|self + endswith)
+
+204         498 LOAD_CONST              18 (('.jpg', '.jpeg', '.png', '.webp', '.gif'))
+
+203         500 CALL                     1
+            508 POP_JUMP_IF_TRUE        31 (to 572)
+
+206         510 LOAD_GLOBAL             15 (NULL + log)
+            520 LOAD_ATTR               16 (info)
+            540 LOAD_CONST              12 ('[news_import] skip ảnh ')
+            542 LOAD_FAST               10 (url)
+            544 LOAD_CONST               9 (None)
+            546 LOAD_CONST              13 (80)
+            548 BINARY_SLICE
+            550 FORMAT_VALUE             0
+            552 LOAD_CONST              19 (': content-type=')
+            554 LOAD_FAST               12 (content_type)
+            556 FORMAT_VALUE             0
+            558 BUILD_STRING             4
+            560 CALL                     1
+            568 POP_TOP
+
+207         570 JUMP_BACKWARD          202 (to 168)
+
+209     >>  572 LOAD_FAST               11 (resp)
+            574 LOAD_ATTR               24 (content)
+            594 STORE_FAST              13 (data)
+
+211         596 LOAD_GLOBAL              9 (NULL + len)
+            606 LOAD_FAST               13 (data)
+            608 CALL                     1
+            616 LOAD_CONST              20 (5000)
+            618 COMPARE_OP               2 (<)
+            622 POP_JUMP_IF_FALSE       42 (to 708)
+
+212         624 LOAD_GLOBAL             15 (NULL + log)
+            634 LOAD_ATTR               16 (info)
+            654 LOAD_CONST              21 ('[news_import] skip ảnh nhỏ ')
+            656 LOAD_FAST               10 (url)
+            658 LOAD_CONST               9 (None)
+            660 LOAD_CONST              13 (80)
+            662 BINARY_SLICE
+            664 FORMAT_VALUE             0
+            666 LOAD_CONST              22 (': ')
+            668 LOAD_GLOBAL              9 (NULL + len)
+            678 LOAD_FAST               13 (data)
+            680 CALL                     1
+            688 FORMAT_VALUE             0
+            690 LOAD_CONST              23 (' bytes')
+            692 BUILD_STRING             5
+            694 CALL                     1
+            702 POP_TOP
+
+213         704 EXTENDED_ARG             1
+            706 JUMP_BACKWARD          270 (to 168)
+
+215     >>  708 LOAD_GLOBAL             27 (NULL + _usable_image_size)
+            718 LOAD_FAST               13 (data)
+            720 CALL                     1
+            728 STORE_FAST              14 (size)
+
+216         730 LOAD_FAST               14 (size)
+            732 POP_JUMP_IF_NOT_NONE    37 (to 808)
+
+217         734 LOAD_GLOBAL             15 (NULL + log)
+            744 LOAD_ATTR               16 (info)
+            764 LOAD_CONST              24 ('[news_import] skip ảnh sai khuôn ')
+            766 LOAD_FAST               10 (url)
+            768 LOAD_CONST               9 (None)
+            770 LOAD_CONST              13 (80)
+            772 BINARY_SLICE
+            774 FORMAT_VALUE             0
+            776 LOAD_CONST              25 (' (nhỏ hơn ')
+
+218         778 LOAD_GLOBAL             28 (_MIN_LONG_EDGE)
+            788 FORMAT_VALUE             0
+            790 LOAD_CONST              26 ('px hoặc tỉ lệ banner)')
+
+217         792 BUILD_STRING             5
+            794 CALL                     1
+            802 POP_TOP
+
+219         804 EXTENDED_ARG             1
+            806 JUMP_BACKWARD          320 (to 168)
+
+222     >>  808 LOAD_CONST              27 ('.jpg')
+            810 STORE_FAST              15 (ext)
+
+223         812 LOAD_CONST              28 ('png')
+            814 LOAD_FAST               12 (content_type)
+            816 CONTAINS_OP              0
+            818 POP_JUMP_IF_TRUE        31 (to 882)
+            820 LOAD_FAST               10 (url)
+            822 LOAD_ATTR               21 (NULL|self + lower)
+            842 CALL                     0
+            850 LOAD_ATTR               23 (NULL|self + endswith)
+            870 LOAD_CONST              29 ('.png')
+            872 CALL                     1
+            880 POP_JUMP_IF_FALSE        3 (to 888)
+
+224     >>  882 LOAD_CONST              29 ('.png')
+            884 STORE_FAST              15 (ext)
+            886 JUMP_FORWARD            37 (to 962)
+
+225     >>  888 LOAD_CONST              30 ('webp')
+            890 LOAD_FAST               12 (content_type)
+            892 CONTAINS_OP              0
+            894 POP_JUMP_IF_TRUE        31 (to 958)
+            896 LOAD_FAST               10 (url)
+            898 LOAD_ATTR               21 (NULL|self + lower)
+            918 CALL                     0
+            926 LOAD_ATTR               23 (NULL|self + endswith)
+            946 LOAD_CONST              31 ('.webp')
+            948 CALL                     1
+            956 POP_JUMP_IF_FALSE        2 (to 962)
+
+226     >>  958 LOAD_CONST              31 ('.webp')
+            960 STORE_FAST              15 (ext)
+
+228     >>  962 LOAD_CONST              32 ('news_img_')
+            964 LOAD_FAST                9 (img)
+            966 LOAD_CONST              33 ('index')
+            968 BINARY_SUBSCR
+            972 LOAD_CONST              34 ('02d')
+            974 FORMAT_VALUE             4 (with format)
+            976 LOAD_FAST               15 (ext)
+            978 FORMAT_VALUE             0
+            980 BUILD_STRING             3
+            982 STORE_FAST              16 (filename)
+
+229         984 LOAD_FAST                1 (save_dir)
+            986 LOAD_FAST               16 (filename)
+            988 BINARY_OP               11 (/)
+            992 STORE_FAST              17 (local_path)
+
+230         994 LOAD_FAST               17 (local_path)
+            996 LOAD_ATTR               31 (NULL|self + write_bytes)
+           1016 LOAD_FAST               13 (data)
+           1018 CALL                     1
+           1026 POP_TOP
+
+232        1028 LOAD_FAST                5 (downloaded)
+           1030 LOAD_ATTR               33 (NULL|self + append)
+           1050 BUILD_MAP                0
+
+233        1052 LOAD_FAST                9 (img)
+
+232        1054 DICT_UPDATE              1
+
+234        1056 LOAD_GLOBAL             35 (NULL + str)
+           1066 LOAD_FAST               17 (local_path)
+           1068 LOAD_ATTR               37 (NULL|self + resolve)
+           1088 CALL                     0
+           1096 CALL                     1
+
+235        1104 LOAD_FAST               16 (filename)
+
+236        1106 LOAD_GLOBAL              9 (NULL + len)
+           1116 LOAD_FAST               13 (data)
+           1118 CALL                     1
+
+237        1126 LOAD_FAST               14 (size)
+           1128 LOAD_CONST              35 (0)
+           1130 BINARY_SUBSCR
+
+238        1134 LOAD_FAST               14 (size)
+           1136 LOAD_CONST              36 (1)
+           1138 BINARY_SUBSCR
+
+232        1142 LOAD_CONST              37 (('local_path', 'filename', 'size_bytes', 'width', 'height'))
+           1144 BUILD_CONST_KEY_MAP      5
+           1146 DICT_UPDATE              1
+           1148 CALL                     1
+           1156 POP_TOP
+
+240        1158 LOAD_GLOBAL             15 (NULL + log)
+           1168 LOAD_ATTR               16 (info)
+           1188 LOAD_CONST              38 ('[news_import] tải ảnh ')
+           1190 LOAD_FAST                9 (img)
+           1192 LOAD_CONST              33 ('index')
+           1194 BINARY_SUBSCR
+           1198 FORMAT_VALUE             0
+           1200 LOAD_CONST              22 (': ')
+           1202 LOAD_FAST               10 (url)
+           1204 LOAD_CONST               9 (None)
+           1206 LOAD_CONST              39 (60)
+           1208 BINARY_SLICE
+           1210 FORMAT_VALUE             0
+           1212 LOAD_CONST              40 ('… → ')
+           1214 LOAD_FAST               16 (filename)
+           1216 FORMAT_VALUE             0
+           1218 LOAD_CONST              41 (' (')
+
+241        1220 LOAD_GLOBAL              9 (NULL + len)
+           1230 LOAD_FAST               13 (data)
+           1232 CALL                     1
+           1240 FORMAT_VALUE             0
+           1242 LOAD_CONST              42 (' bytes, ')
+           1244 LOAD_FAST               14 (size)
+           1246 LOAD_CONST              35 (0)
+           1248 BINARY_SUBSCR
+           1252 FORMAT_VALUE             0
+           1254 LOAD_CONST              43 ('x')
+           1256 LOAD_FAST               14 (size)
+           1258 LOAD_CONST              36 (1)
+           1260 BINARY_SUBSCR
+           1264 FORMAT_VALUE             0
+           1266 LOAD_CONST              44 (')')
+
+240        1268 BUILD_STRING            13
+           1270 CALL                     1
+           1278 POP_TOP
+           1280 EXTENDED_ARG             2
+           1282 JUMP_BACKWARD          558 (to 168)
+
+192     >> 1284 END_FOR
+
+187     >> 1286 LOAD_CONST               9 (None)
+           1288 LOAD_CONST               9 (None)
+           1290 LOAD_CONST               9 (None)
+           1292 CALL                     2
+           1300 GET_AWAITABLE            2
+           1302 LOAD_CONST               9 (None)
+        >> 1304 SEND                     3 (to 1314)
+           1308 YIELD_VALUE              2
+           1310 RESUME                   3
+           1312 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1304)
+        >> 1314 END_SEND
+           1316 POP_TOP
+
+247     >> 1318 LOAD_FAST                5 (downloaded)
+           1320 LOAD_ATTR               41 (NULL|self + sort)
+           1340 LOAD_CONST              46 (<code object <lambda> at 0x7f6c927d47b0, file "app\services\news_import_service.py", line 247>)
+           1342 MAKE_FUNCTION            0
+           1344 KW_NAMES                 4 (('key',))
+           1346 CALL                     1
+           1354 POP_TOP
+
+248        1356 LOAD_FAST                5 (downloaded)
+           1358 RETURN_VALUE
+
+187     >> 1360 CLEANUP_THROW
+           1362 EXTENDED_ARG             2
+           1364 JUMP_BACKWARD          603 (to 160)
+
+197     >> 1366 CLEANUP_THROW
+           1368 EXTENDED_ARG             2
+           1370 JUMP_BACKWARD          552 (to 268)
+        >> 1372 PUSH_EXC_INFO
+
+243        1374 LOAD_GLOBAL             38 (Exception)
+           1384 CHECK_EXC_MATCH
+           1386 POP_JUMP_IF_FALSE       41 (to 1470)
+           1388 STORE_FAST              18 (e)
+
+244        1390 LOAD_GLOBAL             15 (NULL + log)
+           1400 LOAD_ATTR               16 (info)
+           1420 LOAD_CONST              45 ('[news_import] lỗi tải ảnh ')
+           1422 LOAD_FAST               10 (url)
+           1424 LOAD_CONST               9 (None)
+           1426 LOAD_CONST              13 (80)
+           1428 BINARY_SLICE
+           1430 FORMAT_VALUE             0
+           1432 LOAD_CONST              22 (': ')
+           1434 LOAD_FAST               18 (e)
+           1436 FORMAT_VALUE             0
+           1438 BUILD_STRING             4
+           1440 CALL                     1
+           1448 POP_TOP
+
+245        1450 POP_EXCEPT
+           1452 LOAD_CONST               9 (None)
+           1454 STORE_FAST              18 (e)
+           1456 DELETE_FAST             18 (e)
+           1458 EXTENDED_ARG             2
+           1460 JUMP_BACKWARD          647 (to 168)
+        >> 1462 LOAD_CONST               9 (None)
+           1464 STORE_FAST              18 (e)
+           1466 DELETE_FAST             18 (e)
+           1468 RERAISE                  1
+
+243     >> 1470 RERAISE                  0
+        >> 1472 COPY                     3
+           1474 POP_EXCEPT
+           1476 RERAISE                  1
+
+187     >> 1478 CLEANUP_THROW
+           1480 JUMP_BACKWARD           84 (to 1314)
+        >> 1482 PUSH_EXC_INFO
+           1484 WITH_EXCEPT_START
+           1486 GET_AWAITABLE            2
+           1488 LOAD_CONST               9 (None)
+        >> 1490 SEND                     4 (to 1502)
+           1494 YIELD_VALUE              3
+           1496 RESUME                   3
+           1498 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1490)
+        >> 1500 CLEANUP_THROW
+        >> 1502 END_SEND
+           1504 POP_JUMP_IF_TRUE         1 (to 1508)
+           1506 RERAISE                  2
+        >> 1508 POP_TOP
+           1510 POP_EXCEPT
+           1512 POP_TOP
+           1514 POP_TOP
+           1516 JUMP_BACKWARD          100 (to 1318)
+        >> 1518 COPY                     3
+           1520 POP_EXCEPT
+           1522 RERAISE                  1
+        >> 1524 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1526 RERAISE                  1
+ExceptionTable:
+  4 to 152 -> 1524 [0] lasti
+  154 to 154 -> 1360 [3]
+  156 to 160 -> 1524 [0] lasti
+  162 to 218 -> 1482 [1] lasti
+  222 to 260 -> 1372 [2]
+  262 to 262 -> 1366 [4]
+  264 to 380 -> 1372 [2]
+  382 to 382 -> 1482 [1] lasti
+  384 to 568 -> 1372 [2]
+  570 to 570 -> 1482 [1] lasti
+  572 to 702 -> 1372 [2]
+  704 to 706 -> 1482 [1] lasti
+  708 to 802 -> 1372 [2]
+  804 to 806 -> 1482 [1] lasti
+  808 to 1278 -> 1372 [2]
+  1280 to 1284 -> 1482 [1] lasti
+  1286 to 1306 -> 1524 [0] lasti
+  1308 to 1308 -> 1478 [2]
+  1310 to 1360 -> 1524 [0] lasti
+  1366 to 1366 -> 1372 [2]
+  1372 to 1388 -> 1472 [3] lasti
+  1390 to 1448 -> 1462 [3] lasti
+  1450 to 1460 -> 1482 [1] lasti
+  1462 to 1470 -> 1472 [3] lasti
+  1472 to 1476 -> 1482 [1] lasti
+  1478 to 1478 -> 1524 [0] lasti
+  1482 to 1492 -> 1518 [3] lasti
+  1494 to 1494 -> 1500 [6]
+  1496 to 1508 -> 1518 [3] lasti
+  1510 to 1522 -> 1524 [0] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c92152d30, file "app\services\news_import_service.py", line 178>:
+178           0 RESUME                   0
+              2 LOAD_FAST                0 (im)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_CONST               1 ('caption')
+             26 CALL                     1
+             34 COPY                     1
+             36 POP_JUMP_IF_TRUE         2 (to 42)
+             38 POP_TOP
+             40 LOAD_CONST               2 ('')
+        >>   42 LOAD_ATTR                3 (NULL|self + strip)
+             62 CALL                     0
+             70 POP_JUMP_IF_FALSE        2 (to 76)
+             72 LOAD_CONST               3 (0)
+             74 JUMP_FORWARD             1 (to 78)
+        >>   76 LOAD_CONST               4 (1)
+
+179     >>   78 LOAD_FAST                0 (im)
+             80 LOAD_ATTR                1 (NULL|self + get)
+            100 LOAD_CONST               5 ('index')
+            102 LOAD_CONST               3 (0)
+            104 CALL                     2
+
+178         112 BUILD_TUPLE              2
+            114 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c927d47b0, file "app\services\news_import_service.py", line 247>:
+247           0 RESUME                   0
+              2 LOAD_FAST                0 (im)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_CONST               1 ('index')
+             26 LOAD_CONST               2 (0)
+             28 CALL                     2
+             36 RETURN_VALUE
+
+Disassembly of <code object _strip_html_to_text at 0x28ad6b60, file "app\services\news_import_service.py", line 279>:
+279           0 RESUME                   0
+
+281           2 LOAD_FAST                0 (html_content)
+              4 POP_JUMP_IF_TRUE         1 (to 8)
+
+282           6 RETURN_CONST             1 ('')
+
+284     >>    8 LOAD_GLOBAL              1 (NULL + re)
+             18 LOAD_ATTR                2 (sub)
+             38 LOAD_CONST               2 ('<figcaption[^>]*>(.*?)</figcaption>')
+             40 LOAD_CONST               3 ('\\n[Caption: \\1]\\n')
+             42 LOAD_FAST                0 (html_content)
+             44 LOAD_GLOBAL              0 (re)
+             54 LOAD_ATTR                4 (DOTALL)
+             74 KW_NAMES                 4 (('flags',))
+             76 CALL                     4
+             84 STORE_FAST               1 (text)
+
+285          86 LOAD_GLOBAL              1 (NULL + re)
+             96 LOAD_ATTR                2 (sub)
+            116 LOAD_CONST               5 ('<img[^>]*alt="([^"]*)"[^>]*/?\\s*>')
+            118 LOAD_CONST               6 ('\\n[Image: \\1]\\n')
+            120 LOAD_FAST                1 (text)
+            122 CALL                     3
+            130 STORE_FAST               1 (text)
+
+287         132 LOAD_GLOBAL              1 (NULL + re)
+            142 LOAD_ATTR                2 (sub)
+            162 LOAD_CONST               7 ('<h[1-6][^>]*>(.*?)</h[1-6]>')
+            164 LOAD_CONST               8 ('\\n## \\1\\n')
+            166 LOAD_FAST                1 (text)
+            168 LOAD_GLOBAL              0 (re)
+            178 LOAD_ATTR                4 (DOTALL)
+            198 KW_NAMES                 4 (('flags',))
+            200 CALL                     4
+            208 STORE_FAST               1 (text)
+
+289         210 LOAD_GLOBAL              1 (NULL + re)
+            220 LOAD_ATTR                2 (sub)
+            240 LOAD_CONST               9 ('</p>')
+            242 LOAD_CONST              10 ('\n')
+            244 LOAD_FAST                1 (text)
+            246 CALL                     3
+            254 STORE_FAST               1 (text)
+
+290         256 LOAD_GLOBAL              1 (NULL + re)
+            266 LOAD_ATTR                2 (sub)
+            286 LOAD_CONST              11 ('<br\\s*/?>')
+            288 LOAD_CONST              10 ('\n')
+            290 LOAD_FAST                1 (text)
+            292 CALL                     3
+            300 STORE_FAST               1 (text)
+
+292         302 LOAD_GLOBAL              1 (NULL + re)
+            312 LOAD_ATTR                2 (sub)
+            332 LOAD_CONST              12 ('<[^>]+>')
+            334 LOAD_CONST               1 ('')
+            336 LOAD_FAST                1 (text)
+            338 CALL                     3
+            346 STORE_FAST               1 (text)
+
+294         348 LOAD_GLOBAL              1 (NULL + re)
+            358 LOAD_ATTR                2 (sub)
+            378 LOAD_CONST              13 ('\\n{3,}')
+            380 LOAD_CONST              14 ('\n\n')
+            382 LOAD_FAST                1 (text)
+            384 CALL                     3
+            392 LOAD_ATTR                7 (NULL|self + strip)
+            412 CALL                     0
+            420 STORE_FAST               1 (text)
+
+295         422 LOAD_FAST                1 (text)
+            424 RETURN_VALUE
+
+Disassembly of <code object _build_news_idea_prompt at 0x28d887d0, file "app\services\news_import_service.py", line 298>:
+298           0 RESUME                   0
+
+313           2 LOAD_FAST                0 (engine)
+              4 LOAD_ATTR                0 (body)
+             24 STORE_FAST               9 (system)
+
+315          26 BUILD_LIST               0
+             28 STORE_FAST              10 (parts)
+
+318          30 LOAD_FAST               10 (parts)
+             32 LOAD_ATTR                3 (NULL|self + append)
+
+319          52 LOAD_CONST               1 ("TASK: Read the SOURCE NEWS ARTICLE below and create exactly ONE video idea for this channel. Transform the article into a compelling video concept that follows this channel's FORMAT, VISUAL STYLE, and NARRATION VOICE from the Channel Knowledge Base above.\n\nIMPORTANT RULES:\n- Do NOT simply copy/summarize the article. TRANSFORM it into an engaging video concept.\n- The title must be SEO-optimized and click-worthy for the channel's target audience.\n- The hook must grab attention in the first 3 seconds.\n- Characters should be designed for the article's key figures/subjects.\n- The outline should structure the story for maximum viewer retention.\n")
+
+318          54 CALL                     1
+             62 POP_TOP
+
+331          64 LOAD_FAST                5 (profile)
+             66 POP_JUMP_IF_FALSE       89 (to 246)
+
+332          68 LOAD_FAST               10 (parts)
+             70 LOAD_ATTR                3 (NULL|self + append)
+             90 LOAD_GLOBAL              5 (NULL + format_channel_override)
+
+333         100 LOAD_FAST                5 (profile)
+            102 LOAD_ATTR                7 (NULL|self + get)
+            122 LOAD_CONST               2 ('niche')
+            124 CALL                     1
+            132 LOAD_FAST                5 (profile)
+            134 LOAD_ATTR                7 (NULL|self + get)
+            154 LOAD_CONST               3 ('channel_brief')
+            156 CALL                     1
+
+334         164 LOAD_FAST                5 (profile)
+            166 LOAD_ATTR                7 (NULL|self + get)
+            186 LOAD_CONST               4 ('channel_orientation')
+            188 CALL                     1
+            196 LOAD_FAST                5 (profile)
+            198 LOAD_ATTR                7 (NULL|self + get)
+            218 LOAD_CONST               5 ('niche_angle')
+            220 CALL                     1
+
+332         228 CALL                     4
+            236 CALL                     1
+            244 POP_TOP
+
+338     >>  246 LOAD_FAST               10 (parts)
+            248 LOAD_ATTR                3 (NULL|self + append)
+            268 LOAD_CONST               6 ('\n\n')
+            270 LOAD_GLOBAL              8 (ENGAGEMENT_NOTE)
+            280 BINARY_OP                0 (+)
+            284 CALL                     1
+            292 POP_TOP
+
+339         294 LOAD_FAST               10 (parts)
+            296 LOAD_ATTR                3 (NULL|self + append)
+            316 LOAD_CONST               6 ('\n\n')
+            318 LOAD_GLOBAL             10 (ANTI_SLOP_NOTE)
+            328 BINARY_OP                0 (+)
+            332 CALL                     1
+            340 POP_TOP
+
+342         342 LOAD_FAST                8 (video_format)
+            344 POP_JUMP_IF_FALSE       40 (to 426)
+
+343         346 LOAD_FAST                8 (video_format)
+            348 LOAD_ATTR               12 (key)
+            368 LOAD_CONST               7 ('short')
+            370 COMPARE_OP              40 (==)
+            374 POP_JUMP_IF_FALSE        2 (to 380)
+            376 LOAD_CONST               8 ('SHORT vertical video (9:16, ~60-90 seconds)')
+            378 JUMP_FORWARD             1 (to 382)
+        >>  380 LOAD_CONST               9 ('LONG horizontal video (16:9, ~7-12 minutes)')
+        >>  382 STORE_FAST              11 (fmt_label)
+
+344         384 LOAD_FAST               10 (parts)
+            386 LOAD_ATTR                3 (NULL|self + append)
+            406 LOAD_CONST              10 ('\nVIDEO FORMAT: ')
+            408 LOAD_FAST               11 (fmt_label)
+            410 FORMAT_VALUE             0
+            412 LOAD_CONST              11 ('. The outline and est_duration_sec MUST match this format.\n')
+            414 BUILD_STRING             3
+            416 CALL                     1
+            424 POP_TOP
+
+347     >>  426 LOAD_FAST               10 (parts)
+            428 LOAD_ATTR                3 (NULL|self + append)
+
+348         448 LOAD_CONST              12 ('\n\n━━━ SOURCE NEWS ARTICLE (base your video idea on this) ━━━\nTitle: ')
+
+349         450 LOAD_FAST                2 (article_title)
+            452 FORMAT_VALUE             0
+            454 LOAD_CONST              13 ('\nURL: ')
+
+350         456 LOAD_FAST                3 (article_url)
+            458 FORMAT_VALUE             0
+            460 LOAD_CONST               6 ('\n\n')
+
+351         462 LOAD_FAST                1 (article_text)
+            464 FORMAT_VALUE             0
+            466 LOAD_CONST              14 ('\n━━━ END OF ARTICLE ━━━\n')
+
+348         468 BUILD_STRING             7
+
+347         470 CALL                     1
+            478 POP_TOP
+
+356         480 LOAD_FAST                7 (existing_titles)
+            482 COPY                     1
+            484 POP_JUMP_IF_TRUE         2 (to 490)
+            486 POP_TOP
+            488 BUILD_LIST               0
+        >>  490 GET_ITER
+            492 LOAD_FAST_AND_CLEAR     12 (t)
+            494 SWAP                     2
+            496 BUILD_LIST               0
+            498 SWAP                     2
+        >>  500 FOR_ITER                 7 (to 518)
+            504 STORE_FAST              12 (t)
+            506 LOAD_FAST               12 (t)
+            508 POP_JUMP_IF_TRUE         1 (to 512)
+            510 JUMP_BACKWARD            6 (to 500)
+        >>  512 LOAD_FAST               12 (t)
+            514 LIST_APPEND              2
+            516 JUMP_BACKWARD            9 (to 500)
+        >>  518 END_FOR
+            520 STORE_FAST              13 (titles)
+            522 STORE_FAST              12 (t)
+
+357         524 LOAD_FAST               13 (titles)
+            526 POP_JUMP_IF_FALSE       50 (to 628)
+
+358         528 LOAD_CONST              15 ('\n')
+            530 LOAD_ATTR               15 (NULL|self + join)
+            550 LOAD_CONST              16 (<code object <genexpr> at 0x7f6c927d5200, file "app\services\news_import_service.py", line 358>)
+            552 MAKE_FUNCTION            0
+            554 LOAD_FAST               13 (titles)
+            556 LOAD_CONST              17 (None)
+            558 LOAD_CONST              18 (30)
+            560 BINARY_SLICE
+            562 GET_ITER
+            564 CALL                     0
+            572 CALL                     1
+            580 STORE_FAST              14 (lines)
+
+359         582 LOAD_FAST               10 (parts)
+            584 LOAD_ATTR                3 (NULL|self + append)
+
+360         604 LOAD_CONST              19 ('\nEXISTING IDEAS ON THIS CHANNEL (your new idea MUST be different from all of these):\n')
+
+361         606 LOAD_FAST               14 (lines)
+
+360         608 BINARY_OP                0 (+)
+
+361         612 LOAD_CONST               6 ('\n\n')
+
+360         614 BINARY_OP                0 (+)
+
+359         618 CALL                     1
+            626 POP_TOP
+
+365     >>  628 LOAD_CONST              20 (0)
+            630 LOAD_CONST              21 (('_lang_name',))
+            632 IMPORT_NAME              8 (app.adapters.deepseek)
+            634 IMPORT_FROM              9 (_lang_name)
+            636 STORE_FAST              15 (_lang_name)
+            638 POP_TOP
+
+366         640 LOAD_FAST                4 (language)
+            642 COPY                     1
+            644 POP_JUMP_IF_TRUE         2 (to 650)
+            646 POP_TOP
+            648 LOAD_CONST              22 ('vi')
+        >>  650 LOAD_ATTR               21 (NULL|self + strip)
+            670 CALL                     0
+            678 STORE_FAST              16 (lang_code)
+
+367         680 PUSH_NULL
+            682 LOAD_FAST               15 (_lang_name)
+            684 LOAD_FAST               16 (lang_code)
+            686 CALL                     1
+            694 STORE_FAST              17 (lang_full)
+
+368         696 LOAD_FAST               10 (parts)
+            698 LOAD_ATTR                3 (NULL|self + append)
+
+369         718 LOAD_CONST              23 ('\n━━━ OUTPUT LANGUAGE (STRICT) ━━━\nThe channel language is ')
+
+370         720 LOAD_FAST               17 (lang_full)
+            722 FORMAT_VALUE             0
+            724 LOAD_CONST              24 (" (code '")
+            726 LOAD_FAST               16 (lang_code)
+            728 FORMAT_VALUE             0
+            730 LOAD_CONST              25 ("'). Write these fields ENTIRELY in ")
+
+371         732 LOAD_FAST               17 (lang_full)
+            734 FORMAT_VALUE             0
+            736 LOAD_CONST              26 (': title, hook, angle, EVERY item of outline, thumbnail_concept, thumbnail_text, series_link, rationale.\nWrite thumbnail_prompt and character descriptions in ')
+
+373         738 LOAD_FAST               17 (lang_full)
+            740 FORMAT_VALUE             0
+            742 LOAD_CONST              27 ('.\n')
+
+369         744 BUILD_STRING             9
+
+368         746 CALL                     1
+            754 POP_TOP
+
+377         756 LOAD_FAST                4 (language)
+            758 COPY                     1
+            760 POP_JUMP_IF_TRUE         2 (to 766)
+            762 POP_TOP
+            764 LOAD_CONST              28 ('')
+        >>  766 LOAD_ATTR               23 (NULL|self + lower)
+            786 CALL                     0
+            794 LOAD_ATTR               25 (NULL|self + startswith)
+            814 LOAD_CONST              22 ('vi')
+            816 CALL                     1
+            824 STORE_FAST              18 (is_vi)
+
+378         826 LOAD_GLOBAL             27 (NULL + str)
+            836 LOAD_FAST               18 (is_vi)
+            838 POP_JUMP_IF_FALSE       27 (to 894)
+            840 LOAD_FAST                0 (engine)
+            842 LOAD_ATTR               28 (meta)
+            862 LOAD_ATTR                7 (NULL|self + get)
+            882 LOAD_CONST              29 ('style_anchor_vi')
+            884 CALL                     1
+            892 JUMP_FORWARD             1 (to 896)
+        >>  894 LOAD_CONST              28 ('')
+        >>  896 CALL                     1
+            904 LOAD_ATTR               21 (NULL|self + strip)
+            924 CALL                     0
+            932 COPY                     1
+            934 POP_JUMP_IF_TRUE        54 (to 1044)
+            936 POP_TOP
+            938 LOAD_GLOBAL             27 (NULL + str)
+            948 LOAD_FAST                0 (engine)
+            950 LOAD_ATTR               28 (meta)
+            970 LOAD_ATTR                7 (NULL|self + get)
+            990 LOAD_CONST              30 ('style_anchor')
+            992 CALL                     1
+           1000 COPY                     1
+           1002 POP_JUMP_IF_TRUE         2 (to 1008)
+           1004 POP_TOP
+           1006 LOAD_CONST              28 ('')
+        >> 1008 CALL                     1
+           1016 LOAD_ATTR               21 (NULL|self + strip)
+           1036 CALL                     0
+        >> 1044 STORE_FAST              19 (anchor)
+
+379        1046 LOAD_GLOBAL             27 (NULL + str)
+           1056 LOAD_FAST               18 (is_vi)
+           1058 POP_JUMP_IF_FALSE       27 (to 1114)
+           1060 LOAD_FAST                0 (engine)
+           1062 LOAD_ATTR               28 (meta)
+           1082 LOAD_ATTR                7 (NULL|self + get)
+           1102 LOAD_CONST              31 ('style_lock_vi')
+           1104 CALL                     1
+           1112 JUMP_FORWARD             1 (to 1116)
+        >> 1114 LOAD_CONST              28 ('')
+        >> 1116 CALL                     1
+           1124 LOAD_ATTR               21 (NULL|self + strip)
+           1144 CALL                     0
+           1152 COPY                     1
+           1154 POP_JUMP_IF_TRUE        54 (to 1264)
+           1156 POP_TOP
+           1158 LOAD_GLOBAL             27 (NULL + str)
+           1168 LOAD_FAST                0 (engine)
+           1170 LOAD_ATTR               28 (meta)
+           1190 LOAD_ATTR                7 (NULL|self + get)
+           1210 LOAD_CONST              32 ('style_lock')
+           1212 CALL                     1
+           1220 COPY                     1
+           1222 POP_JUMP_IF_TRUE         2 (to 1228)
+           1224 POP_TOP
+           1226 LOAD_CONST              28 ('')
+        >> 1228 CALL                     1
+           1236 LOAD_ATTR               21 (NULL|self + strip)
+           1256 CALL                     0
+        >> 1264 STORE_FAST              20 (lock)
+
+380        1266 LOAD_FAST                0 (engine)
+           1268 LOAD_ATTR               28 (meta)
+           1288 LOAD_ATTR                7 (NULL|self + get)
+           1308 LOAD_CONST              33 ('visual_style')
+           1310 CALL                     1
+           1318 COPY                     1
+           1320 POP_JUMP_IF_TRUE         2 (to 1326)
+           1322 POP_TOP
+           1324 LOAD_CONST              28 ('')
+        >> 1326 LOAD_ATTR               21 (NULL|self + strip)
+           1346 CALL                     0
+           1354 STORE_FAST              21 (visual)
+
+381        1356 LOAD_GLOBAL             31 (NULL + channel_engines)
+           1366 LOAD_ATTR               32 (cast_policy)
+           1386 LOAD_FAST                0 (engine)
+           1388 CALL                     1
+           1396 STORE_FAST              22 (policy)
+
+382        1398 LOAD_FAST               10 (parts)
+           1400 LOAD_ATTR                3 (NULL|self + append)
+
+383        1420 LOAD_CONST              34 ("\nDesign the episode's VISUAL IDENTITY:\n- Channel visual style: ")
+
+384        1422 LOAD_FAST               21 (visual)
+           1424 FORMAT_VALUE             0
+           1426 LOAD_CONST              27 ('.\n')
+
+383        1428 BUILD_STRING             3
+
+385        1430 LOAD_FAST               19 (anchor)
+           1432 POP_JUMP_IF_FALSE        6 (to 1446)
+           1434 LOAD_CONST              35 ('- Begin every image prompt with: "')
+           1436 LOAD_FAST               19 (anchor)
+           1438 FORMAT_VALUE             0
+           1440 LOAD_CONST              36 ('"\n')
+           1442 BUILD_STRING             3
+           1444 JUMP_FORWARD             1 (to 1448)
+        >> 1446 LOAD_CONST              28 ('')
+
+383     >> 1448 BINARY_OP                0 (+)
+
+386        1452 LOAD_FAST               20 (lock)
+           1454 POP_JUMP_IF_FALSE        6 (to 1468)
+           1456 LOAD_CONST              37 ('- End every image prompt with: "')
+           1458 LOAD_FAST               20 (lock)
+           1460 FORMAT_VALUE             0
+           1462 LOAD_CONST              36 ('"\n')
+           1464 BUILD_STRING             3
+           1466 JUMP_FORWARD             1 (to 1470)
+        >> 1468 LOAD_CONST              28 ('')
+
+383     >> 1470 BINARY_OP                0 (+)
+
+387        1474 LOAD_CONST              38 ('- characters: include only meaningful cast (target ')
+           1476 LOAD_FAST               22 (policy)
+           1478 LOAD_CONST              39 ('min')
+           1480 BINARY_SUBSCR
+           1484 FORMAT_VALUE             0
+           1486 LOAD_CONST              40 ('–')
+
+388        1488 LOAD_FAST               22 (policy)
+           1490 LOAD_CONST              41 ('recommended_max')
+           1492 BINARY_SUBSCR
+           1496 FORMAT_VALUE             0
+           1498 LOAD_CONST              42 (', hard maximum ')
+           1500 LOAD_FAST               22 (policy)
+           1502 LOAD_CONST              43 ('hard_max')
+           1504 BINARY_SUBSCR
+           1508 FORMAT_VALUE             0
+           1510 LOAD_CONST              44 ('). Each = a short stable NAME + a DETAILED visual description in ')
+
+389        1512 LOAD_FAST               17 (lang_full)
+           1514 FORMAT_VALUE             0
+           1516 LOAD_CONST              45 ('.\n- thumbnail_prompt: one detailed image prompt in ')
+
+390        1518 LOAD_FAST               17 (lang_full)
+           1520 FORMAT_VALUE             0
+           1522 LOAD_CONST              46 (' for a click-stopping thumbnail.\n')
+
+387        1524 BUILD_STRING            11
+
+383        1526 BINARY_OP                0 (+)
+
+382        1530 CALL                     1
+           1538 POP_TOP
+
+394        1540 LOAD_FAST               10 (parts)
+           1542 LOAD_ATTR                3 (NULL|self + append)
+
+395        1562 LOAD_CONST              47 ('\nReturn ONLY a single JSON object (no markdown fences, no prose before or after), with exactly these keys:\n')
+
+396        1564 LOAD_GLOBAL             34 (_NEWS_IDEA_JSON_SPEC)
+
+395        1574 BINARY_OP                0 (+)
+
+394        1578 CALL                     1
+           1586 POP_TOP
+
+399        1588 LOAD_FAST                9 (system)
+           1590 LOAD_CONST              28 ('')
+           1592 LOAD_ATTR               15 (NULL|self + join)
+           1612 LOAD_FAST               10 (parts)
+           1614 CALL                     1
+           1622 BUILD_TUPLE              2
+           1624 RETURN_VALUE
+        >> 1626 SWAP                     2
+           1628 POP_TOP
+
+356        1630 SWAP                     2
+           1632 STORE_FAST              12 (t)
+           1634 RERAISE                  0
+ExceptionTable:
+  496 to 508 -> 1626 [2]
+  512 to 518 -> 1626 [2]
+
+Disassembly of <code object <genexpr> at 0x7f6c927d5200, file "app\services\news_import_service.py", line 358>:
+358           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                 9 (to 30)
+             12 STORE_FAST               1 (t)
+             14 LOAD_CONST               0 ('  - ')
+             16 LOAD_FAST                1 (t)
+             18 FORMAT_VALUE             0
+             20 BUILD_STRING             2
+             22 YIELD_VALUE              1
+             24 RESUME                   1
+             26 POP_TOP
+             28 JUMP_BACKWARD           11 (to 8)
+        >>   30 END_FOR
+             32 RETURN_CONST             1 (None)
+        >>   34 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             36 RERAISE                  1
+ExceptionTable:
+  4 to 32 -> 34 [0] lasti
+
+Disassembly of <code object import_article_to_channel at 0x28c39440, file "app\services\news_import_service.py", line 402>:
+              0 MAKE_CELL                3 (progress)
+              2 MAKE_CELL                4 (cancel_check)
+
+402           4 RETURN_GENERATOR
+              6 POP_TOP
+              8 RESUME                   0
+
+418          10 LOAD_GLOBAL              1 (NULL + vfmt)
+             20 LOAD_ATTR                2 (resolve)
+             40 LOAD_FAST                2 (video_format_str)
+             42 CALL                     1
+             50 STORE_FAST               5 (fmt)
+
+420          52 LOAD_CONST             100 (('percent', 'float', 'return', 'None'))
+             54 LOAD_CLOSURE             4 (cancel_check)
+             56 LOAD_CLOSURE             3 (progress)
+             58 BUILD_TUPLE              2
+             60 LOAD_CONST               1 (<code object checkpoint at 0x7f6c922184f0, file "app\services\news_import_service.py", line 420>)
+             62 MAKE_FUNCTION           12 (annotations, closure)
+             64 STORE_FAST               6 (checkpoint)
+
+426          66 PUSH_NULL
+             68 LOAD_FAST                6 (checkpoint)
+             70 LOAD_CONST               2 (12)
+             72 CALL                     1
+             80 POP_TOP
+
+429          82 LOAD_GLOBAL              5 (NULL + SessionLocal)
+             92 CALL                     0
+            100 BEFORE_WITH
+            102 STORE_FAST               7 (db)
+
+430         104 LOAD_FAST                7 (db)
+            106 LOAD_ATTR                7 (NULL|self + get)
+            126 LOAD_GLOBAL              8 (NewsArticle)
+            136 LOAD_FAST                0 (article_id)
+            138 CALL                     2
+            146 STORE_FAST               8 (article)
+
+431         148 LOAD_FAST                8 (article)
+            150 POP_JUMP_IF_NOT_NONE    28 (to 208)
+
+432         152 LOAD_GLOBAL             11 (NULL + StudioError)
+            162 LOAD_GLOBAL             12 (E)
+            172 LOAD_ATTR               14 (UNKNOWN)
+            192 LOAD_CONST               4 ('Bài báo không tồn tại.')
+            194 LOAD_CONST               5 (404)
+            196 KW_NAMES                 6 (('status_code',))
+            198 CALL                     3
+            206 RAISE_VARARGS            1
+
+435     >>  208 LOAD_FAST                8 (article)
+            210 LOAD_ATTR               16 (full_text)
+            230 POP_JUMP_IF_FALSE       28 (to 288)
+            232 LOAD_CONST               7 ('<p>')
+            234 LOAD_FAST                8 (article)
+            236 LOAD_ATTR               16 (full_text)
+            256 CONTAINS_OP              1
+            258 POP_JUMP_IF_FALSE       90 (to 440)
+            260 LOAD_CONST               8 ('<figure>')
+            262 LOAD_FAST                8 (article)
+            264 LOAD_ATTR               16 (full_text)
+            284 CONTAINS_OP              1
+            286 POP_JUMP_IF_FALSE       76 (to 440)
+
+436     >>  288 LOAD_CONST               9 (0)
+            290 LOAD_CONST              10 (('read_article',))
+            292 IMPORT_NAME              9 (app.services.news_crawler_service)
+            294 IMPORT_FROM             10 (read_article)
+            296 STORE_FAST               9 (read_article)
+            298 POP_TOP
+
+437         300 PUSH_NULL
+            302 LOAD_FAST                9 (read_article)
+            304 LOAD_FAST                7 (db)
+            306 LOAD_FAST                0 (article_id)
+            308 CALL                     2
+            316 GET_AWAITABLE            0
+            318 LOAD_CONST               3 (None)
+        >>  320 SEND                     3 (to 330)
+            324 YIELD_VALUE              3
+            326 RESUME                   3
+            328 JUMP_BACKWARD_NO_INTERRUPT     5 (to 320)
+        >>  330 END_SEND
+            332 STORE_FAST              10 (result)
+
+438         334 LOAD_FAST               10 (result)
+            336 POP_JUMP_IF_FALSE       17 (to 372)
+            338 LOAD_FAST               10 (result)
+            340 LOAD_ATTR                7 (NULL|self + get)
+            360 LOAD_CONST              11 ('full_text')
+            362 CALL                     1
+            370 POP_JUMP_IF_TRUE        28 (to 428)
+
+439     >>  372 LOAD_GLOBAL             11 (NULL + StudioError)
+
+440         382 LOAD_GLOBAL             12 (E)
+            392 LOAD_ATTR               14 (UNKNOWN)
+
+441         412 LOAD_CONST              12 ('Không đọc được nội dung bài báo. Hãy thử lại sau.')
+
+442         414 LOAD_CONST              13 (422)
+
+439         416 KW_NAMES                 6 (('status_code',))
+            418 CALL                     3
+            426 RAISE_VARARGS            1
+
+444     >>  428 LOAD_FAST               10 (result)
+            430 LOAD_CONST              11 ('full_text')
+            432 BINARY_SUBSCR
+            436 STORE_FAST              11 (article_text_html)
+            438 JUMP_FORWARD            12 (to 464)
+
+446     >>  440 LOAD_FAST                8 (article)
+            442 LOAD_ATTR               16 (full_text)
+            462 STORE_FAST              11 (article_text_html)
+
+448     >>  464 LOAD_FAST                8 (article)
+            466 LOAD_ATTR               22 (title_origin)
+            486 COPY                     1
+            488 POP_JUMP_IF_TRUE         2 (to 494)
+            490 POP_TOP
+            492 LOAD_CONST              14 ('')
+        >>  494 STORE_FAST              12 (article_title)
+
+449         496 LOAD_FAST                8 (article)
+            498 LOAD_ATTR               24 (url)
+            518 COPY                     1
+            520 POP_JUMP_IF_TRUE         2 (to 526)
+            522 POP_TOP
+            524 LOAD_CONST              14 ('')
+        >>  526 STORE_FAST              13 (article_url)
+
+450         528 LOAD_FAST                8 (article)
+            530 LOAD_ATTR               26 (source)
+            550 COPY                     1
+            552 POP_JUMP_IF_TRUE         2 (to 558)
+            554 POP_TOP
+            556 LOAD_CONST              14 ('')
+        >>  558 STORE_FAST              14 (article_source)
+
+453         560 LOAD_GLOBAL             29 (NULL + svc)
+            570 LOAD_ATTR               30 (get_or_create_config)
+            590 LOAD_FAST                7 (db)
+            592 LOAD_FAST                1 (project_id)
+            594 CALL                     2
+            602 STORE_FAST              15 (cfg)
+
+454         604 LOAD_FAST               15 (cfg)
+            606 LOAD_ATTR               32 (engine_id)
+            626 POP_JUMP_IF_TRUE        28 (to 684)
+
+455         628 LOAD_GLOBAL             11 (NULL + StudioError)
+
+456         638 LOAD_GLOBAL             12 (E)
+            648 LOAD_ATTR               14 (UNKNOWN)
+
+457         668 LOAD_CONST              15 ("Kênh chưa chọn 'kiểu video' (channel engine). Hãy chọn engine trước.")
+
+458         670 LOAD_CONST              13 (422)
+
+455         672 KW_NAMES                 6 (('status_code',))
+            674 CALL                     3
+            682 RAISE_VARARGS            1
+
+460     >>  684 LOAD_GLOBAL             35 (NULL + channel_engines)
+            694 LOAD_ATTR               36 (get_engine)
+            714 LOAD_FAST               15 (cfg)
+            716 LOAD_ATTR               32 (engine_id)
+            736 CALL                     1
+            744 STORE_FAST              16 (engine)
+
+461         746 LOAD_FAST               16 (engine)
+            748 POP_JUMP_IF_NOT_NONE    42 (to 834)
+
+462         750 LOAD_GLOBAL             11 (NULL + StudioError)
+            760 LOAD_GLOBAL             12 (E)
+            770 LOAD_ATTR               14 (UNKNOWN)
+            790 LOAD_CONST              16 ("Engine '")
+            792 LOAD_FAST               15 (cfg)
+            794 LOAD_ATTR               32 (engine_id)
+            814 FORMAT_VALUE             0
+            816 LOAD_CONST              17 ("' không tồn tại")
+            818 BUILD_STRING             3
+            820 LOAD_CONST              13 (422)
+            822 KW_NAMES                 6 (('status_code',))
+            824 CALL                     3
+            832 RAISE_VARARGS            1
+
+463     >>  834 LOAD_FAST               16 (engine)
+            836 LOAD_ATTR               38 (body)
+            856 POP_JUMP_IF_FALSE       26 (to 910)
+            858 LOAD_FAST               16 (engine)
+            860 LOAD_ATTR               38 (body)
+            880 LOAD_ATTR               41 (NULL|self + strip)
+            900 CALL                     0
+            908 POP_JUMP_IF_TRUE        28 (to 966)
+
+464     >>  910 LOAD_GLOBAL             11 (NULL + StudioError)
+            920 LOAD_GLOBAL             12 (E)
+            930 LOAD_ATTR               14 (UNKNOWN)
+            950 LOAD_CONST              18 ('Bạn không có quyền sử dụng kiểu kênh này.')
+            952 LOAD_CONST              19 (403)
+            954 KW_NAMES                 6 (('status_code',))
+            956 CALL                     3
+            964 RAISE_VARARGS            1
+
+466     >>  966 LOAD_FAST               15 (cfg)
+            968 LOAD_ATTR               42 (language)
+            988 COPY                     1
+            990 POP_JUMP_IF_TRUE         2 (to 996)
+            992 POP_TOP
+            994 LOAD_CONST              20 ('vi')
+        >>  996 STORE_FAST              17 (language)
+
+467         998 LOAD_FAST               15 (cfg)
+           1000 LOAD_ATTR               44 (channel_profile_json)
+           1020 POP_JUMP_IF_FALSE       31 (to 1084)
+           1022 LOAD_GLOBAL             47 (NULL + json)
+           1032 LOAD_ATTR               48 (loads)
+           1052 LOAD_FAST               15 (cfg)
+           1054 LOAD_ATTR               44 (channel_profile_json)
+           1074 CALL                     1
+           1082 JUMP_FORWARD             1 (to 1086)
+        >> 1084 BUILD_MAP                0
+        >> 1086 STORE_FAST              18 (profile)
+
+470        1088 LOAD_GLOBAL             29 (NULL + svc)
+           1098 LOAD_ATTR               50 (_all_titles)
+           1118 LOAD_FAST                7 (db)
+           1120 LOAD_FAST                1 (project_id)
+           1122 CALL                     2
+           1130 STORE_FAST              19 (existing_titles)
+
+429        1132 LOAD_CONST               3 (None)
+           1134 LOAD_CONST               3 (None)
+           1136 LOAD_CONST               3 (None)
+           1138 CALL                     2
+           1146 POP_TOP
+
+473     >> 1148 LOAD_GLOBAL             53 (NULL + _extract_images_from_html)
+           1158 LOAD_FAST_CHECK         11 (article_text_html)
+           1160 CALL                     1
+           1168 STORE_FAST              20 (raw_images)
+
+474        1170 LOAD_GLOBAL             55 (NULL + log)
+           1180 LOAD_ATTR               56 (info)
+           1200 LOAD_CONST              21 ("[news_import] bài báo '")
+           1202 LOAD_FAST_CHECK         12 (article_title)
+           1204 LOAD_CONST               3 (None)
+           1206 LOAD_CONST              22 (40)
+           1208 BINARY_SLICE
+           1210 FORMAT_VALUE             0
+           1212 LOAD_CONST              23 ("': tìm thấy ")
+           1214 LOAD_GLOBAL             59 (NULL + len)
+           1224 LOAD_FAST               20 (raw_images)
+           1226 CALL                     1
+           1234 FORMAT_VALUE             0
+           1236 LOAD_CONST              24 (' ảnh trong HTML')
+           1238 BUILD_STRING             5
+           1240 CALL                     1
+           1248 POP_TOP
+
+477        1250 LOAD_GLOBAL             61 (NULL + _strip_html_to_text)
+           1260 LOAD_FAST               11 (article_text_html)
+           1262 CALL                     1
+           1270 STORE_FAST              21 (article_text)
+
+478        1272 LOAD_FAST               21 (article_text)
+           1274 POP_JUMP_IF_FALSE       14 (to 1304)
+           1276 LOAD_GLOBAL             59 (NULL + len)
+           1286 LOAD_FAST               21 (article_text)
+           1288 CALL                     1
+           1296 LOAD_CONST              25 (50)
+           1298 COMPARE_OP               2 (<)
+           1302 POP_JUMP_IF_FALSE       28 (to 1360)
+
+479     >> 1304 LOAD_GLOBAL             11 (NULL + StudioError)
+
+480        1314 LOAD_GLOBAL             12 (E)
+           1324 LOAD_ATTR               14 (UNKNOWN)
+
+481        1344 LOAD_CONST              26 ('Nội dung bài báo quá ngắn để tạo ý tưởng video.')
+
+482        1346 LOAD_CONST              13 (422)
+
+479        1348 KW_NAMES                 6 (('status_code',))
+           1350 CALL                     3
+           1358 RAISE_VARARGS            1
+
+485     >> 1360 LOAD_GLOBAL             59 (NULL + len)
+           1370 LOAD_FAST               21 (article_text)
+           1372 CALL                     1
+           1380 LOAD_CONST              27 (12000)
+           1382 COMPARE_OP              68 (>)
+           1386 POP_JUMP_IF_FALSE        8 (to 1404)
+
+486        1388 LOAD_FAST               21 (article_text)
+           1390 LOAD_CONST               3 (None)
+           1392 LOAD_CONST              27 (12000)
+           1394 BINARY_SLICE
+           1396 LOAD_CONST              28 ('\n\n[... article truncated for length ...]')
+           1398 BINARY_OP                0 (+)
+           1402 STORE_FAST              21 (article_text)
+
+489     >> 1404 PUSH_NULL
+           1406 LOAD_FAST                6 (checkpoint)
+           1408 LOAD_CONST              29 (25)
+           1410 CALL                     1
+           1418 POP_TOP
+
+490        1420 LOAD_GLOBAL             63 (NULL + _build_news_idea_prompt)
+
+491        1430 LOAD_FAST_CHECK         16 (engine)
+
+492        1432 LOAD_FAST               21 (article_text)
+
+493        1434 LOAD_FAST               12 (article_title)
+
+494        1436 LOAD_FAST_CHECK         13 (article_url)
+
+495        1438 LOAD_FAST_CHECK         17 (language)
+
+496        1440 LOAD_FAST_CHECK         18 (profile)
+
+497        1442 LOAD_CONST               3 (None)
+
+498        1444 LOAD_FAST_CHECK         19 (existing_titles)
+
+499        1446 LOAD_FAST                5 (fmt)
+
+490        1448 KW_NAMES                30 (('article_text', 'article_title', 'article_url', 'language', 'profile', 'recent_titles', 'existing_titles', 'video_format'))
+           1450 CALL                     9
+           1458 UNPACK_SEQUENCE          2
+           1462 STORE_FAST              22 (system)
+           1464 STORE_FAST              23 (user)
+
+501        1466 LOAD_FAST               18 (profile)
+           1468 LOAD_ATTR                7 (NULL|self + get)
+           1488 LOAD_CONST              31 ('provider')
+           1490 CALL                     1
+           1498 COPY                     1
+           1500 POP_JUMP_IF_TRUE         2 (to 1506)
+           1502 POP_TOP
+           1504 LOAD_CONST               3 (None)
+        >> 1506 STORE_FAST              24 (provider)
+
+503        1508 LOAD_CONST               3 (None)
+           1510 STORE_FAST              25 (obj)
+
+504        1512 LOAD_GLOBAL             65 (NULL + range)
+           1522 LOAD_CONST              32 (2)
+           1524 CALL                     1
+           1532 GET_ITER
+        >> 1534 FOR_ITER               100 (to 1738)
+           1538 STORE_FAST              26 (attempt)
+
+505        1540 LOAD_FAST               26 (attempt)
+           1542 LOAD_CONST               9 (0)
+           1544 COMPARE_OP              40 (==)
+           1548 POP_JUMP_IF_FALSE       24 (to 1598)
+
+506        1550 LOAD_GLOBAL             67 (NULL + complete_text)
+           1560 LOAD_FAST               22 (system)
+           1562 LOAD_FAST               23 (user)
+           1564 LOAD_CONST              33 (0.7)
+           1566 LOAD_FAST               24 (provider)
+           1568 KW_NAMES                34 (('temperature', 'provider'))
+           1570 CALL                     4
+           1578 GET_AWAITABLE            0
+           1580 LOAD_CONST               3 (None)
+        >> 1582 SEND                     3 (to 1592)
+           1586 YIELD_VALUE              2
+           1588 RESUME                   3
+           1590 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1582)
+        >> 1592 END_SEND
+           1594 STORE_FAST              27 (raw)
+           1596 JUMP_FORWARD            56 (to 1710)
+
+509     >> 1598 LOAD_GLOBAL             55 (NULL + log)
+           1608 LOAD_ATTR               56 (info)
+           1628 LOAD_CONST              35 ('[news_import] retry lần ')
+           1630 LOAD_FAST               26 (attempt)
+           1632 LOAD_CONST              36 (1)
+           1634 BINARY_OP                0 (+)
+           1638 FORMAT_VALUE             0
+           1640 LOAD_CONST              37 (' — gửi lại prompt JSON cứng hơn')
+           1642 BUILD_STRING             3
+           1644 CALL                     1
+           1652 POP_TOP
+
+511        1654 LOAD_FAST               23 (user)
+           1656 LOAD_CONST              38 ('\n\n⚠️ CRITICAL: Your previous response was NOT valid JSON. You MUST return ONLY a single JSON object starting with { and ending with }. No markdown fences, no explanations, no prose. ONLY the JSON object.')
+           1658 BINARY_OP                0 (+)
+
+510        1662 STORE_FAST              28 (retry_user)
+
+515        1664 LOAD_GLOBAL             67 (NULL + complete_text)
+           1674 LOAD_FAST               22 (system)
+           1676 LOAD_FAST               28 (retry_user)
+           1678 LOAD_CONST              39 (0.4)
+           1680 LOAD_FAST               24 (provider)
+           1682 KW_NAMES                34 (('temperature', 'provider'))
+           1684 CALL                     4
+           1692 GET_AWAITABLE            0
+           1694 LOAD_CONST               3 (None)
+        >> 1696 SEND                     3 (to 1706)
+           1700 YIELD_VALUE              2
+           1702 RESUME                   3
+           1704 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1696)
+        >> 1706 END_SEND
+           1708 STORE_FAST              27 (raw)
+
+517     >> 1710 NOP
+
+518        1712 LOAD_GLOBAL             69 (NULL + extract_json_object)
+           1722 LOAD_FAST               27 (raw)
+           1724 CALL                     1
+           1732 STORE_FAST              25 (obj)
+
+519        1734 POP_TOP
+           1736 JUMP_FORWARD             1 (to 1740)
+
+504     >> 1738 END_FOR
+
+525     >> 1740 LOAD_GLOBAL             75 (NULL + ideation_service)
+           1750 LOAD_ATTR               76 (_normalize_idea)
+           1770 LOAD_FAST               25 (obj)
+           1772 CALL                     1
+           1780 STORE_FAST              30 (idea)
+
+526        1782 LOAD_FAST                5 (fmt)
+           1784 LOAD_ATTR               78 (key)
+           1804 LOAD_FAST               30 (idea)
+           1806 LOAD_CONST              45 ('format')
+           1808 STORE_SUBSCR
+
+527        1812 LOAD_FAST                5 (fmt)
+           1814 LOAD_ATTR               80 (aspect)
+           1834 LOAD_FAST               30 (idea)
+           1836 LOAD_CONST              46 ('aspect')
+           1838 STORE_SUBSCR
+
+528        1842 LOAD_FAST               30 (idea)
+           1844 LOAD_ATTR                7 (NULL|self + get)
+           1864 LOAD_CONST              47 ('title')
+           1866 CALL                     1
+           1874 POP_JUMP_IF_TRUE        26 (to 1928)
+
+529        1876 LOAD_GLOBAL             11 (NULL + StudioError)
+           1886 LOAD_GLOBAL             12 (E)
+           1896 LOAD_ATTR               14 (UNKNOWN)
+           1916 LOAD_CONST              48 ('AI không tạo được tiêu đề cho ý tưởng.')
+           1918 CALL                     2
+           1926 RAISE_VARARGS            1
+
+532     >> 1928 LOAD_FAST               21 (article_text)
+           1930 LOAD_FAST               30 (idea)
+           1932 LOAD_CONST              49 ('news_source_content')
+           1934 STORE_SUBSCR
+
+534        1938 LOAD_FAST                0 (article_id)
+
+535        1940 LOAD_FAST               13 (article_url)
+
+536        1942 LOAD_FAST               12 (article_title)
+
+537        1944 LOAD_FAST_CHECK         14 (article_source)
+
+533        1946 LOAD_CONST              50 (('article_id', 'article_url', 'article_title', 'article_source'))
+           1948 BUILD_CONST_KEY_MAP      4
+           1950 LOAD_FAST               30 (idea)
+           1952 LOAD_CONST              51 ('news_source_meta')
+           1954 STORE_SUBSCR
+
+541        1958 LOAD_GLOBAL              5 (NULL + SessionLocal)
+           1968 CALL                     0
+           1976 BEFORE_WITH
+           1978 STORE_FAST               7 (db)
+
+542        1980 LOAD_GLOBAL             29 (NULL + svc)
+           1990 LOAD_ATTR               82 (save_idea)
+
+543        2010 LOAD_FAST                7 (db)
+           2012 LOAD_FAST                1 (project_id)
+           2014 LOAD_FAST               30 (idea)
+
+544        2016 LOAD_CONST              52 ('news_import')
+
+545        2018 LOAD_CONST              53 ('proposed')
+
+542        2020 KW_NAMES                54 (('source', 'status'))
+           2022 CALL                     5
+           2030 STORE_FAST              31 (idea_row)
+
+547        2032 LOAD_FAST               31 (idea_row)
+           2034 LOAD_ATTR               84 (id)
+           2054 STORE_FAST              32 (idea_id)
+
+548        2056 LOAD_GLOBAL             29 (NULL + svc)
+           2066 LOAD_ATTR               86 (idea_to_dict)
+           2086 LOAD_FAST               31 (idea_row)
+           2088 CALL                     1
+           2096 STORE_FAST              33 (idea_dict)
+
+541        2098 LOAD_CONST               3 (None)
+           2100 LOAD_CONST               3 (None)
+           2102 LOAD_CONST               3 (None)
+           2104 CALL                     2
+           2112 POP_TOP
+
+550     >> 2114 LOAD_GLOBAL             55 (NULL + log)
+           2124 LOAD_ATTR               56 (info)
+           2144 LOAD_CONST              55 ('[news_import] kênh ')
+           2146 LOAD_FAST                1 (project_id)
+           2148 FORMAT_VALUE             0
+           2150 LOAD_CONST              56 (": sinh ý tưởng từ bài báo '")
+           2152 LOAD_FAST               12 (article_title)
+           2154 LOAD_CONST               3 (None)
+           2156 LOAD_CONST              57 (60)
+           2158 BINARY_SLICE
+           2160 FORMAT_VALUE             0
+           2162 LOAD_CONST              58 ("' → ")
+           2164 LOAD_FAST               30 (idea)
+           2166 LOAD_CONST              47 ('title')
+           2168 BINARY_SUBSCR
+           2172 FORMAT_VALUE             2 (repr)
+           2174 BUILD_STRING             6
+           2176 CALL                     1
+           2184 POP_TOP
+
+553        2186 PUSH_NULL
+           2188 LOAD_FAST                6 (checkpoint)
+           2190 LOAD_CONST              59 (55)
+           2192 CALL                     1
+           2200 POP_TOP
+
+554        2202 BUILD_LIST               0
+           2204 STORE_FAST              34 (downloaded_images)
+
+555        2206 LOAD_FAST               20 (raw_images)
+           2208 EXTENDED_ARG             1
+           2210 POP_JUMP_IF_FALSE      258 (to 2728)
+
+556        2212 NOP
+
+557        2214 LOAD_CONST               9 (0)
+           2216 LOAD_CONST              60 (('Project',))
+           2218 IMPORT_NAME             44 (app.db.models)
+           2220 IMPORT_FROM             45 (Project)
+           2222 STORE_FAST              35 (Project)
+           2224 POP_TOP
+
+558        2226 LOAD_GLOBAL              5 (NULL + SessionLocal)
+           2236 CALL                     0
+           2244 BEFORE_WITH
+           2246 STORE_FAST               7 (db)
+
+559        2248 LOAD_FAST                7 (db)
+           2250 LOAD_ATTR                7 (NULL|self + get)
+           2270 LOAD_FAST               35 (Project)
+           2272 LOAD_FAST                1 (project_id)
+           2274 CALL                     2
+           2282 STORE_FAST              36 (proj)
+
+560        2284 LOAD_FAST               36 (proj)
+           2286 POP_JUMP_IF_FALSE       12 (to 2312)
+           2288 LOAD_FAST               36 (proj)
+           2290 LOAD_ATTR               92 (root_path)
+           2310 JUMP_FORWARD             1 (to 2314)
+        >> 2312 LOAD_CONST               3 (None)
+        >> 2314 STORE_FAST              37 (root_path)
+
+558        2316 LOAD_CONST               3 (None)
+           2318 LOAD_CONST               3 (None)
+           2320 LOAD_CONST               3 (None)
+           2322 CALL                     2
+           2330 POP_TOP
+
+561     >> 2332 LOAD_FAST_CHECK         37 (root_path)
+           2334 POP_JUMP_IF_FALSE      174 (to 2684)
+
+562        2336 LOAD_CONST               9 (0)
+           2338 LOAD_CONST              61 (('ProjectFS',))
+           2340 IMPORT_NAME             47 (app.core.fs)
+           2342 IMPORT_FROM             48 (ProjectFS)
+           2344 STORE_FAST              38 (ProjectFS)
+           2346 POP_TOP
+
+563        2348 PUSH_NULL
+           2350 LOAD_FAST               38 (ProjectFS)
+           2352 LOAD_FAST               37 (root_path)
+           2354 CALL                     1
+           2362 STORE_FAST              39 (fs)
+
+564        2364 LOAD_FAST               39 (fs)
+           2366 LOAD_ATTR               99 (NULL|self + idea_dir)
+           2386 LOAD_FAST_CHECK         32 (idea_id)
+           2388 CALL                     1
+           2396 LOAD_CONST              62 ('news_images')
+           2398 BINARY_OP               11 (/)
+           2402 STORE_FAST              40 (save_dir)
+
+565        2404 LOAD_GLOBAL            101 (NULL + _download_article_images)
+
+566        2414 LOAD_FAST               20 (raw_images)
+           2416 LOAD_FAST               40 (save_dir)
+           2418 LOAD_CONST              63 (10)
+           2420 LOAD_FAST               13 (article_url)
+
+565        2422 KW_NAMES                64 (('max_images', 'referer'))
+           2424 CALL                     4
+           2432 GET_AWAITABLE            0
+           2434 LOAD_CONST               3 (None)
+        >> 2436 SEND                     3 (to 2446)
+           2440 YIELD_VALUE              3
+           2442 RESUME                   3
+           2444 JUMP_BACKWARD_NO_INTERRUPT     5 (to 2436)
+        >> 2446 END_SEND
+           2448 STORE_FAST              34 (downloaded_images)
+
+567        2450 LOAD_GLOBAL             55 (NULL + log)
+           2460 LOAD_ATTR               56 (info)
+           2480 LOAD_CONST              65 ('[news_import] tải ')
+           2482 LOAD_GLOBAL             59 (NULL + len)
+           2492 LOAD_FAST               34 (downloaded_images)
+           2494 CALL                     1
+           2502 FORMAT_VALUE             0
+           2504 LOAD_CONST              66 ('/')
+           2506 LOAD_GLOBAL             59 (NULL + len)
+           2516 LOAD_FAST               20 (raw_images)
+           2518 CALL                     1
+           2526 FORMAT_VALUE             0
+           2528 LOAD_CONST              67 (' ảnh stock bài báo → ')
+           2530 LOAD_FAST               40 (save_dir)
+           2532 FORMAT_VALUE             0
+           2534 BUILD_STRING             6
+           2536 CALL                     1
+           2544 POP_TOP
+
+568        2546 LOAD_FAST               34 (downloaded_images)
+           2548 GET_ITER
+        >> 2550 FOR_ITER                63 (to 2680)
+           2554 STORE_FAST              41 (di)
+
+569        2556 LOAD_GLOBAL             55 (NULL + log)
+           2566 LOAD_ATTR               56 (info)
+           2586 LOAD_CONST              68 ('[news_import]   ảnh #')
+           2588 LOAD_FAST               41 (di)
+           2590 LOAD_CONST              69 ('index')
+           2592 BINARY_SUBSCR
+           2596 FORMAT_VALUE             0
+           2598 LOAD_CONST              70 (': ')
+           2600 LOAD_FAST               41 (di)
+           2602 LOAD_CONST              71 ('filename')
+           2604 BINARY_SUBSCR
+           2608 FORMAT_VALUE             0
+           2610 LOAD_CONST              72 (' (')
+           2612 LOAD_FAST               41 (di)
+           2614 LOAD_CONST              73 ('size_bytes')
+           2616 BINARY_SUBSCR
+           2620 FORMAT_VALUE             0
+           2622 LOAD_CONST              74 ('B) caption=')
+           2624 LOAD_FAST               41 (di)
+           2626 LOAD_ATTR                7 (NULL|self + get)
+           2646 LOAD_CONST              75 ('caption')
+           2648 LOAD_CONST              14 ('')
+           2650 CALL                     2
+           2658 LOAD_CONST               3 (None)
+           2660 LOAD_CONST              25 (50)
+           2662 BINARY_SLICE
+           2664 FORMAT_VALUE             0
+           2666 BUILD_STRING             8
+           2668 CALL                     1
+           2676 POP_TOP
+           2678 JUMP_BACKWARD           65 (to 2550)
+
+568     >> 2680 END_FOR
+           2682 JUMP_FORWARD            21 (to 2726)
+
+571     >> 2684 LOAD_GLOBAL             55 (NULL + log)
+           2694 LOAD_ATTR               72 (warning)
+           2714 LOAD_CONST              76 ('[news_import] không tìm được root_path của project — bỏ qua tải ảnh')
+           2716 CALL                     1
+           2724 POP_TOP
+        >> 2726 JUMP_FORWARD            21 (to 2770)
+
+575     >> 2728 LOAD_GLOBAL             55 (NULL + log)
+           2738 LOAD_ATTR               56 (info)
+           2758 LOAD_CONST              78 ('[news_import] bài báo không có ảnh để tải')
+           2760 CALL                     1
+           2768 POP_TOP
+
+578     >> 2770 LOAD_FAST               34 (downloaded_images)
+           2772 EXTENDED_ARG             1
+           2774 POP_JUMP_IF_FALSE      294 (to 3364)
+
+590        2776 LOAD_FAST               34 (downloaded_images)
+           2778 GET_ITER
+
+580        2780 LOAD_FAST_AND_CLEAR     42 (img)
+           2782 SWAP                     2
+           2784 BUILD_LIST               0
+           2786 SWAP                     2
+
+590     >> 2788 FOR_ITER                64 (to 2920)
+           2792 STORE_FAST              42 (img)
+
+582        2794 LOAD_FAST               42 (img)
+           2796 LOAD_CONST              69 ('index')
+           2798 BINARY_SUBSCR
+
+583        2802 LOAD_FAST               42 (img)
+           2804 LOAD_CONST              79 ('local_path')
+           2806 BINARY_SUBSCR
+
+584        2810 LOAD_FAST               42 (img)
+           2812 LOAD_ATTR                7 (NULL|self + get)
+           2832 LOAD_CONST              75 ('caption')
+           2834 LOAD_CONST              14 ('')
+           2836 CALL                     2
+
+585        2844 LOAD_FAST               42 (img)
+           2846 LOAD_ATTR                7 (NULL|self + get)
+           2866 LOAD_CONST              80 ('context')
+           2868 LOAD_CONST              14 ('')
+           2870 CALL                     2
+
+588        2878 LOAD_FAST               42 (img)
+           2880 LOAD_ATTR                7 (NULL|self + get)
+           2900 LOAD_CONST              81 ('pos_ratio')
+           2902 LOAD_CONST              82 (0.0)
+           2904 CALL                     2
+
+581        2912 LOAD_CONST              83 (('index', 'local_path', 'caption', 'context', 'pos_ratio'))
+           2914 BUILD_CONST_KEY_MAP      5
+           2916 LIST_APPEND              2
+           2918 JUMP_BACKWARD           66 (to 2788)
+
+590     >> 2920 END_FOR
+
+580        2922 STORE_FAST              43 (news_images_payload)
+           2924 STORE_FAST              42 (img)
+
+593        2926 LOAD_GLOBAL              5 (NULL + SessionLocal)
+           2936 CALL                     0
+           2944 BEFORE_WITH
+           2946 STORE_FAST               7 (db)
+
+594        2948 LOAD_FAST                7 (db)
+           2950 LOAD_ATTR                7 (NULL|self + get)
+           2970 LOAD_GLOBAL             28 (svc)
+           2980 LOAD_ATTR              104 (IdeaCard)
+           3000 LOAD_FAST_CHECK         32 (idea_id)
+           3002 CALL                     2
+           3010 STORE_FAST              31 (idea_row)
+
+595        3012 LOAD_FAST               31 (idea_row)
+           3014 POP_JUMP_IF_FALSE      140 (to 3296)
+
+596        3016 LOAD_GLOBAL             47 (NULL + json)
+           3026 LOAD_ATTR               48 (loads)
+           3046 LOAD_FAST               31 (idea_row)
+           3048 LOAD_ATTR              106 (payload_json)
+           3068 COPY                     1
+           3070 POP_JUMP_IF_TRUE         2 (to 3076)
+           3072 POP_TOP
+           3074 LOAD_CONST              84 ('{}')
+        >> 3076 CALL                     1
+           3084 STORE_FAST              44 (payload)
+
+597        3086 LOAD_FAST               43 (news_images_payload)
+           3088 LOAD_FAST               44 (payload)
+           3090 LOAD_CONST              62 ('news_images')
+           3092 STORE_SUBSCR
+
+598        3096 LOAD_GLOBAL             47 (NULL + json)
+           3106 LOAD_ATTR              108 (dumps)
+           3126 LOAD_FAST               44 (payload)
+           3128 LOAD_CONST              85 (False)
+           3130 KW_NAMES                86 (('ensure_ascii',))
+           3132 CALL                     2
+           3140 LOAD_FAST               31 (idea_row)
+           3142 STORE_ATTR              53 (payload_json)
+
+599        3152 LOAD_FAST                7 (db)
+           3154 LOAD_ATTR              111 (NULL|self + commit)
+           3174 CALL                     0
+           3182 POP_TOP
+
+600        3184 LOAD_GLOBAL             29 (NULL + svc)
+           3194 LOAD_ATTR               86 (idea_to_dict)
+           3214 LOAD_FAST               31 (idea_row)
+           3216 CALL                     1
+           3224 STORE_FAST              33 (idea_dict)
+
+601        3226 LOAD_GLOBAL             55 (NULL + log)
+           3236 LOAD_ATTR               56 (info)
+           3256 LOAD_CONST              87 ('[news_import] ✅ lưu ')
+           3258 LOAD_GLOBAL             59 (NULL + len)
+           3268 LOAD_FAST               43 (news_images_payload)
+           3270 CALL                     1
+           3278 FORMAT_VALUE             0
+           3280 LOAD_CONST              88 (' news_images vào idea payload')
+           3282 BUILD_STRING             3
+           3284 CALL                     1
+           3292 POP_TOP
+           3294 JUMP_FORWARD            25 (to 3346)
+
+603     >> 3296 LOAD_GLOBAL             55 (NULL + log)
+           3306 LOAD_ATTR               72 (warning)
+           3326 LOAD_CONST              89 ('[news_import] không tìm thấy idea ')
+           3328 LOAD_FAST               32 (idea_id)
+           3330 FORMAT_VALUE             0
+           3332 LOAD_CONST              90 (' để update news_images')
+           3334 BUILD_STRING             3
+           3336 CALL                     1
+           3344 POP_TOP
+
+593     >> 3346 LOAD_CONST               3 (None)
+           3348 LOAD_CONST               3 (None)
+           3350 LOAD_CONST               3 (None)
+           3352 CALL                     2
+           3360 POP_TOP
+           3362 JUMP_FORWARD            21 (to 3406)
+
+605     >> 3364 LOAD_GLOBAL             55 (NULL + log)
+           3374 LOAD_ATTR               56 (info)
+           3394 LOAD_CONST              91 ('[news_import] không có ảnh downloaded — idea payload không có news_images')
+           3396 CALL                     1
+           3404 POP_TOP
+
+611     >> 3406 NOP
+
+612        3408 LOAD_CONST               9 (0)
+           3410 LOAD_CONST              92 (('idea_media_service',))
+           3412 IMPORT_NAME             56 (app.services)
+           3414 IMPORT_FROM             57 (idea_media_service)
+           3416 STORE_FAST              45 (idea_media_service)
+           3418 POP_TOP
+
+613        3420 LOAD_FAST               45 (idea_media_service)
+           3422 LOAD_ATTR              117 (NULL|self + generate_idea_media)
+           3442 LOAD_FAST_CHECK         32 (idea_id)
+           3444 LOAD_CONST              93 (True)
+           3446 KW_NAMES                94 (('attach_only',))
+           3448 CALL                     2
+           3456 GET_AWAITABLE            0
+           3458 LOAD_CONST               3 (None)
+        >> 3460 SEND                     3 (to 3470)
+           3464 YIELD_VALUE              3
+           3466 RESUME                   3
+           3468 JUMP_BACKWARD_NO_INTERRUPT     5 (to 3460)
+        >> 3470 END_SEND
+           3472 POP_TOP
+
+619     >> 3474 PUSH_NULL
+           3476 LOAD_FAST                6 (checkpoint)
+           3478 LOAD_CONST              96 (80)
+           3480 CALL                     1
+           3488 POP_TOP
+
+621        3490 LOAD_GLOBAL              5 (NULL + SessionLocal)
+           3500 CALL                     0
+           3508 BEFORE_WITH
+           3510 STORE_FAST               7 (db)
+
+622        3512 LOAD_FAST                7 (db)
+           3514 LOAD_ATTR                7 (NULL|self + get)
+           3534 LOAD_GLOBAL             28 (svc)
+           3544 LOAD_ATTR              104 (IdeaCard)
+           3564 LOAD_FAST_CHECK         32 (idea_id)
+           3566 CALL                     2
+           3574 STORE_FAST              46 (check_idea)
+
+623        3576 LOAD_FAST               46 (check_idea)
+           3578 POP_JUMP_IF_FALSE       93 (to 3766)
+
+624        3580 LOAD_GLOBAL             47 (NULL + json)
+           3590 LOAD_ATTR               48 (loads)
+           3610 LOAD_FAST               46 (check_idea)
+           3612 LOAD_ATTR              106 (payload_json)
+           3632 COPY                     1
+           3634 POP_JUMP_IF_TRUE         2 (to 3640)
+           3636 POP_TOP
+           3638 LOAD_CONST              84 ('{}')
+        >> 3640 CALL                     1
+           3648 STORE_FAST              47 (check_payload)
+
+625        3650 LOAD_CONST              62 ('news_images')
+           3652 LOAD_FAST               47 (check_payload)
+           3654 CONTAINS_OP              0
+           3656 STORE_FAST              48 (has_ni)
+
+626        3658 LOAD_GLOBAL             59 (NULL + len)
+           3668 LOAD_FAST               47 (check_payload)
+           3670 LOAD_ATTR                7 (NULL|self + get)
+           3690 LOAD_CONST              62 ('news_images')
+           3692 BUILD_LIST               0
+           3694 CALL                     2
+           3702 CALL                     1
+           3710 STORE_FAST              49 (ni_count)
+
+627        3712 LOAD_GLOBAL             55 (NULL + log)
+           3722 LOAD_ATTR               56 (info)
+           3742 LOAD_CONST              97 ('[news_import] pre-approve check: has_news_images=')
+           3744 LOAD_FAST               48 (has_ni)
+           3746 FORMAT_VALUE             0
+           3748 LOAD_CONST              98 (', count=')
+           3750 LOAD_FAST               49 (ni_count)
+           3752 FORMAT_VALUE             0
+           3754 BUILD_STRING             4
+           3756 CALL                     1
+           3764 POP_TOP
+
+621     >> 3766 LOAD_CONST               3 (None)
+           3768 LOAD_CONST               3 (None)
+           3770 LOAD_CONST               3 (None)
+           3772 CALL                     2
+           3780 POP_TOP
+
+629     >> 3782 LOAD_GLOBAL             29 (NULL + svc)
+           3792 LOAD_ATTR              118 (approve_idea)
+           3812 LOAD_FAST_CHECK         32 (idea_id)
+           3814 CALL                     1
+           3822 GET_AWAITABLE            0
+           3824 LOAD_CONST               3 (None)
+        >> 3826 SEND                     3 (to 3836)
+           3830 YIELD_VALUE              2
+           3832 RESUME                   3
+           3834 JUMP_BACKWARD_NO_INTERRUPT     5 (to 3826)
+        >> 3836 END_SEND
+           3838 STORE_FAST              50 (approve_result)
+
+632        3840 LOAD_FAST_CHECK         33 (idea_dict)
+
+633        3842 LOAD_FAST               50 (approve_result)
+
+634        3844 LOAD_GLOBAL             59 (NULL + len)
+           3854 LOAD_FAST               34 (downloaded_images)
+           3856 CALL                     1
+
+631        3864 LOAD_CONST              99 (('idea', 'approve', 'news_images_count'))
+           3866 BUILD_CONST_KEY_MAP      3
+           3868 RETURN_VALUE
+
+437     >> 3870 CLEANUP_THROW
+           3872 EXTENDED_ARG             6
+           3874 JUMP_BACKWARD         1773 (to 330)
+
+429     >> 3876 PUSH_EXC_INFO
+           3878 WITH_EXCEPT_START
+           3880 POP_JUMP_IF_TRUE         1 (to 3884)
+           3882 RERAISE                  2
+        >> 3884 POP_TOP
+           3886 POP_EXCEPT
+           3888 POP_TOP
+           3890 POP_TOP
+           3892 EXTENDED_ARG             5
+           3894 JUMP_BACKWARD         1374 (to 1148)
+        >> 3896 COPY                     3
+           3898 POP_EXCEPT
+           3900 RERAISE                  1
+
+506     >> 3902 CLEANUP_THROW
+           3904 EXTENDED_ARG             4
+           3906 JUMP_BACKWARD         1158 (to 1592)
+
+515     >> 3908 CLEANUP_THROW
+           3910 EXTENDED_ARG             4
+           3912 JUMP_BACKWARD         1104 (to 1706)
+        >> 3914 PUSH_EXC_INFO
+
+520        3916 LOAD_GLOBAL             70 (ValueError)
+           3926 CHECK_EXC_MATCH
+           3928 POP_JUMP_IF_FALSE       81 (to 4092)
+           3930 STORE_FAST              29 (e)
+
+521        3932 LOAD_GLOBAL             55 (NULL + log)
+           3942 LOAD_ATTR               72 (warning)
+           3962 LOAD_CONST              40 ('[news_import] parse IdeaCard lần ')
+           3964 LOAD_FAST               26 (attempt)
+           3966 LOAD_CONST              36 (1)
+           3968 BINARY_OP                0 (+)
+           3972 FORMAT_VALUE             0
+           3974 LOAD_CONST              41 (' lỗi: ')
+           3976 LOAD_FAST               29 (e)
+           3978 FORMAT_VALUE             0
+           3980 LOAD_CONST              42 (' · raw[:300]=')
+           3982 LOAD_FAST               27 (raw)
+           3984 LOAD_CONST               3 (None)
+           3986 LOAD_CONST              43 (300)
+           3988 BINARY_SLICE
+           3990 FORMAT_VALUE             2 (repr)
+           3992 BUILD_STRING             6
+           3994 CALL                     1
+           4002 POP_TOP
+
+522        4004 LOAD_FAST               26 (attempt)
+           4006 LOAD_CONST              36 (1)
+           4008 COMPARE_OP              40 (==)
+           4012 POP_JUMP_IF_FALSE       29 (to 4072)
+
+523        4014 LOAD_GLOBAL             11 (NULL + StudioError)
+           4024 LOAD_GLOBAL             12 (E)
+           4034 LOAD_ATTR               14 (UNKNOWN)
+           4054 LOAD_CONST              44 ('AI trả ý tưởng sai định dạng JSON sau 2 lần thử: ')
+           4056 LOAD_FAST               29 (e)
+           4058 FORMAT_VALUE             0
+           4060 BUILD_STRING             2
+           4062 CALL                     2
+           4070 RAISE_VARARGS            1
+
+522     >> 4072 POP_EXCEPT
+           4074 LOAD_CONST               3 (None)
+           4076 STORE_FAST              29 (e)
+           4078 DELETE_FAST             29 (e)
+           4080 EXTENDED_ARG             4
+           4082 JUMP_BACKWARD         1275 (to 1534)
+        >> 4084 LOAD_CONST               3 (None)
+           4086 STORE_FAST              29 (e)
+           4088 DELETE_FAST             29 (e)
+           4090 RERAISE                  1
+
+520     >> 4092 RERAISE                  0
+        >> 4094 COPY                     3
+           4096 POP_EXCEPT
+           4098 RERAISE                  1
+
+541     >> 4100 PUSH_EXC_INFO
+           4102 WITH_EXCEPT_START
+           4104 POP_JUMP_IF_TRUE         1 (to 4108)
+           4106 RERAISE                  2
+        >> 4108 POP_TOP
+           4110 POP_EXCEPT
+           4112 POP_TOP
+           4114 POP_TOP
+           4116 EXTENDED_ARG             3
+           4118 JUMP_BACKWARD         1003 (to 2114)
+        >> 4120 COPY                     3
+           4122 POP_EXCEPT
+           4124 RERAISE                  1
+
+558     >> 4126 PUSH_EXC_INFO
+           4128 WITH_EXCEPT_START
+           4130 POP_JUMP_IF_TRUE         1 (to 4134)
+           4132 RERAISE                  2
+        >> 4134 POP_TOP
+           4136 POP_EXCEPT
+           4138 POP_TOP
+           4140 POP_TOP
+           4142 EXTENDED_ARG             3
+           4144 JUMP_BACKWARD          907 (to 2332)
+        >> 4146 COPY                     3
+           4148 POP_EXCEPT
+           4150 RERAISE                  1
+
+565     >> 4152 CLEANUP_THROW
+           4154 EXTENDED_ARG             3
+           4156 JUMP_BACKWARD          856 (to 2446)
+        >> 4158 PUSH_EXC_INFO
+
+572        4160 LOAD_GLOBAL            102 (Exception)
+           4170 CHECK_EXC_MATCH
+           4172 POP_JUMP_IF_FALSE       35 (to 4244)
+           4174 STORE_FAST              29 (e)
+
+573        4176 LOAD_GLOBAL             55 (NULL + log)
+           4186 LOAD_ATTR               72 (warning)
+           4206 LOAD_CONST              77 ('[news_import] lỗi tải ảnh bài báo: ')
+           4208 LOAD_FAST               29 (e)
+           4210 FORMAT_VALUE             0
+           4212 BUILD_STRING             2
+           4214 CALL                     1
+           4222 POP_TOP
+           4224 POP_EXCEPT
+           4226 LOAD_CONST               3 (None)
+           4228 STORE_FAST              29 (e)
+           4230 DELETE_FAST             29 (e)
+           4232 EXTENDED_ARG             2
+           4234 JUMP_BACKWARD          733 (to 2770)
+        >> 4236 LOAD_CONST               3 (None)
+           4238 STORE_FAST              29 (e)
+           4240 DELETE_FAST             29 (e)
+           4242 RERAISE                  1
+
+572     >> 4244 RERAISE                  0
+        >> 4246 COPY                     3
+           4248 POP_EXCEPT
+           4250 RERAISE                  1
+        >> 4252 SWAP                     2
+           4254 POP_TOP
+
+580        4256 SWAP                     2
+           4258 STORE_FAST              42 (img)
+           4260 RERAISE                  0
+
+593     >> 4262 PUSH_EXC_INFO
+           4264 WITH_EXCEPT_START
+           4266 POP_JUMP_IF_TRUE         1 (to 4270)
+           4268 RERAISE                  2
+        >> 4270 POP_TOP
+           4272 POP_EXCEPT
+           4274 POP_TOP
+           4276 POP_TOP
+           4278 EXTENDED_ARG             1
+           4280 JUMP_BACKWARD          438 (to 3406)
+        >> 4282 COPY                     3
+           4284 POP_EXCEPT
+           4286 RERAISE                  1
+
+613     >> 4288 CLEANUP_THROW
+           4290 EXTENDED_ARG             1
+           4292 JUMP_BACKWARD          412 (to 3470)
+        >> 4294 PUSH_EXC_INFO
+
+614        4296 LOAD_GLOBAL            102 (Exception)
+           4306 CHECK_EXC_MATCH
+           4308 POP_JUMP_IF_FALSE       35 (to 4380)
+           4310 STORE_FAST              29 (e)
+
+615        4312 LOAD_GLOBAL             55 (NULL + log)
+           4322 LOAD_ATTR               56 (info)
+           4342 LOAD_CONST              95 ('[news_import] không gắn được nhân vật sẵn có: ')
+           4344 LOAD_FAST               29 (e)
+           4346 FORMAT_VALUE             0
+           4348 BUILD_STRING             2
+           4350 CALL                     1
+           4358 POP_TOP
+           4360 POP_EXCEPT
+           4362 LOAD_CONST               3 (None)
+           4364 STORE_FAST              29 (e)
+           4366 DELETE_FAST             29 (e)
+           4368 EXTENDED_ARG             1
+           4370 JUMP_BACKWARD          449 (to 3474)
+        >> 4372 LOAD_CONST               3 (None)
+           4374 STORE_FAST              29 (e)
+           4376 DELETE_FAST             29 (e)
+           4378 RERAISE                  1
+
+614     >> 4380 RERAISE                  0
+        >> 4382 COPY                     3
+           4384 POP_EXCEPT
+           4386 RERAISE                  1
+
+621     >> 4388 PUSH_EXC_INFO
+           4390 WITH_EXCEPT_START
+           4392 POP_JUMP_IF_TRUE         1 (to 4396)
+           4394 RERAISE                  2
+        >> 4396 POP_TOP
+           4398 POP_EXCEPT
+           4400 POP_TOP
+           4402 POP_TOP
+           4404 EXTENDED_ARG             1
+           4406 JUMP_BACKWARD          313 (to 3782)
+        >> 4408 COPY                     3
+           4410 POP_EXCEPT
+           4412 RERAISE                  1
+
+629     >> 4414 CLEANUP_THROW
+           4416 EXTENDED_ARG             1
+           4418 JUMP_BACKWARD          292 (to 3836)
+        >> 4420 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           4422 RERAISE                  1
+ExceptionTable:
+  8 to 100 -> 4420 [0] lasti
+  102 to 322 -> 3876 [1] lasti
+  324 to 324 -> 3870 [3]
+  326 to 1130 -> 3876 [1] lasti
+  1132 to 1584 -> 4420 [0] lasti
+  1586 to 1586 -> 3902 [3]
+  1588 to 1698 -> 4420 [0] lasti
+  1700 to 1700 -> 3908 [3]
+  1702 to 1708 -> 4420 [0] lasti
+  1712 to 1732 -> 3914 [1]
+  1734 to 1976 -> 4420 [0] lasti
+  1978 to 2096 -> 4100 [1] lasti
+  2098 to 2210 -> 4420 [0] lasti
+  2214 to 2244 -> 4158 [0]
+  2246 to 2314 -> 4126 [1] lasti
+  2316 to 2438 -> 4158 [0]
+  2440 to 2440 -> 4152 [2]
+  2442 to 2724 -> 4158 [0]
+  2726 to 2782 -> 4420 [0] lasti
+  2784 to 2920 -> 4252 [2]
+  2922 to 2944 -> 4420 [0] lasti
+  2946 to 3344 -> 4262 [1] lasti
+  3346 to 3404 -> 4420 [0] lasti
+  3408 to 3462 -> 4294 [0]
+  3464 to 3464 -> 4288 [2]
+  3466 to 3472 -> 4294 [0]
+  3474 to 3508 -> 4420 [0] lasti
+  3510 to 3764 -> 4388 [1] lasti
+  3766 to 3828 -> 4420 [0] lasti
+  3830 to 3830 -> 4414 [2]
+  3832 to 3868 -> 4420 [0] lasti
+  3870 to 3870 -> 3876 [1] lasti
+  3876 to 3884 -> 3896 [3] lasti
+  3886 to 3902 -> 4420 [0] lasti
+  3908 to 3908 -> 4420 [0] lasti
+  3914 to 3930 -> 4094 [2] lasti
+  3932 to 4070 -> 4084 [2] lasti
+  4072 to 4082 -> 4420 [0] lasti
+  4084 to 4092 -> 4094 [2] lasti
+  4094 to 4098 -> 4420 [0] lasti
+  4100 to 4108 -> 4120 [3] lasti
+  4110 to 4124 -> 4420 [0] lasti
+  4126 to 4134 -> 4146 [3] lasti
+  4136 to 4152 -> 4158 [0]
+  4158 to 4174 -> 4246 [1] lasti
+  4176 to 4222 -> 4236 [1] lasti
+  4224 to 4234 -> 4420 [0] lasti
+  4236 to 4244 -> 4246 [1] lasti
+  4246 to 4260 -> 4420 [0] lasti
+  4262 to 4270 -> 4282 [3] lasti
+  4272 to 4286 -> 4420 [0] lasti
+  4288 to 4288 -> 4294 [0]
+  4294 to 4310 -> 4382 [1] lasti
+  4312 to 4358 -> 4372 [1] lasti
+  4360 to 4370 -> 4420 [0] lasti
+  4372 to 4380 -> 4382 [1] lasti
+  4382 to 4386 -> 4420 [0] lasti
+  4388 to 4396 -> 4408 [3] lasti
+  4398 to 4414 -> 4420 [0] lasti
+
+Disassembly of <code object checkpoint at 0x7f6c922184f0, file "app\services\news_import_service.py", line 420>:
+              0 COPY_FREE_VARS           2
+
+420           2 RESUME                   0
+
+421           4 LOAD_DEREF               1 (cancel_check)
+              6 POP_JUMP_IF_FALSE       33 (to 74)
+              8 PUSH_NULL
+             10 LOAD_DEREF               1 (cancel_check)
+             12 CALL                     0
+             20 POP_JUMP_IF_FALSE       26 (to 74)
+
+422          22 LOAD_GLOBAL              1 (NULL + StudioError)
+             32 LOAD_GLOBAL              2 (E)
+             42 LOAD_ATTR                4 (CANCELLED)
+             62 LOAD_CONST               1 ('Đã huỷ import bài báo.')
+             64 CALL                     2
+             72 RAISE_VARARGS            1
+
+423     >>   74 LOAD_DEREF               2 (progress)
+             76 POP_JUMP_IF_FALSE        9 (to 96)
+
+424          78 PUSH_NULL
+             80 LOAD_DEREF               2 (progress)
+             82 LOAD_FAST                0 (percent)
+             84 CALL                     1
+             92 POP_TOP
+             94 RETURN_CONST             0 (None)
+
+423     >>   96 RETURN_CONST             0 (None)

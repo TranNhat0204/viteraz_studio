@@ -1,0 +1,677 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Router style — preset style phụ đề + áp hàng loạt + render 1 frame WYSIWYG (doc 13 §13.5).')
+              4 STORE_NAME               0 (__doc__)
+
+  2           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+  4          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('APIRouter', 'Depends'))
+             22 IMPORT_NAME              3 (fastapi)
+             24 IMPORT_FROM              4 (APIRouter)
+             26 STORE_NAME               4 (APIRouter)
+             28 IMPORT_FROM              5 (Depends)
+             30 STORE_NAME               5 (Depends)
+             32 POP_TOP
+
+  5          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               4 (('Response',))
+             38 IMPORT_NAME              6 (fastapi.responses)
+             40 IMPORT_FROM              7 (Response)
+             42 STORE_NAME               7 (Response)
+             44 POP_TOP
+
+  6          46 LOAD_CONST               1 (0)
+             48 LOAD_CONST               5 (('BaseModel',))
+             50 IMPORT_NAME              8 (pydantic)
+             52 IMPORT_FROM              9 (BaseModel)
+             54 STORE_NAME               9 (BaseModel)
+             56 POP_TOP
+
+  7          58 LOAD_CONST               1 (0)
+             60 LOAD_CONST               6 (('Session',))
+             62 IMPORT_NAME             10 (sqlalchemy.orm)
+             64 IMPORT_FROM             11 (Session)
+             66 STORE_NAME              11 (Session)
+             68 POP_TOP
+
+  9          70 LOAD_CONST               1 (0)
+             72 LOAD_CONST               7 (('verify_token', 'get_session'))
+             74 IMPORT_NAME             12 (app.deps)
+             76 IMPORT_FROM             13 (verify_token)
+             78 STORE_NAME              13 (verify_token)
+             80 IMPORT_FROM             14 (get_session)
+             82 STORE_NAME              14 (get_session)
+             84 POP_TOP
+
+ 10          86 LOAD_CONST               1 (0)
+             88 LOAD_CONST               8 (('style_service',))
+             90 IMPORT_NAME             15 (app.services)
+             92 IMPORT_FROM             16 (style_service)
+             94 STORE_NAME              17 (svc)
+             96 POP_TOP
+
+ 11          98 LOAD_CONST               1 (0)
+            100 LOAD_CONST               9 (('video_service',))
+            102 IMPORT_NAME             15 (app.services)
+            104 IMPORT_FROM             18 (video_service)
+            106 STORE_NAME              19 (vsvc)
+            108 POP_TOP
+
+ 12         110 LOAD_CONST               1 (0)
+            112 LOAD_CONST              10 (('project_service',))
+            114 IMPORT_NAME             15 (app.services)
+            116 IMPORT_FROM             20 (project_service)
+            118 STORE_NAME              21 (psvc)
+            120 POP_TOP
+
+ 13         122 LOAD_CONST               1 (0)
+            124 LOAD_CONST              11 (('render_frame',))
+            126 IMPORT_NAME             22 (app.render.engine)
+            128 IMPORT_FROM             23 (render_frame)
+            130 STORE_NAME              23 (render_frame)
+            132 POP_TOP
+
+ 15         134 PUSH_NULL
+            136 LOAD_NAME                4 (APIRouter)
+            138 LOAD_CONST              12 ('/api/v1')
+            140 LOAD_CONST              13 ('style')
+            142 BUILD_LIST               1
+            144 PUSH_NULL
+            146 LOAD_NAME                5 (Depends)
+            148 LOAD_NAME               13 (verify_token)
+            150 CALL                     1
+            158 BUILD_LIST               1
+            160 KW_NAMES                14 (('prefix', 'tags', 'dependencies'))
+            162 CALL                     3
+            170 STORE_NAME              24 (router)
+
+ 19         172 PUSH_NULL
+            174 LOAD_BUILD_CLASS
+            176 LOAD_CONST              15 (<code object PresetCreate at 0x7f6c92ee8f30, file "app\api\style.py", line 19>)
+            178 MAKE_FUNCTION            0
+            180 LOAD_CONST              16 ('PresetCreate')
+            182 LOAD_NAME                9 (BaseModel)
+            184 CALL                     3
+            192 STORE_NAME              25 (PresetCreate)
+
+ 25         194 PUSH_NULL
+            196 LOAD_BUILD_CLASS
+            198 LOAD_CONST              17 (<code object PresetUpdate at 0x7f6c81a46230, file "app\api\style.py", line 25>)
+            200 MAKE_FUNCTION            0
+            202 LOAD_CONST              18 ('PresetUpdate')
+            204 LOAD_NAME                9 (BaseModel)
+            206 CALL                     3
+            214 STORE_NAME              26 (PresetUpdate)
+
+ 31         216 LOAD_NAME               24 (router)
+            218 LOAD_ATTR               55 (NULL|self + get)
+            238 LOAD_CONST              19 ('/style-presets')
+            240 CALL                     1
+
+ 32         248 PUSH_NULL
+            250 LOAD_NAME                5 (Depends)
+            252 LOAD_NAME               14 (get_session)
+            254 CALL                     1
+            262 BUILD_TUPLE              1
+            264 LOAD_CONST              36 (('db', 'Session'))
+            266 LOAD_CONST              20 (<code object list_style_presets at 0x7f6c81a46030, file "app\api\style.py", line 31>)
+            268 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 31         270 CALL                     0
+
+ 32         278 STORE_NAME              28 (list_style_presets)
+
+ 36         280 LOAD_NAME               24 (router)
+            282 LOAD_ATTR               59 (NULL|self + post)
+            302 LOAD_CONST              19 ('/style-presets')
+            304 LOAD_CONST              21 (201)
+            306 KW_NAMES                22 (('status_code',))
+            308 CALL                     2
+
+ 37         316 PUSH_NULL
+            318 LOAD_NAME                5 (Depends)
+            320 LOAD_NAME               14 (get_session)
+            322 CALL                     1
+            330 BUILD_TUPLE              1
+            332 LOAD_CONST              37 (('body', 'PresetCreate', 'db', 'Session'))
+            334 LOAD_CONST              23 (<code object create_style_preset at 0x7f6c92ea61f0, file "app\api\style.py", line 36>)
+            336 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 36         338 CALL                     0
+
+ 37         346 STORE_NAME              30 (create_style_preset)
+
+ 41         348 LOAD_NAME               24 (router)
+            350 LOAD_ATTR               63 (NULL|self + put)
+            370 LOAD_CONST              24 ('/style-presets/{preset_id}')
+            372 CALL                     1
+
+ 42         380 PUSH_NULL
+            382 LOAD_NAME                5 (Depends)
+            384 LOAD_NAME               14 (get_session)
+            386 CALL                     1
+            394 BUILD_TUPLE              1
+            396 LOAD_CONST              38 (('preset_id', 'str', 'body', 'PresetUpdate', 'db', 'Session'))
+            398 LOAD_CONST              25 (<code object update_style_preset at 0x7f6c92ea6470, file "app\api\style.py", line 41>)
+            400 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 41         402 CALL                     0
+
+ 42         410 STORE_NAME              32 (update_style_preset)
+
+ 46         412 LOAD_NAME               24 (router)
+            414 LOAD_ATTR               67 (NULL|self + delete)
+            434 LOAD_CONST              24 ('/style-presets/{preset_id}')
+            436 CALL                     1
+
+ 47         444 PUSH_NULL
+            446 LOAD_NAME                5 (Depends)
+            448 LOAD_NAME               14 (get_session)
+            450 CALL                     1
+            458 BUILD_TUPLE              1
+            460 LOAD_CONST              39 (('preset_id', 'str', 'db', 'Session'))
+            462 LOAD_CONST              26 (<code object delete_style_preset at 0x7f6c81a46530, file "app\api\style.py", line 46>)
+            464 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 46         466 CALL                     0
+
+ 47         474 STORE_NAME              34 (delete_style_preset)
+
+ 53         476 PUSH_NULL
+            478 LOAD_BUILD_CLASS
+            480 LOAD_CONST              27 (<code object ApplyStyleRequest at 0x7f6c92b70ad0, file "app\api\style.py", line 53>)
+            482 MAKE_FUNCTION            0
+            484 LOAD_CONST              28 ('ApplyStyleRequest')
+            486 LOAD_NAME                9 (BaseModel)
+            488 CALL                     3
+            496 STORE_NAME              35 (ApplyStyleRequest)
+
+ 60         498 LOAD_NAME               24 (router)
+            500 LOAD_ATTR               59 (NULL|self + post)
+            520 LOAD_CONST              29 ('/projects/{project_id}/apply-style')
+            522 CALL                     1
+
+ 61         530 PUSH_NULL
+            532 LOAD_NAME                5 (Depends)
+            534 LOAD_NAME               14 (get_session)
+            536 CALL                     1
+            544 BUILD_TUPLE              1
+            546 LOAD_CONST              40 (('project_id', 'str', 'body', 'ApplyStyleRequest', 'db', 'Session'))
+            548 LOAD_CONST              30 (<code object apply_style at 0x28e39530, file "app\api\style.py", line 60>)
+            550 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 60         552 CALL                     0
+
+ 61         560 STORE_NAME              36 (apply_style)
+
+ 82         562 PUSH_NULL
+            564 LOAD_BUILD_CLASS
+            566 LOAD_CONST              31 (<code object RenderFrameRequest at 0x7f6c81b7e310, file "app\api\style.py", line 82>)
+            568 MAKE_FUNCTION            0
+            570 LOAD_CONST              32 ('RenderFrameRequest')
+            572 LOAD_NAME                9 (BaseModel)
+            574 CALL                     3
+            582 STORE_NAME              37 (RenderFrameRequest)
+
+ 90         584 LOAD_NAME               24 (router)
+            586 LOAD_ATTR               59 (NULL|self + post)
+            606 LOAD_CONST              33 ('/videos/{video_id}/render-frame')
+            608 CALL                     1
+
+ 91         616 PUSH_NULL
+            618 LOAD_NAME                5 (Depends)
+            620 LOAD_NAME               14 (get_session)
+            622 CALL                     1
+            630 BUILD_TUPLE              1
+            632 LOAD_CONST              41 (('video_id', 'str', 'body', 'RenderFrameRequest', 'db', 'Session'))
+            634 LOAD_CONST              34 (<code object render_video_frame at 0x269faf40, file "app\api\style.py", line 90>)
+            636 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 90         638 CALL                     0
+
+ 91         646 STORE_NAME              38 (render_video_frame)
+            648 RETURN_CONST            35 (None)
+
+Disassembly of <code object PresetCreate at 0x7f6c92ee8f30, file "app\api\style.py", line 19>:
+ 19           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('PresetCreate')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 20          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('name')
+             18 STORE_SUBSCR
+
+ 21          22 LOAD_CONST               3 ('dict')
+             24 LOAD_NAME                3 (__annotations__)
+             26 LOAD_CONST               4 ('style')
+             28 STORE_SUBSCR
+
+ 22          32 LOAD_CONST               5 (False)
+             34 STORE_NAME               4 (is_default)
+             36 LOAD_CONST               6 ('bool')
+             38 LOAD_NAME                3 (__annotations__)
+             40 LOAD_CONST               7 ('is_default')
+             42 STORE_SUBSCR
+             46 RETURN_CONST             8 (None)
+
+Disassembly of <code object PresetUpdate at 0x7f6c81a46230, file "app\api\style.py", line 25>:
+ 25           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('PresetUpdate')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 26          12 LOAD_CONST               1 (None)
+             14 STORE_NAME               3 (name)
+             16 LOAD_CONST               2 ('str | None')
+             18 LOAD_NAME                4 (__annotations__)
+             20 LOAD_CONST               3 ('name')
+             22 STORE_SUBSCR
+
+ 27          26 LOAD_CONST               1 (None)
+             28 STORE_NAME               5 (style)
+             30 LOAD_CONST               4 ('dict | None')
+             32 LOAD_NAME                4 (__annotations__)
+             34 LOAD_CONST               5 ('style')
+             36 STORE_SUBSCR
+
+ 28          40 LOAD_CONST               1 (None)
+             42 STORE_NAME               6 (is_default)
+             44 LOAD_CONST               6 ('bool | None')
+             46 LOAD_NAME                4 (__annotations__)
+             48 LOAD_CONST               7 ('is_default')
+             50 STORE_SUBSCR
+             54 RETURN_CONST             1 (None)
+
+Disassembly of <code object list_style_presets at 0x7f6c81a46030, file "app\api\style.py", line 31>:
+ 31           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 33           6 LOAD_CONST               1 ('presets')
+              8 LOAD_GLOBAL              1 (NULL + svc)
+             18 LOAD_ATTR                2 (list_presets)
+             38 LOAD_FAST                0 (db)
+             40 CALL                     1
+             48 BUILD_MAP                1
+             50 RETURN_VALUE
+        >>   52 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             54 RERAISE                  1
+ExceptionTable:
+  4 to 50 -> 52 [0] lasti
+
+Disassembly of <code object create_style_preset at 0x7f6c92ea61f0, file "app\api\style.py", line 36>:
+ 36           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 38           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (create_preset)
+             36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (body)
+             40 LOAD_ATTR                4 (name)
+             60 LOAD_FAST                0 (body)
+             62 LOAD_ATTR                6 (style)
+             82 LOAD_FAST                0 (body)
+             84 LOAD_ATTR                8 (is_default)
+            104 CALL                     4
+            112 RETURN_VALUE
+        >>  114 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            116 RERAISE                  1
+ExceptionTable:
+  4 to 112 -> 114 [0] lasti
+
+Disassembly of <code object update_style_preset at 0x7f6c92ea6470, file "app\api\style.py", line 41>:
+ 41           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 43           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (update_preset)
+             36 LOAD_FAST                2 (db)
+             38 LOAD_FAST                0 (preset_id)
+             40 LOAD_FAST                1 (body)
+             42 LOAD_ATTR                4 (name)
+             62 LOAD_FAST                1 (body)
+             64 LOAD_ATTR                6 (style)
+             84 LOAD_FAST                1 (body)
+             86 LOAD_ATTR                8 (is_default)
+            106 CALL                     5
+            114 RETURN_VALUE
+        >>  116 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            118 RERAISE                  1
+ExceptionTable:
+  4 to 114 -> 116 [0] lasti
+
+Disassembly of <code object delete_style_preset at 0x7f6c81a46530, file "app\api\style.py", line 46>:
+ 46           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 48           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (delete_preset)
+             36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (preset_id)
+             40 CALL                     2
+             48 POP_TOP
+
+ 49          50 LOAD_CONST               1 ('deleted')
+             52 LOAD_FAST                0 (preset_id)
+             54 BUILD_MAP                1
+             56 RETURN_VALUE
+        >>   58 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             60 RERAISE                  1
+ExceptionTable:
+  4 to 56 -> 58 [0] lasti
+
+Disassembly of <code object ApplyStyleRequest at 0x7f6c92b70ad0, file "app\api\style.py", line 53>:
+ 53           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('ApplyStyleRequest')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 54          12 BUILD_LIST               0
+             14 STORE_NAME               3 (video_ids)
+             16 LOAD_CONST               1 ('list[str]')
+             18 LOAD_NAME                4 (__annotations__)
+             20 LOAD_CONST               2 ('video_ids')
+             22 STORE_SUBSCR
+
+ 55          26 LOAD_CONST               3 (None)
+             28 STORE_NAME               5 (preset_id)
+             30 LOAD_CONST               4 ('str | None')
+             32 LOAD_NAME                4 (__annotations__)
+             34 LOAD_CONST               5 ('preset_id')
+             36 STORE_SUBSCR
+
+ 56          40 LOAD_CONST               3 (None)
+             42 STORE_NAME               6 (overrides)
+             44 LOAD_CONST               6 ('dict | None')
+             46 LOAD_NAME                4 (__annotations__)
+             48 LOAD_CONST               7 ('overrides')
+             50 STORE_SUBSCR
+
+ 57          54 LOAD_CONST               8 (False)
+             56 STORE_NAME               7 (apply_all)
+             58 LOAD_CONST               9 ('bool')
+             60 LOAD_NAME                4 (__annotations__)
+             62 LOAD_CONST              10 ('apply_all')
+             64 STORE_SUBSCR
+             68 RETURN_CONST             3 (None)
+
+Disassembly of <code object apply_style at 0x28e39530, file "app\api\style.py", line 60>:
+ 60           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 62           6 LOAD_GLOBAL              1 (NULL + psvc)
+             16 LOAD_ATTR                2 (get_project)
+             36 LOAD_FAST                2 (db)
+             38 LOAD_FAST                0 (project_id)
+             40 CALL                     2
+             48 POP_TOP
+
+ 63          50 LOAD_FAST                1 (body)
+             52 LOAD_ATTR                4 (apply_all)
+             72 POP_JUMP_IF_FALSE       46 (to 166)
+             74 LOAD_GLOBAL              7 (NULL + vsvc)
+             84 LOAD_ATTR                8 (list_videos)
+            104 LOAD_FAST                2 (db)
+            106 LOAD_FAST                0 (project_id)
+            108 CALL                     2
+            116 GET_ITER
+            118 LOAD_FAST_AND_CLEAR      3 (v)
+            120 SWAP                     2
+            122 BUILD_LIST               0
+            124 SWAP                     2
+        >>  126 FOR_ITER                14 (to 158)
+            130 STORE_FAST               3 (v)
+            132 LOAD_FAST                3 (v)
+            134 LOAD_ATTR               10 (id)
+            154 LIST_APPEND              2
+            156 JUMP_BACKWARD           16 (to 126)
+        >>  158 END_FOR
+            160 SWAP                     2
+            162 STORE_FAST               3 (v)
+            164 JUMP_FORWARD            11 (to 188)
+        >>  166 LOAD_FAST                1 (body)
+            168 LOAD_ATTR               12 (video_ids)
+        >>  188 STORE_FAST               4 (targets)
+
+ 64         190 BUILD_LIST               0
+            192 STORE_FAST               5 (updated)
+
+ 65         194 LOAD_FAST                4 (targets)
+            196 GET_ITER
+        >>  198 FOR_ITER               181 (to 564)
+            202 STORE_FAST               6 (vid)
+
+ 66         204 LOAD_GLOBAL              7 (NULL + vsvc)
+            214 LOAD_ATTR               14 (get_video)
+            234 LOAD_FAST                2 (db)
+            236 LOAD_FAST                6 (vid)
+            238 CALL                     2
+            246 STORE_FAST               3 (v)
+
+ 67         248 LOAD_GLOBAL              7 (NULL + vsvc)
+            258 LOAD_ATTR               16 (get_video_config)
+            278 LOAD_FAST                3 (v)
+            280 CALL                     1
+            288 STORE_FAST               7 (cfg)
+
+ 68         290 LOAD_GLOBAL             19 (NULL + dict)
+            300 LOAD_FAST                7 (cfg)
+            302 LOAD_ATTR               21 (NULL|self + get)
+            322 LOAD_CONST               1 ('subtitle_style')
+            324 CALL                     1
+            332 COPY                     1
+            334 POP_JUMP_IF_TRUE         2 (to 340)
+            336 POP_TOP
+            338 BUILD_MAP                0
+        >>  340 CALL                     1
+            348 STORE_FAST               8 (sub)
+
+ 69         350 LOAD_FAST                1 (body)
+            352 LOAD_ATTR               22 (preset_id)
+            372 LOAD_FAST                8 (sub)
+            374 LOAD_CONST               2 ('preset_id')
+            376 STORE_SUBSCR
+
+ 71         380 LOAD_FAST                1 (body)
+            382 LOAD_ATTR               24 (overrides)
+            402 POP_JUMP_IF_FALSE       16 (to 436)
+
+ 72         404 LOAD_FAST                1 (body)
+            406 LOAD_ATTR               24 (overrides)
+            426 LOAD_FAST                8 (sub)
+            428 LOAD_CONST               3 ('overrides')
+            430 STORE_SUBSCR
+            434 JUMP_FORWARD            18 (to 472)
+
+ 74     >>  436 LOAD_FAST                8 (sub)
+            438 LOAD_ATTR               27 (NULL|self + pop)
+            458 LOAD_CONST               3 ('overrides')
+            460 LOAD_CONST               0 (None)
+            462 CALL                     2
+            470 POP_TOP
+
+ 75     >>  472 LOAD_FAST                8 (sub)
+            474 LOAD_FAST                7 (cfg)
+            476 LOAD_CONST               1 ('subtitle_style')
+            478 STORE_SUBSCR
+
+ 76         482 LOAD_GLOBAL              7 (NULL + vsvc)
+            492 LOAD_ATTR               28 (set_video_config)
+            512 LOAD_FAST                2 (db)
+            514 LOAD_FAST                3 (v)
+            516 LOAD_FAST                7 (cfg)
+            518 CALL                     3
+            526 POP_TOP
+
+ 77         528 LOAD_FAST                5 (updated)
+            530 LOAD_ATTR               31 (NULL|self + append)
+            550 LOAD_FAST                6 (vid)
+            552 CALL                     1
+            560 POP_TOP
+            562 JUMP_BACKWARD          183 (to 198)
+
+ 65     >>  564 END_FOR
+
+ 78         566 LOAD_FAST                5 (updated)
+            568 LOAD_FAST                1 (body)
+            570 LOAD_ATTR               22 (preset_id)
+            590 LOAD_CONST               4 (('updated', 'preset_id'))
+            592 BUILD_CONST_KEY_MAP      2
+            594 RETURN_VALUE
+        >>  596 SWAP                     2
+            598 POP_TOP
+
+ 63         600 SWAP                     2
+            602 STORE_FAST               3 (v)
+            604 RERAISE                  0
+        >>  606 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            608 RERAISE                  1
+ExceptionTable:
+  4 to 120 -> 606 [0] lasti
+  122 to 158 -> 596 [2]
+  160 to 604 -> 606 [0] lasti
+
+Disassembly of <code object RenderFrameRequest at 0x7f6c81b7e310, file "app\api\style.py", line 82>:
+ 82           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('RenderFrameRequest')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 83          12 LOAD_CONST               1 (0)
+             14 STORE_NAME               3 (t_ms)
+             16 LOAD_CONST               2 ('int')
+             18 LOAD_NAME                4 (__annotations__)
+             20 LOAD_CONST               3 ('t_ms')
+             22 STORE_SUBSCR
+
+ 84          26 LOAD_CONST               4 (None)
+             28 STORE_NAME               5 (style)
+             30 LOAD_CONST               5 ('dict | None')
+             32 LOAD_NAME                4 (__annotations__)
+             34 LOAD_CONST               6 ('style')
+             36 STORE_SUBSCR
+
+ 85          40 LOAD_CONST               4 (None)
+             42 STORE_NAME               6 (removal)
+             44 LOAD_CONST               5 ('dict | None')
+             46 LOAD_NAME                4 (__annotations__)
+             48 LOAD_CONST               7 ('removal')
+             50 STORE_SUBSCR
+
+ 86          54 LOAD_CONST               8 (False)
+             56 STORE_NAME               7 (bare)
+             58 LOAD_CONST               9 ('bool')
+             60 LOAD_NAME                4 (__annotations__)
+             62 LOAD_CONST              10 ('bare')
+             64 STORE_SUBSCR
+
+ 87          68 LOAD_CONST              11 (540)
+             70 STORE_NAME               8 (width)
+             72 LOAD_CONST               2 ('int')
+             74 LOAD_NAME                4 (__annotations__)
+             76 LOAD_CONST              12 ('width')
+             78 STORE_SUBSCR
+             82 RETURN_CONST             4 (None)
+
+Disassembly of <code object render_video_frame at 0x269faf40, file "app\api\style.py", line 90>:
+ 90           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 92           6 LOAD_GLOBAL              1 (NULL + vsvc)
+             16 LOAD_ATTR                2 (get_video)
+             36 LOAD_FAST                2 (db)
+             38 LOAD_FAST                0 (video_id)
+             40 CALL                     2
+             48 STORE_FAST               3 (v)
+
+ 93          50 LOAD_GLOBAL              5 (NULL + render_frame)
+
+ 94          60 LOAD_FAST                0 (video_id)
+
+ 95          62 LOAD_GLOBAL              7 (NULL + __import__)
+             72 LOAD_CONST               1 ('pathlib')
+             74 CALL                     1
+             82 LOAD_ATTR                9 (NULL|self + Path)
+            102 LOAD_FAST                3 (v)
+            104 LOAD_ATTR               10 (project)
+            124 LOAD_ATTR               12 (root_path)
+            144 CALL                     1
+
+ 96         152 LOAD_GLOBAL              1 (NULL + vsvc)
+            162 LOAD_ATTR               14 (get_video_config)
+            182 LOAD_FAST                3 (v)
+            184 CALL                     1
+
+ 97         192 LOAD_FAST                1 (body)
+            194 LOAD_ATTR               16 (t_ms)
+
+ 98         214 LOAD_FAST                1 (body)
+            216 LOAD_ATTR               18 (style)
+
+ 99         236 LOAD_FAST                1 (body)
+            238 LOAD_ATTR               20 (removal)
+
+100         258 LOAD_FAST                1 (body)
+            260 LOAD_ATTR               22 (bare)
+
+101         280 LOAD_GLOBAL             25 (NULL + max)
+            290 LOAD_CONST               2 (160)
+            292 LOAD_GLOBAL             27 (NULL + min)
+            302 LOAD_CONST               3 (1080)
+            304 LOAD_FAST                1 (body)
+            306 LOAD_ATTR               28 (width)
+            326 CALL                     2
+            334 CALL                     2
+
+ 93         342 KW_NAMES                 4 (('video_id', 'workdir', 'config', 't_ms', 'style_override', 'removal_override', 'bare', 'width'))
+            344 CALL                     8
+            352 GET_AWAITABLE            0
+            354 LOAD_CONST               0 (None)
+        >>  356 SEND                     3 (to 366)
+            360 YIELD_VALUE              2
+            362 RESUME                   3
+            364 JUMP_BACKWARD_NO_INTERRUPT     5 (to 356)
+        >>  366 END_SEND
+            368 STORE_FAST               4 (png)
+
+103         370 LOAD_GLOBAL             31 (NULL + Response)
+            380 LOAD_FAST                4 (png)
+            382 LOAD_CONST               5 ('image/png')
+
+104         384 LOAD_CONST               6 ('Cache-Control')
+            386 LOAD_CONST               7 ('no-store')
+            388 BUILD_MAP                1
+
+103         390 KW_NAMES                 8 (('content', 'media_type', 'headers'))
+            392 CALL                     3
+            400 RETURN_VALUE
+
+ 93     >>  402 CLEANUP_THROW
+            404 JUMP_BACKWARD           20 (to 366)
+        >>  406 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            408 RERAISE                  1
+ExceptionTable:
+  4 to 358 -> 406 [0] lasti
+  360 to 360 -> 402 [2]
+  362 to 402 -> 406 [0] lasti

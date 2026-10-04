@@ -1,0 +1,294 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('WebSocket endpoint — đẩy event realtime. Xem docs/05.')
+              4 STORE_NAME               0 (__doc__)
+
+  2           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+  4          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (asyncio)
+             24 STORE_NAME               3 (asyncio)
+
+  6          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               4 (('APIRouter', 'WebSocket', 'WebSocketDisconnect'))
+             30 IMPORT_NAME              4 (fastapi)
+             32 IMPORT_FROM              5 (APIRouter)
+             34 STORE_NAME               5 (APIRouter)
+             36 IMPORT_FROM              6 (WebSocket)
+             38 STORE_NAME               6 (WebSocket)
+             40 IMPORT_FROM              7 (WebSocketDisconnect)
+             42 STORE_NAME               7 (WebSocketDisconnect)
+             44 POP_TOP
+
+  8          46 LOAD_CONST               1 (0)
+             48 LOAD_CONST               5 (('verify_token_ws',))
+             50 IMPORT_NAME              8 (app.deps)
+             52 IMPORT_FROM              9 (verify_token_ws)
+             54 STORE_NAME               9 (verify_token_ws)
+             56 POP_TOP
+
+  9          58 LOAD_CONST               1 (0)
+             60 LOAD_CONST               6 (('bus',))
+             62 IMPORT_NAME             10 (app.core.events)
+             64 IMPORT_FROM             11 (bus)
+             66 STORE_NAME              11 (bus)
+             68 POP_TOP
+
+ 10          70 LOAD_CONST               1 (0)
+             72 LOAD_CONST               7 (('log',))
+             74 IMPORT_NAME             12 (app.core.logging)
+             76 IMPORT_FROM             13 (log)
+             78 STORE_NAME              13 (log)
+             80 POP_TOP
+
+ 12          82 PUSH_NULL
+             84 LOAD_NAME                5 (APIRouter)
+             86 CALL                     0
+             94 STORE_NAME              14 (router)
+
+ 15          96 LOAD_NAME               14 (router)
+             98 LOAD_ATTR               31 (NULL|self + websocket)
+            118 LOAD_CONST               8 ('/api/v1/ws')
+            120 CALL                     1
+
+ 16         128 LOAD_CONST              10 ((None, None))
+            130 LOAD_CONST              11 (('ws', 'WebSocket', 'token', 'str | None', 'project_id', 'str | None'))
+            132 LOAD_CONST               9 (<code object ws_endpoint at 0x28b788e0, file "app\api\ws.py", line 15>)
+            134 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 15         136 CALL                     0
+
+ 16         144 STORE_NAME              16 (ws_endpoint)
+            146 RETURN_CONST             3 (None)
+
+Disassembly of <code object ws_endpoint at 0x28b788e0, file "app\api\ws.py", line 15>:
+ 15           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 17           6 LOAD_GLOBAL              1 (NULL + verify_token_ws)
+             16 LOAD_FAST                1 (token)
+             18 CALL                     1
+             26 POP_JUMP_IF_TRUE        27 (to 82)
+
+ 18          28 LOAD_FAST                0 (ws)
+             30 LOAD_ATTR                3 (NULL|self + close)
+             50 LOAD_CONST               1 (4401)
+             52 KW_NAMES                 2 (('code',))
+             54 CALL                     1
+             62 GET_AWAITABLE            0
+             64 LOAD_CONST               0 (None)
+        >>   66 SEND                     3 (to 76)
+             70 YIELD_VALUE              2
+             72 RESUME                   3
+             74 JUMP_BACKWARD_NO_INTERRUPT     5 (to 66)
+        >>   76 END_SEND
+             78 POP_TOP
+
+ 19          80 RETURN_CONST             0 (None)
+
+ 20     >>   82 LOAD_FAST                0 (ws)
+             84 LOAD_ATTR                5 (NULL|self + accept)
+            104 CALL                     0
+            112 GET_AWAITABLE            0
+            114 LOAD_CONST               0 (None)
+        >>  116 SEND                     3 (to 126)
+            120 YIELD_VALUE              2
+            122 RESUME                   3
+            124 JUMP_BACKWARD_NO_INTERRUPT     5 (to 116)
+        >>  126 END_SEND
+            128 POP_TOP
+
+ 21         130 LOAD_GLOBAL              7 (NULL + bus)
+            140 LOAD_ATTR                8 (subscribe)
+            160 CALL                     0
+            168 STORE_FAST               3 (q)
+
+ 22         170 LOAD_GLOBAL             11 (NULL + log)
+            180 LOAD_ATTR               12 (info)
+            200 LOAD_CONST               3 ('WS connected (project=')
+            202 LOAD_FAST                2 (project_id)
+            204 FORMAT_VALUE             0
+            206 LOAD_CONST               4 (')')
+            208 BUILD_STRING             3
+            210 CALL                     1
+            218 POP_TOP
+
+ 23         220 NOP
+
+ 25         222 LOAD_FAST                0 (ws)
+            224 LOAD_ATTR               15 (NULL|self + send_json)
+            244 LOAD_CONST               5 ('hello')
+            246 LOAD_FAST                2 (project_id)
+            248 LOAD_CONST               6 (('type', 'project_id'))
+            250 BUILD_CONST_KEY_MAP      2
+            252 CALL                     1
+            260 GET_AWAITABLE            0
+            262 LOAD_CONST               0 (None)
+        >>  264 SEND                     3 (to 274)
+            268 YIELD_VALUE              4
+            270 RESUME                   3
+            272 JUMP_BACKWARD_NO_INTERRUPT     5 (to 264)
+        >>  274 END_SEND
+            276 POP_TOP
+
+ 26     >>  278 NOP
+
+ 27     >>  280 LOAD_FAST                3 (q)
+            282 LOAD_ATTR               17 (NULL|self + get)
+            302 CALL                     0
+            310 GET_AWAITABLE            0
+            312 LOAD_CONST               0 (None)
+        >>  314 SEND                     3 (to 324)
+            318 YIELD_VALUE              4
+            320 RESUME                   3
+            322 JUMP_BACKWARD_NO_INTERRUPT     5 (to 314)
+        >>  324 END_SEND
+            326 STORE_FAST               4 (event)
+
+ 29         328 LOAD_FAST                2 (project_id)
+            330 POP_JUMP_IF_FALSE       22 (to 376)
+            332 LOAD_FAST                4 (event)
+            334 LOAD_ATTR               17 (NULL|self + get)
+            354 LOAD_CONST               7 ('project_id')
+            356 CALL                     1
+            364 LOAD_CONST               0 (None)
+            366 LOAD_FAST                2 (project_id)
+            368 BUILD_TUPLE              2
+            370 CONTAINS_OP              1
+            372 POP_JUMP_IF_FALSE        1 (to 376)
+
+ 30         374 JUMP_BACKWARD           49 (to 278)
+
+ 31     >>  376 LOAD_FAST                0 (ws)
+            378 LOAD_ATTR               15 (NULL|self + send_json)
+            398 LOAD_FAST                4 (event)
+            400 CALL                     1
+            408 GET_AWAITABLE            0
+            410 LOAD_CONST               0 (None)
+        >>  412 SEND                     3 (to 422)
+            416 YIELD_VALUE              4
+            418 RESUME                   3
+            420 JUMP_BACKWARD_NO_INTERRUPT     5 (to 412)
+        >>  422 END_SEND
+            424 POP_TOP
+
+ 26         426 JUMP_BACKWARD           74 (to 280)
+
+ 18     >>  428 CLEANUP_THROW
+            430 JUMP_BACKWARD          178 (to 76)
+
+ 20     >>  432 CLEANUP_THROW
+            434 JUMP_BACKWARD          155 (to 126)
+
+ 25     >>  436 CLEANUP_THROW
+            438 JUMP_BACKWARD           83 (to 274)
+
+ 27     >>  440 CLEANUP_THROW
+            442 JUMP_BACKWARD           60 (to 324)
+
+ 31     >>  444 CLEANUP_THROW
+            446 JUMP_BACKWARD           13 (to 422)
+        >>  448 PUSH_EXC_INFO
+
+ 32         450 LOAD_GLOBAL             18 (WebSocketDisconnect)
+            460 CHECK_EXC_MATCH
+            462 POP_JUMP_IF_FALSE        3 (to 470)
+            464 POP_TOP
+
+ 33         466 POP_EXCEPT
+            468 JUMP_FORWARD            45 (to 560)
+
+ 34     >>  470 LOAD_GLOBAL             20 (Exception)
+            480 CHECK_EXC_MATCH
+            482 POP_JUMP_IF_FALSE       34 (to 552)
+            484 STORE_FAST               5 (e)
+
+ 35         486 LOAD_GLOBAL             11 (NULL + log)
+            496 LOAD_ATTR               12 (info)
+            516 LOAD_CONST               8 ('WS error: ')
+            518 LOAD_FAST                5 (e)
+            520 FORMAT_VALUE             0
+            522 BUILD_STRING             2
+            524 CALL                     1
+            532 POP_TOP
+            534 POP_EXCEPT
+            536 LOAD_CONST               0 (None)
+            538 STORE_FAST               5 (e)
+            540 DELETE_FAST              5 (e)
+            542 JUMP_FORWARD             8 (to 560)
+        >>  544 LOAD_CONST               0 (None)
+            546 STORE_FAST               5 (e)
+            548 DELETE_FAST              5 (e)
+            550 RERAISE                  1
+
+ 34     >>  552 RERAISE                  0
+        >>  554 COPY                     3
+            556 POP_EXCEPT
+            558 RERAISE                  1
+
+ 37     >>  560 LOAD_GLOBAL              7 (NULL + bus)
+            570 LOAD_ATTR               22 (unsubscribe)
+            590 LOAD_FAST                3 (q)
+            592 CALL                     1
+            600 POP_TOP
+
+ 38         602 LOAD_GLOBAL             11 (NULL + log)
+            612 LOAD_ATTR               12 (info)
+            632 LOAD_CONST               9 ('WS disconnected')
+            634 CALL                     1
+            642 POP_TOP
+            644 RETURN_CONST             0 (None)
+        >>  646 PUSH_EXC_INFO
+
+ 37         648 LOAD_GLOBAL              7 (NULL + bus)
+            658 LOAD_ATTR               22 (unsubscribe)
+            678 LOAD_FAST                3 (q)
+            680 CALL                     1
+            688 POP_TOP
+
+ 38         690 LOAD_GLOBAL             11 (NULL + log)
+            700 LOAD_ATTR               12 (info)
+            720 LOAD_CONST               9 ('WS disconnected')
+            722 CALL                     1
+            730 POP_TOP
+            732 RERAISE                  0
+        >>  734 COPY                     3
+            736 POP_EXCEPT
+            738 RERAISE                  1
+        >>  740 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            742 RERAISE                  1
+ExceptionTable:
+  4 to 68 -> 740 [0] lasti
+  70 to 70 -> 428 [2]
+  72 to 118 -> 740 [0] lasti
+  120 to 120 -> 432 [2]
+  122 to 218 -> 740 [0] lasti
+  222 to 266 -> 448 [0]
+  268 to 268 -> 436 [2]
+  270 to 316 -> 448 [0]
+  318 to 318 -> 440 [2]
+  320 to 414 -> 448 [0]
+  416 to 416 -> 444 [2]
+  418 to 426 -> 448 [0]
+  428 to 428 -> 740 [0] lasti
+  432 to 432 -> 740 [0] lasti
+  436 to 436 -> 448 [0]
+  440 to 440 -> 448 [0]
+  444 to 444 -> 448 [0]
+  448 to 464 -> 554 [1] lasti
+  466 to 468 -> 646 [0]
+  470 to 484 -> 554 [1] lasti
+  486 to 532 -> 544 [1] lasti
+  534 to 542 -> 646 [0]
+  544 to 552 -> 554 [1] lasti
+  554 to 558 -> 646 [0]
+  560 to 644 -> 740 [0] lasti
+  646 to 732 -> 734 [1] lasti
+  734 to 738 -> 740 [0] lasti

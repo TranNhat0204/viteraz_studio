@@ -1,0 +1,3814 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Master prompt — "xưởng viết kịch bản" của từng kênh (`channel_profile.script_master_prompt`).\n\nĐây là NGUỒN GIỌNG DUY NHẤT của một kênh. Trước đây còn `script_style` (ô "Phong cách viết kịch bản")\nvà `voice_dna` (học từ kênh đối thủ) nối vào cuối `engine.body`; cả hai đã gỡ bỏ — xem\ndocs/plan-remove-script-style.md.\n\n`script_master_prompt` = MỘT prompt sản xuất hoàn chỉnh 300–600 dòng (xem app/resources/master_prompts/)\ntự mang đủ: source gate + quyền TỪ CHỐI nguồn yếu, fact levels, kiến trúc beat & retention, brand\nidentity, và HỢP ĐỒNG OUTPUT riêng (TITLE / SCRIPT / END OF SCRIPT / NARRATION DIRECTION).\n\nVì vậy master prompt THAY THẾ `engine.body` ở bước `script`, không nối thêm — nối thì hai bộ luật\nđánh nhau, và hợp đồng output sẽ chọi với OUTPUT RULES của luồng engine khiến rác lọt vào phụ đề\n(`TITLE:`, `END OF SCRIPT`, `NARRATION DIRECTION` đều KHÔNG bị clean_llm_script dọn).\n\nUser chưa nhập gì ⇒ `resolve()` trả "" ⇒ pipeline chạy thuần `engine.body` như cũ. KHÔNG có master\nprompt mặc định của hệ thống: 16 file trong app/resources/master_prompts/ là tài liệu để user tự dán,\nruntime không đọc tới.\n\nCHỈ bước `script` dùng master prompt — cố ý:\n  - `ideation` phải trả về JSON IdeaCard; master prompt bắt trả TITLE/SCRIPT sẽ phá schema (và đốt\n    ~10k token mỗi lần đề xuất ý tưởng cho việc không dùng đến).\n  - `storyboard` cần STAGE 3 (visual DNA, style_anchor/style_lock, luật cast) của engine — master\n    prompt không có phần hình.\n  - `metadata` chạy trên transcript đã có, không cần.\n⇒ Bật master prompt KHÔNG đổi một byte nào của ideation / storyboard / metadata.\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 27           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 29          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (json)
+             24 STORE_NAME               3 (json)
+
+ 30          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               3 (None)
+             30 IMPORT_NAME              4 (re)
+             32 STORE_NAME               4 (re)
+
+ 31          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               4 (('dataclass', 'field'))
+             38 IMPORT_NAME              5 (dataclasses)
+             40 IMPORT_FROM              6 (dataclass)
+             42 STORE_NAME               6 (dataclass)
+             44 IMPORT_FROM              7 (field)
+             46 STORE_NAME               7 (field)
+             48 POP_TOP
+
+ 37          50 PUSH_NULL
+             52 LOAD_NAME                4 (re)
+             54 LOAD_ATTR               16 (compile)
+             74 LOAD_CONST               5 ('\\{\\{\\s*([A-Z0-9_]+)\\s*\\}\\}')
+             76 CALL                     1
+             84 STORE_NAME               9 (_PLACEHOLDER_RE)
+
+ 38          86 BUILD_SET                0
+             88 LOAD_CONST               6 (frozenset({'CHANNEL_NAME', 'BRAND_NAME', 'CHANNEL', 'CHANNEL_TITLE'}))
+             90 SET_UPDATE               1
+             92 STORE_NAME              10 (_CHANNEL_NAME_KEYS)
+
+ 40          94 LOAD_CONST               7 ('This Channel')
+             96 STORE_NAME              11 (_DEFAULT_CHANNEL_NAME)
+
+ 43          98 LOAD_CONST              57 (('config', 'dict | None', 'return', 'str'))
+            100 LOAD_CONST               8 (<code object resolve at 0x7f6c9234da70, file "app\services\master_prompt.py", line 43>)
+            102 MAKE_FUNCTION            4 (annotations)
+            104 STORE_NAME              12 (resolve)
+
+ 53         106 LOAD_CONST               3 (None)
+            108 LOAD_CONST               3 (None)
+
+ 54         110 LOAD_CONST               3 (None)
+
+ 55         112 LOAD_CONST               3 (None)
+
+ 56         114 LOAD_CONST               3 (None)
+
+ 53         116 LOAD_CONST               9 (('news_source', 'facts_block', 'idea', 'competitor_brief', 'audience_read'))
+            118 BUILD_CONST_KEY_MAP      5
+
+ 54         120 NOP
+
+ 53         122 NOP
+
+ 55         124 NOP
+
+ 53         126 NOP
+
+ 56         128 NOP
+
+ 53         130 NOP
+
+ 56         132 NOP
+
+ 53         134 LOAD_CONST              58 (('news_source', 'str | None', 'facts_block', 'str | None', 'idea', 'dict | None', 'competitor_brief', 'dict | None', 'audience_read', 'dict | None', 'return', 'tuple[str, bool]'))
+            136 LOAD_CONST              10 (<code object build_source_packet at 0x28c47c60, file "app\services\master_prompt.py", line 53>)
+            138 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            140 STORE_NAME              13 (build_source_packet)
+
+106         142 LOAD_CONST              59 (('read', 'dict | None', 'return', 'str'))
+            144 LOAD_CONST              11 (<code object _audience_read_block at 0x28d63a00, file "app\services\master_prompt.py", line 106>)
+            146 MAKE_FUNCTION            4 (annotations)
+            148 STORE_NAME              14 (_audience_read_block)
+
+155         150 LOAD_CONST              60 (('brief', 'dict | None', 'return', 'str'))
+            152 LOAD_CONST              12 (<code object _competitor_brief_block at 0x28d5c660, file "app\services\master_prompt.py", line 155>)
+            154 MAKE_FUNCTION            4 (annotations)
+            156 STORE_NAME              15 (_competitor_brief_block)
+
+197         158 LOAD_CONST              61 (('idea', 'dict | None', 'return', 'str'))
+            160 LOAD_CONST              13 (<code object _idea_brief at 0x28c58060, file "app\services\master_prompt.py", line 197>)
+            162 MAKE_FUNCTION            4 (annotations)
+            164 STORE_NAME              16 (_idea_brief)
+
+230         166 LOAD_NAME                6 (dataclass)
+
+231         168 PUSH_NULL
+            170 LOAD_BUILD_CLASS
+            172 LOAD_CONST              14 (<code object RenderedMaster at 0x7f6c926fb660, file "app\services\master_prompt.py", line 230>)
+            174 MAKE_FUNCTION            0
+            176 LOAD_CONST              15 ('RenderedMaster')
+            178 CALL                     2
+
+230         186 CALL                     0
+
+231         194 STORE_NAME              17 (RenderedMaster)
+
+238         196 LOAD_CONST              62 (('master', 'str', 'channel_name', 'str | None', 'source_packet', 'str', 'return', 'RenderedMaster'))
+            198 LOAD_CONST              16 (<code object render at 0x7f6c92411990, file "app\services\master_prompt.py", line 238>)
+            200 MAKE_FUNCTION            4 (annotations)
+            202 STORE_NAME              18 (render)
+
+271         204 PUSH_NULL
+            206 LOAD_NAME                4 (re)
+            208 LOAD_ATTR               16 (compile)
+            228 LOAD_CONST              17 ('^\\s*STATUS\\s*[:\\-]\\s*REJECTED\\b')
+            230 LOAD_NAME                4 (re)
+            232 LOAD_ATTR               38 (IGNORECASE)
+            252 LOAD_NAME                4 (re)
+            254 LOAD_ATTR               40 (MULTILINE)
+            274 BINARY_OP                7 (|)
+            278 CALL                     2
+            286 STORE_NAME              21 (_REJECT_RE)
+
+272         288 PUSH_NULL
+            290 LOAD_NAME                4 (re)
+            292 LOAD_ATTR               16 (compile)
+            312 LOAD_CONST              18 ('^\\s*REASON\\s*[:\\-]\\s*(.+)$')
+            314 LOAD_NAME                4 (re)
+            316 LOAD_ATTR               38 (IGNORECASE)
+            336 LOAD_NAME                4 (re)
+            338 LOAD_ATTR               40 (MULTILINE)
+            358 BINARY_OP                7 (|)
+            362 CALL                     2
+            370 STORE_NAME              22 (_REASON_RE)
+
+273         372 PUSH_NULL
+            374 LOAD_NAME                4 (re)
+            376 LOAD_ATTR               16 (compile)
+            396 LOAD_CONST              19 ('^\\s*TITLE\\s*[:\\-]\\s*(.+?)\\s*$')
+            398 LOAD_NAME                4 (re)
+            400 LOAD_ATTR               38 (IGNORECASE)
+            420 LOAD_NAME                4 (re)
+            422 LOAD_ATTR               40 (MULTILINE)
+            442 BINARY_OP                7 (|)
+            446 CALL                     2
+            454 STORE_NAME              23 (_TITLE_RE)
+
+274         456 PUSH_NULL
+            458 LOAD_NAME                4 (re)
+            460 LOAD_ATTR               16 (compile)
+            480 LOAD_CONST              20 ('^[ \\t]*SCRIPT\\s*[:\\-][ \\t]*(.*)$')
+            482 LOAD_NAME                4 (re)
+            484 LOAD_ATTR               38 (IGNORECASE)
+            504 LOAD_NAME                4 (re)
+            506 LOAD_ATTR               40 (MULTILINE)
+            526 BINARY_OP                7 (|)
+            530 CALL                     2
+            538 STORE_NAME              24 (_SCRIPT_RE)
+
+275         540 PUSH_NULL
+            542 LOAD_NAME                4 (re)
+            544 LOAD_ATTR               16 (compile)
+            564 LOAD_CONST              21 ('^[ \\t]*-{2,}\\s*END OF SCRIPT\\s*-{2,}[ \\t]*$')
+            566 LOAD_NAME                4 (re)
+            568 LOAD_ATTR               38 (IGNORECASE)
+            588 LOAD_NAME                4 (re)
+            590 LOAD_ATTR               40 (MULTILINE)
+            610 BINARY_OP                7 (|)
+            614 CALL                     2
+            622 STORE_NAME              25 (_END_RE)
+
+276         624 PUSH_NULL
+            626 LOAD_NAME                4 (re)
+            628 LOAD_ATTR               16 (compile)
+            648 LOAD_CONST              22 ('^[ \\t]*NARRATION\\s+DIRECTION\\s*[:\\-][ \\t]*(.*)$')
+            650 LOAD_NAME                4 (re)
+            652 LOAD_ATTR               38 (IGNORECASE)
+            672 LOAD_NAME                4 (re)
+            674 LOAD_ATTR               40 (MULTILINE)
+            694 BINARY_OP                7 (|)
+            698 CALL                     2
+            706 STORE_NAME              26 (_ND_RE)
+
+277         708 PUSH_NULL
+            710 LOAD_NAME                4 (re)
+            712 LOAD_ATTR               16 (compile)
+            732 LOAD_CONST              23 ('^\\s*```[a-zA-Z]*\\s*\\n(.*?)\\n\\s*```\\s*$')
+            734 LOAD_NAME                4 (re)
+            736 LOAD_ATTR               54 (DOTALL)
+            756 CALL                     2
+            764 STORE_NAME              28 (_FENCE_RE)
+
+280         766 LOAD_NAME                6 (dataclass)
+
+281         768 PUSH_NULL
+            770 LOAD_BUILD_CLASS
+            772 LOAD_CONST              24 (<code object MasterOutput at 0x7f6c9234e3a0, file "app\services\master_prompt.py", line 280>)
+            774 MAKE_FUNCTION            0
+            776 LOAD_CONST              25 ('MasterOutput')
+            778 CALL                     2
+
+280         786 CALL                     0
+
+281         794 STORE_NAME              29 (MasterOutput)
+
+293         796 LOAD_CONST              63 (('raw', 'str', 'return', 'MasterOutput'))
+            798 LOAD_CONST              26 (<code object parse_output at 0x28d664d0, file "app\services\master_prompt.py", line 293>)
+            800 MAKE_FUNCTION            4 (annotations)
+            802 STORE_NAME              30 (parse_output)
+
+353         804 PUSH_NULL
+            806 LOAD_NAME                4 (re)
+            808 LOAD_ATTR               16 (compile)
+            828 LOAD_CONST              27 ('^\\s*```')
+            830 CALL                     1
+            838 STORE_NAME              31 (_FENCE_LINE_RE)
+
+354         840 PUSH_NULL
+            842 LOAD_NAME                4 (re)
+            844 LOAD_ATTR               16 (compile)
+            864 LOAD_CONST              28 ('^\\s*#{1,6}\\s')
+            866 CALL                     1
+            874 STORE_NAME              32 (_HEADING_LINE_RE)
+
+355         876 PUSH_NULL
+            878 LOAD_NAME                4 (re)
+            880 LOAD_ATTR               16 (compile)
+            900 LOAD_CONST              29 ('^\\s*\\*\\*[^*]{1,60}\\*\\*\\s*$')
+            902 CALL                     1
+            910 STORE_NAME              33 (_BOLD_HEADING_RE)
+
+356         912 PUSH_NULL
+            914 LOAD_NAME                4 (re)
+            916 LOAD_ATTR               16 (compile)
+            936 LOAD_CONST              30 ('^\\s*[\\[(](?:visual|scene|sound|music|audio|camera|note|action|sfx|b-roll)\\s*[:\\-–—].*?[\\])]\\s*$')
+
+357         938 LOAD_NAME                4 (re)
+            940 LOAD_ATTR               38 (IGNORECASE)
+
+356         960 CALL                     2
+            968 STORE_NAME              34 (_STAGE_DIR_RE)
+
+358         970 PUSH_NULL
+            972 LOAD_NAME                4 (re)
+            974 LOAD_ATTR               16 (compile)
+            994 LOAD_CONST              31 ('^\\s*(?:\\[?\\d{1,2}:\\d{2}(?::\\d{2})?\\]?|\\(\\d{1,2}:\\d{2}(?::\\d{2})?\\))\\s*')
+            996 CALL                     1
+           1004 STORE_NAME              35 (_TIMESTAMP_RE)
+
+359        1006 PUSH_NULL
+           1008 LOAD_NAME                4 (re)
+           1010 LOAD_ATTR               16 (compile)
+           1030 LOAD_CONST              32 ('^\\s*(?:\\d+[.)]|[-*•])\\s+')
+           1032 CALL                     1
+           1040 STORE_NAME              36 (_LIST_MARKER_RE)
+
+362        1042 LOAD_CONST              64 (('script', 'str', 'return', 'str'))
+           1044 LOAD_CONST              33 (<code object clean_script_body at 0x28ad59e0, file "app\services\master_prompt.py", line 362>)
+           1046 MAKE_FUNCTION            4 (annotations)
+           1048 STORE_NAME              37 (clean_script_body)
+
+395        1050 LOAD_CONST              65 (('s', 'str', 'return', 'str'))
+           1052 LOAD_CONST              34 (<code object _clean_title at 0x7f6c92683830, file "app\services\master_prompt.py", line 395>)
+           1054 MAKE_FUNCTION            4 (annotations)
+           1056 STORE_NAME              38 (_clean_title)
+
+402        1058 LOAD_CONST              64 (('script', 'str', 'return', 'str'))
+           1060 LOAD_CONST              35 (<code object _strip_stray_markers at 0x28d506e0, file "app\services\master_prompt.py", line 402>)
+           1062 MAKE_FUNCTION            4 (annotations)
+           1064 STORE_NAME              39 (_strip_stray_markers)
+
+421        1066 NOP
+
+422        1068 NOP
+
+421        1070 NOP
+
+422        1072 NOP
+
+421        1074 LOAD_CONST              66 (('niche', 'str | None', 'brief', 'str | None', 'orientation', 'str | None', 'angle', 'str | None', 'return', 'str'))
+           1076 LOAD_CONST              36 (<code object _channel_identity at 0x7f6c92683130, file "app\services\master_prompt.py", line 421>)
+           1078 MAKE_FUNCTION            4 (annotations)
+           1080 STORE_NAME              40 (_channel_identity)
+
+443        1082 LOAD_CONST               3 (None)
+           1084 LOAD_CONST               3 (None)
+
+444        1086 LOAD_CONST               3 (None)
+           1088 LOAD_CONST               3 (None)
+
+445        1090 LOAD_CONST               3 (None)
+
+446        1092 LOAD_CONST              37 (False)
+
+447        1094 LOAD_CONST              38 ('')
+
+441        1096 LOAD_CONST              39 (('channel_niche', 'channel_brief', 'channel_orientation', 'niche_angle', 'channel_hook', 'has_competitor_brief', 'cast_block'))
+           1098 BUILD_CONST_KEY_MAP      7
+
+442        1100 NOP
+
+441        1102 NOP
+
+442        1104 NOP
+
+441        1106 NOP
+
+442        1108 NOP
+
+441        1110 NOP
+
+442        1112 NOP
+
+441        1114 NOP
+
+443        1116 NOP
+
+441        1118 NOP
+
+443        1120 NOP
+
+441        1122 NOP
+
+444        1124 NOP
+
+441        1126 NOP
+
+444        1128 NOP
+
+441        1130 NOP
+
+445        1132 NOP
+
+441        1134 NOP
+
+446        1136 NOP
+
+441        1138 NOP
+
+447        1140 NOP
+
+441        1142 NOP
+
+447        1144 NOP
+
+441        1146 LOAD_CONST              67 (('source_packet', 'str', 'has_documented_source', 'bool', 'attach_source', 'bool', 'language', 'str', 'target_sec', 'int | None', 'is_short', 'bool', 'channel_niche', 'str | None', 'channel_brief', 'str | None', 'channel_orientation', 'str | None', 'niche_angle', 'str | None', 'channel_hook', 'str | None', 'has_competitor_brief', 'bool', 'cast_block', 'str', 'return', 'str'))
+           1148 LOAD_CONST              40 (<code object build_user_message at 0x28c32ae0, file "app\services\master_prompt.py", line 441>)
+           1150 MAKE_FUNCTION            6 (kwdefaults, annotations)
+           1152 STORE_NAME              41 (build_user_message)
+
+541        1154 LOAD_CONST              68 (('rendered', 'RenderedMaster', 'has_documented_source', 'bool', 'return', 'str'))
+           1156 LOAD_CONST              41 (<code object debug_summary at 0x7f6c9240aa60, file "app\services\master_prompt.py", line 541>)
+           1158 MAKE_FUNCTION            4 (annotations)
+           1160 STORE_NAME              42 (debug_summary)
+
+558        1162 LOAD_CONST               1 (0)
+           1164 LOAD_CONST              42 (('Path',))
+           1166 IMPORT_NAME             43 (pathlib)
+           1168 IMPORT_FROM             44 (Path)
+           1170 STORE_NAME              44 (Path)
+           1172 POP_TOP
+
+560        1174 PUSH_NULL
+           1176 LOAD_NAME               44 (Path)
+           1178 LOAD_NAME               45 (__file__)
+           1180 CALL                     1
+           1188 LOAD_ATTR               25 (NULL|self + resolve)
+           1208 CALL                     0
+           1216 LOAD_ATTR               92 (parent)
+           1236 LOAD_ATTR               92 (parent)
+           1256 LOAD_CONST              43 ('resources')
+           1258 BINARY_OP               11 (/)
+           1262 LOAD_CONST              44 ('master_prompt_skill.md')
+           1264 BINARY_OP               11 (/)
+           1268 STORE_NAME              47 (_SKILL_PATH)
+
+565        1270 LOAD_CONST              45 (('TITLE:', 'SCRIPT:', '--- END OF SCRIPT ---', 'NARRATION DIRECTION:'))
+           1272 STORE_NAME              48 (_REQUIRED_MARKERS)
+
+566        1274 LOAD_CONST              46 (('{{CHANNEL_NAME}}',))
+           1276 STORE_NAME              49 (_REQUIRED_PLACEHOLDERS)
+
+568        1278 LOAD_CONST              47 (500)
+           1280 STORE_NAME              50 (MIN_MASTER_CHARS)
+
+571        1282 LOAD_CONST              69 (('return', 'str'))
+           1284 LOAD_CONST              48 (<code object skill_text at 0x7f6c926fb990, file "app\services\master_prompt.py", line 571>)
+           1286 MAKE_FUNCTION            4 (annotations)
+           1288 STORE_NAME              51 (skill_text)
+
+579        1290 NOP
+
+580        1292 NOP
+
+579        1294 NOP
+
+580        1296 NOP
+
+579        1298 NOP
+
+580        1300 NOP
+
+579        1302 LOAD_CONST              70 (('channel_name', 'str', 'engine_name', 'str', 'profile', 'dict', 'language', 'str', 'target_sec', 'int | None', 'return', 'dict[str, str]'))
+           1304 LOAD_CONST              49 (<code object _channel_facts at 0x28ad6b60, file "app\services\master_prompt.py", line 579>)
+           1306 MAKE_FUNCTION            4 (annotations)
+           1308 STORE_NAME              52 (_channel_facts)
+
+595        1310 NOP
+
+596        1312 NOP
+
+595        1314 NOP
+
+596        1316 NOP
+
+595        1318 NOP
+
+596        1320 NOP
+
+595        1322 LOAD_CONST              71 (('channel_name', 'str', 'engine_name', 'str', 'profile', 'dict', 'language', 'str', 'target_sec', 'int | None', 'return', 'tuple[str, str]'))
+           1324 LOAD_CONST              50 (<code object build_generate_messages at 0x7f6c9269af10, file "app\services\master_prompt.py", line 595>)
+           1326 MAKE_FUNCTION            4 (annotations)
+           1328 STORE_NAME              53 (build_generate_messages)
+
+622        1330 LOAD_CONST              72 (('current', 'str', 'instruction', 'str', 'language', 'str', 'return', 'tuple[str, str]'))
+           1332 LOAD_CONST              51 (<code object build_refine_messages at 0x7f6c9234e250, file "app\services\master_prompt.py", line 622>)
+           1334 MAKE_FUNCTION            4 (annotations)
+           1336 STORE_NAME              54 (build_refine_messages)
+
+650        1338 LOAD_CONST              73 (('text', 'str', 'return', 'list[str]'))
+           1340 LOAD_CONST              52 (<code object validate_generated at 0x28ba1d30, file "app\services\master_prompt.py", line 650>)
+           1342 MAKE_FUNCTION            4 (annotations)
+           1344 STORE_NAME              55 (validate_generated)
+
+671        1346 LOAD_CONST              74 (('raw', 'str', 'return', 'str'))
+           1348 LOAD_CONST              53 (<code object strip_wrapper at 0x28b24bf0, file "app\services\master_prompt.py", line 671>)
+           1350 MAKE_FUNCTION            4 (annotations)
+           1352 STORE_NAME              56 (strip_wrapper)
+
+688        1354 LOAD_CONST               3 (None)
+           1356 LOAD_CONST               3 (None)
+           1358 LOAD_CONST              54 (('progress', 'cancel_check'))
+           1360 BUILD_CONST_KEY_MAP      2
+           1362 LOAD_CONST              75 (('config', 'dict', 'return', 'dict'))
+           1364 LOAD_CONST              55 (<code object run_generate_job at 0x28d69280, file "app\services\master_prompt.py", line 688>)
+           1366 MAKE_FUNCTION            6 (kwdefaults, annotations)
+           1368 STORE_NAME              57 (run_generate_job)
+
+785        1370 LOAD_CONST              76 (('project_id', 'str', 'return', 'dict'))
+           1372 LOAD_CONST              56 (<code object undo at 0x28c4d9b0, file "app\services\master_prompt.py", line 785>)
+           1374 MAKE_FUNCTION            4 (annotations)
+           1376 STORE_NAME              58 (undo)
+           1378 RETURN_CONST             3 (None)
+
+Disassembly of <code object resolve at 0x7f6c9234da70, file "app\services\master_prompt.py", line 43>:
+ 43           0 RESUME                   0
+
+ 45           2 LOAD_GLOBAL              1 (NULL + isinstance)
+             12 LOAD_FAST                0 (config)
+             14 LOAD_GLOBAL              2 (dict)
+             24 CALL                     2
+             32 POP_JUMP_IF_TRUE         1 (to 36)
+
+ 46          34 RETURN_CONST             1 ('')
+
+ 47     >>   36 LOAD_FAST                0 (config)
+             38 LOAD_ATTR                5 (NULL|self + get)
+             58 LOAD_CONST               2 ('script_master_prompt')
+             60 CALL                     1
+             68 STORE_FAST               1 (raw)
+
+ 48          70 LOAD_GLOBAL              1 (NULL + isinstance)
+             80 LOAD_FAST                1 (raw)
+             82 LOAD_GLOBAL              6 (str)
+             92 CALL                     2
+            100 POP_JUMP_IF_FALSE       16 (to 134)
+            102 LOAD_FAST                1 (raw)
+            104 LOAD_ATTR                9 (NULL|self + strip)
+            124 CALL                     0
+            132 RETURN_VALUE
+        >>  134 LOAD_CONST               1 ('')
+            136 RETURN_VALUE
+
+Disassembly of <code object build_source_packet at 0x28c47c60, file "app\services\master_prompt.py", line 53>:
+ 53           0 RESUME                   0
+
+ 73           2 BUILD_LIST               0
+              4 STORE_FAST               5 (parts)
+
+ 74           6 LOAD_CONST               1 (False)
+              8 STORE_FAST               6 (has_doc)
+
+ 76          10 LOAD_FAST                0 (news_source)
+             12 COPY                     1
+             14 POP_JUMP_IF_TRUE         2 (to 20)
+             16 POP_TOP
+             18 LOAD_CONST               2 ('')
+        >>   20 LOAD_ATTR                1 (NULL|self + strip)
+             40 CALL                     0
+             48 STORE_FAST               7 (article)
+
+ 77          50 LOAD_FAST                7 (article)
+             52 POP_JUMP_IF_FALSE       22 (to 98)
+
+ 78          54 LOAD_CONST               3 (True)
+             56 STORE_FAST               6 (has_doc)
+
+ 79          58 LOAD_FAST                5 (parts)
+             60 LOAD_ATTR                3 (NULL|self + append)
+             80 LOAD_CONST               4 ('=== SOURCE DOCUMENT (published reporting — established fact) ===\n')
+             82 LOAD_FAST                7 (article)
+             84 BINARY_OP                0 (+)
+             88 CALL                     1
+             96 POP_TOP
+
+ 81     >>   98 LOAD_FAST                1 (facts_block)
+            100 COPY                     1
+            102 POP_JUMP_IF_TRUE         2 (to 108)
+            104 POP_TOP
+            106 LOAD_CONST               2 ('')
+        >>  108 LOAD_ATTR                1 (NULL|self + strip)
+            128 CALL                     0
+            136 STORE_FAST               8 (facts)
+
+ 82         138 LOAD_FAST                8 (facts)
+            140 POP_JUMP_IF_FALSE       22 (to 186)
+
+ 83         142 LOAD_CONST               3 (True)
+            144 STORE_FAST               6 (has_doc)
+
+ 84         146 LOAD_FAST                5 (parts)
+            148 LOAD_ATTR                3 (NULL|self + append)
+            168 LOAD_CONST               5 ('=== VERIFIED RESEARCH RECORD (established fact) ===\n')
+            170 LOAD_FAST                8 (facts)
+            172 BINARY_OP                0 (+)
+            176 CALL                     1
+            184 POP_TOP
+
+ 86     >>  186 LOAD_GLOBAL              5 (NULL + _competitor_brief_block)
+            196 LOAD_FAST                3 (competitor_brief)
+            198 CALL                     1
+            206 STORE_FAST               9 (third_party)
+
+ 87         208 LOAD_FAST                9 (third_party)
+            210 POP_JUMP_IF_FALSE       17 (to 246)
+
+ 88         212 LOAD_FAST                5 (parts)
+            214 LOAD_ATTR                3 (NULL|self + append)
+            234 LOAD_FAST                9 (third_party)
+            236 CALL                     1
+            244 POP_TOP
+
+ 90     >>  246 LOAD_GLOBAL              7 (NULL + _audience_read_block)
+            256 LOAD_FAST                4 (audience_read)
+            258 CALL                     1
+            266 STORE_FAST              10 (audience)
+
+ 91         268 LOAD_FAST               10 (audience)
+            270 POP_JUMP_IF_FALSE       17 (to 306)
+
+ 92         272 LOAD_FAST                5 (parts)
+            274 LOAD_ATTR                3 (NULL|self + append)
+            294 LOAD_FAST               10 (audience)
+            296 CALL                     1
+            304 POP_TOP
+
+ 94     >>  306 LOAD_GLOBAL              9 (NULL + _idea_brief)
+            316 LOAD_FAST                2 (idea)
+            318 CALL                     1
+            326 STORE_FAST              11 (brief)
+
+ 95         328 LOAD_FAST               11 (brief)
+            330 POP_JUMP_IF_FALSE       20 (to 372)
+
+ 96         332 LOAD_FAST                5 (parts)
+            334 LOAD_ATTR                3 (NULL|self + append)
+
+ 97         354 LOAD_CONST               6 ('=== EPISODE BRIEF (the commission — WHICH episode to write) ===\nThis brief is NOT a source of fact. It tells you which subject and angle this episode covers. Treat any proper noun, number or detail appearing ONLY here as the subject of the commission, never as a verified detail you may state on air.\n')
+
+100         356 LOAD_FAST               11 (brief)
+
+ 97         358 BINARY_OP                0 (+)
+
+ 96         362 CALL                     1
+            370 POP_TOP
+
+103     >>  372 LOAD_CONST               7 ('\n\n')
+            374 LOAD_ATTR               11 (NULL|self + join)
+            394 LOAD_FAST                5 (parts)
+            396 CALL                     1
+            404 LOAD_ATTR                1 (NULL|self + strip)
+            424 CALL                     0
+            432 LOAD_FAST                6 (has_doc)
+            434 BUILD_TUPLE              2
+            436 RETURN_VALUE
+
+Disassembly of <code object _audience_read_block at 0x28d63a00, file "app\services\master_prompt.py", line 106>:
+106           0 RESUME                   0
+
+114           2 LOAD_GLOBAL              1 (NULL + isinstance)
+             12 LOAD_FAST                0 (read)
+             14 LOAD_GLOBAL              2 (dict)
+             24 CALL                     2
+             32 POP_JUMP_IF_TRUE         1 (to 36)
+
+115          34 RETURN_CONST             1 ('')
+
+116     >>   36 BUILD_LIST               0
+             38 STORE_FAST               1 (lines)
+
+117          40 LOAD_CONST               2 ((('WHAT RESONATED', 'resonated'), ('GAPS — what viewers wanted and did not get', 'gaps'), ('OBJECTIONS raised', 'objections')))
+             42 GET_ITER
+        >>   44 FOR_ITER               133 (to 314)
+             48 UNPACK_SEQUENCE          2
+             52 STORE_FAST               2 (label)
+             54 STORE_FAST               3 (key)
+
+120          56 LOAD_FAST                0 (read)
+             58 LOAD_ATTR                5 (NULL|self + get)
+             78 LOAD_FAST                3 (key)
+             80 CALL                     1
+             88 COPY                     1
+             90 POP_JUMP_IF_TRUE         2 (to 96)
+             92 POP_TOP
+             94 BUILD_LIST               0
+        >>   96 GET_ITER
+             98 LOAD_FAST_AND_CLEAR      4 (r)
+            100 SWAP                     2
+            102 BUILD_LIST               0
+            104 SWAP                     2
+        >>  106 FOR_ITER                53 (to 216)
+            110 STORE_FAST               4 (r)
+            112 LOAD_GLOBAL              7 (NULL + str)
+            122 LOAD_FAST                4 (r)
+            124 CALL                     1
+            132 LOAD_ATTR                9 (NULL|self + strip)
+            152 CALL                     0
+            160 POP_JUMP_IF_TRUE         1 (to 164)
+            162 JUMP_BACKWARD           29 (to 106)
+        >>  164 LOAD_GLOBAL              7 (NULL + str)
+            174 LOAD_FAST                4 (r)
+            176 CALL                     1
+            184 LOAD_ATTR                9 (NULL|self + strip)
+            204 CALL                     0
+            212 LIST_APPEND              2
+            214 JUMP_BACKWARD           55 (to 106)
+        >>  216 END_FOR
+            218 STORE_FAST               5 (rows)
+            220 STORE_FAST               4 (r)
+
+121         222 LOAD_FAST                5 (rows)
+            224 POP_JUMP_IF_TRUE         1 (to 228)
+            226 JUMP_BACKWARD           92 (to 44)
+
+122     >>  228 LOAD_FAST                1 (lines)
+            230 LOAD_ATTR               11 (NULL|self + append)
+            250 LOAD_FAST                2 (label)
+            252 LOAD_CONST               3 (':')
+            254 BINARY_OP                0 (+)
+            258 CALL                     1
+            266 POP_TOP
+
+123         268 LOAD_FAST                1 (lines)
+            270 LOAD_FAST                5 (rows)
+            272 GET_ITER
+            274 LOAD_FAST_AND_CLEAR      4 (r)
+            276 SWAP                     2
+            278 BUILD_LIST               0
+            280 SWAP                     2
+        >>  282 FOR_ITER                 7 (to 300)
+            286 STORE_FAST               4 (r)
+            288 LOAD_CONST               4 ('  - ')
+            290 LOAD_FAST                4 (r)
+            292 FORMAT_VALUE             0
+            294 BUILD_STRING             2
+            296 LIST_APPEND              2
+            298 JUMP_BACKWARD            9 (to 282)
+        >>  300 END_FOR
+            302 SWAP                     2
+            304 STORE_FAST               4 (r)
+            306 BINARY_OP               13 (+=)
+            310 STORE_FAST               1 (lines)
+            312 JUMP_BACKWARD          135 (to 44)
+
+117     >>  314 END_FOR
+
+124         316 LOAD_FAST                0 (read)
+            318 LOAD_ATTR                5 (NULL|self + get)
+            338 LOAD_CONST               5 ('viewer_stories')
+            340 CALL                     1
+            348 COPY                     1
+            350 POP_JUMP_IF_TRUE         2 (to 356)
+            352 POP_TOP
+            354 BUILD_LIST               0
+        >>  356 GET_ITER
+            358 LOAD_FAST_AND_CLEAR      6 (s)
+            360 SWAP                     2
+            362 BUILD_LIST               0
+            364 SWAP                     2
+        >>  366 FOR_ITER                21 (to 412)
+            370 STORE_FAST               6 (s)
+            372 LOAD_GLOBAL              1 (NULL + isinstance)
+            382 LOAD_FAST                6 (s)
+            384 LOAD_GLOBAL              2 (dict)
+            394 CALL                     2
+            402 POP_JUMP_IF_TRUE         1 (to 406)
+            404 JUMP_BACKWARD           20 (to 366)
+        >>  406 LOAD_FAST                6 (s)
+            408 LIST_APPEND              2
+            410 JUMP_BACKWARD           23 (to 366)
+        >>  412 END_FOR
+            414 STORE_FAST               7 (stories)
+            416 STORE_FAST               6 (s)
+
+125         418 LOAD_FAST                7 (stories)
+            420 GET_ITER
+            422 LOAD_FAST_AND_CLEAR      6 (s)
+            424 SWAP                     2
+            426 BUILD_LIST               0
+            428 SWAP                     2
+        >>  430 FOR_ITER                87 (to 608)
+            434 STORE_FAST               6 (s)
+            436 LOAD_GLOBAL              7 (NULL + str)
+            446 LOAD_FAST                6 (s)
+            448 LOAD_ATTR                5 (NULL|self + get)
+            468 LOAD_CONST               6 ('summary')
+            470 CALL                     1
+            478 COPY                     1
+            480 POP_JUMP_IF_TRUE         2 (to 486)
+            482 POP_TOP
+            484 LOAD_CONST               1 ('')
+        >>  486 CALL                     1
+            494 LOAD_ATTR                9 (NULL|self + strip)
+            514 CALL                     0
+            522 POP_JUMP_IF_TRUE         1 (to 526)
+            524 JUMP_BACKWARD           48 (to 430)
+        >>  526 LOAD_GLOBAL              7 (NULL + str)
+            536 LOAD_FAST                6 (s)
+            538 LOAD_ATTR                5 (NULL|self + get)
+            558 LOAD_CONST               6 ('summary')
+            560 CALL                     1
+            568 CALL                     1
+            576 LOAD_ATTR                9 (NULL|self + strip)
+            596 CALL                     0
+            604 LIST_APPEND              2
+            606 JUMP_BACKWARD           89 (to 430)
+        >>  608 END_FOR
+            610 STORE_FAST               8 (told)
+            612 STORE_FAST               6 (s)
+
+126         614 LOAD_FAST                8 (told)
+            616 POP_JUMP_IF_FALSE       39 (to 696)
+
+127         618 LOAD_FAST                1 (lines)
+            620 LOAD_ATTR               11 (NULL|self + append)
+            640 LOAD_CONST               7 ('VIEWER EXPERIENCES worth building on (paraphrased, never quoted):')
+            642 CALL                     1
+            650 POP_TOP
+
+128         652 LOAD_FAST                1 (lines)
+            654 LOAD_FAST                8 (told)
+            656 GET_ITER
+            658 LOAD_FAST_AND_CLEAR      6 (s)
+            660 SWAP                     2
+            662 BUILD_LIST               0
+            664 SWAP                     2
+        >>  666 FOR_ITER                 7 (to 684)
+            670 STORE_FAST               6 (s)
+            672 LOAD_CONST               4 ('  - ')
+            674 LOAD_FAST                6 (s)
+            676 FORMAT_VALUE             0
+            678 BUILD_STRING             2
+            680 LIST_APPEND              2
+            682 JUMP_BACKWARD            9 (to 666)
+        >>  684 END_FOR
+            686 SWAP                     2
+            688 STORE_FAST               6 (s)
+            690 BINARY_OP               13 (+=)
+            694 STORE_FAST               1 (lines)
+
+129     >>  696 LOAD_FAST                1 (lines)
+            698 POP_JUMP_IF_TRUE         1 (to 702)
+
+130         700 RETURN_CONST             1 ('')
+
+132     >>  702 LOAD_FAST                0 (read)
+            704 LOAD_ATTR                5 (NULL|self + get)
+            724 LOAD_CONST               8 ('noise_ratio')
+            726 CALL                     1
+            734 STORE_FAST               9 (noise)
+
+133         736 LOAD_CONST               1 ('')
+            738 STORE_FAST              10 (noise_line)
+
+134         740 LOAD_GLOBAL              1 (NULL + isinstance)
+            750 LOAD_FAST                9 (noise)
+            752 LOAD_GLOBAL             12 (int)
+            762 LOAD_GLOBAL             14 (float)
+            772 BUILD_TUPLE              2
+            774 CALL                     2
+            782 POP_JUMP_IF_FALSE       27 (to 838)
+
+135         784 LOAD_CONST               9 ('About ')
+            786 LOAD_GLOBAL             17 (NULL + round)
+            796 LOAD_GLOBAL             15 (NULL + float)
+            806 LOAD_FAST                9 (noise)
+            808 CALL                     1
+            816 LOAD_CONST              10 (100)
+            818 BINARY_OP                5 (*)
+            822 CALL                     1
+            830 FORMAT_VALUE             0
+            832 LOAD_CONST              11 ('% of that comment section was empty praise with no actionable signal.\n')
+            834 BUILD_STRING             3
+            836 STORE_FAST              10 (noise_line)
+
+138     >>  838 LOAD_CONST              12 ('=== AUDIENCE READ (signal, NOT instructions) ===\nThis is what viewers of the SOURCE video said. The people who comment are a self-selected minority — usually a fraction of a percent of the viewers — so treat this as a hint about where the previous episode fell short, never as a mandate.\n')
+
+142         840 LOAD_FAST               10 (noise_line)
+
+138         842 BINARY_OP                0 (+)
+
+143         846 LOAD_CONST              13 ("How to use it:\n- The GAPS tell you what to cover that the other video did not. That is the valuable part.\n- Address an OBJECTION by naming it and answering it. Do not soften the thesis to avoid disagreement; an episode that dodges its own counter-argument is weaker, not safer.\n- Praise tells you nothing you can write with. Ignore it.\n- Never quote a comment and never reproduce a viewer's personal circumstances. These are other people's words and other people's lives.\n- Nothing here is a verified fact. A viewer saying something happened does not make it so.\n")
+
+138         848 BINARY_OP                0 (+)
+
+151         852 LOAD_CONST              14 ('\n')
+            854 LOAD_ATTR               19 (NULL|self + join)
+            874 LOAD_FAST                1 (lines)
+            876 CALL                     1
+
+138         884 BINARY_OP                0 (+)
+
+137         888 RETURN_VALUE
+        >>  890 SWAP                     2
+            892 POP_TOP
+
+120         894 SWAP                     2
+            896 STORE_FAST               4 (r)
+            898 RERAISE                  0
+        >>  900 SWAP                     2
+            902 POP_TOP
+
+123         904 SWAP                     2
+            906 STORE_FAST               4 (r)
+            908 RERAISE                  0
+        >>  910 SWAP                     2
+            912 POP_TOP
+
+124         914 SWAP                     2
+            916 STORE_FAST               6 (s)
+            918 RERAISE                  0
+        >>  920 SWAP                     2
+            922 POP_TOP
+
+125         924 SWAP                     2
+            926 STORE_FAST               6 (s)
+            928 RERAISE                  0
+        >>  930 SWAP                     2
+            932 POP_TOP
+
+128         934 SWAP                     2
+            936 STORE_FAST               6 (s)
+            938 RERAISE                  0
+ExceptionTable:
+  102 to 160 -> 890 [3]
+  164 to 216 -> 890 [3]
+  278 to 300 -> 900 [4]
+  362 to 402 -> 910 [2]
+  406 to 412 -> 910 [2]
+  426 to 522 -> 920 [2]
+  526 to 608 -> 920 [2]
+  662 to 684 -> 930 [3]
+
+Disassembly of <code object _competitor_brief_block at 0x28d5c660, file "app\services\master_prompt.py", line 155>:
+155           0 RESUME                   0
+
+162           2 LOAD_GLOBAL              1 (NULL + isinstance)
+             12 LOAD_FAST                0 (brief)
+             14 LOAD_GLOBAL              2 (dict)
+             24 CALL                     2
+             32 POP_JUMP_IF_FALSE       44 (to 122)
+             34 LOAD_GLOBAL              5 (NULL + str)
+             44 LOAD_FAST                0 (brief)
+             46 LOAD_ATTR                7 (NULL|self + get)
+             66 LOAD_CONST               1 ('subject')
+             68 CALL                     1
+             76 COPY                     1
+             78 POP_JUMP_IF_TRUE         2 (to 84)
+             80 POP_TOP
+             82 LOAD_CONST               2 ('')
+        >>   84 CALL                     1
+             92 LOAD_ATTR                9 (NULL|self + strip)
+            112 CALL                     0
+            120 POP_JUMP_IF_TRUE         1 (to 124)
+
+163     >>  122 RETURN_CONST             2 ('')
+
+165     >>  124 LOAD_CONST               3 ('SUBJECT: ')
+            126 LOAD_FAST                0 (brief)
+            128 LOAD_CONST               1 ('subject')
+            130 BINARY_SUBSCR
+            134 FORMAT_VALUE             0
+            136 BUILD_STRING             2
+            138 BUILD_LIST               1
+            140 STORE_FAST               1 (lines)
+
+166         142 LOAD_CONST               4 ((('PEOPLE', 'entities', ('name', 'role')), ('CHRONOLOGY', 'chronology', ('when', 'what')), ('FIGURES', 'figures', ('what', 'value'))))
+            144 GET_ITER
+        >>  146 FOR_ITER               156 (to 462)
+            150 UNPACK_SEQUENCE          3
+            154 STORE_FAST               2 (label)
+            156 STORE_FAST               3 (key)
+            158 STORE_FAST               4 (fields)
+
+169         160 LOAD_FAST                0 (brief)
+            162 LOAD_ATTR                7 (NULL|self + get)
+            182 LOAD_FAST                3 (key)
+            184 CALL                     1
+            192 COPY                     1
+            194 POP_JUMP_IF_TRUE         2 (to 200)
+            196 POP_TOP
+            198 BUILD_LIST               0
+        >>  200 GET_ITER
+            202 LOAD_FAST_AND_CLEAR      5 (r)
+            204 SWAP                     2
+            206 BUILD_LIST               0
+            208 SWAP                     2
+        >>  210 FOR_ITER                21 (to 256)
+            214 STORE_FAST               5 (r)
+            216 LOAD_GLOBAL              1 (NULL + isinstance)
+            226 LOAD_FAST                5 (r)
+            228 LOAD_GLOBAL              2 (dict)
+            238 CALL                     2
+            246 POP_JUMP_IF_TRUE         1 (to 250)
+            248 JUMP_BACKWARD           20 (to 210)
+        >>  250 LOAD_FAST                5 (r)
+            252 LIST_APPEND              2
+            254 JUMP_BACKWARD           23 (to 210)
+        >>  256 END_FOR
+            258 STORE_FAST               6 (rows)
+            260 STORE_FAST               5 (r)
+
+170         262 LOAD_FAST                6 (rows)
+            264 POP_JUMP_IF_TRUE         1 (to 268)
+            266 JUMP_BACKWARD           61 (to 146)
+
+171     >>  268 LOAD_FAST                1 (lines)
+            270 LOAD_ATTR               11 (NULL|self + append)
+            290 LOAD_FAST                2 (label)
+            292 LOAD_CONST               5 (':')
+            294 BINARY_OP                0 (+)
+            298 CALL                     1
+            306 POP_TOP
+
+172         308 LOAD_FAST                1 (lines)
+            310 LOAD_FAST                6 (rows)
+            312 GET_ITER
+            314 LOAD_FAST_AND_CLEAR      5 (r)
+            316 SWAP                     2
+            318 BUILD_LIST               0
+            320 SWAP                     2
+        >>  322 FOR_ITER                61 (to 448)
+            326 STORE_FAST               5 (r)
+            328 LOAD_CONST               6 ('  - ')
+            330 LOAD_FAST                5 (r)
+            332 LOAD_ATTR                7 (NULL|self + get)
+            352 LOAD_FAST                4 (fields)
+            354 LOAD_CONST               7 (0)
+            356 BINARY_SUBSCR
+            360 CALL                     1
+            368 FORMAT_VALUE             0
+            370 LOAD_CONST               8 (': ')
+            372 LOAD_FAST                5 (r)
+            374 LOAD_ATTR                7 (NULL|self + get)
+            394 LOAD_FAST                4 (fields)
+            396 LOAD_CONST               9 (1)
+            398 BINARY_SUBSCR
+            402 CALL                     1
+            410 FORMAT_VALUE             0
+            412 BUILD_STRING             4
+            414 LOAD_ATTR               13 (NULL|self + rstrip)
+            434 LOAD_CONST               8 (': ')
+            436 CALL                     1
+            444 LIST_APPEND              2
+            446 JUMP_BACKWARD           63 (to 322)
+        >>  448 END_FOR
+            450 SWAP                     2
+            452 STORE_FAST               5 (r)
+            454 BINARY_OP               13 (+=)
+            458 STORE_FAST               1 (lines)
+            460 JUMP_BACKWARD          158 (to 146)
+
+166     >>  462 END_FOR
+
+173         464 LOAD_CONST              10 ((('CLAIMS MADE BY THAT VIDEO', 'claims'), ('LEFT OPEN', 'open_questions')))
+            466 GET_ITER
+        >>  468 FOR_ITER               119 (to 710)
+            472 UNPACK_SEQUENCE          2
+            476 STORE_FAST               2 (label)
+            478 STORE_FAST               3 (key)
+
+175         480 LOAD_FAST                0 (brief)
+            482 LOAD_ATTR                7 (NULL|self + get)
+            502 LOAD_FAST                3 (key)
+            504 CALL                     1
+            512 COPY                     1
+            514 POP_JUMP_IF_TRUE         2 (to 520)
+            516 POP_TOP
+            518 BUILD_LIST               0
+        >>  520 GET_ITER
+            522 LOAD_FAST_AND_CLEAR      5 (r)
+            524 SWAP                     2
+            526 BUILD_LIST               0
+            528 SWAP                     2
+        >>  530 FOR_ITER                39 (to 612)
+            534 STORE_FAST               5 (r)
+            536 LOAD_GLOBAL              5 (NULL + str)
+            546 LOAD_FAST                5 (r)
+            548 CALL                     1
+            556 LOAD_ATTR                9 (NULL|self + strip)
+            576 CALL                     0
+            584 POP_JUMP_IF_TRUE         1 (to 588)
+            586 JUMP_BACKWARD           29 (to 530)
+        >>  588 LOAD_GLOBAL              5 (NULL + str)
+            598 LOAD_FAST                5 (r)
+            600 CALL                     1
+            608 LIST_APPEND              2
+            610 JUMP_BACKWARD           41 (to 530)
+        >>  612 END_FOR
+            614 STORE_FAST               6 (rows)
+            616 STORE_FAST               5 (r)
+
+176         618 LOAD_FAST                6 (rows)
+            620 POP_JUMP_IF_TRUE         1 (to 624)
+            622 JUMP_BACKWARD           78 (to 468)
+
+177     >>  624 LOAD_FAST                1 (lines)
+            626 LOAD_ATTR               11 (NULL|self + append)
+            646 LOAD_FAST                2 (label)
+            648 LOAD_CONST               5 (':')
+            650 BINARY_OP                0 (+)
+            654 CALL                     1
+            662 POP_TOP
+
+178         664 LOAD_FAST                1 (lines)
+            666 LOAD_FAST                6 (rows)
+            668 GET_ITER
+            670 LOAD_FAST_AND_CLEAR      5 (r)
+            672 SWAP                     2
+            674 BUILD_LIST               0
+            676 SWAP                     2
+        >>  678 FOR_ITER                 7 (to 696)
+            682 STORE_FAST               5 (r)
+            684 LOAD_CONST               6 ('  - ')
+            686 LOAD_FAST                5 (r)
+            688 FORMAT_VALUE             0
+            690 BUILD_STRING             2
+            692 LIST_APPEND              2
+            694 JUMP_BACKWARD            9 (to 678)
+        >>  696 END_FOR
+            698 SWAP                     2
+            700 STORE_FAST               5 (r)
+            702 BINARY_OP               13 (+=)
+            706 STORE_FAST               1 (lines)
+            708 JUMP_BACKWARD          121 (to 468)
+
+173     >>  710 END_FOR
+
+180         712 LOAD_GLOBAL              5 (NULL + str)
+            722 LOAD_FAST                0 (brief)
+            724 LOAD_ATTR                7 (NULL|self + get)
+            744 LOAD_CONST              11 ('verifiability')
+            746 CALL                     1
+            754 COPY                     1
+            756 POP_JUMP_IF_TRUE         2 (to 762)
+            758 POP_TOP
+            760 LOAD_CONST              12 ('low')
+        >>  762 CALL                     1
+            770 STORE_FAST               7 (confidence)
+
+182         772 LOAD_CONST              13 ("=== THIRD-PARTY TOPIC RECORD (UNVERIFIED — NOT established fact) ===\nThis is what ANOTHER CREATOR'S VIDEO said about this subject. It is not a primary document, it has NOT been verified, and its self-assessed verifiability is '")
+
+185         774 LOAD_FAST                7 (confidence)
+            776 FORMAT_VALUE             0
+            778 LOAD_CONST              14 ("'.\nHow to use it:\n- Treat every name, date, figure and quote below as a CLAIM, not as established fact.\n- You may write about this subject. You may NOT state an unverified specific as though it were confirmed: attribute it, hedge it, or leave it out.\n- Where the record is thin, narrow the episode to what you can stand behind and write shorter. Never invent a detail to fill the runtime.\n- The other creator's wording, structure and order of reveals are theirs. Use none of it.\n")
+
+182         780 BUILD_STRING             3
+
+193         782 LOAD_CONST              15 ('\n')
+            784 LOAD_ATTR               15 (NULL|self + join)
+            804 LOAD_FAST                1 (lines)
+            806 CALL                     1
+
+182         814 BINARY_OP                0 (+)
+
+181         818 RETURN_VALUE
+        >>  820 SWAP                     2
+            822 POP_TOP
+
+169         824 SWAP                     2
+            826 STORE_FAST               5 (r)
+            828 RERAISE                  0
+        >>  830 SWAP                     2
+            832 POP_TOP
+
+172         834 SWAP                     2
+            836 STORE_FAST               5 (r)
+            838 RERAISE                  0
+        >>  840 SWAP                     2
+            842 POP_TOP
+
+175         844 SWAP                     2
+            846 STORE_FAST               5 (r)
+            848 RERAISE                  0
+        >>  850 SWAP                     2
+            852 POP_TOP
+
+178         854 SWAP                     2
+            856 STORE_FAST               5 (r)
+            858 RERAISE                  0
+ExceptionTable:
+  206 to 246 -> 820 [3]
+  250 to 256 -> 820 [3]
+  318 to 448 -> 830 [4]
+  526 to 584 -> 840 [3]
+  588 to 612 -> 840 [3]
+  674 to 696 -> 850 [4]
+
+Disassembly of <code object _idea_brief at 0x28c58060, file "app\services\master_prompt.py", line 197>:
+197           0 RESUME                   0
+
+200           2 LOAD_GLOBAL              1 (NULL + isinstance)
+             12 LOAD_FAST                0 (idea)
+             14 LOAD_GLOBAL              2 (dict)
+             24 CALL                     2
+             32 POP_JUMP_IF_TRUE         1 (to 36)
+
+201          34 RETURN_CONST             1 ('')
+
+202     >>   36 BUILD_LIST               0
+             38 STORE_FAST               1 (lines)
+
+203          40 LOAD_CONST               2 ((('title', 'Working title'), ('hook', 'Retention hook'), ('angle', 'Angle'), ('series_link', 'Series link'), ('rationale', 'Why this episode')))
+             42 GET_ITER
+        >>   44 FOR_ITER                92 (to 232)
+             48 UNPACK_SEQUENCE          2
+             52 STORE_FAST               2 (key)
+             54 STORE_FAST               3 (label)
+
+206          56 LOAD_FAST                0 (idea)
+             58 LOAD_ATTR                5 (NULL|self + get)
+             78 LOAD_FAST                2 (key)
+             80 CALL                     1
+             88 STORE_FAST               4 (val)
+
+207          90 LOAD_GLOBAL              1 (NULL + isinstance)
+            100 LOAD_FAST                4 (val)
+            102 LOAD_GLOBAL              6 (str)
+            112 CALL                     2
+            120 POP_JUMP_IF_TRUE         1 (to 124)
+            122 JUMP_BACKWARD           40 (to 44)
+        >>  124 LOAD_FAST                4 (val)
+            126 LOAD_ATTR                9 (NULL|self + strip)
+            146 CALL                     0
+            154 POP_JUMP_IF_TRUE         1 (to 158)
+            156 JUMP_BACKWARD           57 (to 44)
+
+208     >>  158 LOAD_FAST                1 (lines)
+            160 LOAD_ATTR               11 (NULL|self + append)
+            180 LOAD_FAST                3 (label)
+            182 FORMAT_VALUE             0
+            184 LOAD_CONST               3 (': ')
+            186 LOAD_FAST                4 (val)
+            188 LOAD_ATTR                9 (NULL|self + strip)
+            208 CALL                     0
+            216 FORMAT_VALUE             0
+            218 BUILD_STRING             3
+            220 CALL                     1
+            228 POP_TOP
+            230 JUMP_BACKWARD           94 (to 44)
+
+203     >>  232 END_FOR
+
+209         234 LOAD_FAST                0 (idea)
+            236 LOAD_ATTR                5 (NULL|self + get)
+            256 LOAD_CONST               4 ('outline')
+            258 CALL                     1
+            266 STORE_FAST               5 (outline)
+
+210         268 LOAD_GLOBAL              1 (NULL + isinstance)
+            278 LOAD_FAST                5 (outline)
+            280 LOAD_GLOBAL             12 (list)
+            290 CALL                     2
+            298 POP_JUMP_IF_FALSE      101 (to 502)
+
+211         300 LOAD_FAST                5 (outline)
+            302 GET_ITER
+            304 LOAD_FAST_AND_CLEAR      6 (b)
+            306 SWAP                     2
+            308 BUILD_LIST               0
+            310 SWAP                     2
+        >>  312 FOR_ITER                53 (to 422)
+            316 STORE_FAST               6 (b)
+            318 LOAD_GLOBAL              7 (NULL + str)
+            328 LOAD_FAST                6 (b)
+            330 CALL                     1
+            338 LOAD_ATTR                9 (NULL|self + strip)
+            358 CALL                     0
+            366 POP_JUMP_IF_TRUE         1 (to 370)
+            368 JUMP_BACKWARD           29 (to 312)
+        >>  370 LOAD_GLOBAL              7 (NULL + str)
+            380 LOAD_FAST                6 (b)
+            382 CALL                     1
+            390 LOAD_ATTR                9 (NULL|self + strip)
+            410 CALL                     0
+            418 LIST_APPEND              2
+            420 JUMP_BACKWARD           55 (to 312)
+        >>  422 END_FOR
+            424 STORE_FAST               7 (beats)
+            426 STORE_FAST               6 (b)
+
+212         428 LOAD_FAST                7 (beats)
+            430 POP_JUMP_IF_FALSE       35 (to 502)
+
+213         432 LOAD_FAST                1 (lines)
+            434 LOAD_ATTR               11 (NULL|self + append)
+            454 LOAD_CONST               5 ('Outline beats: ')
+            456 LOAD_CONST               6 (' → ')
+            458 LOAD_ATTR               15 (NULL|self + join)
+            478 LOAD_FAST                7 (beats)
+            480 CALL                     1
+            488 BINARY_OP                0 (+)
+            492 CALL                     1
+            500 POP_TOP
+
+217     >>  502 LOAD_FAST                0 (idea)
+            504 LOAD_ATTR                5 (NULL|self + get)
+            524 LOAD_CONST               7 ('beat_plan')
+            526 CALL                     1
+            534 STORE_FAST               8 (plan)
+
+218         536 LOAD_GLOBAL              1 (NULL + isinstance)
+            546 LOAD_FAST                8 (plan)
+            548 LOAD_GLOBAL             12 (list)
+            558 CALL                     2
+            566 POP_JUMP_IF_FALSE      186 (to 940)
+            568 LOAD_FAST                8 (plan)
+            570 POP_JUMP_IF_FALSE      184 (to 940)
+
+220         572 LOAD_FAST                8 (plan)
+            574 GET_ITER
+
+219         576 LOAD_FAST_AND_CLEAR      6 (b)
+            578 SWAP                     2
+            580 BUILD_LIST               0
+            582 SWAP                     2
+
+220     >>  584 FOR_ITER               136 (to 860)
+            588 STORE_FAST               6 (b)
+
+221         590 LOAD_GLOBAL              1 (NULL + isinstance)
+            600 LOAD_FAST                6 (b)
+            602 LOAD_GLOBAL              2 (dict)
+            612 CALL                     2
+            620 POP_JUMP_IF_FALSE      118 (to 858)
+            622 LOAD_GLOBAL              7 (NULL + str)
+            632 LOAD_FAST                6 (b)
+            634 LOAD_ATTR                5 (NULL|self + get)
+            654 LOAD_CONST               8 ('label')
+            656 CALL                     1
+            664 COPY                     1
+            666 POP_JUMP_IF_TRUE         2 (to 672)
+            668 POP_TOP
+            670 LOAD_CONST               1 ('')
+        >>  672 CALL                     1
+            680 LOAD_ATTR                9 (NULL|self + strip)
+            700 CALL                     0
+            708 POP_JUMP_IF_FALSE       74 (to 858)
+
+219         710 LOAD_GLOBAL              7 (NULL + str)
+            720 LOAD_FAST                6 (b)
+            722 LOAD_ATTR                5 (NULL|self + get)
+            742 LOAD_CONST               8 ('label')
+            744 CALL                     1
+            752 CALL                     1
+            760 LOAD_ATTR                9 (NULL|self + strip)
+            780 CALL                     0
+            788 FORMAT_VALUE             0
+            790 LOAD_CONST               9 (' ')
+            792 LOAD_GLOBAL             17 (NULL + int)
+            802 LOAD_FAST                6 (b)
+            804 LOAD_ATTR                5 (NULL|self + get)
+            824 LOAD_CONST              10 ('share')
+            826 CALL                     1
+            834 COPY                     1
+            836 POP_JUMP_IF_TRUE         2 (to 842)
+            838 POP_TOP
+            840 LOAD_CONST              11 (0)
+        >>  842 CALL                     1
+            850 FORMAT_VALUE             0
+            852 LOAD_CONST              12 ('%')
+            854 BUILD_STRING             4
+            856 LIST_APPEND              2
+        >>  858 JUMP_BACKWARD          138 (to 584)
+
+220     >>  860 END_FOR
+
+219         862 STORE_FAST               9 (weights)
+            864 STORE_FAST               6 (b)
+
+222         866 LOAD_FAST                9 (weights)
+            868 POP_JUMP_IF_FALSE       35 (to 940)
+
+223         870 LOAD_FAST                1 (lines)
+            872 LOAD_ATTR               11 (NULL|self + append)
+            892 LOAD_CONST              13 ('Beat weights (share of runtime, measured from a proven video of this format): ')
+
+224         894 LOAD_CONST               6 (' → ')
+            896 LOAD_ATTR               15 (NULL|self + join)
+            916 LOAD_FAST                9 (weights)
+            918 CALL                     1
+
+223         926 BINARY_OP                0 (+)
+            930 CALL                     1
+            938 POP_TOP
+
+225     >>  940 LOAD_CONST              14 ('\n')
+            942 LOAD_ATTR               15 (NULL|self + join)
+            962 LOAD_FAST                1 (lines)
+            964 CALL                     1
+            972 RETURN_VALUE
+        >>  974 SWAP                     2
+            976 POP_TOP
+
+211         978 SWAP                     2
+            980 STORE_FAST               6 (b)
+            982 RERAISE                  0
+        >>  984 SWAP                     2
+            986 POP_TOP
+
+219         988 SWAP                     2
+            990 STORE_FAST               6 (b)
+            992 RERAISE                  0
+ExceptionTable:
+  308 to 366 -> 974 [2]
+  370 to 422 -> 974 [2]
+  580 to 860 -> 984 [2]
+
+Disassembly of <code object RenderedMaster at 0x7f6c926fb660, file "app\services\master_prompt.py", line 230>:
+230           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('RenderedMaster')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+232          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('prompt')
+             18 STORE_SUBSCR
+
+233          22 LOAD_CONST               3 (False)
+             24 STORE_NAME               4 (source_injected)
+             26 LOAD_CONST               4 ('bool')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('source_injected')
+             32 STORE_SUBSCR
+
+234          36 LOAD_CONST               6 (0)
+             38 STORE_NAME               5 (channel_name_slots)
+             40 LOAD_CONST               7 ('int')
+             42 LOAD_NAME                3 (__annotations__)
+             44 LOAD_CONST               8 ('channel_name_slots')
+             46 STORE_SUBSCR
+
+235          50 LOAD_CONST               6 (0)
+             52 STORE_NAME               6 (extra_source_slots)
+             54 LOAD_CONST               7 ('int')
+             56 LOAD_NAME                3 (__annotations__)
+             58 LOAD_CONST               9 ('extra_source_slots')
+             60 STORE_SUBSCR
+             64 RETURN_CONST            10 (None)
+
+Disassembly of <code object render at 0x7f6c92411990, file "app\services\master_prompt.py", line 238>:
+              0 MAKE_CELL                5 (name)
+              2 MAKE_CELL                6 (packet)
+              4 MAKE_CELL                7 (state)
+
+238           6 RESUME                   0
+
+249           8 LOAD_FAST                1 (channel_name)
+             10 COPY                     1
+             12 POP_JUMP_IF_TRUE         2 (to 18)
+             14 POP_TOP
+             16 LOAD_CONST               1 ('')
+        >>   18 LOAD_ATTR                1 (NULL|self + strip)
+             38 CALL                     0
+             46 COPY                     1
+             48 POP_JUMP_IF_TRUE         6 (to 62)
+             50 POP_TOP
+             52 LOAD_GLOBAL              2 (_DEFAULT_CHANNEL_NAME)
+        >>   62 STORE_DEREF              5 (name)
+
+250          64 LOAD_FAST                2 (source_packet)
+             66 COPY                     1
+             68 POP_JUMP_IF_TRUE         2 (to 74)
+             70 POP_TOP
+             72 LOAD_CONST               1 ('')
+        >>   74 LOAD_ATTR                1 (NULL|self + strip)
+             94 CALL                     0
+            102 COPY                     1
+            104 POP_JUMP_IF_TRUE         2 (to 110)
+            106 POP_TOP
+            108 LOAD_CONST               2 ('(no source material was supplied)')
+        >>  110 STORE_DEREF              6 (packet)
+
+251         112 LOAD_CONST               3 (0)
+            114 LOAD_CONST               3 (0)
+            116 LOAD_CONST               4 (('name_slots', 'source_slots'))
+            118 BUILD_CONST_KEY_MAP      2
+            120 STORE_DEREF              7 (state)
+
+253         122 LOAD_CONST              10 (('m', 're.Match[str]', 'return', 'str'))
+            124 LOAD_CLOSURE             5 (name)
+            126 LOAD_CLOSURE             6 (packet)
+            128 LOAD_CLOSURE             7 (state)
+            130 BUILD_TUPLE              3
+            132 LOAD_CONST               5 (<code object _sub at 0x7f6c9288b310, file "app\services\master_prompt.py", line 253>)
+            134 MAKE_FUNCTION           12 (annotations, closure)
+            136 STORE_FAST               3 (_sub)
+
+262         138 LOAD_GLOBAL              4 (_PLACEHOLDER_RE)
+            148 LOAD_ATTR                7 (NULL|self + sub)
+            168 LOAD_FAST                3 (_sub)
+            170 LOAD_FAST                0 (master)
+            172 CALL                     2
+            180 STORE_FAST               4 (prompt)
+
+263         182 LOAD_GLOBAL              9 (NULL + RenderedMaster)
+            192 LOAD_FAST                4 (prompt)
+
+264         194 LOAD_DEREF               7 (state)
+            196 LOAD_CONST               6 ('source_slots')
+            198 BINARY_SUBSCR
+            202 LOAD_CONST               3 (0)
+            204 COMPARE_OP              68 (>)
+
+265         208 LOAD_DEREF               7 (state)
+            210 LOAD_CONST               7 ('name_slots')
+            212 BINARY_SUBSCR
+
+266         216 LOAD_GLOBAL             11 (NULL + max)
+            226 LOAD_CONST               3 (0)
+            228 LOAD_DEREF               7 (state)
+            230 LOAD_CONST               6 ('source_slots')
+            232 BINARY_SUBSCR
+            236 LOAD_CONST               8 (1)
+            238 BINARY_OP               10 (-)
+            242 CALL                     2
+
+263         250 KW_NAMES                 9 (('prompt', 'source_injected', 'channel_name_slots', 'extra_source_slots'))
+            252 CALL                     4
+            260 RETURN_VALUE
+
+Disassembly of <code object _sub at 0x7f6c9288b310, file "app\services\master_prompt.py", line 253>:
+              0 COPY_FREE_VARS           3
+
+253           2 RESUME                   0
+
+254           4 LOAD_FAST                0 (m)
+              6 LOAD_ATTR                1 (NULL|self + group)
+             26 LOAD_CONST               1 (1)
+             28 CALL                     1
+             36 LOAD_ATTR                3 (NULL|self + upper)
+             56 CALL                     0
+             64 LOAD_GLOBAL              4 (_CHANNEL_NAME_KEYS)
+             74 CONTAINS_OP              0
+             76 POP_JUMP_IF_FALSE       15 (to 108)
+
+255          78 LOAD_DEREF               3 (state)
+             80 LOAD_CONST               2 ('name_slots')
+             82 COPY                     2
+             84 COPY                     2
+             86 BINARY_SUBSCR
+             90 LOAD_CONST               1 (1)
+             92 BINARY_OP               13 (+=)
+             96 SWAP                     3
+             98 SWAP                     2
+            100 STORE_SUBSCR
+
+256         104 LOAD_DEREF               1 (name)
+            106 RETURN_VALUE
+
+257     >>  108 LOAD_DEREF               3 (state)
+            110 LOAD_CONST               3 ('source_slots')
+            112 COPY                     2
+            114 COPY                     2
+            116 BINARY_SUBSCR
+            120 LOAD_CONST               1 (1)
+            122 BINARY_OP               13 (+=)
+            126 SWAP                     3
+            128 SWAP                     2
+            130 STORE_SUBSCR
+
+258         134 LOAD_DEREF               3 (state)
+            136 LOAD_CONST               3 ('source_slots')
+            138 BINARY_SUBSCR
+            142 LOAD_CONST               1 (1)
+            144 COMPARE_OP              40 (==)
+            148 POP_JUMP_IF_FALSE        2 (to 154)
+
+259         150 LOAD_DEREF               2 (packet)
+            152 RETURN_VALUE
+
+260     >>  154 RETURN_CONST             4 ('(the material supplied above)')
+
+Disassembly of <code object MasterOutput at 0x7f6c9234e3a0, file "app\services\master_prompt.py", line 280>:
+280           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('MasterOutput')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+282          12 LOAD_CONST               1 ('Kết quả bóc từ hợp đồng output của master prompt.')
+             14 STORE_NAME               3 (__doc__)
+
+283          16 LOAD_CONST               2 (False)
+             18 STORE_NAME               4 (rejected)
+             20 LOAD_CONST               3 ('bool')
+             22 LOAD_NAME                5 (__annotations__)
+             24 LOAD_CONST               4 ('rejected')
+             26 STORE_SUBSCR
+
+284          30 LOAD_CONST               5 ('')
+             32 STORE_NAME               6 (reason)
+             34 LOAD_CONST               6 ('str')
+             36 LOAD_NAME                5 (__annotations__)
+             38 LOAD_CONST               7 ('reason')
+             40 STORE_SUBSCR
+
+285          44 LOAD_CONST               5 ('')
+             46 STORE_NAME               7 (title)
+             48 LOAD_CONST               6 ('str')
+             50 LOAD_NAME                5 (__annotations__)
+             52 LOAD_CONST               8 ('title')
+             54 STORE_SUBSCR
+
+286          58 LOAD_CONST               5 ('')
+             60 STORE_NAME               8 (script)
+             62 LOAD_CONST               6 ('str')
+             64 LOAD_NAME                5 (__annotations__)
+             66 LOAD_CONST               9 ('script')
+             68 STORE_SUBSCR
+
+287          72 LOAD_CONST               5 ('')
+             74 STORE_NAME               9 (narration_direction)
+             76 LOAD_CONST               6 ('str')
+             78 LOAD_NAME                5 (__annotations__)
+             80 LOAD_CONST              10 ('narration_direction')
+             82 STORE_SUBSCR
+
+289          86 LOAD_CONST               2 (False)
+             88 STORE_NAME              10 (contract_ok)
+             90 LOAD_CONST               3 ('bool')
+             92 LOAD_NAME                5 (__annotations__)
+             94 LOAD_CONST              11 ('contract_ok')
+             96 STORE_SUBSCR
+
+290         100 PUSH_NULL
+            102 LOAD_NAME               11 (field)
+            104 LOAD_NAME               12 (list)
+            106 KW_NAMES                12 (('default_factory',))
+            108 CALL                     1
+            116 STORE_NAME              13 (warnings)
+            118 LOAD_CONST              13 ('list[str]')
+            120 LOAD_NAME                5 (__annotations__)
+            122 LOAD_CONST              14 ('warnings')
+            124 STORE_SUBSCR
+            128 RETURN_CONST            15 (None)
+
+Disassembly of <code object parse_output at 0x28d664d0, file "app\services\master_prompt.py", line 293>:
+293           0 RESUME                   0
+
+303           2 LOAD_FAST                0 (raw)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 LOAD_CONST               1 ('')
+        >>   12 LOAD_ATTR                1 (NULL|self + strip)
+             32 CALL                     0
+             40 STORE_FAST               1 (text)
+
+304          42 LOAD_FAST                1 (text)
+             44 POP_JUMP_IF_TRUE        13 (to 72)
+
+305          46 LOAD_GLOBAL              3 (NULL + MasterOutput)
+             56 LOAD_CONST               2 ('empty response')
+             58 BUILD_LIST               1
+             60 KW_NAMES                 3 (('warnings',))
+             62 CALL                     1
+             70 RETURN_VALUE
+
+306     >>   72 LOAD_GLOBAL              4 (_FENCE_RE)
+             82 LOAD_ATTR                7 (NULL|self + match)
+            102 LOAD_FAST                1 (text)
+            104 CALL                     1
+            112 STORE_FAST               2 (fence)
+
+307         114 LOAD_FAST                2 (fence)
+            116 POP_JUMP_IF_FALSE       31 (to 180)
+
+308         118 LOAD_FAST                2 (fence)
+            120 LOAD_ATTR                9 (NULL|self + group)
+            140 LOAD_CONST               4 (1)
+            142 CALL                     1
+            150 LOAD_ATTR                1 (NULL|self + strip)
+            170 CALL                     0
+            178 STORE_FAST               1 (text)
+
+310     >>  180 LOAD_GLOBAL              3 (NULL + MasterOutput)
+            190 CALL                     0
+            198 STORE_FAST               3 (out)
+
+312         200 LOAD_GLOBAL             10 (_SCRIPT_RE)
+            210 LOAD_ATTR               13 (NULL|self + search)
+            230 LOAD_FAST                1 (text)
+            232 CALL                     1
+            240 STORE_FAST               4 (m_script)
+
+313         242 LOAD_GLOBAL             14 (_END_RE)
+            252 LOAD_ATTR               13 (NULL|self + search)
+            272 LOAD_FAST                1 (text)
+            274 LOAD_FAST                4 (m_script)
+            276 POP_JUMP_IF_FALSE       16 (to 310)
+            278 LOAD_FAST                4 (m_script)
+            280 LOAD_ATTR               17 (NULL|self + end)
+            300 CALL                     0
+            308 JUMP_FORWARD             1 (to 312)
+        >>  310 LOAD_CONST               5 (0)
+        >>  312 CALL                     2
+            320 STORE_FAST               5 (m_end)
+
+314         322 LOAD_GLOBAL             18 (_ND_RE)
+            332 LOAD_ATTR               13 (NULL|self + search)
+            352 LOAD_FAST                1 (text)
+            354 LOAD_FAST                4 (m_script)
+            356 POP_JUMP_IF_FALSE       16 (to 390)
+            358 LOAD_FAST                4 (m_script)
+            360 LOAD_ATTR               17 (NULL|self + end)
+            380 CALL                     0
+            388 JUMP_FORWARD             1 (to 392)
+        >>  390 LOAD_CONST               5 (0)
+        >>  392 CALL                     2
+            400 STORE_FAST               6 (m_nd)
+
+317         402 LOAD_GLOBAL             20 (_REJECT_RE)
+            412 LOAD_ATTR               13 (NULL|self + search)
+            432 LOAD_FAST                1 (text)
+            434 CALL                     1
+            442 STORE_FAST               7 (m_reject)
+
+318         444 LOAD_FAST                7 (m_reject)
+            446 POP_JUMP_IF_FALSE      101 (to 650)
+            448 LOAD_FAST                4 (m_script)
+            450 POP_JUMP_IF_TRUE        99 (to 650)
+
+319         452 LOAD_CONST               6 (True)
+            454 LOAD_FAST                3 (out)
+            456 STORE_ATTR              11 (rejected)
+
+320         466 LOAD_GLOBAL             24 (_REASON_RE)
+            476 LOAD_ATTR               13 (NULL|self + search)
+            496 LOAD_FAST                1 (text)
+            498 LOAD_FAST                7 (m_reject)
+            500 LOAD_ATTR               17 (NULL|self + end)
+            520 CALL                     0
+            528 CALL                     2
+            536 STORE_FAST               8 (m_reason)
+
+321         538 LOAD_FAST                8 (m_reason)
+            540 POP_JUMP_IF_FALSE       31 (to 604)
+            542 LOAD_FAST                8 (m_reason)
+            544 LOAD_ATTR                9 (NULL|self + group)
+            564 LOAD_CONST               4 (1)
+            566 CALL                     1
+            574 LOAD_ATTR                1 (NULL|self + strip)
+            594 CALL                     0
+            602 JUMP_FORWARD             1 (to 606)
+        >>  604 LOAD_CONST               1 ('')
+        >>  606 LOAD_ATTR                1 (NULL|self + strip)
+            626 CALL                     0
+            634 LOAD_FAST                3 (out)
+            636 STORE_ATTR              13 (reason)
+
+322         646 LOAD_FAST                3 (out)
+            648 RETURN_VALUE
+
+324     >>  650 LOAD_GLOBAL             28 (_TITLE_RE)
+            660 LOAD_ATTR               13 (NULL|self + search)
+            680 LOAD_FAST                1 (text)
+            682 LOAD_CONST               5 (0)
+            684 LOAD_FAST                4 (m_script)
+            686 POP_JUMP_IF_FALSE       16 (to 720)
+            688 LOAD_FAST                4 (m_script)
+            690 LOAD_ATTR               31 (NULL|self + start)
+            710 CALL                     0
+            718 JUMP_FORWARD            10 (to 740)
+        >>  720 LOAD_GLOBAL             33 (NULL + len)
+            730 LOAD_FAST                1 (text)
+            732 CALL                     1
+        >>  740 CALL                     3
+            748 STORE_FAST               9 (m_title)
+
+325         750 LOAD_FAST                9 (m_title)
+            752 POP_JUMP_IF_FALSE       31 (to 816)
+
+326         754 LOAD_GLOBAL             35 (NULL + _clean_title)
+            764 LOAD_FAST                9 (m_title)
+            766 LOAD_ATTR                9 (NULL|self + group)
+            786 LOAD_CONST               4 (1)
+            788 CALL                     1
+            796 CALL                     1
+            804 LOAD_FAST                3 (out)
+            806 STORE_ATTR              18 (title)
+
+328     >>  816 LOAD_FAST                6 (m_nd)
+            818 POP_JUMP_IF_FALSE      108 (to 1036)
+
+329         820 LOAD_FAST                1 (text)
+            822 LOAD_FAST                6 (m_nd)
+            824 LOAD_ATTR               17 (NULL|self + end)
+            844 CALL                     0
+            852 LOAD_CONST               7 (None)
+            854 BINARY_SLICE
+            856 LOAD_ATTR                1 (NULL|self + strip)
+            876 CALL                     0
+            884 LOAD_FAST                3 (out)
+            886 STORE_ATTR              19 (narration_direction)
+
+330         896 LOAD_FAST                6 (m_nd)
+            898 LOAD_ATTR                9 (NULL|self + group)
+            918 LOAD_CONST               4 (1)
+            920 CALL                     1
+            928 LOAD_ATTR                1 (NULL|self + strip)
+            948 CALL                     0
+            956 STORE_FAST              10 (head)
+
+331         958 LOAD_FAST               10 (head)
+            960 POP_JUMP_IF_FALSE       37 (to 1036)
+
+332         962 LOAD_FAST               10 (head)
+            964 LOAD_CONST               8 ('\n')
+            966 BINARY_OP                0 (+)
+            970 LOAD_FAST                3 (out)
+            972 LOAD_ATTR               38 (narration_direction)
+            992 BINARY_OP                0 (+)
+            996 LOAD_ATTR                1 (NULL|self + strip)
+           1016 CALL                     0
+           1024 LOAD_FAST                3 (out)
+           1026 STORE_ATTR              19 (narration_direction)
+
+334     >> 1036 LOAD_FAST                4 (m_script)
+           1038 POP_JUMP_IF_FALSE      140 (to 1320)
+
+335        1040 LOAD_CONST               6 (True)
+           1042 LOAD_FAST                3 (out)
+           1044 STORE_ATTR              20 (contract_ok)
+
+336        1054 LOAD_FAST                4 (m_script)
+           1056 LOAD_ATTR               17 (NULL|self + end)
+           1076 CALL                     0
+           1084 STORE_FAST              11 (body_start)
+
+337        1086 LOAD_FAST                5 (m_end)
+           1088 POP_JUMP_IF_TRUE         2 (to 1094)
+           1090 LOAD_FAST                6 (m_nd)
+           1092 POP_JUMP_IF_FALSE       20 (to 1134)
+        >> 1094 LOAD_GLOBAL             43 (NULL + min)
+           1104 LOAD_CONST               9 (<code object <genexpr> at 0x7f6c926faef0, file "app\services\master_prompt.py", line 337>)
+           1106 MAKE_FUNCTION            0
+           1108 LOAD_FAST                5 (m_end)
+           1110 LOAD_FAST                6 (m_nd)
+           1112 BUILD_TUPLE              2
+           1114 GET_ITER
+           1116 CALL                     0
+           1124 CALL                     1
+           1132 JUMP_FORWARD            10 (to 1154)
+        >> 1134 LOAD_GLOBAL             33 (NULL + len)
+           1144 LOAD_FAST                1 (text)
+           1146 CALL                     1
+        >> 1154 STORE_FAST              12 (body_end)
+
+338        1156 LOAD_FAST                4 (m_script)
+           1158 LOAD_ATTR                9 (NULL|self + group)
+           1178 LOAD_CONST               4 (1)
+           1180 CALL                     1
+           1188 LOAD_ATTR                1 (NULL|self + strip)
+           1208 CALL                     0
+           1216 STORE_FAST              13 (inline)
+
+339        1218 LOAD_FAST                1 (text)
+           1220 LOAD_FAST               11 (body_start)
+           1222 LOAD_FAST               12 (body_end)
+           1224 BINARY_SLICE
+           1226 LOAD_ATTR                1 (NULL|self + strip)
+           1246 CALL                     0
+           1254 STORE_FAST              14 (body)
+
+340        1256 LOAD_FAST               13 (inline)
+           1258 POP_JUMP_IF_FALSE       22 (to 1304)
+           1260 LOAD_FAST               13 (inline)
+           1262 LOAD_CONST               8 ('\n')
+           1264 BINARY_OP                0 (+)
+           1268 LOAD_FAST               14 (body)
+           1270 BINARY_OP                0 (+)
+           1274 LOAD_ATTR                1 (NULL|self + strip)
+           1294 CALL                     0
+           1302 JUMP_FORWARD             1 (to 1306)
+        >> 1304 LOAD_FAST               14 (body)
+        >> 1306 LOAD_FAST                3 (out)
+           1308 STORE_ATTR              22 (script)
+           1318 JUMP_FORWARD           129 (to 1578)
+
+342     >> 1320 LOAD_FAST                3 (out)
+           1322 LOAD_ATTR               46 (warnings)
+           1342 LOAD_ATTR               49 (NULL|self + append)
+           1362 LOAD_CONST              10 ("model không theo hợp đồng output (thiếu 'SCRIPT:')")
+           1364 CALL                     1
+           1372 POP_TOP
+
+343        1374 LOAD_FAST                5 (m_end)
+           1376 POP_JUMP_IF_TRUE         2 (to 1382)
+           1378 LOAD_FAST                6 (m_nd)
+           1380 POP_JUMP_IF_FALSE       20 (to 1422)
+        >> 1382 LOAD_GLOBAL             43 (NULL + min)
+           1392 LOAD_CONST              11 (<code object <genexpr> at 0x7f6c926facd0, file "app\services\master_prompt.py", line 343>)
+           1394 MAKE_FUNCTION            0
+           1396 LOAD_FAST                5 (m_end)
+           1398 LOAD_FAST                6 (m_nd)
+           1400 BUILD_TUPLE              2
+           1402 GET_ITER
+           1404 CALL                     0
+           1412 CALL                     1
+           1420 JUMP_FORWARD            10 (to 1442)
+        >> 1422 LOAD_GLOBAL             33 (NULL + len)
+           1432 LOAD_FAST                1 (text)
+           1434 CALL                     1
+        >> 1442 STORE_FAST              12 (body_end)
+
+344        1444 LOAD_FAST                1 (text)
+           1446 LOAD_CONST               7 (None)
+           1448 LOAD_FAST               12 (body_end)
+           1450 BINARY_SLICE
+           1452 STORE_FAST              14 (body)
+
+345        1454 LOAD_FAST                9 (m_title)
+           1456 POP_JUMP_IF_FALSE       39 (to 1536)
+
+346        1458 LOAD_FAST               14 (body)
+           1460 LOAD_CONST               7 (None)
+           1462 LOAD_FAST                9 (m_title)
+           1464 LOAD_ATTR               31 (NULL|self + start)
+           1484 CALL                     0
+           1492 BINARY_SLICE
+           1494 LOAD_FAST               14 (body)
+           1496 LOAD_FAST                9 (m_title)
+           1498 LOAD_ATTR               17 (NULL|self + end)
+           1518 CALL                     0
+           1526 LOAD_CONST               7 (None)
+           1528 BINARY_SLICE
+           1530 BINARY_OP                0 (+)
+           1534 STORE_FAST              14 (body)
+
+347     >> 1536 LOAD_FAST               14 (body)
+           1538 LOAD_ATTR                1 (NULL|self + strip)
+           1558 CALL                     0
+           1566 LOAD_FAST                3 (out)
+           1568 STORE_ATTR              22 (script)
+
+349     >> 1578 LOAD_GLOBAL             51 (NULL + _strip_stray_markers)
+           1588 LOAD_FAST                3 (out)
+           1590 LOAD_ATTR               44 (script)
+           1610 CALL                     1
+           1618 LOAD_FAST                3 (out)
+           1620 STORE_ATTR              22 (script)
+
+350        1630 LOAD_FAST                3 (out)
+           1632 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c926faef0, file "app\services\master_prompt.py", line 337>:
+337           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                23 (to 58)
+             12 STORE_FAST               1 (x)
+             14 LOAD_FAST                1 (x)
+             16 POP_JUMP_IF_TRUE         1 (to 20)
+             18 JUMP_BACKWARD            6 (to 8)
+        >>   20 LOAD_FAST                1 (x)
+             22 LOAD_ATTR                1 (NULL|self + start)
+             42 CALL                     0
+             50 YIELD_VALUE              1
+             52 RESUME                   1
+             54 POP_TOP
+             56 JUMP_BACKWARD           25 (to 8)
+        >>   58 END_FOR
+             60 RETURN_CONST             0 (None)
+        >>   62 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             64 RERAISE                  1
+ExceptionTable:
+  4 to 16 -> 62 [0] lasti
+  20 to 60 -> 62 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c926facd0, file "app\services\master_prompt.py", line 343>:
+343           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                23 (to 58)
+             12 STORE_FAST               1 (x)
+             14 LOAD_FAST                1 (x)
+             16 POP_JUMP_IF_TRUE         1 (to 20)
+             18 JUMP_BACKWARD            6 (to 8)
+        >>   20 LOAD_FAST                1 (x)
+             22 LOAD_ATTR                1 (NULL|self + start)
+             42 CALL                     0
+             50 YIELD_VALUE              1
+             52 RESUME                   1
+             54 POP_TOP
+             56 JUMP_BACKWARD           25 (to 8)
+        >>   58 END_FOR
+             60 RETURN_CONST             0 (None)
+        >>   62 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             64 RERAISE                  1
+ExceptionTable:
+  4 to 16 -> 62 [0] lasti
+  20 to 60 -> 62 [0] lasti
+
+Disassembly of <code object clean_script_body at 0x28ad59e0, file "app\services\master_prompt.py", line 362>:
+362           0 RESUME                   0
+
+374           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('strip_thinking_blocks',))
+              6 IMPORT_NAME              0 (app.core.text)
+              8 IMPORT_FROM              1 (strip_thinking_blocks)
+             10 STORE_FAST               1 (strip_thinking_blocks)
+             12 POP_TOP
+
+376          14 PUSH_NULL
+             16 LOAD_FAST                1 (strip_thinking_blocks)
+             18 LOAD_FAST                0 (script)
+             20 COPY                     1
+             22 POP_JUMP_IF_TRUE         2 (to 28)
+             24 POP_TOP
+             26 LOAD_CONST               3 ('')
+        >>   28 CALL                     1
+             36 STORE_FAST               2 (text)
+
+377          38 BUILD_LIST               0
+             40 STORE_FAST               3 (out)
+
+378          42 LOAD_FAST                2 (text)
+             44 LOAD_ATTR                5 (NULL|self + replace)
+             64 LOAD_CONST               4 ('\r')
+             66 LOAD_CONST               5 ('\n')
+             68 CALL                     2
+             76 LOAD_ATTR                7 (NULL|self + split)
+             96 LOAD_CONST               5 ('\n')
+             98 CALL                     1
+            106 GET_ITER
+        >>  108 FOR_ITER               253 (to 618)
+            112 STORE_FAST               4 (line)
+
+379         114 LOAD_FAST                4 (line)
+            116 LOAD_ATTR                9 (NULL|self + strip)
+            136 CALL                     0
+            144 STORE_FAST               5 (s)
+
+380         146 LOAD_FAST                5 (s)
+            148 POP_JUMP_IF_TRUE         1 (to 152)
+
+381         150 JUMP_BACKWARD           22 (to 108)
+
+382     >>  152 LOAD_GLOBAL             10 (_FENCE_LINE_RE)
+            162 LOAD_ATTR               13 (NULL|self + match)
+            182 LOAD_FAST                5 (s)
+            184 CALL                     1
+            192 POP_JUMP_IF_TRUE        42 (to 278)
+            194 LOAD_GLOBAL             14 (_HEADING_LINE_RE)
+            204 LOAD_ATTR               13 (NULL|self + match)
+            224 LOAD_FAST                5 (s)
+            226 CALL                     1
+            234 POP_JUMP_IF_TRUE        21 (to 278)
+            236 LOAD_GLOBAL             16 (_BOLD_HEADING_RE)
+            246 LOAD_ATTR               13 (NULL|self + match)
+            266 LOAD_FAST                5 (s)
+            268 CALL                     1
+            276 POP_JUMP_IF_FALSE        1 (to 280)
+
+383     >>  278 JUMP_BACKWARD           86 (to 108)
+
+384     >>  280 LOAD_GLOBAL             18 (_STAGE_DIR_RE)
+            290 LOAD_ATTR               13 (NULL|self + match)
+            310 LOAD_FAST                5 (s)
+            312 CALL                     1
+            320 POP_JUMP_IF_TRUE        17 (to 356)
+            322 LOAD_FAST                5 (s)
+            324 LOAD_ATTR               21 (NULL|self + startswith)
+            344 LOAD_CONST               6 (':::')
+            346 CALL                     1
+            354 POP_JUMP_IF_FALSE        1 (to 358)
+
+385     >>  356 JUMP_BACKWARD          125 (to 108)
+
+386     >>  358 LOAD_GLOBAL             22 (_TIMESTAMP_RE)
+            368 LOAD_ATTR               25 (NULL|self + sub)
+            388 LOAD_CONST               3 ('')
+            390 LOAD_FAST                5 (s)
+            392 CALL                     2
+            400 LOAD_ATTR                9 (NULL|self + strip)
+            420 CALL                     0
+            428 STORE_FAST               5 (s)
+
+387         430 LOAD_GLOBAL             26 (_LIST_MARKER_RE)
+            440 LOAD_ATTR               25 (NULL|self + sub)
+            460 LOAD_CONST               3 ('')
+            462 LOAD_FAST                5 (s)
+            464 CALL                     2
+            472 LOAD_ATTR                9 (NULL|self + strip)
+            492 CALL                     0
+            500 STORE_FAST               5 (s)
+
+388         502 LOAD_GLOBAL             29 (NULL + re)
+            512 LOAD_ATTR               24 (sub)
+            532 LOAD_CONST               7 ('^\\*\\*(.*?)\\*\\*$')
+            534 LOAD_CONST               8 ('\\1')
+            536 LOAD_FAST                5 (s)
+            538 CALL                     3
+            546 LOAD_ATTR                9 (NULL|self + strip)
+            566 CALL                     0
+            574 STORE_FAST               5 (s)
+
+389         576 LOAD_FAST                5 (s)
+            578 POP_JUMP_IF_TRUE         1 (to 582)
+
+390         580 JUMP_BACKWARD          237 (to 108)
+
+391     >>  582 LOAD_FAST                3 (out)
+            584 LOAD_ATTR               31 (NULL|self + append)
+            604 LOAD_FAST                5 (s)
+            606 CALL                     1
+            614 POP_TOP
+            616 JUMP_BACKWARD          255 (to 108)
+
+378     >>  618 END_FOR
+
+392         620 LOAD_CONST               5 ('\n')
+            622 LOAD_ATTR               33 (NULL|self + join)
+            642 LOAD_FAST                3 (out)
+            644 CALL                     1
+            652 LOAD_ATTR                9 (NULL|self + strip)
+            672 CALL                     0
+            680 RETURN_VALUE
+
+Disassembly of <code object _clean_title at 0x7f6c92683830, file "app\services\master_prompt.py", line 395>:
+395           0 RESUME                   0
+
+396           2 LOAD_FAST                0 (s)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 LOAD_CONST               1 ('')
+        >>   12 LOAD_ATTR                1 (NULL|self + strip)
+             32 CALL                     0
+             40 LOAD_ATTR                1 (NULL|self + strip)
+             60 LOAD_CONST               2 ('*_')
+             62 CALL                     1
+             70 LOAD_ATTR                1 (NULL|self + strip)
+             90 CALL                     0
+             98 STORE_FAST               1 (t)
+
+397         100 LOAD_GLOBAL              3 (NULL + re)
+            110 LOAD_ATTR                4 (sub)
+            130 LOAD_CONST               3 ('^["“](.*)["”]$')
+            132 LOAD_CONST               4 ('\\1')
+            134 LOAD_FAST                1 (t)
+            136 CALL                     3
+            144 LOAD_ATTR                1 (NULL|self + strip)
+            164 CALL                     0
+            172 STORE_FAST               1 (t)
+
+398         174 LOAD_GLOBAL              3 (NULL + re)
+            184 LOAD_ATTR                4 (sub)
+            204 LOAD_CONST               5 ('^\\[(.*)\\]$')
+            206 LOAD_CONST               4 ('\\1')
+            208 LOAD_FAST                1 (t)
+            210 CALL                     3
+            218 LOAD_ATTR                1 (NULL|self + strip)
+            238 CALL                     0
+            246 STORE_FAST               1 (t)
+
+399         248 LOAD_FAST                1 (t)
+            250 RETURN_VALUE
+
+Disassembly of <code object _strip_stray_markers at 0x28d506e0, file "app\services\master_prompt.py", line 402>:
+402           0 RESUME                   0
+
+405           2 BUILD_LIST               0
+              4 STORE_FAST               1 (kept)
+
+406           6 LOAD_FAST                0 (script)
+              8 COPY                     1
+             10 POP_JUMP_IF_TRUE         2 (to 16)
+             12 POP_TOP
+             14 LOAD_CONST               1 ('')
+        >>   16 LOAD_ATTR                1 (NULL|self + replace)
+             36 LOAD_CONST               2 ('\r')
+             38 LOAD_CONST               3 ('\n')
+             40 CALL                     2
+             48 LOAD_ATTR                3 (NULL|self + split)
+             68 LOAD_CONST               3 ('\n')
+             70 CALL                     1
+             78 GET_ITER
+        >>   80 FOR_ITER               183 (to 450)
+             84 STORE_FAST               2 (line)
+
+407          86 LOAD_FAST                2 (line)
+             88 LOAD_ATTR                5 (NULL|self + strip)
+            108 CALL                     0
+            116 STORE_FAST               3 (s)
+
+408         118 LOAD_FAST                3 (s)
+            120 POP_JUMP_IF_TRUE        18 (to 158)
+
+409         122 LOAD_FAST                1 (kept)
+            124 LOAD_ATTR                7 (NULL|self + append)
+            144 LOAD_CONST               1 ('')
+            146 CALL                     1
+            154 POP_TOP
+
+410         156 JUMP_BACKWARD           39 (to 80)
+
+411     >>  158 LOAD_GLOBAL              8 (_END_RE)
+            168 LOAD_ATTR               11 (NULL|self + match)
+            188 LOAD_FAST                3 (s)
+            190 CALL                     1
+            198 POP_JUMP_IF_TRUE        63 (to 326)
+            200 LOAD_GLOBAL             12 (_ND_RE)
+            210 LOAD_ATTR               11 (NULL|self + match)
+            230 LOAD_FAST                3 (s)
+            232 CALL                     1
+            240 POP_JUMP_IF_TRUE        42 (to 326)
+            242 LOAD_GLOBAL             14 (_TITLE_RE)
+            252 LOAD_ATTR               11 (NULL|self + match)
+            272 LOAD_FAST                3 (s)
+            274 CALL                     1
+            282 POP_JUMP_IF_TRUE        21 (to 326)
+            284 LOAD_GLOBAL             16 (_SCRIPT_RE)
+            294 LOAD_ATTR               11 (NULL|self + match)
+            314 LOAD_FAST                3 (s)
+            316 CALL                     1
+            324 POP_JUMP_IF_FALSE        1 (to 328)
+
+412     >>  326 JUMP_BACKWARD          124 (to 80)
+
+413     >>  328 LOAD_GLOBAL             18 (_REJECT_RE)
+            338 LOAD_ATTR               11 (NULL|self + match)
+            358 LOAD_FAST                3 (s)
+            360 CALL                     1
+            368 POP_JUMP_IF_TRUE        21 (to 412)
+            370 LOAD_GLOBAL             20 (_REASON_RE)
+            380 LOAD_ATTR               11 (NULL|self + match)
+            400 LOAD_FAST                3 (s)
+            402 CALL                     1
+            410 POP_JUMP_IF_FALSE        1 (to 414)
+
+414     >>  412 JUMP_BACKWARD          167 (to 80)
+
+415     >>  414 LOAD_FAST                1 (kept)
+            416 LOAD_ATTR                7 (NULL|self + append)
+            436 LOAD_FAST                2 (line)
+            438 CALL                     1
+            446 POP_TOP
+            448 JUMP_BACKWARD          185 (to 80)
+
+406     >>  450 END_FOR
+
+416         452 LOAD_CONST               3 ('\n')
+            454 LOAD_ATTR               23 (NULL|self + join)
+            474 LOAD_FAST                1 (kept)
+            476 CALL                     1
+            484 LOAD_ATTR                5 (NULL|self + strip)
+            504 CALL                     0
+            512 RETURN_VALUE
+
+Disassembly of <code object _channel_identity at 0x7f6c92683130, file "app\services\master_prompt.py", line 421>:
+421           0 RESUME                   0
+
+430           2 LOAD_FAST                0 (niche)
+              4 LOAD_CONST               1 ('NICHE')
+              6 BUILD_TUPLE              2
+              8 LOAD_FAST                3 (angle)
+             10 LOAD_CONST               2 ('Sub-focus / angle')
+             12 BUILD_TUPLE              2
+
+431          14 LOAD_FAST                1 (brief)
+             16 LOAD_CONST               3 ('CHANNEL DESCRIPTION')
+             18 BUILD_TUPLE              2
+             20 LOAD_FAST                2 (orientation)
+             22 LOAD_CONST               4 ('CHANNEL DIRECTION / EMPHASIS')
+             24 BUILD_TUPLE              2
+
+430          26 BUILD_LIST               4
+             28 STORE_FAST               4 (rows)
+
+432          30 LOAD_FAST                4 (rows)
+             32 GET_ITER
+             34 LOAD_FAST_AND_CLEAR      5 (v)
+             36 LOAD_FAST_AND_CLEAR      6 (label)
+             38 SWAP                     3
+             40 BUILD_LIST               0
+             42 SWAP                     2
+        >>   44 FOR_ITER                66 (to 180)
+             48 UNPACK_SEQUENCE          2
+             52 STORE_FAST               5 (v)
+             54 STORE_FAST               6 (label)
+             56 LOAD_GLOBAL              1 (NULL + str)
+             66 LOAD_FAST                5 (v)
+             68 COPY                     1
+             70 POP_JUMP_IF_TRUE         2 (to 76)
+             72 POP_TOP
+             74 LOAD_CONST               5 ('')
+        >>   76 CALL                     1
+             84 LOAD_ATTR                3 (NULL|self + strip)
+            104 CALL                     0
+            112 POP_JUMP_IF_TRUE         1 (to 116)
+            114 JUMP_BACKWARD           36 (to 44)
+        >>  116 LOAD_CONST               6 ('- ')
+            118 LOAD_FAST                6 (label)
+            120 FORMAT_VALUE             0
+            122 LOAD_CONST               7 (': ')
+            124 LOAD_GLOBAL              1 (NULL + str)
+            134 LOAD_FAST                5 (v)
+            136 CALL                     1
+            144 LOAD_ATTR                3 (NULL|self + strip)
+            164 CALL                     0
+            172 FORMAT_VALUE             0
+            174 BUILD_STRING             4
+            176 LIST_APPEND              2
+            178 JUMP_BACKWARD           68 (to 44)
+        >>  180 END_FOR
+            182 STORE_FAST               7 (lines)
+            184 STORE_FAST               5 (v)
+            186 STORE_FAST               6 (label)
+
+433         188 LOAD_FAST                7 (lines)
+            190 POP_JUMP_IF_TRUE         1 (to 194)
+
+434         192 RETURN_CONST             5 ('')
+
+435     >>  194 LOAD_CONST               8 ('━━━ CHANNEL CONTEXT (who this episode is for) ━━━\n')
+
+436         196 LOAD_CONST               9 ('\n')
+            198 LOAD_ATTR                5 (NULL|self + join)
+            218 LOAD_FAST                7 (lines)
+            220 CALL                     1
+
+435         228 BINARY_OP                0 (+)
+
+437         232 LOAD_CONST              10 ('\nThis context refines emphasis and framing. It never relaxes the source, fact or output rules in your instructions above.\n')
+
+435         234 BINARY_OP                0 (+)
+            238 RETURN_VALUE
+        >>  240 SWAP                     2
+            242 POP_TOP
+
+432         244 SWAP                     3
+            246 STORE_FAST               6 (label)
+            248 STORE_FAST               5 (v)
+            250 RERAISE                  0
+ExceptionTable:
+  40 to 112 -> 240 [3]
+  116 to 180 -> 240 [3]
+
+Disassembly of <code object build_user_message at 0x28c32ae0, file "app\services\master_prompt.py", line 441>:
+441           0 RESUME                   0
+
+456           2 LOAD_CONST               1 ('TASK: Execute your PRODUCTION MASTER PROMPT above on the material supplied in it, and return the result in your STRICT OUTPUT FORMAT — nothing else.\n')
+
+455           4 BUILD_LIST               1
+              6 STORE_FAST              13 (parts)
+
+460           8 LOAD_FAST                2 (attach_source)
+             10 POP_JUMP_IF_FALSE       45 (to 102)
+
+463          12 LOAD_FAST               13 (parts)
+             14 LOAD_ATTR                1 (NULL|self + append)
+
+464          34 LOAD_CONST               2 ('=== MATERIAL START ===\n')
+
+465          36 LOAD_FAST                0 (source_packet)
+             38 COPY                     1
+             40 POP_JUMP_IF_TRUE         2 (to 46)
+             42 POP_TOP
+             44 LOAD_CONST               3 ('')
+        >>   46 LOAD_ATTR                3 (NULL|self + strip)
+             66 CALL                     0
+             74 COPY                     1
+             76 POP_JUMP_IF_TRUE         2 (to 82)
+             78 POP_TOP
+             80 LOAD_CONST               4 ('(no source material was supplied)')
+
+464     >>   82 BINARY_OP                0 (+)
+
+466          86 LOAD_CONST               5 ('\n=== MATERIAL END ===\n')
+
+464          88 BINARY_OP                0 (+)
+
+463          92 CALL                     1
+            100 POP_TOP
+
+469     >>  102 LOAD_GLOBAL              5 (NULL + _channel_identity)
+            112 LOAD_FAST                6 (channel_niche)
+            114 LOAD_FAST                7 (channel_brief)
+            116 LOAD_FAST                8 (channel_orientation)
+            118 LOAD_FAST                9 (niche_angle)
+            120 CALL                     4
+            128 STORE_FAST              14 (identity)
+
+470         130 LOAD_FAST               14 (identity)
+            132 POP_JUMP_IF_FALSE       17 (to 168)
+
+471         134 LOAD_FAST               13 (parts)
+            136 LOAD_ATTR                1 (NULL|self + append)
+            156 LOAD_FAST               14 (identity)
+            158 CALL                     1
+            166 POP_TOP
+
+477     >>  168 LOAD_FAST               12 (cast_block)
+            170 COPY                     1
+            172 POP_JUMP_IF_TRUE         2 (to 178)
+            174 POP_TOP
+            176 LOAD_CONST               3 ('')
+        >>  178 LOAD_ATTR                3 (NULL|self + strip)
+            198 CALL                     0
+            206 POP_JUMP_IF_FALSE       17 (to 242)
+
+478         208 LOAD_FAST               13 (parts)
+            210 LOAD_ATTR                1 (NULL|self + append)
+            230 LOAD_FAST               12 (cast_block)
+            232 CALL                     1
+            240 POP_TOP
+
+480     >>  242 LOAD_FAST                1 (has_documented_source)
+            244 POP_JUMP_IF_TRUE        20 (to 286)
+            246 LOAD_FAST               11 (has_competitor_brief)
+            248 POP_JUMP_IF_FALSE       18 (to 286)
+
+484         250 LOAD_FAST               13 (parts)
+            252 LOAD_ATTR                1 (NULL|self + append)
+
+485         272 LOAD_CONST               6 ("SOURCE NOTE: no primary document was supplied. What you have is a TOPIC RECORD taken from another creator's video — unverified. Write the episode, but hold this line: any specific you cannot stand behind must be attributed ('theo hồ sơ được công bố…', 'các bản tin thời điểm đó cho biết…') or left out. Prefer a shorter, narrower episode you can defend over a full-length one padded with unverified specifics. Never present an unconfirmed name, date or figure as settled fact.\n")
+
+484         274 CALL                     1
+            282 POP_TOP
+            284 JUMP_FORWARD            19 (to 324)
+
+492     >>  286 LOAD_FAST                1 (has_documented_source)
+            288 POP_JUMP_IF_TRUE        17 (to 324)
+
+493         290 LOAD_FAST               13 (parts)
+            292 LOAD_ATTR                1 (NULL|self + append)
+
+494         312 LOAD_CONST               7 ('SOURCE NOTE: no published document or verified research record was supplied for this episode — only the commission brief. Apply your own source gate honestly: if your instructions require documented material and none is present, REJECT rather than inventing material to fill the runtime.\n')
+
+493         314 CALL                     1
+            322 POP_TOP
+
+500     >>  324 LOAD_FAST                3 (language)
+            326 COPY                     1
+            328 POP_JUMP_IF_TRUE         2 (to 334)
+            330 POP_TOP
+            332 LOAD_CONST               8 ('en')
+        >>  334 LOAD_ATTR                3 (NULL|self + strip)
+            354 CALL                     0
+            362 STORE_FAST              15 (lang_code)
+
+501         364 LOAD_FAST               13 (parts)
+            366 LOAD_ATTR                1 (NULL|self + append)
+
+502         386 LOAD_CONST               9 ("OUTPUT LANGUAGE: write TITLE, SCRIPT and NARRATION DIRECTION entirely in language code '")
+
+503         388 LOAD_FAST               15 (lang_code)
+            390 FORMAT_VALUE             0
+            392 LOAD_CONST              10 ("'.\n")
+
+502         394 BUILD_STRING             3
+
+501         396 CALL                     1
+            404 POP_TOP
+
+508         406 LOAD_FAST                4 (target_sec)
+            408 POP_JUMP_IF_FALSE       81 (to 572)
+
+509         410 LOAD_GLOBAL              7 (NULL + max)
+            420 LOAD_CONST              11 (1)
+            422 LOAD_GLOBAL              9 (NULL + round)
+            432 LOAD_FAST                4 (target_sec)
+            434 LOAD_CONST              12 (60)
+            436 BINARY_OP               11 (/)
+            440 CALL                     1
+            448 CALL                     2
+            456 STORE_FAST              16 (minutes)
+
+510         458 LOAD_GLOBAL             11 (NULL + int)
+            468 LOAD_FAST                4 (target_sec)
+            470 LOAD_CONST              13 (2.5)
+            472 BINARY_OP                5 (*)
+            476 CALL                     1
+            484 STORE_FAST              17 (words)
+
+511         486 LOAD_FAST               13 (parts)
+            488 LOAD_ATTR                1 (NULL|self + append)
+
+512         508 LOAD_CONST              14 ("RUNTIME LENGTH TARGET (set by this channel's owner — this SUPERSEDES the target length stated in your instructions above): about ")
+
+513         510 LOAD_FAST               16 (minutes)
+            512 FORMAT_VALUE             0
+            514 LOAD_CONST              15 (' minute(s) spoken, roughly ')
+            516 LOAD_FAST               17 (words)
+            518 FORMAT_VALUE             0
+            520 LOAD_CONST              16 (' words. Keep every other rule — beat architecture, brand placement, fact discipline and the final audit — exactly as written; compress or expand the beats to fit this runtime, and never pad with invented material to reach it.\n')
+
+512         522 BUILD_STRING             5
+
+511         524 CALL                     1
+            532 POP_TOP
+
+518         534 LOAD_FAST                5 (is_short)
+            536 POP_JUMP_IF_FALSE       17 (to 572)
+
+519         538 LOAD_FAST               13 (parts)
+            540 LOAD_ATTR                1 (NULL|self + append)
+
+520         560 LOAD_CONST              17 ('This channel is producing a SHORT vertical video at that runtime. Your instructions are written for long form: keep the register, the fact discipline and the signature beat, but deliver ONE idea with a single-line hook and a resolved ending.\n')
+
+519         562 CALL                     1
+            570 POP_TOP
+
+525     >>  572 LOAD_FAST               10 (channel_hook)
+            574 COPY                     1
+            576 POP_JUMP_IF_TRUE         2 (to 582)
+            578 POP_TOP
+            580 LOAD_CONST               3 ('')
+        >>  582 LOAD_ATTR                3 (NULL|self + strip)
+            602 CALL                     0
+            610 STORE_FAST              18 (hook)
+
+526         612 LOAD_FAST               18 (hook)
+            614 POP_JUMP_IF_FALSE       21 (to 658)
+
+527         616 LOAD_FAST               13 (parts)
+            618 LOAD_ATTR                1 (NULL|self + append)
+
+528         638 LOAD_CONST              18 ('CHANNEL SIGNATURE LINE (fixed branding line — reproduce it VERBATIM once, placed according to the brand-placement rules in your instructions above; never in the opening seconds if those rules forbid it):\n"')
+
+530         640 LOAD_FAST               18 (hook)
+            642 FORMAT_VALUE             0
+            644 LOAD_CONST              19 ('"\n')
+
+528         646 BUILD_STRING             3
+
+527         648 CALL                     1
+            656 POP_TOP
+
+533     >>  658 LOAD_FAST               13 (parts)
+            660 LOAD_ATTR                1 (NULL|self + append)
+
+534         680 LOAD_CONST              20 ('NARRATION IS READ ALOUD BY A TTS ENGINE: spell every number, currency amount, percentage and symbol out in full words in the output language. Never emit raw digits or the characters $ % € £ & / in the SCRIPT section.\n')
+
+533         682 CALL                     1
+            690 POP_TOP
+
+538         692 LOAD_CONST              21 ('\n')
+            694 LOAD_ATTR               13 (NULL|self + join)
+            714 LOAD_FAST               13 (parts)
+            716 CALL                     1
+            724 RETURN_VALUE
+
+Disassembly of <code object debug_summary at 0x7f6c9240aa60, file "app\services\master_prompt.py", line 541>:
+541           0 RESUME                   0
+
+543           2 LOAD_GLOBAL              1 (NULL + len)
+             12 LOAD_FAST                0 (rendered)
+             14 LOAD_ATTR                2 (prompt)
+             34 CALL                     1
+             42 LOAD_FAST                0 (rendered)
+             44 LOAD_ATTR                4 (source_injected)
+
+544          64 LOAD_FAST                0 (rendered)
+             66 LOAD_ATTR                6 (channel_name_slots)
+
+545          86 LOAD_FAST                1 (has_documented_source)
+
+543          88 LOAD_CONST               1 (('chars', 'source_slot', 'name_slots', 'documented_source'))
+             90 BUILD_CONST_KEY_MAP      4
+             92 STORE_FAST               2 (payload)
+
+546          94 LOAD_FAST                0 (rendered)
+             96 LOAD_ATTR                8 (extra_source_slots)
+            116 POP_JUMP_IF_FALSE       15 (to 148)
+
+547         118 LOAD_FAST                0 (rendered)
+            120 LOAD_ATTR                8 (extra_source_slots)
+            140 LOAD_FAST                2 (payload)
+            142 LOAD_CONST               2 ('extra_source_slots')
+            144 STORE_SUBSCR
+
+548     >>  148 LOAD_GLOBAL             11 (NULL + json)
+            158 LOAD_ATTR               12 (dumps)
+            178 LOAD_FAST                2 (payload)
+            180 LOAD_CONST               3 (False)
+            182 KW_NAMES                 4 (('ensure_ascii',))
+            184 CALL                     2
+            192 RETURN_VALUE
+
+Disassembly of <code object skill_text at 0x7f6c926fb990, file "app\services\master_prompt.py", line 571>:
+571           0 RESUME                   0
+
+573           2 NOP
+
+574           4 LOAD_GLOBAL              0 (_SKILL_PATH)
+             14 LOAD_ATTR                3 (NULL|self + read_text)
+             34 LOAD_CONST               1 ('utf-8')
+             36 KW_NAMES                 2 (('encoding',))
+             38 CALL                     1
+             46 RETURN_VALUE
+        >>   48 PUSH_EXC_INFO
+
+575          50 LOAD_GLOBAL              4 (OSError)
+             60 CHECK_EXC_MATCH
+             62 POP_JUMP_IF_FALSE        3 (to 70)
+             64 POP_TOP
+
+576          66 POP_EXCEPT
+             68 RETURN_CONST             3 ('')
+
+575     >>   70 RERAISE                  0
+        >>   72 COPY                     3
+             74 POP_EXCEPT
+             76 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 48 [0]
+  48 to 64 -> 72 [1] lasti
+  70 to 70 -> 72 [1] lasti
+
+Disassembly of <code object _channel_facts at 0x28ad6b60, file "app\services\master_prompt.py", line 579>:
+579           0 RESUME                   0
+
+581           2 LOAD_GLOBAL              1 (NULL + max)
+             12 LOAD_CONST               1 (1)
+             14 LOAD_GLOBAL              3 (NULL + round)
+             24 LOAD_FAST                4 (target_sec)
+             26 COPY                     1
+             28 POP_JUMP_IF_TRUE         2 (to 34)
+             30 POP_TOP
+             32 LOAD_CONST               2 (480)
+        >>   34 LOAD_CONST               3 (60)
+             36 BINARY_OP               11 (/)
+             40 CALL                     1
+             48 CALL                     2
+             56 STORE_FAST               5 (minutes)
+
+582          58 LOAD_FAST                2 (profile)
+             60 LOAD_ATTR                5 (NULL|self + get)
+             80 LOAD_CONST               4 ('news_enabled')
+             82 CALL                     1
+             90 POP_JUMP_IF_FALSE        2 (to 96)
+             92 LOAD_CONST               5 ('bài báo / bản tin')
+             94 JUMP_FORWARD             1 (to 98)
+        >>   96 LOAD_CONST               6 ('chủ đề + nguồn tham khảo')
+        >>   98 STORE_FAST               6 (kind)
+
+584         100 LOAD_FAST                0 (channel_name)
+            102 COPY                     1
+            104 POP_JUMP_IF_TRUE         2 (to 110)
+            106 POP_TOP
+            108 LOAD_CONST               7 ('Kênh của tôi')
+
+585     >>  110 LOAD_FAST                1 (engine_name)
+            112 COPY                     1
+            114 POP_JUMP_IF_TRUE         2 (to 120)
+            116 POP_TOP
+            118 LOAD_CONST               8 ('(chưa chọn)')
+
+586     >>  120 LOAD_GLOBAL              7 (NULL + str)
+            130 LOAD_FAST                2 (profile)
+            132 LOAD_ATTR                5 (NULL|self + get)
+            152 LOAD_CONST               9 ('niche')
+            154 CALL                     1
+            162 COPY                     1
+            164 POP_JUMP_IF_TRUE         2 (to 170)
+            166 POP_TOP
+            168 LOAD_CONST              10 ('')
+        >>  170 CALL                     1
+            178 LOAD_ATTR                9 (NULL|self + strip)
+            198 CALL                     0
+            206 COPY                     1
+            208 POP_JUMP_IF_TRUE         2 (to 214)
+            210 POP_TOP
+            212 LOAD_CONST              11 ('(chưa đặt)')
+
+587     >>  214 LOAD_GLOBAL              7 (NULL + str)
+            224 LOAD_FAST                2 (profile)
+            226 LOAD_ATTR                5 (NULL|self + get)
+            246 LOAD_CONST              12 ('channel_brief')
+            248 CALL                     1
+            256 COPY                     1
+            258 POP_JUMP_IF_TRUE         2 (to 264)
+            260 POP_TOP
+            262 LOAD_CONST              10 ('')
+        >>  264 CALL                     1
+            272 LOAD_ATTR                9 (NULL|self + strip)
+            292 CALL                     0
+            300 COPY                     1
+            302 POP_JUMP_IF_TRUE         2 (to 308)
+            304 POP_TOP
+            306 LOAD_CONST              11 ('(chưa đặt)')
+
+588     >>  308 LOAD_GLOBAL              7 (NULL + str)
+            318 LOAD_FAST                2 (profile)
+            320 LOAD_ATTR                5 (NULL|self + get)
+            340 LOAD_CONST              13 ('channel_orientation')
+            342 CALL                     1
+            350 COPY                     1
+            352 POP_JUMP_IF_TRUE         2 (to 358)
+            354 POP_TOP
+            356 LOAD_CONST              10 ('')
+        >>  358 CALL                     1
+            366 LOAD_ATTR                9 (NULL|self + strip)
+            386 CALL                     0
+            394 COPY                     1
+            396 POP_JUMP_IF_TRUE         2 (to 402)
+            398 POP_TOP
+            400 LOAD_CONST              11 ('(chưa đặt)')
+
+589     >>  402 LOAD_FAST                3 (language)
+            404 COPY                     1
+            406 POP_JUMP_IF_TRUE         2 (to 412)
+            408 POP_TOP
+            410 LOAD_CONST              14 ('vi')
+
+590     >>  412 LOAD_GLOBAL              7 (NULL + str)
+            422 LOAD_FAST                5 (minutes)
+            424 CALL                     1
+
+591         432 LOAD_FAST                6 (kind)
+
+583         434 LOAD_CONST              15 (('CHANNEL_NAME', 'ENGINE_NAME', 'NICHE', 'CHANNEL_BRIEF', 'CHANNEL_ORIENTATION', 'LANGUAGE', 'TARGET_MINUTES', 'SOURCE_KIND'))
+            436 BUILD_CONST_KEY_MAP      8
+            438 RETURN_VALUE
+
+Disassembly of <code object build_generate_messages at 0x7f6c9269af10, file "app\services\master_prompt.py", line 595>:
+595           0 RESUME                   0
+
+598           2 LOAD_GLOBAL              1 (NULL + _channel_facts)
+             12 LOAD_FAST                0 (channel_name)
+             14 LOAD_FAST                1 (engine_name)
+             16 LOAD_FAST                2 (profile)
+
+599          18 LOAD_FAST                3 (language)
+             20 LOAD_FAST                4 (target_sec)
+
+598          22 KW_NAMES                 1 (('channel_name', 'engine_name', 'profile', 'language', 'target_sec'))
+             24 CALL                     5
+             32 STORE_FAST               5 (facts)
+
+600          34 LOAD_GLOBAL              3 (NULL + skill_text)
+             44 CALL                     0
+             52 STORE_FAST               6 (skill)
+
+606          54 LOAD_FAST                5 (facts)
+             56 LOAD_ATTR                5 (NULL|self + items)
+             76 CALL                     0
+             84 GET_ITER
+        >>   86 FOR_ITER                29 (to 148)
+             90 UNPACK_SEQUENCE          2
+             94 STORE_FAST               7 (key)
+             96 STORE_FAST               8 (val)
+
+607          98 LOAD_FAST                6 (skill)
+            100 LOAD_ATTR                7 (NULL|self + replace)
+            120 LOAD_CONST               2 ('[[')
+            122 LOAD_FAST                7 (key)
+            124 BINARY_OP                0 (+)
+            128 LOAD_CONST               3 (']]')
+            130 BINARY_OP                0 (+)
+            134 LOAD_FAST                8 (val)
+            136 CALL                     2
+            144 STORE_FAST               6 (skill)
+            146 JUMP_BACKWARD           31 (to 86)
+
+606     >>  148 END_FOR
+
+609         150 LOAD_CONST               4 ('Viết master prompt cho kênh "')
+            152 LOAD_FAST                5 (facts)
+            154 LOAD_CONST               5 ('CHANNEL_NAME')
+            156 BINARY_SUBSCR
+            160 FORMAT_VALUE             0
+            162 LOAD_CONST               6 ('".\n\n')
+            164 BUILD_STRING             3
+
+610         166 LOAD_CONST               7 ('\n')
+            168 LOAD_ATTR                9 (NULL|self + join)
+            188 LOAD_CONST               8 (<code object <genexpr> at 0x7f6c927e3530, file "app\services\master_prompt.py", line 610>)
+            190 MAKE_FUNCTION            0
+            192 LOAD_FAST                5 (facts)
+            194 LOAD_ATTR                5 (NULL|self + items)
+            214 CALL                     0
+            222 GET_ITER
+            224 CALL                     0
+            232 CALL                     1
+
+609         240 BINARY_OP                0 (+)
+
+611         244 LOAD_CONST               9 ('\n\nNhắc lại ba điều quan trọng nhất:\n1. Viết THẲNG tên kênh "')
+
+612         246 LOAD_FAST                5 (facts)
+            248 LOAD_CONST               5 ('CHANNEL_NAME')
+            250 BINARY_SUBSCR
+            254 FORMAT_VALUE             0
+            256 LOAD_CONST              10 ('" vào mục 1, 4 và 4B để prompt đọc lên là ra ngay kênh nào.\n2. Nhưng ở mục 2 (INPUT) và ở mọi CÂU MẪU người dẫn sẽ đọc trên sóng thì giữ nguyên chuỗi {{CHANNEL_NAME}} — phần mềm tự điền lúc chạy, đổi tên kênh sau này không phải viết lại.\n3. Chép NGUYÊN VĂN bốn khối ở PHẦN B (gồm {{SOURCE_MATERIAL}}), và cổng nguồn để NHẸ theo PHẦN C.')
+
+611         258 BUILD_STRING             3
+
+609         260 BINARY_OP                0 (+)
+
+608         264 STORE_FAST               9 (user)
+
+619         266 LOAD_FAST                6 (skill)
+            268 LOAD_FAST                9 (user)
+            270 BUILD_TUPLE              2
+            272 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c927e3530, file "app\services\master_prompt.py", line 610>:
+610           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                15 (to 42)
+             12 UNPACK_SEQUENCE          2
+             16 STORE_FAST               1 (k)
+             18 STORE_FAST               2 (v)
+             20 LOAD_CONST               0 ('- ')
+             22 LOAD_FAST                1 (k)
+             24 FORMAT_VALUE             0
+             26 LOAD_CONST               1 (': ')
+             28 LOAD_FAST                2 (v)
+             30 FORMAT_VALUE             0
+             32 BUILD_STRING             4
+             34 YIELD_VALUE              1
+             36 RESUME                   1
+             38 POP_TOP
+             40 JUMP_BACKWARD           17 (to 8)
+        >>   42 END_FOR
+             44 RETURN_CONST             2 (None)
+        >>   46 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             48 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 46 [0] lasti
+
+Disassembly of <code object build_refine_messages at 0x7f6c9234e250, file "app\services\master_prompt.py", line 622>:
+622           0 RESUME                   0
+
+630           2 LOAD_CONST               1 ("Bạn là biên tập viên PRODUCTION MASTER PROMPT. Người dùng đưa bạn một master prompt đang chạy và một yêu cầu sửa. Sửa ĐÚNG phần được yêu cầu, giữ nguyên mọi phần khác.\n\nVÙNG CẤM SỬA — giữ nguyên từng ký tự, kể cả khi yêu cầu là 'rút ngắn' hay 'gọn lại':\n- Vùng nhận nguồn: {{CHANNEL_NAME}}, {{SOURCE_MATERIAL}} và hai marker '=== SOURCE START ===' / '=== SOURCE END ==='.\n- Mục STRICT OUTPUT FORMAT với đủ bốn dòng: 'TITLE:', 'SCRIPT:', '--- END OF SCRIPT ---', 'NARRATION DIRECTION:'.\n- Luật đọc thành tiếng (số viết thành chữ, không ký hiệu, SCRIPT chỉ có lời đọc).\nĐây là hợp đồng kỹ thuật với phần mềm; xoá là hỏng cả dây chuyền.\n\nTrả về DUY NHẤT master prompt đã sửa, bằng ngôn ngữ ")
+
+639           4 LOAD_FAST                2 (language)
+              6 COPY                     1
+              8 POP_JUMP_IF_TRUE         2 (to 14)
+             10 POP_TOP
+             12 LOAD_CONST               2 ('vi')
+        >>   14 FORMAT_VALUE             0
+             16 LOAD_CONST               3 ('. Không lời dẫn, không giải thích, không bọc trong khối code.')
+
+630          18 BUILD_STRING             3
+
+629          20 STORE_FAST               3 (system)
+
+643          22 LOAD_CONST               4 ('YÊU CẦU SỬA:\n')
+             24 LOAD_FAST                1 (instruction)
+             26 COPY                     1
+             28 POP_JUMP_IF_TRUE         2 (to 34)
+             30 POP_TOP
+             32 LOAD_CONST               5 ('')
+        >>   34 LOAD_ATTR                1 (NULL|self + strip)
+             54 CALL                     0
+             62 BINARY_OP                0 (+)
+
+644          66 LOAD_CONST               6 ('\n\n=== MASTER PROMPT HIỆN TẠI ===\n')
+
+643          68 BINARY_OP                0 (+)
+
+644          72 LOAD_FAST                0 (current)
+             74 COPY                     1
+             76 POP_JUMP_IF_TRUE         2 (to 82)
+             78 POP_TOP
+             80 LOAD_CONST               5 ('')
+        >>   82 LOAD_ATTR                1 (NULL|self + strip)
+            102 CALL                     0
+
+643         110 BINARY_OP                0 (+)
+
+645         114 LOAD_CONST               7 ('\n=== HẾT ===')
+
+643         116 BINARY_OP                0 (+)
+
+642         120 STORE_FAST               4 (user)
+
+647         122 LOAD_FAST                3 (system)
+            124 LOAD_FAST                4 (user)
+            126 BUILD_TUPLE              2
+            128 RETURN_VALUE
+
+Disassembly of <code object validate_generated at 0x28ba1d30, file "app\services\master_prompt.py", line 650>:
+650           0 RESUME                   0
+
+656           2 LOAD_FAST                0 (text)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 LOAD_CONST               1 ('')
+        >>   12 LOAD_ATTR                1 (NULL|self + strip)
+             32 CALL                     0
+             40 STORE_FAST               1 (body)
+
+657          42 BUILD_LIST               0
+             44 STORE_FAST               2 (issues)
+
+658          46 LOAD_GLOBAL              3 (NULL + len)
+             56 LOAD_FAST                1 (body)
+             58 CALL                     1
+             66 LOAD_GLOBAL              4 (MIN_MASTER_CHARS)
+             76 COMPARE_OP               2 (<)
+             80 POP_JUMP_IF_FALSE       30 (to 142)
+
+659          82 LOAD_FAST                2 (issues)
+             84 LOAD_ATTR                7 (NULL|self + append)
+            104 LOAD_CONST               2 ('quá ngắn (')
+            106 LOAD_GLOBAL              3 (NULL + len)
+            116 LOAD_FAST                1 (body)
+            118 CALL                     1
+            126 FORMAT_VALUE             0
+            128 LOAD_CONST               3 (' ký tự) — không giống một master prompt sản xuất')
+            130 BUILD_STRING             3
+            132 CALL                     1
+            140 POP_TOP
+
+660     >>  142 LOAD_GLOBAL              8 (_REQUIRED_MARKERS)
+            152 GET_ITER
+        >>  154 FOR_ITER                27 (to 212)
+            158 STORE_FAST               3 (marker)
+
+661         160 LOAD_FAST                3 (marker)
+            162 LOAD_FAST                1 (body)
+            164 CONTAINS_OP              1
+            166 POP_JUMP_IF_TRUE         1 (to 170)
+            168 JUMP_BACKWARD            8 (to 154)
+
+662     >>  170 LOAD_FAST                2 (issues)
+            172 LOAD_ATTR                7 (NULL|self + append)
+            192 LOAD_CONST               4 ('thiếu marker hợp đồng output: ')
+            194 LOAD_FAST                3 (marker)
+            196 FORMAT_VALUE             2 (repr)
+            198 BUILD_STRING             2
+            200 CALL                     1
+            208 POP_TOP
+            210 JUMP_BACKWARD           29 (to 154)
+
+660     >>  212 END_FOR
+
+663         214 LOAD_GLOBAL             10 (_REQUIRED_PLACEHOLDERS)
+            224 GET_ITER
+        >>  226 FOR_ITER                28 (to 286)
+            230 STORE_FAST               4 (ph)
+
+664         232 LOAD_FAST                4 (ph)
+            234 LOAD_FAST                1 (body)
+            236 CONTAINS_OP              1
+            238 POP_JUMP_IF_TRUE         1 (to 242)
+            240 JUMP_BACKWARD            8 (to 226)
+
+665     >>  242 LOAD_FAST                2 (issues)
+            244 LOAD_ATTR                7 (NULL|self + append)
+            264 LOAD_CONST               5 ('thiếu placeholder ')
+            266 LOAD_FAST                4 (ph)
+            268 FORMAT_VALUE             0
+            270 LOAD_CONST               6 (' — phần mềm không điền được tên kênh')
+            272 BUILD_STRING             3
+            274 CALL                     1
+            282 POP_TOP
+            284 JUMP_BACKWARD           30 (to 226)
+
+663     >>  286 END_FOR
+
+666         288 LOAD_GLOBAL             12 (_PLACEHOLDER_RE)
+            298 LOAD_ATTR               15 (NULL|self + search)
+            318 LOAD_FAST                1 (body)
+            320 LOAD_ATTR               17 (NULL|self + replace)
+            340 LOAD_CONST               7 ('{{CHANNEL_NAME}}')
+            342 LOAD_CONST               1 ('')
+            344 CALL                     2
+            352 CALL                     1
+            360 POP_JUMP_IF_TRUE        17 (to 396)
+
+667         362 LOAD_FAST                2 (issues)
+            364 LOAD_ATTR                7 (NULL|self + append)
+            384 LOAD_CONST               8 ('thiếu placeholder nguồn (vd {{SOURCE_MATERIAL}}) — không có chỗ nhận bài báo/hồ sơ')
+            386 CALL                     1
+            394 POP_TOP
+
+668     >>  396 LOAD_FAST                2 (issues)
+            398 RETURN_VALUE
+
+Disassembly of <code object strip_wrapper at 0x28b24bf0, file "app\services\master_prompt.py", line 671>:
+              0 MAKE_CELL                4 (head)
+
+671           2 RESUME                   0
+
+673           4 LOAD_FAST                0 (raw)
+              6 COPY                     1
+              8 POP_JUMP_IF_TRUE         2 (to 14)
+             10 POP_TOP
+             12 LOAD_CONST               1 ('')
+        >>   14 LOAD_ATTR                1 (NULL|self + strip)
+             34 CALL                     0
+             42 STORE_FAST               1 (text)
+
+674          44 LOAD_GLOBAL              2 (_FENCE_RE)
+             54 LOAD_ATTR                5 (NULL|self + match)
+             74 LOAD_FAST                1 (text)
+             76 CALL                     1
+             84 STORE_FAST               2 (fence)
+
+675          86 LOAD_FAST                2 (fence)
+             88 POP_JUMP_IF_FALSE       31 (to 152)
+
+676          90 LOAD_FAST                2 (fence)
+             92 LOAD_ATTR                7 (NULL|self + group)
+            112 LOAD_CONST               2 (1)
+            114 CALL                     1
+            122 LOAD_ATTR                1 (NULL|self + strip)
+            142 CALL                     0
+            150 STORE_FAST               1 (text)
+
+678     >>  152 LOAD_FAST                1 (text)
+            154 LOAD_ATTR                9 (NULL|self + split)
+            174 LOAD_CONST               3 ('\n')
+            176 CALL                     1
+            184 STORE_FAST               3 (lines)
+
+679         186 LOAD_GLOBAL             11 (NULL + len)
+            196 LOAD_FAST                3 (lines)
+            198 CALL                     1
+            206 LOAD_CONST               4 (3)
+            208 COMPARE_OP              68 (>)
+            212 POP_JUMP_IF_FALSE      124 (to 462)
+            214 LOAD_GLOBAL             11 (NULL + len)
+            224 LOAD_FAST                3 (lines)
+            226 LOAD_CONST               5 (0)
+            228 BINARY_SUBSCR
+            232 CALL                     1
+            240 LOAD_CONST               6 (120)
+            242 COMPARE_OP               2 (<)
+            246 POP_JUMP_IF_FALSE      107 (to 462)
+            248 LOAD_FAST                3 (lines)
+            250 LOAD_CONST               5 (0)
+            252 BINARY_SUBSCR
+            256 LOAD_ATTR                1 (NULL|self + strip)
+            276 CALL                     0
+            284 LOAD_ATTR               13 (NULL|self + startswith)
+            304 LOAD_CONST               7 ('1.')
+            306 CALL                     1
+            314 POP_JUMP_IF_TRUE        73 (to 462)
+
+680         316 LOAD_FAST                3 (lines)
+            318 LOAD_CONST               5 (0)
+            320 BINARY_SUBSCR
+            324 LOAD_ATTR               15 (NULL|self + lower)
+            344 CALL                     0
+            352 STORE_DEREF              4 (head)
+
+681         354 LOAD_GLOBAL             17 (NULL + any)
+            364 LOAD_CLOSURE             4 (head)
+            366 BUILD_TUPLE              1
+            368 LOAD_CONST               8 (<code object <genexpr> at 0x7f6c927d4210, file "app\services\master_prompt.py", line 681>)
+            370 MAKE_FUNCTION            8 (closure)
+            372 LOAD_CONST               9 (('đây là', 'here is', "here's", 'master prompt cho', 'sau đây'))
+            374 GET_ITER
+            376 CALL                     0
+            384 CALL                     1
+            392 POP_JUMP_IF_FALSE       34 (to 462)
+
+682         394 LOAD_CONST               3 ('\n')
+            396 LOAD_ATTR               19 (NULL|self + join)
+            416 LOAD_FAST                3 (lines)
+            418 LOAD_CONST               2 (1)
+            420 LOAD_CONST              10 (None)
+            422 BINARY_SLICE
+            424 CALL                     1
+            432 LOAD_ATTR                1 (NULL|self + strip)
+            452 CALL                     0
+            460 STORE_FAST               1 (text)
+
+683     >>  462 LOAD_FAST                1 (text)
+            464 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c927d4210, file "app\services\master_prompt.py", line 681>:
+              0 COPY_FREE_VARS           1
+
+681           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                 8 (to 30)
+             14 STORE_FAST               1 (k)
+             16 LOAD_FAST                1 (k)
+             18 LOAD_DEREF               2 (head)
+             20 CONTAINS_OP              0
+             22 YIELD_VALUE              1
+             24 RESUME                   1
+             26 POP_TOP
+             28 JUMP_BACKWARD           10 (to 10)
+        >>   30 END_FOR
+             32 RETURN_CONST             0 (None)
+        >>   34 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             36 RERAISE                  1
+ExceptionTable:
+  6 to 32 -> 34 [0] lasti
+
+Disassembly of <code object run_generate_job at 0x28d69280, file "app\services\master_prompt.py", line 688>:
+              0 MAKE_CELL                1 (progress)
+              2 MAKE_CELL                2 (cancel_check)
+              4 MAKE_CELL               29 (E)
+              6 MAKE_CELL               30 (StudioError)
+
+688           8 RETURN_GENERATOR
+             10 POP_TOP
+             12 RESUME                   0
+
+696          14 LOAD_CONST               1 (0)
+             16 LOAD_CONST               2 (('StudioError', 'E'))
+             18 IMPORT_NAME              0 (app.core.errors)
+             20 IMPORT_FROM              1 (StudioError)
+             22 STORE_DEREF             30 (StudioError)
+             24 IMPORT_FROM              2 (E)
+             26 STORE_DEREF             29 (E)
+             28 POP_TOP
+
+697          30 LOAD_CONST               1 (0)
+             32 LOAD_CONST               3 (('log',))
+             34 IMPORT_NAME              3 (app.core.logging)
+             36 IMPORT_FROM              4 (log)
+             38 STORE_FAST               3 (log)
+             40 POP_TOP
+
+698          42 LOAD_CONST               1 (0)
+             44 LOAD_CONST               4 (('complete_text',))
+             46 IMPORT_NAME              5 (app.adapters.ai_provider)
+             48 IMPORT_FROM              6 (complete_text)
+             50 STORE_FAST               4 (complete_text)
+             52 POP_TOP
+
+699          54 LOAD_CONST               1 (0)
+             56 LOAD_CONST               5 (('SessionLocal',))
+             58 IMPORT_NAME              7 (app.db.session)
+             60 IMPORT_FROM              8 (SessionLocal)
+             62 STORE_FAST               5 (SessionLocal)
+             64 POP_TOP
+
+700          66 LOAD_CONST               1 (0)
+             68 LOAD_CONST               6 (('Project',))
+             70 IMPORT_NAME              9 (app.db.models)
+             72 IMPORT_FROM             10 (Project)
+             74 STORE_FAST               6 (Project)
+             76 POP_TOP
+
+701          78 LOAD_CONST               1 (0)
+             80 LOAD_CONST               7 (('ai_studio_service', 'channel_engines'))
+             82 IMPORT_NAME             11 (app.services)
+             84 IMPORT_FROM             12 (ai_studio_service)
+             86 STORE_FAST               7 (ai_studio_service)
+             88 IMPORT_FROM             13 (channel_engines)
+             90 STORE_FAST               8 (channel_engines)
+             92 POP_TOP
+
+703          94 LOAD_GLOBAL             29 (NULL + str)
+            104 LOAD_FAST                0 (config)
+            106 LOAD_ATTR               31 (NULL|self + get)
+            126 LOAD_CONST               8 ('project_id')
+            128 CALL                     1
+            136 COPY                     1
+            138 POP_JUMP_IF_TRUE         2 (to 144)
+            140 POP_TOP
+            142 LOAD_CONST               9 ('')
+        >>  144 CALL                     1
+            152 LOAD_ATTR               33 (NULL|self + strip)
+            172 CALL                     0
+            180 STORE_FAST               9 (project_id)
+
+704         182 LOAD_GLOBAL             29 (NULL + str)
+            192 LOAD_FAST                0 (config)
+            194 LOAD_ATTR               31 (NULL|self + get)
+            214 LOAD_CONST              10 ('mode')
+            216 CALL                     1
+            224 COPY                     1
+            226 POP_JUMP_IF_TRUE         2 (to 232)
+            228 POP_TOP
+            230 LOAD_CONST              11 ('generate')
+        >>  232 CALL                     1
+            240 LOAD_ATTR               33 (NULL|self + strip)
+            260 CALL                     0
+            268 LOAD_ATTR               35 (NULL|self + lower)
+            288 CALL                     0
+            296 STORE_FAST              10 (mode)
+
+705         298 LOAD_GLOBAL             29 (NULL + str)
+            308 LOAD_FAST                0 (config)
+            310 LOAD_ATTR               31 (NULL|self + get)
+            330 LOAD_CONST              12 ('instruction')
+            332 CALL                     1
+            340 COPY                     1
+            342 POP_JUMP_IF_TRUE         2 (to 348)
+            344 POP_TOP
+            346 LOAD_CONST               9 ('')
+        >>  348 CALL                     1
+            356 LOAD_ATTR               33 (NULL|self + strip)
+            376 CALL                     0
+            384 STORE_FAST              11 (instruction)
+
+707         386 LOAD_CONST              58 (('pct', 'float', 'return', 'None'))
+            388 LOAD_CLOSURE            29 (E)
+            390 LOAD_CLOSURE            30 (StudioError)
+            392 LOAD_CLOSURE             2 (cancel_check)
+            394 LOAD_CLOSURE             1 (progress)
+            396 BUILD_TUPLE              4
+            398 LOAD_CONST              13 (<code object checkpoint at 0x7f6c922b4b70, file "app\services\master_prompt.py", line 707>)
+            400 MAKE_FUNCTION           12 (annotations, closure)
+            402 STORE_FAST              12 (checkpoint)
+
+713         404 PUSH_NULL
+            406 LOAD_FAST               12 (checkpoint)
+            408 LOAD_CONST              14 (5)
+            410 CALL                     1
+            418 POP_TOP
+
+714         420 PUSH_NULL
+            422 LOAD_FAST                5 (SessionLocal)
+            424 CALL                     0
+            432 BEFORE_WITH
+            434 STORE_FAST              13 (db)
+
+715         436 LOAD_FAST               13 (db)
+            438 LOAD_ATTR               31 (NULL|self + get)
+            458 LOAD_FAST                6 (Project)
+            460 LOAD_FAST                9 (project_id)
+            462 CALL                     2
+            470 STORE_FAST              14 (project)
+
+716         472 LOAD_FAST               14 (project)
+            474 POP_JUMP_IF_NOT_NONE    21 (to 518)
+
+717         476 PUSH_NULL
+            478 LOAD_DEREF              30 (StudioError)
+            480 LOAD_DEREF              29 (E)
+            482 LOAD_ATTR               36 (PROJECT_NOT_FOUND)
+            502 LOAD_CONST              16 ('Kênh không tồn tại')
+            504 LOAD_CONST              17 (404)
+            506 KW_NAMES                18 (('status_code',))
+            508 CALL                     3
+            516 RAISE_VARARGS            1
+
+718     >>  518 LOAD_FAST                7 (ai_studio_service)
+            520 LOAD_ATTR               39 (NULL|self + get_or_create_config)
+            540 LOAD_FAST               13 (db)
+            542 LOAD_FAST                9 (project_id)
+            544 CALL                     2
+            552 STORE_FAST              15 (cfg)
+
+719         554 LOAD_FAST                7 (ai_studio_service)
+            556 LOAD_ATTR               41 (NULL|self + _loads)
+            576 LOAD_FAST               15 (cfg)
+            578 LOAD_ATTR               42 (channel_profile_json)
+            598 BUILD_MAP                0
+            600 CALL                     2
+            608 STORE_FAST              16 (profile)
+
+720         610 LOAD_FAST               15 (cfg)
+            612 LOAD_ATTR               44 (engine_id)
+            632 POP_JUMP_IF_FALSE       27 (to 688)
+            634 LOAD_FAST                8 (channel_engines)
+            636 LOAD_ATTR               47 (NULL|self + get_engine)
+            656 LOAD_FAST               15 (cfg)
+            658 LOAD_ATTR               44 (engine_id)
+            678 CALL                     1
+            686 JUMP_FORWARD             1 (to 690)
+        >>  688 LOAD_CONST              15 (None)
+        >>  690 STORE_FAST              17 (engine)
+
+721         692 LOAD_GLOBAL             29 (NULL + str)
+            702 LOAD_FAST               16 (profile)
+            704 LOAD_ATTR               31 (NULL|self + get)
+            724 LOAD_CONST              19 ('channel_name')
+            726 CALL                     1
+            734 COPY                     1
+            736 POP_JUMP_IF_TRUE        16 (to 770)
+            738 POP_TOP
+            740 LOAD_FAST               14 (project)
+            742 LOAD_ATTR               48 (name)
+            762 COPY                     1
+            764 POP_JUMP_IF_TRUE         2 (to 770)
+            766 POP_TOP
+            768 LOAD_CONST               9 ('')
+        >>  770 CALL                     1
+            778 LOAD_ATTR               33 (NULL|self + strip)
+            798 CALL                     0
+            806 STORE_FAST              18 (channel_name)
+
+722         808 LOAD_GLOBAL             29 (NULL + str)
+            818 LOAD_FAST               15 (cfg)
+            820 LOAD_ATTR               50 (language)
+            840 COPY                     1
+            842 POP_JUMP_IF_TRUE        21 (to 886)
+            844 POP_TOP
+            846 LOAD_FAST               16 (profile)
+            848 LOAD_ATTR               31 (NULL|self + get)
+            868 LOAD_CONST              20 ('language')
+            870 CALL                     1
+            878 COPY                     1
+            880 POP_JUMP_IF_TRUE         2 (to 886)
+            882 POP_TOP
+            884 LOAD_CONST              21 ('vi')
+        >>  886 CALL                     1
+            894 LOAD_ATTR               33 (NULL|self + strip)
+            914 CALL                     0
+            922 STORE_FAST              19 (language)
+
+723         924 LOAD_FAST               16 (profile)
+            926 LOAD_ATTR               31 (NULL|self + get)
+            946 LOAD_CONST              22 ('long_target_sec')
+            948 CALL                     1
+            956 STORE_FAST              20 (target_sec)
+
+724         958 LOAD_GLOBAL             29 (NULL + str)
+            968 LOAD_FAST               16 (profile)
+            970 LOAD_ATTR               31 (NULL|self + get)
+            990 LOAD_CONST              23 ('script_master_prompt')
+            992 CALL                     1
+           1000 COPY                     1
+           1002 POP_JUMP_IF_TRUE         2 (to 1008)
+           1004 POP_TOP
+           1006 LOAD_CONST               9 ('')
+        >> 1008 CALL                     1
+           1016 LOAD_ATTR               33 (NULL|self + strip)
+           1036 CALL                     0
+           1044 STORE_FAST              21 (current)
+
+725        1046 LOAD_FAST               16 (profile)
+           1048 LOAD_ATTR               31 (NULL|self + get)
+           1068 LOAD_CONST              24 ('provider')
+           1070 CALL                     1
+           1078 COPY                     1
+           1080 POP_JUMP_IF_TRUE         2 (to 1086)
+           1082 POP_TOP
+           1084 LOAD_CONST              15 (None)
+        >> 1086 STORE_FAST              22 (llm_provider)
+
+714        1088 LOAD_CONST              15 (None)
+           1090 LOAD_CONST              15 (None)
+           1092 LOAD_CONST              15 (None)
+           1094 CALL                     2
+           1102 POP_TOP
+
+727     >> 1104 LOAD_FAST               10 (mode)
+           1106 LOAD_CONST              25 ('refine')
+           1108 COMPARE_OP              40 (==)
+           1112 POP_JUMP_IF_FALSE       64 (to 1242)
+
+728        1114 LOAD_FAST_CHECK         21 (current)
+           1116 POP_JUMP_IF_TRUE        21 (to 1160)
+
+729        1118 PUSH_NULL
+           1120 LOAD_DEREF              30 (StudioError)
+           1122 LOAD_DEREF              29 (E)
+           1124 LOAD_ATTR               52 (PRECONDITION_MISSING)
+
+730        1144 LOAD_CONST              26 ('Kênh chưa có master prompt để sửa.')
+           1146 LOAD_CONST              27 (409)
+
+729        1148 KW_NAMES                18 (('status_code',))
+           1150 CALL                     3
+           1158 RAISE_VARARGS            1
+
+731     >> 1160 LOAD_FAST               11 (instruction)
+           1162 POP_JUMP_IF_TRUE        21 (to 1206)
+
+732        1164 PUSH_NULL
+           1166 LOAD_DEREF              30 (StudioError)
+           1168 LOAD_DEREF              29 (E)
+           1170 LOAD_ATTR               54 (UNKNOWN)
+           1190 LOAD_CONST              28 ('Chưa nhập yêu cầu sửa.')
+           1192 LOAD_CONST              29 (422)
+           1194 KW_NAMES                18 (('status_code',))
+           1196 CALL                     3
+           1204 RAISE_VARARGS            1
+
+733     >> 1206 LOAD_GLOBAL             57 (NULL + build_refine_messages)
+           1216 LOAD_FAST               21 (current)
+           1218 LOAD_FAST               11 (instruction)
+           1220 LOAD_FAST_CHECK         19 (language)
+           1222 KW_NAMES                30 (('language',))
+           1224 CALL                     3
+           1232 UNPACK_SEQUENCE          2
+           1236 STORE_FAST              23 (system)
+           1238 STORE_FAST              24 (user)
+           1240 JUMP_FORWARD            33 (to 1308)
+
+735     >> 1242 LOAD_GLOBAL             59 (NULL + build_generate_messages)
+
+736        1252 LOAD_FAST_CHECK         18 (channel_name)
+           1254 LOAD_FAST_CHECK         17 (engine)
+           1256 POP_JUMP_IF_FALSE       12 (to 1282)
+           1258 LOAD_FAST               17 (engine)
+           1260 LOAD_ATTR               48 (name)
+           1280 JUMP_FORWARD             1 (to 1284)
+        >> 1282 LOAD_CONST               9 ('')
+
+737     >> 1284 LOAD_FAST_CHECK         16 (profile)
+           1286 LOAD_FAST_CHECK         19 (language)
+           1288 LOAD_FAST_CHECK         20 (target_sec)
+
+735        1290 KW_NAMES                31 (('channel_name', 'engine_name', 'profile', 'language', 'target_sec'))
+           1292 CALL                     5
+           1300 UNPACK_SEQUENCE          2
+           1304 STORE_FAST              23 (system)
+           1306 STORE_FAST              24 (user)
+
+738     >> 1308 LOAD_FAST               23 (system)
+           1310 POP_JUMP_IF_TRUE        19 (to 1350)
+
+739        1312 PUSH_NULL
+           1314 LOAD_DEREF              30 (StudioError)
+           1316 LOAD_DEREF              29 (E)
+           1318 LOAD_ATTR               54 (UNKNOWN)
+           1338 LOAD_CONST              32 ('Không đọc được skill tạo master prompt (thiếu file resource).')
+           1340 CALL                     2
+           1348 RAISE_VARARGS            1
+
+741     >> 1350 PUSH_NULL
+           1352 LOAD_FAST               12 (checkpoint)
+           1354 LOAD_CONST              33 (15)
+           1356 CALL                     1
+           1364 POP_TOP
+
+742        1366 LOAD_FAST                3 (log)
+           1368 LOAD_ATTR               61 (NULL|self + info)
+           1388 LOAD_CONST              34 ('[master_prompt] kênh ')
+           1390 LOAD_FAST                9 (project_id)
+           1392 LOAD_CONST              15 (None)
+           1394 LOAD_CONST              35 (8)
+           1396 BINARY_SLICE
+           1398 FORMAT_VALUE             0
+           1400 LOAD_CONST              36 (': ')
+           1402 LOAD_FAST               10 (mode)
+           1404 FORMAT_VALUE             0
+           1406 LOAD_CONST              37 (' …')
+           1408 BUILD_STRING             5
+           1410 CALL                     1
+           1418 POP_TOP
+
+743        1420 LOAD_GLOBAL             63 (NULL + strip_wrapper)
+           1430 PUSH_NULL
+           1432 LOAD_FAST                4 (complete_text)
+           1434 LOAD_FAST               23 (system)
+           1436 LOAD_FAST               24 (user)
+           1438 LOAD_CONST              38 (0.6)
+           1440 LOAD_FAST_CHECK         22 (llm_provider)
+           1442 KW_NAMES                39 (('temperature', 'provider'))
+           1444 CALL                     4
+           1452 GET_AWAITABLE            0
+           1454 LOAD_CONST              15 (None)
+        >> 1456 SEND                     3 (to 1466)
+           1460 YIELD_VALUE              2
+           1462 RESUME                   3
+           1464 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1456)
+        >> 1466 END_SEND
+           1468 CALL                     1
+           1476 STORE_FAST              25 (out)
+
+744        1478 PUSH_NULL
+           1480 LOAD_FAST               12 (checkpoint)
+           1482 LOAD_CONST              40 (70)
+           1484 CALL                     1
+           1492 POP_TOP
+
+746        1494 LOAD_GLOBAL             65 (NULL + validate_generated)
+           1504 LOAD_FAST               25 (out)
+           1506 CALL                     1
+           1514 STORE_FAST              26 (issues)
+
+747        1516 LOAD_FAST               26 (issues)
+           1518 POP_JUMP_IF_FALSE       93 (to 1706)
+
+749        1520 LOAD_FAST                3 (log)
+           1522 LOAD_ATTR               67 (NULL|self + warning)
+           1542 LOAD_CONST              34 ('[master_prompt] kênh ')
+           1544 LOAD_FAST                9 (project_id)
+           1546 LOAD_CONST              15 (None)
+           1548 LOAD_CONST              35 (8)
+           1550 BINARY_SLICE
+           1552 FORMAT_VALUE             0
+           1554 LOAD_CONST              41 (': bản đầu thiếu ')
+           1556 LOAD_FAST               26 (issues)
+           1558 FORMAT_VALUE             0
+           1560 LOAD_CONST              42 (' — thử lại…')
+           1562 BUILD_STRING             5
+           1564 CALL                     1
+           1572 POP_TOP
+
+751        1574 LOAD_CONST              43 ('\n\n⚠️ Bản vừa rồi KHÔNG dùng được vì: ')
+           1576 LOAD_CONST              44 ('; ')
+           1578 LOAD_ATTR               69 (NULL|self + join)
+           1598 LOAD_FAST               26 (issues)
+           1600 CALL                     1
+           1608 BINARY_OP                0 (+)
+
+752        1612 LOAD_CONST              45 (".\nViết lại đầy đủ. Bắt buộc có nguyên văn bốn dòng 'TITLE:', 'SCRIPT:', '--- END OF SCRIPT ---', 'NARRATION DIRECTION:' và hai placeholder {{CHANNEL_NAME}}, {{SOURCE_MATERIAL}}.")
+
+751        1614 BINARY_OP                0 (+)
+
+750        1618 STORE_FAST              27 (retry_note)
+
+756        1620 LOAD_GLOBAL             63 (NULL + strip_wrapper)
+           1630 PUSH_NULL
+           1632 LOAD_FAST                4 (complete_text)
+           1634 LOAD_FAST               23 (system)
+           1636 LOAD_FAST               24 (user)
+           1638 LOAD_FAST               27 (retry_note)
+           1640 BINARY_OP                0 (+)
+           1644 LOAD_CONST              46 (0.4)
+
+757        1646 LOAD_FAST               22 (llm_provider)
+
+756        1648 KW_NAMES                39 (('temperature', 'provider'))
+           1650 CALL                     4
+           1658 GET_AWAITABLE            0
+           1660 LOAD_CONST              15 (None)
+        >> 1662 SEND                     3 (to 1672)
+           1666 YIELD_VALUE              2
+           1668 RESUME                   3
+           1670 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1662)
+        >> 1672 END_SEND
+           1674 CALL                     1
+           1682 STORE_FAST              25 (out)
+
+758        1684 LOAD_GLOBAL             65 (NULL + validate_generated)
+           1694 LOAD_FAST               25 (out)
+           1696 CALL                     1
+           1704 STORE_FAST              26 (issues)
+
+759     >> 1706 PUSH_NULL
+           1708 LOAD_FAST               12 (checkpoint)
+           1710 LOAD_CONST              47 (85)
+           1712 CALL                     1
+           1720 POP_TOP
+
+763        1722 LOAD_FAST               26 (issues)
+           1724 POP_JUMP_IF_FALSE       47 (to 1820)
+           1726 LOAD_FAST               10 (mode)
+           1728 LOAD_CONST              25 ('refine')
+           1730 COMPARE_OP              40 (==)
+           1734 POP_JUMP_IF_FALSE       42 (to 1820)
+
+764        1736 PUSH_NULL
+           1738 LOAD_DEREF              30 (StudioError)
+
+765        1740 LOAD_DEREF              29 (E)
+           1742 LOAD_ATTR               54 (UNKNOWN)
+
+766        1762 LOAD_CONST              48 ('Bản sửa không hợp lệ (')
+           1764 LOAD_CONST              44 ('; ')
+           1766 LOAD_ATTR               69 (NULL|self + join)
+           1786 LOAD_FAST               26 (issues)
+           1788 CALL                     1
+           1796 BINARY_OP                0 (+)
+           1800 LOAD_CONST              49 (") — giữ nguyên master prompt đang có. Thử diễn đạt lại yêu cầu, tránh các câu kiểu 'rút ngắn tối đa'.")
+           1802 BINARY_OP                0 (+)
+
+768        1806 LOAD_CONST              27 (409)
+
+764        1808 KW_NAMES                18 (('status_code',))
+           1810 CALL                     3
+           1818 RAISE_VARARGS            1
+
+770     >> 1820 PUSH_NULL
+           1822 LOAD_FAST                5 (SessionLocal)
+           1824 CALL                     0
+           1832 BEFORE_WITH
+           1834 STORE_FAST              13 (db)
+
+771        1836 LOAD_FAST                7 (ai_studio_service)
+           1838 LOAD_ATTR               39 (NULL|self + get_or_create_config)
+           1858 LOAD_FAST               13 (db)
+           1860 LOAD_FAST                9 (project_id)
+           1862 CALL                     2
+           1870 STORE_FAST              15 (cfg)
+
+772        1872 LOAD_FAST                7 (ai_studio_service)
+           1874 LOAD_ATTR               41 (NULL|self + _loads)
+           1894 LOAD_FAST               15 (cfg)
+           1896 LOAD_ATTR               42 (channel_profile_json)
+           1916 BUILD_MAP                0
+           1918 CALL                     2
+           1926 STORE_FAST              16 (profile)
+
+773        1928 LOAD_GLOBAL             29 (NULL + str)
+           1938 LOAD_FAST               16 (profile)
+           1940 LOAD_ATTR               31 (NULL|self + get)
+           1960 LOAD_CONST              23 ('script_master_prompt')
+           1962 CALL                     1
+           1970 COPY                     1
+           1972 POP_JUMP_IF_TRUE         2 (to 1978)
+           1974 POP_TOP
+           1976 LOAD_CONST               9 ('')
+        >> 1978 CALL                     1
+           1986 LOAD_ATTR               33 (NULL|self + strip)
+           2006 CALL                     0
+           2014 STORE_FAST              28 (prev)
+
+774        2016 LOAD_FAST               28 (prev)
+           2018 POP_JUMP_IF_FALSE        5 (to 2030)
+
+775        2020 LOAD_FAST               28 (prev)
+           2022 LOAD_FAST               16 (profile)
+           2024 LOAD_CONST              50 ('script_master_prompt_prev')
+           2026 STORE_SUBSCR
+
+776     >> 2030 LOAD_FAST               25 (out)
+           2032 LOAD_FAST               16 (profile)
+           2034 LOAD_CONST              23 ('script_master_prompt')
+           2036 STORE_SUBSCR
+
+777        2040 LOAD_GLOBAL             71 (NULL + json)
+           2050 LOAD_ATTR               72 (dumps)
+           2070 LOAD_FAST               16 (profile)
+           2072 LOAD_CONST              51 (False)
+           2074 KW_NAMES                52 (('ensure_ascii',))
+           2076 CALL                     2
+           2084 LOAD_FAST               15 (cfg)
+           2086 STORE_ATTR              21 (channel_profile_json)
+
+778        2096 LOAD_FAST               13 (db)
+           2098 LOAD_ATTR               75 (NULL|self + commit)
+           2118 CALL                     0
+           2126 POP_TOP
+
+770        2128 LOAD_CONST              15 (None)
+           2130 LOAD_CONST              15 (None)
+           2132 LOAD_CONST              15 (None)
+           2134 CALL                     2
+           2142 POP_TOP
+
+779     >> 2144 LOAD_FAST                3 (log)
+           2146 LOAD_ATTR               61 (NULL|self + info)
+           2166 LOAD_CONST              34 ('[master_prompt] kênh ')
+           2168 LOAD_FAST                9 (project_id)
+           2170 LOAD_CONST              15 (None)
+           2172 LOAD_CONST              35 (8)
+           2174 BINARY_SLICE
+           2176 FORMAT_VALUE             0
+           2178 LOAD_CONST              36 (': ')
+           2180 LOAD_FAST               10 (mode)
+           2182 FORMAT_VALUE             0
+           2184 LOAD_CONST              53 (' xong (')
+           2186 LOAD_GLOBAL             77 (NULL + len)
+           2196 LOAD_FAST               25 (out)
+           2198 CALL                     1
+           2206 FORMAT_VALUE             0
+           2208 LOAD_CONST              54 (' ký tự)')
+           2210 BUILD_STRING             7
+
+780        2212 LOAD_FAST               26 (issues)
+           2214 POP_JUMP_IF_FALSE        5 (to 2226)
+           2216 LOAD_CONST              55 (', CẢNH BÁO: ')
+           2218 LOAD_FAST               26 (issues)
+           2220 FORMAT_VALUE             0
+           2222 BUILD_STRING             2
+           2224 JUMP_FORWARD             1 (to 2228)
+        >> 2226 LOAD_CONST               9 ('')
+
+779     >> 2228 BINARY_OP                0 (+)
+           2232 CALL                     1
+           2240 POP_TOP
+
+781        2242 PUSH_NULL
+           2244 LOAD_FAST               12 (checkpoint)
+           2246 LOAD_CONST              56 (100)
+           2248 CALL                     1
+           2256 POP_TOP
+
+782        2258 LOAD_FAST               10 (mode)
+           2260 LOAD_GLOBAL             77 (NULL + len)
+           2270 LOAD_FAST               25 (out)
+           2272 CALL                     1
+           2280 LOAD_FAST               26 (issues)
+           2282 LOAD_GLOBAL             79 (NULL + bool)
+           2292 LOAD_FAST_CHECK         21 (current)
+           2294 CALL                     1
+           2302 LOAD_CONST              57 (('mode', 'chars', 'issues', 'had_previous'))
+           2304 BUILD_CONST_KEY_MAP      4
+           2306 RETURN_VALUE
+
+714     >> 2308 PUSH_EXC_INFO
+           2310 WITH_EXCEPT_START
+           2312 POP_JUMP_IF_TRUE         1 (to 2316)
+           2314 RERAISE                  2
+        >> 2316 POP_TOP
+           2318 POP_EXCEPT
+           2320 POP_TOP
+           2322 POP_TOP
+           2324 EXTENDED_ARG             2
+           2326 JUMP_BACKWARD          612 (to 1104)
+        >> 2328 COPY                     3
+           2330 POP_EXCEPT
+           2332 RERAISE                  1
+
+743     >> 2334 CLEANUP_THROW
+           2336 EXTENDED_ARG             1
+           2338 JUMP_BACKWARD          437 (to 1466)
+
+756     >> 2340 CLEANUP_THROW
+           2342 EXTENDED_ARG             1
+           2344 JUMP_BACKWARD          337 (to 1672)
+
+770     >> 2346 PUSH_EXC_INFO
+           2348 WITH_EXCEPT_START
+           2350 POP_JUMP_IF_TRUE         1 (to 2354)
+           2352 RERAISE                  2
+        >> 2354 POP_TOP
+           2356 POP_EXCEPT
+           2358 POP_TOP
+           2360 POP_TOP
+           2362 JUMP_BACKWARD          110 (to 2144)
+        >> 2364 COPY                     3
+           2366 POP_EXCEPT
+           2368 RERAISE                  1
+        >> 2370 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           2372 RERAISE                  1
+ExceptionTable:
+  12 to 432 -> 2370 [0] lasti
+  434 to 1086 -> 2308 [1] lasti
+  1088 to 1458 -> 2370 [0] lasti
+  1460 to 1460 -> 2334 [4]
+  1462 to 1664 -> 2370 [0] lasti
+  1666 to 1666 -> 2340 [4]
+  1668 to 1832 -> 2370 [0] lasti
+  1834 to 2126 -> 2346 [1] lasti
+  2128 to 2306 -> 2370 [0] lasti
+  2308 to 2316 -> 2328 [3] lasti
+  2318 to 2334 -> 2370 [0] lasti
+  2340 to 2340 -> 2370 [0] lasti
+  2346 to 2354 -> 2364 [3] lasti
+  2356 to 2368 -> 2370 [0] lasti
+
+Disassembly of <code object checkpoint at 0x7f6c922b4b70, file "app\services\master_prompt.py", line 707>:
+              0 COPY_FREE_VARS           4
+
+707           2 RESUME                   0
+
+708           4 LOAD_DEREF               3 (cancel_check)
+              6 POP_JUMP_IF_FALSE       26 (to 60)
+              8 PUSH_NULL
+             10 LOAD_DEREF               3 (cancel_check)
+             12 CALL                     0
+             20 POP_JUMP_IF_FALSE       19 (to 60)
+
+709          22 PUSH_NULL
+             24 LOAD_DEREF               2 (StudioError)
+             26 LOAD_DEREF               1 (E)
+             28 LOAD_ATTR                0 (CANCELLED)
+             48 LOAD_CONST               1 ('Đã huỷ tạo master prompt.')
+             50 CALL                     2
+             58 RAISE_VARARGS            1
+
+710     >>   60 LOAD_DEREF               4 (progress)
+             62 POP_JUMP_IF_FALSE        9 (to 82)
+
+711          64 PUSH_NULL
+             66 LOAD_DEREF               4 (progress)
+             68 LOAD_FAST                0 (pct)
+             70 CALL                     1
+             78 POP_TOP
+             80 RETURN_CONST             0 (None)
+
+710     >>   82 RETURN_CONST             0 (None)
+
+Disassembly of <code object undo at 0x28c4d9b0, file "app\services\master_prompt.py", line 785>:
+785           0 RESUME                   0
+
+787           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('StudioError', 'E'))
+              6 IMPORT_NAME              0 (app.core.errors)
+              8 IMPORT_FROM              1 (StudioError)
+             10 STORE_FAST               2 (StudioError)
+             12 IMPORT_FROM              2 (E)
+             14 STORE_FAST               3 (E)
+             16 POP_TOP
+
+788          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('ai_studio_service',))
+             22 IMPORT_NAME              3 (app.services)
+             24 IMPORT_FROM              4 (ai_studio_service)
+             26 STORE_FAST               4 (ai_studio_service)
+             28 POP_TOP
+
+790          30 LOAD_FAST                4 (ai_studio_service)
+             32 LOAD_ATTR               11 (NULL|self + get_or_create_config)
+             52 LOAD_FAST                0 (db)
+             54 LOAD_FAST                1 (project_id)
+             56 CALL                     2
+             64 STORE_FAST               5 (cfg)
+
+791          66 LOAD_FAST                4 (ai_studio_service)
+             68 LOAD_ATTR               13 (NULL|self + _loads)
+             88 LOAD_FAST                5 (cfg)
+             90 LOAD_ATTR               14 (channel_profile_json)
+            110 BUILD_MAP                0
+            112 CALL                     2
+            120 STORE_FAST               6 (profile)
+
+792         122 LOAD_GLOBAL             17 (NULL + str)
+            132 LOAD_FAST                6 (profile)
+            134 LOAD_ATTR               19 (NULL|self + get)
+            154 LOAD_CONST               4 ('script_master_prompt_prev')
+            156 CALL                     1
+            164 COPY                     1
+            166 POP_JUMP_IF_TRUE         2 (to 172)
+            168 POP_TOP
+            170 LOAD_CONST               5 ('')
+        >>  172 CALL                     1
+            180 LOAD_ATTR               21 (NULL|self + strip)
+            200 CALL                     0
+            208 STORE_FAST               7 (prev)
+
+793         210 LOAD_FAST                7 (prev)
+            212 POP_JUMP_IF_TRUE        21 (to 256)
+
+794         214 PUSH_NULL
+            216 LOAD_FAST                2 (StudioError)
+            218 LOAD_FAST                3 (E)
+            220 LOAD_ATTR               22 (PRECONDITION_MISSING)
+            240 LOAD_CONST               6 ('Không có bản trước để hoàn tác.')
+            242 LOAD_CONST               7 (409)
+            244 KW_NAMES                 8 (('status_code',))
+            246 CALL                     3
+            254 RAISE_VARARGS            1
+
+795     >>  256 LOAD_GLOBAL             17 (NULL + str)
+            266 LOAD_FAST                6 (profile)
+            268 LOAD_ATTR               19 (NULL|self + get)
+            288 LOAD_CONST               9 ('script_master_prompt')
+            290 CALL                     1
+            298 COPY                     1
+            300 POP_JUMP_IF_TRUE         2 (to 306)
+            302 POP_TOP
+            304 LOAD_CONST               5 ('')
+        >>  306 CALL                     1
+            314 LOAD_ATTR               21 (NULL|self + strip)
+            334 CALL                     0
+            342 LOAD_FAST                6 (profile)
+            344 LOAD_CONST               4 ('script_master_prompt_prev')
+            346 STORE_SUBSCR
+
+796         350 LOAD_FAST                7 (prev)
+            352 LOAD_FAST                6 (profile)
+            354 LOAD_CONST               9 ('script_master_prompt')
+            356 STORE_SUBSCR
+
+797         360 LOAD_GLOBAL             25 (NULL + json)
+            370 LOAD_ATTR               26 (dumps)
+            390 LOAD_FAST                6 (profile)
+            392 LOAD_CONST              10 (False)
+            394 KW_NAMES                11 (('ensure_ascii',))
+            396 CALL                     2
+            404 LOAD_FAST                5 (cfg)
+            406 STORE_ATTR               7 (channel_profile_json)
+
+798         416 LOAD_FAST                0 (db)
+            418 LOAD_ATTR               29 (NULL|self + commit)
+            438 CALL                     0
+            446 POP_TOP
+
+799         448 LOAD_FAST                7 (prev)
+            450 LOAD_GLOBAL             31 (NULL + len)
+            460 LOAD_FAST                7 (prev)
+            462 CALL                     1
+            470 LOAD_CONST              12 (('script_master_prompt', 'chars'))
+            472 BUILD_CONST_KEY_MAP      2
+            474 RETURN_VALUE

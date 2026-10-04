@@ -1,0 +1,578 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Chuyển cấu hình AI đời trước của Phân tích đối thủ sang kho endpoint dùng chung. Chạy 1 lần.\n\nĐời trước: `competitor_llm_provider` = "deepseek" | "openai" | "gemini", model ở khoá riêng\n`competitor_llm_model`, key nằm trong bảng `settings` (`deepseek_api_key`…). Nay mọi API khai ở\n`llm_endpoints` và tham chiếu là "api:<id>/<model>" — xem docs/plan-competitor-dung-chung-api-custom.md.\n\nBa điều module này TUYỆT ĐỐI không làm:\n\n  1. **Không xoá các khoá key cũ** trong bảng `settings`. Nhìn thì tưởng chỉ Phân tích đối thủ dùng,\n     thực tế `deepseek_api_key` còn chạy khâu dịch/ý tưởng, `openai_api_key` chạy ảnh thumbnail và\n     `gemini_api_key` chạy Gemini TTS. Xoá là chết ba tính năng khác.\n  2. **Không tạo trùng.** Chạy lại (khởi động lần sau, hoặc user đã tự thêm endpoint y hệt) thì nhận\n     lại đúng endpoint cũ theo `preset_key` + `base_url`.\n  3. **Không làm chết khởi động.** Hỏng ở bất kỳ đâu ⇒ ghi log rồi thôi; user vẫn tự chọn tay được.\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 16           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 18          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('log',))
+             22 IMPORT_NAME              3 (app.core.logging)
+             24 IMPORT_FROM              4 (log)
+             26 STORE_NAME               4 (log)
+             28 POP_TOP
+
+ 19          30 LOAD_CONST               1 (0)
+             32 LOAD_CONST               4 (('Setting',))
+             34 IMPORT_NAME              5 (app.db.models)
+             36 IMPORT_FROM              6 (Setting)
+             38 STORE_NAME               6 (Setting)
+             40 POP_TOP
+
+ 20          42 LOAD_CONST               1 (0)
+             44 LOAD_CONST               5 (('SessionLocal',))
+             46 IMPORT_NAME              7 (app.db.session)
+             48 IMPORT_FROM              8 (SessionLocal)
+             50 STORE_NAME               8 (SessionLocal)
+             52 POP_TOP
+
+ 21          54 LOAD_CONST               1 (0)
+             56 LOAD_CONST               6 (('competitor_settings', 'llm_endpoint_store'))
+             58 IMPORT_NAME              9 (app.services)
+             60 IMPORT_FROM             10 (competitor_settings)
+             62 STORE_NAME              10 (competitor_settings)
+             64 IMPORT_FROM             11 (llm_endpoint_store)
+             66 STORE_NAME              12 (store)
+             68 POP_TOP
+
+ 23          70 LOAD_CONST               7 ('competitor_llm_migrated_v1')
+             72 STORE_NAME              13 (_DONE_FLAG)
+
+ 26          74 LOAD_CONST              13 (('key', 'str', 'return', 'str'))
+             76 LOAD_CONST               8 (<code object _get at 0x7f6c92693230, file "app\services\competitor_migration.py", line 26>)
+             78 MAKE_FUNCTION            4 (annotations)
+             80 STORE_NAME              14 (_get)
+
+ 31          82 LOAD_CONST              14 (('key', 'str', 'value', 'str', 'return', 'None'))
+             84 LOAD_CONST               9 (<code object _set at 0x7f6c92692330, file "app\services\competitor_migration.py", line 31>)
+             86 MAKE_FUNCTION            4 (annotations)
+             88 STORE_NAME              15 (_set)
+
+ 39          90 LOAD_CONST              15 (('base_url', 'str', 'preset_key', 'str', 'return', 'dict | None'))
+             92 LOAD_CONST              10 (<code object _find_existing at 0x7f6c92479d70, file "app\services\competitor_migration.py", line 39>)
+             94 MAKE_FUNCTION            4 (annotations)
+             96 STORE_NAME              16 (_find_existing)
+
+ 47          98 LOAD_CONST              16 (('return', 'str | None'))
+            100 LOAD_CONST              11 (<code object migrate_once at 0x28c36760, file "app\services\competitor_migration.py", line 47>)
+            102 MAKE_FUNCTION            4 (annotations)
+            104 STORE_NAME              17 (migrate_once)
+            106 RETURN_CONST            12 (None)
+
+Disassembly of <code object _get at 0x7f6c92693230, file "app\services\competitor_migration.py", line 26>:
+ 26           0 RESUME                   0
+
+ 27           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_GLOBAL              2 (Setting)
+             34 LOAD_FAST                1 (key)
+             36 CALL                     2
+             44 STORE_FAST               2 (row)
+
+ 28          46 LOAD_FAST                2 (row)
+             48 POP_JUMP_IF_FALSE       30 (to 110)
+             50 LOAD_FAST                2 (row)
+             52 LOAD_ATTR                4 (value)
+             72 COPY                     1
+             74 POP_JUMP_IF_TRUE         2 (to 80)
+             76 POP_TOP
+             78 LOAD_CONST               1 ('')
+        >>   80 LOAD_ATTR                7 (NULL|self + strip)
+            100 CALL                     0
+            108 RETURN_VALUE
+        >>  110 LOAD_CONST               1 ('')
+            112 RETURN_VALUE
+
+Disassembly of <code object _set at 0x7f6c92692330, file "app\services\competitor_migration.py", line 31>:
+ 31           0 RESUME                   0
+
+ 32           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_GLOBAL              2 (Setting)
+             34 LOAD_FAST                1 (key)
+             36 CALL                     2
+             44 STORE_FAST               3 (row)
+
+ 33          46 LOAD_FAST                3 (row)
+             48 POP_JUMP_IF_FALSE        8 (to 66)
+
+ 34          50 LOAD_FAST                2 (value)
+             52 LOAD_FAST                3 (row)
+             54 STORE_ATTR               2 (value)
+             64 RETURN_CONST             0 (None)
+
+ 36     >>   66 LOAD_FAST                0 (db)
+             68 LOAD_ATTR                7 (NULL|self + add)
+             88 LOAD_GLOBAL              3 (NULL + Setting)
+             98 LOAD_FAST                1 (key)
+            100 LOAD_FAST                2 (value)
+            102 KW_NAMES                 1 (('key', 'value'))
+            104 CALL                     2
+            112 CALL                     1
+            120 POP_TOP
+            122 RETURN_CONST             0 (None)
+
+Disassembly of <code object _find_existing at 0x7f6c92479d70, file "app\services\competitor_migration.py", line 39>:
+ 39           0 RESUME                   0
+
+ 40           2 LOAD_FAST                0 (base_url)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 LOAD_CONST               1 ('')
+        >>   12 LOAD_ATTR                1 (NULL|self + rstrip)
+             32 LOAD_CONST               2 ('/')
+             34 CALL                     1
+             42 LOAD_ATTR                3 (NULL|self + lower)
+             62 CALL                     0
+             70 STORE_FAST               2 (wanted)
+
+ 41          72 LOAD_GLOBAL              5 (NULL + store)
+             82 LOAD_ATTR                6 (list_public)
+            102 CALL                     0
+            110 GET_ITER
+        >>  112 FOR_ITER                51 (to 218)
+            116 STORE_FAST               3 (ep)
+
+ 42         118 LOAD_FAST                3 (ep)
+            120 LOAD_CONST               3 ('base_url')
+            122 BINARY_SUBSCR
+            126 LOAD_ATTR                1 (NULL|self + rstrip)
+            146 LOAD_CONST               2 ('/')
+            148 CALL                     1
+            156 LOAD_ATTR                3 (NULL|self + lower)
+            176 CALL                     0
+            184 LOAD_FAST                2 (wanted)
+            186 COMPARE_OP              40 (==)
+            190 POP_JUMP_IF_TRUE         9 (to 210)
+            192 LOAD_FAST                3 (ep)
+            194 LOAD_CONST               4 ('preset_key')
+            196 BINARY_SUBSCR
+            200 LOAD_FAST                1 (preset_key)
+            202 COMPARE_OP              40 (==)
+            206 POP_JUMP_IF_TRUE         1 (to 210)
+            208 JUMP_BACKWARD           49 (to 112)
+
+ 43     >>  210 LOAD_FAST                3 (ep)
+            212 SWAP                     2
+            214 POP_TOP
+            216 RETURN_VALUE
+
+ 41     >>  218 END_FOR
+
+ 44         220 RETURN_CONST             0 (None)
+
+Disassembly of <code object migrate_once at 0x28c36760, file "app\services\competitor_migration.py", line 47>:
+ 47           0 RESUME                   0
+
+ 49           2 NOP
+
+ 50           4 LOAD_CONST               1 (0)
+              6 LOAD_CONST               2 (('registry',))
+              8 IMPORT_NAME              0 (app.adapters.llm_api)
+             10 IMPORT_FROM              1 (registry)
+             12 STORE_FAST               0 (registry)
+             14 POP_TOP
+
+ 52          16 LOAD_GLOBAL              5 (NULL + SessionLocal)
+             26 CALL                     0
+             34 BEFORE_WITH
+             36 STORE_FAST               1 (db)
+
+ 53          38 LOAD_GLOBAL              7 (NULL + _get)
+             48 LOAD_FAST                1 (db)
+             50 LOAD_GLOBAL              8 (_DONE_FLAG)
+             60 CALL                     2
+             68 POP_JUMP_IF_FALSE       10 (to 90)
+
+ 54          70 NOP
+
+ 52          72 LOAD_CONST               3 (None)
+             74 LOAD_CONST               3 (None)
+             76 LOAD_CONST               3 (None)
+             78 CALL                     2
+             86 POP_TOP
+             88 RETURN_CONST             3 (None)
+
+ 55     >>   90 LOAD_GLOBAL              7 (NULL + _get)
+            100 LOAD_FAST                1 (db)
+            102 LOAD_CONST               4 ('competitor_llm_provider')
+            104 CALL                     2
+            112 STORE_FAST               2 (legacy)
+
+ 56         114 LOAD_GLOBAL              7 (NULL + _get)
+            124 LOAD_FAST                1 (db)
+            126 LOAD_CONST               5 ('competitor_llm_model')
+            128 CALL                     2
+            136 STORE_FAST               3 (legacy_model)
+
+ 59         138 LOAD_GLOBAL             11 (NULL + _set)
+            148 LOAD_FAST                1 (db)
+            150 LOAD_GLOBAL              8 (_DONE_FLAG)
+            160 LOAD_CONST               6 ('1')
+            162 CALL                     3
+            170 POP_TOP
+
+ 60         172 LOAD_FAST                1 (db)
+            174 LOAD_ATTR               13 (NULL|self + commit)
+            194 CALL                     0
+            202 POP_TOP
+
+ 52         204 LOAD_CONST               3 (None)
+            206 LOAD_CONST               3 (None)
+            208 LOAD_CONST               3 (None)
+            210 CALL                     2
+            218 POP_TOP
+
+ 62     >>  220 LOAD_FAST_CHECK          2 (legacy)
+            222 LOAD_GLOBAL             14 (competitor_settings)
+            232 LOAD_ATTR               16 (LEGACY_LLM_PROVIDERS)
+            252 CONTAINS_OP              1
+            254 POP_JUMP_IF_FALSE        1 (to 258)
+
+ 63         256 RETURN_CONST             3 (None)
+
+ 65     >>  258 LOAD_FAST                0 (registry)
+            260 LOAD_ATTR               19 (NULL|self + get_provider)
+            280 LOAD_FAST                2 (legacy)
+            282 CALL                     1
+            290 STORE_FAST               4 (provider)
+
+ 66         292 LOAD_FAST                4 (provider)
+            294 POP_JUMP_IF_NOT_NONE    26 (to 348)
+
+ 67         296 LOAD_GLOBAL             21 (NULL + log)
+            306 LOAD_ATTR               22 (warning)
+            326 LOAD_CONST               7 ('[competitor] catalog không còn ')
+            328 LOAD_FAST                2 (legacy)
+            330 FORMAT_VALUE             2 (repr)
+            332 LOAD_CONST               8 (' → bỏ qua chuyển đổi')
+            334 BUILD_STRING             3
+            336 CALL                     1
+            344 POP_TOP
+
+ 68         346 RETURN_CONST             3 (None)
+
+ 69     >>  348 LOAD_GLOBAL              5 (NULL + SessionLocal)
+            358 CALL                     0
+            366 BEFORE_WITH
+            368 STORE_FAST               1 (db)
+
+ 70         370 LOAD_GLOBAL              7 (NULL + _get)
+            380 LOAD_FAST                1 (db)
+            382 LOAD_FAST                4 (provider)
+            384 LOAD_ATTR               24 (api_key_setting)
+            404 CALL                     2
+            412 STORE_FAST               5 (api_key)
+
+ 69         414 LOAD_CONST               3 (None)
+            416 LOAD_CONST               3 (None)
+            418 LOAD_CONST               3 (None)
+            420 CALL                     2
+            428 POP_TOP
+
+ 72     >>  430 LOAD_FAST_CHECK          3 (legacy_model)
+            432 COPY                     1
+            434 POP_JUMP_IF_TRUE        12 (to 460)
+            436 POP_TOP
+            438 LOAD_FAST                4 (provider)
+            440 LOAD_ATTR               26 (default_model)
+        >>  460 STORE_FAST               6 (model_id)
+
+ 73         462 LOAD_GLOBAL             29 (NULL + _find_existing)
+            472 LOAD_FAST                4 (provider)
+            474 LOAD_ATTR               30 (base_url)
+            494 LOAD_FAST                4 (provider)
+            496 LOAD_ATTR               32 (key)
+            516 CALL                     2
+            524 STORE_FAST               7 (existing)
+
+ 74         526 LOAD_FAST                7 (existing)
+            528 POP_JUMP_IF_FALSE       48 (to 626)
+
+ 75         530 LOAD_FAST                7 (existing)
+            532 LOAD_CONST               9 ('id')
+            534 BINARY_SUBSCR
+            538 STORE_FAST               8 (endpoint_id)
+
+ 76         540 LOAD_FAST                6 (model_id)
+            542 LOAD_FAST                7 (existing)
+            544 LOAD_CONST              10 ('models')
+            546 BINARY_SUBSCR
+            550 GET_ITER
+            552 LOAD_FAST_AND_CLEAR      9 (m)
+            554 SWAP                     2
+            556 BUILD_LIST               0
+            558 SWAP                     2
+        >>  560 FOR_ITER                 7 (to 578)
+            564 STORE_FAST               9 (m)
+            566 LOAD_FAST                9 (m)
+            568 LOAD_CONST               9 ('id')
+            570 BINARY_SUBSCR
+            574 LIST_APPEND              2
+            576 JUMP_BACKWARD            9 (to 560)
+        >>  578 END_FOR
+            580 SWAP                     2
+            582 STORE_FAST               9 (m)
+            584 CONTAINS_OP              1
+            586 POP_JUMP_IF_FALSE      206 (to 1000)
+
+ 77         588 LOAD_FAST                7 (existing)
+            590 LOAD_CONST              11 ('default_model')
+            592 BINARY_SUBSCR
+            596 COPY                     1
+            598 POP_JUMP_IF_TRUE        11 (to 622)
+            600 POP_TOP
+            602 LOAD_FAST                7 (existing)
+            604 LOAD_CONST              10 ('models')
+            606 BINARY_SUBSCR
+            610 LOAD_CONST               1 (0)
+            612 BINARY_SUBSCR
+            616 LOAD_CONST               9 ('id')
+            618 BINARY_SUBSCR
+        >>  622 STORE_FAST               6 (model_id)
+            624 JUMP_FORWARD           187 (to 1000)
+
+ 79     >>  626 LOAD_GLOBAL             35 (NULL + store)
+            636 LOAD_ATTR               36 (create)
+
+ 80         656 LOAD_FAST                4 (provider)
+            658 LOAD_ATTR               38 (label)
+
+ 81         678 LOAD_FAST                4 (provider)
+            680 LOAD_ATTR               30 (base_url)
+
+ 82         700 LOAD_CONST              12 ('openai_chat')
+
+ 83         702 LOAD_FAST_CHECK          5 (api_key)
+
+ 84         704 LOAD_FAST                4 (provider)
+            706 LOAD_ATTR               32 (key)
+
+ 92         726 LOAD_FAST                4 (provider)
+            728 LOAD_ATTR               40 (models)
+            748 GET_ITER
+
+ 85         750 LOAD_FAST_AND_CLEAR      9 (m)
+            752 SWAP                     2
+            754 BUILD_LIST               0
+            756 SWAP                     2
+
+ 92     >>  758 FOR_ITER               104 (to 970)
+            762 STORE_FAST               9 (m)
+
+ 86         764 LOAD_FAST                9 (m)
+            766 LOAD_ATTR               42 (id)
+            786 LOAD_FAST                9 (m)
+            788 LOAD_ATTR               38 (label)
+
+ 87         808 LOAD_FAST                9 (m)
+            810 LOAD_ATTR               44 (max_input_tokens)
+            830 LOAD_FAST                9 (m)
+            832 LOAD_ATTR               46 (max_output_tokens)
+
+ 88         852 LOAD_FAST                9 (m)
+            854 LOAD_ATTR               48 (price_in)
+            874 LOAD_FAST                9 (m)
+            876 LOAD_ATTR               50 (price_out)
+
+ 89         896 LOAD_FAST                9 (m)
+            898 LOAD_ATTR               52 (price_cache_in)
+
+ 90         918 LOAD_FAST                9 (m)
+            920 LOAD_ATTR               54 (supports_reasoning_effort)
+
+ 91         940 LOAD_FAST                9 (m)
+            942 LOAD_ATTR               56 (honors_temperature)
+
+ 85         962 LOAD_CONST              13 (('id', 'label', 'max_input_tokens', 'max_output_tokens', 'price_in', 'price_out', 'price_cache_in', 'supports_reasoning_effort', 'honors_temperature'))
+            964 BUILD_CONST_KEY_MAP      9
+            966 LIST_APPEND              2
+            968 JUMP_BACKWARD          106 (to 758)
+
+ 92     >>  970 END_FOR
+
+ 85         972 SWAP                     2
+            974 STORE_FAST               9 (m)
+
+ 93         976 LOAD_FAST                6 (model_id)
+
+ 79         978 KW_NAMES                14 (('name', 'base_url', 'dialect', 'api_key', 'preset_key', 'models', 'default_model'))
+            980 CALL                     7
+            988 STORE_FAST              10 (created)
+
+ 95         990 LOAD_FAST               10 (created)
+            992 LOAD_CONST               9 ('id')
+            994 BINARY_SUBSCR
+            998 STORE_FAST               8 (endpoint_id)
+
+ 97     >> 1000 LOAD_CONST              15 ('api:')
+           1002 LOAD_FAST                8 (endpoint_id)
+           1004 FORMAT_VALUE             0
+           1006 LOAD_CONST              16 ('/')
+           1008 LOAD_FAST                6 (model_id)
+           1010 FORMAT_VALUE             0
+           1012 BUILD_STRING             4
+           1014 STORE_FAST              11 (ref)
+
+ 98        1016 LOAD_GLOBAL              5 (NULL + SessionLocal)
+           1026 CALL                     0
+           1034 BEFORE_WITH
+           1036 STORE_FAST               1 (db)
+
+ 99        1038 LOAD_GLOBAL             11 (NULL + _set)
+           1048 LOAD_FAST                1 (db)
+           1050 LOAD_CONST               4 ('competitor_llm_provider')
+           1052 LOAD_FAST               11 (ref)
+           1054 CALL                     3
+           1062 POP_TOP
+
+100        1064 LOAD_FAST                1 (db)
+           1066 LOAD_ATTR               13 (NULL|self + commit)
+           1086 CALL                     0
+           1094 POP_TOP
+
+ 98        1096 LOAD_CONST               3 (None)
+           1098 LOAD_CONST               3 (None)
+           1100 LOAD_CONST               3 (None)
+           1102 CALL                     2
+           1110 POP_TOP
+
+101     >> 1112 LOAD_GLOBAL             21 (NULL + log)
+           1122 LOAD_ATTR               58 (info)
+           1142 LOAD_CONST              17 ('[competitor] cấu hình AI cũ (')
+           1144 LOAD_FAST                2 (legacy)
+           1146 FORMAT_VALUE             0
+           1148 LOAD_CONST              16 ('/')
+           1150 LOAD_FAST                6 (model_id)
+           1152 FORMAT_VALUE             0
+           1154 LOAD_CONST              18 (') → endpoint dùng chung ')
+           1156 LOAD_FAST               11 (ref)
+           1158 FORMAT_VALUE             0
+           1160 BUILD_STRING             6
+
+102        1162 LOAD_FAST_CHECK          5 (api_key)
+           1164 POP_JUMP_IF_FALSE        2 (to 1170)
+           1166 LOAD_CONST              19 ('')
+           1168 JUMP_FORWARD             1 (to 1172)
+        >> 1170 LOAD_CONST              20 (' (chưa có key — nhập lại ở Cài đặt → API tuỳ chỉnh)')
+
+101     >> 1172 BINARY_OP                0 (+)
+           1176 CALL                     1
+           1184 POP_TOP
+
+103        1186 LOAD_FAST               11 (ref)
+           1188 RETURN_VALUE
+
+ 52     >> 1190 PUSH_EXC_INFO
+           1192 WITH_EXCEPT_START
+           1194 POP_JUMP_IF_TRUE         1 (to 1198)
+           1196 RERAISE                  2
+        >> 1198 POP_TOP
+           1200 POP_EXCEPT
+           1202 POP_TOP
+           1204 POP_TOP
+           1206 EXTENDED_ARG             1
+           1208 JUMP_BACKWARD          495 (to 220)
+        >> 1210 COPY                     3
+           1212 POP_EXCEPT
+           1214 RERAISE                  1
+
+ 69     >> 1216 PUSH_EXC_INFO
+           1218 WITH_EXCEPT_START
+           1220 POP_JUMP_IF_TRUE         1 (to 1224)
+           1222 RERAISE                  2
+        >> 1224 POP_TOP
+           1226 POP_EXCEPT
+           1228 POP_TOP
+           1230 POP_TOP
+           1232 EXTENDED_ARG             1
+           1234 JUMP_BACKWARD          403 (to 430)
+        >> 1236 COPY                     3
+           1238 POP_EXCEPT
+           1240 RERAISE                  1
+        >> 1242 SWAP                     2
+           1244 POP_TOP
+
+ 76        1246 SWAP                     2
+           1248 STORE_FAST               9 (m)
+           1250 RERAISE                  0
+        >> 1252 SWAP                     2
+           1254 POP_TOP
+
+ 85        1256 SWAP                     2
+           1258 STORE_FAST               9 (m)
+           1260 RERAISE                  0
+
+ 98     >> 1262 PUSH_EXC_INFO
+           1264 WITH_EXCEPT_START
+           1266 POP_JUMP_IF_TRUE         1 (to 1270)
+           1268 RERAISE                  2
+        >> 1270 POP_TOP
+           1272 POP_EXCEPT
+           1274 POP_TOP
+           1276 POP_TOP
+           1278 JUMP_BACKWARD           84 (to 1112)
+        >> 1280 COPY                     3
+           1282 POP_EXCEPT
+           1284 RERAISE                  1
+        >> 1286 PUSH_EXC_INFO
+
+104        1288 LOAD_GLOBAL             60 (Exception)
+           1298 CHECK_EXC_MATCH
+           1300 POP_JUMP_IF_FALSE       34 (to 1370)
+           1302 STORE_FAST              12 (exc)
+
+105        1304 LOAD_GLOBAL             21 (NULL + log)
+           1314 LOAD_ATTR               62 (error)
+           1334 LOAD_CONST              21 ('[competitor] chuyển cấu hình AI cũ lỗi (bỏ qua, chọn tay vẫn được): ')
+           1336 LOAD_FAST               12 (exc)
+           1338 FORMAT_VALUE             0
+           1340 BUILD_STRING             2
+           1342 CALL                     1
+           1350 POP_TOP
+
+106        1352 POP_EXCEPT
+           1354 LOAD_CONST               3 (None)
+           1356 STORE_FAST              12 (exc)
+           1358 DELETE_FAST             12 (exc)
+           1360 RETURN_CONST             3 (None)
+        >> 1362 LOAD_CONST               3 (None)
+           1364 STORE_FAST              12 (exc)
+           1366 DELETE_FAST             12 (exc)
+           1368 RERAISE                  1
+
+104     >> 1370 RERAISE                  0
+        >> 1372 COPY                     3
+           1374 POP_EXCEPT
+           1376 RERAISE                  1
+ExceptionTable:
+  4 to 34 -> 1286 [0]
+  36 to 70 -> 1190 [1] lasti
+  72 to 86 -> 1286 [0]
+  90 to 202 -> 1190 [1] lasti
+  204 to 254 -> 1286 [0]
+  258 to 344 -> 1286 [0]
+  348 to 366 -> 1286 [0]
+  368 to 412 -> 1216 [1] lasti
+  414 to 554 -> 1286 [0]
+  556 to 578 -> 1242 [3]
+  580 to 752 -> 1286 [0]
+  754 to 970 -> 1252 [9]
+  972 to 1034 -> 1286 [0]
+  1036 to 1094 -> 1262 [1] lasti
+  1096 to 1186 -> 1286 [0]
+  1190 to 1198 -> 1210 [3] lasti
+  1200 to 1214 -> 1286 [0]
+  1216 to 1224 -> 1236 [3] lasti
+  1226 to 1260 -> 1286 [0]
+  1262 to 1270 -> 1280 [3] lasti
+  1272 to 1284 -> 1286 [0]
+  1286 to 1302 -> 1372 [1] lasti
+  1304 to 1350 -> 1362 [1] lasti
+  1362 to 1370 -> 1372 [1] lasti

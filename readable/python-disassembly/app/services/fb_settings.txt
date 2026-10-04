@@ -1,0 +1,583 @@
+  0           0 RESUME                   0
+
+  1           2 SETUP_ANNOTATIONS
+              4 LOAD_CONST               0 ('Cài đặt toàn cục FB (Đợt B — QuanLyPage).\n\nLưu trong bảng `settings` (Setting KV) — không cần migration:\n- fb_publish_enabled   : kill switch toàn cục ("1" = cho đăng, "0" = tạm dừng mọi page)\n- fb_proxy_global      : proxy mặc định áp cho page chưa đặt proxy riêng\n- fb_max_posts_per_day : giới hạn bài/ngày/page mặc định khi tạo page mới\n- fb_min_gap_minutes   : khoảng cách tối thiểu 2 bài (phút) mặc định\n')
+              6 STORE_NAME               0 (__doc__)
+
+  9           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('annotations',))
+             12 IMPORT_NAME              1 (__future__)
+             14 IMPORT_FROM              2 (annotations)
+             16 STORE_NAME               2 (annotations)
+             18 POP_TOP
+
+ 11          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               3 (None)
+             24 IMPORT_NAME              3 (json)
+             26 STORE_NAME               3 (json)
+
+ 12          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               4 (('urlparse',))
+             32 IMPORT_NAME              4 (urllib.parse)
+             34 IMPORT_FROM              5 (urlparse)
+             36 STORE_NAME               5 (urlparse)
+             38 POP_TOP
+
+ 14          40 LOAD_CONST               1 (0)
+             42 LOAD_CONST               5 (('Session',))
+             44 IMPORT_NAME              6 (sqlalchemy.orm)
+             46 IMPORT_FROM              7 (Session)
+             48 STORE_NAME               7 (Session)
+             50 POP_TOP
+
+ 16          52 LOAD_CONST               1 (0)
+             54 LOAD_CONST               6 (('Setting',))
+             56 IMPORT_NAME              8 (app.db.models)
+             58 IMPORT_FROM              9 (Setting)
+             60 STORE_NAME               9 (Setting)
+             62 POP_TOP
+
+ 19          64 LOAD_CONST               7 ('1')
+
+ 20          66 LOAD_CONST               8 ('')
+
+ 21          68 LOAD_CONST               9 ('12')
+
+ 22          70 LOAD_CONST              10 ('20')
+
+ 23          72 LOAD_CONST              11 ('10')
+
+ 24          74 LOAD_CONST              12 ('least_used')
+
+ 25          76 LOAD_CONST              13 ('2')
+
+ 26          78 LOAD_CONST              14 ('[]')
+
+ 18          80 LOAD_CONST              15 (('fb_publish_enabled', 'fb_proxy_global', 'fb_max_posts_per_day', 'fb_min_gap_minutes', 'fb_worker_threads', 'fb_token_strategy', 'fb_token_block_size', 'fb_proxy_vault'))
+             82 BUILD_CONST_KEY_MAP      8
+             84 STORE_NAME              10 (DEFAULTS)
+             86 LOAD_CONST              16 ('dict[str, str]')
+             88 LOAD_NAME               11 (__annotations__)
+             90 LOAD_CONST              17 ('DEFAULTS')
+             92 STORE_SUBSCR
+
+ 30          96 LOAD_CONST              23 (('db', 'Session', 'return', 'dict'))
+             98 LOAD_CONST              18 (<code object get_fb_settings at 0x7f6c926af280, file "app\services\fb_settings.py", line 30>)
+            100 MAKE_FUNCTION            4 (annotations)
+            102 STORE_NAME              12 (get_fb_settings)
+
+ 38         104 LOAD_CONST              24 (('',))
+            106 LOAD_CONST              25 (('db', 'Session', 'key', 'str', 'default', 'str', 'return', 'str'))
+            108 LOAD_CONST              19 (<code object get_str at 0x7f6c926fda50, file "app\services\fb_settings.py", line 38>)
+            110 MAKE_FUNCTION            5 (defaults, annotations)
+            112 STORE_NAME              13 (get_str)
+
+ 43         114 LOAD_CONST              26 (('db', 'Session', 'payload', 'dict', 'return', 'dict'))
+            116 LOAD_CONST              20 (<code object update_fb_settings at 0x28ae1030, file "app\services\fb_settings.py", line 43>)
+            118 MAKE_FUNCTION            4 (annotations)
+            120 STORE_NAME              14 (update_fb_settings)
+
+ 82         122 LOAD_CONST              27 (('value', 'str', 'minimum', 'int', 'maximum', 'int', 'label', 'str', 'return', 'str'))
+            124 LOAD_CONST              21 (<code object _parse_bounded at 0x7f6c92408fd0, file "app\services\fb_settings.py", line 82>)
+            126 MAKE_FUNCTION            4 (annotations)
+            128 STORE_NAME              15 (_parse_bounded)
+
+ 92         130 LOAD_CONST              28 (('value', 'str | None', 'return', 'str | None'))
+            132 LOAD_CONST              22 (<code object validate_proxy at 0x28be9a00, file "app\services\fb_settings.py", line 92>)
+            134 MAKE_FUNCTION            4 (annotations)
+            136 STORE_NAME              16 (validate_proxy)
+            138 RETURN_CONST             3 (None)
+
+Disassembly of <code object get_fb_settings at 0x7f6c926af280, file "app\services\fb_settings.py", line 30>:
+ 30           0 RESUME                   0
+
+ 31           2 BUILD_MAP                0
+              4 STORE_FAST               1 (out)
+
+ 32           6 LOAD_GLOBAL              0 (DEFAULTS)
+             16 LOAD_ATTR                3 (NULL|self + items)
+             36 CALL                     0
+             44 GET_ITER
+        >>   46 FOR_ITER                58 (to 166)
+             50 UNPACK_SEQUENCE          2
+             54 STORE_FAST               2 (key)
+             56 STORE_FAST               3 (default)
+
+ 33          58 LOAD_FAST                0 (db)
+             60 LOAD_ATTR                5 (NULL|self + get)
+             80 LOAD_GLOBAL              6 (Setting)
+             90 LOAD_FAST                2 (key)
+             92 CALL                     2
+            100 STORE_FAST               4 (row)
+
+ 34         102 LOAD_FAST                4 (row)
+            104 POP_JUMP_IF_FALSE       24 (to 154)
+            106 LOAD_FAST                4 (row)
+            108 LOAD_ATTR                8 (value)
+            128 POP_JUMP_IF_NONE        12 (to 154)
+            130 LOAD_FAST                4 (row)
+            132 LOAD_ATTR                8 (value)
+            152 JUMP_FORWARD             1 (to 156)
+        >>  154 LOAD_FAST                3 (default)
+        >>  156 LOAD_FAST                1 (out)
+            158 LOAD_FAST                2 (key)
+            160 STORE_SUBSCR
+            164 JUMP_BACKWARD           60 (to 46)
+
+ 32     >>  166 END_FOR
+
+ 35         168 LOAD_FAST                1 (out)
+            170 RETURN_VALUE
+
+Disassembly of <code object get_str at 0x7f6c926fda50, file "app\services\fb_settings.py", line 38>:
+ 38           0 RESUME                   0
+
+ 39           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_GLOBAL              2 (Setting)
+             34 LOAD_FAST                1 (key)
+             36 CALL                     2
+             44 STORE_FAST               3 (row)
+
+ 40          46 LOAD_FAST                3 (row)
+             48 POP_JUMP_IF_FALSE       24 (to 98)
+             50 LOAD_FAST                3 (row)
+             52 LOAD_ATTR                4 (value)
+             72 POP_JUMP_IF_NONE        12 (to 98)
+             74 LOAD_FAST                3 (row)
+             76 LOAD_ATTR                4 (value)
+             96 RETURN_VALUE
+        >>   98 LOAD_FAST                2 (default)
+            100 RETURN_VALUE
+
+Disassembly of <code object update_fb_settings at 0x28ae1030, file "app\services\fb_settings.py", line 43>:
+ 43           0 RESUME                   0
+
+ 45           2 LOAD_GLOBAL              1 (NULL + set)
+             12 LOAD_GLOBAL              2 (DEFAULTS)
+             22 CALL                     1
+             30 STORE_FAST               2 (allowed)
+
+ 46          32 LOAD_FAST                1 (payload)
+             34 LOAD_ATTR                5 (NULL|self + items)
+             54 CALL                     0
+             62 GET_ITER
+        >>   64 EXTENDED_ARG             1
+             66 FOR_ITER               427 (to 924)
+             70 UNPACK_SEQUENCE          2
+             74 STORE_FAST               3 (key)
+             76 STORE_FAST               4 (value)
+
+ 47          78 LOAD_FAST                3 (key)
+             80 LOAD_FAST                2 (allowed)
+             82 CONTAINS_OP              1
+             84 POP_JUMP_IF_FALSE        1 (to 88)
+
+ 48          86 JUMP_BACKWARD           12 (to 64)
+
+ 49     >>   88 LOAD_FAST                4 (value)
+             90 POP_JUMP_IF_NOT_NONE     1 (to 94)
+
+ 50          92 JUMP_BACKWARD           15 (to 64)
+
+ 51     >>   94 LOAD_GLOBAL              7 (NULL + str)
+            104 LOAD_FAST                4 (value)
+            106 CALL                     1
+            114 LOAD_ATTR                9 (NULL|self + strip)
+            134 CALL                     0
+            142 STORE_FAST               5 (sval)
+
+ 52         144 LOAD_FAST                3 (key)
+            146 LOAD_CONST               1 ('fb_worker_threads')
+            148 COMPARE_OP              40 (==)
+            152 POP_JUMP_IF_FALSE       42 (to 238)
+
+ 53         154 LOAD_GLOBAL              7 (NULL + str)
+            164 LOAD_GLOBAL             11 (NULL + max)
+            174 LOAD_CONST               2 (1)
+            176 LOAD_GLOBAL             13 (NULL + min)
+            186 LOAD_CONST               3 (20)
+            188 LOAD_GLOBAL             15 (NULL + int)
+            198 LOAD_FAST                5 (sval)
+            200 CALL                     1
+            208 CALL                     2
+            216 CALL                     2
+            224 CALL                     1
+            232 STORE_FAST               5 (sval)
+            234 EXTENDED_ARG             1
+            236 JUMP_FORWARD           280 (to 798)
+
+ 54     >>  238 LOAD_FAST                3 (key)
+            240 LOAD_CONST               4 ('fb_token_strategy')
+            242 COMPARE_OP              40 (==)
+            246 POP_JUMP_IF_FALSE       16 (to 280)
+
+ 55         248 LOAD_FAST                5 (sval)
+            250 LOAD_CONST               5 (frozenset({'round_robin', 'block', 'least_used', 'random'}))
+            252 CONTAINS_OP              1
+            254 EXTENDED_ARG             1
+            256 POP_JUMP_IF_FALSE      270 (to 798)
+
+ 56         258 LOAD_GLOBAL             17 (NULL + ValueError)
+            268 LOAD_CONST               6 ('Token strategy không hợp lệ')
+            270 CALL                     1
+            278 RAISE_VARARGS            1
+
+ 57     >>  280 LOAD_FAST                3 (key)
+            282 LOAD_CONST               7 ('fb_token_block_size')
+            284 COMPARE_OP              40 (==)
+            288 POP_JUMP_IF_FALSE       41 (to 372)
+
+ 58         290 LOAD_GLOBAL              7 (NULL + str)
+            300 LOAD_GLOBAL             11 (NULL + max)
+            310 LOAD_CONST               2 (1)
+            312 LOAD_GLOBAL             13 (NULL + min)
+            322 LOAD_CONST               8 (100)
+            324 LOAD_GLOBAL             15 (NULL + int)
+            334 LOAD_FAST                5 (sval)
+            336 CALL                     1
+            344 CALL                     2
+            352 CALL                     2
+            360 CALL                     1
+            368 STORE_FAST               5 (sval)
+            370 JUMP_FORWARD           213 (to 798)
+
+ 59     >>  372 LOAD_FAST                3 (key)
+            374 LOAD_CONST               9 ('fb_max_posts_per_day')
+            376 COMPARE_OP              40 (==)
+            380 POP_JUMP_IF_FALSE       15 (to 412)
+
+ 60         382 LOAD_GLOBAL             19 (NULL + _parse_bounded)
+            392 LOAD_FAST                5 (sval)
+            394 LOAD_CONST               2 (1)
+            396 LOAD_CONST               8 (100)
+            398 LOAD_CONST              10 ('Tối đa bài/ngày')
+            400 CALL                     4
+            408 STORE_FAST               5 (sval)
+            410 JUMP_FORWARD           193 (to 798)
+
+ 61     >>  412 LOAD_FAST                3 (key)
+            414 LOAD_CONST              11 ('fb_min_gap_minutes')
+            416 COMPARE_OP              40 (==)
+            420 POP_JUMP_IF_FALSE       15 (to 452)
+
+ 62         422 LOAD_GLOBAL             19 (NULL + _parse_bounded)
+            432 LOAD_FAST                5 (sval)
+            434 LOAD_CONST               2 (1)
+            436 LOAD_CONST              12 (1440)
+            438 LOAD_CONST              13 ('Khoảng cách tối thiểu')
+            440 CALL                     4
+            448 STORE_FAST               5 (sval)
+            450 JUMP_FORWARD           173 (to 798)
+
+ 63     >>  452 LOAD_FAST                3 (key)
+            454 LOAD_CONST              14 ('fb_publish_enabled')
+            456 COMPARE_OP              40 (==)
+            460 POP_JUMP_IF_FALSE       15 (to 492)
+
+ 64         462 LOAD_FAST                5 (sval)
+            464 LOAD_CONST              15 (frozenset({'1', '0'}))
+            466 CONTAINS_OP              1
+            468 POP_JUMP_IF_FALSE      164 (to 798)
+
+ 65         470 LOAD_GLOBAL             17 (NULL + ValueError)
+            480 LOAD_CONST              16 ('fb_publish_enabled chỉ nhận 0 hoặc 1')
+            482 CALL                     1
+            490 RAISE_VARARGS            1
+
+ 66     >>  492 LOAD_FAST                3 (key)
+            494 LOAD_CONST              17 ('fb_proxy_global')
+            496 COMPARE_OP              40 (==)
+            500 POP_JUMP_IF_FALSE       16 (to 534)
+
+ 67         502 LOAD_GLOBAL             21 (NULL + validate_proxy)
+            512 LOAD_FAST                5 (sval)
+            514 CALL                     1
+            522 COPY                     1
+            524 POP_JUMP_IF_TRUE         2 (to 530)
+            526 POP_TOP
+            528 LOAD_CONST              18 ('')
+        >>  530 STORE_FAST               5 (sval)
+            532 JUMP_FORWARD           132 (to 798)
+
+ 68     >>  534 LOAD_FAST                3 (key)
+            536 LOAD_CONST              19 ('fb_proxy_vault')
+            538 COMPARE_OP              40 (==)
+            542 POP_JUMP_IF_FALSE      127 (to 798)
+
+ 69         544 LOAD_GLOBAL             23 (NULL + json)
+            554 LOAD_ATTR               24 (loads)
+            574 LOAD_FAST                5 (sval)
+            576 CALL                     1
+            584 STORE_FAST               6 (items)
+
+ 70         586 LOAD_GLOBAL             27 (NULL + isinstance)
+            596 LOAD_FAST                6 (items)
+            598 LOAD_GLOBAL             28 (list)
+            608 CALL                     2
+            616 POP_JUMP_IF_TRUE        11 (to 640)
+
+ 71         618 LOAD_GLOBAL             17 (NULL + ValueError)
+            628 LOAD_CONST              20 ('Proxy vault phải là danh sách JSON')
+            630 CALL                     1
+            638 RAISE_VARARGS            1
+
+ 72     >>  640 LOAD_GLOBAL             23 (NULL + json)
+            650 LOAD_ATTR               30 (dumps)
+            670 LOAD_FAST                6 (items)
+            672 GET_ITER
+            674 LOAD_FAST_AND_CLEAR      7 (item)
+            676 SWAP                     2
+            678 BUILD_LIST               0
+            680 SWAP                     2
+        >>  682 FOR_ITER                48 (to 782)
+            686 STORE_FAST               7 (item)
+            688 LOAD_GLOBAL              7 (NULL + str)
+            698 LOAD_FAST                7 (item)
+            700 CALL                     1
+            708 LOAD_ATTR                9 (NULL|self + strip)
+            728 CALL                     0
+            736 POP_JUMP_IF_TRUE         1 (to 740)
+            738 JUMP_BACKWARD           29 (to 682)
+        >>  740 LOAD_GLOBAL             21 (NULL + validate_proxy)
+            750 LOAD_GLOBAL              7 (NULL + str)
+            760 LOAD_FAST                7 (item)
+            762 CALL                     1
+            770 CALL                     1
+            778 LIST_APPEND              2
+            780 JUMP_BACKWARD           50 (to 682)
+        >>  782 END_FOR
+            784 SWAP                     2
+            786 STORE_FAST               7 (item)
+            788 CALL                     1
+            796 STORE_FAST               5 (sval)
+
+ 73     >>  798 LOAD_FAST                0 (db)
+            800 LOAD_ATTR               33 (NULL|self + get)
+            820 LOAD_GLOBAL             34 (Setting)
+            830 LOAD_FAST                3 (key)
+            832 CALL                     2
+            840 STORE_FAST               8 (row)
+
+ 74         842 LOAD_FAST                8 (row)
+            844 POP_JUMP_IF_NOT_NONE    30 (to 906)
+
+ 75         846 LOAD_FAST                0 (db)
+            848 LOAD_ATTR               37 (NULL|self + add)
+            868 LOAD_GLOBAL             35 (NULL + Setting)
+            878 LOAD_FAST                3 (key)
+            880 LOAD_FAST                5 (sval)
+            882 KW_NAMES                21 (('key', 'value'))
+            884 CALL                     2
+            892 CALL                     1
+            900 POP_TOP
+            902 EXTENDED_ARG             1
+            904 JUMP_BACKWARD          421 (to 64)
+
+ 77     >>  906 LOAD_FAST                5 (sval)
+            908 LOAD_FAST                8 (row)
+            910 STORE_ATTR              19 (value)
+            920 EXTENDED_ARG             1
+            922 JUMP_BACKWARD          430 (to 64)
+
+ 46     >>  924 END_FOR
+
+ 78         926 LOAD_FAST                0 (db)
+            928 LOAD_ATTR               41 (NULL|self + commit)
+            948 CALL                     0
+            956 POP_TOP
+
+ 79         958 LOAD_GLOBAL             43 (NULL + get_fb_settings)
+            968 LOAD_FAST                0 (db)
+            970 CALL                     1
+            978 RETURN_VALUE
+        >>  980 SWAP                     2
+            982 POP_TOP
+
+ 72         984 SWAP                     2
+            986 STORE_FAST               7 (item)
+            988 RERAISE                  0
+ExceptionTable:
+  678 to 736 -> 980 [5]
+  740 to 782 -> 980 [5]
+
+Disassembly of <code object _parse_bounded at 0x7f6c92408fd0, file "app\services\fb_settings.py", line 82>:
+ 82           0 RESUME                   0
+
+ 83           2 NOP
+
+ 84           4 LOAD_GLOBAL              1 (NULL + int)
+             14 LOAD_FAST                0 (value)
+             16 CALL                     1
+             24 STORE_FAST               4 (parsed)
+
+ 87          26 LOAD_FAST                1 (minimum)
+             28 LOAD_FAST                4 (parsed)
+             30 SWAP                     2
+             32 COPY                     2
+             34 COMPARE_OP              26 (<=)
+             38 POP_JUMP_IF_FALSE        5 (to 50)
+             40 LOAD_FAST                2 (maximum)
+             42 COMPARE_OP              26 (<=)
+             46 POP_JUMP_IF_TRUE        21 (to 90)
+             48 JUMP_FORWARD             1 (to 52)
+        >>   50 POP_TOP
+
+ 88     >>   52 LOAD_GLOBAL              5 (NULL + ValueError)
+             62 LOAD_FAST                3 (label)
+             64 FORMAT_VALUE             0
+             66 LOAD_CONST               1 (' phải là số từ ')
+             68 LOAD_FAST                1 (minimum)
+             70 FORMAT_VALUE             0
+             72 LOAD_CONST               2 (' đến ')
+             74 LOAD_FAST                2 (maximum)
+             76 FORMAT_VALUE             0
+             78 BUILD_STRING             5
+             80 CALL                     1
+             88 RAISE_VARARGS            1
+
+ 89     >>   90 LOAD_GLOBAL              7 (NULL + str)
+            100 LOAD_FAST                4 (parsed)
+            102 CALL                     1
+            110 RETURN_VALUE
+        >>  112 PUSH_EXC_INFO
+
+ 85         114 LOAD_GLOBAL              2 (TypeError)
+            124 LOAD_GLOBAL              4 (ValueError)
+            134 BUILD_TUPLE              2
+            136 CHECK_EXC_MATCH
+            138 POP_JUMP_IF_FALSE       25 (to 190)
+            140 STORE_FAST               5 (exc)
+
+ 86         142 LOAD_GLOBAL              5 (NULL + ValueError)
+            152 LOAD_FAST                3 (label)
+            154 FORMAT_VALUE             0
+            156 LOAD_CONST               1 (' phải là số từ ')
+            158 LOAD_FAST                1 (minimum)
+            160 FORMAT_VALUE             0
+            162 LOAD_CONST               2 (' đến ')
+            164 LOAD_FAST                2 (maximum)
+            166 FORMAT_VALUE             0
+            168 BUILD_STRING             5
+            170 CALL                     1
+            178 LOAD_FAST                5 (exc)
+            180 RAISE_VARARGS            2
+        >>  182 LOAD_CONST               0 (None)
+            184 STORE_FAST               5 (exc)
+            186 DELETE_FAST              5 (exc)
+            188 RERAISE                  1
+
+ 85     >>  190 RERAISE                  0
+        >>  192 COPY                     3
+            194 POP_EXCEPT
+            196 RERAISE                  1
+ExceptionTable:
+  4 to 24 -> 112 [0]
+  112 to 140 -> 192 [1] lasti
+  142 to 180 -> 182 [1] lasti
+  182 to 190 -> 192 [1] lasti
+
+Disassembly of <code object validate_proxy at 0x28be9a00, file "app\services\fb_settings.py", line 92>:
+ 92           0 RESUME                   0
+
+ 93           2 LOAD_FAST                0 (value)
+              4 POP_JUMP_IF_NONE        16 (to 38)
+              6 LOAD_FAST                0 (value)
+              8 LOAD_ATTR                1 (NULL|self + strip)
+             28 CALL                     0
+             36 POP_JUMP_IF_TRUE         1 (to 40)
+
+ 94     >>   38 RETURN_CONST             0 (None)
+
+ 95     >>   40 LOAD_FAST                0 (value)
+             42 LOAD_ATTR                1 (NULL|self + strip)
+             62 CALL                     0
+             70 STORE_FAST               1 (proxy)
+
+ 96          72 LOAD_CONST               1 ('://')
+             74 LOAD_FAST                1 (proxy)
+             76 CONTAINS_OP              1
+             78 POP_JUMP_IF_FALSE       52 (to 184)
+
+ 97          80 LOAD_FAST                1 (proxy)
+             82 LOAD_ATTR                3 (NULL|self + split)
+            102 LOAD_CONST               2 (':')
+            104 CALL                     1
+            112 STORE_FAST               2 (parts)
+
+ 98         114 LOAD_GLOBAL              5 (NULL + len)
+            124 LOAD_FAST                2 (parts)
+            126 CALL                     1
+            134 LOAD_CONST               3 (4)
+            136 COMPARE_OP              40 (==)
+            140 POP_JUMP_IF_FALSE       21 (to 184)
+
+ 99         142 LOAD_FAST                2 (parts)
+            144 UNPACK_SEQUENCE          4
+            148 STORE_FAST               3 (host)
+            150 STORE_FAST               4 (port)
+            152 STORE_FAST               5 (username)
+            154 STORE_FAST               6 (password)
+
+100         156 LOAD_CONST               4 ('http://')
+            158 LOAD_FAST                5 (username)
+            160 FORMAT_VALUE             0
+            162 LOAD_CONST               2 (':')
+            164 LOAD_FAST                6 (password)
+            166 FORMAT_VALUE             0
+            168 LOAD_CONST               5 ('@')
+            170 LOAD_FAST                3 (host)
+            172 FORMAT_VALUE             0
+            174 LOAD_CONST               2 (':')
+            176 LOAD_FAST                4 (port)
+            178 FORMAT_VALUE             0
+            180 BUILD_STRING             8
+            182 STORE_FAST               1 (proxy)
+
+101     >>  184 LOAD_GLOBAL              7 (NULL + urlparse)
+            194 LOAD_FAST                1 (proxy)
+            196 CALL                     1
+            204 STORE_FAST               7 (parsed)
+
+102         206 LOAD_FAST                7 (parsed)
+            208 LOAD_ATTR                8 (scheme)
+            228 LOAD_CONST               6 (frozenset({'https', 'http', 'socks5h', 'socks5'}))
+            230 CONTAINS_OP              1
+            232 POP_JUMP_IF_TRUE        12 (to 258)
+            234 LOAD_FAST                7 (parsed)
+            236 LOAD_ATTR               10 (hostname)
+            256 POP_JUMP_IF_TRUE        11 (to 280)
+
+103     >>  258 LOAD_GLOBAL             13 (NULL + ValueError)
+            268 LOAD_CONST               7 ('Proxy phải có dạng http(s)://host:port hoặc socks5://host:port')
+            270 CALL                     1
+            278 RAISE_VARARGS            1
+
+104     >>  280 LOAD_FAST                7 (parsed)
+            282 LOAD_ATTR               14 (port)
+            302 POP_JUMP_IF_NONE        33 (to 370)
+            304 LOAD_CONST               8 (1)
+            306 LOAD_FAST                7 (parsed)
+            308 LOAD_ATTR               14 (port)
+            328 SWAP                     2
+            330 COPY                     2
+            332 COMPARE_OP              26 (<=)
+            336 POP_JUMP_IF_FALSE       15 (to 368)
+            338 LOAD_CONST               9 (65535)
+            340 COMPARE_OP              26 (<=)
+            344 POP_JUMP_IF_TRUE        23 (to 392)
+
+105         346 LOAD_GLOBAL             13 (NULL + ValueError)
+            356 LOAD_CONST              10 ('Port proxy không hợp lệ')
+            358 CALL                     1
+            366 RAISE_VARARGS            1
+
+104     >>  368 POP_TOP
+
+105     >>  370 LOAD_GLOBAL             13 (NULL + ValueError)
+            380 LOAD_CONST              10 ('Port proxy không hợp lệ')
+            382 CALL                     1
+            390 RAISE_VARARGS            1
+
+106     >>  392 LOAD_FAST                1 (proxy)
+            394 RETURN_VALUE

@@ -1,0 +1,234 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Media Pool của project (Studio NLE) — đọc/ghi index `assets/media/media_pool.json`.\n\nTách khỏi `api/media.py` để TẦNG RENDER dùng chung: `timeline_compiler` phải bơm index này vào\n`config.media_pool` trước khi resolve timeline v2 (FE không mirror kho media xuống config, nên nếu\ncompiler không tự đọc thì mọi clip nguồn `media` — nhạc/SFX/video/ảnh/sticker import — sẽ bị LOẠI\nkhi export). Index là NGUỒN SỰ THẬT phía server: không phụ thuộc bản config có thể cũ của FE.\n')
+              4 STORE_NAME               0 (__doc__)
+
+  8           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 10          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (json)
+             24 STORE_NAME               3 (json)
+
+ 11          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               4 (('Path',))
+             30 IMPORT_NAME              4 (pathlib)
+             32 IMPORT_FROM              5 (Path)
+             34 STORE_NAME               5 (Path)
+             36 POP_TOP
+
+ 13          38 LOAD_CONST               1 (0)
+             40 LOAD_CONST               5 (('ProjectFS',))
+             42 IMPORT_NAME              6 (app.core.fs)
+             44 IMPORT_FROM              7 (ProjectFS)
+             46 STORE_NAME               7 (ProjectFS)
+             48 POP_TOP
+
+ 15          50 LOAD_CONST               6 ('media_pool.json')
+             52 STORE_NAME               8 (INDEX_NAME)
+
+ 18          54 LOAD_CONST              12 (('root_path', 'str', 'return', 'Path'))
+             56 LOAD_CONST               7 (<code object media_dir at 0x7f6c926ff6d0, file "app\services\media_pool.py", line 18>)
+             58 MAKE_FUNCTION            4 (annotations)
+             60 STORE_NAME               9 (media_dir)
+
+ 24          62 LOAD_CONST              12 (('root_path', 'str', 'return', 'Path'))
+             64 LOAD_CONST               8 (<code object index_path at 0x7f6c926974b0, file "app\services\media_pool.py", line 24>)
+             66 MAKE_FUNCTION            4 (annotations)
+             68 STORE_NAME              10 (index_path)
+
+ 28          70 LOAD_CONST              13 (('root_path', 'str', 'return', 'list[dict]'))
+             72 LOAD_CONST               9 (<code object read_index at 0x7f6c926826b0, file "app\services\media_pool.py", line 28>)
+             74 MAKE_FUNCTION            4 (annotations)
+             76 STORE_NAME              11 (read_index)
+
+ 39          78 LOAD_CONST              14 (('root_path', 'str', 'items', 'list[dict]', 'return', 'None'))
+             80 LOAD_CONST              10 (<code object write_index at 0x7f6c928fc8d0, file "app\services\media_pool.py", line 39>)
+             82 MAKE_FUNCTION            4 (annotations)
+             84 STORE_NAME              12 (write_index)
+
+ 46          86 LOAD_CONST              15 (('config', 'dict', 'return', 'dict'))
+             88 LOAD_CONST              11 (<code object with_media_pool at 0x7f6c926ffdf0, file "app\services\media_pool.py", line 46>)
+             90 MAKE_FUNCTION            4 (annotations)
+             92 STORE_NAME              13 (with_media_pool)
+             94 RETURN_CONST             3 (None)
+
+Disassembly of <code object media_dir at 0x7f6c926ff6d0, file "app\services\media_pool.py", line 18>:
+ 18           0 RESUME                   0
+
+ 19           2 LOAD_GLOBAL              1 (NULL + ProjectFS)
+             12 LOAD_FAST                0 (root_path)
+             14 CALL                     1
+             22 LOAD_ATTR                3 (NULL|self + assets_dir)
+             42 CALL                     0
+             50 LOAD_CONST               1 ('media')
+             52 BINARY_OP               11 (/)
+             56 STORE_FAST               1 (d)
+
+ 20          58 LOAD_FAST                1 (d)
+             60 LOAD_ATTR                5 (NULL|self + mkdir)
+             80 LOAD_CONST               2 (True)
+             82 LOAD_CONST               2 (True)
+             84 KW_NAMES                 3 (('parents', 'exist_ok'))
+             86 CALL                     2
+             94 POP_TOP
+
+ 21          96 LOAD_FAST                1 (d)
+             98 RETURN_VALUE
+
+Disassembly of <code object index_path at 0x7f6c926974b0, file "app\services\media_pool.py", line 24>:
+ 24           0 RESUME                   0
+
+ 25           2 LOAD_GLOBAL              1 (NULL + media_dir)
+             12 LOAD_FAST                0 (root_path)
+             14 CALL                     1
+             22 LOAD_GLOBAL              2 (INDEX_NAME)
+             32 BINARY_OP               11 (/)
+             36 RETURN_VALUE
+
+Disassembly of <code object read_index at 0x7f6c926826b0, file "app\services\media_pool.py", line 28>:
+ 28           0 RESUME                   0
+
+ 29           2 LOAD_GLOBAL              1 (NULL + index_path)
+             12 LOAD_FAST                0 (root_path)
+             14 CALL                     1
+             22 STORE_FAST               1 (p)
+
+ 30          24 LOAD_FAST                1 (p)
+             26 LOAD_ATTR                3 (NULL|self + exists)
+             46 CALL                     0
+             54 POP_JUMP_IF_TRUE         2 (to 60)
+
+ 31          56 BUILD_LIST               0
+             58 RETURN_VALUE
+
+ 32     >>   60 NOP
+
+ 33          62 LOAD_GLOBAL              5 (NULL + json)
+             72 LOAD_ATTR                6 (loads)
+             92 LOAD_FAST                1 (p)
+             94 LOAD_ATTR                9 (NULL|self + read_text)
+            114 LOAD_CONST               1 ('utf-8')
+            116 KW_NAMES                 2 (('encoding',))
+            118 CALL                     1
+            126 CALL                     1
+            134 STORE_FAST               2 (data)
+
+ 34         136 LOAD_GLOBAL             11 (NULL + isinstance)
+            146 LOAD_FAST                2 (data)
+            148 LOAD_GLOBAL             12 (list)
+            158 CALL                     2
+            166 POP_JUMP_IF_FALSE        2 (to 172)
+            168 LOAD_FAST                2 (data)
+            170 RETURN_VALUE
+        >>  172 BUILD_LIST               0
+            174 RETURN_VALUE
+        >>  176 PUSH_EXC_INFO
+
+ 35         178 LOAD_GLOBAL             14 (OSError)
+            188 LOAD_GLOBAL              4 (json)
+            198 LOAD_ATTR               16 (JSONDecodeError)
+            218 BUILD_TUPLE              2
+            220 CHECK_EXC_MATCH
+            222 POP_JUMP_IF_FALSE        5 (to 234)
+            224 POP_TOP
+
+ 36         226 BUILD_LIST               0
+            228 SWAP                     2
+            230 POP_EXCEPT
+            232 RETURN_VALUE
+
+ 35     >>  234 RERAISE                  0
+        >>  236 COPY                     3
+            238 POP_EXCEPT
+            240 RERAISE                  1
+ExceptionTable:
+  62 to 168 -> 176 [0]
+  172 to 172 -> 176 [0]
+  176 to 228 -> 236 [1] lasti
+  234 to 234 -> 236 [1] lasti
+
+Disassembly of <code object write_index at 0x7f6c928fc8d0, file "app\services\media_pool.py", line 39>:
+ 39           0 RESUME                   0
+
+ 40           2 LOAD_GLOBAL              1 (NULL + index_path)
+             12 LOAD_FAST                0 (root_path)
+             14 CALL                     1
+             22 STORE_FAST               2 (p)
+
+ 41          24 LOAD_FAST                2 (p)
+             26 LOAD_ATTR                3 (NULL|self + with_suffix)
+             46 LOAD_CONST               1 ('.json.tmp')
+             48 CALL                     1
+             56 STORE_FAST               3 (tmp)
+
+ 42          58 LOAD_FAST                3 (tmp)
+             60 LOAD_ATTR                5 (NULL|self + write_text)
+             80 LOAD_GLOBAL              7 (NULL + json)
+             90 LOAD_ATTR                8 (dumps)
+            110 LOAD_FAST                1 (items)
+            112 LOAD_CONST               2 (False)
+            114 LOAD_CONST               3 (1)
+            116 KW_NAMES                 4 (('ensure_ascii', 'indent'))
+            118 CALL                     3
+            126 LOAD_CONST               5 ('utf-8')
+            128 KW_NAMES                 6 (('encoding',))
+            130 CALL                     2
+            138 POP_TOP
+
+ 43         140 LOAD_FAST                3 (tmp)
+            142 LOAD_ATTR               11 (NULL|self + replace)
+            162 LOAD_FAST                2 (p)
+            164 CALL                     1
+            172 POP_TOP
+            174 RETURN_CONST             0 (None)
+
+Disassembly of <code object with_media_pool at 0x7f6c926ffdf0, file "app\services\media_pool.py", line 46>:
+ 46           0 RESUME                   0
+
+ 52           2 NOP
+
+ 53           4 LOAD_GLOBAL              1 (NULL + read_index)
+             14 LOAD_GLOBAL              3 (NULL + str)
+             24 LOAD_FAST                1 (root_path)
+             26 CALL                     1
+             34 CALL                     1
+             42 STORE_FAST               2 (items)
+
+ 56     >>   44 BUILD_MAP                0
+             46 LOAD_FAST                0 (config)
+             48 COPY                     1
+             50 POP_JUMP_IF_TRUE         2 (to 56)
+             52 POP_TOP
+             54 BUILD_MAP                0
+        >>   56 DICT_UPDATE              1
+             58 LOAD_CONST               1 ('media_pool')
+             60 LOAD_FAST                2 (items)
+             62 BUILD_MAP                1
+             64 DICT_UPDATE              1
+             66 RETURN_VALUE
+        >>   68 PUSH_EXC_INFO
+
+ 54          70 LOAD_GLOBAL              4 (OSError)
+             80 CHECK_EXC_MATCH
+             82 POP_JUMP_IF_FALSE        5 (to 94)
+             84 POP_TOP
+
+ 55          86 BUILD_LIST               0
+             88 STORE_FAST               2 (items)
+             90 POP_EXCEPT
+             92 JUMP_BACKWARD           25 (to 44)
+
+ 54     >>   94 RERAISE                  0
+        >>   96 COPY                     3
+             98 POP_EXCEPT
+            100 RERAISE                  1
+ExceptionTable:
+  4 to 42 -> 68 [0]
+  68 to 88 -> 96 [1] lasti
+  94 to 94 -> 96 [1] lasti

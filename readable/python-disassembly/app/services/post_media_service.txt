@@ -1,0 +1,2205 @@
+  0           0 RESUME                   0
+
+  1           2 SETUP_ANNOTATIONS
+              4 LOAD_CONST               0 ('Post media — AI tự tạo ẢNH BÌA cho mỗi bài viết Facebook để hiển thị ngay trên card + tải xuống.\n\nChạy ngầm sau khi sinh bài: đọc payload.image_prompt → gọi đúng provider hình của CHANNEL\n(Flow/Meta/ChatGPT); provider chưa sẵn sàng → card placeholder ffmpeg để vẫn có ảnh xem trước. Lưu vào PostCard.images_json +\npayload.image_path. Mirror idea_media_service nhưng cho 1 ảnh bìa / bài (lưu list để mở rộng carousel).\n')
+              6 STORE_NAME               0 (__doc__)
+
+  7           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('annotations',))
+             12 IMPORT_NAME              1 (__future__)
+             14 IMPORT_FROM              2 (annotations)
+             16 STORE_NAME               2 (annotations)
+             18 POP_TOP
+
+  9          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               3 (None)
+             24 IMPORT_NAME              3 (asyncio)
+             26 STORE_NAME               3 (asyncio)
+
+ 10          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               3 (None)
+             32 IMPORT_NAME              4 (hashlib)
+             34 STORE_NAME               4 (hashlib)
+
+ 11          36 LOAD_CONST               1 (0)
+             38 LOAD_CONST               3 (None)
+             40 IMPORT_NAME              5 (json)
+             42 STORE_NAME               5 (json)
+
+ 12          44 LOAD_CONST               1 (0)
+             46 LOAD_CONST               4 (('Path',))
+             48 IMPORT_NAME              6 (pathlib)
+             50 IMPORT_FROM              7 (Path)
+             52 STORE_NAME               7 (Path)
+             54 POP_TOP
+
+ 14          56 LOAD_CONST               1 (0)
+             58 LOAD_CONST               5 (('log',))
+             60 IMPORT_NAME              8 (app.core.logging)
+             62 IMPORT_FROM              9 (log)
+             64 STORE_NAME               9 (log)
+             66 POP_TOP
+
+ 15          68 LOAD_CONST               1 (0)
+             70 LOAD_CONST               6 (('ProjectFS',))
+             72 IMPORT_NAME             10 (app.core.fs)
+             74 IMPORT_FROM             11 (ProjectFS)
+             76 STORE_NAME              11 (ProjectFS)
+             78 POP_TOP
+
+ 16          80 LOAD_CONST               1 (0)
+             82 LOAD_CONST               7 (('with_in_image_text_policy',))
+             84 IMPORT_NAME             12 (app.core.visual_lang)
+             86 IMPORT_FROM             13 (with_in_image_text_policy)
+             88 STORE_NAME              13 (with_in_image_text_policy)
+             90 POP_TOP
+
+ 17          92 LOAD_CONST               1 (0)
+             94 LOAD_CONST               8 (('StudioError', 'E'))
+             96 IMPORT_NAME             14 (app.core.errors)
+             98 IMPORT_FROM             15 (StudioError)
+            100 STORE_NAME              15 (StudioError)
+            102 IMPORT_FROM             16 (E)
+            104 STORE_NAME              16 (E)
+            106 POP_TOP
+
+ 18         108 LOAD_CONST               1 (0)
+            110 LOAD_CONST               9 (('is_placeholder', 'placeholder_stem'))
+            112 IMPORT_NAME             17 (app.core.asset_names)
+            114 IMPORT_FROM             18 (is_placeholder)
+            116 STORE_NAME              18 (is_placeholder)
+            118 IMPORT_FROM             19 (placeholder_stem)
+            120 STORE_NAME              19 (placeholder_stem)
+            122 POP_TOP
+
+ 19         124 LOAD_CONST               1 (0)
+            126 LOAD_CONST              10 (('get_ffmpeg_path',))
+            128 IMPORT_NAME             20 (app.adapters.ffmpeg)
+            130 IMPORT_FROM             21 (get_ffmpeg_path)
+            132 STORE_NAME              21 (get_ffmpeg_path)
+            134 POP_TOP
+
+ 20         136 LOAD_CONST               1 (0)
+            138 LOAD_CONST              11 (('SessionLocal',))
+            140 IMPORT_NAME             22 (app.db.session)
+            142 IMPORT_FROM             23 (SessionLocal)
+            144 STORE_NAME              23 (SessionLocal)
+            146 POP_TOP
+
+ 21         148 LOAD_CONST               1 (0)
+            150 LOAD_CONST              12 (('PostCard', 'Project', 'ScheduleConfig'))
+            152 IMPORT_NAME             24 (app.db.models)
+            154 IMPORT_FROM             25 (PostCard)
+            156 STORE_NAME              25 (PostCard)
+            158 IMPORT_FROM             26 (Project)
+            160 STORE_NAME              26 (Project)
+            162 IMPORT_FROM             27 (ScheduleConfig)
+            164 STORE_NAME              27 (ScheduleConfig)
+            166 POP_TOP
+
+ 22         168 LOAD_CONST               1 (0)
+            170 LOAD_CONST              13 (('channel_engines',))
+            172 IMPORT_NAME             28 (app.services)
+            174 IMPORT_FROM             29 (channel_engines)
+            176 STORE_NAME              29 (channel_engines)
+            178 POP_TOP
+
+ 23         180 LOAD_CONST               1 (0)
+            182 LOAD_CONST              14 (('FlowFailover',))
+            184 IMPORT_NAME             30 (app.pipeline.steps.flow_failover)
+            186 IMPORT_FROM             31 (FlowFailover)
+            188 STORE_NAME              31 (FlowFailover)
+            190 POP_TOP
+
+ 24         192 LOAD_CONST               1 (0)
+            194 LOAD_CONST              15 (('MetaFailover',))
+            196 IMPORT_NAME             32 (app.pipeline.steps.meta_failover)
+            198 IMPORT_FROM             33 (MetaFailover)
+            200 STORE_NAME              33 (MetaFailover)
+            202 POP_TOP
+
+ 25         204 LOAD_CONST               1 (0)
+            206 LOAD_CONST              16 (('Ima2Client',))
+            208 IMPORT_NAME             34 (app.adapters.ima2_client)
+            210 IMPORT_FROM             35 (Ima2Client)
+            212 STORE_NAME              35 (Ima2Client)
+            214 POP_TOP
+
+ 26         216 LOAD_CONST               1 (0)
+            218 LOAD_CONST              17 (('aspect_to_dims', '_palette_hexes', 'ensure_card_font', 'render_card'))
+            220 IMPORT_NAME             36 (app.pipeline.steps.flow_generate)
+            222 IMPORT_FROM             37 (aspect_to_dims)
+            224 STORE_NAME              37 (aspect_to_dims)
+            226 IMPORT_FROM             38 (_palette_hexes)
+            228 STORE_NAME              38 (_palette_hexes)
+            230 IMPORT_FROM             39 (ensure_card_font)
+            232 STORE_NAME              39 (ensure_card_font)
+            234 IMPORT_FROM             40 (render_card)
+            236 STORE_NAME              40 (render_card)
+            238 POP_TOP
+
+ 31         240 LOAD_CONST              18 ('1:1')
+            242 STORE_NAME              41 (POST_IMAGE_ASPECT)
+
+ 33         244 PUSH_NULL
+            246 LOAD_NAME               42 (set)
+            248 CALL                     0
+            256 STORE_NAME              43 (_TASKS)
+            258 LOAD_CONST              19 ('set[asyncio.Task]')
+            260 LOAD_NAME               44 (__annotations__)
+            262 LOAD_CONST              20 ('_TASKS')
+            264 STORE_SUBSCR
+
+ 40         268 NOP
+
+ 41         270 NOP
+
+ 40         272 NOP
+
+ 41         274 NOP
+
+ 40         276 NOP
+
+ 41         278 NOP
+
+ 40         280 LOAD_CONST              29 (('prompt', 'str', 'out', 'Path', 'aspect', 'str', 'refs', 'list[str] | None', 'reason', 'str', 'return', 'Path | None'))
+            282 LOAD_CONST              21 (<code object _chatgpt_image_or_none at 0x28aef020, file "app\services\post_media_service.py", line 40>)
+            284 MAKE_FUNCTION            4 (annotations)
+            286 STORE_NAME              45 (_chatgpt_image_or_none)
+
+ 68         288 LOAD_CONST              30 (('post_id', 'str', 'return', 'None'))
+            290 LOAD_CONST              22 (<code object schedule_post_media at 0x7f6c923597d0, file "app\services\post_media_service.py", line 68>)
+            292 MAKE_FUNCTION            4 (annotations)
+            294 STORE_NAME              46 (schedule_post_media)
+
+ 79         296 LOAD_CONST              30 (('post_id', 'str', 'return', 'None'))
+            298 LOAD_CONST              23 (<code object _safe_generate at 0x28c1b7b0, file "app\services\post_media_service.py", line 79>)
+            300 MAKE_FUNCTION            4 (annotations)
+            302 STORE_NAME              47 (_safe_generate)
+
+ 92         304 LOAD_CONST              31 (('post_id', 'str', 'return', 'dict'))
+            306 LOAD_CONST              24 (<code object generate_post_media at 0x28d85ff0, file "app\services\post_media_service.py", line 92>)
+            308 MAKE_FUNCTION            4 (annotations)
+            310 STORE_NAME              48 (generate_post_media)
+
+177         312 LOAD_CONST              32 (('project_id', 'str', 'return', 'tuple[list[str], list[str]]'))
+            314 LOAD_CONST              25 (<code object _host_identity_refs at 0x28d62cf0, file "app\services\post_media_service.py", line 177>)
+            316 MAKE_FUNCTION            4 (annotations)
+            318 STORE_NAME              49 (_host_identity_refs)
+
+201         320 NOP
+
+202         322 NOP
+
+203         324 NOP
+
+199         326 LOAD_CONST              33 ((None, True, False))
+
+200         328 NOP
+
+199         330 NOP
+
+200         332 NOP
+
+199         334 NOP
+
+200         336 NOP
+
+199         338 NOP
+
+201         340 NOP
+
+199         342 NOP
+
+202         344 NOP
+
+199         346 NOP
+
+203         348 NOP
+
+199         350 NOP
+
+203         352 NOP
+
+199         354 LOAD_CONST              34 (('provider', 'str', 'project_id', 'str', 'out_dir', 'Path', 'stem', 'str', 'prompt', 'str', 'aspect', 'str', 'bg_hex', 'str', 'have_font', 'bool', 'refs', 'list[str] | None', 'allow_placeholder', 'bool', 'critical_identity', 'bool', 'return', 'Path | None'))
+            356 LOAD_CONST              26 (<code object _one_image at 0x28d88110, file "app\services\post_media_service.py", line 199>)
+            358 MAKE_FUNCTION            5 (defaults, annotations)
+            360 STORE_NAME              50 (_one_image)
+
+302         362 LOAD_CONST              27 (<code object _loads at 0x7f6c92218290, file "app\services\post_media_service.py", line 302>)
+            364 MAKE_FUNCTION            0
+            366 STORE_NAME              51 (_loads)
+
+311         368 NOP
+
+312         370 NOP
+
+311         372 NOP
+
+312         374 NOP
+
+311         376 NOP
+
+312         378 NOP
+
+311         380 NOP
+
+312         382 NOP
+
+311         384 LOAD_CONST              35 (('path', 'str', 'provider', 'str', 'post_id', 'str', 'index', 'int', 'slot', 'str', 'prompt', 'str', 'status', 'str', 'return', 'dict'))
+            386 LOAD_CONST              28 (<code object _asset_label at 0x7f6c92050450, file "app\services\post_media_service.py", line 311>)
+            388 MAKE_FUNCTION            4 (annotations)
+            390 STORE_NAME              52 (_asset_label)
+            392 RETURN_CONST             3 (None)
+
+Disassembly of <code object _chatgpt_image_or_none at 0x28aef020, file "app\services\post_media_service.py", line 40>:
+ 40           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 43           6 LOAD_GLOBAL              1 (NULL + Ima2Client)
+             16 CALL                     0
+             24 STORE_FAST               5 (client)
+
+ 44          26 LOAD_FAST                5 (client)
+             28 LOAD_ATTR                3 (NULL|self + get_provider_status)
+             48 LOAD_CONST               1 ('oauth')
+             50 CALL                     1
+             58 GET_AWAITABLE            0
+             60 LOAD_CONST               2 (None)
+        >>   62 SEND                     3 (to 72)
+             66 YIELD_VALUE              2
+             68 RESUME                   3
+             70 JUMP_BACKWARD_NO_INTERRUPT     5 (to 62)
+        >>   72 END_SEND
+             74 STORE_FAST               6 (status)
+
+ 45          76 LOAD_FAST                6 (status)
+             78 LOAD_ATTR                5 (NULL|self + get)
+             98 LOAD_CONST               3 ('connected')
+            100 CALL                     1
+            108 POP_JUMP_IF_TRUE        42 (to 194)
+
+ 46         110 LOAD_GLOBAL              7 (NULL + log)
+            120 LOAD_ATTR                8 (warning)
+            140 LOAD_CONST               4 ('[post_media] GPT Image OAuth chưa sẵn sàng: ')
+            142 LOAD_FAST                6 (status)
+            144 LOAD_ATTR                5 (NULL|self + get)
+            164 LOAD_CONST               5 ('reason')
+            166 LOAD_CONST               6 ('unknown')
+            168 CALL                     2
+            176 FORMAT_VALUE             0
+            178 LOAD_CONST               7 ('.')
+            180 BUILD_STRING             3
+            182 CALL                     1
+            190 POP_TOP
+
+ 47         192 RETURN_CONST             2 (None)
+
+ 48     >>  194 LOAD_GLOBAL             11 (NULL + range)
+            204 LOAD_CONST               8 (1)
+            206 LOAD_CONST               9 (19)
+            208 CALL                     2
+            216 GET_ITER
+        >>  218 FOR_ITER                76 (to 374)
+            222 STORE_FAST               7 (attempt)
+
+ 49         224 NOP
+
+ 50         226 LOAD_FAST                4 (reason)
+            228 POP_JUMP_IF_FALSE       38 (to 306)
+
+ 51         230 LOAD_GLOBAL              7 (NULL + log)
+            240 LOAD_ATTR                8 (warning)
+            260 LOAD_CONST              10 ('[post_media] ')
+            262 LOAD_FAST                4 (reason)
+            264 FORMAT_VALUE             0
+            266 LOAD_CONST              11 (' → ChatGPT Image cho ')
+            268 LOAD_FAST                1 (out)
+            270 LOAD_ATTR               12 (stem)
+            290 FORMAT_VALUE             0
+            292 LOAD_CONST               7 ('.')
+            294 BUILD_STRING             5
+            296 CALL                     1
+            304 POP_TOP
+
+ 52     >>  306 LOAD_FAST                5 (client)
+            308 LOAD_ATTR               15 (NULL|self + generate_image)
+
+ 53         328 LOAD_FAST                0 (prompt)
+            330 LOAD_FAST                1 (out)
+            332 LOAD_FAST                2 (aspect)
+            334 LOAD_CONST               1 ('oauth')
+            336 LOAD_FAST                3 (refs)
+
+ 52         338 KW_NAMES                12 (('aspect', 'provider', 'references'))
+            340 CALL                     5
+            348 GET_AWAITABLE            0
+            350 LOAD_CONST               2 (None)
+        >>  352 SEND                     3 (to 362)
+            356 YIELD_VALUE              3
+            358 RESUME                   3
+            360 JUMP_BACKWARD_NO_INTERRUPT     5 (to 352)
+        >>  362 END_SEND
+            364 POP_TOP
+
+ 55         366 LOAD_FAST                1 (out)
+            368 SWAP                     2
+            370 POP_TOP
+            372 RETURN_VALUE
+
+ 48     >>  374 END_FOR
+
+ 65         376 RETURN_CONST             2 (None)
+
+ 44     >>  378 CLEANUP_THROW
+            380 JUMP_BACKWARD          155 (to 72)
+
+ 52     >>  382 CLEANUP_THROW
+            384 JUMP_BACKWARD           12 (to 362)
+        >>  386 PUSH_EXC_INFO
+
+ 56         388 LOAD_GLOBAL             16 (StudioError)
+            398 CHECK_EXC_MATCH
+            400 POP_JUMP_IF_FALSE      145 (to 692)
+            402 STORE_FAST               8 (exc)
+
+ 59         404 LOAD_FAST                8 (exc)
+            406 LOAD_ATTR               18 (code)
+            426 LOAD_GLOBAL             20 (E)
+            436 LOAD_ATTR               22 (CHATGPT_RATE_LIMIT)
+            456 COMPARE_OP              40 (==)
+            460 COPY                     1
+            462 POP_JUMP_IF_FALSE       28 (to 520)
+            464 POP_TOP
+            466 LOAD_CONST              13 ('too_many_jobs')
+            468 LOAD_FAST                8 (exc)
+            470 LOAD_ATTR               24 (message)
+            490 LOAD_ATTR               27 (NULL|self + lower)
+            510 CALL                     0
+            518 CONTAINS_OP              0
+        >>  520 STORE_FAST               9 (local_busy)
+
+ 60         522 LOAD_FAST                9 (local_busy)
+            524 POP_JUMP_IF_FALSE       78 (to 682)
+            526 LOAD_FAST                7 (attempt)
+            528 LOAD_CONST              14 (18)
+            530 COMPARE_OP               2 (<)
+            534 POP_JUMP_IF_FALSE       73 (to 682)
+
+ 61         536 LOAD_GLOBAL              7 (NULL + log)
+            546 LOAD_ATTR               28 (info)
+            566 LOAD_CONST              15 ('[post_media] hàng ChatGPT đang đầy; chờ slot (')
+            568 LOAD_FAST                7 (attempt)
+            570 FORMAT_VALUE             0
+            572 LOAD_CONST              16 ('/18) cho ')
+            574 LOAD_FAST                1 (out)
+            576 LOAD_ATTR               12 (stem)
+            596 FORMAT_VALUE             0
+            598 LOAD_CONST               7 ('.')
+            600 BUILD_STRING             5
+            602 CALL                     1
+            610 POP_TOP
+
+ 62         612 LOAD_GLOBAL             31 (NULL + asyncio)
+            622 LOAD_ATTR               32 (sleep)
+            642 LOAD_CONST              17 (10.0)
+            644 CALL                     1
+            652 GET_AWAITABLE            0
+            654 LOAD_CONST               2 (None)
+        >>  656 SEND                     4 (to 668)
+            660 YIELD_VALUE              4
+            662 RESUME                   3
+            664 JUMP_BACKWARD_NO_INTERRUPT     5 (to 656)
+        >>  666 CLEANUP_THROW
+        >>  668 END_SEND
+            670 POP_TOP
+
+ 63         672 POP_EXCEPT
+            674 LOAD_CONST               2 (None)
+            676 STORE_FAST               8 (exc)
+            678 DELETE_FAST              8 (exc)
+            680 JUMP_BACKWARD          232 (to 218)
+
+ 64     >>  682 RAISE_VARARGS            0
+        >>  684 LOAD_CONST               2 (None)
+            686 STORE_FAST               8 (exc)
+            688 DELETE_FAST              8 (exc)
+            690 RERAISE                  1
+
+ 56     >>  692 RERAISE                  0
+        >>  694 COPY                     3
+            696 POP_EXCEPT
+            698 RERAISE                  1
+        >>  700 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            702 RERAISE                  1
+ExceptionTable:
+  4 to 64 -> 700 [0] lasti
+  66 to 66 -> 378 [2]
+  68 to 222 -> 700 [0] lasti
+  226 to 354 -> 386 [1]
+  356 to 356 -> 382 [3]
+  358 to 366 -> 386 [1]
+  368 to 378 -> 700 [0] lasti
+  382 to 382 -> 386 [1]
+  386 to 402 -> 694 [2] lasti
+  404 to 658 -> 684 [2] lasti
+  660 to 660 -> 666 [4]
+  662 to 670 -> 684 [2] lasti
+  672 to 680 -> 700 [0] lasti
+  682 to 682 -> 684 [2] lasti
+  684 to 692 -> 694 [2] lasti
+  694 to 698 -> 700 [0] lasti
+
+Disassembly of <code object schedule_post_media at 0x7f6c923597d0, file "app\services\post_media_service.py", line 68>:
+ 68           0 RESUME                   0
+
+ 70           2 NOP
+
+ 71           4 LOAD_GLOBAL              1 (NULL + asyncio)
+             14 LOAD_ATTR                2 (get_event_loop)
+             34 CALL                     0
+             42 STORE_FAST               1 (loop)
+
+ 74          44 LOAD_FAST                1 (loop)
+             46 LOAD_ATTR                7 (NULL|self + create_task)
+             66 LOAD_GLOBAL              9 (NULL + _safe_generate)
+             76 LOAD_FAST                0 (post_id)
+             78 CALL                     1
+             86 CALL                     1
+             94 STORE_FAST               2 (task)
+
+ 75          96 LOAD_GLOBAL             10 (_TASKS)
+            106 LOAD_ATTR               13 (NULL|self + add)
+            126 LOAD_FAST                2 (task)
+            128 CALL                     1
+            136 POP_TOP
+
+ 76         138 LOAD_FAST                2 (task)
+            140 LOAD_ATTR               15 (NULL|self + add_done_callback)
+            160 LOAD_GLOBAL             10 (_TASKS)
+            170 LOAD_ATTR               16 (discard)
+            190 CALL                     1
+            198 POP_TOP
+            200 RETURN_CONST             1 (None)
+        >>  202 PUSH_EXC_INFO
+
+ 72         204 LOAD_GLOBAL              4 (RuntimeError)
+            214 CHECK_EXC_MATCH
+            216 POP_JUMP_IF_FALSE        3 (to 224)
+            218 POP_TOP
+
+ 73         220 POP_EXCEPT
+            222 RETURN_CONST             1 (None)
+
+ 72     >>  224 RERAISE                  0
+        >>  226 COPY                     3
+            228 POP_EXCEPT
+            230 RERAISE                  1
+ExceptionTable:
+  4 to 42 -> 202 [0]
+  202 to 218 -> 226 [1] lasti
+  224 to 224 -> 226 [1] lasti
+
+Disassembly of <code object _safe_generate at 0x28c1b7b0, file "app\services\post_media_service.py", line 79>:
+ 79           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 80           6 NOP
+
+ 81           8 LOAD_GLOBAL              1 (NULL + generate_post_media)
+             18 LOAD_FAST                0 (post_id)
+             20 CALL                     1
+             28 GET_AWAITABLE            0
+             30 LOAD_CONST               0 (None)
+        >>   32 SEND                     3 (to 42)
+             36 YIELD_VALUE              3
+             38 RESUME                   3
+             40 JUMP_BACKWARD_NO_INTERRUPT     5 (to 32)
+        >>   42 END_SEND
+             44 POP_TOP
+             46 RETURN_CONST             0 (None)
+        >>   48 CLEANUP_THROW
+             50 JUMP_BACKWARD            5 (to 42)
+        >>   52 PUSH_EXC_INFO
+
+ 82          54 LOAD_GLOBAL              2 (Exception)
+             64 CHECK_EXC_MATCH
+             66 POP_JUMP_IF_FALSE      136 (to 340)
+             68 STORE_FAST               1 (e)
+
+ 83          70 LOAD_GLOBAL              5 (NULL + log)
+             80 LOAD_ATTR                6 (warning)
+            100 LOAD_CONST               1 ('[post_media] ')
+            102 LOAD_FAST                0 (post_id)
+            104 FORMAT_VALUE             0
+            106 LOAD_CONST               2 (': sinh ảnh bìa lỗi: ')
+            108 LOAD_FAST                1 (e)
+            110 FORMAT_VALUE             0
+            112 BUILD_STRING             4
+            114 CALL                     1
+            122 POP_TOP
+
+ 85         124 LOAD_GLOBAL              9 (NULL + SessionLocal)
+            134 CALL                     0
+            142 BEFORE_WITH
+            144 STORE_FAST               2 (db)
+
+ 86         146 LOAD_FAST                2 (db)
+            148 LOAD_ATTR               11 (NULL|self + get)
+            168 LOAD_GLOBAL             12 (PostCard)
+            178 LOAD_FAST                0 (post_id)
+            180 CALL                     2
+            188 STORE_FAST               3 (post)
+
+ 87         190 LOAD_FAST                3 (post)
+            192 POP_JUMP_IF_NONE        38 (to 270)
+            194 LOAD_FAST                3 (post)
+            196 LOAD_ATTR               14 (status)
+            216 LOAD_CONST               3 ('generating')
+            218 COMPARE_OP              40 (==)
+            222 POP_JUMP_IF_FALSE       23 (to 270)
+
+ 88         224 LOAD_CONST               4 ('failed')
+            226 LOAD_FAST                3 (post)
+            228 STORE_ATTR               7 (status)
+
+ 89         238 LOAD_FAST                2 (db)
+            240 LOAD_ATTR               17 (NULL|self + commit)
+            260 CALL                     0
+            268 POP_TOP
+
+ 85     >>  270 LOAD_CONST               0 (None)
+            272 LOAD_CONST               0 (None)
+            274 LOAD_CONST               0 (None)
+            276 CALL                     2
+            284 POP_TOP
+            286 JUMP_FORWARD            17 (to 322)
+        >>  288 PUSH_EXC_INFO
+            290 WITH_EXCEPT_START
+            292 POP_JUMP_IF_TRUE         1 (to 296)
+            294 RERAISE                  2
+        >>  296 POP_TOP
+            298 POP_EXCEPT
+            300 POP_TOP
+            302 POP_TOP
+            304 JUMP_FORWARD             3 (to 312)
+        >>  306 COPY                     3
+            308 POP_EXCEPT
+            310 RERAISE                  1
+        >>  312 POP_EXCEPT
+            314 LOAD_CONST               0 (None)
+            316 STORE_FAST               1 (e)
+            318 DELETE_FAST              1 (e)
+            320 RETURN_CONST             0 (None)
+        >>  322 POP_EXCEPT
+            324 LOAD_CONST               0 (None)
+            326 STORE_FAST               1 (e)
+            328 DELETE_FAST              1 (e)
+            330 RETURN_CONST             0 (None)
+        >>  332 LOAD_CONST               0 (None)
+            334 STORE_FAST               1 (e)
+            336 DELETE_FAST              1 (e)
+            338 RERAISE                  1
+
+ 82     >>  340 RERAISE                  0
+        >>  342 COPY                     3
+            344 POP_EXCEPT
+            346 RERAISE                  1
+        >>  348 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            350 RERAISE                  1
+ExceptionTable:
+  4 to 4 -> 348 [0] lasti
+  8 to 34 -> 52 [0]
+  36 to 36 -> 48 [2]
+  38 to 44 -> 52 [0]
+  46 to 46 -> 348 [0] lasti
+  48 to 48 -> 52 [0]
+  52 to 68 -> 342 [1] lasti
+  70 to 142 -> 332 [1] lasti
+  144 to 268 -> 288 [2] lasti
+  270 to 286 -> 332 [1] lasti
+  288 to 296 -> 306 [4] lasti
+  298 to 310 -> 332 [1] lasti
+  312 to 330 -> 348 [0] lasti
+  332 to 340 -> 342 [1] lasti
+  342 to 346 -> 348 [0] lasti
+
+Disassembly of <code object generate_post_media at 0x28d85ff0, file "app\services\post_media_service.py", line 92>:
+ 92           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 94           6 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             16 CALL                     0
+             24 BEFORE_WITH
+             26 STORE_FAST               1 (db)
+
+ 95          28 LOAD_FAST                1 (db)
+             30 LOAD_ATTR                3 (NULL|self + get)
+             50 LOAD_GLOBAL              4 (PostCard)
+             60 LOAD_FAST                0 (post_id)
+             62 CALL                     2
+             70 STORE_FAST               2 (post)
+
+ 96          72 LOAD_FAST                2 (post)
+             74 POP_JUMP_IF_NOT_NONE    11 (to 98)
+
+ 97          76 BUILD_MAP                0
+
+ 94          78 SWAP                     2
+             80 LOAD_CONST               1 (None)
+             82 LOAD_CONST               1 (None)
+             84 LOAD_CONST               1 (None)
+             86 CALL                     2
+             94 POP_TOP
+             96 RETURN_VALUE
+
+ 98     >>   98 LOAD_FAST                1 (db)
+            100 LOAD_ATTR                3 (NULL|self + get)
+            120 LOAD_GLOBAL              6 (Project)
+            130 LOAD_FAST                2 (post)
+            132 LOAD_ATTR                8 (project_id)
+            152 CALL                     2
+            160 STORE_FAST               3 (project)
+
+ 99         162 LOAD_FAST                2 (post)
+            164 LOAD_ATTR                8 (project_id)
+            184 STORE_FAST               4 (project_id)
+
+100         186 LOAD_GLOBAL             11 (NULL + _loads)
+            196 LOAD_FAST                2 (post)
+            198 LOAD_ATTR               12 (payload_json)
+            218 BUILD_MAP                0
+            220 CALL                     2
+            228 STORE_FAST               5 (payload)
+
+101         230 LOAD_FAST                1 (db)
+            232 LOAD_ATTR               15 (NULL|self + query)
+            252 LOAD_GLOBAL             16 (ScheduleConfig)
+            262 CALL                     1
+            270 LOAD_ATTR               19 (NULL|self + filter)
+            290 LOAD_GLOBAL             16 (ScheduleConfig)
+            300 LOAD_ATTR                8 (project_id)
+            320 LOAD_FAST                2 (post)
+            322 LOAD_ATTR                8 (project_id)
+            342 COMPARE_OP              40 (==)
+            346 CALL                     1
+            354 LOAD_ATTR               21 (NULL|self + first)
+            374 CALL                     0
+            382 STORE_FAST               6 (cfg)
+
+102         384 LOAD_FAST                6 (cfg)
+            386 POP_JUMP_IF_FALSE       12 (to 412)
+            388 LOAD_FAST                6 (cfg)
+            390 LOAD_ATTR               22 (engine_id)
+            410 JUMP_FORWARD             1 (to 414)
+        >>  412 LOAD_CONST               1 (None)
+        >>  414 STORE_FAST               7 (engine_id)
+
+103         416 LOAD_FAST                6 (cfg)
+            418 POP_JUMP_IF_FALSE       22 (to 464)
+            420 LOAD_GLOBAL             11 (NULL + _loads)
+            430 LOAD_FAST                6 (cfg)
+            432 LOAD_ATTR               24 (channel_profile_json)
+            452 BUILD_MAP                0
+            454 CALL                     2
+            462 JUMP_FORWARD             1 (to 466)
+        >>  464 BUILD_MAP                0
+        >>  466 STORE_FAST               8 (profile)
+
+104         468 LOAD_FAST                3 (project)
+            470 POP_JUMP_IF_FALSE       22 (to 516)
+            472 LOAD_GLOBAL             11 (NULL + _loads)
+            482 LOAD_FAST                3 (project)
+            484 LOAD_ATTR               26 (default_config)
+            504 BUILD_MAP                0
+            506 CALL                     2
+            514 JUMP_FORWARD             1 (to 518)
+        >>  516 BUILD_MAP                0
+        >>  518 STORE_FAST               9 (project_default)
+
+106         520 LOAD_GLOBAL             29 (NULL + str)
+            530 LOAD_FAST                8 (profile)
+            532 LOAD_ATTR                3 (NULL|self + get)
+            552 LOAD_CONST               2 ('image_provider')
+            554 CALL                     1
+            562 COPY                     1
+            564 POP_JUMP_IF_TRUE        21 (to 608)
+            566 POP_TOP
+            568 LOAD_FAST                9 (project_default)
+            570 LOAD_ATTR                3 (NULL|self + get)
+            590 LOAD_CONST               2 ('image_provider')
+            592 CALL                     1
+            600 COPY                     1
+            602 POP_JUMP_IF_TRUE         2 (to 608)
+            604 POP_TOP
+            606 LOAD_CONST               3 ('flow')
+        >>  608 CALL                     1
+            616 LOAD_ATTR               31 (NULL|self + lower)
+            636 CALL                     0
+            644 STORE_FAST              10 (provider)
+
+107         646 LOAD_FAST               10 (provider)
+            648 LOAD_CONST               4 (frozenset({'chatgpt', 'flow', 'stock', 'grok', 'meta'}))
+            650 CONTAINS_OP              1
+            652 POP_JUMP_IF_FALSE        2 (to 658)
+
+108         654 LOAD_CONST               3 ('flow')
+            656 STORE_FAST              10 (provider)
+
+109     >>  658 LOAD_FAST                3 (project)
+            660 POP_JUMP_IF_FALSE       12 (to 686)
+            662 LOAD_FAST                3 (project)
+            664 LOAD_ATTR               32 (root_path)
+            684 JUMP_FORWARD             1 (to 688)
+        >>  686 LOAD_CONST               1 (None)
+        >>  688 STORE_FAST              11 (root)
+
+110         690 LOAD_GLOBAL             29 (NULL + str)
+            700 LOAD_FAST                8 (profile)
+            702 LOAD_ATTR                3 (NULL|self + get)
+            722 LOAD_CONST               5 ('language')
+            724 CALL                     1
+            732 COPY                     1
+            734 POP_JUMP_IF_TRUE        36 (to 808)
+            736 POP_TOP
+            738 LOAD_GLOBAL             35 (NULL + getattr)
+            748 LOAD_FAST                6 (cfg)
+            750 LOAD_CONST               5 ('language')
+            752 LOAD_CONST               1 (None)
+            754 CALL                     3
+            762 COPY                     1
+            764 POP_JUMP_IF_TRUE        21 (to 808)
+            766 POP_TOP
+
+111         768 LOAD_FAST                9 (project_default)
+            770 LOAD_ATTR                3 (NULL|self + get)
+            790 LOAD_CONST               5 ('language')
+            792 CALL                     1
+
+110         800 COPY                     1
+            802 POP_JUMP_IF_TRUE         2 (to 808)
+            804 POP_TOP
+
+111         806 LOAD_CONST               6 ('vi')
+
+110     >>  808 CALL                     1
+            816 STORE_FAST              12 (lang)
+
+113         818 LOAD_FAST                2 (post)
+            820 LOAD_ATTR               36 (status)
+            840 LOAD_CONST               7 (('proposed', 'ready', 'approved', 'failed'))
+            842 CONTAINS_OP              0
+            844 POP_JUMP_IF_FALSE        7 (to 860)
+
+114         846 LOAD_CONST               8 ('generating')
+            848 LOAD_FAST                2 (post)
+            850 STORE_ATTR              18 (status)
+
+115     >>  860 LOAD_FAST                1 (db)
+            862 LOAD_ATTR               39 (NULL|self + commit)
+            882 CALL                     0
+            890 POP_TOP
+
+ 94         892 LOAD_CONST               1 (None)
+            894 LOAD_CONST               1 (None)
+            896 LOAD_CONST               1 (None)
+            898 CALL                     2
+            906 POP_TOP
+
+116     >>  908 LOAD_FAST_CHECK         11 (root)
+            910 POP_JUMP_IF_TRUE        83 (to 1078)
+
+117         912 LOAD_GLOBAL              1 (NULL + SessionLocal)
+            922 CALL                     0
+            930 BEFORE_WITH
+            932 STORE_FAST               1 (db)
+
+118         934 LOAD_FAST                1 (db)
+            936 LOAD_ATTR                3 (NULL|self + get)
+            956 LOAD_GLOBAL              4 (PostCard)
+            966 LOAD_FAST                0 (post_id)
+            968 CALL                     2
+            976 STORE_FAST               2 (post)
+
+119         978 LOAD_FAST                2 (post)
+            980 POP_JUMP_IF_NONE        38 (to 1058)
+            982 LOAD_FAST                2 (post)
+            984 LOAD_ATTR               36 (status)
+           1004 LOAD_CONST               8 ('generating')
+           1006 COMPARE_OP              40 (==)
+           1010 POP_JUMP_IF_FALSE       23 (to 1058)
+
+120        1012 LOAD_CONST               9 ('failed')
+           1014 LOAD_FAST                2 (post)
+           1016 STORE_ATTR              18 (status)
+
+121        1026 LOAD_FAST                1 (db)
+           1028 LOAD_ATTR               39 (NULL|self + commit)
+           1048 CALL                     0
+           1056 POP_TOP
+
+117     >> 1058 LOAD_CONST               1 (None)
+           1060 LOAD_CONST               1 (None)
+           1062 LOAD_CONST               1 (None)
+           1064 CALL                     2
+           1072 POP_TOP
+
+122        1074 LOAD_FAST_CHECK          5 (payload)
+           1076 RETURN_VALUE
+
+124     >> 1078 LOAD_FAST_CHECK          7 (engine_id)
+           1080 POP_JUMP_IF_FALSE       21 (to 1124)
+           1082 LOAD_GLOBAL             41 (NULL + channel_engines)
+           1092 LOAD_ATTR               42 (get_engine)
+           1112 LOAD_FAST                7 (engine_id)
+           1114 CALL                     1
+           1122 JUMP_FORWARD             1 (to 1126)
+        >> 1124 LOAD_CONST               1 (None)
+        >> 1126 STORE_FAST              13 (engine)
+
+125        1128 LOAD_GLOBAL             45 (NULL + ProjectFS)
+           1138 LOAD_FAST               11 (root)
+           1140 CALL                     1
+           1148 STORE_FAST              14 (fs)
+
+126        1150 LOAD_FAST               14 (fs)
+           1152 LOAD_ATTR               47 (NULL|self + post_dir)
+           1172 LOAD_FAST                0 (post_id)
+           1174 CALL                     1
+           1182 STORE_FAST              15 (out_dir)
+
+127        1184 LOAD_GLOBAL             49 (NULL + get_ffmpeg_path)
+           1194 CALL                     0
+           1202 STORE_FAST              16 (ffmpeg)
+
+128        1204 LOAD_GLOBAL             51 (NULL + ensure_card_font)
+           1214 LOAD_FAST               15 (out_dir)
+           1216 CALL                     1
+           1224 STORE_FAST              17 (have_font)
+
+129        1226 LOAD_GLOBAL             53 (NULL + _palette_hexes)
+           1236 LOAD_FAST               13 (engine)
+           1238 CALL                     1
+           1246 STORE_FAST              18 (palette)
+
+131        1248 LOAD_FAST_CHECK          5 (payload)
+           1250 LOAD_ATTR                3 (NULL|self + get)
+           1270 LOAD_CONST              10 ('image_prompt')
+           1272 CALL                     1
+           1280 COPY                     1
+           1282 POP_JUMP_IF_TRUE        40 (to 1364)
+           1284 POP_TOP
+           1286 LOAD_FAST                5 (payload)
+           1288 LOAD_ATTR                3 (NULL|self + get)
+           1308 LOAD_CONST              11 ('image_concept')
+           1310 CALL                     1
+           1318 COPY                     1
+           1320 POP_JUMP_IF_TRUE        21 (to 1364)
+           1322 POP_TOP
+
+132        1324 LOAD_FAST                5 (payload)
+           1326 LOAD_ATTR                3 (NULL|self + get)
+           1346 LOAD_CONST              12 ('topic')
+           1348 CALL                     1
+
+131        1356 COPY                     1
+           1358 POP_JUMP_IF_TRUE         2 (to 1364)
+           1360 POP_TOP
+
+132        1362 LOAD_CONST              13 ('')
+        >> 1364 LOAD_ATTR               55 (NULL|self + strip)
+           1384 CALL                     0
+
+131        1392 STORE_FAST              19 (prompt)
+
+136        1394 LOAD_GLOBAL             57 (NULL + _host_identity_refs)
+           1404 LOAD_FAST_CHECK          4 (project_id)
+           1406 CALL                     1
+           1414 UNPACK_SEQUENCE          2
+           1418 STORE_FAST              20 (host_refs)
+           1420 STORE_FAST              21 (host_names)
+
+137        1422 LOAD_FAST               20 (host_refs)
+           1424 POP_JUMP_IF_FALSE       24 (to 1474)
+
+138        1426 LOAD_GLOBAL             41 (NULL + channel_engines)
+           1436 LOAD_ATTR               58 (character_identity_block)
+           1456 LOAD_FAST               21 (host_names)
+           1458 CALL                     1
+           1466 LOAD_FAST               19 (prompt)
+           1468 BINARY_OP                0 (+)
+           1472 STORE_FAST              19 (prompt)
+
+140     >> 1474 LOAD_GLOBAL             61 (NULL + with_in_image_text_policy)
+           1484 LOAD_FAST               19 (prompt)
+           1486 LOAD_FAST_CHECK         12 (lang)
+           1488 CALL                     2
+           1496 STORE_FAST              19 (prompt)
+
+141        1498 LOAD_GLOBAL             63 (NULL + _one_image)
+
+142        1508 LOAD_FAST_CHECK         10 (provider)
+           1510 LOAD_FAST                4 (project_id)
+           1512 LOAD_FAST               16 (ffmpeg)
+           1514 LOAD_FAST               15 (out_dir)
+           1516 LOAD_CONST              14 ('cover')
+           1518 LOAD_FAST               19 (prompt)
+           1520 LOAD_GLOBAL             64 (POST_IMAGE_ASPECT)
+           1530 LOAD_FAST               18 (palette)
+           1532 LOAD_CONST              15 (0)
+           1534 BINARY_SUBSCR
+
+143        1538 LOAD_FAST               17 (have_font)
+           1540 LOAD_FAST               20 (host_refs)
+           1542 COPY                     1
+           1544 POP_JUMP_IF_TRUE         2 (to 1550)
+           1546 POP_TOP
+           1548 LOAD_CONST               1 (None)
+
+141     >> 1550 KW_NAMES                16 (('refs',))
+           1552 CALL                    10
+           1560 GET_AWAITABLE            0
+           1562 LOAD_CONST               1 (None)
+        >> 1564 SEND                     3 (to 1574)
+           1568 YIELD_VALUE              2
+           1570 RESUME                   3
+           1572 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1564)
+        >> 1574 END_SEND
+           1576 STORE_FAST              22 (img_path)
+
+145        1578 BUILD_LIST               0
+           1580 STORE_FAST              23 (images)
+
+146        1582 LOAD_FAST               22 (img_path)
+           1584 POP_JUMP_IF_FALSE       90 (to 1766)
+
+147        1586 LOAD_GLOBAL             29 (NULL + str)
+           1596 LOAD_FAST               22 (img_path)
+           1598 LOAD_ATTR               67 (NULL|self + resolve)
+           1618 CALL                     0
+           1626 CALL                     1
+           1634 STORE_FAST              24 (p)
+
+148        1636 LOAD_GLOBAL             69 (NULL + is_placeholder)
+           1646 LOAD_FAST               22 (img_path)
+           1648 CALL                     1
+           1656 STORE_FAST              25 (is_ph)
+
+149        1658 LOAD_GLOBAL             71 (NULL + _asset_label)
+
+150        1668 LOAD_FAST               24 (p)
+
+151        1670 LOAD_FAST               10 (provider)
+
+152        1672 LOAD_FAST                0 (post_id)
+
+153        1674 LOAD_CONST              15 (0)
+
+154        1676 LOAD_CONST              14 ('cover')
+
+155        1678 LOAD_FAST               19 (prompt)
+
+156        1680 LOAD_FAST               25 (is_ph)
+           1682 POP_JUMP_IF_FALSE        2 (to 1688)
+           1684 LOAD_CONST              17 ('placeholder')
+           1686 JUMP_FORWARD             1 (to 1690)
+        >> 1688 LOAD_CONST              18 ('done')
+
+149     >> 1690 KW_NAMES                19 (('path', 'provider', 'post_id', 'index', 'slot', 'prompt', 'status'))
+           1692 CALL                     7
+           1700 STORE_FAST              26 (asset)
+
+158        1702 LOAD_FAST               23 (images)
+           1704 LOAD_ATTR               73 (NULL|self + append)
+           1724 LOAD_FAST               26 (asset)
+           1726 CALL                     1
+           1734 POP_TOP
+
+159        1736 LOAD_FAST               24 (p)
+           1738 LOAD_FAST                5 (payload)
+           1740 LOAD_CONST              20 ('image_path')
+           1742 STORE_SUBSCR
+
+160        1746 LOAD_FAST               10 (provider)
+           1748 LOAD_FAST                5 (payload)
+           1750 LOAD_CONST               2 ('image_provider')
+           1752 STORE_SUBSCR
+
+161        1756 LOAD_FAST               26 (asset)
+           1758 LOAD_FAST                5 (payload)
+           1760 LOAD_CONST              21 ('image_asset')
+           1762 STORE_SUBSCR
+
+163     >> 1766 LOAD_GLOBAL              1 (NULL + SessionLocal)
+           1776 CALL                     0
+           1784 BEFORE_WITH
+           1786 STORE_FAST               1 (db)
+
+164        1788 LOAD_FAST                1 (db)
+           1790 LOAD_ATTR                3 (NULL|self + get)
+           1810 LOAD_GLOBAL              4 (PostCard)
+           1820 LOAD_FAST                0 (post_id)
+           1822 CALL                     2
+           1830 STORE_FAST               2 (post)
+
+165        1832 LOAD_FAST                2 (post)
+           1834 POP_JUMP_IF_NONE        98 (to 2032)
+
+166        1836 LOAD_GLOBAL             75 (NULL + json)
+           1846 LOAD_ATTR               76 (dumps)
+           1866 LOAD_FAST                5 (payload)
+           1868 LOAD_CONST              22 (False)
+           1870 KW_NAMES                23 (('ensure_ascii',))
+           1872 CALL                     2
+           1880 LOAD_FAST                2 (post)
+           1882 STORE_ATTR               6 (payload_json)
+
+167        1892 LOAD_GLOBAL             75 (NULL + json)
+           1902 LOAD_ATTR               76 (dumps)
+           1922 LOAD_FAST               23 (images)
+           1924 LOAD_CONST              22 (False)
+           1926 KW_NAMES                23 (('ensure_ascii',))
+           1928 CALL                     2
+           1936 LOAD_FAST                2 (post)
+           1938 STORE_ATTR              39 (images_json)
+
+170        1948 LOAD_FAST                2 (post)
+           1950 LOAD_ATTR               36 (status)
+           1970 LOAD_CONST               8 ('generating')
+           1972 COMPARE_OP              40 (==)
+           1976 POP_JUMP_IF_FALSE       11 (to 2000)
+
+171        1978 LOAD_FAST               23 (images)
+           1980 POP_JUMP_IF_FALSE        2 (to 1986)
+           1982 LOAD_CONST              24 ('proposed')
+           1984 JUMP_FORWARD             1 (to 1988)
+        >> 1986 LOAD_CONST               9 ('failed')
+        >> 1988 LOAD_FAST                2 (post)
+           1990 STORE_ATTR              18 (status)
+
+172     >> 2000 LOAD_FAST                1 (db)
+           2002 LOAD_ATTR               39 (NULL|self + commit)
+           2022 CALL                     0
+           2030 POP_TOP
+
+163     >> 2032 LOAD_CONST               1 (None)
+           2034 LOAD_CONST               1 (None)
+           2036 LOAD_CONST               1 (None)
+           2038 CALL                     2
+           2046 POP_TOP
+
+173     >> 2048 LOAD_GLOBAL             81 (NULL + log)
+           2058 LOAD_ATTR               82 (info)
+           2078 LOAD_CONST              25 ('[post_media] ')
+           2080 LOAD_FAST                0 (post_id)
+           2082 FORMAT_VALUE             0
+           2084 LOAD_CONST              26 (': xong (')
+           2086 LOAD_GLOBAL             85 (NULL + len)
+           2096 LOAD_FAST               23 (images)
+           2098 CALL                     1
+           2106 FORMAT_VALUE             0
+           2108 LOAD_CONST              27 (' ảnh, provider=')
+           2110 LOAD_FAST               10 (provider)
+           2112 FORMAT_VALUE             0
+           2114 LOAD_CONST              28 (').')
+           2116 BUILD_STRING             7
+           2118 CALL                     1
+           2126 POP_TOP
+
+174        2128 LOAD_FAST                5 (payload)
+           2130 RETURN_VALUE
+
+ 94     >> 2132 PUSH_EXC_INFO
+           2134 WITH_EXCEPT_START
+           2136 POP_JUMP_IF_TRUE         1 (to 2140)
+           2138 RERAISE                  2
+        >> 2140 POP_TOP
+           2142 POP_EXCEPT
+           2144 POP_TOP
+           2146 POP_TOP
+           2148 EXTENDED_ARG             2
+           2150 JUMP_BACKWARD          622 (to 908)
+        >> 2152 COPY                     3
+           2154 POP_EXCEPT
+           2156 RERAISE                  1
+
+117     >> 2158 PUSH_EXC_INFO
+           2160 WITH_EXCEPT_START
+           2162 POP_JUMP_IF_TRUE         1 (to 2166)
+           2164 RERAISE                  2
+        >> 2166 POP_TOP
+           2168 POP_EXCEPT
+           2170 POP_TOP
+           2172 POP_TOP
+
+122        2174 LOAD_FAST_CHECK          5 (payload)
+           2176 RETURN_VALUE
+        >> 2178 COPY                     3
+           2180 POP_EXCEPT
+           2182 RERAISE                  1
+
+141     >> 2184 CLEANUP_THROW
+           2186 EXTENDED_ARG             1
+           2188 JUMP_BACKWARD          308 (to 1574)
+
+163     >> 2190 PUSH_EXC_INFO
+           2192 WITH_EXCEPT_START
+           2194 POP_JUMP_IF_TRUE         1 (to 2198)
+           2196 RERAISE                  2
+        >> 2198 POP_TOP
+           2200 POP_EXCEPT
+           2202 POP_TOP
+           2204 POP_TOP
+           2206 JUMP_BACKWARD           80 (to 2048)
+        >> 2208 COPY                     3
+           2210 POP_EXCEPT
+           2212 RERAISE                  1
+        >> 2214 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           2216 RERAISE                  1
+ExceptionTable:
+  4 to 24 -> 2214 [0] lasti
+  26 to 76 -> 2132 [1] lasti
+  78 to 96 -> 2214 [0] lasti
+  98 to 890 -> 2132 [1] lasti
+  892 to 930 -> 2214 [0] lasti
+  932 to 1056 -> 2158 [1] lasti
+  1058 to 1566 -> 2214 [0] lasti
+  1568 to 1568 -> 2184 [2]
+  1570 to 1784 -> 2214 [0] lasti
+  1786 to 2030 -> 2190 [1] lasti
+  2032 to 2130 -> 2214 [0] lasti
+  2132 to 2140 -> 2152 [3] lasti
+  2142 to 2156 -> 2214 [0] lasti
+  2158 to 2166 -> 2178 [3] lasti
+  2168 to 2184 -> 2214 [0] lasti
+  2190 to 2198 -> 2208 [3] lasti
+  2200 to 2212 -> 2214 [0] lasti
+
+Disassembly of <code object _host_identity_refs at 0x28d62cf0, file "app\services\post_media_service.py", line 177>:
+177           0 RESUME                   0
+
+183           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('host_service',))
+              6 IMPORT_NAME              0 (app.services)
+              8 IMPORT_FROM              1 (host_service)
+             10 STORE_FAST               1 (host_service)
+             12 POP_TOP
+
+184          14 NOP
+
+185          16 LOAD_GLOBAL              5 (NULL + SessionLocal)
+             26 CALL                     0
+             34 BEFORE_WITH
+             36 STORE_FAST               2 (db)
+
+186          38 LOAD_FAST                1 (host_service)
+             40 LOAD_ATTR                7 (NULL|self + get_host)
+             60 LOAD_FAST                2 (db)
+             62 LOAD_FAST                0 (project_id)
+             64 CALL                     2
+             72 STORE_FAST               3 (host)
+
+187          74 LOAD_FAST                3 (host)
+             76 POP_JUMP_IF_NOT_NONE    13 (to 104)
+
+188          78 BUILD_LIST               0
+             80 BUILD_LIST               0
+             82 BUILD_TUPLE              2
+
+185          84 SWAP                     2
+             86 LOAD_CONST               3 (None)
+             88 LOAD_CONST               3 (None)
+             90 LOAD_CONST               3 (None)
+             92 CALL                     2
+            100 POP_TOP
+            102 RETURN_VALUE
+
+189     >>  104 LOAD_GLOBAL              9 (NULL + str)
+            114 LOAD_FAST                3 (host)
+            116 LOAD_ATTR               10 (ref_image_path)
+            136 COPY                     1
+            138 POP_JUMP_IF_TRUE         2 (to 144)
+            140 POP_TOP
+            142 LOAD_CONST               4 ('')
+        >>  144 CALL                     1
+            152 LOAD_ATTR               13 (NULL|self + strip)
+            172 CALL                     0
+            180 STORE_FAST               4 (ref)
+
+190         182 LOAD_GLOBAL              9 (NULL + str)
+            192 LOAD_FAST                3 (host)
+            194 LOAD_ATTR               14 (name)
+            214 COPY                     1
+            216 POP_JUMP_IF_TRUE         2 (to 222)
+            218 POP_TOP
+            220 LOAD_CONST               4 ('')
+        >>  222 CALL                     1
+            230 LOAD_ATTR               13 (NULL|self + strip)
+            250 CALL                     0
+            258 STORE_FAST               5 (name)
+
+185         260 LOAD_CONST               3 (None)
+            262 LOAD_CONST               3 (None)
+            264 LOAD_CONST               3 (None)
+            266 CALL                     2
+            274 POP_TOP
+
+194     >>  276 LOAD_FAST_CHECK          4 (ref)
+            278 POP_JUMP_IF_FALSE       38 (to 356)
+            280 LOAD_FAST_CHECK          5 (name)
+            282 POP_JUMP_IF_FALSE       36 (to 356)
+            284 LOAD_GLOBAL             23 (NULL + is_placeholder)
+            294 LOAD_FAST                4 (ref)
+            296 CALL                     1
+            304 POP_JUMP_IF_TRUE        25 (to 356)
+            306 LOAD_GLOBAL             25 (NULL + Path)
+            316 LOAD_FAST                4 (ref)
+            318 CALL                     1
+            326 LOAD_ATTR               27 (NULL|self + is_file)
+            346 CALL                     0
+            354 POP_JUMP_IF_TRUE         4 (to 364)
+
+195     >>  356 BUILD_LIST               0
+            358 BUILD_LIST               0
+            360 BUILD_TUPLE              2
+            362 RETURN_VALUE
+
+196     >>  364 LOAD_FAST                4 (ref)
+            366 BUILD_LIST               1
+            368 LOAD_FAST                5 (name)
+            370 BUILD_LIST               1
+            372 BUILD_TUPLE              2
+            374 RETURN_VALUE
+
+185     >>  376 PUSH_EXC_INFO
+            378 WITH_EXCEPT_START
+            380 POP_JUMP_IF_TRUE         1 (to 384)
+            382 RERAISE                  2
+        >>  384 POP_TOP
+            386 POP_EXCEPT
+            388 POP_TOP
+            390 POP_TOP
+            392 JUMP_BACKWARD           59 (to 276)
+        >>  394 COPY                     3
+            396 POP_EXCEPT
+            398 RERAISE                  1
+        >>  400 PUSH_EXC_INFO
+
+191         402 LOAD_GLOBAL             16 (Exception)
+            412 CHECK_EXC_MATCH
+            414 POP_JUMP_IF_FALSE       42 (to 500)
+            416 STORE_FAST               6 (e)
+
+192         418 LOAD_GLOBAL             19 (NULL + log)
+            428 LOAD_ATTR               20 (info)
+            448 LOAD_CONST               5 ('[post_media] không đọc được host của ')
+            450 LOAD_FAST                0 (project_id)
+            452 FORMAT_VALUE             0
+            454 LOAD_CONST               6 (' (')
+            456 LOAD_FAST                6 (e)
+            458 FORMAT_VALUE             0
+            460 LOAD_CONST               7 (') — bỏ qua ref.')
+            462 BUILD_STRING             5
+            464 CALL                     1
+            472 POP_TOP
+
+193         474 BUILD_LIST               0
+            476 BUILD_LIST               0
+            478 BUILD_TUPLE              2
+            480 SWAP                     2
+            482 POP_EXCEPT
+            484 LOAD_CONST               3 (None)
+            486 STORE_FAST               6 (e)
+            488 DELETE_FAST              6 (e)
+            490 RETURN_VALUE
+        >>  492 LOAD_CONST               3 (None)
+            494 STORE_FAST               6 (e)
+            496 DELETE_FAST              6 (e)
+            498 RERAISE                  1
+
+191     >>  500 RERAISE                  0
+        >>  502 COPY                     3
+            504 POP_EXCEPT
+            506 RERAISE                  1
+ExceptionTable:
+  16 to 34 -> 400 [0]
+  36 to 82 -> 376 [1] lasti
+  84 to 100 -> 400 [0]
+  104 to 258 -> 376 [1] lasti
+  260 to 274 -> 400 [0]
+  376 to 384 -> 394 [3] lasti
+  386 to 398 -> 400 [0]
+  400 to 416 -> 502 [1] lasti
+  418 to 478 -> 492 [1] lasti
+  480 to 480 -> 502 [1] lasti
+  492 to 500 -> 502 [1] lasti
+
+Disassembly of <code object _one_image at 0x28d88110, file "app\services\post_media_service.py", line 199>:
+199           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+211           6 LOAD_FAST                5 (prompt)
+              8 POP_JUMP_IF_TRUE         1 (to 12)
+
+212          10 RETURN_CONST             1 (None)
+
+213     >>   12 LOAD_FAST                9 (refs)
+             14 COPY                     1
+             16 POP_JUMP_IF_TRUE         2 (to 22)
+             18 POP_TOP
+             20 BUILD_LIST               0
+        >>   22 GET_ITER
+             24 LOAD_FAST_AND_CLEAR     12 (r)
+             26 SWAP                     2
+             28 BUILD_LIST               0
+             30 SWAP                     2
+        >>   32 FOR_ITER                 7 (to 50)
+             36 STORE_FAST              12 (r)
+             38 LOAD_FAST               12 (r)
+             40 POP_JUMP_IF_TRUE         1 (to 44)
+             42 JUMP_BACKWARD            6 (to 32)
+        >>   44 LOAD_FAST               12 (r)
+             46 LIST_APPEND              2
+             48 JUMP_BACKWARD            9 (to 32)
+        >>   50 END_FOR
+             52 SWAP                     2
+             54 STORE_FAST              12 (r)
+             56 COPY                     1
+             58 POP_JUMP_IF_TRUE         2 (to 64)
+             60 POP_TOP
+             62 LOAD_CONST               1 (None)
+        >>   64 STORE_FAST               9 (refs)
+
+214          66 LOAD_FAST                0 (provider)
+             68 LOAD_CONST               2 ('meta')
+             70 COMPARE_OP              40 (==)
+             74 POP_JUMP_IF_FALSE      157 (to 390)
+
+215          76 LOAD_GLOBAL              1 (NULL + MetaFailover)
+             86 LOAD_FAST                1 (project_id)
+             88 KW_NAMES                 3 (('project_key',))
+             90 CALL                     1
+             98 STORE_FAST              13 (fo)
+
+216         100 LOAD_FAST               13 (fo)
+            102 LOAD_ATTR                2 (exhausted_all)
+            122 EXTENDED_ARG             2
+            124 POP_JUMP_IF_TRUE       575 (to 1276)
+            126 LOAD_FAST               13 (fo)
+            128 LOAD_ATTR                4 (client)
+            148 LOAD_ATTR                6 (available)
+            168 EXTENDED_ARG             2
+            170 POP_JUMP_IF_FALSE      552 (to 1276)
+
+217         172 NOP
+
+218         174 LOAD_GLOBAL              9 (NULL + bool)
+            184 LOAD_FAST               13 (fo)
+            186 LOAD_ATTR                4 (client)
+            206 LOAD_ATTR               11 (NULL|self + get_status)
+            226 CALL                     0
+            234 GET_AWAITABLE            0
+            236 LOAD_CONST               1 (None)
+        >>  238 SEND                     3 (to 248)
+            242 YIELD_VALUE              3
+            244 RESUME                   3
+            246 JUMP_BACKWARD_NO_INTERRUPT     5 (to 238)
+        >>  248 END_SEND
+            250 LOAD_ATTR               13 (NULL|self + get)
+            270 LOAD_CONST               4 ('connected')
+            272 CALL                     1
+            280 CALL                     1
+            288 POP_JUMP_IF_FALSE       48 (to 386)
+
+219         290 LOAD_FAST                3 (out_dir)
+            292 LOAD_FAST                4 (stem)
+            294 FORMAT_VALUE             0
+            296 LOAD_CONST               5 ('.png')
+            298 BUILD_STRING             2
+            300 BINARY_OP               11 (/)
+            304 STORE_FAST              14 (out)
+
+220         306 LOAD_FAST               13 (fo)
+            308 LOAD_ATTR                4 (client)
+            328 LOAD_ATTR               15 (NULL|self + generate_image)
+            348 LOAD_FAST                5 (prompt)
+            350 LOAD_FAST               14 (out)
+            352 LOAD_FAST                6 (aspect)
+            354 KW_NAMES                 6 (('aspect',))
+            356 CALL                     3
+            364 GET_AWAITABLE            0
+            366 LOAD_CONST               1 (None)
+        >>  368 SEND                     3 (to 378)
+            372 YIELD_VALUE              3
+            374 RESUME                   3
+            376 JUMP_BACKWARD_NO_INTERRUPT     5 (to 368)
+        >>  378 END_SEND
+            380 POP_TOP
+
+221         382 LOAD_FAST               14 (out)
+            384 RETURN_VALUE
+
+218     >>  386 EXTENDED_ARG             1
+            388 JUMP_FORWARD           443 (to 1276)
+
+224     >>  390 LOAD_FAST                0 (provider)
+            392 LOAD_CONST              10 ('chatgpt')
+            394 COMPARE_OP              40 (==)
+            398 POP_JUMP_IF_FALSE       37 (to 474)
+
+226         400 NOP
+
+227         402 LOAD_GLOBAL             23 (NULL + _chatgpt_image_or_none)
+
+228         412 LOAD_FAST                5 (prompt)
+            414 LOAD_FAST                3 (out_dir)
+            416 LOAD_FAST                4 (stem)
+            418 FORMAT_VALUE             0
+            420 LOAD_CONST               5 ('.png')
+            422 BUILD_STRING             2
+            424 BINARY_OP               11 (/)
+            428 LOAD_FAST                6 (aspect)
+            430 LOAD_FAST                9 (refs)
+            432 LOAD_CONST              11 ('')
+
+227         434 KW_NAMES                12 (('prompt', 'out', 'aspect', 'refs', 'reason'))
+            436 CALL                     5
+            444 GET_AWAITABLE            0
+            446 LOAD_CONST               1 (None)
+        >>  448 SEND                     3 (to 458)
+            452 YIELD_VALUE              3
+            454 RESUME                   3
+            456 JUMP_BACKWARD_NO_INTERRUPT     5 (to 448)
+        >>  458 END_SEND
+            460 STORE_FAST              14 (out)
+
+230         462 LOAD_FAST               14 (out)
+            464 POP_JUMP_IF_FALSE        2 (to 470)
+
+231         466 LOAD_FAST               14 (out)
+            468 RETURN_VALUE
+
+230     >>  470 EXTENDED_ARG             1
+            472 JUMP_FORWARD           401 (to 1276)
+
+234     >>  474 LOAD_FAST                0 (provider)
+            476 LOAD_CONST              14 ('grok')
+            478 COMPARE_OP              40 (==)
+            482 POP_JUMP_IF_FALSE      136 (to 756)
+
+235         484 LOAD_GLOBAL             25 (NULL + Ima2Client)
+            494 CALL                     0
+            502 STORE_FAST              16 (client)
+
+236         504 NOP
+
+237         506 LOAD_FAST               16 (client)
+            508 LOAD_ATTR               27 (NULL|self + get_provider_status)
+            528 LOAD_CONST              14 ('grok')
+            530 CALL                     1
+            538 GET_AWAITABLE            0
+            540 LOAD_CONST               1 (None)
+        >>  542 SEND                     3 (to 552)
+            546 YIELD_VALUE              3
+            548 RESUME                   3
+            550 JUMP_BACKWARD_NO_INTERRUPT     5 (to 542)
+        >>  552 END_SEND
+            554 STORE_FAST              17 (status)
+
+238         556 LOAD_FAST               17 (status)
+            558 LOAD_ATTR               13 (NULL|self + get)
+            578 LOAD_CONST               4 ('connected')
+            580 CALL                     1
+            588 POP_JUMP_IF_FALSE       40 (to 670)
+
+239         590 LOAD_FAST                3 (out_dir)
+            592 LOAD_FAST                4 (stem)
+            594 FORMAT_VALUE             0
+            596 LOAD_CONST               5 ('.png')
+            598 BUILD_STRING             2
+            600 BINARY_OP               11 (/)
+            604 STORE_FAST              14 (out)
+
+240         606 LOAD_FAST               16 (client)
+            608 LOAD_ATTR               15 (NULL|self + generate_image)
+
+241         628 LOAD_FAST                5 (prompt)
+            630 LOAD_FAST               14 (out)
+            632 LOAD_FAST                6 (aspect)
+            634 LOAD_FAST                9 (refs)
+            636 LOAD_CONST              14 ('grok')
+
+240         638 KW_NAMES                15 (('aspect', 'references', 'provider'))
+            640 CALL                     5
+            648 GET_AWAITABLE            0
+            650 LOAD_CONST               1 (None)
+        >>  652 SEND                     3 (to 662)
+            656 YIELD_VALUE              3
+            658 RESUME                   3
+            660 JUMP_BACKWARD_NO_INTERRUPT     5 (to 652)
+        >>  662 END_SEND
+            664 POP_TOP
+
+242         666 LOAD_FAST               14 (out)
+            668 RETURN_VALUE
+
+243     >>  670 LOAD_GLOBAL             19 (NULL + log)
+            680 LOAD_ATTR               28 (warning)
+            700 LOAD_CONST              16 ('[post_media] Grok ima2 chưa sẵn sàng: ')
+            702 LOAD_FAST               17 (status)
+            704 LOAD_ATTR               13 (NULL|self + get)
+            724 LOAD_CONST              17 ('reason')
+            726 LOAD_CONST              18 ('unknown')
+            728 CALL                     2
+            736 FORMAT_VALUE             0
+            738 LOAD_CONST               9 ('.')
+            740 BUILD_STRING             3
+            742 CALL                     1
+            750 POP_TOP
+            752 EXTENDED_ARG             1
+            754 JUMP_FORWARD           260 (to 1276)
+
+246     >>  756 LOAD_FAST                0 (provider)
+            758 LOAD_CONST              20 ('flow')
+            760 COMPARE_OP              40 (==)
+            764 POP_JUMP_IF_FALSE      255 (to 1276)
+
+247         766 LOAD_GLOBAL             31 (NULL + FlowFailover)
+            776 LOAD_FAST                1 (project_id)
+            778 KW_NAMES                 3 (('project_key',))
+            780 CALL                     1
+            788 STORE_FAST              13 (fo)
+
+248         790 LOAD_CONST              21 (False)
+            792 STORE_FAST              18 (flow_ok)
+
+249         794 LOAD_FAST               13 (fo)
+            796 LOAD_ATTR                2 (exhausted_all)
+            816 POP_JUMP_IF_TRUE        81 (to 980)
+            818 LOAD_FAST               13 (fo)
+            820 LOAD_ATTR                4 (client)
+            840 LOAD_ATTR                6 (available)
+            860 POP_JUMP_IF_FALSE       59 (to 980)
+
+250         862 NOP
+
+251         864 LOAD_GLOBAL              9 (NULL + bool)
+            874 LOAD_FAST               13 (fo)
+            876 LOAD_ATTR                4 (client)
+            896 LOAD_ATTR               11 (NULL|self + get_status)
+            916 CALL                     0
+            924 GET_AWAITABLE            0
+            926 LOAD_CONST               1 (None)
+        >>  928 SEND                     3 (to 938)
+            932 YIELD_VALUE              3
+            934 RESUME                   3
+            936 JUMP_BACKWARD_NO_INTERRUPT     5 (to 928)
+        >>  938 END_SEND
+            940 LOAD_ATTR               13 (NULL|self + get)
+            960 LOAD_CONST               4 ('connected')
+            962 CALL                     1
+            970 CALL                     1
+            978 STORE_FAST              18 (flow_ok)
+
+254     >>  980 LOAD_FAST               18 (flow_ok)
+            982 POP_JUMP_IF_FALSE       46 (to 1076)
+            984 LOAD_FAST               13 (fo)
+            986 LOAD_ATTR               32 (multi)
+           1006 POP_JUMP_IF_FALSE       34 (to 1076)
+
+255        1008 LOAD_GLOBAL             19 (NULL + log)
+           1018 LOAD_ATTR               20 (info)
+           1038 LOAD_CONST              22 ('[post_media] dùng tài khoản Flow: ')
+           1040 LOAD_FAST               13 (fo)
+           1042 LOAD_ATTR               34 (label)
+           1062 FORMAT_VALUE             0
+           1064 BUILD_STRING             2
+           1066 CALL                     1
+           1074 POP_TOP
+
+256     >> 1076 LOAD_FAST               18 (flow_ok)
+           1078 POP_JUMP_IF_FALSE       98 (to 1276)
+           1080 LOAD_FAST               13 (fo)
+           1082 LOAD_ATTR                2 (exhausted_all)
+           1102 POP_JUMP_IF_TRUE        86 (to 1276)
+
+260        1104 LOAD_CONST              23 (0)
+           1106 LOAD_CONST              24 (('generate_flow_image',))
+           1108 IMPORT_NAME             18 (app.services.flow_image_service)
+           1110 IMPORT_FROM             19 (generate_flow_image)
+           1112 STORE_FAST              19 (generate_flow_image)
+           1114 POP_TOP
+
+261        1116 NOP
+
+263        1118 PUSH_NULL
+           1120 LOAD_FAST               19 (generate_flow_image)
+
+264        1122 LOAD_FAST               13 (fo)
+           1124 LOAD_FAST                5 (prompt)
+           1126 LOAD_FAST                3 (out_dir)
+           1128 LOAD_FAST                4 (stem)
+           1130 FORMAT_VALUE             0
+           1132 LOAD_CONST               5 ('.png')
+           1134 BUILD_STRING             2
+           1136 BINARY_OP               11 (/)
+           1140 LOAD_FAST                6 (aspect)
+           1142 LOAD_FAST                9 (refs)
+           1144 LOAD_FAST                4 (stem)
+
+265        1146 LOAD_FAST               11 (critical_identity)
+           1148 POP_JUMP_IF_FALSE        2 (to 1154)
+           1150 LOAD_CONST              25 (4)
+           1152 JUMP_FORWARD             1 (to 1156)
+        >> 1154 LOAD_CONST              26 (3)
+
+266     >> 1156 LOAD_FAST               11 (critical_identity)
+
+267        1158 LOAD_CONST              41 (('info',))
+           1160 LOAD_CONST              27 (<code object <lambda> at 0x7f6c922b6af0, file "app\services\post_media_service.py", line 267>)
+           1162 MAKE_FUNCTION            1 (defaults)
+
+263        1164 KW_NAMES                28 (('aspect', 'refs', 'label', 'tries', 'resubmit_lost', 'on_log'))
+           1166 CALL                     9
+           1174 GET_AWAITABLE            0
+           1176 LOAD_CONST               1 (None)
+        >> 1178 SEND                     3 (to 1188)
+           1182 YIELD_VALUE              3
+           1184 RESUME                   3
+           1186 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1178)
+        >> 1188 END_SEND
+           1190 STORE_FAST              20 (got)
+
+273        1192 LOAD_FAST               20 (got)
+           1194 POP_JUMP_IF_FALSE       38 (to 1272)
+           1196 LOAD_FAST               11 (critical_identity)
+           1198 POP_JUMP_IF_TRUE        36 (to 1272)
+
+274        1200 LOAD_CONST              23 (0)
+           1202 LOAD_CONST              29 (('zoom_crop_image',))
+           1204 IMPORT_NAME             20 (app.media.logo_zoom)
+           1206 IMPORT_FROM             21 (zoom_crop_image)
+           1208 STORE_FAST              21 (zoom_crop_image)
+           1210 POP_TOP
+
+276        1212 LOAD_GLOBAL             45 (NULL + asyncio)
+           1222 LOAD_ATTR               46 (to_thread)
+           1242 LOAD_FAST               21 (zoom_crop_image)
+           1244 LOAD_FAST               20 (got)
+           1246 CALL                     2
+           1254 GET_AWAITABLE            0
+           1256 LOAD_CONST               1 (None)
+        >> 1258 SEND                     3 (to 1268)
+           1262 YIELD_VALUE              3
+           1264 RESUME                   3
+           1266 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1258)
+        >> 1268 END_SEND
+           1270 POP_TOP
+
+277     >> 1272 LOAD_FAST               20 (got)
+           1274 RETURN_VALUE
+
+285     >> 1276 LOAD_FAST               10 (allow_placeholder)
+           1278 POP_JUMP_IF_TRUE        26 (to 1332)
+
+289        1280 LOAD_GLOBAL             19 (NULL + log)
+           1290 LOAD_ATTR               28 (warning)
+           1310 LOAD_CONST              35 ('[post_media] ')
+           1312 LOAD_FAST                4 (stem)
+           1314 FORMAT_VALUE             0
+           1316 LOAD_CONST              36 (': không tạo được ảnh thật → để trống (không dùng ảnh tạm).')
+           1318 BUILD_STRING             3
+           1320 CALL                     1
+           1328 POP_TOP
+
+290        1330 RETURN_CONST             1 (None)
+
+292     >> 1332 NOP
+
+293        1334 LOAD_FAST                3 (out_dir)
+           1336 LOAD_GLOBAL             53 (NULL + placeholder_stem)
+           1346 LOAD_FAST                4 (stem)
+           1348 CALL                     1
+           1356 FORMAT_VALUE             0
+           1358 LOAD_CONST               5 ('.png')
+           1360 BUILD_STRING             2
+           1362 BINARY_OP               11 (/)
+           1366 STORE_FAST              14 (out)
+
+294        1368 LOAD_GLOBAL             55 (NULL + aspect_to_dims)
+           1378 LOAD_FAST                6 (aspect)
+           1380 CALL                     1
+           1388 STORE_FAST              22 (dims)
+
+295        1390 LOAD_GLOBAL             57 (NULL + render_card)
+           1400 LOAD_FAST                2 (ffmpeg)
+           1402 LOAD_FAST               14 (out)
+           1404 LOAD_FAST                5 (prompt)
+           1406 LOAD_CONST               1 (None)
+           1408 LOAD_CONST              37 (300)
+           1410 BINARY_SLICE
+           1412 LOAD_FAST                7 (bg_hex)
+           1414 LOAD_FAST               22 (dims)
+           1416 LOAD_FAST                8 (have_font)
+           1418 LOAD_CONST              38 (40)
+           1420 KW_NAMES                39 (('font_size',))
+           1422 CALL                     7
+           1430 GET_AWAITABLE            0
+           1432 LOAD_CONST               1 (None)
+        >> 1434 SEND                     3 (to 1444)
+           1438 YIELD_VALUE              3
+           1440 RESUME                   3
+           1442 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1434)
+        >> 1444 END_SEND
+           1446 POP_TOP
+
+296        1448 LOAD_FAST               14 (out)
+           1450 RETURN_VALUE
+        >> 1452 SWAP                     2
+           1454 POP_TOP
+
+213        1456 SWAP                     2
+           1458 STORE_FAST              12 (r)
+           1460 RERAISE                  0
+
+218     >> 1462 CLEANUP_THROW
+           1464 EXTENDED_ARG             2
+           1466 JUMP_BACKWARD          610 (to 248)
+
+220     >> 1468 CLEANUP_THROW
+           1470 EXTENDED_ARG             2
+           1472 JUMP_BACKWARD          548 (to 378)
+        >> 1474 PUSH_EXC_INFO
+
+222        1476 LOAD_GLOBAL             16 (Exception)
+           1486 CHECK_EXC_MATCH
+           1488 POP_JUMP_IF_FALSE       38 (to 1566)
+           1490 STORE_FAST              15 (e)
+
+223        1492 LOAD_GLOBAL             19 (NULL + log)
+           1502 LOAD_ATTR               20 (info)
+           1522 LOAD_CONST               7 ('[post_media] Meta lỗi (')
+           1524 LOAD_FAST               15 (e)
+           1526 FORMAT_VALUE             0
+           1528 LOAD_CONST               8 (') → placeholder ')
+           1530 LOAD_FAST                4 (stem)
+           1532 FORMAT_VALUE             0
+           1534 LOAD_CONST               9 ('.')
+           1536 BUILD_STRING             5
+           1538 CALL                     1
+           1546 POP_TOP
+           1548 POP_EXCEPT
+           1550 LOAD_CONST               1 (None)
+           1552 STORE_FAST              15 (e)
+           1554 DELETE_FAST             15 (e)
+           1556 JUMP_BACKWARD          141 (to 1276)
+        >> 1558 LOAD_CONST               1 (None)
+           1560 STORE_FAST              15 (e)
+           1562 DELETE_FAST             15 (e)
+           1564 RERAISE                  1
+
+222     >> 1566 RERAISE                  0
+        >> 1568 COPY                     3
+           1570 POP_EXCEPT
+           1572 RERAISE                  1
+
+227     >> 1574 CLEANUP_THROW
+           1576 EXTENDED_ARG             2
+           1578 JUMP_BACKWARD          561 (to 458)
+        >> 1580 PUSH_EXC_INFO
+
+232        1582 LOAD_GLOBAL             16 (Exception)
+           1592 CHECK_EXC_MATCH
+           1594 POP_JUMP_IF_FALSE       38 (to 1672)
+           1596 STORE_FAST              15 (e)
+
+233        1598 LOAD_GLOBAL             19 (NULL + log)
+           1608 LOAD_ATTR               20 (info)
+           1628 LOAD_CONST              13 ('[post_media] GPT Image API lỗi (')
+           1630 LOAD_FAST               15 (e)
+           1632 FORMAT_VALUE             0
+           1634 LOAD_CONST               8 (') → placeholder ')
+           1636 LOAD_FAST                4 (stem)
+           1638 FORMAT_VALUE             0
+           1640 LOAD_CONST               9 ('.')
+           1642 BUILD_STRING             5
+           1644 CALL                     1
+           1652 POP_TOP
+           1654 POP_EXCEPT
+           1656 LOAD_CONST               1 (None)
+           1658 STORE_FAST              15 (e)
+           1660 DELETE_FAST             15 (e)
+           1662 JUMP_BACKWARD          194 (to 1276)
+        >> 1664 LOAD_CONST               1 (None)
+           1666 STORE_FAST              15 (e)
+           1668 DELETE_FAST             15 (e)
+           1670 RERAISE                  1
+
+232     >> 1672 RERAISE                  0
+        >> 1674 COPY                     3
+           1676 POP_EXCEPT
+           1678 RERAISE                  1
+
+237     >> 1680 CLEANUP_THROW
+           1682 EXTENDED_ARG             2
+           1684 JUMP_BACKWARD          567 (to 552)
+
+240     >> 1686 CLEANUP_THROW
+           1688 EXTENDED_ARG             2
+           1690 JUMP_BACKWARD          515 (to 662)
+        >> 1692 PUSH_EXC_INFO
+
+244        1694 LOAD_GLOBAL             16 (Exception)
+           1704 CHECK_EXC_MATCH
+           1706 POP_JUMP_IF_FALSE       38 (to 1784)
+           1708 STORE_FAST              15 (e)
+
+245        1710 LOAD_GLOBAL             19 (NULL + log)
+           1720 LOAD_ATTR               20 (info)
+           1740 LOAD_CONST              19 ('[post_media] Grok ima2 lỗi (')
+           1742 LOAD_FAST               15 (e)
+           1744 FORMAT_VALUE             0
+           1746 LOAD_CONST               8 (') → placeholder ')
+           1748 LOAD_FAST                4 (stem)
+           1750 FORMAT_VALUE             0
+           1752 LOAD_CONST               9 ('.')
+           1754 BUILD_STRING             5
+           1756 CALL                     1
+           1764 POP_TOP
+           1766 POP_EXCEPT
+           1768 LOAD_CONST               1 (None)
+           1770 STORE_FAST              15 (e)
+           1772 DELETE_FAST             15 (e)
+           1774 JUMP_BACKWARD          250 (to 1276)
+        >> 1776 LOAD_CONST               1 (None)
+           1778 STORE_FAST              15 (e)
+           1780 DELETE_FAST             15 (e)
+           1782 RERAISE                  1
+
+244     >> 1784 RERAISE                  0
+        >> 1786 COPY                     3
+           1788 POP_EXCEPT
+           1790 RERAISE                  1
+
+251     >> 1792 CLEANUP_THROW
+           1794 EXTENDED_ARG             1
+           1796 JUMP_BACKWARD          430 (to 938)
+        >> 1798 PUSH_EXC_INFO
+
+252        1800 LOAD_GLOBAL             16 (Exception)
+           1810 CHECK_EXC_MATCH
+           1812 POP_JUMP_IF_FALSE        6 (to 1826)
+           1814 POP_TOP
+
+253        1816 LOAD_CONST              21 (False)
+           1818 STORE_FAST              18 (flow_ok)
+           1820 POP_EXCEPT
+           1822 EXTENDED_ARG             1
+           1824 JUMP_BACKWARD          423 (to 980)
+
+252     >> 1826 RERAISE                  0
+        >> 1828 COPY                     3
+           1830 POP_EXCEPT
+           1832 RERAISE                  1
+
+263     >> 1834 CLEANUP_THROW
+           1836 EXTENDED_ARG             1
+           1838 JUMP_BACKWARD          326 (to 1188)
+
+276     >> 1840 CLEANUP_THROW
+           1842 EXTENDED_ARG             1
+           1844 JUMP_BACKWARD          289 (to 1268)
+        >> 1846 PUSH_EXC_INFO
+
+278        1848 LOAD_GLOBAL             48 (StudioError)
+           1858 CHECK_EXC_MATCH
+           1860 POP_JUMP_IF_FALSE       49 (to 1960)
+           1862 STORE_FAST              15 (e)
+
+279        1864 LOAD_GLOBAL             19 (NULL + log)
+           1874 LOAD_ATTR               28 (warning)
+           1894 LOAD_CONST              30 ('[post_media] Flow không tạo được ảnh ')
+           1896 LOAD_FAST                4 (stem)
+           1898 FORMAT_VALUE             0
+           1900 LOAD_CONST              31 (' (')
+           1902 LOAD_FAST               15 (e)
+           1904 LOAD_ATTR               50 (code)
+           1924 FORMAT_VALUE             0
+           1926 LOAD_CONST              32 (').')
+           1928 BUILD_STRING             5
+           1930 CALL                     1
+           1938 POP_TOP
+           1940 POP_EXCEPT
+           1942 LOAD_CONST               1 (None)
+           1944 STORE_FAST              15 (e)
+           1946 DELETE_FAST             15 (e)
+           1948 EXTENDED_ARG             1
+           1950 JUMP_BACKWARD          338 (to 1276)
+        >> 1952 LOAD_CONST               1 (None)
+           1954 STORE_FAST              15 (e)
+           1956 DELETE_FAST             15 (e)
+           1958 RERAISE                  1
+
+280     >> 1960 LOAD_GLOBAL             16 (Exception)
+           1970 CHECK_EXC_MATCH
+           1972 POP_JUMP_IF_FALSE       38 (to 2050)
+           1974 STORE_FAST              15 (e)
+
+281        1976 LOAD_GLOBAL             19 (NULL + log)
+           1986 LOAD_ATTR               28 (warning)
+           2006 LOAD_CONST              33 ('[post_media] Flow lỗi khi tạo ảnh ')
+           2008 LOAD_FAST                4 (stem)
+           2010 FORMAT_VALUE             0
+           2012 LOAD_CONST              34 (': ')
+           2014 LOAD_FAST               15 (e)
+           2016 FORMAT_VALUE             0
+           2018 BUILD_STRING             4
+           2020 CALL                     1
+           2028 POP_TOP
+           2030 POP_EXCEPT
+           2032 LOAD_CONST               1 (None)
+           2034 STORE_FAST              15 (e)
+           2036 DELETE_FAST             15 (e)
+           2038 EXTENDED_ARG             1
+           2040 JUMP_BACKWARD          383 (to 1276)
+        >> 2042 LOAD_CONST               1 (None)
+           2044 STORE_FAST              15 (e)
+           2046 DELETE_FAST             15 (e)
+           2048 RERAISE                  1
+
+280     >> 2050 RERAISE                  0
+        >> 2052 COPY                     3
+           2054 POP_EXCEPT
+           2056 RERAISE                  1
+
+295     >> 2058 CLEANUP_THROW
+           2060 EXTENDED_ARG             1
+           2062 JUMP_BACKWARD          310 (to 1444)
+        >> 2064 PUSH_EXC_INFO
+
+297        2066 LOAD_GLOBAL             16 (Exception)
+           2076 CHECK_EXC_MATCH
+           2078 POP_JUMP_IF_FALSE       37 (to 2154)
+           2080 STORE_FAST              15 (e)
+
+298        2082 LOAD_GLOBAL             19 (NULL + log)
+           2092 LOAD_ATTR               20 (info)
+           2112 LOAD_CONST              40 ('[post_media] placeholder lỗi ')
+           2114 LOAD_FAST                4 (stem)
+           2116 FORMAT_VALUE             0
+           2118 LOAD_CONST              34 (': ')
+           2120 LOAD_FAST               15 (e)
+           2122 FORMAT_VALUE             0
+           2124 BUILD_STRING             4
+           2126 CALL                     1
+           2134 POP_TOP
+
+299        2136 POP_EXCEPT
+           2138 LOAD_CONST               1 (None)
+           2140 STORE_FAST              15 (e)
+           2142 DELETE_FAST             15 (e)
+           2144 RETURN_CONST             1 (None)
+        >> 2146 LOAD_CONST               1 (None)
+           2148 STORE_FAST              15 (e)
+           2150 DELETE_FAST             15 (e)
+           2152 RERAISE                  1
+
+297     >> 2154 RERAISE                  0
+        >> 2156 COPY                     3
+           2158 POP_EXCEPT
+           2160 RERAISE                  1
+        >> 2162 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           2164 RERAISE                  1
+ExceptionTable:
+  4 to 26 -> 2162 [0] lasti
+  28 to 40 -> 1452 [2]
+  44 to 50 -> 1452 [2]
+  52 to 170 -> 2162 [0] lasti
+  174 to 240 -> 1474 [0]
+  242 to 242 -> 1462 [4]
+  244 to 370 -> 1474 [0]
+  372 to 372 -> 1468 [2]
+  374 to 382 -> 1474 [0]
+  384 to 398 -> 2162 [0] lasti
+  402 to 450 -> 1580 [0]
+  452 to 452 -> 1574 [2]
+  454 to 466 -> 1580 [0]
+  468 to 502 -> 2162 [0] lasti
+  506 to 544 -> 1692 [0]
+  546 to 546 -> 1680 [2]
+  548 to 654 -> 1692 [0]
+  656 to 656 -> 1686 [2]
+  658 to 666 -> 1692 [0]
+  668 to 668 -> 2162 [0] lasti
+  670 to 750 -> 1692 [0]
+  752 to 860 -> 2162 [0] lasti
+  864 to 930 -> 1798 [0]
+  932 to 932 -> 1792 [4]
+  934 to 978 -> 1798 [0]
+  980 to 1114 -> 2162 [0] lasti
+  1118 to 1180 -> 1846 [0]
+  1182 to 1182 -> 1834 [2]
+  1184 to 1260 -> 1846 [0]
+  1262 to 1262 -> 1840 [2]
+  1264 to 1272 -> 1846 [0]
+  1274 to 1330 -> 2162 [0] lasti
+  1334 to 1436 -> 2064 [0]
+  1438 to 1438 -> 2058 [2]
+  1440 to 1448 -> 2064 [0]
+  1450 to 1460 -> 2162 [0] lasti
+  1462 to 1462 -> 1474 [0]
+  1468 to 1468 -> 1474 [0]
+  1474 to 1490 -> 1568 [1] lasti
+  1492 to 1546 -> 1558 [1] lasti
+  1548 to 1556 -> 2162 [0] lasti
+  1558 to 1566 -> 1568 [1] lasti
+  1568 to 1572 -> 2162 [0] lasti
+  1574 to 1574 -> 1580 [0]
+  1580 to 1596 -> 1674 [1] lasti
+  1598 to 1652 -> 1664 [1] lasti
+  1654 to 1662 -> 2162 [0] lasti
+  1664 to 1672 -> 1674 [1] lasti
+  1674 to 1678 -> 2162 [0] lasti
+  1680 to 1680 -> 1692 [0]
+  1686 to 1686 -> 1692 [0]
+  1692 to 1708 -> 1786 [1] lasti
+  1710 to 1764 -> 1776 [1] lasti
+  1766 to 1774 -> 2162 [0] lasti
+  1776 to 1784 -> 1786 [1] lasti
+  1786 to 1790 -> 2162 [0] lasti
+  1792 to 1792 -> 1798 [0]
+  1798 to 1818 -> 1828 [1] lasti
+  1820 to 1824 -> 2162 [0] lasti
+  1826 to 1826 -> 1828 [1] lasti
+  1828 to 1832 -> 2162 [0] lasti
+  1834 to 1834 -> 1846 [0]
+  1840 to 1840 -> 1846 [0]
+  1846 to 1862 -> 2052 [1] lasti
+  1864 to 1938 -> 1952 [1] lasti
+  1940 to 1950 -> 2162 [0] lasti
+  1952 to 1974 -> 2052 [1] lasti
+  1976 to 2028 -> 2042 [1] lasti
+  2030 to 2040 -> 2162 [0] lasti
+  2042 to 2050 -> 2052 [1] lasti
+  2052 to 2056 -> 2162 [0] lasti
+  2058 to 2058 -> 2064 [0]
+  2064 to 2080 -> 2156 [1] lasti
+  2082 to 2134 -> 2146 [1] lasti
+  2136 to 2144 -> 2162 [0] lasti
+  2146 to 2154 -> 2156 [1] lasti
+  2156 to 2160 -> 2162 [0] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c922b6af0, file "app\services\post_media_service.py", line 267>:
+267           0 RESUME                   0
+
+268           2 PUSH_NULL
+              4 LOAD_FAST                1 (level)
+              6 LOAD_CONST               1 (('warn', 'error'))
+              8 CONTAINS_OP              0
+             10 POP_JUMP_IF_FALSE       16 (to 44)
+             12 LOAD_GLOBAL              0 (log)
+             22 LOAD_ATTR                2 (warning)
+             42 JUMP_FORWARD            15 (to 74)
+        >>   44 LOAD_GLOBAL              0 (log)
+             54 LOAD_ATTR                4 (info)
+        >>   74 LOAD_CONST               2 ('[post_media] ')
+             76 LOAD_FAST                0 (msg)
+             78 FORMAT_VALUE             0
+             80 BUILD_STRING             2
+
+267          82 CALL                     1
+             90 RETURN_VALUE
+
+Disassembly of <code object _loads at 0x7f6c92218290, file "app\services\post_media_service.py", line 302>:
+302           0 RESUME                   0
+
+303           2 LOAD_FAST                0 (blob)
+              4 POP_JUMP_IF_TRUE         2 (to 10)
+
+304           6 LOAD_FAST                1 (default)
+              8 RETURN_VALUE
+
+305     >>   10 NOP
+
+306          12 LOAD_GLOBAL              1 (NULL + json)
+             22 LOAD_ATTR                2 (loads)
+             42 LOAD_FAST                0 (blob)
+             44 CALL                     1
+             52 RETURN_VALUE
+        >>   54 PUSH_EXC_INFO
+
+307          56 LOAD_GLOBAL              0 (json)
+             66 LOAD_ATTR                4 (JSONDecodeError)
+             86 CHECK_EXC_MATCH
+             88 POP_JUMP_IF_FALSE        5 (to 100)
+             90 POP_TOP
+
+308          92 LOAD_FAST                1 (default)
+             94 SWAP                     2
+             96 POP_EXCEPT
+             98 RETURN_VALUE
+
+307     >>  100 RERAISE                  0
+        >>  102 COPY                     3
+            104 POP_EXCEPT
+            106 RERAISE                  1
+ExceptionTable:
+  12 to 50 -> 54 [0]
+  54 to 94 -> 102 [1] lasti
+  100 to 100 -> 102 [1] lasti
+
+Disassembly of <code object _asset_label at 0x7f6c92050450, file "app\services\post_media_service.py", line 311>:
+311           0 RESUME                   0
+
+313           2 LOAD_FAST                1 (provider)
+              4 FORMAT_VALUE             0
+              6 LOAD_CONST               1 (':')
+              8 LOAD_FAST                2 (post_id)
+             10 FORMAT_VALUE             0
+             12 LOAD_CONST               1 (':')
+             14 LOAD_FAST                3 (index)
+             16 FORMAT_VALUE             0
+             18 LOAD_CONST               1 (':')
+             20 LOAD_FAST                4 (slot)
+             22 FORMAT_VALUE             0
+             24 LOAD_CONST               1 (':')
+             26 LOAD_FAST                5 (prompt)
+             28 FORMAT_VALUE             0
+             30 BUILD_STRING             9
+             32 LOAD_ATTR                1 (NULL|self + encode)
+             52 LOAD_CONST               2 ('utf-8')
+             54 LOAD_CONST               3 ('ignore')
+             56 CALL                     2
+             64 STORE_FAST               7 (raw)
+
+315          66 LOAD_FAST                0 (path)
+
+316          68 LOAD_FAST                5 (prompt)
+
+317          70 LOAD_FAST                1 (provider)
+
+318          72 LOAD_FAST                6 (status)
+
+319          74 LOAD_FAST                2 (post_id)
+
+320          76 LOAD_FAST                3 (index)
+
+321          78 LOAD_FAST                4 (slot)
+
+322          80 LOAD_GLOBAL              3 (NULL + hashlib)
+             90 LOAD_ATTR                4 (sha256)
+            110 LOAD_FAST                7 (raw)
+            112 CALL                     1
+            120 LOAD_ATTR                7 (NULL|self + hexdigest)
+            140 CALL                     0
+            148 LOAD_CONST               0 (None)
+            150 LOAD_CONST               4 (16)
+            152 BINARY_SLICE
+
+314         154 LOAD_CONST               5 (('path', 'prompt', 'provider', 'status', 'post_id', 'index', 'slot', 'request_id'))
+            156 BUILD_CONST_KEY_MAP      8
+            158 RETURN_VALUE

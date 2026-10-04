@@ -1,0 +1,1574 @@
+  0           0 RESUME                   0
+
+  1           2 SETUP_ANNOTATIONS
+              4 LOAD_CONST               0 ('OmniVoice (k2-fsa/OmniVoice, Apache-2.0) — engine local, chạy qua WORKER THƯỜNG TRÚ tách process.\n\nMột model duy nhất làm 3 việc: clone giọng zero-shot (ref_audio), voice design (instruct theo\nthuộc tính), TTS đa ngữ cross-lingual (600+ ngôn ngữ, output 24kHz).\n\nQUAN TRỌNG — vì sao tách process (xem app/workers/omnivoice_proc.py): OmniVoice cần PyTorch 2.8\n(cài riêng ở resources/omnivoice). Backend chính thường đã nạp torch khác (whisper/kokoro/openvoice)\n→ import torch 2.8 CHUNG process gây xung đột/native-crash. Vì vậy chạy ở process con.\n\nTỐI ƯU TỐC ĐỘ: worker chạy ở chế độ `--serve` THƯỜNG TRÚ — nạp model 1 LẦN rồi phục vụ nhiều câu\nqua stdin/stdout (JSON theo dòng). Trước đây mỗi câu spawn + nạp lại model (rất chậm trên CPU).\nEngine quản lý 1 worker dùng chung, threading.Lock tuần tự hoá request; tự khởi động lại nếu worker chết.\n')
+              6 STORE_NAME               0 (__doc__)
+
+ 14           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('annotations',))
+             12 IMPORT_NAME              1 (__future__)
+             14 IMPORT_FROM              2 (annotations)
+             16 STORE_NAME               2 (annotations)
+             18 POP_TOP
+
+ 16          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               3 (None)
+             24 IMPORT_NAME              3 (atexit)
+             26 STORE_NAME               3 (atexit)
+
+ 17          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               3 (None)
+             32 IMPORT_NAME              4 (json)
+             34 STORE_NAME               4 (json)
+
+ 18          36 LOAD_CONST               1 (0)
+             38 LOAD_CONST               3 (None)
+             40 IMPORT_NAME              5 (os)
+             42 STORE_NAME               5 (os)
+
+ 19          44 LOAD_CONST               1 (0)
+             46 LOAD_CONST               3 (None)
+             48 IMPORT_NAME              6 (queue)
+             50 STORE_NAME               6 (queue)
+
+ 20          52 LOAD_CONST               1 (0)
+             54 LOAD_CONST               3 (None)
+             56 IMPORT_NAME              7 (subprocess)
+             58 STORE_NAME               7 (subprocess)
+
+ 21          60 LOAD_CONST               1 (0)
+             62 LOAD_CONST               3 (None)
+             64 IMPORT_NAME              8 (sys)
+             66 STORE_NAME               8 (sys)
+
+ 22          68 LOAD_CONST               1 (0)
+             70 LOAD_CONST               3 (None)
+             72 IMPORT_NAME              9 (threading)
+             74 STORE_NAME               9 (threading)
+
+ 23          76 LOAD_CONST               1 (0)
+             78 LOAD_CONST               3 (None)
+             80 IMPORT_NAME             10 (time)
+             82 STORE_NAME              10 (time)
+
+ 24          84 LOAD_CONST               1 (0)
+             86 LOAD_CONST               4 (('Path',))
+             88 IMPORT_NAME             11 (pathlib)
+             90 IMPORT_FROM             12 (Path)
+             92 STORE_NAME              12 (Path)
+             94 POP_TOP
+
+ 26          96 LOAD_CONST               1 (0)
+             98 LOAD_CONST               5 (('log',))
+            100 IMPORT_NAME             13 (app.core.logging)
+            102 IMPORT_FROM             14 (log)
+            104 STORE_NAME              14 (log)
+            106 POP_TOP
+
+ 27         108 LOAD_CONST               1 (0)
+            110 LOAD_CONST               6 (('make_error', 'E'))
+            112 IMPORT_NAME             15 (app.core.errors)
+            114 IMPORT_FROM             16 (make_error)
+            116 STORE_NAME              16 (make_error)
+            118 IMPORT_FROM             17 (E)
+            120 STORE_NAME              17 (E)
+            122 POP_TOP
+
+ 28         124 LOAD_CONST               1 (0)
+            126 LOAD_CONST               7 (('no_window_kwargs',))
+            128 IMPORT_NAME             18 (app.core.proc)
+            130 IMPORT_FROM             19 (no_window_kwargs)
+            132 STORE_NAME              19 (no_window_kwargs)
+            134 POP_TOP
+
+ 30         136 LOAD_CONST               8 (24000)
+            138 STORE_NAME              20 (OUTPUT_SR)
+
+ 34         140 LOAD_CONST              31 (('return', 'Path'))
+            142 LOAD_CONST               9 (<code object omnivoice_root at 0x7f6c929b6bf0, file "app\adapters\tts\omnivoice_engine.py", line 34>)
+            144 MAKE_FUNCTION            4 (annotations)
+            146 STORE_NAME              21 (omnivoice_root)
+
+ 42         148 LOAD_CONST              31 (('return', 'Path'))
+            150 LOAD_CONST              10 (<code object model_dir at 0x7f6c929b6410, file "app\adapters\tts\omnivoice_engine.py", line 42>)
+            152 MAKE_FUNCTION            4 (annotations)
+            154 STORE_NAME              22 (model_dir)
+
+ 47         156 LOAD_CONST              32 (('return', 'bool'))
+            158 LOAD_CONST              11 (<code object is_ready at 0x7f6c933da8b0, file "app\adapters\tts\omnivoice_engine.py", line 47>)
+            160 MAKE_FUNCTION            4 (annotations)
+            162 STORE_NAME              23 (is_ready)
+
+ 56         164 LOAD_CONST              33 (('worker_args', 'list[str]', 'return', 'tuple[list[str], str]'))
+            166 LOAD_CONST              12 (<code object _worker_cmd at 0x7f6c92eb9630, file "app\adapters\tts\omnivoice_engine.py", line 56>)
+            168 MAKE_FUNCTION            4 (annotations)
+            170 STORE_NAME              24 (_worker_cmd)
+
+ 66         172 PUSH_NULL
+            174 LOAD_NAME                9 (threading)
+            176 LOAD_ATTR               50 (Lock)
+            196 CALL                     0
+            204 STORE_NAME              26 (_LOCK)
+
+ 67         206 LOAD_CONST               3 (None)
+            208 STORE_GLOBAL            27 (_PROC)
+            210 LOAD_CONST              13 ('subprocess.Popen | None')
+            212 LOAD_NAME               28 (__annotations__)
+            214 LOAD_CONST              14 ('_PROC')
+            216 STORE_SUBSCR
+
+ 68         220 LOAD_CONST               3 (None)
+            222 STORE_GLOBAL            29 (_OUT_Q)
+            224 LOAD_CONST              15 ("'queue.Queue | None'")
+            226 LOAD_NAME               28 (__annotations__)
+            228 LOAD_CONST              16 ('_OUT_Q')
+            230 STORE_SUBSCR
+
+ 69         234 LOAD_CONST               1 (0)
+            236 STORE_GLOBAL            30 (_REQ_ID)
+
+ 72         238 LOAD_CONST              17 (False)
+            240 STORE_GLOBAL            31 (_WARMED)
+
+ 73         242 LOAD_CONST              18 (1800)
+            244 STORE_NAME              32 (_LOAD_TIMEOUT)
+
+ 76         246 BUILD_MAP                0
+            248 STORE_GLOBAL            33 (_ACCEL)
+            250 LOAD_CONST              19 ('dict')
+            252 LOAD_NAME               28 (__annotations__)
+            254 LOAD_CONST              20 ('_ACCEL')
+            256 STORE_SUBSCR
+
+ 79         260 LOAD_CONST              34 (('return', 'dict'))
+            262 LOAD_CONST              21 (<code object last_accel at 0x7f6c929b57d0, file "app\adapters\tts\omnivoice_engine.py", line 79>)
+            264 MAKE_FUNCTION            4 (annotations)
+            266 STORE_NAME              34 (last_accel)
+
+ 84         268 LOAD_CONST              22 (<code object _spawn at 0x269ea4b0, file "app\adapters\tts\omnivoice_engine.py", line 84>)
+            270 MAKE_FUNCTION            0
+            272 STORE_NAME              35 (_spawn)
+
+121         274 LOAD_CONST              35 (('return', 'None'))
+            276 LOAD_CONST              23 (<code object _kill at 0x26a0a550, file "app\adapters\tts\omnivoice_engine.py", line 121>)
+            278 MAKE_FUNCTION            4 (annotations)
+            280 STORE_NAME              36 (_kill)
+
+152         282 LOAD_CONST              24 (<code object _ensure at 0x7f6c9324b800, file "app\adapters\tts\omnivoice_engine.py", line 152>)
+            284 MAKE_FUNCTION            0
+            286 STORE_NAME              37 (_ensure)
+
+159         288 PUSH_NULL
+            290 LOAD_NAME                3 (atexit)
+            292 LOAD_ATTR               76 (register)
+            312 LOAD_NAME               36 (_kill)
+            314 CALL                     1
+            322 POP_TOP
+
+162         324 LOAD_CONST              35 (('return', 'None'))
+            326 LOAD_CONST              25 (<code object shutdown at 0x7f6c92a3a010, file "app\adapters\tts\omnivoice_engine.py", line 162>)
+            328 MAKE_FUNCTION            4 (annotations)
+            330 STORE_NAME              39 (shutdown)
+
+168         332 LOAD_CONST              36 ((1800,))
+            334 LOAD_CONST              37 (('timeout', 'int', 'return', 'bool'))
+            336 LOAD_CONST              26 (<code object warmup at 0x269eb8b0, file "app\adapters\tts\omnivoice_engine.py", line 168>)
+            338 MAKE_FUNCTION            5 (defaults, annotations)
+            340 STORE_NAME              40 (warmup)
+
+224         342 LOAD_CONST               3 (None)
+
+225         344 LOAD_CONST               3 (None)
+
+226         346 LOAD_CONST               3 (None)
+
+227         348 LOAD_CONST               3 (None)
+
+228         350 LOAD_CONST              27 (1.0)
+
+229         352 LOAD_CONST               3 (None)
+
+230         354 LOAD_CONST               3 (None)
+
+231         356 LOAD_CONST               3 (None)
+
+232         358 LOAD_CONST              17 (False)
+
+233         360 LOAD_CONST               3 (None)
+
+234         362 LOAD_CONST               3 (None)
+
+235         364 LOAD_CONST               3 (None)
+
+236         366 LOAD_CONST              28 (900)
+
+220         368 LOAD_CONST              29 (('ref_audio', 'ref_text', 'instruct', 'lang', 'speed', 'num_step', 'guidance_scale', 'seed', 'normalize_text', 'duration', 'pad_duration', 'fade_duration', 'timeout'))
+            370 BUILD_CONST_KEY_MAP     13
+
+221         372 NOP
+
+220         374 NOP
+
+223         376 NOP
+
+220         378 NOP
+
+224         380 NOP
+
+220         382 NOP
+
+225         384 NOP
+
+220         386 NOP
+
+226         388 NOP
+
+220         390 NOP
+
+227         392 NOP
+
+220         394 NOP
+
+228         396 NOP
+
+220         398 NOP
+
+229         400 NOP
+
+220         402 NOP
+
+230         404 NOP
+
+220         406 NOP
+
+231         408 NOP
+
+220         410 NOP
+
+232         412 NOP
+
+220         414 NOP
+
+233         416 NOP
+
+220         418 NOP
+
+234         420 NOP
+
+220         422 NOP
+
+235         424 NOP
+
+220         426 NOP
+
+236         428 NOP
+
+220         430 NOP
+
+237         432 NOP
+
+220         434 LOAD_CONST              38 (('out_wav', 'str', 'text', 'str', 'ref_audio', 'str | None', 'ref_text', 'str | None', 'instruct', 'str | None', 'lang', 'str | None', 'speed', 'float', 'num_step', 'int | None', 'guidance_scale', 'float | None', 'seed', 'int | None', 'normalize_text', 'bool', 'duration', 'float | None', 'pad_duration', 'float | None', 'fade_duration', 'float | None', 'timeout', 'int', 'return', 'dict'))
+            436 LOAD_CONST              30 (<code object synthesize_to_file at 0x26a17c50, file "app\adapters\tts\omnivoice_engine.py", line 220>)
+            438 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            440 STORE_NAME              41 (synthesize_to_file)
+            442 RETURN_CONST             3 (None)
+
+Disassembly of <code object omnivoice_root at 0x7f6c929b6bf0, file "app\adapters\tts\omnivoice_engine.py", line 34>:
+ 34           0 RESUME                   0
+
+ 38           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('omnivoice_runtime_path',))
+              6 IMPORT_NAME              0 (app.config)
+              8 IMPORT_FROM              1 (omnivoice_runtime_path)
+             10 STORE_FAST               0 (omnivoice_runtime_path)
+             12 POP_TOP
+
+ 39          14 PUSH_NULL
+             16 LOAD_FAST                0 (omnivoice_runtime_path)
+             18 CALL                     0
+             26 RETURN_VALUE
+
+Disassembly of <code object model_dir at 0x7f6c929b6410, file "app\adapters\tts\omnivoice_engine.py", line 42>:
+ 42           0 RESUME                   0
+
+ 44           2 LOAD_GLOBAL              1 (NULL + omnivoice_root)
+             12 CALL                     0
+             20 LOAD_CONST               1 ('model')
+             22 BINARY_OP               11 (/)
+             26 RETURN_VALUE
+
+Disassembly of <code object is_ready at 0x7f6c933da8b0, file "app\adapters\tts\omnivoice_engine.py", line 47>:
+ 47           0 RESUME                   0
+
+ 49           2 LOAD_GLOBAL              1 (NULL + omnivoice_root)
+             12 CALL                     0
+             20 STORE_FAST               0 (root)
+
+ 50          22 LOAD_FAST                0 (root)
+             24 LOAD_CONST               1 ('omnivoice')
+             26 BINARY_OP               11 (/)
+             30 LOAD_ATTR                3 (NULL|self + exists)
+             50 CALL                     0
+             58 STORE_FAST               1 (has_pkg)
+
+ 51          60 LOAD_GLOBAL              5 (NULL + model_dir)
+             70 CALL                     0
+             78 STORE_FAST               2 (md)
+
+ 52          80 LOAD_FAST                2 (md)
+             82 LOAD_ATTR                3 (NULL|self + exists)
+            102 CALL                     0
+            110 COPY                     1
+            112 POP_JUMP_IF_FALSE       54 (to 222)
+            114 POP_TOP
+            116 LOAD_GLOBAL              7 (NULL + any)
+            126 LOAD_FAST                2 (md)
+            128 LOAD_ATTR                9 (NULL|self + glob)
+            148 LOAD_CONST               2 ('*.safetensors')
+            150 CALL                     1
+            158 CALL                     1
+            166 COPY                     1
+            168 POP_JUMP_IF_TRUE        26 (to 222)
+            170 POP_TOP
+            172 LOAD_GLOBAL              7 (NULL + any)
+            182 LOAD_FAST                2 (md)
+            184 LOAD_ATTR                9 (NULL|self + glob)
+            204 LOAD_CONST               3 ('*.bin')
+            206 CALL                     1
+            214 CALL                     1
+        >>  222 STORE_FAST               3 (has_model)
+
+ 53         224 LOAD_FAST                1 (has_pkg)
+            226 COPY                     1
+            228 POP_JUMP_IF_FALSE        2 (to 234)
+            230 POP_TOP
+            232 LOAD_FAST                3 (has_model)
+        >>  234 RETURN_VALUE
+
+Disassembly of <code object _worker_cmd at 0x7f6c92eb9630, file "app\adapters\tts\omnivoice_engine.py", line 56>:
+ 56           0 RESUME                   0
+
+ 58           2 LOAD_GLOBAL              1 (NULL + getattr)
+             12 LOAD_GLOBAL              2 (sys)
+             22 LOAD_CONST               1 ('frozen')
+             24 LOAD_CONST               2 (False)
+             26 CALL                     3
+             34 POP_JUMP_IF_FALSE       64 (to 164)
+
+ 60          36 LOAD_GLOBAL              2 (sys)
+             46 LOAD_ATTR                4 (executable)
+             66 LOAD_CONST               3 ('omnivoice-worker')
+             68 BUILD_LIST               2
+             70 LOAD_FAST                0 (worker_args)
+             72 LIST_EXTEND              1
+             74 LOAD_GLOBAL              7 (NULL + str)
+             84 LOAD_GLOBAL              9 (NULL + Path)
+             94 LOAD_GLOBAL              2 (sys)
+            104 LOAD_ATTR                4 (executable)
+            124 CALL                     1
+            132 LOAD_ATTR               10 (parent)
+            152 CALL                     1
+            160 BUILD_TUPLE              2
+            162 RETURN_VALUE
+
+ 61     >>  164 LOAD_GLOBAL              2 (sys)
+            174 LOAD_ATTR                4 (executable)
+            194 LOAD_CONST               4 ('-u')
+            196 LOAD_CONST               5 ('-m')
+            198 LOAD_CONST               6 ('app.workers.omnivoice_proc')
+            200 BUILD_LIST               4
+            202 LOAD_FAST                0 (worker_args)
+            204 LIST_EXTEND              1
+
+ 62         206 LOAD_GLOBAL              7 (NULL + str)
+            216 LOAD_GLOBAL              9 (NULL + Path)
+            226 LOAD_GLOBAL             12 (__file__)
+            236 CALL                     1
+            244 LOAD_ATTR               15 (NULL|self + resolve)
+            264 CALL                     0
+            272 LOAD_ATTR               16 (parents)
+            292 LOAD_CONST               7 (3)
+            294 BINARY_SUBSCR
+            298 CALL                     1
+
+ 61         306 BUILD_TUPLE              2
+            308 RETURN_VALUE
+
+Disassembly of <code object last_accel at 0x7f6c929b57d0, file "app\adapters\tts\omnivoice_engine.py", line 79>:
+ 79           0 RESUME                   0
+
+ 81           2 LOAD_GLOBAL              1 (NULL + dict)
+             12 LOAD_GLOBAL              2 (_ACCEL)
+             22 CALL                     1
+             30 RETURN_VALUE
+
+Disassembly of <code object _spawn at 0x269ea4b0, file "app\adapters\tts\omnivoice_engine.py", line 84>:
+              0 MAKE_CELL                4 (proc)
+              2 MAKE_CELL                5 (q)
+
+ 84           4 RESUME                   0
+
+ 86           6 LOAD_GLOBAL              1 (NULL + _worker_cmd)
+
+ 87          16 LOAD_CONST               1 ('--serve')
+             18 LOAD_CONST               2 ('--omni-root')
+             20 LOAD_GLOBAL              3 (NULL + str)
+             30 LOAD_GLOBAL              5 (NULL + omnivoice_root)
+             40 CALL                     0
+             48 CALL                     1
+             56 LOAD_CONST               3 ('--model-dir')
+             58 LOAD_GLOBAL              3 (NULL + str)
+             68 LOAD_GLOBAL              7 (NULL + model_dir)
+             78 CALL                     0
+             86 CALL                     1
+
+ 86          94 BUILD_LIST               5
+             96 CALL                     1
+            104 UNPACK_SEQUENCE          2
+            108 STORE_FAST               0 (cmd)
+            110 STORE_FAST               1 (cwd)
+
+ 89         112 LOAD_GLOBAL              9 (NULL + subprocess)
+            122 LOAD_ATTR               10 (Popen)
+
+ 90         142 LOAD_FAST                0 (cmd)
+
+ 89         144 BUILD_TUPLE              1
+
+ 90         146 LOAD_FAST                1 (cwd)
+            148 LOAD_GLOBAL              8 (subprocess)
+            158 LOAD_ATTR               12 (PIPE)
+            178 LOAD_GLOBAL              8 (subprocess)
+            188 LOAD_ATTR               12 (PIPE)
+            208 LOAD_GLOBAL              8 (subprocess)
+            218 LOAD_ATTR               12 (PIPE)
+
+ 91         238 LOAD_CONST               4 (True)
+            240 LOAD_CONST               5 ('utf-8')
+            242 LOAD_CONST               6 ('ignore')
+            244 LOAD_CONST               7 (1)
+
+ 89         246 LOAD_CONST               8 (('cwd', 'stdin', 'stdout', 'stderr', 'text', 'encoding', 'errors', 'bufsize'))
+            248 BUILD_CONST_KEY_MAP      8
+
+ 91         250 LOAD_GLOBAL             15 (NULL + no_window_kwargs)
+            260 CALL                     0
+
+ 89         268 DICT_MERGE               1
+            270 CALL_FUNCTION_EX         1
+            272 STORE_DEREF              4 (proc)
+
+ 93         274 LOAD_GLOBAL             17 (NULL + queue)
+            284 LOAD_ATTR               18 (Queue)
+            304 CALL                     0
+            312 STORE_DEREF              5 (q)
+
+ 95         314 LOAD_CLOSURE             4 (proc)
+            316 LOAD_CLOSURE             5 (q)
+            318 BUILD_TUPLE              2
+            320 LOAD_CONST               9 (<code object _read_stdout at 0x7f6c9343b0a0, file "app\adapters\tts\omnivoice_engine.py", line 95>)
+            322 MAKE_FUNCTION            8 (closure)
+            324 STORE_FAST               2 (_read_stdout)
+
+109         326 LOAD_CLOSURE             4 (proc)
+            328 BUILD_TUPLE              1
+            330 LOAD_CONST              10 (<code object _read_stderr at 0x7f6c92d7ed30, file "app\adapters\tts\omnivoice_engine.py", line 109>)
+            332 MAKE_FUNCTION            8 (closure)
+            334 STORE_FAST               3 (_read_stderr)
+
+115         336 LOAD_GLOBAL             21 (NULL + threading)
+            346 LOAD_ATTR               22 (Thread)
+            366 LOAD_FAST                2 (_read_stdout)
+            368 LOAD_CONST               4 (True)
+            370 KW_NAMES                11 (('target', 'daemon'))
+            372 CALL                     2
+            380 LOAD_ATTR               25 (NULL|self + start)
+            400 CALL                     0
+            408 POP_TOP
+
+116         410 LOAD_GLOBAL             21 (NULL + threading)
+            420 LOAD_ATTR               22 (Thread)
+            440 LOAD_FAST                3 (_read_stderr)
+            442 LOAD_CONST               4 (True)
+            444 KW_NAMES                11 (('target', 'daemon'))
+            446 CALL                     2
+            454 LOAD_ATTR               25 (NULL|self + start)
+            474 CALL                     0
+            482 POP_TOP
+
+117         484 LOAD_GLOBAL             27 (NULL + log)
+            494 LOAD_ATTR               28 (info)
+            514 LOAD_CONST              12 ('OmniVoice worker thường trú đã khởi động.')
+            516 CALL                     1
+            524 POP_TOP
+
+118         526 LOAD_DEREF               4 (proc)
+            528 LOAD_DEREF               5 (q)
+            530 BUILD_TUPLE              2
+            532 RETURN_VALUE
+
+Disassembly of <code object _read_stdout at 0x7f6c9343b0a0, file "app\adapters\tts\omnivoice_engine.py", line 95>:
+              0 COPY_FREE_VARS           2
+
+ 95           2 RESUME                   0
+
+ 96           4 LOAD_DEREF               1 (proc)
+              6 LOAD_ATTR                0 (stdout)
+             26 GET_ITER
+        >>   28 FOR_ITER               100 (to 232)
+             32 STORE_FAST               0 (line)
+
+ 97          34 LOAD_FAST                0 (line)
+             36 LOAD_ATTR                3 (NULL|self + strip)
+             56 CALL                     0
+             64 STORE_FAST               0 (line)
+
+ 98          66 LOAD_FAST                0 (line)
+             68 POP_JUMP_IF_TRUE         1 (to 72)
+
+ 99          70 JUMP_BACKWARD           22 (to 28)
+
+100     >>   72 LOAD_FAST                0 (line)
+             74 LOAD_ATTR                5 (NULL|self + startswith)
+             94 LOAD_CONST               1 ('{')
+             96 CALL                     1
+            104 POP_JUMP_IF_FALSE       38 (to 182)
+
+101         106 NOP
+
+102         108 LOAD_DEREF               2 (q)
+            110 LOAD_ATTR                7 (NULL|self + put)
+            130 LOAD_GLOBAL              9 (NULL + json)
+            140 LOAD_ATTR               10 (loads)
+            160 LOAD_FAST                0 (line)
+            162 CALL                     1
+            170 CALL                     1
+            178 POP_TOP
+
+103         180 JUMP_BACKWARD           77 (to 28)
+
+106     >>  182 LOAD_GLOBAL             15 (NULL + log)
+            192 LOAD_ATTR               16 (info)
+            212 LOAD_CONST               2 ('[omnivoice] ')
+            214 LOAD_FAST                0 (line)
+            216 FORMAT_VALUE             0
+            218 BUILD_STRING             2
+            220 CALL                     1
+            228 POP_TOP
+            230 JUMP_BACKWARD          102 (to 28)
+
+ 96     >>  232 END_FOR
+
+107         234 LOAD_DEREF               2 (q)
+            236 LOAD_ATTR                7 (NULL|self + put)
+            256 LOAD_CONST               0 (None)
+            258 CALL                     1
+            266 POP_TOP
+            268 RETURN_CONST             0 (None)
+        >>  270 PUSH_EXC_INFO
+
+104         272 LOAD_GLOBAL             12 (ValueError)
+            282 CHECK_EXC_MATCH
+            284 POP_JUMP_IF_FALSE        3 (to 292)
+            286 POP_TOP
+
+105         288 POP_EXCEPT
+            290 JUMP_BACKWARD           55 (to 182)
+
+104     >>  292 RERAISE                  0
+        >>  294 COPY                     3
+            296 POP_EXCEPT
+            298 RERAISE                  1
+ExceptionTable:
+  108 to 178 -> 270 [1]
+  270 to 286 -> 294 [2] lasti
+  292 to 292 -> 294 [2] lasti
+
+Disassembly of <code object _read_stderr at 0x7f6c92d7ed30, file "app\adapters\tts\omnivoice_engine.py", line 109>:
+              0 COPY_FREE_VARS           1
+
+109           2 RESUME                   0
+
+110           4 LOAD_DEREF               1 (proc)
+              6 LOAD_ATTR                0 (stderr)
+             26 GET_ITER
+        >>   28 FOR_ITER                45 (to 122)
+             32 STORE_FAST               0 (line)
+
+111          34 LOAD_FAST                0 (line)
+             36 LOAD_ATTR                3 (NULL|self + strip)
+             56 CALL                     0
+             64 STORE_FAST               0 (line)
+
+112          66 LOAD_FAST                0 (line)
+             68 POP_JUMP_IF_TRUE         1 (to 72)
+             70 JUMP_BACKWARD           22 (to 28)
+
+113     >>   72 LOAD_GLOBAL              5 (NULL + log)
+             82 LOAD_ATTR                6 (warning)
+            102 LOAD_CONST               1 ('[omnivoice-worker] ')
+            104 LOAD_FAST                0 (line)
+            106 FORMAT_VALUE             0
+            108 BUILD_STRING             2
+            110 CALL                     1
+            118 POP_TOP
+            120 JUMP_BACKWARD           47 (to 28)
+
+110     >>  122 END_FOR
+            124 RETURN_CONST             0 (None)
+
+Disassembly of <code object _kill at 0x26a0a550, file "app\adapters\tts\omnivoice_engine.py", line 121>:
+121           0 RESUME                   0
+
+123           2 BUILD_MAP                0
+              4 STORE_GLOBAL             0 (_ACCEL)
+
+124           6 LOAD_GLOBAL              2 (_PROC)
+             16 STORE_FAST               0 (proc)
+
+125          18 LOAD_FAST                0 (proc)
+             20 POP_JUMP_IF_NONE        75 (to 172)
+
+130          22 NOP
+
+132          24 LOAD_FAST                0 (proc)
+             26 LOAD_ATTR                4 (stdin)
+             46 POP_JUMP_IF_NONE        27 (to 102)
+
+133          48 NOP
+
+134          50 LOAD_FAST                0 (proc)
+             52 LOAD_ATTR                4 (stdin)
+             72 LOAD_ATTR                7 (NULL|self + close)
+             92 CALL                     0
+            100 POP_TOP
+
+137     >>  102 LOAD_FAST                0 (proc)
+            104 LOAD_ATTR               11 (NULL|self + terminate)
+            124 CALL                     0
+            132 POP_TOP
+
+138         134 NOP
+
+139         136 LOAD_FAST                0 (proc)
+            138 LOAD_ATTR               13 (NULL|self + wait)
+            158 LOAD_CONST               1 (5)
+            160 KW_NAMES                 2 (('timeout',))
+            162 CALL                     1
+            170 POP_TOP
+
+148     >>  172 LOAD_CONST               3 ((None, None))
+            174 UNPACK_SEQUENCE          2
+            178 STORE_GLOBAL             1 (_PROC)
+            180 STORE_GLOBAL             8 (_OUT_Q)
+
+149         182 LOAD_CONST               4 (False)
+            184 STORE_GLOBAL             9 (_WARMED)
+            186 RETURN_CONST             0 (None)
+        >>  188 PUSH_EXC_INFO
+
+135         190 LOAD_GLOBAL              8 (Exception)
+            200 CHECK_EXC_MATCH
+            202 POP_JUMP_IF_FALSE        3 (to 210)
+            204 POP_TOP
+
+136         206 POP_EXCEPT
+            208 JUMP_BACKWARD           54 (to 102)
+
+135     >>  210 RERAISE                  0
+        >>  212 COPY                     3
+            214 POP_EXCEPT
+            216 RERAISE                  1
+        >>  218 PUSH_EXC_INFO
+
+140         220 LOAD_GLOBAL              8 (Exception)
+            230 CHECK_EXC_MATCH
+            232 POP_JUMP_IF_FALSE       54 (to 342)
+            234 POP_TOP
+
+141         236 NOP
+
+142         238 LOAD_FAST                0 (proc)
+            240 LOAD_ATTR               15 (NULL|self + kill)
+            260 CALL                     0
+            268 POP_TOP
+
+143         270 LOAD_FAST                0 (proc)
+            272 LOAD_ATTR               13 (NULL|self + wait)
+            292 LOAD_CONST               1 (5)
+            294 KW_NAMES                 2 (('timeout',))
+            296 CALL                     1
+            304 POP_TOP
+            306 JUMP_FORWARD            15 (to 338)
+        >>  308 PUSH_EXC_INFO
+
+144         310 LOAD_GLOBAL              8 (Exception)
+            320 CHECK_EXC_MATCH
+            322 POP_JUMP_IF_FALSE        3 (to 330)
+            324 POP_TOP
+
+145         326 POP_EXCEPT
+            328 JUMP_FORWARD             4 (to 338)
+
+144     >>  330 RERAISE                  0
+        >>  332 COPY                     3
+            334 POP_EXCEPT
+            336 RERAISE                  1
+        >>  338 POP_EXCEPT
+            340 JUMP_BACKWARD           85 (to 172)
+
+140     >>  342 RERAISE                  0
+        >>  344 COPY                     3
+            346 POP_EXCEPT
+            348 RERAISE                  1
+        >>  350 PUSH_EXC_INFO
+
+146         352 LOAD_GLOBAL              8 (Exception)
+            362 CHECK_EXC_MATCH
+            364 POP_JUMP_IF_FALSE        3 (to 372)
+            366 POP_TOP
+
+147         368 POP_EXCEPT
+            370 JUMP_BACKWARD          100 (to 172)
+
+146     >>  372 RERAISE                  0
+        >>  374 COPY                     3
+            376 POP_EXCEPT
+            378 RERAISE                  1
+ExceptionTable:
+  24 to 46 -> 350 [0]
+  50 to 100 -> 188 [0]
+  102 to 132 -> 350 [0]
+  136 to 170 -> 218 [0]
+  188 to 204 -> 212 [1] lasti
+  206 to 208 -> 350 [0]
+  210 to 210 -> 212 [1] lasti
+  212 to 216 -> 350 [0]
+  218 to 234 -> 344 [1] lasti
+  238 to 304 -> 308 [1]
+  306 to 306 -> 344 [1] lasti
+  308 to 324 -> 332 [2] lasti
+  326 to 328 -> 344 [1] lasti
+  330 to 330 -> 332 [2] lasti
+  332 to 336 -> 344 [1] lasti
+  338 to 340 -> 350 [0]
+  342 to 342 -> 344 [1] lasti
+  344 to 348 -> 350 [0]
+  350 to 366 -> 374 [1] lasti
+  372 to 372 -> 374 [1] lasti
+
+Disassembly of <code object _ensure at 0x7f6c9324b800, file "app\adapters\tts\omnivoice_engine.py", line 152>:
+152           0 RESUME                   0
+
+154           2 LOAD_GLOBAL              0 (_PROC)
+             12 POP_JUMP_IF_NONE        20 (to 54)
+             14 LOAD_GLOBAL              0 (_PROC)
+             24 LOAD_ATTR                3 (NULL|self + poll)
+             44 CALL                     0
+             52 POP_JUMP_IF_NONE        13 (to 80)
+
+155     >>   54 LOAD_GLOBAL              5 (NULL + _spawn)
+             64 CALL                     0
+             72 UNPACK_SEQUENCE          2
+             76 STORE_GLOBAL             0 (_PROC)
+             78 STORE_GLOBAL             3 (_OUT_Q)
+
+156     >>   80 LOAD_GLOBAL              0 (_PROC)
+             90 LOAD_GLOBAL              6 (_OUT_Q)
+            100 BUILD_TUPLE              2
+            102 RETURN_VALUE
+
+Disassembly of <code object shutdown at 0x7f6c92a3a010, file "app\adapters\tts\omnivoice_engine.py", line 162>:
+162           0 RESUME                   0
+
+164           2 LOAD_GLOBAL              0 (_LOCK)
+             12 BEFORE_WITH
+             14 POP_TOP
+
+165          16 LOAD_GLOBAL              3 (NULL + _kill)
+             26 CALL                     0
+             34 POP_TOP
+
+164          36 LOAD_CONST               1 (None)
+             38 LOAD_CONST               1 (None)
+             40 LOAD_CONST               1 (None)
+             42 CALL                     2
+             50 POP_TOP
+             52 RETURN_CONST             1 (None)
+        >>   54 PUSH_EXC_INFO
+             56 WITH_EXCEPT_START
+             58 POP_JUMP_IF_TRUE         1 (to 62)
+             60 RERAISE                  2
+        >>   62 POP_TOP
+             64 POP_EXCEPT
+             66 POP_TOP
+             68 POP_TOP
+             70 RETURN_CONST             1 (None)
+        >>   72 COPY                     3
+             74 POP_EXCEPT
+             76 RERAISE                  1
+ExceptionTable:
+  14 to 34 -> 54 [1] lasti
+  54 to 62 -> 72 [3] lasti
+
+Disassembly of <code object warmup at 0x269eb8b0, file "app\adapters\tts\omnivoice_engine.py", line 168>:
+168           0 RESUME                   0
+
+178           2 LOAD_GLOBAL              1 (NULL + is_ready)
+             12 CALL                     0
+             20 POP_JUMP_IF_TRUE         1 (to 24)
+
+179          22 RETURN_CONST             1 (False)
+
+180     >>   24 LOAD_GLOBAL              2 (_LOCK)
+             34 BEFORE_WITH
+             36 POP_TOP
+
+181          38 NOP
+
+182          40 LOAD_GLOBAL              5 (NULL + _ensure)
+             50 CALL                     0
+             58 UNPACK_SEQUENCE          2
+             62 STORE_FAST               1 (proc)
+             64 STORE_FAST               2 (q)
+
+185          66 LOAD_GLOBAL              8 (_WARMED)
+             76 POP_JUMP_IF_FALSE        2 (to 82)
+             78 LOAD_FAST                0 (timeout)
+             80 JUMP_FORWARD            15 (to 112)
+        >>   82 LOAD_GLOBAL             11 (NULL + max)
+             92 LOAD_FAST                0 (timeout)
+             94 LOAD_GLOBAL             12 (_LOAD_TIMEOUT)
+            104 CALL                     2
+        >>  112 STORE_FAST               3 (effective_timeout)
+
+186         114 NOP
+
+187         116 NOP
+
+188     >>  118 LOAD_FAST                2 (q)
+            120 LOAD_ATTR               15 (NULL|self + get_nowait)
+            140 CALL                     0
+            148 POP_TOP
+
+187         150 JUMP_BACKWARD           17 (to 118)
+        >>  152 PUSH_EXC_INFO
+
+183         154 LOAD_GLOBAL              6 (Exception)
+            164 CHECK_EXC_MATCH
+            166 POP_JUMP_IF_FALSE       11 (to 190)
+            168 POP_TOP
+
+184         170 POP_EXCEPT
+
+180         172 LOAD_CONST               2 (None)
+            174 LOAD_CONST               2 (None)
+            176 LOAD_CONST               2 (None)
+            178 CALL                     2
+            186 POP_TOP
+            188 RETURN_CONST             1 (False)
+
+183     >>  190 RERAISE                  0
+        >>  192 COPY                     3
+            194 POP_EXCEPT
+            196 RERAISE                  1
+        >>  198 PUSH_EXC_INFO
+
+189         200 LOAD_GLOBAL             16 (queue)
+            210 LOAD_ATTR               18 (Empty)
+            230 CHECK_EXC_MATCH
+            232 POP_JUMP_IF_FALSE        3 (to 240)
+            234 POP_TOP
+
+190         236 POP_EXCEPT
+            238 JUMP_FORWARD             4 (to 248)
+
+189     >>  240 RERAISE                  0
+        >>  242 COPY                     3
+            244 POP_EXCEPT
+            246 RERAISE                  1
+
+191     >>  248 LOAD_GLOBAL             20 (_REQ_ID)
+            258 LOAD_CONST               4 (1)
+            260 BINARY_OP               13 (+=)
+            264 STORE_GLOBAL            10 (_REQ_ID)
+
+192         266 LOAD_GLOBAL             20 (_REQ_ID)
+            276 STORE_FAST               4 (rid)
+
+193         278 NOP
+
+194         280 LOAD_FAST                1 (proc)
+            282 LOAD_ATTR               22 (stdin)
+            302 LOAD_ATTR               25 (NULL|self + write)
+            322 LOAD_GLOBAL             27 (NULL + json)
+            332 LOAD_ATTR               28 (dumps)
+            352 LOAD_FAST                4 (rid)
+            354 LOAD_CONST               3 (True)
+            356 LOAD_CONST               5 (('id', 'ping'))
+            358 BUILD_CONST_KEY_MAP      2
+            360 CALL                     1
+            368 LOAD_CONST               6 ('\n')
+            370 BINARY_OP                0 (+)
+            374 CALL                     1
+            382 POP_TOP
+
+195         384 LOAD_FAST                1 (proc)
+            386 LOAD_ATTR               22 (stdin)
+            406 LOAD_ATTR               31 (NULL|self + flush)
+            426 CALL                     0
+            434 POP_TOP
+            436 JUMP_FORWARD            39 (to 516)
+        >>  438 PUSH_EXC_INFO
+
+196         440 LOAD_GLOBAL             32 (BrokenPipeError)
+            450 LOAD_GLOBAL             34 (OSError)
+            460 BUILD_TUPLE              2
+            462 CHECK_EXC_MATCH
+            464 POP_JUMP_IF_FALSE       21 (to 508)
+            466 POP_TOP
+
+197         468 LOAD_GLOBAL             37 (NULL + _kill)
+            478 CALL                     0
+            486 POP_TOP
+
+198         488 POP_EXCEPT
+
+180         490 LOAD_CONST               2 (None)
+            492 LOAD_CONST               2 (None)
+            494 LOAD_CONST               2 (None)
+            496 CALL                     2
+            504 POP_TOP
+            506 RETURN_CONST             1 (False)
+
+196     >>  508 RERAISE                  0
+        >>  510 COPY                     3
+            512 POP_EXCEPT
+            514 RERAISE                  1
+
+199     >>  516 LOAD_GLOBAL             39 (NULL + time)
+            526 LOAD_ATTR               40 (monotonic)
+            546 CALL                     0
+            554 LOAD_FAST                3 (effective_timeout)
+            556 BINARY_OP                0 (+)
+            560 STORE_FAST               5 (deadline)
+
+200         562 NOP
+
+201     >>  564 LOAD_FAST                5 (deadline)
+            566 LOAD_GLOBAL             39 (NULL + time)
+            576 LOAD_ATTR               40 (monotonic)
+            596 CALL                     0
+            604 BINARY_OP               10 (-)
+            608 STORE_FAST               6 (remaining)
+
+202         610 LOAD_FAST                6 (remaining)
+            612 LOAD_CONST               7 (0)
+            614 COMPARE_OP              26 (<=)
+            618 POP_JUMP_IF_FALSE       10 (to 640)
+
+203         620 NOP
+
+180         622 LOAD_CONST               2 (None)
+            624 LOAD_CONST               2 (None)
+            626 LOAD_CONST               2 (None)
+            628 CALL                     2
+            636 POP_TOP
+            638 RETURN_CONST             1 (False)
+
+204     >>  640 NOP
+
+205         642 LOAD_FAST                2 (q)
+            644 LOAD_ATTR               43 (NULL|self + get)
+            664 LOAD_FAST                6 (remaining)
+            666 KW_NAMES                 8 (('timeout',))
+            668 CALL                     1
+            676 STORE_FAST               7 (msg)
+            678 JUMP_FORWARD            33 (to 746)
+        >>  680 PUSH_EXC_INFO
+
+206         682 LOAD_GLOBAL             16 (queue)
+            692 LOAD_ATTR               18 (Empty)
+            712 CHECK_EXC_MATCH
+            714 POP_JUMP_IF_FALSE       11 (to 738)
+            716 POP_TOP
+
+207         718 POP_EXCEPT
+
+180         720 LOAD_CONST               2 (None)
+            722 LOAD_CONST               2 (None)
+            724 LOAD_CONST               2 (None)
+            726 CALL                     2
+            734 POP_TOP
+            736 RETURN_CONST             1 (False)
+
+206     >>  738 RERAISE                  0
+        >>  740 COPY                     3
+            742 POP_EXCEPT
+            744 RERAISE                  1
+
+208     >>  746 LOAD_FAST                7 (msg)
+            748 POP_JUMP_IF_NOT_NONE    20 (to 790)
+
+209         750 LOAD_GLOBAL             37 (NULL + _kill)
+            760 CALL                     0
+            768 POP_TOP
+
+210         770 NOP
+
+180         772 LOAD_CONST               2 (None)
+            774 LOAD_CONST               2 (None)
+            776 LOAD_CONST               2 (None)
+            778 CALL                     2
+            786 POP_TOP
+            788 RETURN_CONST             1 (False)
+
+211     >>  790 LOAD_GLOBAL             45 (NULL + isinstance)
+            800 LOAD_FAST                7 (msg)
+            802 LOAD_GLOBAL             46 (dict)
+            812 CALL                     2
+            820 POP_JUMP_IF_FALSE      123 (to 1068)
+            822 LOAD_FAST                7 (msg)
+            824 LOAD_ATTR               43 (NULL|self + get)
+            844 LOAD_CONST               9 ('id')
+            846 CALL                     1
+            854 LOAD_FAST                4 (rid)
+            856 COMPARE_OP              40 (==)
+            860 POP_JUMP_IF_FALSE      103 (to 1068)
+
+212         862 LOAD_GLOBAL             49 (NULL + bool)
+            872 LOAD_FAST                7 (msg)
+            874 LOAD_ATTR               43 (NULL|self + get)
+            894 LOAD_CONST              10 ('ok')
+            896 CALL                     1
+            904 CALL                     1
+            912 STORE_FAST               8 (ok)
+
+213         914 LOAD_FAST                8 (ok)
+            916 POP_JUMP_IF_FALSE       64 (to 1046)
+
+214         918 LOAD_CONST               3 (True)
+            920 STORE_GLOBAL             4 (_WARMED)
+
+215         922 LOAD_GLOBAL             47 (NULL + dict)
+            932 LOAD_FAST                7 (msg)
+            934 LOAD_ATTR               43 (NULL|self + get)
+            954 LOAD_CONST              11 ('accel')
+            956 CALL                     1
+            964 COPY                     1
+            966 POP_JUMP_IF_TRUE         2 (to 972)
+            968 POP_TOP
+            970 BUILD_MAP                0
+        >>  972 CALL                     1
+            980 STORE_GLOBAL            25 (_ACCEL)
+
+216         982 LOAD_GLOBAL             53 (NULL + log)
+            992 LOAD_ATTR               54 (info)
+           1012 LOAD_CONST              12 ('OmniVoice warmup xong — tăng tốc: ')
+           1014 LOAD_GLOBAL             50 (_ACCEL)
+           1024 COPY                     1
+           1026 POP_JUMP_IF_TRUE         2 (to 1032)
+           1028 POP_TOP
+           1030 LOAD_CONST              13 ('mặc định')
+        >> 1032 FORMAT_VALUE             0
+           1034 BUILD_STRING             2
+           1036 CALL                     1
+           1044 POP_TOP
+
+217     >> 1046 LOAD_FAST                8 (ok)
+
+180        1048 SWAP                     2
+           1050 LOAD_CONST               2 (None)
+           1052 LOAD_CONST               2 (None)
+           1054 LOAD_CONST               2 (None)
+           1056 CALL                     2
+           1064 POP_TOP
+           1066 RETURN_VALUE
+
+200     >> 1068 JUMP_BACKWARD          253 (to 564)
+
+180     >> 1070 PUSH_EXC_INFO
+           1072 WITH_EXCEPT_START
+           1074 POP_JUMP_IF_TRUE         1 (to 1078)
+           1076 RERAISE                  2
+        >> 1078 POP_TOP
+           1080 POP_EXCEPT
+           1082 POP_TOP
+           1084 POP_TOP
+           1086 RETURN_CONST             2 (None)
+        >> 1088 COPY                     3
+           1090 POP_EXCEPT
+           1092 RERAISE                  1
+ExceptionTable:
+  36 to 36 -> 1070 [1] lasti
+  40 to 64 -> 152 [1]
+  66 to 112 -> 1070 [1] lasti
+  116 to 150 -> 198 [1]
+  152 to 168 -> 192 [2] lasti
+  170 to 170 -> 1070 [1] lasti
+  190 to 190 -> 192 [2] lasti
+  192 to 196 -> 1070 [1] lasti
+  198 to 234 -> 242 [2] lasti
+  236 to 238 -> 1070 [1] lasti
+  240 to 240 -> 242 [2] lasti
+  242 to 276 -> 1070 [1] lasti
+  280 to 434 -> 438 [1]
+  436 to 436 -> 1070 [1] lasti
+  438 to 486 -> 510 [2] lasti
+  488 to 488 -> 1070 [1] lasti
+  508 to 508 -> 510 [2] lasti
+  510 to 620 -> 1070 [1] lasti
+  642 to 676 -> 680 [1]
+  678 to 678 -> 1070 [1] lasti
+  680 to 716 -> 740 [2] lasti
+  718 to 718 -> 1070 [1] lasti
+  738 to 738 -> 740 [2] lasti
+  740 to 770 -> 1070 [1] lasti
+  790 to 1046 -> 1070 [1] lasti
+  1068 to 1068 -> 1070 [1] lasti
+  1070 to 1078 -> 1088 [3] lasti
+
+Disassembly of <code object synthesize_to_file at 0x26a17c50, file "app\adapters\tts\omnivoice_engine.py", line 220>:
+220           0 RESUME                   0
+
+249           2 LOAD_GLOBAL              1 (NULL + is_ready)
+             12 CALL                     0
+             20 POP_JUMP_IF_TRUE        26 (to 74)
+
+250          22 LOAD_GLOBAL              3 (NULL + make_error)
+
+251          32 LOAD_GLOBAL              4 (E)
+             42 LOAD_ATTR                6 (TTS_NETWORK)
+
+252          62 LOAD_CONST               1 ("OmniVoice chưa được cài. Vào Settings → TTS → bấm 'Tải OmniVoice' để cài đặt.")
+
+250          64 CALL                     2
+             72 RAISE_VARARGS            1
+
+254     >>   74 LOAD_FAST                2 (ref_audio)
+             76 POP_JUMP_IF_TRUE        28 (to 134)
+             78 LOAD_FAST                4 (instruct)
+             80 POP_JUMP_IF_TRUE        26 (to 134)
+
+255          82 LOAD_GLOBAL              3 (NULL + make_error)
+             92 LOAD_GLOBAL              4 (E)
+            102 LOAD_ATTR                8 (TTS_VOICE_INVALID)
+
+256         122 LOAD_CONST               2 ('OmniVoice cần reference audio (clone) hoặc instruct (voice design).')
+
+255         124 CALL                     2
+            132 RAISE_VARARGS            1
+
+259     >>  134 LOAD_GLOBAL             10 (_LOCK)
+            144 BEFORE_WITH
+            146 POP_TOP
+
+260         148 LOAD_GLOBAL             13 (NULL + _ensure)
+            158 CALL                     0
+            166 UNPACK_SEQUENCE          2
+            170 STORE_FAST              15 (proc)
+            172 STORE_FAST              16 (q)
+
+262         174 LOAD_GLOBAL             14 (_WARMED)
+            184 POP_JUMP_IF_FALSE        2 (to 190)
+            186 LOAD_FAST               14 (timeout)
+            188 JUMP_FORWARD            15 (to 220)
+        >>  190 LOAD_GLOBAL             17 (NULL + max)
+            200 LOAD_FAST               14 (timeout)
+            202 LOAD_GLOBAL             18 (_LOAD_TIMEOUT)
+            212 CALL                     2
+        >>  220 STORE_FAST              17 (effective_timeout)
+
+264         222 NOP
+
+265         224 NOP
+
+266     >>  226 LOAD_FAST               16 (q)
+            228 LOAD_ATTR               21 (NULL|self + get_nowait)
+            248 CALL                     0
+            256 POP_TOP
+
+265         258 JUMP_BACKWARD           17 (to 226)
+        >>  260 PUSH_EXC_INFO
+
+267         262 LOAD_GLOBAL             22 (queue)
+            272 LOAD_ATTR               24 (Empty)
+            292 CHECK_EXC_MATCH
+            294 POP_JUMP_IF_FALSE        3 (to 302)
+            296 POP_TOP
+
+268         298 POP_EXCEPT
+            300 JUMP_FORWARD             4 (to 310)
+
+267     >>  302 RERAISE                  0
+        >>  304 COPY                     3
+            306 POP_EXCEPT
+            308 RERAISE                  1
+
+270     >>  310 LOAD_GLOBAL             26 (_REQ_ID)
+            320 LOAD_CONST               4 (1)
+            322 BINARY_OP               13 (+=)
+            326 STORE_GLOBAL            13 (_REQ_ID)
+
+271         328 LOAD_GLOBAL             26 (_REQ_ID)
+            338 STORE_FAST              18 (rid)
+
+273         340 LOAD_FAST               18 (rid)
+            342 LOAD_FAST                0 (out_wav)
+            344 LOAD_FAST                1 (text)
+
+274         346 LOAD_FAST                2 (ref_audio)
+            348 COPY                     1
+            350 POP_JUMP_IF_TRUE         2 (to 356)
+            352 POP_TOP
+            354 LOAD_CONST               5 ('')
+        >>  356 LOAD_FAST                3 (ref_text)
+            358 COPY                     1
+            360 POP_JUMP_IF_TRUE         2 (to 366)
+            362 POP_TOP
+            364 LOAD_CONST               5 ('')
+
+275     >>  366 LOAD_FAST                4 (instruct)
+            368 COPY                     1
+            370 POP_JUMP_IF_TRUE         2 (to 376)
+            372 POP_TOP
+            374 LOAD_CONST               5 ('')
+        >>  376 LOAD_FAST                5 (lang)
+            378 COPY                     1
+            380 POP_JUMP_IF_TRUE         2 (to 386)
+            382 POP_TOP
+            384 LOAD_CONST               5 ('')
+        >>  386 LOAD_GLOBAL             29 (NULL + float)
+            396 LOAD_FAST                6 (speed)
+            398 CALL                     1
+
+272         406 LOAD_CONST               6 (('id', 'out_wav', 'text', 'ref_audio', 'ref_text', 'instruct', 'lang', 'speed'))
+            408 BUILD_CONST_KEY_MAP      8
+            410 STORE_FAST              19 (req)
+
+278         412 LOAD_FAST                7 (num_step)
+            414 POP_JUMP_IF_NONE        14 (to 444)
+
+279         416 LOAD_GLOBAL             31 (NULL + int)
+            426 LOAD_FAST                7 (num_step)
+            428 CALL                     1
+            436 LOAD_FAST               19 (req)
+            438 LOAD_CONST               8 ('num_step')
+            440 STORE_SUBSCR
+
+280     >>  444 LOAD_FAST                8 (guidance_scale)
+            446 POP_JUMP_IF_NONE        14 (to 476)
+
+281         448 LOAD_GLOBAL             29 (NULL + float)
+            458 LOAD_FAST                8 (guidance_scale)
+            460 CALL                     1
+            468 LOAD_FAST               19 (req)
+            470 LOAD_CONST               9 ('guidance_scale')
+            472 STORE_SUBSCR
+
+282     >>  476 LOAD_FAST                9 (seed)
+            478 POP_JUMP_IF_NONE        14 (to 508)
+
+283         480 LOAD_GLOBAL             31 (NULL + int)
+            490 LOAD_FAST                9 (seed)
+            492 CALL                     1
+            500 LOAD_FAST               19 (req)
+            502 LOAD_CONST              10 ('seed')
+            504 STORE_SUBSCR
+
+284     >>  508 LOAD_FAST               10 (normalize_text)
+            510 POP_JUMP_IF_FALSE        5 (to 522)
+
+285         512 LOAD_CONST               3 (True)
+            514 LOAD_FAST               19 (req)
+            516 LOAD_CONST              11 ('normalize_text')
+            518 STORE_SUBSCR
+
+286     >>  522 LOAD_FAST               11 (duration)
+            524 POP_JUMP_IF_NONE        14 (to 554)
+
+287         526 LOAD_GLOBAL             29 (NULL + float)
+            536 LOAD_FAST               11 (duration)
+            538 CALL                     1
+            546 LOAD_FAST               19 (req)
+            548 LOAD_CONST              12 ('duration')
+            550 STORE_SUBSCR
+
+288     >>  554 LOAD_FAST               12 (pad_duration)
+            556 POP_JUMP_IF_NONE        14 (to 586)
+
+289         558 LOAD_GLOBAL             29 (NULL + float)
+            568 LOAD_FAST               12 (pad_duration)
+            570 CALL                     1
+            578 LOAD_FAST               19 (req)
+            580 LOAD_CONST              13 ('pad_duration')
+            582 STORE_SUBSCR
+
+290     >>  586 LOAD_FAST               13 (fade_duration)
+            588 POP_JUMP_IF_NONE        14 (to 618)
+
+291         590 LOAD_GLOBAL             29 (NULL + float)
+            600 LOAD_FAST               13 (fade_duration)
+            602 CALL                     1
+            610 LOAD_FAST               19 (req)
+            612 LOAD_CONST              14 ('fade_duration')
+            614 STORE_SUBSCR
+
+292     >>  618 NOP
+
+293         620 LOAD_FAST               15 (proc)
+            622 LOAD_ATTR               32 (stdin)
+            642 LOAD_ATTR               35 (NULL|self + write)
+            662 LOAD_GLOBAL             37 (NULL + json)
+            672 LOAD_ATTR               38 (dumps)
+            692 LOAD_FAST               19 (req)
+            694 CALL                     1
+            702 LOAD_CONST              15 ('\n')
+            704 BINARY_OP                0 (+)
+            708 CALL                     1
+            716 POP_TOP
+
+294         718 LOAD_FAST               15 (proc)
+            720 LOAD_ATTR               32 (stdin)
+            740 LOAD_ATTR               41 (NULL|self + flush)
+            760 CALL                     0
+            768 POP_TOP
+            770 JUMP_FORWARD            55 (to 882)
+        >>  772 PUSH_EXC_INFO
+
+295         774 LOAD_GLOBAL             42 (BrokenPipeError)
+            784 LOAD_GLOBAL             44 (OSError)
+            794 BUILD_TUPLE              2
+            796 CHECK_EXC_MATCH
+            798 POP_JUMP_IF_FALSE       37 (to 874)
+            800 POP_TOP
+
+296         802 LOAD_GLOBAL             47 (NULL + _kill)
+            812 CALL                     0
+            820 POP_TOP
+
+297         822 LOAD_GLOBAL              3 (NULL + make_error)
+            832 LOAD_GLOBAL              4 (E)
+            842 LOAD_ATTR                6 (TTS_NETWORK)
+            862 LOAD_CONST              16 ('OmniVoice worker đã dừng — thử lại.')
+            864 CALL                     2
+            872 RAISE_VARARGS            1
+
+295     >>  874 RERAISE                  0
+        >>  876 COPY                     3
+            878 POP_EXCEPT
+            880 RERAISE                  1
+
+299     >>  882 LOAD_GLOBAL             49 (NULL + time)
+            892 LOAD_ATTR               50 (monotonic)
+            912 CALL                     0
+            920 LOAD_FAST               17 (effective_timeout)
+            922 BINARY_OP                0 (+)
+            926 STORE_FAST              20 (deadline)
+
+300         928 NOP
+
+301     >>  930 LOAD_FAST               20 (deadline)
+            932 LOAD_GLOBAL             49 (NULL + time)
+            942 LOAD_ATTR               50 (monotonic)
+            962 CALL                     0
+            970 BINARY_OP               10 (-)
+            974 STORE_FAST              21 (remaining)
+
+302         976 LOAD_FAST               21 (remaining)
+            978 LOAD_CONST              17 (0)
+            980 COMPARE_OP              26 (<=)
+            984 POP_JUMP_IF_FALSE       36 (to 1058)
+
+303         986 LOAD_GLOBAL             47 (NULL + _kill)
+            996 CALL                     0
+           1004 POP_TOP
+
+304        1006 LOAD_GLOBAL              3 (NULL + make_error)
+           1016 LOAD_GLOBAL              4 (E)
+           1026 LOAD_ATTR                6 (TTS_NETWORK)
+           1046 LOAD_CONST              18 ('OmniVoice tổng hợp quá lâu (timeout).')
+           1048 CALL                     2
+           1056 RAISE_VARARGS            1
+
+305     >> 1058 NOP
+
+306        1060 LOAD_FAST               16 (q)
+           1062 LOAD_ATTR               53 (NULL|self + get)
+           1082 LOAD_FAST               21 (remaining)
+           1084 KW_NAMES                19 (('timeout',))
+           1086 CALL                     1
+           1094 STORE_FAST              22 (msg)
+           1096 JUMP_FORWARD            59 (to 1216)
+        >> 1098 PUSH_EXC_INFO
+
+307        1100 LOAD_GLOBAL             22 (queue)
+           1110 LOAD_ATTR               24 (Empty)
+           1130 CHECK_EXC_MATCH
+           1132 POP_JUMP_IF_FALSE       37 (to 1208)
+           1134 POP_TOP
+
+308        1136 LOAD_GLOBAL             47 (NULL + _kill)
+           1146 CALL                     0
+           1154 POP_TOP
+
+309        1156 LOAD_GLOBAL              3 (NULL + make_error)
+           1166 LOAD_GLOBAL              4 (E)
+           1176 LOAD_ATTR                6 (TTS_NETWORK)
+           1196 LOAD_CONST              20 ('OmniVoice không phản hồi (timeout).')
+           1198 CALL                     2
+           1206 RAISE_VARARGS            1
+
+307     >> 1208 RERAISE                  0
+        >> 1210 COPY                     3
+           1212 POP_EXCEPT
+           1214 RERAISE                  1
+
+310     >> 1216 LOAD_FAST               22 (msg)
+           1218 POP_JUMP_IF_NOT_NONE    36 (to 1292)
+
+311        1220 LOAD_GLOBAL             47 (NULL + _kill)
+           1230 CALL                     0
+           1238 POP_TOP
+
+312        1240 LOAD_GLOBAL              3 (NULL + make_error)
+           1250 LOAD_GLOBAL              4 (E)
+           1260 LOAD_ATTR                6 (TTS_NETWORK)
+           1280 LOAD_CONST              21 ('OmniVoice worker đã thoát giữa chừng (xem log).')
+           1282 CALL                     2
+           1290 RAISE_VARARGS            1
+
+313     >> 1292 LOAD_GLOBAL             55 (NULL + isinstance)
+           1302 LOAD_FAST               22 (msg)
+           1304 LOAD_GLOBAL             56 (dict)
+           1314 CALL                     2
+           1322 POP_JUMP_IF_FALSE      135 (to 1594)
+           1324 LOAD_FAST               22 (msg)
+           1326 LOAD_ATTR               53 (NULL|self + get)
+           1346 LOAD_CONST              22 ('id')
+           1348 CALL                     1
+           1356 LOAD_FAST               18 (rid)
+           1358 COMPARE_OP              40 (==)
+           1362 POP_JUMP_IF_FALSE      115 (to 1594)
+
+314        1364 LOAD_FAST               22 (msg)
+           1366 LOAD_ATTR               53 (NULL|self + get)
+           1386 LOAD_CONST              23 ('ok')
+           1388 CALL                     1
+           1396 POP_JUMP_IF_TRUE        48 (to 1494)
+
+320        1398 LOAD_GLOBAL              3 (NULL + make_error)
+           1408 LOAD_GLOBAL              4 (E)
+           1418 LOAD_ATTR                6 (TTS_NETWORK)
+           1438 LOAD_CONST              24 ('OmniVoice lỗi: ')
+           1440 LOAD_FAST               22 (msg)
+           1442 LOAD_ATTR               53 (NULL|self + get)
+           1462 LOAD_CONST              25 ('error')
+           1464 CALL                     1
+           1472 COPY                     1
+           1474 POP_JUMP_IF_TRUE         2 (to 1480)
+           1476 POP_TOP
+           1478 LOAD_CONST              26 ('không rõ')
+        >> 1480 FORMAT_VALUE             0
+           1482 BUILD_STRING             2
+           1484 CALL                     2
+           1492 RAISE_VARARGS            1
+
+321     >> 1494 LOAD_CONST               3 (True)
+           1496 STORE_GLOBAL             7 (_WARMED)
+
+322        1498 LOAD_FAST               22 (msg)
+           1500 LOAD_ATTR               59 (NULL|self + items)
+           1520 CALL                     0
+           1528 GET_ITER
+           1530 LOAD_FAST_AND_CLEAR     23 (k)
+           1532 LOAD_FAST_AND_CLEAR     24 (v)
+           1534 SWAP                     3
+           1536 BUILD_MAP                0
+           1538 SWAP                     2
+        >> 1540 FOR_ITER                13 (to 1570)
+           1544 UNPACK_SEQUENCE          2
+           1548 STORE_FAST              23 (k)
+           1550 STORE_FAST              24 (v)
+           1552 LOAD_FAST               23 (k)
+           1554 LOAD_CONST              27 (('id', 'ok'))
+           1556 CONTAINS_OP              1
+           1558 POP_JUMP_IF_TRUE         1 (to 1562)
+           1560 JUMP_BACKWARD           11 (to 1540)
+        >> 1562 LOAD_FAST               23 (k)
+           1564 LOAD_FAST               24 (v)
+           1566 MAP_ADD                  2
+           1568 JUMP_BACKWARD           15 (to 1540)
+        >> 1570 END_FOR
+           1572 JUMP_FORWARD             6 (to 1586)
+        >> 1574 SWAP                     2
+           1576 POP_TOP
+           1578 SWAP                     3
+           1580 STORE_FAST              24 (v)
+           1582 STORE_FAST              23 (k)
+           1584 RERAISE                  0
+        >> 1586 STORE_FAST              25 (info)
+           1588 STORE_FAST              23 (k)
+           1590 STORE_FAST              24 (v)
+
+323        1592 JUMP_FORWARD             2 (to 1598)
+
+300     >> 1594 EXTENDED_ARG             1
+           1596 JUMP_BACKWARD          334 (to 930)
+
+323     >> 1598 NOP
+
+259        1600 LOAD_CONST               7 (None)
+           1602 LOAD_CONST               7 (None)
+           1604 LOAD_CONST               7 (None)
+           1606 CALL                     2
+           1614 POP_TOP
+           1616 JUMP_FORWARD            12 (to 1642)
+        >> 1618 PUSH_EXC_INFO
+           1620 WITH_EXCEPT_START
+           1622 POP_JUMP_IF_TRUE         1 (to 1626)
+           1624 RERAISE                  2
+        >> 1626 POP_TOP
+           1628 POP_EXCEPT
+           1630 POP_TOP
+           1632 POP_TOP
+           1634 JUMP_FORWARD             3 (to 1642)
+        >> 1636 COPY                     3
+           1638 POP_EXCEPT
+           1640 RERAISE                  1
+
+325     >> 1642 LOAD_GLOBAL             60 (os)
+           1652 LOAD_ATTR               62 (path)
+           1672 LOAD_ATTR               65 (NULL|self + exists)
+           1692 LOAD_FAST                0 (out_wav)
+           1694 CALL                     1
+           1702 POP_JUMP_IF_TRUE        26 (to 1756)
+
+326        1704 LOAD_GLOBAL              3 (NULL + make_error)
+           1714 LOAD_GLOBAL              4 (E)
+           1724 LOAD_ATTR                6 (TTS_NETWORK)
+           1744 LOAD_CONST              28 ('OmniVoice không tạo được file âm thanh.')
+           1746 CALL                     2
+           1754 RAISE_VARARGS            1
+
+327     >> 1756 LOAD_FAST_CHECK         25 (info)
+           1758 RETURN_VALUE
+ExceptionTable:
+  146 to 220 -> 1618 [1] lasti
+  224 to 258 -> 260 [1]
+  260 to 296 -> 304 [2] lasti
+  298 to 300 -> 1618 [1] lasti
+  302 to 302 -> 304 [2] lasti
+  304 to 616 -> 1618 [1] lasti
+  620 to 768 -> 772 [1]
+  770 to 770 -> 1618 [1] lasti
+  772 to 874 -> 876 [2] lasti
+  876 to 1056 -> 1618 [1] lasti
+  1060 to 1094 -> 1098 [1]
+  1096 to 1096 -> 1618 [1] lasti
+  1098 to 1208 -> 1210 [2] lasti
+  1210 to 1534 -> 1618 [1] lasti
+  1536 to 1558 -> 1574 [4]
+  1562 to 1570 -> 1574 [4]
+  1572 to 1596 -> 1618 [1] lasti
+  1618 to 1626 -> 1636 [3] lasti

@@ -1,0 +1,1912 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ("Step stock_generate — provider hình thứ 3: TẢI clip B-roll bản quyền HỢP LỆ khớp từng cảnh.\n\nThay AI-gen (flow/meta): đọc ContentPlan.scenes (storyboard đã có timing + stock_query) → mỗi cảnh\nsearch kho stock (Pexels/Pixabay qua API chính thức) → chọn clip hợp orientation + đủ dài + chưa dùng →\ntải về videos/<vid>/scenes/. assemble/visual_bake ĐÃ trim+scale+crop clip theo ô + aspect → không code\nghép mới. Không match sau retry → cảnh 'failed' (gate assemble chặn preview, giống no-mock flow/meta).\n\nCHỈ qua API kho có license thương mại — KHÔNG cào YouTube/TikTok (bản quyền). Xem\ndocs/stock-footage-provider-plan.md.\n")
+              4 STORE_NAME               0 (__doc__)
+
+ 11           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 13          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (asyncio)
+             24 STORE_NAME               3 (asyncio)
+
+ 14          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               3 (None)
+             30 IMPORT_NAME              4 (json)
+             32 STORE_NAME               4 (json)
+
+ 15          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               4 (('Path',))
+             38 IMPORT_NAME              5 (pathlib)
+             40 IMPORT_FROM              6 (Path)
+             42 STORE_NAME               6 (Path)
+             44 POP_TOP
+
+ 17          46 LOAD_CONST               1 (0)
+             48 LOAD_CONST               5 (('make_error', 'StudioError', 'E'))
+             50 IMPORT_NAME              7 (app.core.errors)
+             52 IMPORT_FROM              8 (make_error)
+             54 STORE_NAME               8 (make_error)
+             56 IMPORT_FROM              9 (StudioError)
+             58 STORE_NAME               9 (StudioError)
+             60 IMPORT_FROM             10 (E)
+             62 STORE_NAME              10 (E)
+             64 POP_TOP
+
+ 18          66 LOAD_CONST               1 (0)
+             68 LOAD_CONST               6 (('ProjectFS',))
+             70 IMPORT_NAME             11 (app.core.fs)
+             72 IMPORT_FROM             12 (ProjectFS)
+             74 STORE_NAME              12 (ProjectFS)
+             76 POP_TOP
+
+ 19          78 LOAD_CONST               1 (0)
+             80 LOAD_CONST               7 (('BaseStep', 'StepContext'))
+             82 IMPORT_NAME             13 (app.pipeline.base)
+             84 IMPORT_FROM             14 (BaseStep)
+             86 STORE_NAME              14 (BaseStep)
+             88 IMPORT_FROM             15 (StepContext)
+             90 STORE_NAME              15 (StepContext)
+             92 POP_TOP
+
+ 20          94 LOAD_CONST               1 (0)
+             96 LOAD_CONST               8 (('SessionLocal',))
+             98 IMPORT_NAME             16 (app.db.session)
+            100 IMPORT_FROM             17 (SessionLocal)
+            102 STORE_NAME              17 (SessionLocal)
+            104 POP_TOP
+
+ 21         106 LOAD_CONST               1 (0)
+            108 LOAD_CONST               9 (('ContentPlan',))
+            110 IMPORT_NAME             18 (app.db.models)
+            112 IMPORT_FROM             19 (ContentPlan)
+            114 STORE_NAME              19 (ContentPlan)
+            116 POP_TOP
+
+ 22         118 LOAD_CONST               1 (0)
+            120 LOAD_CONST              10 (('channel_engines',))
+            122 IMPORT_NAME             20 (app.services)
+            124 IMPORT_FROM             21 (channel_engines)
+            126 STORE_NAME              21 (channel_engines)
+            128 POP_TOP
+
+ 23         130 LOAD_CONST               1 (0)
+            132 LOAD_CONST              11 (('StockFailover', 'download_clip'))
+            134 IMPORT_NAME             22 (app.adapters.stock)
+            136 IMPORT_FROM             23 (StockFailover)
+            138 STORE_NAME              23 (StockFailover)
+            140 IMPORT_FROM             24 (download_clip)
+            142 STORE_NAME              24 (download_clip)
+            144 POP_TOP
+
+ 25         146 LOAD_CONST              12 (4)
+            148 STORE_NAME              25 (_SCENE_ATTEMPTS)
+
+ 28         150 LOAD_CONST              16 (('scene', 'dict', 'return', 'list[str]'))
+            152 LOAD_CONST              13 (<code object _scene_queries at 0x28b2af10, file "app\pipeline\steps\stock_generate.py", line 28>)
+            154 MAKE_FUNCTION            4 (annotations)
+            156 STORE_NAME              26 (_scene_queries)
+
+ 48         158 PUSH_NULL
+            160 LOAD_BUILD_CLASS
+            162 LOAD_CONST              14 (<code object StockGenerateStep at 0x7f6c930b8250, file "app\pipeline\steps\stock_generate.py", line 48>)
+            164 MAKE_FUNCTION            0
+            166 LOAD_CONST              15 ('StockGenerateStep')
+            168 LOAD_NAME               14 (BaseStep)
+            170 CALL                     3
+            178 STORE_NAME              27 (StockGenerateStep)
+            180 RETURN_CONST             3 (None)
+
+Disassembly of <code object _scene_queries at 0x28b2af10, file "app\pipeline\steps\stock_generate.py", line 28>:
+ 28           0 RESUME                   0
+
+ 31           2 BUILD_LIST               0
+              4 STORE_FAST               1 (out)
+
+ 32           6 LOAD_FAST                0 (scene)
+              8 LOAD_ATTR                1 (NULL|self + get)
+             28 LOAD_CONST               1 ('stock_queries')
+             30 CALL                     1
+             38 STORE_FAST               2 (qs)
+
+ 33          40 LOAD_GLOBAL              3 (NULL + isinstance)
+             50 LOAD_FAST                2 (qs)
+             52 LOAD_GLOBAL              4 (list)
+             62 CALL                     2
+             70 POP_JUMP_IF_FALSE       67 (to 206)
+
+ 34          72 LOAD_FAST                2 (qs)
+             74 GET_ITER
+             76 LOAD_FAST_AND_CLEAR      3 (q)
+             78 SWAP                     2
+             80 BUILD_LIST               0
+             82 SWAP                     2
+        >>   84 FOR_ITER                56 (to 200)
+             88 STORE_FAST               3 (q)
+             90 LOAD_GLOBAL              7 (NULL + str)
+            100 LOAD_FAST                3 (q)
+            102 CALL                     1
+            110 LOAD_ATTR                9 (NULL|self + strip)
+            130 CALL                     0
+            138 POP_JUMP_IF_TRUE         1 (to 142)
+            140 JUMP_BACKWARD           29 (to 84)
+        >>  142 LOAD_GLOBAL              7 (NULL + str)
+            152 LOAD_FAST                3 (q)
+            154 CALL                     1
+            162 LOAD_ATTR                9 (NULL|self + strip)
+            182 CALL                     0
+            190 LOAD_CONST               2 (None)
+            192 LOAD_CONST               3 (100)
+            194 BINARY_SLICE
+            196 LIST_APPEND              2
+            198 JUMP_BACKWARD           58 (to 84)
+        >>  200 END_FOR
+            202 STORE_FAST               1 (out)
+            204 STORE_FAST               3 (q)
+
+ 35     >>  206 LOAD_FAST                1 (out)
+            208 POP_JUMP_IF_TRUE        85 (to 380)
+
+ 36         210 LOAD_FAST                0 (scene)
+            212 LOAD_ATTR                1 (NULL|self + get)
+            232 LOAD_CONST               4 ('stock_query')
+            234 CALL                     1
+            242 STORE_FAST               3 (q)
+
+ 37         244 LOAD_GLOBAL              3 (NULL + isinstance)
+            254 LOAD_FAST                3 (q)
+            256 LOAD_GLOBAL              4 (list)
+            266 CALL                     2
+            274 POP_JUMP_IF_FALSE       24 (to 324)
+
+ 38         276 LOAD_CONST               5 (' ')
+            278 LOAD_ATTR               11 (NULL|self + join)
+            298 LOAD_CONST               6 (<code object <genexpr> at 0x7f6c92bcc3c0, file "app\pipeline\steps\stock_generate.py", line 38>)
+            300 MAKE_FUNCTION            0
+            302 LOAD_FAST                3 (q)
+            304 GET_ITER
+            306 CALL                     0
+            314 CALL                     1
+            322 STORE_FAST               3 (q)
+
+ 39     >>  324 LOAD_FAST                3 (q)
+            326 COPY                     1
+            328 POP_JUMP_IF_TRUE         2 (to 334)
+            330 POP_TOP
+            332 LOAD_CONST               7 ('')
+        >>  334 LOAD_ATTR                9 (NULL|self + strip)
+            354 CALL                     0
+            362 STORE_FAST               3 (q)
+
+ 40         364 LOAD_FAST                3 (q)
+            366 POP_JUMP_IF_FALSE        6 (to 380)
+
+ 41         368 LOAD_FAST                3 (q)
+            370 LOAD_CONST               2 (None)
+            372 LOAD_CONST               3 (100)
+            374 BINARY_SLICE
+            376 BUILD_LIST               1
+            378 STORE_FAST               1 (out)
+
+ 42     >>  380 LOAD_FAST                1 (out)
+            382 POP_JUMP_IF_TRUE        96 (to 576)
+
+ 43         384 LOAD_FAST                0 (scene)
+            386 LOAD_ATTR                1 (NULL|self + get)
+            406 LOAD_CONST               8 ('image_prompt_en')
+            408 CALL                     1
+            416 COPY                     1
+            418 POP_JUMP_IF_TRUE        21 (to 462)
+            420 POP_TOP
+            422 LOAD_FAST                0 (scene)
+            424 LOAD_ATTR                1 (NULL|self + get)
+            444 LOAD_CONST               9 ('text')
+            446 CALL                     1
+            454 COPY                     1
+            456 POP_JUMP_IF_TRUE         2 (to 462)
+            458 POP_TOP
+            460 LOAD_CONST               7 ('')
+        >>  462 LOAD_ATTR                9 (NULL|self + strip)
+            482 CALL                     0
+            490 STORE_FAST               4 (prompt)
+
+ 44         492 LOAD_CONST               5 (' ')
+            494 LOAD_ATTR               11 (NULL|self + join)
+            514 LOAD_FAST                4 (prompt)
+            516 LOAD_ATTR               13 (NULL|self + split)
+            536 CALL                     0
+            544 LOAD_CONST               2 (None)
+            546 LOAD_CONST              10 (8)
+            548 BINARY_SLICE
+            550 CALL                     1
+            558 LOAD_CONST               2 (None)
+            560 LOAD_CONST               3 (100)
+            562 BINARY_SLICE
+            564 COPY                     1
+            566 POP_JUMP_IF_TRUE         2 (to 572)
+            568 POP_TOP
+            570 LOAD_CONST              11 ('cinematic background')
+        >>  572 BUILD_LIST               1
+            574 STORE_FAST               1 (out)
+
+ 45     >>  576 LOAD_FAST                1 (out)
+            578 RETURN_VALUE
+        >>  580 SWAP                     2
+            582 POP_TOP
+
+ 34         584 SWAP                     2
+            586 STORE_FAST               3 (q)
+            588 RERAISE                  0
+ExceptionTable:
+  80 to 138 -> 580 [2]
+  142 to 200 -> 580 [2]
+
+Disassembly of <code object <genexpr> at 0x7f6c92bcc3c0, file "app\pipeline\steps\stock_generate.py", line 38>:
+ 38           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                41 (to 94)
+             12 STORE_FAST               1 (x)
+             14 LOAD_GLOBAL              1 (NULL + str)
+             24 LOAD_FAST                1 (x)
+             26 CALL                     1
+             34 LOAD_ATTR                3 (NULL|self + strip)
+             54 CALL                     0
+             62 POP_JUMP_IF_TRUE         1 (to 66)
+             64 JUMP_BACKWARD           29 (to 8)
+        >>   66 LOAD_GLOBAL              1 (NULL + str)
+             76 LOAD_FAST                1 (x)
+             78 CALL                     1
+             86 YIELD_VALUE              1
+             88 RESUME                   1
+             90 POP_TOP
+             92 JUMP_BACKWARD           43 (to 8)
+        >>   94 END_FOR
+             96 RETURN_CONST             0 (None)
+        >>   98 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            100 RERAISE                  1
+ExceptionTable:
+  4 to 62 -> 98 [0] lasti
+  66 to 96 -> 98 [0] lasti
+
+Disassembly of <code object StockGenerateStep at 0x7f6c930b8250, file "app\pipeline\steps\stock_generate.py", line 48>:
+ 48           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('StockGenerateStep')
+              8 STORE_NAME               2 (__qualname__)
+
+ 49          10 LOAD_CONST               1 ('stock_generate')
+             12 STORE_NAME               3 (name)
+
+ 50          14 LOAD_CONST               2 ('NET')
+             16 STORE_NAME               4 (resource)
+
+ 51          18 LOAD_CONST               3 ('scene_assets')
+             20 BUILD_LIST               1
+             22 STORE_NAME               5 (produces)
+
+ 53          24 LOAD_CONST              10 (('ctx', 'StepContext', 'return', 'dict'))
+             26 LOAD_CONST               4 (<code object run at 0x28b243c0, file "app\pipeline\steps\stock_generate.py", line 53>)
+             28 MAKE_FUNCTION            4 (annotations)
+             30 STORE_NAME               6 (run)
+
+222          32 LOAD_CONST               5 (False)
+
+221          34 LOAD_CONST               6 (('strict',))
+             36 BUILD_CONST_KEY_MAP      1
+
+222          38 NOP
+
+221          40 NOP
+
+222          42 NOP
+
+221          44 NOP
+
+222          46 NOP
+
+221          48 LOAD_CONST              11 (('fo', 'StockFailover', 'query', 'str', 'orientation', 'str', 'window_ms', 'int', 'used', 'set[str]', 'strict', 'bool'))
+             50 LOAD_CONST               7 (<code object _search_pick at 0x7f6c9257cd50, file "app\pipeline\steps\stock_generate.py", line 221>)
+             52 MAKE_FUNCTION            6 (kwdefaults, annotations)
+             54 STORE_NAME               7 (_search_pick)
+
+249          56 LOAD_NAME                8 (staticmethod)
+
+250          58 LOAD_CONST              12 (('video_id', 'str', 'scenes', 'list', 'return', 'None'))
+             60 LOAD_CONST               8 (<code object _save_scenes at 0x28b7be20, file "app\pipeline\steps\stock_generate.py", line 249>)
+             62 MAKE_FUNCTION            4 (annotations)
+
+249          64 CALL                     0
+
+250          72 STORE_NAME               9 (_save_scenes)
+             74 RETURN_CONST             9 (None)
+
+Disassembly of <code object run at 0x28b243c0, file "app\pipeline\steps\stock_generate.py", line 53>:
+ 53           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 54           6 LOAD_GLOBAL              1 (NULL + ProjectFS)
+             16 LOAD_FAST                1 (ctx)
+             18 LOAD_ATTR                2 (workdir)
+             38 CALL                     1
+             46 STORE_FAST               2 (fs)
+
+ 55          48 LOAD_FAST                2 (fs)
+             50 LOAD_ATTR                5 (NULL|self + video_dir)
+             70 LOAD_FAST                1 (ctx)
+             72 LOAD_ATTR                6 (video_id)
+             92 CALL                     1
+            100 LOAD_CONST               1 ('scenes')
+            102 BINARY_OP               11 (/)
+            106 STORE_FAST               3 (scenes_dir)
+
+ 56         108 LOAD_FAST                3 (scenes_dir)
+            110 LOAD_ATTR                9 (NULL|self + mkdir)
+            130 LOAD_CONST               2 (True)
+            132 LOAD_CONST               2 (True)
+            134 KW_NAMES                 3 (('parents', 'exist_ok'))
+            136 CALL                     2
+            144 POP_TOP
+
+ 58         146 LOAD_FAST                1 (ctx)
+            148 LOAD_ATTR               10 (config)
+            168 LOAD_ATTR               13 (NULL|self + get)
+            188 LOAD_CONST               4 ('engine_id')
+            190 CALL                     1
+            198 STORE_FAST               4 (engine_id)
+
+ 59         200 LOAD_FAST                4 (engine_id)
+            202 POP_JUMP_IF_FALSE       21 (to 246)
+            204 LOAD_GLOBAL             15 (NULL + channel_engines)
+            214 LOAD_ATTR               16 (get_engine)
+            234 LOAD_FAST                4 (engine_id)
+            236 CALL                     1
+            244 JUMP_FORWARD             1 (to 248)
+        >>  246 LOAD_CONST               0 (None)
+        >>  248 STORE_FAST               5 (engine)
+
+ 60         250 LOAD_FAST                1 (ctx)
+            252 LOAD_ATTR               10 (config)
+            272 LOAD_ATTR               13 (NULL|self + get)
+            292 LOAD_CONST               5 ('aspect')
+            294 CALL                     1
+            302 STORE_FAST               6 (aspect)
+
+ 61         304 LOAD_FAST                6 (aspect)
+            306 LOAD_CONST               6 (('16:9', '9:16'))
+            308 CONTAINS_OP              1
+            310 POP_JUMP_IF_FALSE       35 (to 382)
+
+ 62         312 LOAD_FAST                5 (engine)
+            314 POP_JUMP_IF_FALSE       27 (to 370)
+            316 LOAD_FAST                5 (engine)
+            318 LOAD_ATTR               18 (meta)
+            338 LOAD_ATTR               13 (NULL|self + get)
+            358 LOAD_CONST               7 ('aspect_ratio')
+            360 CALL                     1
+            368 JUMP_FORWARD             1 (to 372)
+        >>  370 LOAD_CONST               0 (None)
+        >>  372 COPY                     1
+            374 POP_JUMP_IF_TRUE         2 (to 380)
+            376 POP_TOP
+            378 LOAD_CONST               8 ('16:9')
+        >>  380 STORE_FAST               6 (aspect)
+
+ 63     >>  382 LOAD_FAST                6 (aspect)
+            384 LOAD_CONST               9 ('9:16')
+            386 COMPARE_OP              40 (==)
+            390 POP_JUMP_IF_FALSE        2 (to 396)
+            392 LOAD_CONST              10 ('portrait')
+            394 JUMP_FORWARD             1 (to 398)
+        >>  396 LOAD_CONST              11 ('landscape')
+        >>  398 STORE_FAST               7 (orientation)
+
+ 68         400 LOAD_GLOBAL             15 (NULL + channel_engines)
+            410 LOAD_ATTR               20 (stock_bank)
+            430 LOAD_FAST                5 (engine)
+            432 LOAD_FAST                1 (ctx)
+            434 LOAD_ATTR               10 (config)
+            454 LOAD_ATTR               13 (NULL|self + get)
+            474 LOAD_CONST              12 ('channel_niche')
+            476 CALL                     1
+            484 CALL                     2
+            492 STORE_FAST               8 (stock_kw_bank)
+
+ 69         494 LOAD_FAST                8 (stock_kw_bank)
+            496 POP_JUMP_IF_TRUE        19 (to 536)
+
+ 70         498 LOAD_FAST                1 (ctx)
+            500 LOAD_ATTR               23 (NULL|self + emit_log)
+            520 LOAD_CONST              13 ('[stock] engine chưa cấu hình stock_keywords — dùng từ khoá từ prompt (fallback).')
+
+ 71         522 LOAD_CONST              14 ('warn')
+
+ 70         524 KW_NAMES                15 (('level',))
+            526 CALL                     2
+            534 POP_TOP
+
+ 74     >>  536 LOAD_GLOBAL             25 (NULL + SessionLocal)
+            546 CALL                     0
+            554 BEFORE_WITH
+            556 STORE_FAST               9 (db)
+
+ 75         558 LOAD_FAST                9 (db)
+            560 LOAD_ATTR               27 (NULL|self + query)
+            580 LOAD_GLOBAL             28 (ContentPlan)
+            590 CALL                     1
+            598 LOAD_ATTR               31 (NULL|self + filter)
+            618 LOAD_GLOBAL             28 (ContentPlan)
+            628 LOAD_ATTR                6 (video_id)
+            648 LOAD_FAST                1 (ctx)
+            650 LOAD_ATTR                6 (video_id)
+            670 COMPARE_OP              40 (==)
+            674 CALL                     1
+            682 LOAD_ATTR               33 (NULL|self + first)
+            702 CALL                     0
+            710 STORE_FAST              10 (plan)
+
+ 76         712 BUILD_LIST               0
+            714 STORE_FAST              11 (scenes)
+
+ 77         716 LOAD_FAST               10 (plan)
+            718 POP_JUMP_IF_FALSE       44 (to 808)
+            720 LOAD_FAST               10 (plan)
+            722 LOAD_ATTR               34 (scenes_json)
+            742 POP_JUMP_IF_FALSE       32 (to 808)
+
+ 78         744 NOP
+
+ 79         746 LOAD_GLOBAL             37 (NULL + json)
+            756 LOAD_ATTR               38 (loads)
+            776 LOAD_FAST               10 (plan)
+            778 LOAD_ATTR               34 (scenes_json)
+            798 CALL                     1
+            806 STORE_FAST              11 (scenes)
+
+ 74     >>  808 LOAD_CONST               0 (None)
+            810 LOAD_CONST               0 (None)
+            812 LOAD_CONST               0 (None)
+            814 CALL                     2
+            822 POP_TOP
+
+ 82     >>  824 LOAD_FAST_CHECK         11 (scenes)
+            826 POP_JUMP_IF_TRUE        26 (to 880)
+
+ 83         828 LOAD_GLOBAL             43 (NULL + make_error)
+            838 LOAD_GLOBAL             44 (E)
+            848 LOAD_ATTR               46 (PRECONDITION_MISSING)
+
+ 84         868 LOAD_CONST              16 ('Chưa có storyboard (scenes). Hãy chạy step storyboard trước.')
+
+ 83         870 CALL                     2
+            878 RAISE_VARARGS            1
+
+ 87     >>  880 LOAD_CONST              17 (0)
+            882 LOAD_CONST              18 (('raise_if_storyboard_invalid',))
+            884 IMPORT_NAME             24 (app.pipeline.steps.storyboard)
+            886 IMPORT_FROM             25 (raise_if_storyboard_invalid)
+            888 STORE_FAST              12 (raise_if_storyboard_invalid)
+            890 POP_TOP
+
+ 88         892 PUSH_NULL
+            894 LOAD_FAST               12 (raise_if_storyboard_invalid)
+
+ 89         896 LOAD_FAST               11 (scenes)
+            898 LOAD_CONST               0 (None)
+            900 LOAD_FAST                5 (engine)
+            902 LOAD_FAST                6 (aspect)
+
+ 90         904 LOAD_FAST                1 (ctx)
+            906 LOAD_ATTR               10 (config)
+            926 LOAD_ATTR               13 (NULL|self + get)
+            946 LOAD_CONST              19 ('language')
+            948 CALL                     1
+            956 COPY                     1
+            958 POP_JUMP_IF_TRUE        31 (to 1022)
+            960 POP_TOP
+            962 LOAD_FAST                1 (ctx)
+            964 LOAD_ATTR               10 (config)
+            984 LOAD_ATTR               13 (NULL|self + get)
+           1004 LOAD_CONST              20 ('dst_lang')
+           1006 CALL                     1
+           1014 COPY                     1
+           1016 POP_JUMP_IF_TRUE         2 (to 1022)
+           1018 POP_TOP
+           1020 LOAD_CONST              21 ('vi')
+
+ 91     >> 1022 LOAD_CONST              22 ('stock')
+           1024 LOAD_CONST              23 ('Tải clip stock')
+
+ 88        1026 KW_NAMES                24 (('image_provider', 'where'))
+           1028 CALL                     7
+           1036 POP_TOP
+
+ 94        1038 LOAD_FAST                1 (ctx)
+           1040 LOAD_ATTR               10 (config)
+           1060 LOAD_ATTR               13 (NULL|self + get)
+           1080 LOAD_CONST              25 ('stock_providers')
+           1082 CALL                     1
+           1090 COPY                     1
+           1092 POP_JUMP_IF_TRUE         4 (to 1102)
+           1094 POP_TOP
+           1096 LOAD_CONST              26 ('pexels')
+           1098 LOAD_CONST              27 ('pixabay')
+           1100 BUILD_LIST               2
+        >> 1102 STORE_FAST              13 (providers)
+
+ 95        1104 LOAD_GLOBAL             53 (NULL + StockFailover)
+           1114 LOAD_GLOBAL             55 (NULL + isinstance)
+           1124 LOAD_FAST               13 (providers)
+           1126 LOAD_GLOBAL             56 (list)
+           1136 CALL                     2
+           1144 POP_JUMP_IF_FALSE        2 (to 1150)
+           1146 LOAD_FAST               13 (providers)
+           1148 JUMP_FORWARD             3 (to 1156)
+        >> 1150 LOAD_CONST              26 ('pexels')
+           1152 LOAD_CONST              27 ('pixabay')
+           1154 BUILD_LIST               2
+        >> 1156 CALL                     1
+           1164 STORE_FAST              14 (fo)
+
+ 96        1166 LOAD_FAST               14 (fo)
+           1168 LOAD_ATTR               58 (available)
+           1188 POP_JUMP_IF_TRUE        26 (to 1242)
+
+ 97        1190 LOAD_GLOBAL             43 (NULL + make_error)
+
+ 98        1200 LOAD_GLOBAL             44 (E)
+           1210 LOAD_ATTR               60 (STOCK_AUTH)
+
+ 99        1230 LOAD_CONST              28 ("Chưa nhập API key kho tư liệu (Pexels/Pixabay). Mở Settings → Kho tư liệu (Stock) để nhập key (đăng ký miễn phí), rồi bấm 'Tải lại cảnh thiếu'.")
+
+ 97        1232 CALL                     2
+           1240 RAISE_VARARGS            1
+
+101     >> 1242 LOAD_FAST                1 (ctx)
+           1244 LOAD_ATTR               23 (NULL|self + emit_log)
+           1264 LOAD_CONST              29 ('[stock] dùng kho: ')
+           1266 LOAD_CONST              30 (', ')
+           1268 LOAD_ATTR               63 (NULL|self + join)
+           1288 LOAD_FAST               14 (fo)
+           1290 LOAD_ATTR               64 (labels)
+           1310 CALL                     1
+           1318 FORMAT_VALUE             0
+           1320 LOAD_CONST              31 (' · orientation=')
+           1322 LOAD_FAST                7 (orientation)
+           1324 FORMAT_VALUE             0
+           1326 BUILD_STRING             4
+           1328 CALL                     1
+           1336 POP_TOP
+
+103        1338 LOAD_GLOBAL             67 (NULL + set)
+           1348 CALL                     0
+           1356 STORE_FAST              15 (used_ids)
+
+104        1358 LOAD_GLOBAL             69 (NULL + len)
+           1368 LOAD_FAST               11 (scenes)
+           1370 CALL                     1
+           1378 STORE_FAST              16 (total)
+
+105        1380 LOAD_CONST              17 (0)
+           1382 COPY                     1
+           1384 STORE_FAST              17 (n_ok)
+           1386 STORE_FAST              18 (n_fail)
+
+107        1388 LOAD_GLOBAL             71 (NULL + enumerate)
+           1398 LOAD_FAST               11 (scenes)
+           1400 CALL                     1
+           1408 GET_ITER
+        >> 1410 EXTENDED_ARG             4
+           1412 FOR_ITER              1087 (to 3590)
+           1416 UNPACK_SEQUENCE          2
+           1420 STORE_FAST              19 (i)
+           1422 STORE_FAST              20 (scene)
+
+108        1424 LOAD_FAST                1 (ctx)
+           1426 LOAD_ATTR               73 (NULL|self + is_cancelled)
+           1446 CALL                     0
+           1454 POP_JUMP_IF_FALSE       26 (to 1508)
+
+109        1456 LOAD_GLOBAL             43 (NULL + make_error)
+           1466 LOAD_GLOBAL             44 (E)
+           1476 LOAD_ATTR               74 (CANCELLED)
+           1496 LOAD_CONST              32 ('Đã huỷ khi tải tư liệu.')
+           1498 CALL                     2
+           1506 RAISE_VARARGS            1
+
+110     >> 1508 LOAD_FAST               20 (scene)
+           1510 LOAD_ATTR               13 (NULL|self + get)
+           1530 LOAD_CONST              33 ('render_skip')
+           1532 CALL                     1
+           1540 POP_JUMP_IF_FALSE        1 (to 1544)
+
+111        1542 JUMP_BACKWARD           67 (to 1410)
+
+112     >> 1544 LOAD_GLOBAL             77 (NULL + int)
+           1554 LOAD_FAST               20 (scene)
+           1556 LOAD_ATTR               13 (NULL|self + get)
+           1576 LOAD_CONST              34 ('seq')
+           1578 LOAD_FAST               19 (i)
+           1580 LOAD_CONST              35 (1)
+           1582 BINARY_OP                0 (+)
+           1586 CALL                     2
+           1594 CALL                     1
+           1602 STORE_FAST              21 (seq)
+
+113        1604 LOAD_GLOBAL             79 (NULL + max)
+           1614 LOAD_CONST              35 (1)
+           1616 LOAD_GLOBAL             77 (NULL + int)
+           1626 LOAD_FAST               20 (scene)
+           1628 LOAD_ATTR               13 (NULL|self + get)
+           1648 LOAD_CONST              36 ('end_ms')
+           1650 LOAD_CONST              17 (0)
+           1652 CALL                     2
+           1660 CALL                     1
+           1668 LOAD_GLOBAL             77 (NULL + int)
+           1678 LOAD_FAST               20 (scene)
+           1680 LOAD_ATTR               13 (NULL|self + get)
+           1700 LOAD_CONST              37 ('start_ms')
+           1702 LOAD_CONST              17 (0)
+           1704 CALL                     2
+           1712 CALL                     1
+           1720 BINARY_OP               10 (-)
+           1724 CALL                     2
+           1732 STORE_FAST              22 (window_ms)
+
+116        1734 LOAD_FAST               20 (scene)
+           1736 LOAD_ATTR               13 (NULL|self + get)
+           1756 LOAD_CONST              38 ('asset_path')
+           1758 CALL                     1
+           1766 STORE_FAST              23 (existing)
+
+117        1768 LOAD_FAST               23 (existing)
+           1770 POP_JUMP_IF_FALSE      180 (to 2132)
+           1772 LOAD_GLOBAL             81 (NULL + Path)
+           1782 LOAD_FAST               23 (existing)
+           1784 CALL                     1
+           1792 LOAD_ATTR               83 (NULL|self + exists)
+           1812 CALL                     0
+           1820 POP_JUMP_IF_FALSE      155 (to 2132)
+           1822 LOAD_FAST               20 (scene)
+           1824 LOAD_ATTR               13 (NULL|self + get)
+           1844 LOAD_CONST              39 ('status')
+           1846 CALL                     1
+           1854 LOAD_CONST              40 ('done')
+           1856 COMPARE_OP              40 (==)
+           1860 POP_JUMP_IF_FALSE      135 (to 2132)
+
+118        1862 LOAD_FAST               20 (scene)
+           1864 LOAD_ATTR               13 (NULL|self + get)
+           1884 LOAD_CONST              41 ('asset_kind')
+           1886 CALL                     1
+           1894 LOAD_CONST              42 ('video')
+           1896 COMPARE_OP              40 (==)
+           1900 POP_JUMP_IF_FALSE      115 (to 2132)
+
+119        1902 LOAD_GLOBAL             85 (NULL + str)
+           1912 LOAD_FAST               20 (scene)
+           1914 LOAD_ATTR               13 (NULL|self + get)
+           1934 LOAD_CONST              43 ('stock_meta')
+           1936 CALL                     1
+           1944 COPY                     1
+           1946 POP_JUMP_IF_TRUE         2 (to 1952)
+           1948 POP_TOP
+           1950 BUILD_MAP                0
+        >> 1952 LOAD_ATTR               13 (NULL|self + get)
+           1972 LOAD_CONST              44 ('id')
+           1974 CALL                     1
+           1982 COPY                     1
+           1984 POP_JUMP_IF_TRUE         2 (to 1990)
+           1986 POP_TOP
+           1988 LOAD_CONST              45 ('')
+        >> 1990 CALL                     1
+           1998 STORE_FAST              24 (sid)
+
+120        2000 LOAD_FAST               24 (sid)
+           2002 POP_JUMP_IF_FALSE       17 (to 2038)
+
+121        2004 LOAD_FAST               15 (used_ids)
+           2006 LOAD_ATTR               87 (NULL|self + add)
+           2026 LOAD_FAST               24 (sid)
+           2028 CALL                     1
+           2036 POP_TOP
+
+122     >> 2038 LOAD_FAST               17 (n_ok)
+           2040 LOAD_CONST              35 (1)
+           2042 BINARY_OP               13 (+=)
+           2046 STORE_FAST              17 (n_ok)
+
+123        2048 LOAD_FAST                1 (ctx)
+           2050 LOAD_ATTR               89 (NULL|self + emit_progress)
+           2070 LOAD_CONST              46 (0.05)
+           2072 LOAD_CONST              47 (0.9)
+           2074 LOAD_FAST               19 (i)
+           2076 LOAD_CONST              35 (1)
+           2078 BINARY_OP                0 (+)
+           2082 BINARY_OP                5 (*)
+           2086 LOAD_FAST               16 (total)
+           2088 BINARY_OP               11 (/)
+           2092 BINARY_OP                0 (+)
+           2096 LOAD_CONST              48 ('Cảnh ')
+           2098 LOAD_FAST               19 (i)
+           2100 LOAD_CONST              35 (1)
+           2102 BINARY_OP                0 (+)
+           2106 FORMAT_VALUE             0
+           2108 LOAD_CONST              49 ('/')
+           2110 LOAD_FAST               16 (total)
+           2112 FORMAT_VALUE             0
+           2114 LOAD_CONST              50 (' (đã có, bỏ qua)')
+           2116 BUILD_STRING             5
+           2118 CALL                     2
+           2126 POP_TOP
+
+124        2128 EXTENDED_ARG             1
+           2130 JUMP_BACKWARD          361 (to 1410)
+
+128     >> 2132 LOAD_FAST                8 (stock_kw_bank)
+           2134 POP_JUMP_IF_FALSE       63 (to 2262)
+
+129        2136 LOAD_GLOBAL             15 (NULL + channel_engines)
+           2146 LOAD_ATTR               90 (build_stock_queries)
+
+130        2166 LOAD_FAST               20 (scene)
+           2168 LOAD_ATTR               13 (NULL|self + get)
+           2188 LOAD_CONST              51 ('image_prompt_en')
+           2190 CALL                     1
+           2198 COPY                     1
+           2200 POP_JUMP_IF_TRUE         2 (to 2206)
+           2202 POP_TOP
+           2204 LOAD_CONST              45 ('')
+        >> 2206 LOAD_FAST               20 (scene)
+           2208 LOAD_ATTR               13 (NULL|self + get)
+           2228 LOAD_CONST              52 ('text')
+           2230 CALL                     1
+           2238 COPY                     1
+           2240 POP_JUMP_IF_TRUE         2 (to 2246)
+           2242 POP_TOP
+           2244 LOAD_CONST              45 ('')
+        >> 2246 LOAD_FAST                8 (stock_kw_bank)
+           2248 LOAD_FAST               21 (seq)
+
+129        2250 CALL                     4
+           2258 STORE_FAST              25 (queries)
+           2260 JUMP_FORWARD            11 (to 2284)
+
+132     >> 2262 LOAD_GLOBAL             93 (NULL + _scene_queries)
+           2272 LOAD_FAST               20 (scene)
+           2274 CALL                     1
+           2282 STORE_FAST              25 (queries)
+
+133     >> 2284 LOAD_FAST                1 (ctx)
+           2286 LOAD_ATTR               23 (NULL|self + emit_log)
+           2306 LOAD_CONST              48 ('Cảnh ')
+           2308 LOAD_FAST               21 (seq)
+           2310 FORMAT_VALUE             0
+           2312 LOAD_CONST              53 (': từ khoá stock (snap bank) → ')
+           2314 LOAD_FAST               25 (queries)
+           2316 FORMAT_VALUE             0
+           2318 BUILD_STRING             4
+           2320 CALL                     1
+           2328 POP_TOP
+
+134        2330 LOAD_CONST               0 (None)
+           2332 STORE_FAST              26 (clip)
+
+135        2334 LOAD_CONST               0 (None)
+           2336 STORE_FAST              27 (asset)
+
+136        2338 LOAD_CONST              54 (3.0)
+           2340 STORE_FAST              28 (delay)
+
+137        2342 LOAD_GLOBAL             95 (NULL + range)
+           2352 LOAD_CONST              35 (1)
+           2354 LOAD_GLOBAL             96 (_SCENE_ATTEMPTS)
+           2364 LOAD_CONST              35 (1)
+           2366 BINARY_OP                0 (+)
+           2370 CALL                     2
+           2378 GET_ITER
+        >> 2380 FOR_ITER               216 (to 2816)
+           2384 STORE_FAST              29 (attempt)
+
+139        2386 LOAD_FAST               25 (queries)
+           2388 LOAD_GLOBAL             99 (NULL + min)
+           2398 LOAD_FAST               29 (attempt)
+           2400 LOAD_CONST              35 (1)
+           2402 BINARY_OP               10 (-)
+           2406 LOAD_GLOBAL             69 (NULL + len)
+           2416 LOAD_FAST               25 (queries)
+           2418 CALL                     1
+           2426 LOAD_CONST              35 (1)
+           2428 BINARY_OP               10 (-)
+           2432 CALL                     2
+           2440 BINARY_SUBSCR
+           2444 STORE_FAST              30 (query)
+
+140        2446 NOP
+
+142        2448 LOAD_FAST                0 (self)
+           2450 LOAD_ATTR              101 (NULL|self + _search_pick)
+           2470 LOAD_FAST               14 (fo)
+           2472 LOAD_FAST               30 (query)
+           2474 LOAD_FAST                7 (orientation)
+           2476 LOAD_FAST               22 (window_ms)
+           2478 LOAD_FAST               15 (used_ids)
+
+143        2480 LOAD_FAST               29 (attempt)
+           2482 LOAD_GLOBAL             96 (_SCENE_ATTEMPTS)
+           2492 COMPARE_OP               2 (<)
+
+142        2496 KW_NAMES                55 (('strict',))
+           2498 CALL                     6
+           2506 GET_AWAITABLE            0
+           2508 LOAD_CONST               0 (None)
+        >> 2510 SEND                     3 (to 2520)
+           2514 YIELD_VALUE              3
+           2516 RESUME                   3
+           2518 JUMP_BACKWARD_NO_INTERRUPT     5 (to 2510)
+        >> 2520 END_SEND
+           2522 STORE_FAST              26 (clip)
+
+144        2524 LOAD_FAST               26 (clip)
+           2526 POP_JUMP_IF_NOT_NONE    30 (to 2588)
+
+145        2528 LOAD_FAST                1 (ctx)
+           2530 LOAD_ATTR               23 (NULL|self + emit_log)
+           2550 LOAD_CONST              48 ('Cảnh ')
+           2552 LOAD_FAST               21 (seq)
+           2554 FORMAT_VALUE             0
+           2556 LOAD_CONST              56 (": không có clip khớp '")
+           2558 LOAD_FAST               30 (query)
+           2560 FORMAT_VALUE             0
+           2562 LOAD_CONST              57 ("' (lần ")
+           2564 LOAD_FAST               29 (attempt)
+           2566 FORMAT_VALUE             0
+           2568 LOAD_CONST              58 (').')
+           2570 BUILD_STRING             7
+           2572 LOAD_CONST              14 ('warn')
+           2574 KW_NAMES                15 (('level',))
+           2576 CALL                     2
+           2584 POP_TOP
+           2586 JUMP_FORWARD            59 (to 2706)
+
+147     >> 2588 LOAD_FAST                3 (scenes_dir)
+           2590 LOAD_CONST              59 ('scene_')
+           2592 LOAD_FAST               21 (seq)
+           2594 FORMAT_VALUE             0
+           2596 LOAD_CONST              60 ('_')
+           2598 LOAD_FAST               26 (clip)
+           2600 LOAD_ATTR              102 (provider)
+           2620 FORMAT_VALUE             0
+           2622 LOAD_CONST              60 ('_')
+           2624 LOAD_FAST               26 (clip)
+           2626 LOAD_ATTR              104 (id)
+           2646 FORMAT_VALUE             0
+           2648 LOAD_CONST              61 ('.mp4')
+           2650 BUILD_STRING             7
+           2652 BINARY_OP               11 (/)
+           2656 STORE_FAST              31 (out)
+
+148        2658 LOAD_GLOBAL            107 (NULL + download_clip)
+           2668 LOAD_FAST               26 (clip)
+           2670 LOAD_FAST               31 (out)
+           2672 CALL                     2
+           2680 GET_AWAITABLE            0
+           2682 LOAD_CONST               0 (None)
+        >> 2684 SEND                     3 (to 2694)
+           2688 YIELD_VALUE              3
+           2690 RESUME                   3
+           2692 JUMP_BACKWARD_NO_INTERRUPT     5 (to 2684)
+        >> 2694 END_SEND
+           2696 POP_JUMP_IF_FALSE        4 (to 2706)
+
+149        2698 LOAD_FAST               31 (out)
+           2700 STORE_FAST              27 (asset)
+
+150        2702 POP_TOP
+           2704 JUMP_FORWARD            56 (to 2818)
+
+159     >> 2706 LOAD_FAST               29 (attempt)
+           2708 LOAD_GLOBAL             96 (_SCENE_ATTEMPTS)
+           2718 COMPARE_OP               2 (<)
+           2722 POP_JUMP_IF_TRUE         1 (to 2726)
+           2724 JUMP_BACKWARD          173 (to 2380)
+
+160     >> 2726 LOAD_GLOBAL            117 (NULL + asyncio)
+           2736 LOAD_ATTR              118 (sleep)
+           2756 LOAD_FAST               28 (delay)
+           2758 CALL                     1
+           2766 GET_AWAITABLE            0
+           2768 LOAD_CONST               0 (None)
+        >> 2770 SEND                     3 (to 2780)
+           2774 YIELD_VALUE              2
+           2776 RESUME                   3
+           2778 JUMP_BACKWARD_NO_INTERRUPT     5 (to 2770)
+        >> 2780 END_SEND
+           2782 POP_TOP
+
+161        2784 LOAD_GLOBAL             99 (NULL + min)
+           2794 LOAD_FAST               28 (delay)
+           2796 LOAD_CONST              68 (2)
+           2798 BINARY_OP                5 (*)
+           2802 LOAD_CONST              69 (20)
+           2804 CALL                     2
+           2812 STORE_FAST              28 (delay)
+           2814 JUMP_BACKWARD          218 (to 2380)
+
+137     >> 2816 END_FOR
+
+163     >> 2818 LOAD_FAST               27 (asset)
+           2820 EXTENDED_ARG             1
+           2822 POP_JUMP_IF_NONE       299 (to 3422)
+           2824 LOAD_FAST               27 (asset)
+           2826 LOAD_ATTR               83 (NULL|self + exists)
+           2846 CALL                     0
+           2854 EXTENDED_ARG             1
+           2856 POP_JUMP_IF_FALSE      282 (to 3422)
+           2858 LOAD_FAST               26 (clip)
+           2860 EXTENDED_ARG             1
+           2862 POP_JUMP_IF_NONE       279 (to 3422)
+
+164        2864 LOAD_GLOBAL             85 (NULL + str)
+           2874 LOAD_FAST               27 (asset)
+           2876 LOAD_ATTR              121 (NULL|self + resolve)
+           2896 CALL                     0
+           2904 CALL                     1
+           2912 LOAD_FAST               20 (scene)
+           2914 LOAD_CONST              38 ('asset_path')
+           2916 STORE_SUBSCR
+
+165        2920 LOAD_CONST              42 ('video')
+           2922 LOAD_FAST               20 (scene)
+           2924 LOAD_CONST              41 ('asset_kind')
+           2926 STORE_SUBSCR
+
+166        2930 LOAD_CONST              42 ('video')
+           2932 LOAD_FAST               20 (scene)
+           2934 LOAD_CONST              70 ('media_type')
+           2936 STORE_SUBSCR
+
+167        2940 LOAD_FAST               26 (clip)
+           2942 LOAD_ATTR              102 (provider)
+           2962 LOAD_FAST               26 (clip)
+           2964 LOAD_ATTR              104 (id)
+
+168        2984 LOAD_FAST               26 (clip)
+           2986 LOAD_ATTR              122 (author)
+           3006 LOAD_FAST               26 (clip)
+           3008 LOAD_ATTR              124 (page_url)
+
+169        3028 LOAD_FAST               26 (clip)
+           3030 LOAD_ATTR              126 (license)
+           3050 LOAD_FAST               26 (clip)
+           3052 LOAD_ATTR              129 (NULL|self + credit)
+           3072 CALL                     0
+
+167        3080 LOAD_CONST              71 (('provider', 'id', 'author', 'page_url', 'license', 'credit'))
+           3082 BUILD_CONST_KEY_MAP      6
+           3084 LOAD_FAST               20 (scene)
+           3086 LOAD_CONST              43 ('stock_meta')
+           3088 STORE_SUBSCR
+
+171        3092 LOAD_GLOBAL             77 (NULL + int)
+           3102 LOAD_FAST               26 (clip)
+           3104 LOAD_ATTR              130 (duration_s)
+           3124 LOAD_CONST              72 (1000)
+           3126 BINARY_OP                5 (*)
+           3130 CALL                     1
+           3138 STORE_FAST              33 (clip_ms)
+
+172        3140 LOAD_FAST               33 (clip_ms)
+           3142 LOAD_FAST               22 (window_ms)
+           3144 LOAD_CONST              73 (500)
+           3146 BINARY_OP                0 (+)
+           3150 COMPARE_OP              68 (>)
+           3154 POP_JUMP_IF_FALSE       21 (to 3198)
+
+173        3156 LOAD_GLOBAL             79 (NULL + max)
+           3166 LOAD_CONST              17 (0)
+           3168 LOAD_FAST               33 (clip_ms)
+           3170 LOAD_FAST               22 (window_ms)
+           3172 BINARY_OP               10 (-)
+           3176 LOAD_CONST              68 (2)
+           3178 BINARY_OP                2 (//)
+           3182 CALL                     2
+           3190 LOAD_FAST               20 (scene)
+           3192 LOAD_CONST              74 ('src_in_ms')
+           3194 STORE_SUBSCR
+
+174     >> 3198 LOAD_CONST              40 ('done')
+           3200 LOAD_FAST               20 (scene)
+           3202 LOAD_CONST              39 ('status')
+           3204 STORE_SUBSCR
+
+175        3208 LOAD_FAST               15 (used_ids)
+           3210 LOAD_ATTR               87 (NULL|self + add)
+           3230 LOAD_FAST               26 (clip)
+           3232 LOAD_ATTR              104 (id)
+           3252 CALL                     1
+           3260 POP_TOP
+
+176        3262 LOAD_FAST               17 (n_ok)
+           3264 LOAD_CONST              35 (1)
+           3266 BINARY_OP               13 (+=)
+           3270 STORE_FAST              17 (n_ok)
+
+177        3272 LOAD_FAST                1 (ctx)
+           3274 LOAD_ATTR               23 (NULL|self + emit_log)
+           3294 LOAD_CONST              48 ('Cảnh ')
+           3296 LOAD_FAST               21 (seq)
+           3298 FORMAT_VALUE             0
+           3300 LOAD_CONST              75 (': ✓ clip ')
+           3302 LOAD_FAST               26 (clip)
+           3304 LOAD_ATTR              102 (provider)
+           3324 FORMAT_VALUE             0
+           3326 LOAD_CONST              63 (' (')
+           3328 LOAD_FAST               26 (clip)
+           3330 LOAD_ATTR              132 (width)
+           3350 FORMAT_VALUE             0
+           3352 LOAD_CONST              76 ('x')
+           3354 LOAD_FAST               26 (clip)
+           3356 LOAD_ATTR              134 (height)
+           3376 FORMAT_VALUE             0
+           3378 LOAD_CONST              30 (', ')
+
+178        3380 LOAD_FAST               26 (clip)
+           3382 LOAD_ATTR              130 (duration_s)
+           3402 LOAD_CONST              77 ('.0f')
+           3404 FORMAT_VALUE             4 (with format)
+           3406 LOAD_CONST              78 ('s).')
+
+177        3408 BUILD_STRING            11
+           3410 CALL                     1
+           3418 POP_TOP
+           3420 JUMP_FORWARD            15 (to 3452)
+
+180     >> 3422 LOAD_CONST              79 ('failed')
+           3424 LOAD_FAST               20 (scene)
+           3426 LOAD_CONST              39 ('status')
+           3428 STORE_SUBSCR
+
+181        3432 LOAD_CONST               0 (None)
+           3434 LOAD_FAST               20 (scene)
+           3436 LOAD_CONST              38 ('asset_path')
+           3438 STORE_SUBSCR
+
+182        3442 LOAD_FAST               18 (n_fail)
+           3444 LOAD_CONST              35 (1)
+           3446 BINARY_OP               13 (+=)
+           3450 STORE_FAST              18 (n_fail)
+
+184     >> 3452 LOAD_FAST                0 (self)
+           3454 LOAD_ATTR              137 (NULL|self + _save_scenes)
+           3474 LOAD_FAST                1 (ctx)
+           3476 LOAD_ATTR                6 (video_id)
+           3496 LOAD_FAST               11 (scenes)
+           3498 CALL                     2
+           3506 POP_TOP
+
+185        3508 LOAD_FAST                1 (ctx)
+           3510 LOAD_ATTR               89 (NULL|self + emit_progress)
+           3530 LOAD_CONST              46 (0.05)
+           3532 LOAD_CONST              47 (0.9)
+           3534 LOAD_FAST               19 (i)
+           3536 LOAD_CONST              35 (1)
+           3538 BINARY_OP                0 (+)
+           3542 BINARY_OP                5 (*)
+           3546 LOAD_FAST               16 (total)
+           3548 BINARY_OP               11 (/)
+           3552 BINARY_OP                0 (+)
+           3556 LOAD_CONST              80 ('Tải tư liệu cảnh ')
+           3558 LOAD_FAST               19 (i)
+           3560 LOAD_CONST              35 (1)
+           3562 BINARY_OP                0 (+)
+           3566 FORMAT_VALUE             0
+           3568 LOAD_CONST              49 ('/')
+           3570 LOAD_FAST               16 (total)
+           3572 FORMAT_VALUE             0
+           3574 BUILD_STRING             4
+           3576 CALL                     2
+           3584 POP_TOP
+           3586 EXTENDED_ARG             4
+           3588 JUMP_BACKWARD         1090 (to 1410)
+
+107     >> 3590 END_FOR
+
+188        3592 LOAD_GLOBAL             71 (NULL + enumerate)
+           3602 LOAD_FAST               11 (scenes)
+           3604 CALL                     1
+           3612 GET_ITER
+           3614 LOAD_FAST_AND_CLEAR     34 (k)
+           3616 LOAD_FAST_AND_CLEAR     35 (s)
+           3618 SWAP                     3
+           3620 BUILD_LIST               0
+           3622 SWAP                     2
+        >> 3624 FOR_ITER                72 (to 3772)
+           3628 UNPACK_SEQUENCE          2
+           3632 STORE_FAST              34 (k)
+           3634 STORE_FAST              35 (s)
+
+189        3636 LOAD_FAST               35 (s)
+           3638 LOAD_ATTR               13 (NULL|self + get)
+           3658 LOAD_CONST              33 ('render_skip')
+           3660 CALL                     1
+           3668 POP_JUMP_IF_TRUE        50 (to 3770)
+           3670 LOAD_FAST               35 (s)
+           3672 LOAD_ATTR               13 (NULL|self + get)
+           3692 LOAD_CONST              39 ('status')
+           3694 CALL                     1
+           3702 LOAD_CONST              40 ('done')
+           3704 COMPARE_OP              55 (!=)
+           3708 POP_JUMP_IF_FALSE       30 (to 3770)
+
+188        3710 LOAD_GLOBAL             77 (NULL + int)
+           3720 LOAD_FAST               35 (s)
+           3722 LOAD_ATTR               13 (NULL|self + get)
+           3742 LOAD_CONST              34 ('seq')
+           3744 LOAD_FAST               34 (k)
+           3746 LOAD_CONST              35 (1)
+           3748 BINARY_OP                0 (+)
+           3752 CALL                     2
+           3760 CALL                     1
+           3768 LIST_APPEND              2
+        >> 3770 JUMP_BACKWARD           74 (to 3624)
+        >> 3772 END_FOR
+           3774 STORE_FAST              36 (missing)
+           3776 STORE_FAST              34 (k)
+           3778 STORE_FAST              35 (s)
+
+190        3780 LOAD_FAST               36 (missing)
+           3782 POP_JUMP_IF_FALSE      144 (to 4072)
+
+191        3784 LOAD_FAST                0 (self)
+           3786 LOAD_ATTR              137 (NULL|self + _save_scenes)
+           3806 LOAD_FAST                1 (ctx)
+           3808 LOAD_ATTR                6 (video_id)
+           3828 LOAD_FAST               11 (scenes)
+           3830 CALL                     2
+           3838 POP_TOP
+
+192        3840 LOAD_GLOBAL            139 (NULL + sum)
+           3850 LOAD_CONST              81 (<code object <genexpr> at 0x7f6c930b88b0, file "app\pipeline\steps\stock_generate.py", line 192>)
+           3852 MAKE_FUNCTION            0
+           3854 LOAD_FAST               11 (scenes)
+           3856 GET_ITER
+           3858 CALL                     0
+           3866 CALL                     1
+           3874 STORE_FAST              37 (n_visible)
+
+193        3876 LOAD_CONST              30 (', ')
+           3878 LOAD_ATTR               63 (NULL|self + join)
+           3898 LOAD_CONST              82 (<code object <genexpr> at 0x7f6c92fd4a30, file "app\pipeline\steps\stock_generate.py", line 193>)
+           3900 MAKE_FUNCTION            0
+           3902 LOAD_FAST               36 (missing)
+           3904 LOAD_CONST               0 (None)
+           3906 LOAD_CONST              83 (8)
+           3908 BINARY_SLICE
+           3910 GET_ITER
+           3912 CALL                     0
+           3920 CALL                     1
+           3928 LOAD_GLOBAL             69 (NULL + len)
+           3938 LOAD_FAST               36 (missing)
+           3940 CALL                     1
+           3948 LOAD_CONST              83 (8)
+           3950 COMPARE_OP              68 (>)
+           3954 POP_JUMP_IF_FALSE        2 (to 3960)
+           3956 LOAD_CONST              84 ('…')
+           3958 JUMP_FORWARD             1 (to 3962)
+        >> 3960 LOAD_CONST              45 ('')
+        >> 3962 BINARY_OP                0 (+)
+           3966 STORE_FAST              38 (preview)
+
+194        3968 LOAD_GLOBAL             43 (NULL + make_error)
+
+195        3978 LOAD_GLOBAL             44 (E)
+           3988 LOAD_ATTR              140 (STOCK_NO_MATCH)
+
+196        4008 LOAD_CONST              85 ('Còn ')
+           4010 LOAD_GLOBAL             69 (NULL + len)
+           4020 LOAD_FAST               36 (missing)
+           4022 CALL                     1
+           4030 FORMAT_VALUE             0
+           4032 LOAD_CONST              49 ('/')
+           4034 LOAD_FAST               37 (n_visible)
+           4036 FORMAT_VALUE             0
+           4038 LOAD_CONST              86 (' cảnh CHƯA tìm được clip stock khớp (cảnh ')
+           4040 LOAD_FAST               38 (preview)
+           4042 FORMAT_VALUE             0
+           4044 LOAD_CONST              87 (') sau ')
+
+197        4046 LOAD_GLOBAL             96 (_SCENE_ATTEMPTS)
+           4056 FORMAT_VALUE             0
+           4058 LOAD_CONST              88 (" lần thử. Sửa Mô tả/từ khoá cho cụ thể hơn, thử ngách hợp stock hơn, hoặc bấm 'Tải lại cảnh thiếu' (kiểm tra API key / hạn mức).")
+
+196        4060 BUILD_STRING             9
+
+194        4062 CALL                     2
+           4070 RAISE_VARARGS            1
+
+200     >> 4072 LOAD_GLOBAL             25 (NULL + SessionLocal)
+           4082 CALL                     0
+           4090 BEFORE_WITH
+           4092 STORE_FAST               9 (db)
+
+201        4094 LOAD_FAST                9 (db)
+           4096 LOAD_ATTR               27 (NULL|self + query)
+           4116 LOAD_GLOBAL             28 (ContentPlan)
+           4126 CALL                     1
+           4134 LOAD_ATTR               31 (NULL|self + filter)
+           4154 LOAD_GLOBAL             28 (ContentPlan)
+           4164 LOAD_ATTR                6 (video_id)
+           4184 LOAD_FAST                1 (ctx)
+           4186 LOAD_ATTR                6 (video_id)
+           4206 COMPARE_OP              40 (==)
+           4210 CALL                     1
+           4218 LOAD_ATTR               33 (NULL|self + first)
+           4238 CALL                     0
+           4246 STORE_FAST              10 (plan)
+
+202        4248 LOAD_FAST               10 (plan)
+           4250 POP_JUMP_IF_NOT_NONE    39 (to 4330)
+
+203        4252 LOAD_GLOBAL             29 (NULL + ContentPlan)
+           4262 LOAD_FAST                1 (ctx)
+           4264 LOAD_ATTR                6 (video_id)
+           4284 KW_NAMES                89 (('video_id',))
+           4286 CALL                     1
+           4294 STORE_FAST              10 (plan)
+
+204        4296 LOAD_FAST                9 (db)
+           4298 LOAD_ATTR               87 (NULL|self + add)
+           4318 LOAD_FAST               10 (plan)
+           4320 CALL                     1
+           4328 POP_TOP
+
+205     >> 4330 LOAD_GLOBAL             37 (NULL + json)
+           4340 LOAD_ATTR              142 (dumps)
+           4360 LOAD_FAST               11 (scenes)
+           4362 LOAD_CONST              90 (False)
+           4364 KW_NAMES                91 (('ensure_ascii',))
+           4366 CALL                     2
+           4374 LOAD_FAST               10 (plan)
+           4376 STORE_ATTR              17 (scenes_json)
+
+206        4386 LOAD_FAST                9 (db)
+           4388 LOAD_ATTR              145 (NULL|self + commit)
+           4408 CALL                     0
+           4416 POP_TOP
+
+200        4418 LOAD_CONST               0 (None)
+           4420 LOAD_CONST               0 (None)
+           4422 LOAD_CONST               0 (None)
+           4424 CALL                     2
+           4432 POP_TOP
+
+208     >> 4434 LOAD_FAST                3 (scenes_dir)
+           4436 LOAD_CONST              92 ('assets.json')
+           4438 BINARY_OP               11 (/)
+           4442 STORE_FAST              39 (manifest)
+
+209        4444 LOAD_FAST               39 (manifest)
+           4446 LOAD_ATTR              147 (NULL|self + write_text)
+           4466 LOAD_GLOBAL             37 (NULL + json)
+           4476 LOAD_ATTR              142 (dumps)
+
+210        4496 LOAD_CONST               1 ('scenes')
+
+213        4498 LOAD_FAST               11 (scenes)
+           4500 GET_ITER
+
+210        4502 LOAD_FAST_AND_CLEAR     35 (s)
+           4504 SWAP                     2
+           4506 BUILD_LIST               0
+           4508 SWAP                     2
+
+213     >> 4510 FOR_ITER                85 (to 4684)
+           4514 STORE_FAST              35 (s)
+
+210        4516 LOAD_FAST               35 (s)
+           4518 LOAD_ATTR               13 (NULL|self + get)
+           4538 LOAD_CONST              34 ('seq')
+           4540 CALL                     1
+           4548 LOAD_FAST               35 (s)
+           4550 LOAD_ATTR               13 (NULL|self + get)
+           4570 LOAD_CONST              38 ('asset_path')
+           4572 CALL                     1
+
+211        4580 LOAD_FAST               35 (s)
+           4582 LOAD_ATTR               13 (NULL|self + get)
+           4602 LOAD_CONST              41 ('asset_kind')
+           4604 CALL                     1
+           4612 LOAD_FAST               35 (s)
+           4614 LOAD_ATTR               13 (NULL|self + get)
+           4634 LOAD_CONST              39 ('status')
+           4636 CALL                     1
+
+212        4644 LOAD_FAST               35 (s)
+           4646 LOAD_ATTR               13 (NULL|self + get)
+           4666 LOAD_CONST              43 ('stock_meta')
+           4668 CALL                     1
+
+210        4676 LOAD_CONST              93 (('seq', 'asset_path', 'asset_kind', 'status', 'stock_meta'))
+           4678 BUILD_CONST_KEY_MAP      5
+           4680 LIST_APPEND              2
+           4682 JUMP_BACKWARD           87 (to 4510)
+
+213     >> 4684 END_FOR
+
+210        4686 SWAP                     2
+           4688 STORE_FAST              35 (s)
+           4690 BUILD_MAP                1
+
+213        4692 LOAD_CONST              90 (False)
+           4694 LOAD_CONST              68 (2)
+
+209        4696 KW_NAMES                94 (('ensure_ascii', 'indent'))
+           4698 CALL                     3
+
+213        4706 LOAD_CONST              95 ('utf-8')
+
+209        4708 KW_NAMES                96 (('encoding',))
+           4710 CALL                     2
+           4718 POP_TOP
+
+215        4720 LOAD_FAST                1 (ctx)
+           4722 LOAD_ATTR               89 (NULL|self + emit_progress)
+           4742 LOAD_CONST              97 (1.0)
+           4744 LOAD_CONST              98 ('Xong tư liệu: ')
+           4746 LOAD_FAST               17 (n_ok)
+           4748 FORMAT_VALUE             0
+           4750 LOAD_CONST              99 (' clip stock (tất cả là video THẬT).')
+           4752 BUILD_STRING             3
+           4754 CALL                     2
+           4762 POP_TOP
+
+217        4764 LOAD_GLOBAL             85 (NULL + str)
+           4774 LOAD_FAST               39 (manifest)
+           4776 LOAD_ATTR              121 (NULL|self + resolve)
+           4796 CALL                     0
+           4804 CALL                     1
+
+218        4812 LOAD_FAST               16 (total)
+           4814 LOAD_FAST               17 (n_ok)
+           4816 LOAD_FAST               18 (n_fail)
+           4818 LOAD_CONST              22 ('stock')
+           4820 LOAD_CONST             100 (('scenes', 'clips', 'failed', 'source'))
+           4822 BUILD_CONST_KEY_MAP      4
+
+216        4824 LOAD_CONST             101 (('scene_assets', 'meta'))
+           4826 BUILD_CONST_KEY_MAP      2
+           4828 RETURN_VALUE
+        >> 4830 PUSH_EXC_INFO
+
+ 80        4832 LOAD_GLOBAL             36 (json)
+           4842 LOAD_ATTR               40 (JSONDecodeError)
+           4862 CHECK_EXC_MATCH
+           4864 POP_JUMP_IF_FALSE        6 (to 4878)
+           4866 POP_TOP
+
+ 81        4868 BUILD_LIST               0
+           4870 STORE_FAST              11 (scenes)
+           4872 POP_EXCEPT
+           4874 EXTENDED_ARG             7
+           4876 JUMP_BACKWARD         2035 (to 808)
+
+ 80     >> 4878 RERAISE                  0
+        >> 4880 COPY                     3
+           4882 POP_EXCEPT
+           4884 RERAISE                  1
+
+ 74     >> 4886 PUSH_EXC_INFO
+           4888 WITH_EXCEPT_START
+           4890 POP_JUMP_IF_TRUE         1 (to 4894)
+           4892 RERAISE                  2
+        >> 4894 POP_TOP
+           4896 POP_EXCEPT
+           4898 POP_TOP
+           4900 POP_TOP
+           4902 EXTENDED_ARG             7
+           4904 JUMP_BACKWARD         2041 (to 824)
+        >> 4906 COPY                     3
+           4908 POP_EXCEPT
+           4910 RERAISE                  1
+
+142     >> 4912 CLEANUP_THROW
+           4914 EXTENDED_ARG             4
+           4916 JUMP_BACKWARD         1199 (to 2520)
+
+148     >> 4918 CLEANUP_THROW
+           4920 EXTENDED_ARG             4
+           4922 JUMP_BACKWARD         1115 (to 2694)
+        >> 4924 PUSH_EXC_INFO
+
+151        4926 LOAD_GLOBAL            108 (StudioError)
+           4936 CHECK_EXC_MATCH
+           4938 POP_JUMP_IF_FALSE      107 (to 5154)
+           4940 STORE_FAST              32 (e)
+
+152        4942 LOAD_FAST               32 (e)
+           4944 LOAD_ATTR              110 (code)
+           4964 LOAD_GLOBAL             44 (E)
+           4974 LOAD_ATTR               74 (CANCELLED)
+           4994 COMPARE_OP              40 (==)
+           4998 POP_JUMP_IF_FALSE        1 (to 5002)
+
+153        5000 RAISE_VARARGS            0
+
+154     >> 5002 LOAD_FAST                1 (ctx)
+           5004 LOAD_ATTR               23 (NULL|self + emit_log)
+           5024 LOAD_CONST              48 ('Cảnh ')
+           5026 LOAD_FAST               21 (seq)
+           5028 FORMAT_VALUE             0
+           5030 LOAD_CONST              62 (': lỗi stock lần ')
+           5032 LOAD_FAST               29 (attempt)
+           5034 FORMAT_VALUE             0
+           5036 LOAD_CONST              49 ('/')
+           5038 LOAD_GLOBAL             96 (_SCENE_ATTEMPTS)
+           5048 FORMAT_VALUE             0
+           5050 LOAD_CONST              63 (' (')
+           5052 LOAD_FAST               32 (e)
+           5054 LOAD_ATTR              110 (code)
+           5074 FORMAT_VALUE             0
+           5076 LOAD_CONST              64 ('): ')
+
+155        5078 LOAD_FAST               32 (e)
+           5080 LOAD_ATTR              112 (message)
+           5100 COPY                     1
+           5102 POP_JUMP_IF_TRUE         2 (to 5108)
+           5104 POP_TOP
+           5106 LOAD_CONST              45 ('')
+        >> 5108 LOAD_CONST               0 (None)
+           5110 LOAD_CONST              65 (160)
+           5112 BINARY_SLICE
+           5114 FORMAT_VALUE             0
+           5116 LOAD_CONST              66 (' → thử lại.')
+
+154        5118 BUILD_STRING            11
+
+155        5120 LOAD_CONST              14 ('warn')
+
+154        5122 KW_NAMES                15 (('level',))
+           5124 CALL                     2
+           5132 POP_TOP
+           5134 POP_EXCEPT
+           5136 LOAD_CONST               0 (None)
+           5138 STORE_FAST              32 (e)
+           5140 DELETE_FAST             32 (e)
+           5142 EXTENDED_ARG             4
+           5144 JUMP_BACKWARD         1220 (to 2706)
+        >> 5146 LOAD_CONST               0 (None)
+           5148 STORE_FAST              32 (e)
+           5150 DELETE_FAST             32 (e)
+           5152 RERAISE                  1
+
+156     >> 5154 LOAD_GLOBAL            114 (Exception)
+           5164 CHECK_EXC_MATCH
+           5166 POP_JUMP_IF_FALSE       47 (to 5262)
+           5168 STORE_FAST              32 (e)
+
+157        5170 LOAD_FAST                1 (ctx)
+           5172 LOAD_ATTR               23 (NULL|self + emit_log)
+           5192 LOAD_CONST              48 ('Cảnh ')
+           5194 LOAD_FAST               21 (seq)
+           5196 FORMAT_VALUE             0
+           5198 LOAD_CONST              62 (': lỗi stock lần ')
+           5200 LOAD_FAST               29 (attempt)
+           5202 FORMAT_VALUE             0
+           5204 LOAD_CONST              49 ('/')
+           5206 LOAD_GLOBAL             96 (_SCENE_ATTEMPTS)
+           5216 FORMAT_VALUE             0
+           5218 LOAD_CONST              63 (' (')
+           5220 LOAD_FAST               32 (e)
+           5222 FORMAT_VALUE             0
+           5224 LOAD_CONST              67 (') → thử lại.')
+           5226 BUILD_STRING             9
+
+158        5228 LOAD_CONST              14 ('warn')
+
+157        5230 KW_NAMES                15 (('level',))
+           5232 CALL                     2
+           5240 POP_TOP
+           5242 POP_EXCEPT
+           5244 LOAD_CONST               0 (None)
+           5246 STORE_FAST              32 (e)
+           5248 DELETE_FAST             32 (e)
+           5250 EXTENDED_ARG             4
+           5252 JUMP_BACKWARD         1274 (to 2706)
+        >> 5254 LOAD_CONST               0 (None)
+           5256 STORE_FAST              32 (e)
+           5258 DELETE_FAST             32 (e)
+           5260 RERAISE                  1
+
+156     >> 5262 RERAISE                  0
+        >> 5264 COPY                     3
+           5266 POP_EXCEPT
+           5268 RERAISE                  1
+
+160     >> 5270 CLEANUP_THROW
+           5272 EXTENDED_ARG             4
+           5274 JUMP_BACKWARD         1248 (to 2780)
+        >> 5276 SWAP                     2
+           5278 POP_TOP
+
+188        5280 SWAP                     3
+           5282 STORE_FAST              35 (s)
+           5284 STORE_FAST              34 (k)
+           5286 RERAISE                  0
+
+200     >> 5288 PUSH_EXC_INFO
+           5290 WITH_EXCEPT_START
+           5292 POP_JUMP_IF_TRUE         1 (to 5296)
+           5294 RERAISE                  2
+        >> 5296 POP_TOP
+           5298 POP_EXCEPT
+           5300 POP_TOP
+           5302 POP_TOP
+           5304 EXTENDED_ARG             1
+           5306 JUMP_BACKWARD          437 (to 4434)
+        >> 5308 COPY                     3
+           5310 POP_EXCEPT
+           5312 RERAISE                  1
+        >> 5314 SWAP                     2
+           5316 POP_TOP
+
+210        5318 SWAP                     2
+           5320 STORE_FAST              35 (s)
+           5322 RERAISE                  0
+        >> 5324 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           5326 RERAISE                  1
+ExceptionTable:
+  4 to 554 -> 5324 [0] lasti
+  556 to 742 -> 4886 [1] lasti
+  746 to 806 -> 4830 [1]
+  808 to 2444 -> 5324 [0] lasti
+  2448 to 2512 -> 4924 [2]
+  2514 to 2514 -> 4912 [4]
+  2516 to 2686 -> 4924 [2]
+  2688 to 2688 -> 4918 [4]
+  2690 to 2700 -> 4924 [2]
+  2702 to 2722 -> 5324 [0] lasti
+  2726 to 2772 -> 5324 [0] lasti
+  2774 to 2774 -> 5270 [4]
+  2776 to 3618 -> 5324 [0] lasti
+  3620 to 3772 -> 5276 [3]
+  3774 to 4090 -> 5324 [0] lasti
+  4092 to 4416 -> 5288 [1] lasti
+  4418 to 4504 -> 5324 [0] lasti
+  4506 to 4684 -> 5314 [7]
+  4686 to 4828 -> 5324 [0] lasti
+  4830 to 4870 -> 4880 [2] lasti
+  4872 to 4876 -> 4886 [1] lasti
+  4878 to 4878 -> 4880 [2] lasti
+  4880 to 4884 -> 4886 [1] lasti
+  4886 to 4894 -> 4906 [3] lasti
+  4896 to 4910 -> 5324 [0] lasti
+  4912 to 4912 -> 4924 [2]
+  4918 to 4918 -> 4924 [2]
+  4924 to 4940 -> 5264 [3] lasti
+  4942 to 5132 -> 5146 [3] lasti
+  5134 to 5144 -> 5324 [0] lasti
+  5146 to 5168 -> 5264 [3] lasti
+  5170 to 5240 -> 5254 [3] lasti
+  5242 to 5252 -> 5324 [0] lasti
+  5254 to 5262 -> 5264 [3] lasti
+  5264 to 5270 -> 5324 [0] lasti
+  5276 to 5286 -> 5324 [0] lasti
+  5288 to 5296 -> 5308 [3] lasti
+  5298 to 5322 -> 5324 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c930b88b0, file "app\pipeline\steps\stock_generate.py", line 192>:
+192           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                24 (to 60)
+             12 STORE_FAST               1 (s)
+             14 LOAD_FAST                1 (s)
+             16 LOAD_ATTR                1 (NULL|self + get)
+             36 LOAD_CONST               0 ('render_skip')
+             38 CALL                     1
+             46 POP_JUMP_IF_FALSE        1 (to 50)
+             48 JUMP_BACKWARD           21 (to 8)
+        >>   50 LOAD_CONST               1 (1)
+             52 YIELD_VALUE              1
+             54 RESUME                   1
+             56 POP_TOP
+             58 JUMP_BACKWARD           26 (to 8)
+        >>   60 END_FOR
+             62 RETURN_CONST             2 (None)
+        >>   64 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             66 RERAISE                  1
+ExceptionTable:
+  4 to 46 -> 64 [0] lasti
+  50 to 62 -> 64 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c92fd4a30, file "app\pipeline\steps\stock_generate.py", line 193>:
+193           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                15 (to 42)
+             12 STORE_FAST               1 (x)
+             14 LOAD_GLOBAL              1 (NULL + str)
+             24 LOAD_FAST                1 (x)
+             26 CALL                     1
+             34 YIELD_VALUE              1
+             36 RESUME                   1
+             38 POP_TOP
+             40 JUMP_BACKWARD           17 (to 8)
+        >>   42 END_FOR
+             44 RETURN_CONST             0 (None)
+        >>   46 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             48 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 46 [0] lasti
+
+Disassembly of <code object _search_pick at 0x7f6c9257cd50, file "app\pipeline\steps\stock_generate.py", line 221>:
+              0 MAKE_CELL                3 (orientation)
+              2 MAKE_CELL                5 (used)
+              4 MAKE_CELL               10 (_rel)
+              6 MAKE_CELL               11 (qtok)
+              8 MAKE_CELL               12 (win_s)
+
+221          10 RETURN_GENERATOR
+             12 POP_TOP
+             14 RESUME                   0
+
+226          16 LOAD_FAST                1 (fo)
+             18 LOAD_ATTR                1 (NULL|self + search)
+             38 LOAD_FAST                2 (query)
+             40 LOAD_DEREF               3 (orientation)
+             42 LOAD_CONST               1 (15)
+             44 KW_NAMES                 2 (('per_page',))
+             46 CALL                     3
+             54 GET_AWAITABLE            0
+             56 LOAD_CONST               3 (None)
+        >>   58 SEND                     3 (to 68)
+             62 YIELD_VALUE              2
+             64 RESUME                   3
+             66 JUMP_BACKWARD_NO_INTERRUPT     5 (to 58)
+        >>   68 END_SEND
+             70 STORE_FAST               7 (clips)
+
+227          72 LOAD_FAST                7 (clips)
+             74 POP_JUMP_IF_TRUE         1 (to 78)
+
+228          76 RETURN_CONST             3 (None)
+
+229     >>   78 LOAD_GLOBAL              3 (NULL + max)
+             88 LOAD_CONST               4 (1.0)
+             90 LOAD_FAST                4 (window_ms)
+             92 LOAD_CONST               5 (1000.0)
+             94 BINARY_OP               11 (/)
+             98 CALL                     2
+            106 STORE_DEREF             12 (win_s)
+
+230         108 LOAD_GLOBAL              5 (NULL + set)
+            118 LOAD_GLOBAL              7 (NULL + channel_engines)
+            128 LOAD_ATTR                8 (content_tokens)
+            148 LOAD_FAST                2 (query)
+            150 CALL                     1
+            158 CALL                     1
+            166 STORE_DEREF             11 (qtok)
+
+232         168 LOAD_CONST              10 (('return', 'int'))
+            170 LOAD_CLOSURE            11 (qtok)
+            172 BUILD_TUPLE              1
+            174 LOAD_CONST               6 (<code object _rel at 0x7f6c92b4bd70, file "app\pipeline\steps\stock_generate.py", line 232>)
+            176 MAKE_FUNCTION           12 (annotations, closure)
+            178 STORE_DEREF             10 (_rel)
+
+235         180 LOAD_CONST              11 (('return', 'tuple'))
+            182 LOAD_CLOSURE            10 (_rel)
+            184 LOAD_CLOSURE             3 (orientation)
+            186 LOAD_CLOSURE             5 (used)
+            188 LOAD_CLOSURE            12 (win_s)
+            190 BUILD_TUPLE              4
+            192 LOAD_CONST               7 (<code object _score at 0x7f6c92b94350, file "app\pipeline\steps\stock_generate.py", line 235>)
+            194 MAKE_FUNCTION           12 (annotations, closure)
+            196 STORE_FAST               8 (_score)
+
+243         198 LOAD_FAST                7 (clips)
+            200 LOAD_ATTR               11 (NULL|self + sort)
+            220 LOAD_FAST                8 (_score)
+            222 KW_NAMES                 8 (('key',))
+            224 CALL                     1
+            232 POP_TOP
+
+244         234 LOAD_FAST                7 (clips)
+            236 LOAD_CONST               9 (0)
+            238 BINARY_SUBSCR
+            242 STORE_FAST               9 (best)
+
+245         244 LOAD_FAST                6 (strict)
+            246 POP_JUMP_IF_FALSE       12 (to 272)
+            248 PUSH_NULL
+            250 LOAD_DEREF              10 (_rel)
+            252 LOAD_FAST                9 (best)
+            254 CALL                     1
+            262 LOAD_CONST               9 (0)
+            264 COMPARE_OP              40 (==)
+            268 POP_JUMP_IF_FALSE        1 (to 272)
+
+246         270 RETURN_CONST             3 (None)
+
+247     >>  272 LOAD_FAST                9 (best)
+            274 RETURN_VALUE
+
+226     >>  276 CLEANUP_THROW
+            278 JUMP_BACKWARD          106 (to 68)
+        >>  280 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            282 RERAISE                  1
+ExceptionTable:
+  14 to 60 -> 280 [0] lasti
+  62 to 62 -> 276 [2]
+  64 to 276 -> 280 [0] lasti
+
+Disassembly of <code object _rel at 0x7f6c92b4bd70, file "app\pipeline\steps\stock_generate.py", line 232>:
+              0 COPY_FREE_VARS           1
+
+232           2 RESUME                   0
+
+233           4 LOAD_GLOBAL              1 (NULL + len)
+             14 LOAD_DEREF               1 (qtok)
+             16 LOAD_GLOBAL              3 (NULL + set)
+             26 LOAD_GLOBAL              5 (NULL + channel_engines)
+             36 LOAD_ATTR                6 (content_tokens)
+             56 LOAD_GLOBAL              9 (NULL + getattr)
+             66 LOAD_FAST                0 (c)
+             68 LOAD_CONST               1 ('keywords')
+             70 LOAD_CONST               2 ('')
+             72 CALL                     3
+             80 COPY                     1
+             82 POP_JUMP_IF_TRUE         2 (to 88)
+             84 POP_TOP
+             86 LOAD_CONST               2 ('')
+        >>   88 CALL                     1
+             96 CALL                     1
+            104 BINARY_OP                1 (&)
+            108 CALL                     1
+            116 RETURN_VALUE
+
+Disassembly of <code object _score at 0x7f6c92b94350, file "app\pipeline\steps\stock_generate.py", line 235>:
+              0 COPY_FREE_VARS           4
+
+235           2 RESUME                   0
+
+237           4 LOAD_FAST                0 (c)
+              6 LOAD_ATTR                0 (id)
+             26 LOAD_DEREF               3 (used)
+             28 CONTAINS_OP              0
+             30 POP_JUMP_IF_FALSE        2 (to 36)
+             32 LOAD_CONST               1 (1)
+             34 JUMP_FORWARD             1 (to 38)
+        >>   36 LOAD_CONST               2 (0)
+
+238     >>   38 LOAD_GLOBAL              3 (NULL + min)
+             48 PUSH_NULL
+             50 LOAD_DEREF               1 (_rel)
+             52 LOAD_FAST                0 (c)
+             54 CALL                     1
+             62 LOAD_CONST               3 (3)
+             64 CALL                     2
+             72 UNARY_NEGATIVE
+
+239          74 LOAD_FAST                0 (c)
+             76 LOAD_ATTR                4 (orientation)
+             96 LOAD_DEREF               2 (orientation)
+             98 COMPARE_OP              40 (==)
+            102 POP_JUMP_IF_FALSE        2 (to 108)
+            104 LOAD_CONST               2 (0)
+            106 JUMP_FORWARD             1 (to 110)
+        >>  108 LOAD_CONST               1 (1)
+
+240     >>  110 LOAD_FAST                0 (c)
+            112 LOAD_ATTR                6 (duration_s)
+            132 LOAD_CONST               4 (0.3)
+            134 BINARY_OP                0 (+)
+            138 LOAD_DEREF               4 (win_s)
+            140 COMPARE_OP              92 (>=)
+            144 POP_JUMP_IF_FALSE        2 (to 150)
+            146 LOAD_CONST               2 (0)
+            148 JUMP_FORWARD             1 (to 152)
+        >>  150 LOAD_CONST               1 (1)
+
+241     >>  152 LOAD_GLOBAL              9 (NULL + int)
+            162 LOAD_FAST                0 (c)
+            164 LOAD_ATTR               10 (height)
+            184 CALL                     1
+            192 UNARY_NEGATIVE
+
+236         194 BUILD_TUPLE              5
+            196 RETURN_VALUE
+
+Disassembly of <code object _save_scenes at 0x28b7be20, file "app\pipeline\steps\stock_generate.py", line 249>:
+249           0 RESUME                   0
+
+251           2 NOP
+
+252           4 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             14 CALL                     0
+             22 BEFORE_WITH
+             24 STORE_FAST               2 (db)
+
+253          26 LOAD_FAST                2 (db)
+             28 LOAD_ATTR                3 (NULL|self + query)
+             48 LOAD_GLOBAL              4 (ContentPlan)
+             58 CALL                     1
+             66 LOAD_ATTR                7 (NULL|self + filter)
+             86 LOAD_GLOBAL              4 (ContentPlan)
+             96 LOAD_ATTR                8 (video_id)
+            116 LOAD_FAST                0 (video_id)
+            118 COMPARE_OP              40 (==)
+            122 CALL                     1
+            130 LOAD_ATTR               11 (NULL|self + first)
+            150 CALL                     0
+            158 STORE_FAST               3 (plan)
+
+254         160 LOAD_FAST                3 (plan)
+            162 POP_JUMP_IF_NONE        44 (to 252)
+
+255         164 LOAD_GLOBAL             13 (NULL + json)
+            174 LOAD_ATTR               14 (dumps)
+            194 LOAD_FAST                1 (scenes)
+            196 LOAD_CONST               1 (False)
+            198 KW_NAMES                 2 (('ensure_ascii',))
+            200 CALL                     2
+            208 LOAD_FAST                3 (plan)
+            210 STORE_ATTR               8 (scenes_json)
+
+256         220 LOAD_FAST                2 (db)
+            222 LOAD_ATTR               19 (NULL|self + commit)
+            242 CALL                     0
+            250 POP_TOP
+
+252     >>  252 LOAD_CONST               0 (None)
+            254 LOAD_CONST               0 (None)
+            256 LOAD_CONST               0 (None)
+            258 CALL                     2
+            266 POP_TOP
+            268 RETURN_CONST             0 (None)
+        >>  270 PUSH_EXC_INFO
+            272 WITH_EXCEPT_START
+            274 POP_JUMP_IF_TRUE         1 (to 278)
+            276 RERAISE                  2
+        >>  278 POP_TOP
+            280 POP_EXCEPT
+            282 POP_TOP
+            284 POP_TOP
+            286 RETURN_CONST             0 (None)
+        >>  288 COPY                     3
+            290 POP_EXCEPT
+            292 RERAISE                  1
+        >>  294 PUSH_EXC_INFO
+
+257         296 LOAD_GLOBAL             20 (Exception)
+            306 CHECK_EXC_MATCH
+            308 POP_JUMP_IF_FALSE        3 (to 316)
+            310 POP_TOP
+
+258         312 POP_EXCEPT
+            314 RETURN_CONST             0 (None)
+
+257     >>  316 RERAISE                  0
+        >>  318 COPY                     3
+            320 POP_EXCEPT
+            322 RERAISE                  1
+ExceptionTable:
+  4 to 22 -> 294 [0]
+  24 to 250 -> 270 [1] lasti
+  252 to 266 -> 294 [0]
+  270 to 278 -> 288 [3] lasti
+  280 to 284 -> 294 [0]
+  288 to 292 -> 294 [0]
+  294 to 310 -> 318 [1] lasti
+  316 to 316 -> 318 [1] lasti

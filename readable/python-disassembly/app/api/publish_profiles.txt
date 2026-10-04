@@ -1,0 +1,338 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('FastAPI Router cho các publishing profiles (tự động đăng bài).\n')
+              4 STORE_NAME               0 (__doc__)
+
+  3           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+  5          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('APIRouter', 'Depends'))
+             22 IMPORT_NAME              3 (fastapi)
+             24 IMPORT_FROM              4 (APIRouter)
+             26 STORE_NAME               4 (APIRouter)
+             28 IMPORT_FROM              5 (Depends)
+             30 STORE_NAME               5 (Depends)
+             32 POP_TOP
+
+  6          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               4 (('BaseModel',))
+             38 IMPORT_NAME              6 (pydantic)
+             40 IMPORT_FROM              7 (BaseModel)
+             42 STORE_NAME               7 (BaseModel)
+             44 POP_TOP
+
+  7          46 LOAD_CONST               1 (0)
+             48 LOAD_CONST               5 (('Session',))
+             50 IMPORT_NAME              8 (sqlalchemy.orm)
+             52 IMPORT_FROM              9 (Session)
+             54 STORE_NAME               9 (Session)
+             56 POP_TOP
+
+  9          58 LOAD_CONST               1 (0)
+             60 LOAD_CONST               6 (('verify_token', 'get_session'))
+             62 IMPORT_NAME             10 (app.deps)
+             64 IMPORT_FROM             11 (verify_token)
+             66 STORE_NAME              11 (verify_token)
+             68 IMPORT_FROM             12 (get_session)
+             70 STORE_NAME              12 (get_session)
+             72 POP_TOP
+
+ 10          74 LOAD_CONST               1 (0)
+             76 LOAD_CONST               7 (('publish_profile_service',))
+             78 IMPORT_NAME             13 (app.services)
+             80 IMPORT_FROM             14 (publish_profile_service)
+             82 STORE_NAME              15 (svc)
+             84 POP_TOP
+
+ 12          86 PUSH_NULL
+             88 LOAD_NAME                4 (APIRouter)
+             90 LOAD_CONST               8 ('/api/v1/publish-profiles')
+             92 LOAD_CONST               9 ('publish-profiles')
+             94 BUILD_LIST               1
+
+ 13          96 PUSH_NULL
+             98 LOAD_NAME                5 (Depends)
+            100 LOAD_NAME               11 (verify_token)
+            102 CALL                     1
+            110 BUILD_LIST               1
+
+ 12         112 KW_NAMES                10 (('prefix', 'tags', 'dependencies'))
+            114 CALL                     3
+            122 STORE_NAME              16 (router)
+
+ 16         124 PUSH_NULL
+            126 LOAD_BUILD_CLASS
+            128 LOAD_CONST              11 (<code object ProfileCreate at 0x7f6c92ee95c0, file "app\api\publish_profiles.py", line 16>)
+            130 MAKE_FUNCTION            0
+            132 LOAD_CONST              12 ('ProfileCreate')
+            134 LOAD_NAME                7 (BaseModel)
+            136 CALL                     3
+            144 STORE_NAME              17 (ProfileCreate)
+
+ 21         146 PUSH_NULL
+            148 LOAD_BUILD_CLASS
+            150 LOAD_CONST              13 (<code object ProfileUpdate at 0x7f6c92a3b770, file "app\api\publish_profiles.py", line 21>)
+            152 MAKE_FUNCTION            0
+            154 LOAD_CONST              14 ('ProfileUpdate')
+            156 LOAD_NAME                7 (BaseModel)
+            158 CALL                     3
+            166 STORE_NAME              18 (ProfileUpdate)
+
+ 28         168 LOAD_NAME               16 (router)
+            170 LOAD_ATTR               39 (NULL|self + get)
+            190 LOAD_CONST              15 ('')
+            192 CALL                     1
+
+ 29         200 PUSH_NULL
+            202 LOAD_NAME                5 (Depends)
+            204 LOAD_NAME               12 (get_session)
+            206 CALL                     1
+            214 BUILD_TUPLE              1
+            216 LOAD_CONST              24 (('db', 'Session'))
+            218 LOAD_CONST              16 (<code object list_profiles at 0x7f6c92d628e0, file "app\api\publish_profiles.py", line 28>)
+            220 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 28         222 CALL                     0
+
+ 29         230 STORE_NAME              20 (list_profiles)
+
+ 33         232 LOAD_NAME               16 (router)
+            234 LOAD_ATTR               43 (NULL|self + post)
+            254 LOAD_CONST              15 ('')
+            256 LOAD_CONST              17 (201)
+            258 KW_NAMES                18 (('status_code',))
+            260 CALL                     2
+
+ 34         268 PUSH_NULL
+            270 LOAD_NAME                5 (Depends)
+            272 LOAD_NAME               12 (get_session)
+            274 CALL                     1
+            282 BUILD_TUPLE              1
+            284 LOAD_CONST              25 (('body', 'ProfileCreate', 'db', 'Session'))
+            286 LOAD_CONST              19 (<code object create_profile at 0x7f6c92d63210, file "app\api\publish_profiles.py", line 33>)
+            288 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 33         290 CALL                     0
+
+ 34         298 STORE_NAME              22 (create_profile)
+
+ 39         300 LOAD_NAME               16 (router)
+            302 LOAD_ATTR               47 (NULL|self + put)
+            322 LOAD_CONST              20 ('/{profile_id}')
+            324 CALL                     1
+
+ 40         332 PUSH_NULL
+            334 LOAD_NAME                5 (Depends)
+            336 LOAD_NAME               12 (get_session)
+            338 CALL                     1
+            346 BUILD_TUPLE              1
+            348 LOAD_CONST              26 (('profile_id', 'str', 'body', 'ProfileUpdate', 'db', 'Session'))
+            350 LOAD_CONST              21 (<code object update_profile at 0x7f6c9296b7b0, file "app\api\publish_profiles.py", line 39>)
+            352 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 39         354 CALL                     0
+
+ 40         362 STORE_NAME              24 (update_profile)
+
+ 51         364 LOAD_NAME               16 (router)
+            366 LOAD_ATTR               51 (NULL|self + delete)
+            386 LOAD_CONST              20 ('/{profile_id}')
+            388 CALL                     1
+
+ 52         396 PUSH_NULL
+            398 LOAD_NAME                5 (Depends)
+            400 LOAD_NAME               12 (get_session)
+            402 CALL                     1
+            410 BUILD_TUPLE              1
+            412 LOAD_CONST              27 (('profile_id', 'str', 'db', 'Session'))
+            414 LOAD_CONST              22 (<code object delete_profile at 0x7f6c81a45530, file "app\api\publish_profiles.py", line 51>)
+            416 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 51         418 CALL                     0
+
+ 52         426 STORE_NAME              26 (delete_profile)
+            428 RETURN_CONST            23 (None)
+
+Disassembly of <code object ProfileCreate at 0x7f6c92ee95c0, file "app\api\publish_profiles.py", line 16>:
+ 16           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('ProfileCreate')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 17          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('name')
+             18 STORE_SUBSCR
+
+ 18          22 LOAD_CONST               1 ('str')
+             24 LOAD_NAME                3 (__annotations__)
+             26 LOAD_CONST               3 ('chrome_id')
+             28 STORE_SUBSCR
+             32 RETURN_CONST             4 (None)
+
+Disassembly of <code object ProfileUpdate at 0x7f6c92a3b770, file "app\api\publish_profiles.py", line 21>:
+ 21           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('ProfileUpdate')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 22          12 LOAD_CONST               1 (None)
+             14 STORE_NAME               3 (name)
+             16 LOAD_CONST               2 ('str | None')
+             18 LOAD_NAME                4 (__annotations__)
+             20 LOAD_CONST               3 ('name')
+             22 STORE_SUBSCR
+
+ 23          26 LOAD_CONST               1 (None)
+             28 STORE_NAME               5 (youtube_channel)
+             30 LOAD_CONST               2 ('str | None')
+             32 LOAD_NAME                4 (__annotations__)
+             34 LOAD_CONST               4 ('youtube_channel')
+             36 STORE_SUBSCR
+
+ 24          40 LOAD_CONST               1 (None)
+             42 STORE_NAME               6 (facebook_page)
+             44 LOAD_CONST               2 ('str | None')
+             46 LOAD_NAME                4 (__annotations__)
+             48 LOAD_CONST               5 ('facebook_page')
+             50 STORE_SUBSCR
+
+ 25          54 LOAD_CONST               1 (None)
+             56 STORE_NAME               7 (tiktok_username)
+             58 LOAD_CONST               2 ('str | None')
+             60 LOAD_NAME                4 (__annotations__)
+             62 LOAD_CONST               6 ('tiktok_username')
+             64 STORE_SUBSCR
+             68 RETURN_CONST             1 (None)
+
+Disassembly of <code object list_profiles at 0x7f6c92d628e0, file "app\api\publish_profiles.py", line 28>:
+ 28           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 30           6 LOAD_CONST               1 ('profiles')
+              8 LOAD_GLOBAL              1 (NULL + svc)
+             18 LOAD_ATTR                2 (list_profiles)
+             38 LOAD_FAST                0 (db)
+             40 CALL                     1
+             48 GET_ITER
+             50 LOAD_FAST_AND_CLEAR      1 (p)
+             52 SWAP                     2
+             54 BUILD_LIST               0
+             56 SWAP                     2
+        >>   58 FOR_ITER                23 (to 108)
+             62 STORE_FAST               1 (p)
+             64 LOAD_GLOBAL              1 (NULL + svc)
+             74 LOAD_ATTR                4 (to_dict)
+             94 LOAD_FAST                1 (p)
+             96 CALL                     1
+            104 LIST_APPEND              2
+            106 JUMP_BACKWARD           25 (to 58)
+        >>  108 END_FOR
+            110 SWAP                     2
+            112 STORE_FAST               1 (p)
+            114 BUILD_MAP                1
+            116 RETURN_VALUE
+        >>  118 SWAP                     2
+            120 POP_TOP
+            122 SWAP                     2
+            124 STORE_FAST               1 (p)
+            126 RERAISE                  0
+        >>  128 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            130 RERAISE                  1
+ExceptionTable:
+  4 to 52 -> 128 [0] lasti
+  54 to 108 -> 118 [3]
+  110 to 126 -> 128 [0] lasti
+
+Disassembly of <code object create_profile at 0x7f6c92d63210, file "app\api\publish_profiles.py", line 33>:
+ 33           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 35           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (create_profile)
+             36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (body)
+             40 LOAD_ATTR                4 (name)
+             60 LOAD_FAST                0 (body)
+             62 LOAD_ATTR                6 (chrome_id)
+             82 CALL                     3
+             90 STORE_FAST               2 (p)
+
+ 36          92 LOAD_GLOBAL              1 (NULL + svc)
+            102 LOAD_ATTR                8 (to_dict)
+            122 LOAD_FAST                2 (p)
+            124 CALL                     1
+            132 RETURN_VALUE
+        >>  134 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            136 RERAISE                  1
+ExceptionTable:
+  4 to 132 -> 134 [0] lasti
+
+Disassembly of <code object update_profile at 0x7f6c9296b7b0, file "app\api\publish_profiles.py", line 39>:
+ 39           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 41           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (update_profile)
+
+ 42          36 LOAD_FAST                2 (db)
+             38 LOAD_FAST                0 (profile_id)
+
+ 43          40 LOAD_FAST                1 (body)
+             42 LOAD_ATTR                4 (name)
+
+ 44          62 LOAD_FAST                1 (body)
+             64 LOAD_ATTR                6 (youtube_channel)
+
+ 45          84 LOAD_FAST                1 (body)
+             86 LOAD_ATTR                8 (facebook_page)
+
+ 46         106 LOAD_FAST                1 (body)
+            108 LOAD_ATTR               10 (tiktok_username)
+
+ 41         128 KW_NAMES                 1 (('name', 'youtube_channel', 'facebook_page', 'tiktok_username'))
+            130 CALL                     6
+            138 STORE_FAST               3 (p)
+
+ 48         140 LOAD_GLOBAL              1 (NULL + svc)
+            150 LOAD_ATTR               12 (to_dict)
+            170 LOAD_FAST                3 (p)
+            172 CALL                     1
+            180 RETURN_VALUE
+        >>  182 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            184 RERAISE                  1
+ExceptionTable:
+  4 to 180 -> 182 [0] lasti
+
+Disassembly of <code object delete_profile at 0x7f6c81a45530, file "app\api\publish_profiles.py", line 51>:
+ 51           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 53           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (delete_profile)
+             36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (profile_id)
+             40 CALL                     2
+             48 POP_TOP
+
+ 54          50 LOAD_CONST               1 ('deleted')
+             52 LOAD_FAST                0 (profile_id)
+             54 BUILD_MAP                1
+             56 RETURN_VALUE
+        >>   58 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             60 RERAISE                  1
+ExceptionTable:
+  4 to 56 -> 58 [0] lasti

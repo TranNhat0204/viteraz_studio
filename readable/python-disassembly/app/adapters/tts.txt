@@ -1,0 +1,954 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('TTS providers — registry: revo-voice (giọng Việt có sẵn), azure-tts, elevenlabs, kokoro, omnivoice…\n\nProvider id chuẩn: "revo-voice" | "edge-tts" | "azure-tts" | "elevenlabs" | "kokoro" | "kokoro_vi" |\n"omnivoice" | "gemini-tts" | "capcut-tts" | "vbee-tts" | "ai33-tts".\nMặc định lấy từ Setting "tts_provider_default" (fallback DEFAULT_PROVIDER).\n\n"revo-voice" = BỘ GIỌNG VIỆT CÓ SẴN của Revo Studio (Piper VITS `.onnx` trong tts2/models): chạy\n    offline, không key, không GPU → dùng làm mặc định của sản phẩm.\n"omnivoice" = clone đa ngữ zero-shot + voice design (model local k2-fsa/OmniVoice, Apache-2.0):\n    nhận thẳng reference audio → đọc 600+ ngôn ngữ cùng chất giọng (cross-lingual).\n\nĐÃ GỠ HẲN: "openvoice" (RevoVoice cũ — Edge-TTS nền + OpenVoice v2 bọc màu giọng). Lý do: chất\nlượng kém, bắt user cài thêm runtime torch ~2GB mới đọc được tiếng Việt, và trùng tên với bộ giọng\nRevo Voice mới. Config cũ chọn "openvoice" tự quy về "revo-voice" qua _ALIASES; giọng clone\nopenvoice cũ (ClonedVoice is_preset/engine=openvoice) được dọn lúc khởi động (app/main.py).\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 17           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 19          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('make_error', 'E'))
+             22 IMPORT_NAME              3 (app.core.errors)
+             24 IMPORT_FROM              4 (make_error)
+             26 STORE_NAME               4 (make_error)
+             28 IMPORT_FROM              5 (E)
+             30 STORE_NAME               5 (E)
+             32 POP_TOP
+
+ 20          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               4 (('TTSProvider', 'get_setting_value', 'LANGUAGE_MAP'))
+             38 IMPORT_NAME              6 (app.adapters.tts.base)
+             40 IMPORT_FROM              7 (TTSProvider)
+             42 STORE_NAME               7 (TTSProvider)
+             44 IMPORT_FROM              8 (get_setting_value)
+             46 STORE_NAME               8 (get_setting_value)
+             48 IMPORT_FROM              9 (LANGUAGE_MAP)
+             50 STORE_NAME               9 (LANGUAGE_MAP)
+             52 POP_TOP
+
+ 22          54 LOAD_CONST               5 ('revo-voice')
+             56 STORE_NAME              10 (DEFAULT_PROVIDER)
+
+ 26          58 PUSH_NULL
+             60 LOAD_NAME               11 (frozenset)
+             62 LOAD_CONST               6 ('edge-tts')
+             64 BUILD_SET                1
+             66 CALL                     1
+             74 STORE_NAME              12 (_RETIRED_PROVIDERS)
+
+ 29          76 BUILD_MAP                0
+
+ 30          78 LOAD_CONST               7 ('edge tts')
+             80 LOAD_CONST               6 ('edge-tts')
+
+ 29          82 MAP_ADD                  1
+
+ 31          84 LOAD_CONST               8 ('edge')
+             86 LOAD_CONST               6 ('edge-tts')
+
+ 29          88 MAP_ADD                  1
+
+ 32          90 LOAD_CONST               9 ('azure')
+             92 LOAD_CONST              10 ('azure-tts')
+
+ 29          94 MAP_ADD                  1
+
+ 33          96 LOAD_CONST              11 ('azure tts')
+             98 LOAD_CONST              10 ('azure-tts')
+
+ 29         100 MAP_ADD                  1
+
+ 34         102 LOAD_CONST              12 ('eleven labs')
+            104 LOAD_CONST              13 ('elevenlabs')
+
+ 29         106 MAP_ADD                  1
+
+ 35         108 LOAD_CONST              14 ('elevenlab')
+            110 LOAD_CONST              13 ('elevenlabs')
+
+ 29         112 MAP_ADD                  1
+
+ 36         114 LOAD_CONST              15 ('evenlab')
+            116 LOAD_CONST              13 ('elevenlabs')
+
+ 29         118 MAP_ADD                  1
+
+ 37         120 LOAD_CONST              16 ('kokoro-tts')
+            122 LOAD_CONST              17 ('kokoro')
+
+ 29         124 MAP_ADD                  1
+
+ 38         126 LOAD_CONST              18 ('kokoro tts')
+            128 LOAD_CONST              17 ('kokoro')
+
+ 29         130 MAP_ADD                  1
+
+ 39         132 LOAD_CONST              19 ('kokoro-vi')
+            134 LOAD_CONST              20 ('kokoro_vi')
+
+ 29         136 MAP_ADD                  1
+
+ 40         138 LOAD_CONST              21 ('kokoro vi')
+            140 LOAD_CONST              20 ('kokoro_vi')
+
+ 29         142 MAP_ADD                  1
+
+ 43         144 LOAD_CONST              22 ('openvoice')
+            146 LOAD_CONST               5 ('revo-voice')
+
+ 29         148 MAP_ADD                  1
+
+ 44         150 LOAD_CONST              23 ('open-voice')
+            152 LOAD_CONST               5 ('revo-voice')
+
+ 29         154 MAP_ADD                  1
+
+ 45         156 LOAD_CONST              24 ('open voice')
+            158 LOAD_CONST               5 ('revo-voice')
+
+ 29         160 MAP_ADD                  1
+
+ 46         162 LOAD_CONST              25 ('clone')
+            164 LOAD_CONST              26 ('omnivoice')
+
+ 29         166 MAP_ADD                  1
+
+ 47         168 LOAD_CONST              27 ('omni voice')
+            170 LOAD_CONST              26 ('omnivoice')
+
+ 29         172 MAP_ADD                  1
+
+ 48         174 LOAD_CONST              28 ('omni')
+            176 LOAD_CONST              26 ('omnivoice')
+
+ 29         178 MAP_ADD                  1
+            180 BUILD_MAP                0
+
+ 49         182 LOAD_CONST              29 ('omnivoice-tts')
+            184 LOAD_CONST              26 ('omnivoice')
+
+ 29         186 MAP_ADD                  1
+
+ 50         188 LOAD_CONST              30 ('omnivoice tts')
+            190 LOAD_CONST              26 ('omnivoice')
+
+ 29         192 MAP_ADD                  1
+
+ 51         194 LOAD_CONST              31 ('capcut')
+            196 LOAD_CONST              32 ('capcut-tts')
+
+ 29         198 MAP_ADD                  1
+
+ 52         200 LOAD_CONST              33 ('capcut tts')
+            202 LOAD_CONST              32 ('capcut-tts')
+
+ 29         204 MAP_ADD                  1
+
+ 53         206 LOAD_CONST              34 ('cap cut')
+            208 LOAD_CONST              32 ('capcut-tts')
+
+ 29         210 MAP_ADD                  1
+
+ 54         212 LOAD_CONST              35 ('capcut-tts-api')
+            214 LOAD_CONST              32 ('capcut-tts')
+
+ 29         216 MAP_ADD                  1
+
+ 55         218 LOAD_CONST              36 ('vbee')
+            220 LOAD_CONST              37 ('vbee-tts')
+
+ 29         222 MAP_ADD                  1
+
+ 56         224 LOAD_CONST              38 ('vbee tts')
+            226 LOAD_CONST              37 ('vbee-tts')
+
+ 29         228 MAP_ADD                  1
+
+ 57         230 LOAD_CONST              39 ('vbee-api')
+            232 LOAD_CONST              37 ('vbee-tts')
+
+ 29         234 MAP_ADD                  1
+
+ 58         236 LOAD_CONST              40 ('resona')
+            238 LOAD_CONST              41 ('resona-tts')
+
+ 29         240 MAP_ADD                  1
+
+ 59         242 LOAD_CONST              42 ('resona tts')
+            244 LOAD_CONST              41 ('resona-tts')
+
+ 29         246 MAP_ADD                  1
+
+ 60         248 LOAD_CONST              43 ('resona-api')
+            250 LOAD_CONST              41 ('resona-tts')
+
+ 29         252 MAP_ADD                  1
+
+ 61         254 LOAD_CONST              44 ('resona-live')
+            256 LOAD_CONST              41 ('resona-tts')
+
+ 29         258 MAP_ADD                  1
+
+ 62         260 LOAD_CONST              45 ('ai33')
+            262 LOAD_CONST              46 ('ai33-tts')
+
+ 29         264 MAP_ADD                  1
+
+ 63         266 LOAD_CONST              47 ('ai33 tts')
+            268 LOAD_CONST              46 ('ai33-tts')
+
+ 29         270 MAP_ADD                  1
+
+ 64         272 LOAD_CONST              48 ('openspeaker')
+            274 LOAD_CONST              46 ('ai33-tts')
+
+ 29         276 MAP_ADD                  1
+
+ 65         278 LOAD_CONST              49 ('open speaker')
+            280 LOAD_CONST              46 ('ai33-tts')
+
+ 29         282 MAP_ADD                  1
+            284 DICT_UPDATE              1
+
+ 66         286 LOAD_CONST               5 ('revo-voice')
+
+ 67         288 LOAD_CONST               5 ('revo-voice')
+
+ 68         290 LOAD_CONST               5 ('revo-voice')
+
+ 69         292 LOAD_CONST               5 ('revo-voice')
+
+ 70         294 LOAD_CONST               5 ('revo-voice')
+
+ 71         296 LOAD_CONST               5 ('revo-voice')
+
+ 72         298 LOAD_CONST              50 ('gcloud-tts')
+
+ 73         300 LOAD_CONST              50 ('gcloud-tts')
+
+ 74         302 LOAD_CONST              50 ('gcloud-tts')
+
+ 75         304 LOAD_CONST              50 ('gcloud-tts')
+
+ 76         306 LOAD_CONST              50 ('gcloud-tts')
+
+ 77         308 LOAD_CONST              50 ('gcloud-tts')
+
+ 78         310 LOAD_CONST              50 ('gcloud-tts')
+
+ 79         312 LOAD_CONST              50 ('gcloud-tts')
+
+ 29         314 LOAD_CONST              51 (('revo', 'revovoice', 'revo voice', 'revo-tts', 'piper', 'piper-tts', 'gcloud', 'gcloud tts', 'gcloud-tts', 'google tts', 'google-tts', 'google cloud', 'google cloud tts', 'google-cloud-tts'))
+            316 BUILD_CONST_KEY_MAP     14
+            318 DICT_UPDATE              1
+            320 STORE_NAME              13 (_ALIASES)
+
+ 82         322 LOAD_CONST              52 (('revo-voice', 'edge-tts', 'azure-tts', 'elevenlabs', 'kokoro', 'kokoro_vi', 'omnivoice', 'gemini-tts', 'capcut-tts', 'vbee-tts', 'resona-tts', 'gcloud-tts', 'ai33-tts'))
+            324 STORE_NAME              14 (PROVIDER_IDS)
+
+ 88         326 LOAD_CONST              53 (('revo-voice', 'kokoro', 'kokoro_vi', 'omnivoice', 'elevenlabs', 'azure-tts', 'gemini-tts', 'capcut-tts', 'vbee-tts', 'resona-tts', 'gcloud-tts', 'ai33-tts'))
+            328 STORE_NAME              15 (SELECTABLE_PROVIDERS)
+
+ 91         330 LOAD_CONST              54 ('Revo Voice (giọng Việt có sẵn, offline)')
+
+ 92         332 LOAD_CONST              55 ('Edge TTS (miễn phí)')
+
+ 93         334 LOAD_CONST              56 ('Azure TTS')
+
+ 94         336 LOAD_CONST              57 ('ElevenLabs')
+
+ 95         338 LOAD_CONST              58 ('Kokoro TTS (Anh/Mỹ/..., miễn phí)')
+
+ 96         340 LOAD_CONST              59 ('Kokoro Việt Nam (local, miễn phí)')
+
+ 97         342 LOAD_CONST              60 ('OmniVoice (clone đa ngữ, local)')
+
+ 98         344 LOAD_CONST              61 ('Gemini TTS (AI Studio)')
+
+ 99         346 LOAD_CONST              62 ('CapCut TTS (giọng Việt)')
+
+100         348 LOAD_CONST              63 ('Vbee TTS (giọng Việt cao cấp)')
+
+101         350 LOAD_CONST              64 ('Resona TTS (giọng Việt AI tự nhiên)')
+
+102         352 LOAD_CONST              65 ('Google Cloud TTS (Cao cấp Studio, $300 credit)')
+
+103         354 LOAD_CONST              66 ('AI33 TTS (7 nguồn giọng hợp nhất)')
+
+ 90         356 LOAD_CONST              52 (('revo-voice', 'edge-tts', 'azure-tts', 'elevenlabs', 'kokoro', 'kokoro_vi', 'omnivoice', 'gemini-tts', 'capcut-tts', 'vbee-tts', 'resona-tts', 'gcloud-tts', 'ai33-tts'))
+            358 BUILD_CONST_KEY_MAP     13
+            360 STORE_NAME              16 (PROVIDER_LABELS)
+
+107         362 LOAD_CONST              74 (('return', 'str'))
+            364 LOAD_CONST              67 (<code object default_provider at 0x7f6c81b7c930, file "app\adapters\tts\__init__.py", line 107>)
+            366 MAKE_FUNCTION            4 (annotations)
+            368 STORE_NAME              17 (default_provider)
+
+115         370 LOAD_CONST              75 (('name', 'str | None', 'return', 'str'))
+            372 LOAD_CONST              68 (<code object normalize_provider at 0x7f6c9331e100, file "app\adapters\tts\__init__.py", line 115>)
+            374 MAKE_FUNCTION            4 (annotations)
+            376 STORE_NAME              18 (normalize_provider)
+
+126         378 LOAD_CONST              76 (('provider_id', 'str'))
+            380 LOAD_CONST              69 (<code object _module at 0x269eb8b0, file "app\adapters\tts\__init__.py", line 126>)
+            382 MAKE_FUNCTION            4 (annotations)
+            384 STORE_NAME              19 (_module)
+
+157         386 LOAD_CONST              77 (('name', 'str | None', 'return', 'TTSProvider'))
+            388 LOAD_CONST              70 (<code object get_provider at 0x269ecd70, file "app\adapters\tts\__init__.py", line 157>)
+            390 MAKE_FUNCTION            4 (annotations)
+            392 STORE_NAME              20 (get_provider)
+
+199         394 LOAD_CONST              78 ((None,))
+            396 LOAD_CONST              79 (('name', 'str | None', 'return', 'tuple[str, list[dict]]'))
+            398 LOAD_CONST              72 (<code object list_voices at 0x7f6c81c20620, file "app\adapters\tts\__init__.py", line 199>)
+            400 MAKE_FUNCTION            5 (defaults, annotations)
+            402 STORE_NAME              21 (list_voices)
+
+206         404 LOAD_CONST              78 ((None,))
+            406 LOAD_CONST              80 (('name', 'str | None', 'voice', 'str', 'text', 'str', 'context', 'dict | None', 'return', 'tuple[bytes, str]'))
+            408 LOAD_CONST              73 (<code object preview_voice at 0x269fea00, file "app\adapters\tts\__init__.py", line 206>)
+            410 MAKE_FUNCTION            5 (defaults, annotations)
+            412 STORE_NAME              22 (preview_voice)
+            414 RETURN_CONST            71 (None)
+
+Disassembly of <code object default_provider at 0x7f6c81b7c930, file "app\adapters\tts\__init__.py", line 107>:
+107           0 RESUME                   0
+
+108           2 LOAD_GLOBAL              1 (NULL + get_setting_value)
+             12 LOAD_CONST               1 ('tts_provider_default')
+             14 CALL                     1
+             22 STORE_FAST               0 (saved)
+
+110          24 LOAD_FAST                0 (saved)
+             26 LOAD_GLOBAL              2 (_RETIRED_PROVIDERS)
+             36 CONTAINS_OP              0
+             38 POP_JUMP_IF_FALSE        6 (to 52)
+
+111          40 LOAD_GLOBAL              4 (DEFAULT_PROVIDER)
+             50 RETURN_VALUE
+
+112     >>   52 LOAD_FAST                0 (saved)
+             54 LOAD_GLOBAL              6 (PROVIDER_IDS)
+             64 CONTAINS_OP              0
+             66 POP_JUMP_IF_FALSE        2 (to 72)
+             68 LOAD_FAST                0 (saved)
+             70 RETURN_VALUE
+        >>   72 LOAD_GLOBAL              4 (DEFAULT_PROVIDER)
+             82 RETURN_VALUE
+
+Disassembly of <code object normalize_provider at 0x7f6c9331e100, file "app\adapters\tts\__init__.py", line 115>:
+115           0 RESUME                   0
+
+117           2 LOAD_FAST                0 (name)
+              4 POP_JUMP_IF_TRUE        10 (to 26)
+
+118           6 LOAD_GLOBAL              1 (NULL + default_provider)
+             16 CALL                     0
+             24 RETURN_VALUE
+
+119     >>   26 LOAD_FAST                0 (name)
+             28 LOAD_ATTR                3 (NULL|self + strip)
+             48 CALL                     0
+             56 LOAD_ATTR                5 (NULL|self + lower)
+             76 CALL                     0
+             84 STORE_FAST               1 (key)
+
+120          86 LOAD_GLOBAL              6 (_ALIASES)
+             96 LOAD_ATTR                9 (NULL|self + get)
+            116 LOAD_FAST                1 (key)
+            118 LOAD_FAST                1 (key)
+            120 CALL                     2
+            128 STORE_FAST               1 (key)
+
+121         130 LOAD_FAST                1 (key)
+            132 LOAD_GLOBAL             10 (PROVIDER_IDS)
+            142 CONTAINS_OP              1
+            144 POP_JUMP_IF_FALSE       29 (to 204)
+
+122         146 LOAD_GLOBAL             13 (NULL + make_error)
+            156 LOAD_GLOBAL             14 (E)
+            166 LOAD_ATTR               16 (TTS_PROVIDER_INVALID)
+            186 LOAD_CONST               1 ('Nhà cung cấp TTS không hợp lệ: ')
+            188 LOAD_FAST                0 (name)
+            190 FORMAT_VALUE             0
+            192 BUILD_STRING             2
+            194 CALL                     2
+            202 RAISE_VARARGS            1
+
+123     >>  204 LOAD_FAST                1 (key)
+            206 RETURN_VALUE
+
+Disassembly of <code object _module at 0x269eb8b0, file "app\adapters\tts\__init__.py", line 126>:
+126           0 RESUME                   0
+
+128           2 LOAD_FAST                0 (provider_id)
+              4 LOAD_CONST               1 ('revo-voice')
+              6 COMPARE_OP              40 (==)
+             10 POP_JUMP_IF_FALSE        8 (to 28)
+
+129          12 LOAD_CONST               2 (0)
+             14 LOAD_CONST               3 (('revo_voice',))
+             16 IMPORT_NAME              0 (app.adapters.tts)
+             18 IMPORT_FROM              1 (revo_voice)
+             20 STORE_FAST               1 (mod)
+             22 POP_TOP
+
+154          24 LOAD_FAST                1 (mod)
+             26 RETURN_VALUE
+
+130     >>   28 LOAD_FAST                0 (provider_id)
+             30 LOAD_CONST               4 ('edge-tts')
+             32 COMPARE_OP              40 (==)
+             36 POP_JUMP_IF_FALSE        8 (to 54)
+
+131          38 LOAD_CONST               2 (0)
+             40 LOAD_CONST               5 (('edge_tts',))
+             42 IMPORT_NAME              0 (app.adapters.tts)
+             44 IMPORT_FROM              2 (edge_tts)
+             46 STORE_FAST               1 (mod)
+             48 POP_TOP
+
+154          50 LOAD_FAST                1 (mod)
+             52 RETURN_VALUE
+
+132     >>   54 LOAD_FAST                0 (provider_id)
+             56 LOAD_CONST               6 ('azure-tts')
+             58 COMPARE_OP              40 (==)
+             62 POP_JUMP_IF_FALSE        8 (to 80)
+
+133          64 LOAD_CONST               2 (0)
+             66 LOAD_CONST               7 (('azure_tts',))
+             68 IMPORT_NAME              0 (app.adapters.tts)
+             70 IMPORT_FROM              3 (azure_tts)
+             72 STORE_FAST               1 (mod)
+             74 POP_TOP
+
+154          76 LOAD_FAST                1 (mod)
+             78 RETURN_VALUE
+
+134     >>   80 LOAD_FAST                0 (provider_id)
+             82 LOAD_CONST               8 ('kokoro')
+             84 COMPARE_OP              40 (==)
+             88 POP_JUMP_IF_FALSE        8 (to 106)
+
+135          90 LOAD_CONST               2 (0)
+             92 LOAD_CONST               9 (('kokoro_tts',))
+             94 IMPORT_NAME              0 (app.adapters.tts)
+             96 IMPORT_FROM              4 (kokoro_tts)
+             98 STORE_FAST               1 (mod)
+            100 POP_TOP
+
+154         102 LOAD_FAST                1 (mod)
+            104 RETURN_VALUE
+
+136     >>  106 LOAD_FAST                0 (provider_id)
+            108 LOAD_CONST              10 ('kokoro_vi')
+            110 COMPARE_OP              40 (==)
+            114 POP_JUMP_IF_FALSE        8 (to 132)
+
+137         116 LOAD_CONST               2 (0)
+            118 LOAD_CONST              11 (('kokoro_vi_tts',))
+            120 IMPORT_NAME              0 (app.adapters.tts)
+            122 IMPORT_FROM              5 (kokoro_vi_tts)
+            124 STORE_FAST               1 (mod)
+            126 POP_TOP
+
+154         128 LOAD_FAST                1 (mod)
+            130 RETURN_VALUE
+
+138     >>  132 LOAD_FAST                0 (provider_id)
+            134 LOAD_CONST              12 ('omnivoice')
+            136 COMPARE_OP              40 (==)
+            140 POP_JUMP_IF_FALSE        8 (to 158)
+
+139         142 LOAD_CONST               2 (0)
+            144 LOAD_CONST              13 (('omnivoice_tts',))
+            146 IMPORT_NAME              0 (app.adapters.tts)
+            148 IMPORT_FROM              6 (omnivoice_tts)
+            150 STORE_FAST               1 (mod)
+            152 POP_TOP
+
+154         154 LOAD_FAST                1 (mod)
+            156 RETURN_VALUE
+
+140     >>  158 LOAD_FAST                0 (provider_id)
+            160 LOAD_CONST              14 ('gemini-tts')
+            162 COMPARE_OP              40 (==)
+            166 POP_JUMP_IF_FALSE        8 (to 184)
+
+141         168 LOAD_CONST               2 (0)
+            170 LOAD_CONST              15 (('gemini_tts',))
+            172 IMPORT_NAME              0 (app.adapters.tts)
+            174 IMPORT_FROM              7 (gemini_tts)
+            176 STORE_FAST               1 (mod)
+            178 POP_TOP
+
+154         180 LOAD_FAST                1 (mod)
+            182 RETURN_VALUE
+
+142     >>  184 LOAD_FAST                0 (provider_id)
+            186 LOAD_CONST              16 ('capcut-tts')
+            188 COMPARE_OP              40 (==)
+            192 POP_JUMP_IF_FALSE        8 (to 210)
+
+143         194 LOAD_CONST               2 (0)
+            196 LOAD_CONST              17 (('capcut_tts',))
+            198 IMPORT_NAME              0 (app.adapters.tts)
+            200 IMPORT_FROM              8 (capcut_tts)
+            202 STORE_FAST               1 (mod)
+            204 POP_TOP
+
+154         206 LOAD_FAST                1 (mod)
+            208 RETURN_VALUE
+
+144     >>  210 LOAD_FAST                0 (provider_id)
+            212 LOAD_CONST              18 ('vbee-tts')
+            214 COMPARE_OP              40 (==)
+            218 POP_JUMP_IF_FALSE        8 (to 236)
+
+145         220 LOAD_CONST               2 (0)
+            222 LOAD_CONST              19 (('vbee_tts',))
+            224 IMPORT_NAME              0 (app.adapters.tts)
+            226 IMPORT_FROM              9 (vbee_tts)
+            228 STORE_FAST               1 (mod)
+            230 POP_TOP
+
+154         232 LOAD_FAST                1 (mod)
+            234 RETURN_VALUE
+
+146     >>  236 LOAD_FAST                0 (provider_id)
+            238 LOAD_CONST              20 ('resona-tts')
+            240 COMPARE_OP              40 (==)
+            244 POP_JUMP_IF_FALSE        8 (to 262)
+
+147         246 LOAD_CONST               2 (0)
+            248 LOAD_CONST              21 (('resona_tts',))
+            250 IMPORT_NAME              0 (app.adapters.tts)
+            252 IMPORT_FROM             10 (resona_tts)
+            254 STORE_FAST               1 (mod)
+            256 POP_TOP
+
+154         258 LOAD_FAST                1 (mod)
+            260 RETURN_VALUE
+
+148     >>  262 LOAD_FAST                0 (provider_id)
+            264 LOAD_CONST              22 ('gcloud-tts')
+            266 COMPARE_OP              40 (==)
+            270 POP_JUMP_IF_FALSE        8 (to 288)
+
+149         272 LOAD_CONST               2 (0)
+            274 LOAD_CONST              23 (('gcloud_tts',))
+            276 IMPORT_NAME              0 (app.adapters.tts)
+            278 IMPORT_FROM             11 (gcloud_tts)
+            280 STORE_FAST               1 (mod)
+            282 POP_TOP
+
+154         284 LOAD_FAST                1 (mod)
+            286 RETURN_VALUE
+
+150     >>  288 LOAD_FAST                0 (provider_id)
+            290 LOAD_CONST              24 ('ai33-tts')
+            292 COMPARE_OP              40 (==)
+            296 POP_JUMP_IF_FALSE        8 (to 314)
+
+151         298 LOAD_CONST               2 (0)
+            300 LOAD_CONST              25 (('ai33_tts',))
+            302 IMPORT_NAME              0 (app.adapters.tts)
+            304 IMPORT_FROM             12 (ai33_tts)
+            306 STORE_FAST               1 (mod)
+            308 POP_TOP
+
+154         310 LOAD_FAST                1 (mod)
+            312 RETURN_VALUE
+
+153     >>  314 LOAD_CONST               2 (0)
+            316 LOAD_CONST              26 (('elevenlabs_tts',))
+            318 IMPORT_NAME              0 (app.adapters.tts)
+            320 IMPORT_FROM             13 (elevenlabs_tts)
+            322 STORE_FAST               1 (mod)
+            324 POP_TOP
+
+154         326 LOAD_FAST                1 (mod)
+            328 RETURN_VALUE
+
+Disassembly of <code object get_provider at 0x269ecd70, file "app\adapters\tts\__init__.py", line 157>:
+157           0 RESUME                   0
+
+158           2 LOAD_GLOBAL              1 (NULL + normalize_provider)
+             12 LOAD_FAST                0 (name)
+             14 CALL                     1
+             22 STORE_FAST               1 (pid)
+
+159          24 LOAD_FAST                1 (pid)
+             26 LOAD_CONST               1 ('revo-voice')
+             28 COMPARE_OP              40 (==)
+             32 POP_JUMP_IF_FALSE       13 (to 60)
+
+160          34 LOAD_CONST               2 (0)
+             36 LOAD_CONST               3 (('RevoVoiceProvider',))
+             38 IMPORT_NAME              1 (app.adapters.tts.revo_voice)
+             40 IMPORT_FROM              2 (RevoVoiceProvider)
+             42 STORE_FAST               2 (RevoVoiceProvider)
+             44 POP_TOP
+
+161          46 PUSH_NULL
+             48 LOAD_FAST                2 (RevoVoiceProvider)
+             50 CALL                     0
+             58 RETURN_VALUE
+
+162     >>   60 LOAD_FAST                1 (pid)
+             62 LOAD_CONST               4 ('edge-tts')
+             64 COMPARE_OP              40 (==)
+             68 POP_JUMP_IF_FALSE       13 (to 96)
+
+163          70 LOAD_CONST               2 (0)
+             72 LOAD_CONST               5 (('EdgeTTSProvider',))
+             74 IMPORT_NAME              3 (app.adapters.tts.edge_tts)
+             76 IMPORT_FROM              4 (EdgeTTSProvider)
+             78 STORE_FAST               3 (EdgeTTSProvider)
+             80 POP_TOP
+
+164          82 PUSH_NULL
+             84 LOAD_FAST                3 (EdgeTTSProvider)
+             86 CALL                     0
+             94 RETURN_VALUE
+
+165     >>   96 LOAD_FAST                1 (pid)
+             98 LOAD_CONST               6 ('azure-tts')
+            100 COMPARE_OP              40 (==)
+            104 POP_JUMP_IF_FALSE       13 (to 132)
+
+166         106 LOAD_CONST               2 (0)
+            108 LOAD_CONST               7 (('AzureTTSProvider',))
+            110 IMPORT_NAME              5 (app.adapters.tts.azure_tts)
+            112 IMPORT_FROM              6 (AzureTTSProvider)
+            114 STORE_FAST               4 (AzureTTSProvider)
+            116 POP_TOP
+
+167         118 PUSH_NULL
+            120 LOAD_FAST                4 (AzureTTSProvider)
+            122 CALL                     0
+            130 RETURN_VALUE
+
+168     >>  132 LOAD_FAST                1 (pid)
+            134 LOAD_CONST               8 ('kokoro')
+            136 COMPARE_OP              40 (==)
+            140 POP_JUMP_IF_FALSE       13 (to 168)
+
+169         142 LOAD_CONST               2 (0)
+            144 LOAD_CONST               9 (('KokoroTTSProvider',))
+            146 IMPORT_NAME              7 (app.adapters.tts.kokoro_tts)
+            148 IMPORT_FROM              8 (KokoroTTSProvider)
+            150 STORE_FAST               5 (KokoroTTSProvider)
+            152 POP_TOP
+
+170         154 PUSH_NULL
+            156 LOAD_FAST                5 (KokoroTTSProvider)
+            158 CALL                     0
+            166 RETURN_VALUE
+
+171     >>  168 LOAD_FAST                1 (pid)
+            170 LOAD_CONST              10 ('kokoro_vi')
+            172 COMPARE_OP              40 (==)
+            176 POP_JUMP_IF_FALSE       13 (to 204)
+
+172         178 LOAD_CONST               2 (0)
+            180 LOAD_CONST              11 (('KokoroViTTSProvider',))
+            182 IMPORT_NAME              9 (app.adapters.tts.kokoro_vi_tts)
+            184 IMPORT_FROM             10 (KokoroViTTSProvider)
+            186 STORE_FAST               6 (KokoroViTTSProvider)
+            188 POP_TOP
+
+173         190 PUSH_NULL
+            192 LOAD_FAST                6 (KokoroViTTSProvider)
+            194 CALL                     0
+            202 RETURN_VALUE
+
+174     >>  204 LOAD_FAST                1 (pid)
+            206 LOAD_CONST              12 ('omnivoice')
+            208 COMPARE_OP              40 (==)
+            212 POP_JUMP_IF_FALSE       13 (to 240)
+
+175         214 LOAD_CONST               2 (0)
+            216 LOAD_CONST              13 (('OmniVoiceProvider',))
+            218 IMPORT_NAME             11 (app.adapters.tts.omnivoice_tts)
+            220 IMPORT_FROM             12 (OmniVoiceProvider)
+            222 STORE_FAST               7 (OmniVoiceProvider)
+            224 POP_TOP
+
+176         226 PUSH_NULL
+            228 LOAD_FAST                7 (OmniVoiceProvider)
+            230 CALL                     0
+            238 RETURN_VALUE
+
+177     >>  240 LOAD_FAST                1 (pid)
+            242 LOAD_CONST              14 ('gemini-tts')
+            244 COMPARE_OP              40 (==)
+            248 POP_JUMP_IF_FALSE       13 (to 276)
+
+178         250 LOAD_CONST               2 (0)
+            252 LOAD_CONST              15 (('GeminiTTSProvider',))
+            254 IMPORT_NAME             13 (app.adapters.tts.gemini_tts)
+            256 IMPORT_FROM             14 (GeminiTTSProvider)
+            258 STORE_FAST               8 (GeminiTTSProvider)
+            260 POP_TOP
+
+179         262 PUSH_NULL
+            264 LOAD_FAST                8 (GeminiTTSProvider)
+            266 CALL                     0
+            274 RETURN_VALUE
+
+180     >>  276 LOAD_FAST                1 (pid)
+            278 LOAD_CONST              16 ('capcut-tts')
+            280 COMPARE_OP              40 (==)
+            284 POP_JUMP_IF_FALSE       13 (to 312)
+
+181         286 LOAD_CONST               2 (0)
+            288 LOAD_CONST              17 (('CapCutTTSProvider',))
+            290 IMPORT_NAME             15 (app.adapters.tts.capcut_tts)
+            292 IMPORT_FROM             16 (CapCutTTSProvider)
+            294 STORE_FAST               9 (CapCutTTSProvider)
+            296 POP_TOP
+
+182         298 PUSH_NULL
+            300 LOAD_FAST                9 (CapCutTTSProvider)
+            302 CALL                     0
+            310 RETURN_VALUE
+
+183     >>  312 LOAD_FAST                1 (pid)
+            314 LOAD_CONST              18 ('vbee-tts')
+            316 COMPARE_OP              40 (==)
+            320 POP_JUMP_IF_FALSE       13 (to 348)
+
+184         322 LOAD_CONST               2 (0)
+            324 LOAD_CONST              19 (('VbeeTTSProvider',))
+            326 IMPORT_NAME             17 (app.adapters.tts.vbee_tts)
+            328 IMPORT_FROM             18 (VbeeTTSProvider)
+            330 STORE_FAST              10 (VbeeTTSProvider)
+            332 POP_TOP
+
+185         334 PUSH_NULL
+            336 LOAD_FAST               10 (VbeeTTSProvider)
+            338 CALL                     0
+            346 RETURN_VALUE
+
+186     >>  348 LOAD_FAST                1 (pid)
+            350 LOAD_CONST              20 ('resona-tts')
+            352 COMPARE_OP              40 (==)
+            356 POP_JUMP_IF_FALSE       13 (to 384)
+
+187         358 LOAD_CONST               2 (0)
+            360 LOAD_CONST              21 (('ResonaTTSProvider',))
+            362 IMPORT_NAME             19 (app.adapters.tts.resona_tts)
+            364 IMPORT_FROM             20 (ResonaTTSProvider)
+            366 STORE_FAST              11 (ResonaTTSProvider)
+            368 POP_TOP
+
+188         370 PUSH_NULL
+            372 LOAD_FAST               11 (ResonaTTSProvider)
+            374 CALL                     0
+            382 RETURN_VALUE
+
+189     >>  384 LOAD_FAST                1 (pid)
+            386 LOAD_CONST              22 ('gcloud-tts')
+            388 COMPARE_OP              40 (==)
+            392 POP_JUMP_IF_FALSE       13 (to 420)
+
+190         394 LOAD_CONST               2 (0)
+            396 LOAD_CONST              23 (('GoogleCloudTTSProvider',))
+            398 IMPORT_NAME             21 (app.adapters.tts.gcloud_tts)
+            400 IMPORT_FROM             22 (GoogleCloudTTSProvider)
+            402 STORE_FAST              12 (GoogleCloudTTSProvider)
+            404 POP_TOP
+
+191         406 PUSH_NULL
+            408 LOAD_FAST               12 (GoogleCloudTTSProvider)
+            410 CALL                     0
+            418 RETURN_VALUE
+
+192     >>  420 LOAD_FAST                1 (pid)
+            422 LOAD_CONST              24 ('ai33-tts')
+            424 COMPARE_OP              40 (==)
+            428 POP_JUMP_IF_FALSE       13 (to 456)
+
+193         430 LOAD_CONST               2 (0)
+            432 LOAD_CONST              25 (('AI33TTSProvider',))
+            434 IMPORT_NAME             23 (app.adapters.tts.ai33_tts)
+            436 IMPORT_FROM             24 (AI33TTSProvider)
+            438 STORE_FAST              13 (AI33TTSProvider)
+            440 POP_TOP
+
+194         442 PUSH_NULL
+            444 LOAD_FAST               13 (AI33TTSProvider)
+            446 CALL                     0
+            454 RETURN_VALUE
+
+195     >>  456 LOAD_CONST               2 (0)
+            458 LOAD_CONST              26 (('ElevenLabsProvider',))
+            460 IMPORT_NAME             25 (app.adapters.tts.elevenlabs_tts)
+            462 IMPORT_FROM             26 (ElevenLabsProvider)
+            464 STORE_FAST              14 (ElevenLabsProvider)
+            466 POP_TOP
+
+196         468 PUSH_NULL
+            470 LOAD_FAST               14 (ElevenLabsProvider)
+            472 CALL                     0
+            480 RETURN_VALUE
+
+Disassembly of <code object list_voices at 0x7f6c81c20620, file "app\adapters\tts\__init__.py", line 199>:
+199           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+201           6 LOAD_GLOBAL              1 (NULL + normalize_provider)
+             16 LOAD_FAST                0 (name)
+             18 CALL                     1
+             26 STORE_FAST               1 (pid)
+
+202          28 LOAD_GLOBAL              3 (NULL + _module)
+             38 LOAD_FAST                1 (pid)
+             40 CALL                     1
+             48 LOAD_ATTR                5 (NULL|self + list_voices)
+             68 CALL                     0
+             76 GET_AWAITABLE            0
+             78 LOAD_CONST               1 (None)
+        >>   80 SEND                     3 (to 90)
+             84 YIELD_VALUE              2
+             86 RESUME                   3
+             88 JUMP_BACKWARD_NO_INTERRUPT     5 (to 80)
+        >>   90 END_SEND
+             92 STORE_FAST               2 (voices)
+
+203          94 LOAD_FAST                1 (pid)
+             96 LOAD_FAST                2 (voices)
+             98 BUILD_TUPLE              2
+            100 RETURN_VALUE
+
+202     >>  102 CLEANUP_THROW
+            104 JUMP_BACKWARD            8 (to 90)
+        >>  106 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            108 RERAISE                  1
+ExceptionTable:
+  4 to 82 -> 106 [0] lasti
+  84 to 84 -> 102 [2]
+  86 to 102 -> 106 [0] lasti
+
+Disassembly of <code object preview_voice at 0x269fea00, file "app\adapters\tts\__init__.py", line 206>:
+206           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+208           6 LOAD_GLOBAL              1 (NULL + normalize_provider)
+             16 LOAD_FAST                0 (name)
+             18 CALL                     1
+             26 STORE_FAST               4 (pid)
+
+209          28 LOAD_FAST                4 (pid)
+             30 LOAD_CONST               1 ('gemini-tts')
+             32 COMPARE_OP              40 (==)
+             36 POP_JUMP_IF_FALSE       53 (to 144)
+             38 LOAD_FAST                3 (context)
+             40 POP_JUMP_IF_FALSE       51 (to 144)
+
+210          42 LOAD_GLOBAL              3 (NULL + _module)
+             52 LOAD_FAST                4 (pid)
+             54 CALL                     1
+             62 LOAD_ATTR                5 (NULL|self + preview_voice)
+             82 LOAD_FAST                1 (voice)
+             84 LOAD_FAST                2 (text)
+             86 LOAD_FAST                3 (context)
+             88 LOAD_ATTR                7 (NULL|self + get)
+            108 LOAD_CONST               2 ('gemini_profile')
+            110 CALL                     1
+            118 CALL                     3
+            126 GET_AWAITABLE            0
+            128 LOAD_CONST               3 (None)
+        >>  130 SEND                     3 (to 140)
+            134 YIELD_VALUE              2
+            136 RESUME                   3
+            138 JUMP_BACKWARD_NO_INTERRUPT     5 (to 130)
+        >>  140 END_SEND
+            142 RETURN_VALUE
+
+211     >>  144 LOAD_FAST                4 (pid)
+            146 LOAD_CONST               4 ('gcloud-tts')
+            148 COMPARE_OP              40 (==)
+            152 POP_JUMP_IF_FALSE       53 (to 260)
+            154 LOAD_FAST                3 (context)
+            156 POP_JUMP_IF_FALSE       51 (to 260)
+
+212         158 LOAD_GLOBAL              3 (NULL + _module)
+            168 LOAD_FAST                4 (pid)
+            170 CALL                     1
+            178 LOAD_ATTR                5 (NULL|self + preview_voice)
+            198 LOAD_FAST                1 (voice)
+            200 LOAD_FAST                2 (text)
+            202 LOAD_FAST                3 (context)
+            204 LOAD_ATTR                7 (NULL|self + get)
+            224 LOAD_CONST               5 ('gcloud_profile')
+            226 CALL                     1
+            234 CALL                     3
+            242 GET_AWAITABLE            0
+            244 LOAD_CONST               3 (None)
+        >>  246 SEND                     3 (to 256)
+            250 YIELD_VALUE              2
+            252 RESUME                   3
+            254 JUMP_BACKWARD_NO_INTERRUPT     5 (to 246)
+        >>  256 END_SEND
+            258 RETURN_VALUE
+
+213     >>  260 LOAD_GLOBAL              3 (NULL + _module)
+            270 LOAD_FAST                4 (pid)
+            272 CALL                     1
+            280 LOAD_ATTR                5 (NULL|self + preview_voice)
+            300 LOAD_FAST                1 (voice)
+            302 LOAD_FAST                2 (text)
+            304 CALL                     2
+            312 GET_AWAITABLE            0
+            314 LOAD_CONST               3 (None)
+        >>  316 SEND                     3 (to 326)
+            320 YIELD_VALUE              2
+            322 RESUME                   3
+            324 JUMP_BACKWARD_NO_INTERRUPT     5 (to 316)
+        >>  326 END_SEND
+            328 STORE_FAST               5 (result)
+
+214         330 LOAD_GLOBAL              9 (NULL + isinstance)
+            340 LOAD_FAST                5 (result)
+            342 LOAD_GLOBAL             10 (tuple)
+            352 CALL                     2
+            360 POP_JUMP_IF_FALSE        2 (to 366)
+
+215         362 LOAD_FAST                5 (result)
+            364 RETURN_VALUE
+
+216     >>  366 LOAD_FAST                5 (result)
+            368 LOAD_CONST               6 ('audio/mpeg')
+            370 BUILD_TUPLE              2
+            372 RETURN_VALUE
+
+210     >>  374 CLEANUP_THROW
+            376 JUMP_BACKWARD          119 (to 140)
+
+212     >>  378 CLEANUP_THROW
+            380 JUMP_BACKWARD           63 (to 256)
+
+213     >>  382 CLEANUP_THROW
+            384 JUMP_BACKWARD           30 (to 326)
+        >>  386 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            388 RERAISE                  1
+ExceptionTable:
+  4 to 132 -> 386 [0] lasti
+  134 to 134 -> 374 [2]
+  136 to 248 -> 386 [0] lasti
+  250 to 250 -> 378 [2]
+  252 to 318 -> 386 [0] lasti
+  320 to 320 -> 382 [2]
+  322 to 374 -> 386 [0] lasti
+  378 to 378 -> 386 [0] lasti
+  382 to 382 -> 386 [0] lasti

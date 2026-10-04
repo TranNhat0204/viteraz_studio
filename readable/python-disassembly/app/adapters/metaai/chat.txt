@@ -1,0 +1,582 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Chat over the clippy WebSocket (send sequence + optional streaming recv).\n\nPorted from metaai-go @ 93e06e643643eade877cf1742d877575d813486d\n  - vendor/metaai-go/chat.go\n  - vendor/metaai-go/ws_conn.go\n\nCRITICAL: the 300ms CONNECT→CHAT debounce (chat.go) — a shorter delay makes the\nserver silently drop the CHAT frame. Template mode is preferred (byte-faithful);\nthe hand-rolled encoder is the fallback.\n\nThe generation path only needs the SEND sequence (the prompt text triggers media\ngeneration; results come from the GraphQL feed). Streaming recv is ported for\nthe optional chat feature but not required for image/video.\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 15           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 17          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (asyncio)
+             24 STORE_NAME               3 (asyncio)
+
+ 18          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               4 (('AsyncIterator', 'Optional'))
+             30 IMPORT_NAME              4 (typing)
+             32 IMPORT_FROM              5 (AsyncIterator)
+             34 STORE_NAME               5 (AsyncIterator)
+             36 IMPORT_FROM              6 (Optional)
+             38 STORE_NAME               6 (Optional)
+             40 POP_TOP
+
+ 20          42 LOAD_CONST               5 (1)
+             44 LOAD_CONST               6 (('constants',))
+             46 IMPORT_NAME              7
+             48 IMPORT_FROM              8 (constants)
+             50 STORE_NAME               9 (C)
+             52 POP_TOP
+
+ 21          54 LOAD_CONST               5 (1)
+             56 LOAD_CONST               7 (('frame',))
+             58 IMPORT_NAME             10 (clippy)
+             60 IMPORT_FROM             11 (frame)
+             62 STORE_NAME              12 (clippy_frame)
+             64 POP_TOP
+
+ 22          66 LOAD_CONST               5 (1)
+             68 LOAD_CONST               8 (('parse',))
+             70 IMPORT_NAME             10 (clippy)
+             72 IMPORT_FROM             13 (parse)
+             74 STORE_NAME              14 (clippy_parse)
+             76 POP_TOP
+
+ 23          78 LOAD_CONST               5 (1)
+             80 LOAD_CONST               9 (('template',))
+             82 IMPORT_NAME             10 (clippy)
+             84 IMPORT_FROM             15 (template)
+             86 STORE_NAME              16 (clippy_template)
+             88 POP_TOP
+
+ 24          90 LOAD_CONST               5 (1)
+             92 LOAD_CONST              10 (('transport',))
+             94 IMPORT_NAME             10 (clippy)
+             96 IMPORT_FROM             17 (transport)
+             98 STORE_NAME              17 (transport)
+            100 POP_TOP
+
+ 25         102 LOAD_CONST               5 (1)
+            104 LOAD_CONST              11 (('ids',))
+            106 IMPORT_NAME             10 (clippy)
+            108 IMPORT_FROM             18 (ids)
+            110 STORE_NAME              18 (ids)
+            112 POP_TOP
+
+ 26         114 LOAD_CONST               5 (1)
+            116 LOAD_CONST              12 (('ErrAccessTokenMissing',))
+            118 IMPORT_NAME             19 (errors)
+            120 IMPORT_FROM             20 (ErrAccessTokenMissing)
+            122 STORE_NAME              20 (ErrAccessTokenMissing)
+            124 POP_TOP
+
+ 28         126 LOAD_CONST              13 (0.3)
+            128 STORE_NAME              21 (CONNECT_CHAT_DEBOUNCE)
+
+ 29         130 LOAD_CONST              14 (120.0)
+            132 STORE_NAME              22 (RECV_READ_TIMEOUT)
+
+ 37         134 LOAD_CONST              15 (False)
+
+ 38         136 LOAD_CONST               3 (None)
+
+ 39         138 LOAD_CONST              16 ('')
+
+ 32         140 LOAD_CONST              17 (('thinking', 'attach_media', 'system_instruction'))
+            142 BUILD_CONST_KEY_MAP      3
+
+ 33         144 NOP
+
+ 32         146 NOP
+
+ 34         148 NOP
+
+ 32         150 NOP
+
+ 35         152 NOP
+
+ 32         154 NOP
+
+ 37         156 NOP
+
+ 32         158 NOP
+
+ 38         160 NOP
+
+ 32         162 NOP
+
+ 39         164 NOP
+
+ 32         166 NOP
+
+ 40         168 NOP
+
+ 32         170 LOAD_CONST              22 (('conn', 'transport.Conn', 'message', 'str', 'conversation_id', 'str', 'thinking', 'bool', 'attach_media', 'Optional[dict]', 'system_instruction', 'str', 'return', 'None'))
+            172 LOAD_CONST              18 (<code object send_chat_frames at 0x29060850, file "app\adapters\metaai\chat.py", line 32>)
+            174 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            176 STORE_NAME              23 (send_chat_frames)
+
+ 77         178 LOAD_CONST              23 (('conn', 'transport.Conn', 'return', 'AsyncIterator[str]'))
+            180 LOAD_CONST              19 (<code object stream_recv at 0x26a11e00, file "app\adapters\metaai\chat.py", line 77>)
+            182 MAKE_FUNCTION            4 (annotations)
+            184 STORE_NAME              24 (stream_recv)
+
+125         186 LOAD_CONST              24 (('raw', 'bytes', 'return', 'bool'))
+            188 LOAD_CONST              20 (<code object _is_end_of_stream at 0x7f6c933929e0, file "app\adapters\metaai\chat.py", line 125>)
+            190 MAKE_FUNCTION            4 (annotations)
+            192 STORE_NAME              25 (_is_end_of_stream)
+
+138         194 LOAD_CONST              25 (('return', 'str'))
+            196 LOAD_CONST              21 (<code object new_conversation_id at 0x7f6c9329e880, file "app\adapters\metaai\chat.py", line 138>)
+            198 MAKE_FUNCTION            4 (annotations)
+            200 STORE_NAME              26 (new_conversation_id)
+            202 RETURN_CONST             3 (None)
+
+Disassembly of <code object send_chat_frames at 0x29060850, file "app\adapters\metaai\chat.py", line 32>:
+ 32           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 46           6 LOAD_FAST                5 (system_instruction)
+              8 POP_JUMP_IF_FALSE       11 (to 32)
+
+ 47          10 LOAD_CONST               1 ('[System]\n')
+             12 LOAD_FAST                5 (system_instruction)
+             14 BINARY_OP                0 (+)
+             18 LOAD_CONST               2 ('\n\n')
+             20 BINARY_OP                0 (+)
+             24 LOAD_FAST                1 (message)
+             26 BINARY_OP                0 (+)
+             30 STORE_FAST               1 (message)
+
+ 49     >>   32 LOAD_GLOBAL              1 (NULL + clippy_frame)
+             42 LOAD_ATTR                2 (build_connect_message)
+             62 LOAD_FAST                2 (conversation_id)
+             64 CALL                     1
+             72 STORE_FAST               6 (connect_frame)
+
+ 50          74 LOAD_FAST                0 (conn)
+             76 LOAD_ATTR                5 (NULL|self + send_binary)
+             96 LOAD_FAST                6 (connect_frame)
+             98 CALL                     1
+            106 GET_AWAITABLE            0
+            108 LOAD_CONST               3 (None)
+        >>  110 SEND                     3 (to 120)
+            114 YIELD_VALUE              2
+            116 RESUME                   3
+            118 JUMP_BACKWARD_NO_INTERRUPT     5 (to 110)
+        >>  120 END_SEND
+            122 POP_TOP
+
+ 51         124 LOAD_GLOBAL              7 (NULL + asyncio)
+            134 LOAD_ATTR                8 (sleep)
+            154 LOAD_GLOBAL             10 (CONNECT_CHAT_DEBOUNCE)
+            164 CALL                     1
+            172 GET_AWAITABLE            0
+            174 LOAD_CONST               3 (None)
+        >>  176 SEND                     3 (to 186)
+            180 YIELD_VALUE              2
+            182 RESUME                   3
+            184 JUMP_BACKWARD_NO_INTERRUPT     5 (to 176)
+        >>  186 END_SEND
+            188 POP_TOP
+
+ 53         190 LOAD_GLOBAL             13 (NULL + C)
+            200 LOAD_ATTR               14 (default_template_b64)
+            220 CALL                     0
+            228 STORE_FAST               7 (tpl_b64)
+
+ 54         230 LOAD_FAST                7 (tpl_b64)
+            232 POP_JUMP_IF_FALSE      164 (to 562)
+
+ 55         234 LOAD_GLOBAL             17 (NULL + clippy_template)
+            244 LOAD_ATTR               18 (TemplateOptions)
+
+ 56         264 LOAD_FAST                7 (tpl_b64)
+
+ 57         266 LOAD_GLOBAL             12 (C)
+            276 LOAD_ATTR               20 (DEFAULT_TEMPLATE_TEXT)
+
+ 58         296 LOAD_FAST                1 (message)
+
+ 59         298 LOAD_FAST                2 (conversation_id)
+
+ 55         300 KW_NAMES                 4 (('template_b64', 'template_text', 'new_text', 'conversation_id'))
+            302 CALL                     4
+            310 STORE_FAST               8 (opts)
+
+ 61         312 LOAD_FAST                4 (attach_media)
+            314 POP_JUMP_IF_FALSE      101 (to 518)
+
+ 62         316 LOAD_GLOBAL             13 (NULL + C)
+            326 LOAD_ATTR               22 (default_attachment_template_b64)
+            346 CALL                     0
+            354 LOAD_FAST                8 (opts)
+            356 STORE_ATTR              12 (template_b64)
+
+ 63         366 LOAD_CONST               5 ('What do you see ?')
+            368 LOAD_FAST                8 (opts)
+            370 STORE_ATTR              13 (template_text)
+
+ 64         380 LOAD_FAST                4 (attach_media)
+            382 LOAD_ATTR               29 (NULL|self + get)
+            402 LOAD_CONST               6 ('media_id')
+            404 LOAD_CONST               7 ('')
+            406 CALL                     2
+            414 LOAD_FAST                8 (opts)
+            416 STORE_ATTR              15 (media_id)
+
+ 65         426 LOAD_FAST                4 (attach_media)
+            428 LOAD_ATTR               29 (NULL|self + get)
+            448 LOAD_CONST               8 ('mime')
+            450 LOAD_CONST               7 ('')
+            452 CALL                     2
+            460 LOAD_FAST                8 (opts)
+            462 STORE_ATTR              16 (media_mime)
+
+ 66         472 LOAD_FAST                4 (attach_media)
+            474 LOAD_ATTR               29 (NULL|self + get)
+            494 LOAD_CONST               9 ('filename')
+            496 LOAD_CONST               7 ('')
+            498 CALL                     2
+            506 LOAD_FAST                8 (opts)
+            508 STORE_ATTR              17 (media_filename)
+
+ 67     >>  518 LOAD_GLOBAL             17 (NULL + clippy_template)
+            528 LOAD_ATTR               36 (build_from_template)
+            548 LOAD_FAST                8 (opts)
+            550 CALL                     1
+            558 STORE_FAST               9 (chat_frame)
+            560 JUMP_FORWARD            43 (to 648)
+
+ 69     >>  562 LOAD_GLOBAL              1 (NULL + clippy_frame)
+            572 LOAD_ATTR               38 (build_chat_message)
+
+ 70         592 LOAD_GLOBAL              1 (NULL + clippy_frame)
+            602 LOAD_ATTR               40 (ChatMessageOptions)
+
+ 71         622 LOAD_FAST                1 (message)
+            624 LOAD_FAST                2 (conversation_id)
+            626 LOAD_FAST                3 (thinking)
+
+ 70         628 KW_NAMES                10 (('text', 'conversation_id', 'thinking'))
+            630 CALL                     3
+
+ 69         638 CALL                     1
+            646 STORE_FAST               9 (chat_frame)
+
+ 74     >>  648 LOAD_FAST                0 (conn)
+            650 LOAD_ATTR                5 (NULL|self + send_binary)
+            670 LOAD_FAST                9 (chat_frame)
+            672 CALL                     1
+            680 GET_AWAITABLE            0
+            682 LOAD_CONST               3 (None)
+        >>  684 SEND                     3 (to 694)
+            688 YIELD_VALUE              2
+            690 RESUME                   3
+            692 JUMP_BACKWARD_NO_INTERRUPT     5 (to 684)
+        >>  694 END_SEND
+            696 POP_TOP
+            698 RETURN_CONST             3 (None)
+
+ 50     >>  700 CLEANUP_THROW
+            702 EXTENDED_ARG             1
+            704 JUMP_BACKWARD          293 (to 120)
+
+ 51     >>  706 CLEANUP_THROW
+            708 EXTENDED_ARG             1
+            710 JUMP_BACKWARD          263 (to 186)
+
+ 74     >>  712 CLEANUP_THROW
+            714 JUMP_BACKWARD           11 (to 694)
+        >>  716 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            718 RERAISE                  1
+ExceptionTable:
+  4 to 112 -> 716 [0] lasti
+  114 to 114 -> 700 [2]
+  116 to 178 -> 716 [0] lasti
+  180 to 180 -> 706 [2]
+  182 to 686 -> 716 [0] lasti
+  688 to 688 -> 712 [2]
+  690 to 700 -> 716 [0] lasti
+  706 to 706 -> 716 [0] lasti
+  712 to 712 -> 716 [0] lasti
+
+Disassembly of <code object stream_recv at 0x26a11e00, file "app\adapters\metaai\chat.py", line 77>:
+ 77           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 79           6 LOAD_CONST               1 (False)
+              8 STORE_FAST               1 (seen_full)
+
+ 80          10 LOAD_CONST               1 (False)
+             12 STORE_FAST               2 (received_any)
+
+ 81          14 LOAD_CONST               2 ('')
+             16 STORE_FAST               3 (last_full_text)
+
+ 82          18 LOAD_CONST               3 (None)
+             20 STORE_FAST               4 (last_seq)
+
+ 83          22 LOAD_CONST               2 ('')
+             24 STORE_FAST               5 (last_text)
+
+ 84     >>   26 NOP
+
+ 85     >>   28 NOP
+
+ 86          30 LOAD_FAST                0 (conn)
+             32 LOAD_ATTR                1 (NULL|self + recv_binary)
+             52 LOAD_GLOBAL              2 (RECV_READ_TIMEOUT)
+             62 CALL                     1
+             70 GET_AWAITABLE            0
+             72 LOAD_CONST               3 (None)
+        >>   74 SEND                     3 (to 84)
+             78 YIELD_VALUE              3
+             80 RESUME                   3
+             82 JUMP_BACKWARD_NO_INTERRUPT     5 (to 74)
+        >>   84 END_SEND
+             86 STORE_FAST               6 (raw)
+
+ 93          88 LOAD_FAST                6 (raw)
+             90 POP_JUMP_IF_TRUE         1 (to 94)
+
+ 94          92 JUMP_BACKWARD           34 (to 26)
+
+ 95     >>   94 LOAD_CONST               4 (True)
+             96 STORE_FAST               2 (received_any)
+
+ 97          98 LOAD_GLOBAL             11 (NULL + clippy_parse)
+            108 LOAD_ATTR               12 (response_text_info)
+            128 LOAD_FAST                6 (raw)
+            130 CALL                     1
+            138 UNPACK_SEQUENCE          3
+            142 STORE_FAST               7 (txt)
+            144 STORE_FAST               8 (ok)
+            146 STORE_FAST               9 (is_full)
+
+ 98         148 LOAD_FAST                8 (ok)
+            150 POP_JUMP_IF_FALSE      126 (to 404)
+            152 LOAD_FAST                7 (txt)
+            154 POP_JUMP_IF_FALSE      124 (to 404)
+
+ 99         156 LOAD_GLOBAL             11 (NULL + clippy_parse)
+            166 LOAD_ATTR               14 (is_full_response)
+            186 LOAD_FAST                6 (raw)
+            188 CALL                     1
+            196 POP_JUMP_IF_FALSE        5 (to 208)
+
+100         198 LOAD_FAST                1 (seen_full)
+            200 POP_JUMP_IF_FALSE        1 (to 204)
+
+101         202 RETURN_CONST             3 (None)
+
+102     >>  204 LOAD_CONST               4 (True)
+            206 STORE_FAST               1 (seen_full)
+
+103     >>  208 LOAD_FAST                9 (is_full)
+            210 POP_JUMP_IF_TRUE        44 (to 300)
+
+104         212 LOAD_GLOBAL             11 (NULL + clippy_parse)
+            222 LOAD_ATTR               16 (response_seq)
+            242 LOAD_FAST                6 (raw)
+            244 CALL                     1
+            252 UNPACK_SEQUENCE          2
+            256 STORE_FAST              10 (seq)
+            258 STORE_FAST              11 (has_seq)
+
+105         260 LOAD_FAST               11 (has_seq)
+            262 POP_JUMP_IF_FALSE        6 (to 276)
+            264 LOAD_FAST               10 (seq)
+            266 LOAD_FAST                4 (last_seq)
+            268 COMPARE_OP              40 (==)
+            272 POP_JUMP_IF_FALSE        1 (to 276)
+
+106         274 JUMP_BACKWARD          125 (to 26)
+
+107     >>  276 LOAD_FAST               11 (has_seq)
+            278 POP_JUMP_IF_FALSE        2 (to 284)
+
+108         280 LOAD_FAST               10 (seq)
+            282 STORE_FAST               4 (last_seq)
+
+109     >>  284 LOAD_FAST                7 (txt)
+            286 LOAD_FAST                5 (last_text)
+            288 COMPARE_OP              40 (==)
+            292 POP_JUMP_IF_FALSE        1 (to 296)
+
+110         294 JUMP_BACKWARD          135 (to 26)
+
+111     >>  296 LOAD_FAST                7 (txt)
+            298 STORE_FAST               5 (last_text)
+
+112     >>  300 LOAD_FAST                7 (txt)
+            302 STORE_FAST              12 (chunk_text)
+
+113         304 LOAD_FAST                9 (is_full)
+            306 POP_JUMP_IF_FALSE       36 (to 380)
+
+114         308 LOAD_FAST                3 (last_full_text)
+            310 POP_JUMP_IF_FALSE       31 (to 374)
+            312 LOAD_FAST                7 (txt)
+            314 LOAD_ATTR               19 (NULL|self + startswith)
+            334 LOAD_FAST                3 (last_full_text)
+            336 CALL                     1
+            344 POP_JUMP_IF_FALSE       14 (to 374)
+
+115         346 LOAD_FAST                7 (txt)
+            348 LOAD_GLOBAL             21 (NULL + len)
+            358 LOAD_FAST                3 (last_full_text)
+            360 CALL                     1
+            368 LOAD_CONST               3 (None)
+            370 BINARY_SLICE
+            372 STORE_FAST              12 (chunk_text)
+
+116     >>  374 LOAD_FAST                7 (txt)
+            376 STORE_FAST               3 (last_full_text)
+            378 JUMP_FORWARD             5 (to 390)
+
+118     >>  380 LOAD_FAST                3 (last_full_text)
+            382 LOAD_FAST                7 (txt)
+            384 BINARY_OP               13 (+=)
+            388 STORE_FAST               3 (last_full_text)
+
+119     >>  390 LOAD_FAST               12 (chunk_text)
+            392 POP_JUMP_IF_FALSE        5 (to 404)
+
+120         394 LOAD_FAST               12 (chunk_text)
+            396 CALL_INTRINSIC_1         4 (INTRINSIC_ASYNC_GEN_WRAP)
+            398 YIELD_VALUE              1
+            400 RESUME                   1
+            402 POP_TOP
+
+121     >>  404 LOAD_GLOBAL             23 (NULL + _is_end_of_stream)
+            414 LOAD_FAST                6 (raw)
+            416 CALL                     1
+            424 POP_JUMP_IF_FALSE        1 (to 428)
+
+122         426 RETURN_CONST             3 (None)
+
+ 84     >>  428 JUMP_BACKWARD          201 (to 28)
+
+ 86     >>  430 CLEANUP_THROW
+            432 JUMP_BACKWARD          175 (to 84)
+        >>  434 PUSH_EXC_INFO
+
+ 87         436 LOAD_GLOBAL              4 (transport)
+            446 LOAD_ATTR                6 (TransportClosed)
+            466 CHECK_EXC_MATCH
+            468 POP_JUMP_IF_FALSE        3 (to 476)
+            470 POP_TOP
+
+ 88         472 POP_EXCEPT
+            474 RETURN_CONST             3 (None)
+
+ 89     >>  476 LOAD_GLOBAL              8 (Exception)
+            486 CHECK_EXC_MATCH
+            488 POP_JUMP_IF_FALSE        6 (to 502)
+            490 POP_TOP
+
+ 90         492 LOAD_FAST                2 (received_any)
+            494 POP_JUMP_IF_FALSE        2 (to 500)
+
+ 91         496 POP_EXCEPT
+            498 RETURN_CONST             3 (None)
+
+ 92     >>  500 RAISE_VARARGS            0
+
+ 89     >>  502 RERAISE                  0
+        >>  504 COPY                     3
+            506 POP_EXCEPT
+            508 RERAISE                  1
+        >>  510 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            512 RERAISE                  1
+ExceptionTable:
+  4 to 26 -> 510 [0] lasti
+  30 to 76 -> 434 [0]
+  78 to 78 -> 430 [2]
+  80 to 86 -> 434 [0]
+  88 to 428 -> 510 [0] lasti
+  430 to 430 -> 434 [0]
+  434 to 470 -> 504 [1] lasti
+  472 to 474 -> 510 [0] lasti
+  476 to 494 -> 504 [1] lasti
+  496 to 498 -> 510 [0] lasti
+  500 to 502 -> 504 [1] lasti
+  504 to 508 -> 510 [0] lasti
+
+Disassembly of <code object _is_end_of_stream at 0x7f6c933929e0, file "app\adapters\metaai\chat.py", line 125>:
+125           0 RESUME                   0
+
+126           2 LOAD_GLOBAL              1 (NULL + clippy_parse)
+             12 LOAD_ATTR                2 (parse_frame)
+             32 LOAD_FAST                0 (raw)
+             34 CALL                     1
+             42 STORE_FAST               1 (frame)
+
+127          44 LOAD_FAST                1 (frame)
+             46 POP_JUMP_IF_NONE        41 (to 130)
+             48 LOAD_FAST                1 (frame)
+             50 LOAD_ATTR                4 (type)
+             70 LOAD_GLOBAL              0 (clippy_parse)
+             80 LOAD_ATTR                6 (TYPE_CONNECT)
+            100 COMPARE_OP              55 (!=)
+            104 POP_JUMP_IF_TRUE        12 (to 130)
+            106 LOAD_FAST                1 (frame)
+            108 LOAD_ATTR                8 (payload)
+            128 POP_JUMP_IF_TRUE         1 (to 132)
+
+128     >>  130 RETURN_CONST             1 (False)
+
+129     >>  132 LOAD_FAST                1 (frame)
+            134 LOAD_ATTR                8 (payload)
+            154 LOAD_ATTR               11 (NULL|self + get)
+            174 LOAD_CONST               2 ('code')
+            176 CALL                     1
+            184 STORE_FAST               2 (code)
+
+130         186 LOAD_FAST                2 (code)
+            188 POP_JUMP_IF_NOT_NONE     1 (to 192)
+
+131         190 RETURN_CONST             1 (False)
+
+132     >>  192 NOP
+
+133         194 LOAD_GLOBAL             13 (NULL + int)
+            204 LOAD_FAST                2 (code)
+            206 CALL                     1
+            214 LOAD_CONST               3 (200)
+            216 COMPARE_OP              55 (!=)
+            220 RETURN_VALUE
+        >>  222 PUSH_EXC_INFO
+
+134         224 LOAD_GLOBAL             14 (TypeError)
+            234 LOAD_GLOBAL             16 (ValueError)
+            244 BUILD_TUPLE              2
+            246 CHECK_EXC_MATCH
+            248 POP_JUMP_IF_FALSE        3 (to 256)
+            250 POP_TOP
+
+135         252 POP_EXCEPT
+            254 RETURN_CONST             1 (False)
+
+134     >>  256 RERAISE                  0
+        >>  258 COPY                     3
+            260 POP_EXCEPT
+            262 RERAISE                  1
+ExceptionTable:
+  194 to 218 -> 222 [0]
+  222 to 250 -> 258 [1] lasti
+  256 to 256 -> 258 [1] lasti
+
+Disassembly of <code object new_conversation_id at 0x7f6c9329e880, file "app\adapters\metaai\chat.py", line 138>:
+138           0 RESUME                   0
+
+139           2 LOAD_GLOBAL              1 (NULL + ids)
+             12 LOAD_ATTR                2 (v4)
+             32 CALL                     0
+             40 RETURN_VALUE

@@ -1,0 +1,116 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Access-token scraping + HTML helpers.\n\nPorted from metaai-go @ 93e06e643643eade877cf1742d877575d813486d\n  - vendor/metaai-go/auth.go\n  - vendor/metaai-go/utils.go  (extract_access_token / detect_challenge_page)\n')
+              4 STORE_NAME               0 (__doc__)
+
+  7           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+  9          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (re)
+             24 STORE_NAME               3 (re)
+
+ 12          26 PUSH_NULL
+             28 LOAD_NAME                3 (re)
+             30 LOAD_ATTR                8 (compile)
+             50 LOAD_CONST               4 ('accessToken\\\\?\\s*["\\\']?\\s*:\\s*\\\\?\\s*["\\\']\\s*(ecto1:[A-Za-z0-9_-]+)')
+             52 LOAD_NAME                3 (re)
+             54 LOAD_ATTR               10 (I)
+             74 CALL                     2
+             82 STORE_NAME               6 (_ACCESS_TOKEN_RE)
+
+ 13          84 PUSH_NULL
+             86 LOAD_NAME                3 (re)
+             88 LOAD_ATTR                8 (compile)
+            108 LOAD_CONST               5 ('(ecto1:[A-Za-z0-9_-]+)')
+            110 LOAD_NAME                3 (re)
+            112 LOAD_ATTR               10 (I)
+            132 CALL                     2
+            140 STORE_NAME               7 (_RAW_ACCESS_TOKEN_RE)
+
+ 14         142 PUSH_NULL
+            144 LOAD_NAME                3 (re)
+            146 LOAD_ATTR                8 (compile)
+            166 LOAD_CONST               6 ("fetch\\('(/__rd_verify[^']+)")
+            168 CALL                     1
+            176 STORE_NAME               8 (_CHALLENGE_URL_RE)
+
+ 17         178 LOAD_CONST               9 (('html_text', 'str', 'return', 'str'))
+            180 LOAD_CONST               7 (<code object extract_access_token at 0x7f6c93271d10, file "app\adapters\metaai\auth.py", line 17>)
+            182 MAKE_FUNCTION            4 (annotations)
+            184 STORE_NAME               9 (extract_access_token)
+
+ 23         186 LOAD_CONST               9 (('html_text', 'str', 'return', 'str'))
+            188 LOAD_CONST               8 (<code object detect_challenge_page at 0x7f6c9324a3d0, file "app\adapters\metaai\auth.py", line 23>)
+            190 MAKE_FUNCTION            4 (annotations)
+            192 STORE_NAME              10 (detect_challenge_page)
+            194 RETURN_CONST             3 (None)
+
+Disassembly of <code object extract_access_token at 0x7f6c93271d10, file "app\adapters\metaai\auth.py", line 17>:
+ 17           0 RESUME                   0
+
+ 19           2 LOAD_GLOBAL              0 (_ACCESS_TOKEN_RE)
+             12 LOAD_ATTR                3 (NULL|self + search)
+             32 LOAD_FAST                0 (html_text)
+             34 COPY                     1
+             36 POP_JUMP_IF_TRUE         2 (to 42)
+             38 POP_TOP
+             40 LOAD_CONST               1 ('')
+        >>   42 CALL                     1
+             50 COPY                     1
+             52 POP_JUMP_IF_TRUE        25 (to 104)
+             54 POP_TOP
+             56 LOAD_GLOBAL              4 (_RAW_ACCESS_TOKEN_RE)
+             66 LOAD_ATTR                3 (NULL|self + search)
+             86 LOAD_FAST                0 (html_text)
+             88 COPY                     1
+             90 POP_JUMP_IF_TRUE         2 (to 96)
+             92 POP_TOP
+             94 LOAD_CONST               1 ('')
+        >>   96 CALL                     1
+        >>  104 STORE_FAST               1 (m)
+
+ 20         106 LOAD_FAST                1 (m)
+            108 POP_JUMP_IF_FALSE       17 (to 144)
+            110 LOAD_FAST                1 (m)
+            112 LOAD_ATTR                7 (NULL|self + group)
+            132 LOAD_CONST               2 (1)
+            134 CALL                     1
+            142 RETURN_VALUE
+        >>  144 LOAD_CONST               1 ('')
+            146 RETURN_VALUE
+
+Disassembly of <code object detect_challenge_page at 0x7f6c9324a3d0, file "app\adapters\metaai\auth.py", line 23>:
+ 23           0 RESUME                   0
+
+ 25           2 LOAD_CONST               1 ('executeChallenge')
+              4 LOAD_FAST                0 (html_text)
+              6 CONTAINS_OP              1
+              8 POP_JUMP_IF_FALSE        5 (to 20)
+             10 LOAD_CONST               2 ('__rd_verify')
+             12 LOAD_FAST                0 (html_text)
+             14 CONTAINS_OP              1
+             16 POP_JUMP_IF_FALSE        1 (to 20)
+
+ 26          18 RETURN_CONST             3 ('')
+
+ 27     >>   20 LOAD_GLOBAL              0 (_CHALLENGE_URL_RE)
+             30 LOAD_ATTR                3 (NULL|self + search)
+             50 LOAD_FAST                0 (html_text)
+             52 CALL                     1
+             60 STORE_FAST               1 (m)
+
+ 28          62 LOAD_FAST                1 (m)
+             64 POP_JUMP_IF_FALSE       17 (to 100)
+             66 LOAD_FAST                1 (m)
+             68 LOAD_ATTR                5 (NULL|self + group)
+             88 LOAD_CONST               4 (1)
+             90 CALL                     1
+             98 RETURN_VALUE
+        >>  100 LOAD_CONST               3 ('')
+            102 RETURN_VALUE

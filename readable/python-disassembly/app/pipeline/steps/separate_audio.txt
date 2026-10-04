@@ -1,0 +1,717 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Step separate_audio — tách giọng/nhạc nền bằng Demucs (tùy chọn).\n\nĐầu vào ưu tiên audio.source.wav (48kHz stereo, chất lượng gốc); fallback audio.wav.\nĐầu ra:\n  - audio.vocals.wav : giọng sạch  → tham chiếu clone giọng / recap rõ lời\n  - audio.music.wav  : nhạc nền    → có thể trộn lại vào bản recap\n\nĐây là step KHÔNG nằm trong preset mặc định (heavy, cần Demucs/torch). Chạy theo nhu cầu\nqua API run-step, hoặc preset chuyên dụng. Nếu Demucs chưa cài → báo lỗi có hint, không sập.\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 11           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 13          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('make_error', 'E'))
+             22 IMPORT_NAME              3 (app.core.errors)
+             24 IMPORT_FROM              4 (make_error)
+             26 STORE_NAME               4 (make_error)
+             28 IMPORT_FROM              5 (E)
+             30 STORE_NAME               5 (E)
+             32 POP_TOP
+
+ 14          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               4 (('ProjectFS',))
+             38 IMPORT_NAME              6 (app.core.fs)
+             40 IMPORT_FROM              7 (ProjectFS)
+             42 STORE_NAME               7 (ProjectFS)
+             44 POP_TOP
+
+ 15          46 LOAD_CONST               1 (0)
+             48 LOAD_CONST               5 (('gpu_gate',))
+             50 IMPORT_NAME              8 (app.core.gpu_gate)
+             52 IMPORT_FROM              9 (gpu_gate)
+             54 STORE_NAME               9 (gpu_gate)
+             56 POP_TOP
+
+ 16          58 LOAD_CONST               1 (0)
+             60 LOAD_CONST               6 (('AudioSeparator',))
+             62 IMPORT_NAME             10 (app.adapters.audio_separation)
+             64 IMPORT_FROM             11 (AudioSeparator)
+             66 STORE_NAME              11 (AudioSeparator)
+             68 POP_TOP
+
+ 17          70 LOAD_CONST               1 (0)
+             72 LOAD_CONST               7 (('BaseStep', 'StepContext'))
+             74 IMPORT_NAME             12 (app.pipeline.base)
+             76 IMPORT_FROM             13 (BaseStep)
+             78 STORE_NAME              13 (BaseStep)
+             80 IMPORT_FROM             14 (StepContext)
+             82 STORE_NAME              14 (StepContext)
+             84 POP_TOP
+
+ 20          86 PUSH_NULL
+             88 LOAD_BUILD_CLASS
+             90 LOAD_CONST               8 (<code object SeparateAudioStep at 0x7f6c92fd5030, file "app\pipeline\steps\separate_audio.py", line 20>)
+             92 MAKE_FUNCTION            0
+             94 LOAD_CONST               9 ('SeparateAudioStep')
+             96 LOAD_NAME               13 (BaseStep)
+             98 CALL                     3
+            106 STORE_NAME              15 (SeparateAudioStep)
+            108 RETURN_CONST            10 (None)
+
+Disassembly of <code object SeparateAudioStep at 0x7f6c92fd5030, file "app\pipeline\steps\separate_audio.py", line 20>:
+ 20           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('SeparateAudioStep')
+              8 STORE_NAME               2 (__qualname__)
+
+ 21          10 LOAD_CONST               1 ('separate_audio')
+             12 STORE_NAME               3 (name)
+
+ 22          14 LOAD_CONST               2 ('GPU')
+             16 STORE_NAME               4 (resource)
+
+ 23          18 LOAD_CONST               3 ('vocals')
+             20 LOAD_CONST               4 ('music')
+             22 BUILD_LIST               2
+             24 STORE_NAME               5 (produces)
+
+ 25          26 LOAD_CONST               9 (('ctx', 'StepContext', 'return', 'dict'))
+             28 LOAD_CONST               5 (<code object run at 0x28b2bc40, file "app\pipeline\steps\separate_audio.py", line 25>)
+             30 MAKE_FUNCTION            4 (annotations)
+             32 STORE_NAME               6 (run)
+
+ 75          34 LOAD_CONST              10 (('ctx', 'StepContext', 'fs', 'ProjectFS'))
+             36 LOAD_CONST               6 (<code object _ensure_source_audio at 0x28b859c0, file "app\pipeline\steps\separate_audio.py", line 75>)
+             38 MAKE_FUNCTION            4 (annotations)
+             40 STORE_NAME               7 (_ensure_source_audio)
+
+ 93          42 LOAD_CONST              11 (('ctx', 'StepContext', 'music_path', 'str', 'return', 'None'))
+             44 LOAD_CONST               7 (<code object _wire_music_into_config at 0x290e8410, file "app\pipeline\steps\separate_audio.py", line 93>)
+             46 MAKE_FUNCTION            4 (annotations)
+             48 STORE_NAME               8 (_wire_music_into_config)
+             50 RETURN_CONST             8 (None)
+
+Disassembly of <code object run at 0x28b2bc40, file "app\pipeline\steps\separate_audio.py", line 25>:
+              0 MAKE_CELL                1 (ctx)
+
+ 25           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+ 26           8 LOAD_GLOBAL              1 (NULL + ProjectFS)
+             18 LOAD_DEREF               1 (ctx)
+             20 LOAD_ATTR                2 (workdir)
+             40 CALL                     1
+             48 STORE_FAST               2 (fs)
+
+ 27          50 LOAD_FAST                2 (fs)
+             52 LOAD_ATTR                5 (NULL|self + audio_source)
+             72 LOAD_DEREF               1 (ctx)
+             74 LOAD_ATTR                6 (video_id)
+             94 CALL                     1
+            102 STORE_FAST               3 (src)
+
+ 28         104 LOAD_FAST                3 (src)
+            106 LOAD_ATTR                9 (NULL|self + exists)
+            126 CALL                     0
+            134 POP_JUMP_IF_TRUE        26 (to 188)
+
+ 31         136 LOAD_FAST                0 (self)
+            138 LOAD_ATTR               11 (NULL|self + _ensure_source_audio)
+            158 LOAD_DEREF               1 (ctx)
+            160 LOAD_FAST                2 (fs)
+            162 CALL                     2
+            170 GET_AWAITABLE            0
+            172 LOAD_CONST               0 (None)
+        >>  174 SEND                     3 (to 184)
+            178 YIELD_VALUE              2
+            180 RESUME                   3
+            182 JUMP_BACKWARD_NO_INTERRUPT     5 (to 174)
+        >>  184 END_SEND
+            186 STORE_FAST               3 (src)
+
+ 32     >>  188 LOAD_FAST                3 (src)
+            190 LOAD_ATTR                9 (NULL|self + exists)
+            210 CALL                     0
+            218 POP_JUMP_IF_TRUE        28 (to 276)
+
+ 33         220 LOAD_GLOBAL             13 (NULL + make_error)
+
+ 34         230 LOAD_GLOBAL             14 (E)
+            240 LOAD_ATTR               16 (PRECONDITION_MISSING)
+
+ 35         260 LOAD_CONST               1 ('Thiếu file audio để tách nguồn.')
+
+ 36         262 LOAD_CONST               2 ('Hãy chạy step extract_audio trước.')
+
+ 33         264 KW_NAMES                 3 (('hint',))
+            266 CALL                     3
+            274 RAISE_VARARGS            1
+
+ 39     >>  276 LOAD_FAST                2 (fs)
+            278 LOAD_ATTR               19 (NULL|self + audio_vocals)
+            298 LOAD_DEREF               1 (ctx)
+            300 LOAD_ATTR                6 (video_id)
+            320 CALL                     1
+            328 STORE_FAST               4 (out_vocals)
+
+ 40         330 LOAD_FAST                2 (fs)
+            332 LOAD_ATTR               21 (NULL|self + audio_music)
+            352 LOAD_DEREF               1 (ctx)
+            354 LOAD_ATTR                6 (video_id)
+            374 CALL                     1
+            382 STORE_FAST               5 (out_music)
+
+ 41         384 LOAD_DEREF               1 (ctx)
+            386 LOAD_ATTR               22 (config)
+            406 LOAD_ATTR               25 (NULL|self + get)
+            426 LOAD_CONST               4 ('demucs_model')
+            428 LOAD_CONST               5 ('htdemucs')
+            430 CALL                     2
+            438 STORE_FAST               6 (model)
+
+ 43         440 LOAD_DEREF               1 (ctx)
+            442 LOAD_ATTR               27 (NULL|self + emit_log)
+            462 LOAD_CONST               6 ('Tách giọng/nhạc bằng Demucs (')
+            464 LOAD_FAST                6 (model)
+            466 FORMAT_VALUE             0
+            468 LOAD_CONST               7 (') từ ')
+            470 LOAD_FAST                3 (src)
+            472 LOAD_ATTR               28 (name)
+            492 FORMAT_VALUE             0
+            494 LOAD_CONST               8 ('…')
+            496 BUILD_STRING             5
+            498 CALL                     1
+            506 POP_TOP
+
+ 45         508 LOAD_CONST              22 (('p', 'float'))
+            510 LOAD_CLOSURE             1 (ctx)
+            512 BUILD_TUPLE              1
+            514 LOAD_CONST               9 (<code object on_prog at 0x7f6c930b8580, file "app\pipeline\steps\separate_audio.py", line 45>)
+            516 MAKE_FUNCTION           12 (annotations, closure)
+            518 STORE_FAST               7 (on_prog)
+
+ 48         520 LOAD_GLOBAL             31 (NULL + AudioSeparator)
+            530 CALL                     0
+            538 STORE_FAST               8 (sep)
+
+ 50         540 LOAD_GLOBAL             33 (NULL + gpu_gate)
+            550 LOAD_ATTR               34 (slot)
+            570 LOAD_CONST              10 ('demucs')
+            572 LOAD_DEREF               1 (ctx)
+            574 LOAD_ATTR                6 (video_id)
+            594 LOAD_CONST               0 (None)
+            596 LOAD_CONST              11 (8)
+            598 BINARY_SLICE
+            600 KW_NAMES                12 (('label',))
+            602 CALL                     2
+            610 BEFORE_ASYNC_WITH
+            612 GET_AWAITABLE            1
+            614 LOAD_CONST               0 (None)
+        >>  616 SEND                     3 (to 626)
+            620 YIELD_VALUE              2
+            622 RESUME                   3
+            624 JUMP_BACKWARD_NO_INTERRUPT     5 (to 616)
+        >>  626 END_SEND
+            628 POP_TOP
+
+ 51         630 LOAD_FAST                8 (sep)
+            632 LOAD_ATTR               37 (NULL|self + separate)
+
+ 52         652 LOAD_GLOBAL             39 (NULL + str)
+            662 LOAD_FAST                3 (src)
+            664 CALL                     1
+
+ 53         672 LOAD_GLOBAL             39 (NULL + str)
+            682 LOAD_FAST                4 (out_vocals)
+            684 CALL                     1
+
+ 54         692 LOAD_GLOBAL             39 (NULL + str)
+            702 LOAD_FAST                5 (out_music)
+            704 CALL                     1
+
+ 55         712 LOAD_FAST                6 (model)
+
+ 56         714 LOAD_FAST                7 (on_prog)
+
+ 57         716 LOAD_CLOSURE             1 (ctx)
+            718 BUILD_TUPLE              1
+            720 LOAD_CONST              13 (<code object <lambda> at 0x7f6c93094b70, file "app\pipeline\steps\separate_audio.py", line 57>)
+            722 MAKE_FUNCTION            8 (closure)
+
+ 51         724 KW_NAMES                14 (('input_wav', 'out_vocals', 'out_music', 'model', 'on_progress', 'cancel_check'))
+            726 CALL                     6
+            734 GET_AWAITABLE            0
+            736 LOAD_CONST               0 (None)
+        >>  738 SEND                     3 (to 748)
+            742 YIELD_VALUE              3
+            744 RESUME                   3
+            746 JUMP_BACKWARD_NO_INTERRUPT     5 (to 738)
+        >>  748 END_SEND
+            750 STORE_FAST               9 (meta)
+
+ 50         752 LOAD_CONST               0 (None)
+            754 LOAD_CONST               0 (None)
+            756 LOAD_CONST               0 (None)
+            758 CALL                     2
+            766 GET_AWAITABLE            2
+            768 LOAD_CONST               0 (None)
+        >>  770 SEND                     3 (to 780)
+            774 YIELD_VALUE              2
+            776 RESUME                   3
+            778 JUMP_BACKWARD_NO_INTERRUPT     5 (to 770)
+        >>  780 END_SEND
+            782 POP_TOP
+
+ 60     >>  784 LOAD_DEREF               1 (ctx)
+            786 LOAD_ATTR               27 (NULL|self + emit_log)
+            806 LOAD_CONST              15 ('Đã tách xong (device=')
+            808 LOAD_FAST_CHECK          9 (meta)
+            810 LOAD_ATTR               25 (NULL|self + get)
+            830 LOAD_CONST              16 ('device')
+            832 CALL                     1
+            840 FORMAT_VALUE             0
+            842 LOAD_CONST              17 ('): ')
+
+ 61         844 LOAD_FAST                4 (out_vocals)
+            846 LOAD_ATTR               28 (name)
+            866 FORMAT_VALUE             0
+            868 LOAD_CONST              18 (' + ')
+            870 LOAD_FAST                5 (out_music)
+            872 LOAD_ATTR               28 (name)
+            892 FORMAT_VALUE             0
+
+ 60         894 BUILD_STRING             6
+            896 CALL                     1
+            904 POP_TOP
+
+ 66         906 LOAD_DEREF               1 (ctx)
+            908 LOAD_ATTR               22 (config)
+            928 LOAD_ATTR               25 (NULL|self + get)
+            948 LOAD_CONST              19 ('auto_use_separated_music')
+            950 LOAD_CONST              20 (True)
+            952 CALL                     2
+            960 POP_JUMP_IF_FALSE       41 (to 1044)
+
+ 67         962 LOAD_FAST                0 (self)
+            964 LOAD_ATTR               41 (NULL|self + _wire_music_into_config)
+            984 LOAD_DEREF               1 (ctx)
+            986 LOAD_GLOBAL             39 (NULL + str)
+            996 LOAD_FAST                5 (out_music)
+            998 LOAD_ATTR               43 (NULL|self + resolve)
+           1018 CALL                     0
+           1026 CALL                     1
+           1034 CALL                     2
+           1042 POP_TOP
+
+ 70     >> 1044 LOAD_GLOBAL             39 (NULL + str)
+           1054 LOAD_FAST                4 (out_vocals)
+           1056 LOAD_ATTR               43 (NULL|self + resolve)
+           1076 CALL                     0
+           1084 CALL                     1
+
+ 71        1092 LOAD_GLOBAL             39 (NULL + str)
+           1102 LOAD_FAST                5 (out_music)
+           1104 LOAD_ATTR               43 (NULL|self + resolve)
+           1124 CALL                     0
+           1132 CALL                     1
+
+ 72        1140 LOAD_FAST                9 (meta)
+
+ 69        1142 LOAD_CONST              21 (('vocals', 'music', 'meta'))
+           1144 BUILD_CONST_KEY_MAP      3
+           1146 RETURN_VALUE
+
+ 31     >> 1148 CLEANUP_THROW
+           1150 EXTENDED_ARG             1
+           1152 JUMP_BACKWARD          485 (to 184)
+
+ 50     >> 1154 CLEANUP_THROW
+           1156 EXTENDED_ARG             1
+           1158 JUMP_BACKWARD          267 (to 626)
+
+ 51     >> 1160 CLEANUP_THROW
+           1162 JUMP_BACKWARD          208 (to 748)
+
+ 50     >> 1164 CLEANUP_THROW
+           1166 JUMP_BACKWARD          194 (to 780)
+        >> 1168 PUSH_EXC_INFO
+           1170 WITH_EXCEPT_START
+           1172 GET_AWAITABLE            2
+           1174 LOAD_CONST               0 (None)
+        >> 1176 SEND                     4 (to 1188)
+           1180 YIELD_VALUE              3
+           1182 RESUME                   3
+           1184 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1176)
+        >> 1186 CLEANUP_THROW
+        >> 1188 END_SEND
+           1190 POP_JUMP_IF_TRUE         1 (to 1194)
+           1192 RERAISE                  2
+        >> 1194 POP_TOP
+           1196 POP_EXCEPT
+           1198 POP_TOP
+           1200 POP_TOP
+           1202 JUMP_BACKWARD          210 (to 784)
+        >> 1204 COPY                     3
+           1206 POP_EXCEPT
+           1208 RERAISE                  1
+        >> 1210 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1212 RERAISE                  1
+ExceptionTable:
+  6 to 176 -> 1210 [0] lasti
+  178 to 178 -> 1148 [2]
+  180 to 618 -> 1210 [0] lasti
+  620 to 620 -> 1154 [3]
+  622 to 626 -> 1210 [0] lasti
+  628 to 740 -> 1168 [1] lasti
+  742 to 742 -> 1160 [3]
+  744 to 750 -> 1168 [1] lasti
+  752 to 772 -> 1210 [0] lasti
+  774 to 774 -> 1164 [2]
+  776 to 1148 -> 1210 [0] lasti
+  1154 to 1154 -> 1210 [0] lasti
+  1160 to 1160 -> 1168 [1] lasti
+  1164 to 1164 -> 1210 [0] lasti
+  1168 to 1178 -> 1204 [3] lasti
+  1180 to 1180 -> 1186 [6]
+  1182 to 1194 -> 1204 [3] lasti
+  1196 to 1208 -> 1210 [0] lasti
+
+Disassembly of <code object on_prog at 0x7f6c930b8580, file "app\pipeline\steps\separate_audio.py", line 45>:
+              0 COPY_FREE_VARS           1
+
+ 45           2 RESUME                   0
+
+ 46           4 LOAD_DEREF               1 (ctx)
+              6 LOAD_ATTR                1 (NULL|self + emit_progress)
+             26 LOAD_FAST                0 (p)
+             28 LOAD_CONST               1 ('Đang tách nguồn: ')
+             30 LOAD_GLOBAL              3 (NULL + int)
+             40 LOAD_FAST                0 (p)
+             42 LOAD_CONST               2 (100)
+             44 BINARY_OP                5 (*)
+             48 CALL                     1
+             56 FORMAT_VALUE             0
+             58 LOAD_CONST               3 ('%')
+             60 BUILD_STRING             3
+             62 CALL                     2
+             70 POP_TOP
+             72 RETURN_CONST             0 (None)
+
+Disassembly of <code object <lambda> at 0x7f6c93094b70, file "app\pipeline\steps\separate_audio.py", line 57>:
+              0 COPY_FREE_VARS           1
+
+ 57           2 RESUME                   0
+              4 LOAD_DEREF               0 (ctx)
+              6 LOAD_ATTR                1 (NULL|self + is_cancelled)
+             26 CALL                     0
+             34 RETURN_VALUE
+
+Disassembly of <code object _ensure_source_audio at 0x28b859c0, file "app\pipeline\steps\separate_audio.py", line 75>:
+              0 MAKE_CELL                1 (ctx)
+
+ 75           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+ 77           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('FFmpegRunner',))
+             12 IMPORT_NAME              0 (app.adapters.ffmpeg)
+             14 IMPORT_FROM              1 (FFmpegRunner)
+             16 STORE_FAST               3 (FFmpegRunner)
+             18 POP_TOP
+
+ 78          20 LOAD_FAST                2 (fs)
+             22 LOAD_ATTR                5 (NULL|self + audio_source)
+             42 LOAD_DEREF               1 (ctx)
+             44 LOAD_ATTR                6 (video_id)
+             64 CALL                     1
+             72 STORE_FAST               4 (out)
+
+ 79          74 LOAD_FAST                2 (fs)
+             76 LOAD_ATTR                9 (NULL|self + source_mp4)
+             96 LOAD_DEREF               1 (ctx)
+             98 LOAD_ATTR                6 (video_id)
+            118 CALL                     1
+            126 STORE_FAST               5 (mp4)
+
+ 80         128 LOAD_FAST                5 (mp4)
+            130 LOAD_ATTR               11 (NULL|self + exists)
+            150 CALL                     0
+            158 POP_JUMP_IF_TRUE        27 (to 214)
+
+ 81         160 LOAD_FAST                2 (fs)
+            162 LOAD_ATTR               13 (NULL|self + audio_wav)
+            182 LOAD_DEREF               1 (ctx)
+            184 LOAD_ATTR                6 (video_id)
+            204 CALL                     1
+            212 RETURN_VALUE
+
+ 82     >>  214 LOAD_DEREF               1 (ctx)
+            216 LOAD_ATTR               15 (NULL|self + emit_log)
+            236 LOAD_CONST               3 ('Chưa có bản âm thanh chất lượng gốc → trích nhanh từ video nguồn…')
+            238 CALL                     1
+            246 POP_TOP
+
+ 83         248 NOP
+
+ 84         250 PUSH_NULL
+            252 LOAD_FAST                3 (FFmpegRunner)
+            254 CALL                     0
+            262 LOAD_ATTR               17 (NULL|self + extract_audio_hq)
+
+ 85         282 LOAD_GLOBAL             19 (NULL + str)
+            292 LOAD_FAST                5 (mp4)
+            294 CALL                     1
+            302 LOAD_GLOBAL             19 (NULL + str)
+            312 LOAD_FAST                4 (out)
+            314 CALL                     1
+
+ 86         322 LOAD_CLOSURE             1 (ctx)
+            324 BUILD_TUPLE              1
+            326 LOAD_CONST               4 (<code object <lambda> at 0x7f6c93094e40, file "app\pipeline\steps\separate_audio.py", line 86>)
+            328 MAKE_FUNCTION            8 (closure)
+
+ 84         330 KW_NAMES                 5 (('input_mp4', 'output_wav', 'cancel_check'))
+            332 CALL                     3
+            340 GET_AWAITABLE            0
+            342 LOAD_CONST               6 (None)
+        >>  344 SEND                     3 (to 354)
+            348 YIELD_VALUE              3
+            350 RESUME                   3
+            352 JUMP_BACKWARD_NO_INTERRUPT     5 (to 344)
+        >>  354 END_SEND
+            356 POP_TOP
+
+ 88         358 LOAD_FAST                4 (out)
+            360 RETURN_VALUE
+
+ 84     >>  362 CLEANUP_THROW
+            364 JUMP_BACKWARD            6 (to 354)
+        >>  366 PUSH_EXC_INFO
+
+ 89         368 LOAD_GLOBAL             20 (Exception)
+            378 CHECK_EXC_MATCH
+            380 POP_JUMP_IF_FALSE       60 (to 502)
+            382 STORE_FAST               6 (e)
+
+ 90         384 LOAD_DEREF               1 (ctx)
+            386 LOAD_ATTR               15 (NULL|self + emit_log)
+            406 LOAD_CONST               7 ('Không trích được bản chất lượng gốc (')
+            408 LOAD_FAST                6 (e)
+            410 FORMAT_VALUE             0
+            412 LOAD_CONST               8 (') → dùng bản 16kHz.')
+            414 BUILD_STRING             3
+            416 LOAD_CONST               9 ('warn')
+            418 KW_NAMES                10 (('level',))
+            420 CALL                     2
+            428 POP_TOP
+
+ 91         430 LOAD_FAST                2 (fs)
+            432 LOAD_ATTR               13 (NULL|self + audio_wav)
+            452 LOAD_DEREF               1 (ctx)
+            454 LOAD_ATTR                6 (video_id)
+            474 CALL                     1
+            482 SWAP                     2
+            484 POP_EXCEPT
+            486 LOAD_CONST               6 (None)
+            488 STORE_FAST               6 (e)
+            490 DELETE_FAST              6 (e)
+            492 RETURN_VALUE
+        >>  494 LOAD_CONST               6 (None)
+            496 STORE_FAST               6 (e)
+            498 DELETE_FAST              6 (e)
+            500 RERAISE                  1
+
+ 89     >>  502 RERAISE                  0
+        >>  504 COPY                     3
+            506 POP_EXCEPT
+            508 RERAISE                  1
+        >>  510 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            512 RERAISE                  1
+ExceptionTable:
+  6 to 246 -> 510 [0] lasti
+  250 to 346 -> 366 [0]
+  348 to 348 -> 362 [2]
+  350 to 358 -> 366 [0]
+  360 to 360 -> 510 [0] lasti
+  362 to 362 -> 366 [0]
+  366 to 382 -> 504 [1] lasti
+  384 to 480 -> 494 [1] lasti
+  482 to 482 -> 504 [1] lasti
+  484 to 492 -> 510 [0] lasti
+  494 to 502 -> 504 [1] lasti
+  504 to 508 -> 510 [0] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c93094e40, file "app\pipeline\steps\separate_audio.py", line 86>:
+              0 COPY_FREE_VARS           1
+
+ 86           2 RESUME                   0
+              4 LOAD_DEREF               0 (ctx)
+              6 LOAD_ATTR                1 (NULL|self + is_cancelled)
+             26 CALL                     0
+             34 RETURN_VALUE
+
+Disassembly of <code object _wire_music_into_config at 0x290e8410, file "app\pipeline\steps\separate_audio.py", line 93>:
+ 93           0 RESUME                   0
+
+ 95           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('SessionLocal',))
+              6 IMPORT_NAME              0 (app.db.session)
+              8 IMPORT_FROM              1 (SessionLocal)
+             10 STORE_FAST               3 (SessionLocal)
+             12 POP_TOP
+
+ 96          14 LOAD_CONST               1 (0)
+             16 LOAD_CONST               3 (('Video',))
+             18 IMPORT_NAME              2 (app.db.models)
+             20 IMPORT_FROM              3 (Video)
+             22 STORE_FAST               4 (Video)
+             24 POP_TOP
+
+ 97          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               4 (('video_service',))
+             30 IMPORT_NAME              4 (app.services)
+             32 IMPORT_FROM              5 (video_service)
+             34 STORE_FAST               5 (vsvc)
+             36 POP_TOP
+
+ 98          38 NOP
+
+ 99          40 PUSH_NULL
+             42 LOAD_FAST                3 (SessionLocal)
+             44 CALL                     0
+             52 BEFORE_WITH
+             54 STORE_FAST               6 (db)
+
+100          56 LOAD_FAST                6 (db)
+             58 LOAD_ATTR               13 (NULL|self + get)
+             78 LOAD_FAST                4 (Video)
+             80 LOAD_FAST                1 (ctx)
+             82 LOAD_ATTR               14 (video_id)
+            102 CALL                     2
+            110 STORE_FAST               7 (v)
+
+101         112 LOAD_FAST                7 (v)
+            114 POP_JUMP_IF_TRUE        10 (to 136)
+
+102         116 NOP
+
+ 99         118 LOAD_CONST               5 (None)
+            120 LOAD_CONST               5 (None)
+            122 LOAD_CONST               5 (None)
+            124 CALL                     2
+            132 POP_TOP
+            134 RETURN_CONST             5 (None)
+
+103     >>  136 LOAD_GLOBAL             17 (NULL + dict)
+            146 LOAD_FAST                5 (vsvc)
+            148 LOAD_ATTR               19 (NULL|self + get_video_config)
+            168 LOAD_FAST                7 (v)
+            170 CALL                     1
+            178 CALL                     1
+            186 STORE_FAST               8 (cfg)
+
+105         188 LOAD_FAST                2 (music_path)
+
+106         190 LOAD_FAST                1 (ctx)
+            192 LOAD_ATTR               20 (config)
+            212 LOAD_ATTR               13 (NULL|self + get)
+            232 LOAD_CONST               6 ('separated_music_volume')
+            234 LOAD_CONST               7 (0.5)
+            236 CALL                     2
+
+107         244 LOAD_CONST               8 (False)
+
+108         246 LOAD_CONST               9 (400)
+
+109         248 LOAD_CONST              10 (1200)
+
+104         250 LOAD_CONST              11 (('path', 'volume', 'loop', 'fade_in_ms', 'fade_out_ms'))
+            252 BUILD_CONST_KEY_MAP      5
+            254 LOAD_FAST                8 (cfg)
+            256 LOAD_CONST              12 ('background_music')
+            258 STORE_SUBSCR
+
+111         262 LOAD_CONST               8 (False)
+            264 LOAD_FAST                8 (cfg)
+            266 LOAD_CONST              13 ('keep_original_audio')
+            268 STORE_SUBSCR
+
+112         272 LOAD_FAST                5 (vsvc)
+            274 LOAD_ATTR               23 (NULL|self + set_video_config)
+            294 LOAD_FAST                6 (db)
+            296 LOAD_FAST                7 (v)
+            298 LOAD_FAST                8 (cfg)
+            300 CALL                     3
+            308 POP_TOP
+
+ 99         310 LOAD_CONST               5 (None)
+            312 LOAD_CONST               5 (None)
+            314 LOAD_CONST               5 (None)
+            316 CALL                     2
+            324 POP_TOP
+
+113     >>  326 LOAD_FAST                1 (ctx)
+            328 LOAD_ATTR               25 (NULL|self + emit_log)
+            348 LOAD_CONST              14 ('Đã gán nhạc nền tách (Demucs) vào cấu hình export (BGM, không giữ tiếng gốc).')
+            350 CALL                     1
+            358 POP_TOP
+            360 RETURN_CONST             5 (None)
+
+ 99     >>  362 PUSH_EXC_INFO
+            364 WITH_EXCEPT_START
+            366 POP_JUMP_IF_TRUE         1 (to 370)
+            368 RERAISE                  2
+        >>  370 POP_TOP
+            372 POP_EXCEPT
+            374 POP_TOP
+            376 POP_TOP
+            378 JUMP_BACKWARD           27 (to 326)
+        >>  380 COPY                     3
+            382 POP_EXCEPT
+            384 RERAISE                  1
+        >>  386 PUSH_EXC_INFO
+
+114         388 LOAD_GLOBAL             26 (Exception)
+            398 CHECK_EXC_MATCH
+            400 POP_JUMP_IF_FALSE       32 (to 466)
+            402 STORE_FAST               9 (e)
+
+115         404 LOAD_FAST                1 (ctx)
+            406 LOAD_ATTR               25 (NULL|self + emit_log)
+            426 LOAD_CONST              15 ('Không gán được nhạc nền tách vào config: ')
+            428 LOAD_FAST                9 (e)
+            430 FORMAT_VALUE             0
+            432 BUILD_STRING             2
+            434 LOAD_CONST              16 ('warn')
+            436 KW_NAMES                17 (('level',))
+            438 CALL                     2
+            446 POP_TOP
+            448 POP_EXCEPT
+            450 LOAD_CONST               5 (None)
+            452 STORE_FAST               9 (e)
+            454 DELETE_FAST              9 (e)
+            456 RETURN_CONST             5 (None)
+        >>  458 LOAD_CONST               5 (None)
+            460 STORE_FAST               9 (e)
+            462 DELETE_FAST              9 (e)
+            464 RERAISE                  1
+
+114     >>  466 RERAISE                  0
+        >>  468 COPY                     3
+            470 POP_EXCEPT
+            472 RERAISE                  1
+ExceptionTable:
+  40 to 52 -> 386 [0]
+  54 to 116 -> 362 [1] lasti
+  118 to 132 -> 386 [0]
+  136 to 308 -> 362 [1] lasti
+  310 to 358 -> 386 [0]
+  362 to 370 -> 380 [3] lasti
+  372 to 384 -> 386 [0]
+  386 to 402 -> 468 [1] lasti
+  404 to 446 -> 458 [1] lasti
+  458 to 466 -> 468 [1] lasti

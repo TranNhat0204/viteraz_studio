@@ -1,0 +1,1362 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Fan-out đa ngôn ngữ: 1 video nguồn → nhiều video con, mỗi video con một ngôn ngữ đầu ra.\n\nMục tiêu: KHÔNG tải/transcribe lại N lần. Video GỐC chạy download→transcribe một lần. Khi\npipeline gốc \'done\' (hook ở JobQueue._finalize gọi ``maybe_seed_children``), ta:\n  1) copy artifact dùng chung (source.mp4 / audio.* / phụ đề gốc) sang thư mục từng video con,\n  2) copy các SubtitleSegment kind="original" sang video con,\n  3) đánh dấu các bước prep (download/extract_audio/transcribe) = success ở video con,\n  4) enqueue preset \'fanout\' (translate→tts→render→export) với dst_lang riêng của con.\n\nMỗi video con là một Video bình thường nên Queue / Library / SEO (A/B title) dùng lại nguyên vẹn.\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 12           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 14          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (asyncio)
+             24 STORE_NAME               3 (asyncio)
+
+ 15          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               3 (None)
+             30 IMPORT_NAME              4 (shutil)
+             32 STORE_NAME               4 (shutil)
+
+ 16          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               4 (('datetime',))
+             38 IMPORT_NAME              5 (datetime)
+             40 IMPORT_FROM              5 (datetime)
+             42 STORE_NAME               5 (datetime)
+             44 POP_TOP
+
+ 17          46 LOAD_CONST               1 (0)
+             48 LOAD_CONST               5 (('Path',))
+             50 IMPORT_NAME              6 (pathlib)
+             52 IMPORT_FROM              7 (Path)
+             54 STORE_NAME               7 (Path)
+             56 POP_TOP
+
+ 19          58 LOAD_CONST               1 (0)
+             60 LOAD_CONST               6 (('select',))
+             62 IMPORT_NAME              8 (sqlalchemy)
+             64 IMPORT_FROM              9 (select)
+             66 STORE_NAME               9 (select)
+             68 POP_TOP
+
+ 20          70 LOAD_CONST               1 (0)
+             72 LOAD_CONST               7 (('Session',))
+             74 IMPORT_NAME             10 (sqlalchemy.orm)
+             76 IMPORT_FROM             11 (Session)
+             78 STORE_NAME              11 (Session)
+             80 POP_TOP
+
+ 22          82 LOAD_CONST               1 (0)
+             84 LOAD_CONST               8 (('ProjectFS',))
+             86 IMPORT_NAME             12 (app.core.fs)
+             88 IMPORT_FROM             13 (ProjectFS)
+             90 STORE_NAME              13 (ProjectFS)
+             92 POP_TOP
+
+ 23          94 LOAD_CONST               1 (0)
+             96 LOAD_CONST               9 (('log',))
+             98 IMPORT_NAME             14 (app.core.logging)
+            100 IMPORT_FROM             15 (log)
+            102 STORE_NAME              15 (log)
+            104 POP_TOP
+
+ 24         106 LOAD_CONST               1 (0)
+            108 LOAD_CONST              10 (('SessionLocal',))
+            110 IMPORT_NAME             16 (app.db.session)
+            112 IMPORT_FROM             17 (SessionLocal)
+            114 STORE_NAME              17 (SessionLocal)
+            116 POP_TOP
+
+ 25         118 LOAD_CONST               1 (0)
+            120 LOAD_CONST              11 (('Video', 'VideoStep', 'SubtitleSegment', 'STEP_NAMES'))
+            122 IMPORT_NAME             18 (app.db.models)
+            124 IMPORT_FROM             19 (Video)
+            126 STORE_NAME              19 (Video)
+            128 IMPORT_FROM             20 (VideoStep)
+            130 STORE_NAME              20 (VideoStep)
+            132 IMPORT_FROM             21 (SubtitleSegment)
+            134 STORE_NAME              21 (SubtitleSegment)
+            136 IMPORT_FROM             22 (STEP_NAMES)
+            138 STORE_NAME              22 (STEP_NAMES)
+            140 POP_TOP
+
+ 26         142 LOAD_CONST               1 (0)
+            144 LOAD_CONST              12 (('video_service',))
+            146 IMPORT_NAME             23 (app.services)
+            148 IMPORT_FROM             24 (video_service)
+            150 STORE_NAME              25 (vsvc)
+            152 POP_TOP
+
+ 27         154 LOAD_CONST               1 (0)
+            156 LOAD_CONST              13 (('sanitize_config',))
+            158 IMPORT_NAME             26 (app.pipeline.base)
+            160 IMPORT_FROM             27 (sanitize_config)
+            162 STORE_NAME              27 (sanitize_config)
+            164 POP_TOP
+
+ 33         166 LOAD_CONST              14 (('download', 'extract_audio', 'transcribe'))
+            168 STORE_NAME              28 (_PREP_STEPS)
+
+ 36         170 LOAD_CONST              23 (('config', 'dict', 'return', 'str'))
+            172 LOAD_CONST              15 (<code object resolve_fanout_preset at 0x7f6c922482a0, file "app\services\fanout_service.py", line 36>)
+            174 MAKE_FUNCTION            4 (annotations)
+            176 STORE_NAME              29 (resolve_fanout_preset)
+
+ 41         178 LOAD_CONST              24 (('primary', 'Video', 'lang', 'str', 'return', 'str'))
+            180 LOAD_CONST              16 (<code object _child_source_url at 0x7f6c92696010, file "app\services\fanout_service.py", line 41>)
+            182 MAKE_FUNCTION            4 (annotations)
+            184 STORE_NAME              30 (_child_source_url)
+
+ 46         186 LOAD_CONST              24 (('primary', 'Video', 'lang', 'str', 'return', 'str'))
+            188 LOAD_CONST              17 (<code object _child_title at 0x7f6c92692ab0, file "app\services\fanout_service.py", line 46>)
+            190 MAKE_FUNCTION            4 (annotations)
+            192 STORE_NAME              31 (_child_title)
+
+ 51         194 LOAD_CONST              25 (('langs', 'list[str]', 'primary_lang', 'str', 'return', 'list[str]'))
+            196 LOAD_CONST              18 (<code object _normalize_langs at 0x7f6c9288a550, file "app\services\fanout_service.py", line 51>)
+            198 MAKE_FUNCTION            4 (annotations)
+            200 STORE_NAME              32 (_normalize_langs)
+
+ 65         202 LOAD_CONST              19 (('tts_provider', 'voice', 'voice_quality'))
+            204 STORE_NAME              33 (_OVERRIDE_KEYS)
+
+ 69         206 NOP
+
+ 68         208 LOAD_CONST              26 ((None,))
+
+ 69         210 NOP
+
+ 68         212 NOP
+
+ 69         214 NOP
+
+ 68         216 LOAD_CONST              27 (('db', 'Session', 'primary', 'Video', 'langs', 'list[str]', 'base_config', 'dict', 'lang_overrides', 'dict | None', 'return', 'dict'))
+            218 LOAD_CONST              20 (<code object plan_fanout at 0x28c03e50, file "app\services\fanout_service.py", line 68>)
+            220 MAKE_FUNCTION            5 (defaults, annotations)
+            222 STORE_NAME              34 (plan_fanout)
+
+131         224 LOAD_CONST              28 (('root_path', 'str', 'primary_id', 'str', 'child_id', 'str', 'return', 'None'))
+            226 LOAD_CONST              21 (<code object _seed_one at 0x28c23580, file "app\services\fanout_service.py", line 131>)
+            228 MAKE_FUNCTION            4 (annotations)
+            230 STORE_NAME              35 (_seed_one)
+
+185         232 LOAD_CONST              29 (('project_id', 'str', 'video_id', 'str', 'return', 'None'))
+            234 LOAD_CONST              22 (<code object maybe_seed_children at 0x28c2de10, file "app\services\fanout_service.py", line 185>)
+            236 MAKE_FUNCTION            4 (annotations)
+            238 STORE_NAME              36 (maybe_seed_children)
+            240 RETURN_CONST             3 (None)
+
+Disassembly of <code object resolve_fanout_preset at 0x7f6c922482a0, file "app\services\fanout_service.py", line 36>:
+ 36           0 RESUME                   0
+
+ 38           2 RETURN_CONST             1 ('fanout')
+
+Disassembly of <code object _child_source_url at 0x7f6c92696010, file "app\services\fanout_service.py", line 41>:
+ 41           0 RESUME                   0
+
+ 43           2 LOAD_FAST                0 (primary)
+              4 LOAD_ATTR                0 (source_url)
+             24 FORMAT_VALUE             0
+             26 LOAD_CONST               1 ('#vlang=')
+             28 LOAD_FAST                1 (lang)
+             30 FORMAT_VALUE             0
+             32 BUILD_STRING             3
+             34 RETURN_VALUE
+
+Disassembly of <code object _child_title at 0x7f6c92692ab0, file "app\services\fanout_service.py", line 46>:
+ 46           0 RESUME                   0
+
+ 47           2 LOAD_FAST                0 (primary)
+              4 LOAD_ATTR                0 (title)
+             24 COPY                     1
+             26 POP_JUMP_IF_TRUE         2 (to 32)
+             28 POP_TOP
+             30 LOAD_CONST               1 ('')
+        >>   32 LOAD_ATTR                3 (NULL|self + strip)
+             52 CALL                     0
+             60 COPY                     1
+             62 POP_JUMP_IF_TRUE         2 (to 68)
+             64 POP_TOP
+             66 LOAD_CONST               2 ('(video)')
+        >>   68 STORE_FAST               2 (base)
+
+ 48          70 LOAD_FAST                2 (base)
+             72 FORMAT_VALUE             0
+             74 LOAD_CONST               3 (' [')
+             76 LOAD_FAST                1 (lang)
+             78 LOAD_ATTR                5 (NULL|self + upper)
+             98 CALL                     0
+            106 FORMAT_VALUE             0
+            108 LOAD_CONST               4 (']')
+            110 BUILD_STRING             4
+            112 RETURN_VALUE
+
+Disassembly of <code object _normalize_langs at 0x7f6c9288a550, file "app\services\fanout_service.py", line 51>:
+ 51           0 RESUME                   0
+
+ 53           2 BUILD_LIST               0
+              4 STORE_FAST               2 (out)
+
+ 54           6 LOAD_FAST                1 (primary_lang)
+              8 BUILD_SET                1
+             10 STORE_FAST               3 (seen)
+
+ 55          12 LOAD_FAST                0 (langs)
+             14 COPY                     1
+             16 POP_JUMP_IF_TRUE         2 (to 22)
+             18 POP_TOP
+             20 BUILD_LIST               0
+        >>   22 GET_ITER
+        >>   24 FOR_ITER                63 (to 154)
+             28 STORE_FAST               4 (l)
+
+ 56          30 LOAD_FAST                4 (l)
+             32 COPY                     1
+             34 POP_JUMP_IF_TRUE         2 (to 40)
+             36 POP_TOP
+             38 LOAD_CONST               1 ('')
+        >>   40 LOAD_ATTR                1 (NULL|self + strip)
+             60 CALL                     0
+             68 STORE_FAST               4 (l)
+
+ 57          70 LOAD_FAST                4 (l)
+             72 POP_JUMP_IF_FALSE        4 (to 82)
+             74 LOAD_FAST                4 (l)
+             76 LOAD_FAST                3 (seen)
+             78 CONTAINS_OP              0
+             80 POP_JUMP_IF_FALSE        1 (to 84)
+
+ 58     >>   82 JUMP_BACKWARD           30 (to 24)
+
+ 59     >>   84 LOAD_FAST                3 (seen)
+             86 LOAD_ATTR                3 (NULL|self + add)
+            106 LOAD_FAST                4 (l)
+            108 CALL                     1
+            116 POP_TOP
+
+ 60         118 LOAD_FAST                2 (out)
+            120 LOAD_ATTR                5 (NULL|self + append)
+            140 LOAD_FAST                4 (l)
+            142 CALL                     1
+            150 POP_TOP
+            152 JUMP_BACKWARD           65 (to 24)
+
+ 55     >>  154 END_FOR
+
+ 61         156 LOAD_FAST                2 (out)
+            158 RETURN_VALUE
+
+Disassembly of <code object plan_fanout at 0x28c03e50, file "app\services\fanout_service.py", line 68>:
+ 68           0 RESUME                   0
+
+ 75           2 LOAD_FAST                3 (base_config)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_CONST               1 ('dst_lang')
+             26 CALL                     1
+             34 COPY                     1
+             36 POP_JUMP_IF_TRUE         2 (to 42)
+             38 POP_TOP
+             40 LOAD_CONST               2 ('vi')
+        >>   42 STORE_FAST               5 (primary_lang)
+
+ 76          44 LOAD_GLOBAL              3 (NULL + _normalize_langs)
+             54 LOAD_FAST                2 (langs)
+             56 LOAD_FAST                5 (primary_lang)
+             58 CALL                     2
+             66 STORE_FAST               6 (extra)
+
+ 77          68 LOAD_FAST                4 (lang_overrides)
+             70 COPY                     1
+             72 POP_JUMP_IF_TRUE         2 (to 78)
+             74 POP_TOP
+             76 BUILD_MAP                0
+        >>   78 STORE_FAST               4 (lang_overrides)
+
+ 79          80 LOAD_GLOBAL              5 (NULL + vsvc)
+             90 LOAD_ATTR                6 (get_fanout_plan)
+            110 LOAD_FAST                1 (primary)
+            112 CALL                     1
+            120 LOAD_ATTR                1 (NULL|self + get)
+            140 LOAD_CONST               3 ('children')
+            142 CALL                     1
+            150 COPY                     1
+            152 POP_JUMP_IF_TRUE         2 (to 158)
+            154 POP_TOP
+            156 BUILD_MAP                0
+        >>  158 STORE_FAST               7 (prev_children)
+
+ 81         160 LOAD_FAST                0 (db)
+            162 LOAD_ATTR                9 (NULL|self + scalar)
+
+ 82         182 LOAD_GLOBAL             11 (NULL + select)
+            192 LOAD_GLOBAL             12 (Video)
+            202 LOAD_ATTR               14 (order_index)
+            222 CALL                     1
+            230 LOAD_ATTR               17 (NULL|self + where)
+            250 LOAD_GLOBAL             12 (Video)
+            260 LOAD_ATTR               18 (project_id)
+            280 LOAD_FAST                1 (primary)
+            282 LOAD_ATTR               18 (project_id)
+            302 COMPARE_OP              40 (==)
+            306 CALL                     1
+
+ 83         314 LOAD_ATTR               21 (NULL|self + order_by)
+            334 LOAD_GLOBAL             12 (Video)
+            344 LOAD_ATTR               14 (order_index)
+            364 LOAD_ATTR               23 (NULL|self + desc)
+            384 CALL                     0
+            392 CALL                     1
+            400 LOAD_ATTR               25 (NULL|self + limit)
+            420 LOAD_CONST               4 (1)
+            422 CALL                     1
+
+ 81         430 CALL                     1
+            438 COPY                     1
+            440 POP_JUMP_IF_TRUE         2 (to 446)
+            442 POP_TOP
+
+ 84         444 LOAD_CONST               5 (0)
+
+ 81     >>  446 STORE_FAST               8 (base_order)
+
+ 86         448 LOAD_FAST                1 (primary)
+            450 LOAD_ATTR               26 (project)
+            470 LOAD_ATTR               28 (root_path)
+            490 STORE_FAST               9 (root_path)
+
+ 87         492 BUILD_MAP                0
+            494 STORE_FAST              10 (new_children)
+
+ 88         496 LOAD_GLOBAL             31 (NULL + enumerate)
+            506 LOAD_FAST                6 (extra)
+            508 CALL                     1
+            516 GET_ITER
+        >>  518 EXTENDED_ARG             1
+            520 FOR_ITER               485 (to 1494)
+            524 UNPACK_SEQUENCE          2
+            528 STORE_FAST              11 (i)
+            530 STORE_FAST              12 (lang)
+
+ 89         532 BUILD_MAP                0
+            534 LOAD_GLOBAL             33 (NULL + sanitize_config)
+            544 LOAD_FAST                3 (base_config)
+            546 CALL                     1
+            554 DICT_UPDATE              1
+            556 LOAD_CONST               1 ('dst_lang')
+            558 LOAD_FAST               12 (lang)
+            560 BUILD_MAP                1
+            562 DICT_UPDATE              1
+            564 STORE_FAST              13 (child_cfg)
+
+ 90         566 LOAD_FAST                4 (lang_overrides)
+            568 LOAD_ATTR                1 (NULL|self + get)
+            588 LOAD_FAST               12 (lang)
+            590 CALL                     1
+            598 COPY                     1
+            600 POP_JUMP_IF_TRUE         2 (to 606)
+            602 POP_TOP
+            604 BUILD_MAP                0
+        >>  606 STORE_FAST              14 (ov)
+
+ 91         608 LOAD_GLOBAL             34 (_OVERRIDE_KEYS)
+            618 GET_ITER
+        >>  620 FOR_ITER                28 (to 680)
+            624 STORE_FAST              15 (k)
+
+ 92         626 LOAD_FAST               14 (ov)
+            628 LOAD_ATTR                1 (NULL|self + get)
+            648 LOAD_FAST               15 (k)
+            650 CALL                     1
+            658 POP_JUMP_IF_TRUE         1 (to 662)
+            660 JUMP_BACKWARD           21 (to 620)
+
+ 93     >>  662 LOAD_FAST               14 (ov)
+            664 LOAD_FAST               15 (k)
+            666 BINARY_SUBSCR
+            670 LOAD_FAST               13 (child_cfg)
+            672 LOAD_FAST               15 (k)
+            674 STORE_SUBSCR
+            678 JUMP_BACKWARD           30 (to 620)
+
+ 91     >>  680 END_FOR
+
+ 94         682 LOAD_FAST                7 (prev_children)
+            684 LOAD_ATTR                1 (NULL|self + get)
+            704 LOAD_FAST               12 (lang)
+            706 CALL                     1
+            714 STORE_FAST              16 (prev)
+
+ 95         716 LOAD_FAST               16 (prev)
+            718 POP_JUMP_IF_FALSE       25 (to 770)
+            720 LOAD_FAST                0 (db)
+            722 LOAD_ATTR                1 (NULL|self + get)
+            742 LOAD_GLOBAL             12 (Video)
+            752 LOAD_FAST               16 (prev)
+            754 LOAD_CONST               6 ('video_id')
+            756 BINARY_SUBSCR
+            760 CALL                     2
+            768 JUMP_FORWARD             1 (to 772)
+        >>  770 LOAD_CONST               7 (None)
+        >>  772 STORE_FAST              17 (child)
+
+ 96         774 LOAD_FAST               17 (child)
+            776 POP_JUMP_IF_NOT_NONE   255 (to 1288)
+
+ 97         778 LOAD_GLOBAL             13 (NULL + Video)
+
+ 98         788 LOAD_FAST                1 (primary)
+            790 LOAD_ATTR               18 (project_id)
+
+ 99         810 LOAD_GLOBAL             37 (NULL + _child_source_url)
+            820 LOAD_FAST                1 (primary)
+            822 LOAD_FAST               12 (lang)
+            824 CALL                     2
+
+100         832 LOAD_FAST                1 (primary)
+            834 LOAD_ATTR               38 (platform)
+
+101         854 LOAD_GLOBAL             41 (NULL + _child_title)
+            864 LOAD_FAST                1 (primary)
+            866 LOAD_FAST               12 (lang)
+            868 CALL                     2
+
+102         876 LOAD_FAST                1 (primary)
+            878 LOAD_ATTR               42 (author)
+
+103         898 LOAD_FAST                1 (primary)
+            900 LOAD_ATTR               44 (duration_ms)
+
+104         920 LOAD_FAST                1 (primary)
+            922 LOAD_ATTR               46 (cover_url)
+
+105         942 LOAD_CONST               8 ('pending')
+
+106         944 LOAD_FAST                8 (base_order)
+            946 LOAD_FAST               11 (i)
+            948 BINARY_OP                0 (+)
+            952 LOAD_CONST               4 (1)
+            954 BINARY_OP                0 (+)
+
+ 97         958 KW_NAMES                 9 (('project_id', 'source_url', 'platform', 'title', 'author', 'duration_ms', 'cover_url', 'overall_status', 'order_index'))
+            960 CALL                     9
+            968 STORE_FAST              17 (child)
+
+108         970 LOAD_FAST                0 (db)
+            972 LOAD_ATTR               49 (NULL|self + add)
+            992 LOAD_FAST               17 (child)
+            994 CALL                     1
+           1002 POP_TOP
+
+109        1004 LOAD_FAST                0 (db)
+           1006 LOAD_ATTR               51 (NULL|self + flush)
+           1026 CALL                     0
+           1034 POP_TOP
+
+110        1036 LOAD_GLOBAL             53 (NULL + str)
+           1046 LOAD_GLOBAL             55 (NULL + ProjectFS)
+           1056 LOAD_FAST                9 (root_path)
+           1058 CALL                     1
+           1066 LOAD_ATTR               57 (NULL|self + name_video_dir)
+
+111        1086 LOAD_FAST               17 (child)
+           1088 LOAD_ATTR               58 (id)
+           1108 LOAD_FAST               17 (child)
+           1110 LOAD_ATTR               14 (order_index)
+           1130 LOAD_FAST               17 (child)
+           1132 LOAD_ATTR               60 (title)
+
+110        1152 KW_NAMES                10 (('order_index', 'title'))
+           1154 CALL                     3
+           1162 CALL                     1
+           1170 LOAD_FAST               17 (child)
+           1172 STORE_ATTR              31 (folder_path)
+
+112        1182 LOAD_GLOBAL             64 (STEP_NAMES)
+           1192 GET_ITER
+        >> 1194 FOR_ITER                41 (to 1280)
+           1198 STORE_FAST              18 (name)
+
+113        1200 LOAD_FAST                0 (db)
+           1202 LOAD_ATTR               49 (NULL|self + add)
+           1222 LOAD_GLOBAL             67 (NULL + VideoStep)
+           1232 LOAD_FAST               17 (child)
+           1234 LOAD_ATTR               58 (id)
+           1254 LOAD_FAST               18 (name)
+           1256 LOAD_CONST               8 ('pending')
+           1258 KW_NAMES                11 (('video_id', 'step_name', 'status'))
+           1260 CALL                     3
+           1268 CALL                     1
+           1276 POP_TOP
+           1278 JUMP_BACKWARD           43 (to 1194)
+
+112     >> 1280 END_FOR
+
+114        1282 LOAD_CONST              12 (False)
+           1284 STORE_FAST              19 (dispatched)
+           1286 JUMP_FORWARD            26 (to 1340)
+
+116     >> 1288 LOAD_GLOBAL             69 (NULL + bool)
+           1298 LOAD_FAST               16 (prev)
+           1300 LOAD_ATTR                1 (NULL|self + get)
+           1320 LOAD_CONST              13 ('dispatched')
+           1322 CALL                     1
+           1330 CALL                     1
+           1338 STORE_FAST              19 (dispatched)
+
+117     >> 1340 LOAD_GLOBAL              5 (NULL + vsvc)
+           1350 LOAD_ATTR               70 (set_video_config)
+           1370 LOAD_FAST                0 (db)
+           1372 LOAD_FAST               17 (child)
+           1374 LOAD_FAST               13 (child_cfg)
+           1376 CALL                     3
+           1384 POP_TOP
+
+118        1386 LOAD_GLOBAL              5 (NULL + vsvc)
+           1396 LOAD_ATTR               72 (set_fanout_child)
+           1416 LOAD_FAST                0 (db)
+           1418 LOAD_FAST               17 (child)
+           1420 LOAD_FAST                1 (primary)
+           1422 LOAD_ATTR               58 (id)
+           1442 LOAD_FAST               12 (lang)
+           1444 CALL                     4
+           1452 POP_TOP
+
+119        1454 LOAD_FAST               17 (child)
+           1456 LOAD_ATTR               58 (id)
+           1476 LOAD_FAST               19 (dispatched)
+           1478 LOAD_CONST              14 (('video_id', 'dispatched'))
+           1480 BUILD_CONST_KEY_MAP      2
+           1482 LOAD_FAST               10 (new_children)
+           1484 LOAD_FAST               12 (lang)
+           1486 STORE_SUBSCR
+           1490 EXTENDED_ARG             1
+           1492 JUMP_BACKWARD          488 (to 518)
+
+ 88     >> 1494 END_FOR
+
+122        1496 LOAD_FAST                5 (primary_lang)
+
+123        1498 LOAD_GLOBAL             75 (NULL + resolve_fanout_preset)
+           1508 LOAD_FAST                3 (base_config)
+           1510 CALL                     1
+
+124        1518 LOAD_FAST               10 (new_children)
+
+121        1520 LOAD_CONST              15 (('primary_lang', 'preset', 'children'))
+           1522 BUILD_CONST_KEY_MAP      3
+           1524 STORE_FAST              20 (plan)
+
+126        1526 LOAD_GLOBAL              5 (NULL + vsvc)
+           1536 LOAD_ATTR               76 (set_fanout_plan)
+           1556 LOAD_FAST                0 (db)
+           1558 LOAD_FAST                1 (primary)
+           1560 LOAD_FAST               20 (plan)
+           1562 CALL                     3
+           1570 POP_TOP
+
+127        1572 LOAD_FAST                0 (db)
+           1574 LOAD_ATTR               79 (NULL|self + commit)
+           1594 CALL                     0
+           1602 POP_TOP
+
+128        1604 LOAD_FAST               20 (plan)
+           1606 RETURN_VALUE
+
+Disassembly of <code object _seed_one at 0x28c23580, file "app\services\fanout_service.py", line 131>:
+131           0 RESUME                   0
+
+133           2 LOAD_GLOBAL              1 (NULL + ProjectFS)
+             12 LOAD_FAST                0 (root_path)
+             14 CALL                     1
+             22 STORE_FAST               3 (fs)
+
+139          24 LOAD_FAST                3 (fs)
+             26 LOAD_ATTR                3 (NULL|self + source_mp4)
+             46 LOAD_FAST                1 (primary_id)
+             48 CALL                     1
+             56 LOAD_FAST                3 (fs)
+             58 LOAD_ATTR                3 (NULL|self + source_mp4)
+             78 LOAD_FAST                2 (child_id)
+             80 CALL                     1
+             88 BUILD_TUPLE              2
+
+140          90 LOAD_FAST                3 (fs)
+             92 LOAD_ATTR                5 (NULL|self + audio_wav)
+            112 LOAD_FAST                1 (primary_id)
+            114 CALL                     1
+            122 LOAD_FAST                3 (fs)
+            124 LOAD_ATTR                5 (NULL|self + audio_wav)
+            144 LOAD_FAST                2 (child_id)
+            146 CALL                     1
+            154 BUILD_TUPLE              2
+
+141         156 LOAD_FAST                3 (fs)
+            158 LOAD_ATTR                7 (NULL|self + audio_source)
+            178 LOAD_FAST                1 (primary_id)
+            180 CALL                     1
+            188 LOAD_FAST                3 (fs)
+            190 LOAD_ATTR                7 (NULL|self + audio_source)
+            210 LOAD_FAST                2 (child_id)
+            212 CALL                     1
+            220 BUILD_TUPLE              2
+
+142         222 LOAD_FAST                3 (fs)
+            224 LOAD_ATTR                9 (NULL|self + audio_vocals)
+            244 LOAD_FAST                1 (primary_id)
+            246 CALL                     1
+            254 LOAD_FAST                3 (fs)
+            256 LOAD_ATTR                9 (NULL|self + audio_vocals)
+            276 LOAD_FAST                2 (child_id)
+            278 CALL                     1
+            286 BUILD_TUPLE              2
+
+143         288 LOAD_FAST                3 (fs)
+            290 LOAD_ATTR               11 (NULL|self + audio_music)
+            310 LOAD_FAST                1 (primary_id)
+            312 CALL                     1
+            320 LOAD_FAST                3 (fs)
+            322 LOAD_ATTR               11 (NULL|self + audio_music)
+            342 LOAD_FAST                2 (child_id)
+            344 CALL                     1
+            352 BUILD_TUPLE              2
+
+144         354 LOAD_FAST                3 (fs)
+            356 LOAD_ATTR               13 (NULL|self + subtitle_original)
+            376 LOAD_FAST                1 (primary_id)
+            378 CALL                     1
+            386 LOAD_FAST                3 (fs)
+            388 LOAD_ATTR               13 (NULL|self + subtitle_original)
+            408 LOAD_FAST                2 (child_id)
+            410 CALL                     1
+            418 BUILD_TUPLE              2
+
+138         420 BUILD_LIST               6
+            422 STORE_FAST               4 (pairs)
+
+146         424 LOAD_FAST                3 (fs)
+            426 LOAD_ATTR               15 (NULL|self + video_dir)
+            446 LOAD_FAST                2 (child_id)
+            448 CALL                     1
+            456 POP_TOP
+
+147         458 LOAD_FAST                4 (pairs)
+            460 GET_ITER
+        >>  462 FOR_ITER               114 (to 694)
+            466 UNPACK_SEQUENCE          2
+            470 STORE_FAST               5 (src)
+            472 STORE_FAST               6 (dst)
+
+148         474 LOAD_FAST                5 (src)
+            476 LOAD_ATTR               17 (NULL|self + exists)
+            496 CALL                     0
+            504 POP_JUMP_IF_TRUE         1 (to 508)
+            506 JUMP_BACKWARD           23 (to 462)
+        >>  508 LOAD_FAST                6 (dst)
+            510 LOAD_ATTR               17 (NULL|self + exists)
+            530 CALL                     0
+            538 POP_JUMP_IF_FALSE       54 (to 648)
+            540 LOAD_FAST                6 (dst)
+            542 LOAD_ATTR               19 (NULL|self + stat)
+            562 CALL                     0
+            570 LOAD_ATTR               20 (st_size)
+            590 LOAD_FAST                5 (src)
+            592 LOAD_ATTR               19 (NULL|self + stat)
+            612 CALL                     0
+            620 LOAD_ATTR               20 (st_size)
+            640 COMPARE_OP              55 (!=)
+            644 POP_JUMP_IF_TRUE         1 (to 648)
+            646 JUMP_BACKWARD           93 (to 462)
+
+149     >>  648 LOAD_GLOBAL             23 (NULL + shutil)
+            658 LOAD_ATTR               24 (copy2)
+            678 LOAD_FAST                5 (src)
+            680 LOAD_FAST                6 (dst)
+            682 CALL                     2
+            690 POP_TOP
+            692 JUMP_BACKWARD          116 (to 462)
+
+147     >>  694 END_FOR
+
+151         696 LOAD_GLOBAL             27 (NULL + SessionLocal)
+            706 CALL                     0
+            714 BEFORE_WITH
+            716 STORE_FAST               7 (db)
+
+153         718 LOAD_FAST                7 (db)
+            720 LOAD_ATTR               29 (NULL|self + query)
+            740 LOAD_GLOBAL             30 (SubtitleSegment)
+            750 CALL                     1
+            758 LOAD_ATTR               33 (NULL|self + filter)
+
+154         778 LOAD_GLOBAL             30 (SubtitleSegment)
+            788 LOAD_ATTR               34 (video_id)
+            808 LOAD_FAST                2 (child_id)
+            810 COMPARE_OP              40 (==)
+            814 LOAD_GLOBAL             30 (SubtitleSegment)
+            824 LOAD_ATTR               36 (kind)
+            844 LOAD_CONST               1 ('original')
+            846 COMPARE_OP              40 (==)
+
+153         850 CALL                     2
+
+155         858 LOAD_ATTR               39 (NULL|self + delete)
+            878 CALL                     0
+            886 POP_TOP
+
+156         888 LOAD_FAST                7 (db)
+            890 LOAD_ATTR               29 (NULL|self + query)
+            910 LOAD_GLOBAL             30 (SubtitleSegment)
+            920 CALL                     1
+            928 LOAD_ATTR               33 (NULL|self + filter)
+
+157         948 LOAD_GLOBAL             30 (SubtitleSegment)
+            958 LOAD_ATTR               34 (video_id)
+            978 LOAD_FAST                1 (primary_id)
+            980 COMPARE_OP              40 (==)
+            984 LOAD_GLOBAL             30 (SubtitleSegment)
+            994 LOAD_ATTR               36 (kind)
+           1014 LOAD_CONST               1 ('original')
+           1016 COMPARE_OP              40 (==)
+
+156        1020 CALL                     2
+
+158        1028 LOAD_ATTR               41 (NULL|self + order_by)
+           1048 LOAD_GLOBAL             30 (SubtitleSegment)
+           1058 LOAD_ATTR               42 (seq)
+           1078 CALL                     1
+           1086 LOAD_ATTR               45 (NULL|self + all)
+           1106 CALL                     0
+
+156        1114 STORE_FAST               8 (rows)
+
+159        1116 LOAD_FAST                8 (rows)
+           1118 GET_ITER
+        >> 1120 FOR_ITER                86 (to 1296)
+           1124 STORE_FAST               9 (r)
+
+160        1126 LOAD_FAST                7 (db)
+           1128 LOAD_ATTR               47 (NULL|self + add)
+           1148 LOAD_GLOBAL             31 (NULL + SubtitleSegment)
+
+161        1158 LOAD_FAST                2 (child_id)
+           1160 LOAD_CONST               1 ('original')
+           1162 LOAD_FAST                9 (r)
+           1164 LOAD_ATTR               42 (seq)
+
+162        1184 LOAD_FAST                9 (r)
+           1186 LOAD_ATTR               48 (start_ms)
+           1206 LOAD_FAST                9 (r)
+           1208 LOAD_ATTR               50 (end_ms)
+           1228 LOAD_FAST                9 (r)
+           1230 LOAD_ATTR               52 (text)
+
+163        1250 LOAD_CONST               2 (0)
+           1252 LOAD_FAST                9 (r)
+           1254 LOAD_ATTR               54 (meta_json)
+
+160        1274 KW_NAMES                 3 (('video_id', 'kind', 'seq', 'start_ms', 'end_ms', 'text', 'edited', 'meta_json'))
+           1276 CALL                     8
+           1284 CALL                     1
+           1292 POP_TOP
+           1294 JUMP_BACKWARD           88 (to 1120)
+
+159     >> 1296 END_FOR
+
+167        1298 LOAD_GLOBAL             57 (NULL + str)
+           1308 LOAD_FAST                3 (fs)
+           1310 LOAD_ATTR                3 (NULL|self + source_mp4)
+           1330 LOAD_FAST                2 (child_id)
+           1332 CALL                     1
+           1340 LOAD_ATTR               59 (NULL|self + resolve)
+           1360 CALL                     0
+           1368 CALL                     1
+
+168        1376 LOAD_GLOBAL             57 (NULL + str)
+           1386 LOAD_FAST                3 (fs)
+           1388 LOAD_ATTR                5 (NULL|self + audio_wav)
+           1408 LOAD_FAST                2 (child_id)
+           1410 CALL                     1
+           1418 LOAD_ATTR               59 (NULL|self + resolve)
+           1438 CALL                     0
+           1446 CALL                     1
+
+169        1454 LOAD_GLOBAL             57 (NULL + str)
+           1464 LOAD_FAST                3 (fs)
+           1466 LOAD_ATTR               13 (NULL|self + subtitle_original)
+           1486 LOAD_FAST                2 (child_id)
+           1488 CALL                     1
+           1496 LOAD_ATTR               59 (NULL|self + resolve)
+           1516 CALL                     0
+           1524 CALL                     1
+
+166        1532 LOAD_CONST               4 (('download', 'extract_audio', 'transcribe'))
+           1534 BUILD_CONST_KEY_MAP      3
+           1536 STORE_FAST              10 (prep_output)
+
+171        1538 LOAD_GLOBAL             60 (_PREP_STEPS)
+           1548 GET_ITER
+        >> 1550 FOR_ITER               180 (to 1914)
+           1554 STORE_FAST              11 (name)
+
+172        1556 LOAD_FAST                7 (db)
+           1558 LOAD_ATTR               29 (NULL|self + query)
+           1578 LOAD_GLOBAL             62 (VideoStep)
+           1588 CALL                     1
+
+173        1596 LOAD_ATTR               33 (NULL|self + filter)
+           1616 LOAD_GLOBAL             62 (VideoStep)
+           1626 LOAD_ATTR               34 (video_id)
+           1646 LOAD_FAST                2 (child_id)
+           1648 COMPARE_OP              40 (==)
+           1652 LOAD_GLOBAL             62 (VideoStep)
+           1662 LOAD_ATTR               64 (step_name)
+           1682 LOAD_FAST               11 (name)
+           1684 COMPARE_OP              40 (==)
+           1688 CALL                     2
+
+174        1696 LOAD_ATTR               67 (NULL|self + first)
+           1716 CALL                     0
+
+172        1724 STORE_FAST              12 (row)
+
+175        1726 LOAD_FAST               12 (row)
+           1728 POP_JUMP_IF_TRUE        30 (to 1790)
+
+176        1730 LOAD_GLOBAL             63 (NULL + VideoStep)
+           1740 LOAD_FAST                2 (child_id)
+           1742 LOAD_FAST               11 (name)
+           1744 KW_NAMES                 5 (('video_id', 'step_name'))
+           1746 CALL                     2
+           1754 STORE_FAST              12 (row)
+
+177        1756 LOAD_FAST                7 (db)
+           1758 LOAD_ATTR               47 (NULL|self + add)
+           1778 LOAD_FAST               12 (row)
+           1780 CALL                     1
+           1788 POP_TOP
+
+178     >> 1790 LOAD_CONST               6 ('success')
+           1792 LOAD_FAST               12 (row)
+           1794 STORE_ATTR              34 (status)
+
+179        1804 LOAD_CONST               7 (100.0)
+           1806 LOAD_FAST               12 (row)
+           1808 STORE_ATTR              35 (progress)
+
+180        1818 LOAD_FAST               10 (prep_output)
+           1820 LOAD_ATTR               73 (NULL|self + get)
+           1840 LOAD_FAST               11 (name)
+           1842 CALL                     1
+           1850 LOAD_FAST               12 (row)
+           1852 STORE_ATTR              37 (output_path)
+
+181        1862 LOAD_GLOBAL             77 (NULL + datetime)
+           1872 LOAD_ATTR               78 (utcnow)
+           1892 CALL                     0
+           1900 LOAD_FAST               12 (row)
+           1902 STORE_ATTR              40 (finished_at)
+           1912 JUMP_BACKWARD          182 (to 1550)
+
+171     >> 1914 END_FOR
+
+182        1916 LOAD_FAST                7 (db)
+           1918 LOAD_ATTR               83 (NULL|self + commit)
+           1938 CALL                     0
+           1946 POP_TOP
+
+151        1948 LOAD_CONST               8 (None)
+           1950 LOAD_CONST               8 (None)
+           1952 LOAD_CONST               8 (None)
+           1954 CALL                     2
+           1962 POP_TOP
+           1964 RETURN_CONST             8 (None)
+        >> 1966 PUSH_EXC_INFO
+           1968 WITH_EXCEPT_START
+           1970 POP_JUMP_IF_TRUE         1 (to 1974)
+           1972 RERAISE                  2
+        >> 1974 POP_TOP
+           1976 POP_EXCEPT
+           1978 POP_TOP
+           1980 POP_TOP
+           1982 RETURN_CONST             8 (None)
+        >> 1984 COPY                     3
+           1986 POP_EXCEPT
+           1988 RERAISE                  1
+ExceptionTable:
+  716 to 1946 -> 1966 [1] lasti
+  1966 to 1974 -> 1984 [3] lasti
+
+Disassembly of <code object maybe_seed_children at 0x28c2de10, file "app\services\fanout_service.py", line 185>:
+185           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+190           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('job_queue',))
+             10 IMPORT_NAME              0 (app.pipeline.queue)
+             12 IMPORT_FROM              1 (job_queue)
+             14 STORE_FAST               2 (job_queue)
+             16 POP_TOP
+
+192          18 LOAD_GLOBAL              5 (NULL + SessionLocal)
+             28 CALL                     0
+             36 BEFORE_WITH
+             38 STORE_FAST               3 (db)
+
+193          40 LOAD_FAST                3 (db)
+             42 LOAD_ATTR                7 (NULL|self + get)
+             62 LOAD_GLOBAL              8 (Video)
+             72 LOAD_FAST                1 (video_id)
+             74 CALL                     2
+             82 STORE_FAST               4 (primary)
+
+194          84 LOAD_FAST                4 (primary)
+             86 POP_JUMP_IF_TRUE        10 (to 108)
+
+195          88 NOP
+
+192          90 LOAD_CONST               3 (None)
+             92 LOAD_CONST               3 (None)
+             94 LOAD_CONST               3 (None)
+             96 CALL                     2
+            104 POP_TOP
+            106 RETURN_CONST             3 (None)
+
+196     >>  108 LOAD_GLOBAL             11 (NULL + vsvc)
+            118 LOAD_ATTR               12 (get_fanout_plan)
+            138 LOAD_FAST                4 (primary)
+            140 CALL                     1
+            148 STORE_FAST               5 (plan)
+
+197         150 LOAD_FAST                5 (plan)
+            152 LOAD_ATTR                7 (NULL|self + get)
+            172 LOAD_CONST               4 ('children')
+            174 CALL                     1
+            182 COPY                     1
+            184 POP_JUMP_IF_TRUE         2 (to 190)
+            186 POP_TOP
+            188 BUILD_MAP                0
+        >>  190 STORE_FAST               6 (children)
+
+198         192 LOAD_FAST                6 (children)
+            194 LOAD_ATTR               15 (NULL|self + items)
+            214 CALL                     0
+            222 GET_ITER
+            224 LOAD_FAST_AND_CLEAR      7 (lang)
+            226 LOAD_FAST_AND_CLEAR      8 (c)
+            228 SWAP                     3
+            230 BUILD_LIST               0
+            232 SWAP                     2
+        >>  234 FOR_ITER                27 (to 292)
+            238 UNPACK_SEQUENCE          2
+            242 STORE_FAST               7 (lang)
+            244 STORE_FAST               8 (c)
+            246 LOAD_FAST                8 (c)
+            248 LOAD_ATTR                7 (NULL|self + get)
+            268 LOAD_CONST               5 ('dispatched')
+            270 CALL                     1
+            278 POP_JUMP_IF_FALSE        1 (to 282)
+            280 JUMP_BACKWARD           24 (to 234)
+        >>  282 LOAD_FAST                7 (lang)
+            284 LOAD_FAST                8 (c)
+            286 BUILD_TUPLE              2
+            288 LIST_APPEND              2
+            290 JUMP_BACKWARD           29 (to 234)
+        >>  292 END_FOR
+            294 STORE_FAST               9 (pending)
+            296 STORE_FAST               7 (lang)
+            298 STORE_FAST               8 (c)
+
+199         300 LOAD_FAST                9 (pending)
+            302 POP_JUMP_IF_TRUE        10 (to 324)
+
+200         304 NOP
+
+192         306 LOAD_CONST               3 (None)
+            308 LOAD_CONST               3 (None)
+            310 LOAD_CONST               3 (None)
+            312 CALL                     2
+            320 POP_TOP
+            322 RETURN_CONST             3 (None)
+
+201     >>  324 LOAD_FAST                3 (db)
+            326 LOAD_ATTR               17 (NULL|self + scalar)
+
+202         346 LOAD_GLOBAL             19 (NULL + select)
+            356 LOAD_GLOBAL             20 (SubtitleSegment)
+            366 LOAD_ATTR               22 (id)
+            386 CALL                     1
+            394 LOAD_ATTR               25 (NULL|self + where)
+
+203         414 LOAD_GLOBAL             20 (SubtitleSegment)
+            424 LOAD_ATTR               26 (video_id)
+            444 LOAD_FAST                1 (video_id)
+            446 COMPARE_OP              40 (==)
+
+204         450 LOAD_GLOBAL             20 (SubtitleSegment)
+            460 LOAD_ATTR               28 (kind)
+            480 LOAD_CONST               6 ('original')
+            482 COMPARE_OP              40 (==)
+
+202         486 CALL                     2
+
+205         494 LOAD_ATTR               31 (NULL|self + limit)
+            514 LOAD_CONST               7 (1)
+            516 CALL                     1
+
+201         524 CALL                     1
+            532 STORE_FAST              10 (has_original)
+
+207         534 LOAD_FAST               10 (has_original)
+            536 POP_JUMP_IF_TRUE        35 (to 608)
+
+208         538 LOAD_GLOBAL             33 (NULL + log)
+            548 LOAD_ATTR               34 (warning)
+            568 LOAD_CONST               8 ('[fanout] video gốc ')
+            570 LOAD_FAST                1 (video_id)
+            572 FORMAT_VALUE             0
+            574 LOAD_CONST               9 (' chưa có phụ đề gốc → hoãn seed video con.')
+            576 BUILD_STRING             3
+            578 CALL                     1
+            586 POP_TOP
+
+209         588 NOP
+
+192         590 LOAD_CONST               3 (None)
+            592 LOAD_CONST               3 (None)
+            594 LOAD_CONST               3 (None)
+            596 CALL                     2
+            604 POP_TOP
+            606 RETURN_CONST             3 (None)
+
+210     >>  608 LOAD_FAST                4 (primary)
+            610 LOAD_ATTR               36 (project)
+            630 LOAD_ATTR               38 (root_path)
+            650 STORE_FAST              11 (root_path)
+
+211         652 LOAD_FAST                5 (plan)
+            654 LOAD_ATTR                7 (NULL|self + get)
+            674 LOAD_CONST              10 ('preset')
+            676 CALL                     1
+            684 COPY                     1
+            686 POP_JUMP_IF_TRUE         2 (to 692)
+            688 POP_TOP
+            690 LOAD_CONST              11 ('fanout')
+        >>  692 STORE_FAST              12 (preset)
+
+192         694 LOAD_CONST               3 (None)
+            696 LOAD_CONST               3 (None)
+            698 LOAD_CONST               3 (None)
+            700 CALL                     2
+            708 POP_TOP
+
+213     >>  710 LOAD_FAST_CHECK          9 (pending)
+            712 GET_ITER
+        >>  714 EXTENDED_ARG             1
+            716 FOR_ITER               314 (to 1348)
+            720 UNPACK_SEQUENCE          2
+            724 STORE_FAST               7 (lang)
+            726 STORE_FAST              13 (child_meta)
+
+214         728 LOAD_FAST               13 (child_meta)
+            730 LOAD_CONST              12 ('video_id')
+            732 BINARY_SUBSCR
+            736 STORE_FAST              14 (child_id)
+
+215         738 NOP
+
+217         740 LOAD_GLOBAL             41 (NULL + asyncio)
+            750 LOAD_ATTR               42 (to_thread)
+            770 LOAD_GLOBAL             44 (_seed_one)
+            780 LOAD_FAST_CHECK         11 (root_path)
+            782 LOAD_FAST                1 (video_id)
+            784 LOAD_FAST               14 (child_id)
+            786 CALL                     4
+            794 GET_AWAITABLE            0
+            796 LOAD_CONST               3 (None)
+        >>  798 SEND                     3 (to 808)
+            802 YIELD_VALUE              3
+            804 RESUME                   3
+            806 JUMP_BACKWARD_NO_INTERRUPT     5 (to 798)
+        >>  808 END_SEND
+            810 POP_TOP
+
+218         812 LOAD_GLOBAL              5 (NULL + SessionLocal)
+            822 CALL                     0
+            830 BEFORE_WITH
+            832 STORE_FAST               3 (db)
+
+219         834 LOAD_FAST                3 (db)
+            836 LOAD_ATTR                7 (NULL|self + get)
+            856 LOAD_GLOBAL              8 (Video)
+            866 LOAD_FAST               14 (child_id)
+            868 CALL                     2
+            876 STORE_FAST              15 (child)
+
+220         878 LOAD_FAST               15 (child)
+            880 POP_JUMP_IF_TRUE        10 (to 902)
+
+221         882 NOP
+
+218         884 LOAD_CONST               3 (None)
+            886 LOAD_CONST               3 (None)
+            888 LOAD_CONST               3 (None)
+            890 CALL                     2
+            898 POP_TOP
+            900 JUMP_BACKWARD           94 (to 714)
+
+222     >>  902 LOAD_GLOBAL             11 (NULL + vsvc)
+            912 LOAD_ATTR               46 (effective_config)
+            932 LOAD_FAST               15 (child)
+            934 BUILD_MAP                0
+            936 CALL                     2
+            944 STORE_FAST              16 (cfg)
+
+218         946 LOAD_CONST               3 (None)
+            948 LOAD_CONST               3 (None)
+            950 LOAD_CONST               3 (None)
+            952 CALL                     2
+            960 POP_TOP
+
+223     >>  962 LOAD_FAST                2 (job_queue)
+            964 LOAD_ATTR               49 (NULL|self + enqueue_pipeline)
+
+224         984 LOAD_FAST                0 (project_id)
+            986 LOAD_FAST               14 (child_id)
+            988 LOAD_FAST_CHECK         12 (preset)
+            990 LOAD_FAST_CHECK         16 (cfg)
+
+223         992 KW_NAMES                13 (('project_id', 'video_id', 'preset', 'config'))
+            994 CALL                     4
+           1002 GET_AWAITABLE            0
+           1004 LOAD_CONST               3 (None)
+        >> 1006 SEND                     3 (to 1016)
+           1010 YIELD_VALUE              3
+           1012 RESUME                   3
+           1014 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1006)
+        >> 1016 END_SEND
+           1018 POP_TOP
+
+230        1020 LOAD_GLOBAL              5 (NULL + SessionLocal)
+           1030 CALL                     0
+           1038 BEFORE_WITH
+           1040 STORE_FAST               3 (db)
+
+231        1042 LOAD_FAST                3 (db)
+           1044 LOAD_ATTR                7 (NULL|self + get)
+           1064 LOAD_GLOBAL              8 (Video)
+           1074 LOAD_FAST                1 (video_id)
+           1076 CALL                     2
+           1084 STORE_FAST               4 (primary)
+
+232        1086 LOAD_FAST                4 (primary)
+           1088 POP_JUMP_IF_TRUE        10 (to 1110)
+
+233        1090 NOP
+
+230        1092 LOAD_CONST               3 (None)
+           1094 LOAD_CONST               3 (None)
+           1096 LOAD_CONST               3 (None)
+           1098 CALL                     2
+           1106 POP_TOP
+           1108 JUMP_BACKWARD          198 (to 714)
+
+234     >> 1110 LOAD_GLOBAL             11 (NULL + vsvc)
+           1120 LOAD_ATTR               12 (get_fanout_plan)
+           1140 LOAD_FAST                4 (primary)
+           1142 CALL                     1
+           1150 STORE_FAST               5 (plan)
+
+235        1152 LOAD_FAST                7 (lang)
+           1154 LOAD_FAST                5 (plan)
+           1156 LOAD_ATTR                7 (NULL|self + get)
+           1176 LOAD_CONST               4 ('children')
+           1178 CALL                     1
+           1186 COPY                     1
+           1188 POP_JUMP_IF_TRUE         2 (to 1194)
+           1190 POP_TOP
+           1192 BUILD_MAP                0
+        >> 1194 CONTAINS_OP              0
+           1196 POP_JUMP_IF_FALSE       34 (to 1266)
+
+236        1198 LOAD_CONST              17 (True)
+           1200 LOAD_FAST                5 (plan)
+           1202 LOAD_CONST               4 ('children')
+           1204 BINARY_SUBSCR
+           1208 LOAD_FAST                7 (lang)
+           1210 BINARY_SUBSCR
+           1214 LOAD_CONST               5 ('dispatched')
+           1216 STORE_SUBSCR
+
+237        1220 LOAD_GLOBAL             11 (NULL + vsvc)
+           1230 LOAD_ATTR               54 (set_fanout_plan)
+           1250 LOAD_FAST                3 (db)
+           1252 LOAD_FAST                4 (primary)
+           1254 LOAD_FAST                5 (plan)
+           1256 CALL                     3
+           1264 POP_TOP
+
+230     >> 1266 LOAD_CONST               3 (None)
+           1268 LOAD_CONST               3 (None)
+           1270 LOAD_CONST               3 (None)
+           1272 CALL                     2
+           1280 POP_TOP
+
+238     >> 1282 LOAD_GLOBAL             33 (NULL + log)
+           1292 LOAD_ATTR               56 (info)
+           1312 LOAD_CONST              19 ('[fanout] đã seed + enqueue video con ')
+           1314 LOAD_FAST               14 (child_id)
+           1316 FORMAT_VALUE             0
+           1318 LOAD_CONST              15 (' (')
+           1320 LOAD_FAST                7 (lang)
+           1322 FORMAT_VALUE             0
+           1324 LOAD_CONST              20 (') từ gốc ')
+           1326 LOAD_FAST                1 (video_id)
+           1328 FORMAT_VALUE             0
+           1330 LOAD_CONST              21 ('.')
+           1332 BUILD_STRING             7
+           1334 CALL                     1
+           1342 POP_TOP
+           1344 EXTENDED_ARG             1
+           1346 JUMP_BACKWARD          317 (to 714)
+
+213     >> 1348 END_FOR
+           1350 RETURN_CONST             3 (None)
+        >> 1352 SWAP                     2
+           1354 POP_TOP
+
+198        1356 SWAP                     3
+           1358 STORE_FAST               8 (c)
+           1360 STORE_FAST               7 (lang)
+           1362 RERAISE                  0
+
+192     >> 1364 PUSH_EXC_INFO
+           1366 WITH_EXCEPT_START
+           1368 POP_JUMP_IF_TRUE         1 (to 1372)
+           1370 RERAISE                  2
+        >> 1372 POP_TOP
+           1374 POP_EXCEPT
+           1376 POP_TOP
+           1378 POP_TOP
+           1380 EXTENDED_ARG             1
+           1382 JUMP_BACKWARD          337 (to 710)
+        >> 1384 COPY                     3
+           1386 POP_EXCEPT
+           1388 RERAISE                  1
+
+217     >> 1390 CLEANUP_THROW
+           1392 EXTENDED_ARG             1
+           1394 JUMP_BACKWARD          294 (to 808)
+
+218     >> 1396 PUSH_EXC_INFO
+           1398 WITH_EXCEPT_START
+           1400 POP_JUMP_IF_TRUE         1 (to 1404)
+           1402 RERAISE                  2
+        >> 1404 POP_TOP
+           1406 POP_EXCEPT
+           1408 POP_TOP
+           1410 POP_TOP
+           1412 JUMP_BACKWARD          226 (to 962)
+        >> 1414 COPY                     3
+           1416 POP_EXCEPT
+           1418 RERAISE                  1
+
+223     >> 1420 CLEANUP_THROW
+           1422 JUMP_BACKWARD          204 (to 1016)
+        >> 1424 PUSH_EXC_INFO
+
+226        1426 LOAD_GLOBAL             50 (Exception)
+           1436 CHECK_EXC_MATCH
+           1438 POP_JUMP_IF_FALSE       43 (to 1526)
+           1440 STORE_FAST              17 (e)
+
+227        1442 LOAD_GLOBAL             33 (NULL + log)
+           1452 LOAD_ATTR               52 (error)
+           1472 LOAD_CONST              14 ('[fanout] seed video con ')
+           1474 LOAD_FAST               14 (child_id)
+           1476 FORMAT_VALUE             0
+           1478 LOAD_CONST              15 (' (')
+           1480 LOAD_FAST                7 (lang)
+           1482 FORMAT_VALUE             0
+           1484 LOAD_CONST              16 (') lỗi: ')
+           1486 LOAD_FAST               17 (e)
+           1488 FORMAT_VALUE             0
+           1490 BUILD_STRING             6
+           1492 LOAD_CONST              17 (True)
+           1494 KW_NAMES                18 (('exc_info',))
+           1496 CALL                     2
+           1504 POP_TOP
+
+228        1506 POP_EXCEPT
+           1508 LOAD_CONST               3 (None)
+           1510 STORE_FAST              17 (e)
+           1512 DELETE_FAST             17 (e)
+           1514 EXTENDED_ARG             1
+           1516 JUMP_BACKWARD          402 (to 714)
+        >> 1518 LOAD_CONST               3 (None)
+           1520 STORE_FAST              17 (e)
+           1522 DELETE_FAST             17 (e)
+           1524 RERAISE                  1
+
+226     >> 1526 RERAISE                  0
+        >> 1528 COPY                     3
+           1530 POP_EXCEPT
+           1532 RERAISE                  1
+
+230     >> 1534 PUSH_EXC_INFO
+           1536 WITH_EXCEPT_START
+           1538 POP_JUMP_IF_TRUE         1 (to 1542)
+           1540 RERAISE                  2
+        >> 1542 POP_TOP
+           1544 POP_EXCEPT
+           1546 POP_TOP
+           1548 POP_TOP
+           1550 JUMP_BACKWARD          135 (to 1282)
+        >> 1552 COPY                     3
+           1554 POP_EXCEPT
+           1556 RERAISE                  1
+        >> 1558 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1560 RERAISE                  1
+ExceptionTable:
+  4 to 36 -> 1558 [0] lasti
+  38 to 88 -> 1364 [1] lasti
+  90 to 106 -> 1558 [0] lasti
+  108 to 228 -> 1364 [1] lasti
+  230 to 278 -> 1352 [4]
+  282 to 292 -> 1352 [4]
+  294 to 304 -> 1364 [1] lasti
+  306 to 322 -> 1558 [0] lasti
+  324 to 588 -> 1364 [1] lasti
+  590 to 606 -> 1558 [0] lasti
+  608 to 692 -> 1364 [1] lasti
+  694 to 736 -> 1558 [0] lasti
+  740 to 800 -> 1424 [1]
+  802 to 802 -> 1390 [3]
+  804 to 830 -> 1424 [1]
+  832 to 882 -> 1396 [2] lasti
+  884 to 898 -> 1424 [1]
+  900 to 900 -> 1558 [0] lasti
+  902 to 944 -> 1396 [2] lasti
+  946 to 1008 -> 1424 [1]
+  1010 to 1010 -> 1420 [3]
+  1012 to 1018 -> 1424 [1]
+  1020 to 1038 -> 1558 [0] lasti
+  1040 to 1090 -> 1534 [2] lasti
+  1092 to 1108 -> 1558 [0] lasti
+  1110 to 1264 -> 1534 [2] lasti
+  1266 to 1350 -> 1558 [0] lasti
+  1352 to 1362 -> 1364 [1] lasti
+  1364 to 1372 -> 1384 [3] lasti
+  1374 to 1388 -> 1558 [0] lasti
+  1390 to 1390 -> 1424 [1]
+  1396 to 1404 -> 1414 [4] lasti
+  1406 to 1420 -> 1424 [1]
+  1424 to 1440 -> 1528 [2] lasti
+  1442 to 1504 -> 1518 [2] lasti
+  1506 to 1516 -> 1558 [0] lasti
+  1518 to 1526 -> 1528 [2] lasti
+  1528 to 1532 -> 1558 [0] lasti
+  1534 to 1542 -> 1552 [4] lasti
+  1544 to 1556 -> 1558 [0] lasti

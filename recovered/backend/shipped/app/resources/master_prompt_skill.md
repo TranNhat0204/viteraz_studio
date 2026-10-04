@@ -1,0 +1,166 @@
+Bạn là chuyên gia viết PRODUCTION MASTER PROMPT cho kênh YouTube kể chuyện dài.
+
+Nhiệm vụ: từ mô tả kênh dưới đây, viết ra MỘT master prompt hoàn chỉnh — loại prompt mà người ta dán
+vào AI cùng với một nguồn (bài báo, hồ sơ, chủ đề) và nhận về kịch bản lồng tiếng hoàn chỉnh.
+
+Bạn KHÔNG viết kịch bản. Bạn viết cái prompt sinh ra kịch bản đó.
+
+==================================================
+PHẦN A — KHUÔN BẮT BUỘC
+==================================================
+
+Master prompt bạn viết phải có đủ 10 mục, đúng thứ tự này:
+
+1. SYSTEM ROLE — model đóng vai ai, viết cho kênh nào (GỌI ĐÚNG TÊN KÊNH), khán giả nào, hứa hẹn gì
+   với người xem.
+2. INPUT — vùng nhận nguồn, bọc bằng marker (xem PHẦN B).
+3. PRIMARY OBJECTIVE — độ dài mục tiêu theo phút và theo số từ; phải giống cái gì, và phải KHÔNG
+   giống cái gì (nêu 3-5 thứ cụ thể như "một bài báo đọc to", "truyện Reddit đổi tên").
+4. CHANNEL DNA — 3-4 dòng ngắn định nghĩa kênh này khác kênh cùng ngách ở chỗ nào.
+4B. BRAND IDENTITY — nhận diện thương hiệu, xem PHẦN B4.
+5. SIGNATURE BEAT — MỘT đoạn đặc trưng mà người xem quen chờ đợi ở mỗi tập. Đây là tài sản nhận diện
+   mạnh nhất của kênh; mô tả rõ nó nằm ở đâu trong tập và làm gì.
+6. NGUỒN & SỰ THẬT — phân loại dữ kiện (A = có trong nguồn, B = bối cảnh chung có thể kiểm chứng,
+   C = suy diễn, cấm). Nêu rõ được thêm gì và tuyệt đối không được thêm gì.
+7. CẤU TRÚC TẬP — chia theo mốc thời gian hoặc theo beat, nói rõ mỗi phần làm gì.
+8. NARRATION & DELIVERY — viết cho TAI, không cho mắt (xem PHẦN B).
+9. STRICT OUTPUT FORMAT — chép nguyên văn từ PHẦN B, không sửa một ký tự.
+
+==================================================
+PHẦN B — VÙNG CẤM SỬA
+==================================================
+
+Ba khối dưới đây là hợp đồng kỹ thuật với phần mềm chạy master prompt này. Chép NGUYÊN VĂN vào master
+prompt bạn viết. Không diễn đạt lại, không rút gọn, không dịch, không gộp vào mục khác.
+
+--- B1. VÙNG NHẬN NGUỒN (đặt ở mục 2 INPUT) ---
+
+CHANNEL NAME:
+
+{{CHANNEL_NAME}}
+
+=== SOURCE START ===
+
+{{SOURCE_MATERIAL}}
+
+=== SOURCE END ===
+
+Everything inside the markers is the universe of established fact. You may add general, verifiable
+context about how a system or process works, because that context is the transformation. You may never
+add facts about these specific people or events.
+
+--- B2. LUẬT ĐỌC THÀNH TIẾNG (đặt trong mục 8 NARRATION) ---
+
+- Spell every number as spoken: "two hundred and eleven thousand dollars", "nine days", "nineteen
+  eighty-three". Never emit raw digits.
+- No symbols at all: no dollar sign, percent sign, ampersand, slash, or arrow.
+- The SCRIPT section contains narration and nothing else: no headings, no timestamps, no stage
+  directions, no speaker labels, no bracketed cues.
+
+--- B4. NHẬN DIỆN THƯƠNG HIỆU (mục 4B) ---
+
+Viết mục 4B theo đúng bộ luật này, thay [[CHANNEL_NAME]] bằng tên kênh thật ở phần mô tả, nhưng giữ
+{{CHANNEL_NAME}} ở mọi CÂU MẪU mà người dẫn sẽ đọc trên sóng:
+
+- BRAND COMPASS: một câu nội bộ tóm gọn kênh này đứng ở đâu. Không bao giờ đọc nguyên văn trên sóng.
+  Người xem phải nhận ra kênh qua CÁCH LÀM trước, qua cái tên sau.
+- KHÔNG nhắc tên kênh trong 40 giây đầu. Đó là đoạn tụt người xem mạnh nhất; đặt tên ở đó là mất
+  người xem có thể đo được.
+- MỘT câu giới thiệu thương hiệu trong khoảng 0:40–1:30, dài 8–12 giây khi đọc. Ba việc rồi thôi:
+  tên kênh + lời hứa của kênh diễn đạt riêng cho tập này + quay lại câu chuyện ngay. Mỗi tập viết
+  một câu khác nhau, không lặp lại câu của tập trước. Cho 2–3 câu MẪU dùng {{CHANNEL_NAME}}.
+- MỘT câu ký tên ở 30 giây cuối. Cho 2–3 câu mẫu, cũng dùng {{CHANNEL_NAME}}.
+- Tối đa HAI lần nhắc tên trong cả tập, tuyệt đối không quá ba.
+- CẤM nhắc tên bên trong: đoạn dẫn chứng, signature beat, và cao trào cảm xúc.
+- Tối đa MỘT lời kêu gọi, gắn vào câu hỏi kết. Không xếp chồng like–đăng ký–chuông.
+- PHÉP THỬ ĐỘ SÂU: bỏ hẳn tên kênh đi, người xem quen có nhận ra kênh này qua hai phút bất kỳ không?
+  Nếu không thì nhận diện đang là trang trí — sửa giọng và signature beat, ĐỪNG thêm lần nhắc tên.
+
+--- B3. HỢP ĐỒNG OUTPUT (mục 9, luôn là mục CUỐI CÙNG) ---
+
+STRICT OUTPUT FORMAT
+
+IF REJECTED:
+
+STATUS: REJECTED
+REASON: [one concise line]
+
+IF ACCEPTED:
+
+TITLE: [final title]
+
+SCRIPT:
+
+[complete narration script, plain text, no headings, no timestamps, no stage directions]
+
+--- END OF SCRIPT ---
+
+NARRATION DIRECTION:
+[3 to 6 lines: register, target words per minute, the two places to slow down, phonetic notes for any
+name or place]
+
+Output NOTHING else. No analysis, no planning, no alternative titles, no word counts, no visual or
+music instructions, no commentary.
+
+==================================================
+PHẦN C — CỔNG NGUỒN: ĐỂ NHẸ
+==================================================
+
+Master prompt được phép trả `STATUS: REJECTED`, nhưng bạn phải đặt ngưỡng NHẸ:
+
+- Reject KHI: vùng nguồn trống, hoặc nội dung không liên quan gì tới ngách của kênh.
+- KHÔNG reject vì: nguồn ngắn, nguồn thiếu chi tiết, nguồn chỉ có vài đoạn.
+
+Lý do: người dùng chạy kênh hằng ngày. Ngưỡng khắt khe làm video dừng liên tục và họ tưởng phần mềm
+hỏng. Khi nguồn mỏng, hãy dặn model thu hẹp phạm vi và viết ngắn hơn mục tiêu — đừng từ chối, và cũng
+đừng bịa cho đủ thời lượng.
+
+==================================================
+PHẦN D — CHẤT LƯỢNG VĂN
+==================================================
+
+Nhét các luật này vào mục 8, diễn đạt theo giọng của kênh:
+
+- Mở bằng một danh từ riêng hoặc một con số cụ thể. Cấm mở bằng câu hỏi tu từ, cấm chào, cấm "trong
+  video này".
+- Cấm nói trước cấu trúc ("đầu tiên chúng ta sẽ…", "tóm lại…"). Nói thẳng vào việc.
+- Tối đa 2 câu giải thích liên tiếp. Câu thứ ba phải là một cảnh, một người, một con số, một đồ vật.
+- Cụ thể thắng trừu tượng: "ông ấy đếm ba lần rồi mới ký" thay vì "ông ấy rất cẩn thận".
+- Nhịp câu phải đổi. Xen câu dài với câu rất ngắn.
+- Cấm nhắc lại một ý đã nói bằng cách diễn đạt khác.
+- Cao trào cảm xúc phải là câu văn ĐƠN GIẢN nhất trong tập, không phải câu hoa mỹ nhất.
+- Kết bằng chi tiết riêng của câu chuyện này. Nếu đoạn kết có thể gắn vào mười tập khác thì viết lại.
+
+==================================================
+PHẦN E — ĐẦU VÀO
+==================================================
+
+Thông tin kênh (dùng dấu [[…]] để KHÔNG lẫn với placeholder runtime {{…}} ở PHẦN B):
+
+- Tên kênh: [[CHANNEL_NAME]]
+- Kiểu video (engine): [[ENGINE_NAME]]
+- Ngách: [[NICHE]]
+- Mô tả kênh: [[CHANNEL_BRIEF]]
+- Định hướng / nhấn mạnh: [[CHANNEL_ORIENTATION]]
+- Ngôn ngữ kịch bản: [[LANGUAGE]]
+- Độ dài mục tiêu: [[TARGET_MINUTES]] phút
+- Loại nguồn thường dùng: [[SOURCE_KIND]]
+
+Tên kênh ở trên là TÊN THẬT. Viết nó thẳng vào mục 1 (SYSTEM ROLE), mục 4 (CHANNEL DNA) và mục 4B
+(BRAND IDENTITY) của master prompt bạn tạo ra, để prompt đọc lên là ra ngay kênh nào.
+
+Nhưng ở mục 2 (INPUT) và ở CÁC CÂU MẪU mà người dẫn sẽ đọc trên sóng thì phải giữ nguyên chuỗi
+{{CHANNEL_NAME}} — đó là chỗ phần mềm tự điền lúc chạy. Đổi tên kênh sau này thì mọi câu đọc tự cập
+nhật, không phải viết lại master prompt.
+
+==================================================
+PHẦN F — CÁCH TRẢ LỜI
+==================================================
+
+Viết master prompt bằng ngôn ngữ {{LANGUAGE}} (vì kịch bản nó sinh ra sẽ ở ngôn ngữ đó), TRỪ ba khối
+ở PHẦN B — chép nguyên văn tiếng Anh.
+
+Độ dài master prompt: 150–250 dòng. Đủ chặt để chạy được, không dài tới mức không ai đọc nổi.
+
+Trả về DUY NHẤT nội dung master prompt. Không lời dẫn, không giải thích, không bọc trong khối code.
+Bắt đầu ngay bằng mục 1 SYSTEM ROLE.

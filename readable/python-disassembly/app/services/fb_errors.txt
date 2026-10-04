@@ -1,0 +1,728 @@
+  0           0 RESUME                   0
+
+  1           2 SETUP_ANNOTATIONS
+              4 LOAD_CONST               0 ('Phân loại lỗi Facebook Graph API — port từ LoHa facebook.js translateError + schedule-rule.js.\n\nMọi lỗi từ fb_graph_client quy về FbError (hoặc StudioError có code FB_*) để:\n- UI hiện hint tiếng Việt hành động được\n- scheduler biết retry hay không (retryable)\n- token pool biết có nên reactivate token (token_error)\n')
+              6 STORE_NAME               0 (__doc__)
+
+  8           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('annotations',))
+             12 IMPORT_NAME              1 (__future__)
+             14 IMPORT_FROM              2 (annotations)
+             16 STORE_NAME               2 (annotations)
+             18 POP_TOP
+
+ 10          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               3 (None)
+             24 IMPORT_NAME              3 (re)
+             26 STORE_NAME               3 (re)
+
+ 11          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               4 (('dataclass', 'field'))
+             32 IMPORT_NAME              4 (dataclasses)
+             34 IMPORT_FROM              5 (dataclass)
+             36 STORE_NAME               5 (dataclass)
+             38 IMPORT_FROM              6 (field)
+             40 STORE_NAME               6 (field)
+             42 POP_TOP
+
+ 19          44 PUSH_NULL
+             46 LOAD_NAME                3 (re)
+             48 LOAD_ATTR               14 (compile)
+             68 LOAD_CONST               5 ('Session has expired')
+             70 LOAD_NAME                3 (re)
+             72 LOAD_ATTR               16 (I)
+             92 CALL                     2
+            100 LOAD_CONST               6 ('session_expired')
+            102 BUILD_TUPLE              2
+
+ 20         104 PUSH_NULL
+            106 LOAD_NAME                3 (re)
+            108 LOAD_ATTR               14 (compile)
+            128 LOAD_CONST               7 ('Invalid OAuth access token')
+            130 LOAD_NAME                3 (re)
+            132 LOAD_ATTR               16 (I)
+            152 CALL                     2
+            160 LOAD_CONST               8 ('invalid_token')
+            162 BUILD_TUPLE              2
+
+ 21         164 PUSH_NULL
+            166 LOAD_NAME                3 (re)
+            168 LOAD_ATTR               14 (compile)
+            188 LOAD_CONST               9 ('token.*(expired|invalid|revoked)')
+            190 LOAD_NAME                3 (re)
+            192 LOAD_ATTR               16 (I)
+            212 CALL                     2
+            220 LOAD_CONST               8 ('invalid_token')
+            222 BUILD_TUPLE              2
+
+ 22         224 PUSH_NULL
+            226 LOAD_NAME                3 (re)
+            228 LOAD_ATTR               14 (compile)
+            248 LOAD_CONST              10 ('Error validating access token')
+            250 LOAD_NAME                3 (re)
+            252 LOAD_ATTR               16 (I)
+            272 CALL                     2
+            280 LOAD_CONST               8 ('invalid_token')
+            282 BUILD_TUPLE              2
+
+ 23         284 PUSH_NULL
+            286 LOAD_NAME                3 (re)
+            288 LOAD_ATTR               14 (compile)
+            308 LOAD_CONST              11 ('Permissions error')
+            310 LOAD_NAME                3 (re)
+            312 LOAD_ATTR               16 (I)
+            332 CALL                     2
+            340 LOAD_CONST              12 ('permission_error')
+            342 BUILD_TUPLE              2
+
+ 24         344 PUSH_NULL
+            346 LOAD_NAME                3 (re)
+            348 LOAD_ATTR               14 (compile)
+            368 LOAD_CONST              13 ('\\(#200\\)')
+            370 LOAD_NAME                3 (re)
+            372 LOAD_ATTR               16 (I)
+            392 CALL                     2
+            400 LOAD_CONST              12 ('permission_error')
+            402 BUILD_TUPLE              2
+
+ 25         404 PUSH_NULL
+            406 LOAD_NAME                3 (re)
+            408 LOAD_ATTR               14 (compile)
+            428 LOAD_CONST              14 ('\\(#100\\).*permission')
+            430 LOAD_NAME                3 (re)
+            432 LOAD_ATTR               16 (I)
+            452 CALL                     2
+            460 LOAD_CONST              12 ('permission_error')
+            462 BUILD_TUPLE              2
+
+ 26         464 PUSH_NULL
+            466 LOAD_NAME                3 (re)
+            468 LOAD_ATTR               14 (compile)
+            488 LOAD_CONST              15 ('\\(#190\\)')
+            490 LOAD_NAME                3 (re)
+            492 LOAD_ATTR               16 (I)
+            512 CALL                     2
+            520 LOAD_CONST               8 ('invalid_token')
+            522 BUILD_TUPLE              2
+
+ 18         524 BUILD_TUPLE              8
+            526 STORE_NAME               9 (_TOKEN_ERROR_PATTERNS)
+            528 LOAD_CONST              16 ('tuple[tuple[re.Pattern[str], str], ...]')
+            530 LOAD_NAME               10 (__annotations__)
+            532 LOAD_CONST              17 ('_TOKEN_ERROR_PATTERNS')
+            534 STORE_SUBSCR
+
+ 31         538 PUSH_NULL
+            540 LOAD_NAME                3 (re)
+            542 LOAD_ATTR               14 (compile)
+            562 LOAD_CONST              18 ('\\(#4\\)')
+            564 LOAD_NAME                3 (re)
+            566 LOAD_ATTR               16 (I)
+            586 CALL                     2
+
+ 32         594 PUSH_NULL
+            596 LOAD_NAME                3 (re)
+            598 LOAD_ATTR               14 (compile)
+            618 LOAD_CONST              19 ('Application request limit reached')
+            620 LOAD_NAME                3 (re)
+            622 LOAD_ATTR               16 (I)
+            642 CALL                     2
+
+ 33         650 PUSH_NULL
+            652 LOAD_NAME                3 (re)
+            654 LOAD_ATTR               14 (compile)
+            674 LOAD_CONST              20 ('\\(#613\\)')
+            676 LOAD_NAME                3 (re)
+            678 LOAD_ATTR               16 (I)
+            698 CALL                     2
+
+ 34         706 PUSH_NULL
+            708 LOAD_NAME                3 (re)
+            710 LOAD_ATTR               14 (compile)
+            730 LOAD_CONST              21 ('reduce the number of requests')
+            732 LOAD_NAME                3 (re)
+            734 LOAD_ATTR               16 (I)
+            754 CALL                     2
+
+ 35         762 PUSH_NULL
+            764 LOAD_NAME                3 (re)
+            766 LOAD_ATTR               14 (compile)
+            786 LOAD_CONST              22 ('Rate limit')
+            788 LOAD_NAME                3 (re)
+            790 LOAD_ATTR               16 (I)
+            810 CALL                     2
+
+ 36         818 PUSH_NULL
+            820 LOAD_NAME                3 (re)
+            822 LOAD_ATTR               14 (compile)
+            842 LOAD_CONST              23 ('too many requests')
+            844 LOAD_NAME                3 (re)
+            846 LOAD_ATTR               16 (I)
+            866 CALL                     2
+
+ 37         874 PUSH_NULL
+            876 LOAD_NAME                3 (re)
+            878 LOAD_ATTR               14 (compile)
+            898 LOAD_CONST              24 ('429')
+            900 LOAD_NAME                3 (re)
+            902 LOAD_ATTR               16 (I)
+            922 CALL                     2
+
+ 30         930 BUILD_LIST               7
+            932 STORE_NAME              11 (_RATE_LIMIT_PATTERNS)
+
+ 42         934 PUSH_NULL
+            936 LOAD_NAME                3 (re)
+            938 LOAD_ATTR               14 (compile)
+            958 LOAD_CONST              25 ('checkpoint')
+            960 LOAD_NAME                3 (re)
+            962 LOAD_ATTR               16 (I)
+            982 CALL                     2
+
+ 43         990 PUSH_NULL
+            992 LOAD_NAME                3 (re)
+            994 LOAD_ATTR               14 (compile)
+           1014 LOAD_CONST              26 ('blocked.*(temporarily|permanently)')
+           1016 LOAD_NAME                3 (re)
+           1018 LOAD_ATTR               16 (I)
+           1038 CALL                     2
+
+ 44        1046 PUSH_NULL
+           1048 LOAD_NAME                3 (re)
+           1050 LOAD_ATTR               14 (compile)
+           1070 LOAD_CONST              27 ('restricted')
+           1072 LOAD_NAME                3 (re)
+           1074 LOAD_ATTR               16 (I)
+           1094 CALL                     2
+
+ 45        1102 PUSH_NULL
+           1104 LOAD_NAME                3 (re)
+           1106 LOAD_ATTR               14 (compile)
+           1126 LOAD_CONST              28 ('#368')
+           1128 LOAD_NAME                3 (re)
+           1130 LOAD_ATTR               16 (I)
+           1150 CALL                     2
+
+ 46        1158 PUSH_NULL
+           1160 LOAD_NAME                3 (re)
+           1162 LOAD_ATTR               14 (compile)
+           1182 LOAD_CONST              29 ('#269')
+           1184 LOAD_NAME                3 (re)
+           1186 LOAD_ATTR               16 (I)
+           1206 CALL                     2
+
+ 47        1214 PUSH_NULL
+           1216 LOAD_NAME                3 (re)
+           1218 LOAD_ATTR               14 (compile)
+           1238 LOAD_CONST              30 ('Page posted too many times')
+           1240 LOAD_NAME                3 (re)
+           1242 LOAD_ATTR               16 (I)
+           1262 CALL                     2
+           1270 LOAD_CONST              31 ('page_burst')
+           1272 BUILD_TUPLE              2
+
+ 48        1274 PUSH_NULL
+           1276 LOAD_NAME                3 (re)
+           1278 LOAD_ATTR               14 (compile)
+           1298 LOAD_CONST              32 ('limit.*25')
+           1300 LOAD_NAME                3 (re)
+           1302 LOAD_ATTR               16 (I)
+           1322 CALL                     2
+           1330 LOAD_CONST              31 ('page_burst')
+           1332 BUILD_TUPLE              2
+
+ 41        1334 BUILD_LIST               7
+           1336 STORE_NAME              12 (_PAGE_ERROR_PATTERNS)
+
+ 53        1338 PUSH_NULL
+           1340 LOAD_NAME                3 (re)
+           1342 LOAD_ATTR               14 (compile)
+           1362 LOAD_CONST              33 ('aspect ratio|vertical|portrait|9:16|landscape|orientation')
+           1364 LOAD_NAME                3 (re)
+           1366 LOAD_ATTR               16 (I)
+           1386 CALL                     2
+
+ 54        1394 PUSH_NULL
+           1396 LOAD_NAME                3 (re)
+           1398 LOAD_ATTR               14 (compile)
+           1418 LOAD_CONST              34 ('duration|too long|too short|reel length|video length')
+           1420 LOAD_NAME                3 (re)
+           1422 LOAD_ATTR               16 (I)
+           1442 CALL                     2
+
+ 55        1450 PUSH_NULL
+           1452 LOAD_NAME                3 (re)
+           1454 LOAD_ATTR               14 (compile)
+           1474 LOAD_CONST              35 ('dimension|resolution|width|height')
+           1476 LOAD_NAME                3 (re)
+           1478 LOAD_ATTR               16 (I)
+           1498 CALL                     2
+
+ 56        1506 PUSH_NULL
+           1508 LOAD_NAME                3 (re)
+           1510 LOAD_ATTR               14 (compile)
+           1530 LOAD_CONST              36 ('540|960')
+           1532 LOAD_NAME                3 (re)
+           1534 LOAD_ATTR               16 (I)
+           1554 CALL                     2
+
+ 57        1562 PUSH_NULL
+           1564 LOAD_NAME                3 (re)
+           1566 LOAD_ATTR               14 (compile)
+           1586 LOAD_CONST              37 ('reels?\\b.{0,30}\\b(not|cannot|fail|reject|denied|unsupport|unable)')
+           1588 LOAD_NAME                3 (re)
+           1590 LOAD_ATTR               16 (I)
+           1610 LOAD_NAME                3 (re)
+           1612 LOAD_ATTR               26 (S)
+           1632 BINARY_OP                7 (|)
+           1636 CALL                     2
+
+ 58        1644 PUSH_NULL
+           1646 LOAD_NAME                3 (re)
+           1648 LOAD_ATTR               14 (compile)
+           1668 LOAD_CONST              38 ('\\(#100\\).*video_reels')
+           1670 LOAD_NAME                3 (re)
+           1672 LOAD_ATTR               16 (I)
+           1692 LOAD_NAME                3 (re)
+           1694 LOAD_ATTR               26 (S)
+           1714 BINARY_OP                7 (|)
+           1718 CALL                     2
+
+ 52        1726 BUILD_LIST               6
+           1728 STORE_NAME              14 (REELS_FALLBACK_PATTERNS)
+
+ 62        1730 LOAD_NAME                5 (dataclass)
+
+ 63        1732 PUSH_NULL
+           1734 LOAD_BUILD_CLASS
+           1736 LOAD_CONST              39 (<code object FbError at 0x7f6c9268eaf0, file "app\services\fb_errors.py", line 62>)
+           1738 MAKE_FUNCTION            0
+           1740 LOAD_CONST              40 ('FbError')
+           1742 LOAD_NAME               15 (Exception)
+           1744 CALL                     3
+
+ 62        1752 CALL                     0
+
+ 63        1760 STORE_NAME              16 (FbError)
+
+ 77        1762 LOAD_CONST              43 ((None,))
+           1764 LOAD_CONST              44 (('raw', 'str | dict | None', 'status_code', 'int | None', 'return', 'FbError'))
+           1766 LOAD_CONST              41 (<code object translate_error at 0x28c16160, file "app\services\fb_errors.py", line 77>)
+           1768 MAKE_FUNCTION            5 (defaults, annotations)
+           1770 STORE_NAME              17 (translate_error)
+
+135        1772 LOAD_CONST              45 (('err', 'FbError | Exception', 'return', 'bool'))
+           1774 LOAD_CONST              42 (<code object should_fallback_reels at 0x7f6c926f9240, file "app\services\fb_errors.py", line 135>)
+           1776 MAKE_FUNCTION            4 (annotations)
+           1778 STORE_NAME              18 (should_fallback_reels)
+           1780 RETURN_CONST             3 (None)
+
+Disassembly of <code object FbError at 0x7f6c9268eaf0, file "app\services\fb_errors.py", line 62>:
+ 62           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('FbError')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 64          12 LOAD_CONST               1 ('Lỗi đã phân loại từ phản hồi Graph API.')
+             14 STORE_NAME               3 (__doc__)
+
+ 66          16 LOAD_CONST               2 ('str')
+             18 LOAD_NAME                4 (__annotations__)
+             20 LOAD_CONST               3 ('kind')
+             22 STORE_SUBSCR
+
+ 67          26 LOAD_CONST               2 ('str')
+             28 LOAD_NAME                4 (__annotations__)
+             30 LOAD_CONST               4 ('message')
+             32 STORE_SUBSCR
+
+ 68          36 LOAD_CONST               5 (None)
+             38 STORE_NAME               5 (fb_code)
+             40 LOAD_CONST               6 ('int | None')
+             42 LOAD_NAME                4 (__annotations__)
+             44 LOAD_CONST               7 ('fb_code')
+             46 STORE_SUBSCR
+
+ 69          50 LOAD_CONST               8 (False)
+             52 STORE_NAME               6 (retryable)
+             54 LOAD_CONST               9 ('bool')
+             56 LOAD_NAME                4 (__annotations__)
+             58 LOAD_CONST              10 ('retryable')
+             60 STORE_SUBSCR
+
+ 70          64 LOAD_CONST               5 (None)
+             66 STORE_NAME               7 (fb_subcode)
+             68 LOAD_CONST               6 ('int | None')
+             70 LOAD_NAME                4 (__annotations__)
+             72 LOAD_CONST              11 ('fb_subcode')
+             74 STORE_SUBSCR
+
+ 72          78 LOAD_CONST              13 (('return', 'str'))
+             80 LOAD_CONST              12 (<code object __str__ at 0x7f6c9268e790, file "app\services\fb_errors.py", line 72>)
+             82 MAKE_FUNCTION            4 (annotations)
+             84 STORE_NAME               8 (__str__)
+             86 RETURN_CONST             5 (None)
+
+Disassembly of <code object __str__ at 0x7f6c9268e790, file "app\services\fb_errors.py", line 72>:
+ 72           0 RESUME                   0
+
+ 73           2 LOAD_CONST               1 ('[')
+              4 LOAD_FAST                0 (self)
+              6 LOAD_ATTR                0 (kind)
+             26 FORMAT_VALUE             0
+             28 LOAD_CONST               2 ('] ')
+             30 LOAD_FAST                0 (self)
+             32 LOAD_ATTR                2 (message)
+             52 FORMAT_VALUE             0
+             54 LOAD_CONST               3 (' (fb_code=')
+             56 LOAD_FAST                0 (self)
+             58 LOAD_ATTR                4 (fb_code)
+             78 FORMAT_VALUE             0
+             80 LOAD_CONST               4 (')')
+             82 BUILD_STRING             7
+             84 RETURN_VALUE
+
+Disassembly of <code object translate_error at 0x28c16160, file "app\services\fb_errors.py", line 77>:
+              0 MAKE_CELL                8 (text)
+
+ 77           2 RESUME                   0
+
+ 82           4 LOAD_FAST                0 (raw)
+              6 POP_JUMP_IF_NOT_NONE    14 (to 36)
+
+ 83           8 LOAD_GLOBAL              1 (NULL + FbError)
+             18 LOAD_CONST               2 ('generic')
+             20 LOAD_CONST               3 ('Lỗi không xác định từ Facebook')
+             22 LOAD_FAST                1 (status_code)
+             24 KW_NAMES                 4 (('status_code',))
+             26 CALL                     3
+             34 RETURN_VALUE
+
+ 85     >>   36 LOAD_GLOBAL              3 (NULL + isinstance)
+             46 LOAD_FAST                0 (raw)
+             48 LOAD_GLOBAL              4 (dict)
+             58 CALL                     2
+             66 POP_JUMP_IF_FALSE      118 (to 304)
+
+ 86          68 LOAD_FAST                0 (raw)
+             70 LOAD_ATTR                7 (NULL|self + get)
+             90 LOAD_CONST               5 ('error')
+             92 CALL                     1
+            100 COPY                     1
+            102 POP_JUMP_IF_TRUE         2 (to 108)
+            104 POP_TOP
+            106 LOAD_FAST                0 (raw)
+        >>  108 STORE_FAST               2 (err)
+
+ 87         110 LOAD_GLOBAL              3 (NULL + isinstance)
+            120 LOAD_FAST                2 (err)
+            122 LOAD_GLOBAL              4 (dict)
+            132 CALL                     2
+            140 POP_JUMP_IF_FALSE       65 (to 272)
+
+ 88         142 LOAD_GLOBAL              9 (NULL + str)
+            152 LOAD_FAST                2 (err)
+            154 LOAD_ATTR                7 (NULL|self + get)
+            174 LOAD_CONST               6 ('message')
+            176 CALL                     1
+            184 COPY                     1
+            186 POP_JUMP_IF_TRUE         2 (to 192)
+            188 POP_TOP
+            190 LOAD_CONST               7 ('')
+        >>  192 CALL                     1
+            200 STORE_FAST               3 (message)
+
+ 89         202 LOAD_FAST                2 (err)
+            204 LOAD_ATTR                7 (NULL|self + get)
+            224 LOAD_CONST               8 ('code')
+            226 CALL                     1
+            234 STORE_FAST               4 (fb_code)
+
+ 90         236 LOAD_FAST                2 (err)
+            238 LOAD_ATTR                7 (NULL|self + get)
+            258 LOAD_CONST               9 ('error_subcode')
+            260 CALL                     1
+            268 STORE_FAST               5 (subcode)
+            270 JUMP_FORWARD            31 (to 334)
+
+ 92     >>  272 LOAD_GLOBAL              9 (NULL + str)
+            282 LOAD_FAST                2 (err)
+            284 CALL                     1
+            292 STORE_FAST               3 (message)
+
+ 93         294 LOAD_CONST               1 (None)
+            296 STORE_FAST               4 (fb_code)
+
+ 94         298 LOAD_CONST               1 (None)
+            300 STORE_FAST               5 (subcode)
+            302 JUMP_FORWARD            15 (to 334)
+
+ 96     >>  304 LOAD_GLOBAL              9 (NULL + str)
+            314 LOAD_FAST                0 (raw)
+            316 CALL                     1
+            324 STORE_FAST               3 (message)
+
+ 97         326 LOAD_CONST               1 (None)
+            328 STORE_FAST               4 (fb_code)
+
+ 98         330 LOAD_CONST               1 (None)
+            332 STORE_FAST               5 (subcode)
+
+100     >>  334 LOAD_FAST                3 (message)
+            336 FORMAT_VALUE             0
+            338 LOAD_CONST              10 (' ')
+            340 LOAD_FAST                4 (fb_code)
+            342 COPY                     1
+            344 POP_JUMP_IF_TRUE         2 (to 350)
+            346 POP_TOP
+            348 LOAD_CONST               7 ('')
+        >>  350 FORMAT_VALUE             0
+            352 BUILD_STRING             3
+            354 LOAD_ATTR               11 (NULL|self + strip)
+            374 CALL                     0
+            382 STORE_DEREF              8 (text)
+
+103         384 LOAD_FAST                1 (status_code)
+            386 LOAD_CONST              11 (429)
+            388 COMPARE_OP              40 (==)
+            392 POP_JUMP_IF_TRUE        24 (to 442)
+            394 LOAD_GLOBAL             13 (NULL + any)
+            404 LOAD_CLOSURE             8 (text)
+            406 BUILD_TUPLE              1
+            408 LOAD_CONST              12 (<code object <genexpr> at 0x7f6c9288a130, file "app\services\fb_errors.py", line 103>)
+            410 MAKE_FUNCTION            8 (closure)
+            412 LOAD_GLOBAL             14 (_RATE_LIMIT_PATTERNS)
+            422 GET_ITER
+            424 CALL                     0
+            432 CALL                     1
+            440 POP_JUMP_IF_FALSE       15 (to 472)
+
+104     >>  442 LOAD_GLOBAL              1 (NULL + FbError)
+            452 LOAD_CONST              13 ('rate_limited')
+            454 LOAD_CONST              14 ('Facebook giới hạn tần suất gọi — tạm nghỉ 10 phút')
+            456 LOAD_FAST                4 (fb_code)
+            458 LOAD_CONST              15 (True)
+            460 KW_NAMES                16 (('fb_code', 'retryable'))
+            462 CALL                     4
+            470 RETURN_VALUE
+
+107     >>  472 LOAD_GLOBAL             16 (_TOKEN_ERROR_PATTERNS)
+            482 GET_ITER
+        >>  484 FOR_ITER                38 (to 564)
+            488 UNPACK_SEQUENCE          2
+            492 STORE_FAST               6 (pat)
+            494 STORE_FAST               7 (kind)
+
+108         496 LOAD_FAST                6 (pat)
+            498 LOAD_ATTR               19 (NULL|self + search)
+            518 LOAD_DEREF               8 (text)
+            520 CALL                     1
+            528 POP_JUMP_IF_TRUE         1 (to 532)
+            530 JUMP_BACKWARD           24 (to 484)
+
+109     >>  532 LOAD_GLOBAL              1 (NULL + FbError)
+            542 LOAD_FAST                7 (kind)
+            544 LOAD_CONST              17 ('Token Facebook hết hạn/hết quyền — kết nối lại token')
+            546 LOAD_FAST                4 (fb_code)
+            548 KW_NAMES                18 (('fb_code',))
+            550 CALL                     3
+            558 SWAP                     2
+            560 POP_TOP
+            562 RETURN_VALUE
+
+107     >>  564 END_FOR
+
+112         566 LOAD_GLOBAL             20 (_PAGE_ERROR_PATTERNS)
+            576 GET_ITER
+        >>  578 FOR_ITER                97 (to 776)
+            582 STORE_FAST               6 (pat)
+
+113         584 LOAD_GLOBAL              3 (NULL + isinstance)
+            594 LOAD_FAST                6 (pat)
+            596 LOAD_GLOBAL             22 (tuple)
+            606 CALL                     2
+            614 POP_JUMP_IF_FALSE       43 (to 702)
+
+114         616 LOAD_FAST                6 (pat)
+            618 LOAD_CONST              19 (0)
+            620 BINARY_SUBSCR
+            624 LOAD_ATTR               19 (NULL|self + search)
+            644 LOAD_DEREF               8 (text)
+            646 CALL                     1
+            654 POP_JUMP_IF_TRUE         1 (to 658)
+            656 JUMP_BACKWARD           40 (to 578)
+
+115     >>  658 LOAD_GLOBAL              1 (NULL + FbError)
+            668 LOAD_FAST                6 (pat)
+            670 LOAD_CONST              20 (1)
+            672 BINARY_SUBSCR
+            676 LOAD_CONST              21 ('Page bị FB hạn chế: ')
+            678 LOAD_FAST                3 (message)
+            680 FORMAT_VALUE             0
+            682 BUILD_STRING             2
+            684 LOAD_FAST                4 (fb_code)
+            686 KW_NAMES                18 (('fb_code',))
+            688 CALL                     3
+            696 SWAP                     2
+            698 POP_TOP
+            700 RETURN_VALUE
+
+116     >>  702 LOAD_FAST                6 (pat)
+            704 LOAD_ATTR               19 (NULL|self + search)
+            724 LOAD_DEREF               8 (text)
+            726 CALL                     1
+            734 POP_JUMP_IF_TRUE         1 (to 738)
+            736 JUMP_BACKWARD           80 (to 578)
+
+117     >>  738 LOAD_GLOBAL              1 (NULL + FbError)
+            748 LOAD_CONST              22 ('blocked')
+            750 LOAD_CONST              23 ('Tài khoản/page bị hạn chế: ')
+            752 LOAD_FAST                3 (message)
+            754 FORMAT_VALUE             0
+            756 BUILD_STRING             2
+            758 LOAD_FAST                4 (fb_code)
+            760 KW_NAMES                18 (('fb_code',))
+            762 CALL                     3
+            770 SWAP                     2
+            772 POP_TOP
+            774 RETURN_VALUE
+
+112     >>  776 END_FOR
+
+120         778 LOAD_GLOBAL             24 (REELS_FALLBACK_PATTERNS)
+            788 GET_ITER
+        >>  790 FOR_ITER                88 (to 970)
+            794 STORE_FAST               6 (pat)
+
+121         796 LOAD_GLOBAL              3 (NULL + isinstance)
+            806 LOAD_FAST                6 (pat)
+            808 LOAD_GLOBAL             22 (tuple)
+            818 CALL                     2
+            826 POP_JUMP_IF_FALSE       37 (to 902)
+
+122         828 LOAD_FAST                6 (pat)
+            830 LOAD_CONST              19 (0)
+            832 BINARY_SUBSCR
+            836 LOAD_ATTR               19 (NULL|self + search)
+            856 LOAD_DEREF               8 (text)
+            858 CALL                     1
+            866 POP_JUMP_IF_TRUE         1 (to 870)
+            868 JUMP_BACKWARD           40 (to 790)
+
+123     >>  870 LOAD_GLOBAL              1 (NULL + FbError)
+            880 LOAD_CONST              24 ('reels_fallback')
+            882 LOAD_CONST              25 ('Video không hợp lệ với Reels — chuyển sang đăng dạng video thường')
+            884 LOAD_FAST                4 (fb_code)
+            886 KW_NAMES                18 (('fb_code',))
+            888 CALL                     3
+            896 SWAP                     2
+            898 POP_TOP
+            900 RETURN_VALUE
+
+124     >>  902 LOAD_FAST                6 (pat)
+            904 LOAD_ATTR               19 (NULL|self + search)
+            924 LOAD_DEREF               8 (text)
+            926 CALL                     1
+            934 POP_JUMP_IF_TRUE         1 (to 938)
+            936 JUMP_BACKWARD           74 (to 790)
+
+125     >>  938 LOAD_GLOBAL              1 (NULL + FbError)
+            948 LOAD_CONST              24 ('reels_fallback')
+            950 LOAD_CONST              25 ('Video không hợp lệ với Reels — chuyển sang đăng dạng video thường')
+            952 LOAD_FAST                4 (fb_code)
+            954 KW_NAMES                18 (('fb_code',))
+            956 CALL                     3
+            964 SWAP                     2
+            966 POP_TOP
+            968 RETURN_VALUE
+
+120     >>  970 END_FOR
+
+128         972 LOAD_GLOBAL             27 (NULL + re)
+            982 LOAD_ATTR               18 (search)
+           1002 LOAD_CONST              26 ('transcod|processing|in progress|still processing')
+           1004 LOAD_DEREF               8 (text)
+           1006 LOAD_GLOBAL             26 (re)
+           1016 LOAD_ATTR               28 (I)
+           1036 CALL                     3
+           1044 POP_JUMP_IF_FALSE       15 (to 1076)
+
+129        1046 LOAD_GLOBAL              1 (NULL + FbError)
+           1056 LOAD_CONST              27 ('transcode')
+           1058 LOAD_CONST              28 ('Facebook đang xử lý video — retry sau')
+           1060 LOAD_FAST                4 (fb_code)
+           1062 LOAD_CONST              15 (True)
+           1064 KW_NAMES                16 (('fb_code', 'retryable'))
+           1066 CALL                     4
+           1074 RETURN_VALUE
+
+132     >> 1076 LOAD_GLOBAL              1 (NULL + FbError)
+           1086 LOAD_CONST               2 ('generic')
+           1088 LOAD_FAST                3 (message)
+           1090 COPY                     1
+           1092 POP_JUMP_IF_TRUE         2 (to 1098)
+           1094 POP_TOP
+           1096 LOAD_CONST              29 ('Lỗi Facebook không xác định')
+        >> 1098 LOAD_FAST                4 (fb_code)
+           1100 LOAD_FAST                1 (status_code)
+           1102 LOAD_CONST              30 ((500, 502, 503, 504))
+           1104 CONTAINS_OP              0
+           1106 KW_NAMES                16 (('fb_code', 'retryable'))
+           1108 CALL                     4
+           1116 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c9288a130, file "app\services\fb_errors.py", line 103>:
+              0 COPY_FREE_VARS           1
+
+103           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                67 (to 148)
+             14 STORE_FAST               1 (p)
+             16 LOAD_GLOBAL              1 (NULL + isinstance)
+             26 LOAD_FAST                1 (p)
+             28 LOAD_GLOBAL              2 (re)
+             38 LOAD_ATTR                4 (Pattern)
+             58 CALL                     2
+             66 POP_JUMP_IF_FALSE       17 (to 102)
+             68 LOAD_FAST                1 (p)
+             70 LOAD_ATTR                7 (NULL|self + search)
+             90 LOAD_DEREF               2 (text)
+             92 CALL                     1
+            100 JUMP_FORWARD            19 (to 140)
+        >>  102 LOAD_FAST                1 (p)
+            104 LOAD_CONST               0 (0)
+            106 BINARY_SUBSCR
+            110 LOAD_ATTR                7 (NULL|self + search)
+            130 LOAD_DEREF               2 (text)
+            132 CALL                     1
+        >>  140 YIELD_VALUE              1
+            142 RESUME                   1
+            144 POP_TOP
+            146 JUMP_BACKWARD           69 (to 10)
+        >>  148 END_FOR
+            150 RETURN_CONST             1 (None)
+        >>  152 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            154 RERAISE                  1
+ExceptionTable:
+  6 to 150 -> 152 [0] lasti
+
+Disassembly of <code object should_fallback_reels at 0x7f6c926f9240, file "app\services\fb_errors.py", line 135>:
+135           0 RESUME                   0
+
+137           2 LOAD_GLOBAL              1 (NULL + isinstance)
+             12 LOAD_FAST                0 (err)
+             14 LOAD_GLOBAL              2 (FbError)
+             24 CALL                     2
+             32 POP_JUMP_IF_FALSE       15 (to 64)
+
+138          34 LOAD_FAST                0 (err)
+             36 LOAD_ATTR                4 (kind)
+             56 LOAD_CONST               1 ('reels_fallback')
+             58 COMPARE_OP              40 (==)
+             62 RETURN_VALUE
+
+139     >>   64 RETURN_CONST             2 (False)

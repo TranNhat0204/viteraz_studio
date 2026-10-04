@@ -1,0 +1,1850 @@
+  0           0 RESUME                   0
+
+  1           2 SETUP_ANNOTATIONS
+              4 LOAD_CONST               0 ('Danh mục nhà cung cấp LLM — đọc từ khai báo, không hardcode trong mã.\n\nBốn tầng, mỗi tầng đổi với tần suất khác nhau:\n\n    bảng llm_endpoints   ← đổi BẤT CỨ LÚC NÀO (user tự thêm)   → DỮ LIỆU NGƯỜI DÙNG\n    llm_providers.json   ← đổi HÀNG THÁNG (giá, tên model)      → DỮ LIỆU\n    dialects/*.py        ← đổi HÀNG NĂM (giao thức mới)         → 1 file / giao thức\n    registry.py + client ← gần như không đổi                    → hạ tầng\n\nĐiểm mấu chốt: *dialect* KHÁC *provider*. Một dialect = một ĐỊNH DẠNG DÂY. Hôm nay DeepSeek, OpenAI,\nGemini (lớp tương thích), OpenRouter, Groq, Together, Ollama, LM Studio… đều nói OpenAI Chat\nCompletions ⇒ dùng chung một dialect. Thêm bất kỳ nhà nào trong nhóm đó = thêm JSON hoặc thêm một\nendpoint trong app, KHÔNG sửa mã.\n\nBài học đã trả giá: `deepseek.py` hardcode `DEFAULT_MODEL = "deepseek-chat"`, alias đó ngưng ngày\n24/07/2026 và cả app không có chỗ nào đổi được ngoài việc sửa mã rồi build lại.\n')
+              6 STORE_NAME               0 (__doc__)
+
+ 18           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('annotations',))
+             12 IMPORT_NAME              1 (__future__)
+             14 IMPORT_FROM              2 (annotations)
+             16 STORE_NAME               2 (annotations)
+             18 POP_TOP
+
+ 20          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               3 (None)
+             24 IMPORT_NAME              3 (json)
+             26 STORE_NAME               3 (json)
+
+ 21          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               4 (('dataclass', 'field'))
+             32 IMPORT_NAME              4 (dataclasses)
+             34 IMPORT_FROM              5 (dataclass)
+             36 STORE_NAME               5 (dataclass)
+             38 IMPORT_FROM              6 (field)
+             40 STORE_NAME               6 (field)
+             42 POP_TOP
+
+ 22          44 LOAD_CONST               1 (0)
+             46 LOAD_CONST               5 (('Path',))
+             48 IMPORT_NAME              7 (pathlib)
+             50 IMPORT_FROM              8 (Path)
+             52 STORE_NAME               8 (Path)
+             54 POP_TOP
+
+ 24          56 LOAD_CONST               1 (0)
+             58 LOAD_CONST               6 (('dialects',))
+             60 IMPORT_NAME              9 (app.adapters.llm_api)
+             62 IMPORT_FROM             10 (dialects)
+             64 STORE_NAME              10 (dialects)
+             66 POP_TOP
+
+ 25          68 LOAD_CONST               1 (0)
+             70 LOAD_CONST               7 (('log',))
+             72 IMPORT_NAME             11 (app.core.logging)
+             74 IMPORT_FROM             12 (log)
+             76 STORE_NAME              12 (log)
+             78 POP_TOP
+
+ 27          80 PUSH_NULL
+             82 LOAD_NAME                8 (Path)
+             84 LOAD_NAME               13 (__file__)
+             86 CALL                     1
+             94 LOAD_ATTR               29 (NULL|self + resolve)
+            114 CALL                     0
+            122 LOAD_ATTR               30 (parent)
+            142 LOAD_ATTR               30 (parent)
+            162 LOAD_ATTR               30 (parent)
+            182 LOAD_CONST               8 ('resources')
+            184 BINARY_OP               11 (/)
+            188 LOAD_CONST               9 ('llm_providers.json')
+            190 BINARY_OP               11 (/)
+            194 STORE_NAME              16 (_CATALOG_PATH)
+
+ 31         196 LOAD_CONST              10 ('api:')
+            198 STORE_NAME              17 (ENDPOINT_PREFIX)
+
+ 34         200 LOAD_NAME                5 (dataclass)
+
+ 35         202 PUSH_NULL
+            204 LOAD_BUILD_CLASS
+            206 LOAD_CONST              11 (<code object ModelSpec at 0x7f6c933b6790, file "app\adapters\llm_api\registry.py", line 34>)
+            208 MAKE_FUNCTION            0
+            210 LOAD_CONST              12 ('ModelSpec')
+            212 CALL                     2
+
+ 34         220 CALL                     0
+
+ 35         228 STORE_NAME              18 (ModelSpec)
+
+ 49         230 LOAD_NAME                5 (dataclass)
+
+ 50         232 PUSH_NULL
+            234 LOAD_BUILD_CLASS
+            236 LOAD_CONST              13 (<code object PriceCliff at 0x7f6c92e4fa30, file "app\adapters\llm_api\registry.py", line 49>)
+            238 MAKE_FUNCTION            0
+            240 LOAD_CONST              14 ('PriceCliff')
+            242 CALL                     2
+
+ 49         250 CALL                     0
+
+ 50         258 STORE_NAME              19 (PriceCliff)
+
+ 57         260 LOAD_NAME                5 (dataclass)
+
+ 58         262 PUSH_NULL
+            264 LOAD_BUILD_CLASS
+            266 LOAD_CONST              15 (<code object ProviderSpec at 0x7f6c933afc50, file "app\adapters\llm_api\registry.py", line 57>)
+            268 MAKE_FUNCTION            0
+            270 LOAD_CONST              16 ('ProviderSpec')
+            272 CALL                     2
+
+ 57         280 CALL                     0
+
+ 58         288 STORE_NAME              20 (ProviderSpec)
+
+ 95         290 LOAD_CONST              65 (('raw', 'dict', 'return', 'ModelSpec | None'))
+            292 LOAD_CONST              17 (<code object _parse_model at 0x2682bf60, file "app\adapters\llm_api\registry.py", line 95>)
+            294 MAKE_FUNCTION            4 (annotations)
+            296 STORE_NAME              21 (_parse_model)
+
+114         298 LOAD_CONST              66 (('raw', 'dict', 'return', 'ProviderSpec | None'))
+            300 LOAD_CONST              18 (<code object _parse_provider at 0x2906cf60, file "app\adapters\llm_api\registry.py", line 114>)
+            302 MAKE_FUNCTION            4 (annotations)
+            304 STORE_NAME              22 (_parse_provider)
+
+170         306 LOAD_CONST              19 ('deepseek')
+            308 LOAD_CONST              20 ('DeepSeek')
+            310 LOAD_CONST              21 ('openai')
+
+171         312 LOAD_CONST              22 ('https://api.deepseek.com/v1')
+            314 LOAD_CONST              23 ('deepseek_api_key')
+
+172         316 LOAD_CONST              24 ('deepseek-v4-flash')
+
+173         318 LOAD_CONST              24 ('deepseek-v4-flash')
+            320 LOAD_CONST              25 (0.22)
+            322 LOAD_CONST              26 (0.66)
+
+174         324 LOAD_CONST              27 (0.007)
+            326 LOAD_CONST              28 (1000000)
+
+175         328 LOAD_CONST              29 (True)
+            330 LOAD_CONST              29 (True)
+
+173         332 LOAD_CONST              30 (('id', 'price_in', 'price_out', 'price_cache_in', 'max_input_tokens', 'supports_reasoning_effort', 'honors_temperature'))
+            334 BUILD_CONST_KEY_MAP      7
+            336 BUILD_LIST               1
+
+170         338 LOAD_CONST              31 (('key', 'label', 'dialect', 'base_url', 'api_key_setting', 'default_model', 'models'))
+            340 BUILD_CONST_KEY_MAP      7
+
+176         342 LOAD_CONST              21 ('openai')
+            344 LOAD_CONST              32 ('OpenAI')
+            346 LOAD_CONST              21 ('openai')
+
+177         348 LOAD_CONST              33 ('https://api.openai.com/v1')
+            350 LOAD_CONST              34 ('openai_api_key')
+
+178         352 LOAD_CONST              35 ('gpt-5.6-luna')
+
+179         354 LOAD_CONST              36 (272000)
+            356 LOAD_CONST              37 (2.0)
+            358 LOAD_CONST              38 (1.5)
+            360 LOAD_CONST              39 (('input_tokens', 'mult_in', 'mult_out'))
+            362 BUILD_CONST_KEY_MAP      3
+
+180         364 LOAD_CONST              35 ('gpt-5.6-luna')
+            366 LOAD_CONST              40 (0.2)
+            368 LOAD_CONST              41 (1.2)
+
+181         370 LOAD_CONST              42 (0.02)
+            372 LOAD_CONST              43 (1050000)
+
+182         374 LOAD_CONST              29 (True)
+            376 LOAD_CONST              29 (True)
+
+180         378 LOAD_CONST              30 (('id', 'price_in', 'price_out', 'price_cache_in', 'max_input_tokens', 'supports_reasoning_effort', 'honors_temperature'))
+            380 BUILD_CONST_KEY_MAP      7
+            382 BUILD_LIST               1
+
+176         384 LOAD_CONST              44 (('key', 'label', 'dialect', 'base_url', 'api_key_setting', 'default_model', 'price_cliff', 'models'))
+            386 BUILD_CONST_KEY_MAP      8
+
+183         388 LOAD_CONST              45 ('gemini')
+            390 LOAD_CONST              46 ('Google Gemini')
+            392 LOAD_CONST              21 ('openai')
+
+184         394 LOAD_CONST              47 ('https://generativelanguage.googleapis.com/v1beta/openai/')
+
+185         396 LOAD_CONST              48 ('gemini_api_key')
+            398 LOAD_CONST              49 ('gemini-3.6-flash')
+
+186         400 LOAD_CONST              49 ('gemini-3.6-flash')
+            402 LOAD_CONST              50 (0.75)
+            404 LOAD_CONST              51 (3.75)
+
+187         406 LOAD_CONST              52 (0.075)
+            408 LOAD_CONST              28 (1000000)
+
+188         410 LOAD_CONST              29 (True)
+            412 LOAD_CONST              29 (True)
+
+186         414 LOAD_CONST              30 (('id', 'price_in', 'price_out', 'price_cache_in', 'max_input_tokens', 'supports_reasoning_effort', 'honors_temperature'))
+            416 BUILD_CONST_KEY_MAP      7
+            418 BUILD_LIST               1
+
+183         420 LOAD_CONST              31 (('key', 'label', 'dialect', 'base_url', 'api_key_setting', 'default_model', 'models'))
+            422 BUILD_CONST_KEY_MAP      7
+
+169         424 BUILD_LIST               3
+            426 STORE_NAME              23 (_BUILTIN)
+            428 LOAD_CONST              53 ('list[dict]')
+            430 LOAD_NAME               24 (__annotations__)
+            432 LOAD_CONST              54 ('_BUILTIN')
+            434 STORE_SUBSCR
+
+191         438 LOAD_CONST               3 (None)
+            440 STORE_GLOBAL            25 (_cache)
+            442 LOAD_CONST              55 ('list[ProviderSpec] | None')
+            444 LOAD_NAME               24 (__annotations__)
+            446 LOAD_CONST              56 ('_cache')
+            448 STORE_SUBSCR
+
+194         452 LOAD_CONST              67 (('return', 'None'))
+            454 LOAD_CONST              57 (<code object clear_cache at 0x7f6c92a35890, file "app\adapters\llm_api\registry.py", line 194>)
+            456 MAKE_FUNCTION            4 (annotations)
+            458 STORE_NAME              26 (clear_cache)
+
+199         460 LOAD_CONST              68 (('return', 'list[ProviderSpec]'))
+            462 LOAD_CONST              58 (<code object load_catalog at 0x29096e60, file "app\adapters\llm_api\registry.py", line 199>)
+            464 MAKE_FUNCTION            4 (annotations)
+            466 STORE_NAME              27 (load_catalog)
+
+229         468 LOAD_CONST              69 (('row', 'dict', 'return', 'ProviderSpec | None'))
+            470 LOAD_CONST              59 (<code object endpoint_to_provider at 0x26838120, file "app\adapters\llm_api\registry.py", line 229>)
+            472 MAKE_FUNCTION            4 (annotations)
+            474 STORE_NAME              28 (endpoint_to_provider)
+
+256         476 LOAD_CONST              29 (True)
+            478 LOAD_CONST              60 (('enabled_only',))
+            480 BUILD_CONST_KEY_MAP      1
+            482 LOAD_CONST              70 (('enabled_only', 'bool', 'return', 'list[ProviderSpec]'))
+            484 LOAD_CONST              61 (<code object list_endpoint_providers at 0x7f6c933ad890, file "app\adapters\llm_api\registry.py", line 256>)
+            486 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            488 STORE_NAME              29 (list_endpoint_providers)
+
+271         490 LOAD_CONST              29 (True)
+            492 LOAD_CONST              62 (('include_endpoints',))
+            494 BUILD_CONST_KEY_MAP      1
+            496 LOAD_CONST              71 (('include_endpoints', 'bool', 'return', 'list[ProviderSpec]'))
+            498 LOAD_CONST              63 (<code object list_providers at 0x7f6c93249cb0, file "app\adapters\llm_api\registry.py", line 271>)
+            500 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            502 STORE_NAME              30 (list_providers)
+
+279         504 LOAD_CONST              72 (('key', 'str', 'return', 'ProviderSpec | None'))
+            506 LOAD_CONST              64 (<code object get_provider at 0x269d4610, file "app\adapters\llm_api\registry.py", line 279>)
+            508 MAKE_FUNCTION            4 (annotations)
+            510 STORE_NAME              31 (get_provider)
+            512 RETURN_CONST             3 (None)
+
+Disassembly of <code object ModelSpec at 0x7f6c933b6790, file "app\adapters\llm_api\registry.py", line 34>:
+ 34           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('ModelSpec')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 36          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('id')
+             18 STORE_SUBSCR
+
+ 37          22 LOAD_CONST               3 ('')
+             24 STORE_NAME               4 (label)
+             26 LOAD_CONST               1 ('str')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               4 ('label')
+             32 STORE_SUBSCR
+
+ 38          36 LOAD_CONST               5 (128000)
+             38 STORE_NAME               5 (max_input_tokens)
+             40 LOAD_CONST               6 ('int')
+             42 LOAD_NAME                3 (__annotations__)
+             44 LOAD_CONST               7 ('max_input_tokens')
+             46 STORE_SUBSCR
+
+ 39          50 LOAD_CONST               8 (8192)
+             52 STORE_NAME               6 (max_output_tokens)
+             54 LOAD_CONST               6 ('int')
+             56 LOAD_NAME                3 (__annotations__)
+             58 LOAD_CONST               9 ('max_output_tokens')
+             60 STORE_SUBSCR
+
+ 40          64 LOAD_CONST              10 (0.0)
+             66 STORE_NAME               7 (price_in)
+             68 LOAD_CONST              11 ('float')
+             70 LOAD_NAME                3 (__annotations__)
+             72 LOAD_CONST              12 ('price_in')
+             74 STORE_SUBSCR
+
+ 41          78 LOAD_CONST              10 (0.0)
+             80 STORE_NAME               8 (price_out)
+             82 LOAD_CONST              11 ('float')
+             84 LOAD_NAME                3 (__annotations__)
+             86 LOAD_CONST              13 ('price_out')
+             88 STORE_SUBSCR
+
+ 42          92 LOAD_CONST              10 (0.0)
+             94 STORE_NAME               9 (price_cache_in)
+             96 LOAD_CONST              11 ('float')
+             98 LOAD_NAME                3 (__annotations__)
+            100 LOAD_CONST              14 ('price_cache_in')
+            102 STORE_SUBSCR
+
+ 45         106 LOAD_CONST              15 (False)
+            108 STORE_NAME              10 (supports_reasoning_effort)
+            110 LOAD_CONST              16 ('bool')
+            112 LOAD_NAME                3 (__annotations__)
+            114 LOAD_CONST              17 ('supports_reasoning_effort')
+            116 STORE_SUBSCR
+
+ 46         120 LOAD_CONST              15 (False)
+            122 STORE_NAME              11 (honors_temperature)
+            124 LOAD_CONST              16 ('bool')
+            126 LOAD_NAME                3 (__annotations__)
+            128 LOAD_CONST              18 ('honors_temperature')
+            130 STORE_SUBSCR
+            134 RETURN_CONST            19 (None)
+
+Disassembly of <code object PriceCliff at 0x7f6c92e4fa30, file "app\adapters\llm_api\registry.py", line 49>:
+ 49           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('PriceCliff')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 51          12 LOAD_CONST               1 ('Ngưỡng mà vượt qua là CẢ request bị tính lại theo giá nhân (không chỉ phần vượt).')
+             14 STORE_NAME               3 (__doc__)
+
+ 52          16 LOAD_CONST               2 ('int')
+             18 LOAD_NAME                4 (__annotations__)
+             20 LOAD_CONST               3 ('input_tokens')
+             22 STORE_SUBSCR
+
+ 53          26 LOAD_CONST               4 (1.0)
+             28 STORE_NAME               5 (mult_in)
+             30 LOAD_CONST               5 ('float')
+             32 LOAD_NAME                4 (__annotations__)
+             34 LOAD_CONST               6 ('mult_in')
+             36 STORE_SUBSCR
+
+ 54          40 LOAD_CONST               4 (1.0)
+             42 STORE_NAME               6 (mult_out)
+             44 LOAD_CONST               5 ('float')
+             46 LOAD_NAME                4 (__annotations__)
+             48 LOAD_CONST               7 ('mult_out')
+             50 STORE_SUBSCR
+             54 RETURN_CONST             8 (None)
+
+Disassembly of <code object ProviderSpec at 0x7f6c933afc50, file "app\adapters\llm_api\registry.py", line 57>:
+ 57           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('ProviderSpec')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 59          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('key')
+             18 STORE_SUBSCR
+
+ 60          22 LOAD_CONST               1 ('str')
+             24 LOAD_NAME                3 (__annotations__)
+             26 LOAD_CONST               3 ('label')
+             28 STORE_SUBSCR
+
+ 61          32 LOAD_CONST               1 ('str')
+             34 LOAD_NAME                3 (__annotations__)
+             36 LOAD_CONST               4 ('dialect')
+             38 STORE_SUBSCR
+
+ 62          42 LOAD_CONST               1 ('str')
+             44 LOAD_NAME                3 (__annotations__)
+             46 LOAD_CONST               5 ('base_url')
+             48 STORE_SUBSCR
+
+ 63          52 LOAD_CONST               1 ('str')
+             54 LOAD_NAME                3 (__annotations__)
+             56 LOAD_CONST               6 ('api_key_setting')
+             58 STORE_SUBSCR
+
+ 64          62 LOAD_CONST               1 ('str')
+             64 LOAD_NAME                3 (__annotations__)
+             66 LOAD_CONST               7 ('default_model')
+             68 STORE_SUBSCR
+
+ 65          72 LOAD_CONST               8 ('list[ModelSpec]')
+             74 LOAD_NAME                3 (__annotations__)
+             76 LOAD_CONST               9 ('models')
+             78 STORE_SUBSCR
+
+ 66          82 LOAD_CONST              10 ('auto')
+             84 STORE_NAME               4 (cache_mode)
+             86 LOAD_CONST               1 ('str')
+             88 LOAD_NAME                3 (__annotations__)
+             90 LOAD_CONST              11 ('cache_mode')
+             92 STORE_SUBSCR
+
+ 67          96 LOAD_CONST              12 (())
+             98 STORE_NAME               5 (quirks)
+            100 LOAD_CONST              13 ('tuple[str, ...]')
+            102 LOAD_NAME                3 (__annotations__)
+            104 LOAD_CONST              14 ('quirks')
+            106 STORE_SUBSCR
+
+ 68         110 LOAD_CONST              15 ('')
+            112 STORE_NAME               6 (notes_vi)
+            114 LOAD_CONST               1 ('str')
+            116 LOAD_NAME                3 (__annotations__)
+            118 LOAD_CONST              16 ('notes_vi')
+            120 STORE_SUBSCR
+
+ 69         124 LOAD_CONST              17 (None)
+            126 STORE_NAME               7 (price_cliff)
+            128 LOAD_CONST              18 ('PriceCliff | None')
+            130 LOAD_NAME                3 (__annotations__)
+            132 LOAD_CONST              19 ('price_cliff')
+            134 STORE_SUBSCR
+
+ 71         138 LOAD_CONST              17 (None)
+            140 STORE_NAME               8 (endpoint_id)
+            142 LOAD_CONST              20 ('str | None')
+            144 LOAD_NAME                3 (__annotations__)
+            146 LOAD_CONST              21 ('endpoint_id')
+            148 STORE_SUBSCR
+
+ 72         152 PUSH_NULL
+            154 LOAD_NAME                9 (field)
+            156 LOAD_NAME               10 (dict)
+            158 KW_NAMES                22 (('default_factory',))
+            160 CALL                     1
+            168 STORE_NAME              11 (extra_headers)
+            170 LOAD_CONST              23 ('dict')
+            172 LOAD_NAME                3 (__annotations__)
+            174 LOAD_CONST              24 ('extra_headers')
+            176 STORE_SUBSCR
+
+ 73         180 LOAD_CONST              25 (300.0)
+            182 STORE_NAME              12 (timeout_s)
+            184 LOAD_CONST              26 ('float')
+            186 LOAD_NAME                3 (__annotations__)
+            188 LOAD_CONST              27 ('timeout_s')
+            190 STORE_SUBSCR
+
+ 75         194 LOAD_CONST              31 (('model_id', 'str | None', 'return', 'ModelSpec | None'))
+            196 LOAD_CONST              28 (<code object get_model at 0x7f6c933b7750, file "app\adapters\llm_api\registry.py", line 75>)
+            198 MAKE_FUNCTION            4 (annotations)
+            200 STORE_NAME              13 (get_model)
+
+ 82         202 LOAD_CONST              32 (('model_id', 'str | None', 'return', 'ModelSpec'))
+            204 LOAD_CONST              29 (<code object resolve_model at 0x7f6c933c9e30, file "app\adapters\llm_api\registry.py", line 82>)
+            206 MAKE_FUNCTION            4 (annotations)
+            208 STORE_NAME              14 (resolve_model)
+
+ 86         210 LOAD_CONST              33 (('return', 'str'))
+            212 LOAD_CONST              30 (<code object chat_url at 0x7f6c929699b0, file "app\adapters\llm_api\registry.py", line 86>)
+            214 MAKE_FUNCTION            4 (annotations)
+            216 STORE_NAME              15 (chat_url)
+            218 RETURN_CONST            17 (None)
+
+Disassembly of <code object get_model at 0x7f6c933b7750, file "app\adapters\llm_api\registry.py", line 75>:
+ 75           0 RESUME                   0
+
+ 76           2 LOAD_FAST                1 (model_id)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE        16 (to 40)
+              8 POP_TOP
+             10 LOAD_FAST                0 (self)
+             12 LOAD_ATTR                0 (default_model)
+             32 COPY                     1
+             34 POP_JUMP_IF_TRUE         2 (to 40)
+             36 POP_TOP
+             38 LOAD_CONST               1 ('')
+        >>   40 LOAD_ATTR                3 (NULL|self + strip)
+             60 CALL                     0
+             68 STORE_FAST               2 (wanted)
+
+ 77          70 LOAD_FAST                0 (self)
+             72 LOAD_ATTR                4 (models)
+             92 GET_ITER
+        >>   94 FOR_ITER                21 (to 140)
+             98 STORE_FAST               3 (m)
+
+ 78         100 LOAD_FAST                3 (m)
+            102 LOAD_ATTR                6 (id)
+            122 LOAD_FAST                2 (wanted)
+            124 COMPARE_OP              40 (==)
+            128 POP_JUMP_IF_TRUE         1 (to 132)
+            130 JUMP_BACKWARD           19 (to 94)
+
+ 79     >>  132 LOAD_FAST                3 (m)
+            134 SWAP                     2
+            136 POP_TOP
+            138 RETURN_VALUE
+
+ 77     >>  140 END_FOR
+
+ 80         142 RETURN_CONST             0 (None)
+
+Disassembly of <code object resolve_model at 0x7f6c933c9e30, file "app\adapters\llm_api\registry.py", line 82>:
+ 82           0 RESUME                   0
+
+ 84           2 LOAD_FAST                0 (self)
+              4 LOAD_ATTR                1 (NULL|self + get_model)
+             24 LOAD_FAST                1 (model_id)
+             26 CALL                     1
+             34 COPY                     1
+             36 POP_JUMP_IF_TRUE        44 (to 126)
+             38 POP_TOP
+             40 LOAD_FAST                0 (self)
+             42 LOAD_ATTR                1 (NULL|self + get_model)
+             62 LOAD_FAST                0 (self)
+             64 LOAD_ATTR                2 (default_model)
+             84 CALL                     1
+             92 COPY                     1
+             94 POP_JUMP_IF_TRUE        15 (to 126)
+             96 POP_TOP
+             98 LOAD_FAST                0 (self)
+            100 LOAD_ATTR                4 (models)
+            120 LOAD_CONST               1 (0)
+            122 BINARY_SUBSCR
+        >>  126 RETURN_VALUE
+
+Disassembly of <code object chat_url at 0x7f6c929699b0, file "app\adapters\llm_api\registry.py", line 86>:
+ 86           0 RESUME                   0
+
+ 88           2 LOAD_GLOBAL              1 (NULL + dialects)
+             12 LOAD_ATTR                2 (get)
+             32 LOAD_FAST                0 (self)
+             34 LOAD_ATTR                4 (dialect)
+             54 CALL                     1
+             62 STORE_FAST               1 (module)
+
+ 89          64 LOAD_FAST                1 (module)
+             66 POP_JUMP_IF_NOT_NONE    30 (to 128)
+
+ 91          68 LOAD_FAST                0 (self)
+             70 LOAD_ATTR                6 (base_url)
+             90 LOAD_ATTR                9 (NULL|self + rstrip)
+            110 LOAD_CONST               1 ('/')
+            112 CALL                     1
+            120 LOAD_CONST               2 ('/chat/completions')
+            122 BINARY_OP                0 (+)
+            126 RETURN_VALUE
+
+ 92     >>  128 LOAD_FAST                1 (module)
+            130 LOAD_ATTR               11 (NULL|self + url)
+            150 LOAD_FAST                0 (self)
+            152 LOAD_ATTR                6 (base_url)
+            172 CALL                     1
+            180 RETURN_VALUE
+
+Disassembly of <code object _parse_model at 0x2682bf60, file "app\adapters\llm_api\registry.py", line 95>:
+ 95           0 RESUME                   0
+
+ 96           2 LOAD_GLOBAL              1 (NULL + str)
+             12 LOAD_FAST                0 (raw)
+             14 LOAD_ATTR                3 (NULL|self + get)
+             34 LOAD_CONST               1 ('id')
+             36 CALL                     1
+             44 COPY                     1
+             46 POP_JUMP_IF_TRUE         2 (to 52)
+             48 POP_TOP
+             50 LOAD_CONST               2 ('')
+        >>   52 CALL                     1
+             60 LOAD_ATTR                5 (NULL|self + strip)
+             80 CALL                     0
+             88 STORE_FAST               1 (model_id)
+
+ 97          90 LOAD_FAST                1 (model_id)
+             92 POP_JUMP_IF_TRUE         1 (to 96)
+
+ 98          94 RETURN_CONST             0 (None)
+
+ 99     >>   96 LOAD_GLOBAL              7 (NULL + ModelSpec)
+            106 LOAD_FAST                1 (model_id)
+            108 LOAD_GLOBAL              1 (NULL + str)
+            118 LOAD_FAST                0 (raw)
+            120 LOAD_ATTR                3 (NULL|self + get)
+            140 LOAD_CONST               3 ('label')
+            142 CALL                     1
+            150 COPY                     1
+            152 POP_JUMP_IF_TRUE         2 (to 158)
+            154 POP_TOP
+            156 LOAD_FAST                1 (model_id)
+        >>  158 CALL                     1
+            166 KW_NAMES                 4 (('id', 'label'))
+            168 CALL                     2
+            176 STORE_FAST               2 (spec)
+
+100         178 LOAD_CONST               5 ('max_input_tokens')
+            180 LOAD_GLOBAL              8 (int)
+            190 BUILD_TUPLE              2
+            192 LOAD_CONST               6 ('max_output_tokens')
+            194 LOAD_GLOBAL              8 (int)
+            204 BUILD_TUPLE              2
+
+101         206 LOAD_CONST               7 ('price_in')
+            208 LOAD_GLOBAL             10 (float)
+            218 BUILD_TUPLE              2
+            220 LOAD_CONST               8 ('price_out')
+            222 LOAD_GLOBAL             10 (float)
+            232 BUILD_TUPLE              2
+            234 LOAD_CONST               9 ('price_cache_in')
+            236 LOAD_GLOBAL             10 (float)
+            246 BUILD_TUPLE              2
+
+102         248 LOAD_CONST              10 ('supports_reasoning_effort')
+            250 LOAD_GLOBAL             12 (bool)
+            260 BUILD_TUPLE              2
+            262 LOAD_CONST              11 ('honors_temperature')
+            264 LOAD_GLOBAL             12 (bool)
+            274 BUILD_TUPLE              2
+
+100         276 BUILD_TUPLE              7
+            278 GET_ITER
+        >>  280 FOR_ITER                33 (to 350)
+            284 UNPACK_SEQUENCE          2
+            288 STORE_FAST               3 (attr)
+            290 STORE_FAST               4 (caster)
+
+103         292 LOAD_FAST                3 (attr)
+            294 LOAD_FAST                0 (raw)
+            296 CONTAINS_OP              0
+            298 POP_JUMP_IF_TRUE         1 (to 302)
+            300 JUMP_BACKWARD           11 (to 280)
+
+104     >>  302 NOP
+
+105         304 LOAD_GLOBAL             15 (NULL + setattr)
+            314 LOAD_FAST                2 (spec)
+            316 LOAD_FAST                3 (attr)
+            318 PUSH_NULL
+            320 LOAD_FAST                4 (caster)
+            322 LOAD_FAST                0 (raw)
+            324 LOAD_FAST                3 (attr)
+            326 BINARY_SUBSCR
+            330 CALL                     1
+            338 CALL                     3
+            346 POP_TOP
+            348 JUMP_BACKWARD           35 (to 280)
+
+100     >>  350 END_FOR
+
+108         352 LOAD_FAST                2 (spec)
+            354 LOAD_ATTR               24 (price_in)
+            374 LOAD_CONST              16 (0)
+            376 COMPARE_OP               2 (<)
+            380 POP_JUMP_IF_TRUE        30 (to 442)
+            382 LOAD_FAST                2 (spec)
+            384 LOAD_ATTR               26 (price_out)
+            404 LOAD_CONST              16 (0)
+            406 COMPARE_OP               2 (<)
+            410 POP_JUMP_IF_TRUE        15 (to 442)
+            412 LOAD_FAST                2 (spec)
+            414 LOAD_ATTR               28 (max_input_tokens)
+            434 LOAD_CONST              16 (0)
+            436 COMPARE_OP              26 (<=)
+            440 POP_JUMP_IF_FALSE       26 (to 494)
+
+109     >>  442 LOAD_GLOBAL             21 (NULL + log)
+            452 LOAD_ATTR               30 (warning)
+            472 LOAD_CONST              12 ('[llm_api] model ')
+            474 LOAD_FAST                1 (model_id)
+            476 FORMAT_VALUE             0
+            478 LOAD_CONST              17 (' có số liệu vô lý → bỏ qua')
+            480 BUILD_STRING             3
+            482 CALL                     1
+            490 POP_TOP
+
+110         492 RETURN_CONST             0 (None)
+
+111     >>  494 LOAD_FAST                2 (spec)
+            496 RETURN_VALUE
+        >>  498 PUSH_EXC_INFO
+
+106         500 LOAD_GLOBAL             16 (TypeError)
+            510 LOAD_GLOBAL             18 (ValueError)
+            520 BUILD_TUPLE              2
+            522 CHECK_EXC_MATCH
+            524 POP_JUMP_IF_FALSE       37 (to 600)
+            526 POP_TOP
+
+107         528 LOAD_GLOBAL             21 (NULL + log)
+            538 LOAD_ATTR               22 (info)
+            558 LOAD_CONST              12 ('[llm_api] model ')
+            560 LOAD_FAST                1 (model_id)
+            562 FORMAT_VALUE             0
+            564 LOAD_CONST              13 (': ')
+            566 LOAD_FAST                3 (attr)
+            568 FORMAT_VALUE             0
+            570 LOAD_CONST              14 ('=')
+            572 LOAD_FAST                0 (raw)
+            574 LOAD_FAST                3 (attr)
+            576 BINARY_SUBSCR
+            580 FORMAT_VALUE             2 (repr)
+            582 LOAD_CONST              15 (' không hợp lệ → dùng mặc định')
+            584 BUILD_STRING             7
+            586 CALL                     1
+            594 POP_TOP
+            596 POP_EXCEPT
+            598 JUMP_BACKWARD          160 (to 280)
+
+106     >>  600 RERAISE                  0
+        >>  602 COPY                     3
+            604 POP_EXCEPT
+            606 RERAISE                  1
+ExceptionTable:
+  304 to 346 -> 498 [1]
+  498 to 594 -> 602 [2] lasti
+  600 to 600 -> 602 [2] lasti
+
+Disassembly of <code object _parse_provider at 0x2906cf60, file "app\adapters\llm_api\registry.py", line 114>:
+              0 MAKE_CELL               10 (default_model)
+
+114           2 RESUME                   0
+
+115           4 LOAD_GLOBAL              1 (NULL + str)
+             14 LOAD_FAST                0 (raw)
+             16 LOAD_ATTR                3 (NULL|self + get)
+             36 LOAD_CONST               1 ('key')
+             38 CALL                     1
+             46 COPY                     1
+             48 POP_JUMP_IF_TRUE         2 (to 54)
+             50 POP_TOP
+             52 LOAD_CONST               2 ('')
+        >>   54 CALL                     1
+             62 LOAD_ATTR                5 (NULL|self + strip)
+             82 CALL                     0
+             90 STORE_FAST               1 (key)
+
+116          92 LOAD_FAST                1 (key)
+             94 POP_JUMP_IF_TRUE         1 (to 98)
+
+117          96 RETURN_CONST             0 (None)
+
+118     >>   98 LOAD_GLOBAL              1 (NULL + str)
+            108 LOAD_FAST                0 (raw)
+            110 LOAD_ATTR                3 (NULL|self + get)
+            130 LOAD_CONST               3 ('dialect')
+            132 CALL                     1
+            140 COPY                     1
+            142 POP_JUMP_IF_TRUE         2 (to 148)
+            144 POP_TOP
+            146 LOAD_CONST               4 ('openai')
+        >>  148 CALL                     1
+            156 LOAD_ATTR                5 (NULL|self + strip)
+            176 CALL                     0
+            184 STORE_FAST               2 (dialect)
+
+119         186 LOAD_GLOBAL              1 (NULL + str)
+            196 LOAD_FAST                0 (raw)
+            198 LOAD_ATTR                3 (NULL|self + get)
+            218 LOAD_CONST               5 ('base_url')
+            220 CALL                     1
+            228 COPY                     1
+            230 POP_JUMP_IF_TRUE         2 (to 236)
+            232 POP_TOP
+            234 LOAD_CONST               2 ('')
+        >>  236 CALL                     1
+            244 LOAD_ATTR                5 (NULL|self + strip)
+            264 CALL                     0
+            272 STORE_FAST               3 (base_url)
+
+120         274 LOAD_GLOBAL              1 (NULL + str)
+            284 LOAD_FAST                0 (raw)
+            286 LOAD_ATTR                3 (NULL|self + get)
+            306 LOAD_CONST               6 ('api_key_setting')
+            308 CALL                     1
+            316 COPY                     1
+            318 POP_JUMP_IF_TRUE         2 (to 324)
+            320 POP_TOP
+            322 LOAD_CONST               2 ('')
+        >>  324 CALL                     1
+            332 LOAD_ATTR                5 (NULL|self + strip)
+            352 CALL                     0
+            360 STORE_FAST               4 (api_key_setting)
+
+122         362 BUILD_LIST               0
+            364 STORE_FAST               5 (problems)
+
+123         366 LOAD_GLOBAL              7 (NULL + dialects)
+            376 LOAD_ATTR                2 (get)
+            396 LOAD_FAST                2 (dialect)
+            398 CALL                     1
+            406 POP_JUMP_IF_NOT_NONE    21 (to 450)
+
+124         408 LOAD_FAST                5 (problems)
+            410 LOAD_ATTR                9 (NULL|self + append)
+            430 LOAD_CONST               7 ('dialect ')
+            432 LOAD_FAST                2 (dialect)
+            434 FORMAT_VALUE             2 (repr)
+            436 LOAD_CONST               8 (' chưa cài đặt')
+            438 BUILD_STRING             3
+            440 CALL                     1
+            448 POP_TOP
+
+127     >>  450 LOAD_FAST                3 (base_url)
+            452 LOAD_ATTR               11 (NULL|self + startswith)
+            472 LOAD_CONST               9 ('https://')
+            474 CALL                     1
+            482 POP_JUMP_IF_TRUE        51 (to 586)
+
+128         484 LOAD_FAST                3 (base_url)
+            486 LOAD_ATTR               11 (NULL|self + startswith)
+            506 LOAD_CONST              10 ('http://localhost')
+            508 CALL                     1
+            516 POP_JUMP_IF_TRUE        34 (to 586)
+
+129         518 LOAD_FAST                3 (base_url)
+            520 LOAD_ATTR               11 (NULL|self + startswith)
+            540 LOAD_CONST              11 ('http://127.0.0.1')
+            542 CALL                     1
+            550 POP_JUMP_IF_TRUE        17 (to 586)
+
+130         552 LOAD_FAST                5 (problems)
+            554 LOAD_ATTR                9 (NULL|self + append)
+            574 LOAD_CONST              12 ('base_url phải là https (hoặc localhost)')
+            576 CALL                     1
+            584 POP_TOP
+
+131     >>  586 LOAD_FAST                4 (api_key_setting)
+            588 POP_JUMP_IF_TRUE        17 (to 624)
+
+132         590 LOAD_FAST                5 (problems)
+            592 LOAD_ATTR                9 (NULL|self + append)
+            612 LOAD_CONST              13 ('thiếu api_key_setting')
+            614 CALL                     1
+            622 POP_TOP
+
+134     >>  624 LOAD_CONST              14 (<code object <genexpr> at 0x7f6c92e4fb30, file "app\adapters\llm_api\registry.py", line 134>)
+            626 MAKE_FUNCTION            0
+            628 LOAD_FAST                0 (raw)
+            630 LOAD_ATTR                3 (NULL|self + get)
+            650 LOAD_CONST              15 ('models')
+            652 CALL                     1
+            660 COPY                     1
+            662 POP_JUMP_IF_TRUE         2 (to 668)
+            664 POP_TOP
+            666 BUILD_LIST               0
+        >>  668 GET_ITER
+            670 CALL                     0
+            678 GET_ITER
+            680 LOAD_FAST_AND_CLEAR      6 (m)
+            682 SWAP                     2
+            684 BUILD_LIST               0
+            686 SWAP                     2
+        >>  688 FOR_ITER                 7 (to 706)
+            692 STORE_FAST               6 (m)
+            694 LOAD_FAST                6 (m)
+            696 POP_JUMP_IF_TRUE         1 (to 700)
+            698 JUMP_BACKWARD            6 (to 688)
+        >>  700 LOAD_FAST                6 (m)
+            702 LIST_APPEND              2
+            704 JUMP_BACKWARD            9 (to 688)
+        >>  706 END_FOR
+            708 STORE_FAST               7 (models)
+            710 STORE_FAST               6 (m)
+
+135         712 LOAD_FAST                7 (models)
+            714 POP_JUMP_IF_TRUE        17 (to 750)
+
+136         716 LOAD_FAST                5 (problems)
+            718 LOAD_ATTR                9 (NULL|self + append)
+            738 LOAD_CONST              16 ('không có model hợp lệ')
+            740 CALL                     1
+            748 POP_TOP
+
+138     >>  750 LOAD_FAST                5 (problems)
+            752 POP_JUMP_IF_FALSE       43 (to 840)
+
+139         754 LOAD_GLOBAL             13 (NULL + log)
+            764 LOAD_ATTR               14 (warning)
+            784 LOAD_CONST              17 ('[llm_api] bỏ qua provider ')
+            786 LOAD_FAST                1 (key)
+            788 FORMAT_VALUE             2 (repr)
+            790 LOAD_CONST              18 (': ')
+            792 LOAD_CONST              19 ('; ')
+            794 LOAD_ATTR               17 (NULL|self + join)
+            814 LOAD_FAST                5 (problems)
+            816 CALL                     1
+            824 FORMAT_VALUE             0
+            826 BUILD_STRING             4
+            828 CALL                     1
+            836 POP_TOP
+
+140         838 RETURN_CONST             0 (None)
+
+142     >>  840 LOAD_CONST               0 (None)
+            842 STORE_FAST               8 (cliff)
+
+143         844 LOAD_FAST                0 (raw)
+            846 LOAD_ATTR                3 (NULL|self + get)
+            866 LOAD_CONST              20 ('price_cliff')
+            868 CALL                     1
+            876 STORE_FAST               9 (raw_cliff)
+
+144         878 LOAD_GLOBAL             19 (NULL + isinstance)
+            888 LOAD_FAST                9 (raw_cliff)
+            890 LOAD_GLOBAL             20 (dict)
+            900 CALL                     2
+            908 POP_JUMP_IF_FALSE       77 (to 1064)
+
+145         910 NOP
+
+146         912 LOAD_GLOBAL             23 (NULL + PriceCliff)
+            922 LOAD_GLOBAL             25 (NULL + int)
+            932 LOAD_FAST                9 (raw_cliff)
+            934 LOAD_CONST              21 ('input_tokens')
+            936 BINARY_SUBSCR
+            940 CALL                     1
+
+147         948 LOAD_GLOBAL             27 (NULL + float)
+            958 LOAD_FAST                9 (raw_cliff)
+            960 LOAD_ATTR                3 (NULL|self + get)
+            980 LOAD_CONST              22 ('mult_in')
+            982 LOAD_CONST              23 (1.0)
+            984 CALL                     2
+            992 CALL                     1
+
+148        1000 LOAD_GLOBAL             27 (NULL + float)
+           1010 LOAD_FAST                9 (raw_cliff)
+           1012 LOAD_ATTR                3 (NULL|self + get)
+           1032 LOAD_CONST              24 ('mult_out')
+           1034 LOAD_CONST              23 (1.0)
+           1036 CALL                     2
+           1044 CALL                     1
+
+146        1052 KW_NAMES                25 (('input_tokens', 'mult_in', 'mult_out'))
+           1054 CALL                     3
+           1062 STORE_FAST               8 (cliff)
+
+152     >> 1064 LOAD_GLOBAL              1 (NULL + str)
+           1074 LOAD_FAST                0 (raw)
+           1076 LOAD_ATTR                3 (NULL|self + get)
+           1096 LOAD_CONST              28 ('default_model')
+           1098 CALL                     1
+           1106 COPY                     1
+           1108 POP_JUMP_IF_TRUE         2 (to 1114)
+           1110 POP_TOP
+           1112 LOAD_CONST               2 ('')
+        >> 1114 CALL                     1
+           1122 LOAD_ATTR                5 (NULL|self + strip)
+           1142 CALL                     0
+           1150 COPY                     1
+           1152 POP_JUMP_IF_TRUE        15 (to 1184)
+           1154 POP_TOP
+           1156 LOAD_FAST                7 (models)
+           1158 LOAD_CONST              29 (0)
+           1160 BINARY_SUBSCR
+           1164 LOAD_ATTR               36 (id)
+        >> 1184 STORE_DEREF             10 (default_model)
+
+153        1186 LOAD_GLOBAL             39 (NULL + any)
+           1196 LOAD_CLOSURE            10 (default_model)
+           1198 BUILD_TUPLE              1
+           1200 LOAD_CONST              30 (<code object <genexpr> at 0x7f6c92e4d630, file "app\adapters\llm_api\registry.py", line 153>)
+           1202 MAKE_FUNCTION            8 (closure)
+           1204 LOAD_FAST                7 (models)
+           1206 GET_ITER
+           1208 CALL                     0
+           1216 CALL                     1
+           1224 POP_JUMP_IF_TRUE        58 (to 1342)
+
+154        1226 LOAD_GLOBAL             13 (NULL + log)
+           1236 LOAD_ATTR               34 (info)
+           1256 LOAD_CONST              26 ('[llm_api] provider ')
+           1258 LOAD_FAST                1 (key)
+           1260 FORMAT_VALUE             0
+           1262 LOAD_CONST              31 (': default_model ')
+           1264 LOAD_DEREF              10 (default_model)
+           1266 FORMAT_VALUE             2 (repr)
+           1268 LOAD_CONST              32 (' không có trong models → dùng ')
+
+155        1270 LOAD_FAST                7 (models)
+           1272 LOAD_CONST              29 (0)
+           1274 BINARY_SUBSCR
+           1278 LOAD_ATTR               36 (id)
+           1298 FORMAT_VALUE             0
+
+154        1300 BUILD_STRING             6
+           1302 CALL                     1
+           1310 POP_TOP
+
+156        1312 LOAD_FAST                7 (models)
+           1314 LOAD_CONST              29 (0)
+           1316 BINARY_SUBSCR
+           1320 LOAD_ATTR               36 (id)
+           1340 STORE_DEREF             10 (default_model)
+
+158     >> 1342 LOAD_GLOBAL             41 (NULL + ProviderSpec)
+
+159        1352 LOAD_FAST                1 (key)
+           1354 LOAD_GLOBAL              1 (NULL + str)
+           1364 LOAD_FAST                0 (raw)
+           1366 LOAD_ATTR                3 (NULL|self + get)
+           1386 LOAD_CONST              33 ('label')
+           1388 CALL                     1
+           1396 COPY                     1
+           1398 POP_JUMP_IF_TRUE         2 (to 1404)
+           1400 POP_TOP
+           1402 LOAD_FAST                1 (key)
+        >> 1404 CALL                     1
+           1412 LOAD_FAST                2 (dialect)
+           1414 LOAD_FAST                3 (base_url)
+
+160        1416 LOAD_FAST                4 (api_key_setting)
+           1418 LOAD_DEREF              10 (default_model)
+           1420 LOAD_FAST                7 (models)
+
+161        1422 LOAD_GLOBAL              1 (NULL + str)
+           1432 LOAD_FAST                0 (raw)
+           1434 LOAD_ATTR                3 (NULL|self + get)
+           1454 LOAD_CONST              34 ('cache_mode')
+           1456 CALL                     1
+           1464 COPY                     1
+           1466 POP_JUMP_IF_TRUE         2 (to 1472)
+           1468 POP_TOP
+           1470 LOAD_CONST              35 ('auto')
+        >> 1472 CALL                     1
+
+162        1480 LOAD_GLOBAL             43 (NULL + tuple)
+           1490 LOAD_CONST              36 (<code object <genexpr> at 0x7f6c92e4d730, file "app\adapters\llm_api\registry.py", line 162>)
+           1492 MAKE_FUNCTION            0
+           1494 LOAD_FAST                0 (raw)
+           1496 LOAD_ATTR                3 (NULL|self + get)
+           1516 LOAD_CONST              37 ('quirks')
+           1518 CALL                     1
+           1526 COPY                     1
+           1528 POP_JUMP_IF_TRUE         2 (to 1534)
+           1530 POP_TOP
+           1532 BUILD_LIST               0
+        >> 1534 GET_ITER
+           1536 CALL                     0
+           1544 CALL                     1
+
+163        1552 LOAD_GLOBAL              1 (NULL + str)
+           1562 LOAD_FAST                0 (raw)
+           1564 LOAD_ATTR                3 (NULL|self + get)
+           1584 LOAD_CONST              38 ('notes_vi')
+           1586 CALL                     1
+           1594 COPY                     1
+           1596 POP_JUMP_IF_TRUE         2 (to 1602)
+           1598 POP_TOP
+           1600 LOAD_CONST               2 ('')
+        >> 1602 CALL                     1
+           1610 LOAD_FAST                8 (cliff)
+
+158        1612 KW_NAMES                39 (('key', 'label', 'dialect', 'base_url', 'api_key_setting', 'default_model', 'models', 'cache_mode', 'quirks', 'notes_vi', 'price_cliff'))
+           1614 CALL                    11
+           1622 RETURN_VALUE
+        >> 1624 SWAP                     2
+           1626 POP_TOP
+
+134        1628 SWAP                     2
+           1630 STORE_FAST               6 (m)
+           1632 RERAISE                  0
+        >> 1634 PUSH_EXC_INFO
+
+149        1636 LOAD_GLOBAL             28 (KeyError)
+           1646 LOAD_GLOBAL             30 (TypeError)
+           1656 LOAD_GLOBAL             32 (ValueError)
+           1666 BUILD_TUPLE              3
+           1668 CHECK_EXC_MATCH
+           1670 POP_JUMP_IF_FALSE       29 (to 1730)
+           1672 POP_TOP
+
+150        1674 LOAD_GLOBAL             13 (NULL + log)
+           1684 LOAD_ATTR               34 (info)
+           1704 LOAD_CONST              26 ('[llm_api] provider ')
+           1706 LOAD_FAST                1 (key)
+           1708 FORMAT_VALUE             0
+           1710 LOAD_CONST              27 (': price_cliff sai định dạng → bỏ qua')
+           1712 BUILD_STRING             3
+           1714 CALL                     1
+           1722 POP_TOP
+           1724 POP_EXCEPT
+           1726 EXTENDED_ARG             1
+           1728 JUMP_BACKWARD          333 (to 1064)
+
+149     >> 1730 RERAISE                  0
+        >> 1732 COPY                     3
+           1734 POP_EXCEPT
+           1736 RERAISE                  1
+ExceptionTable:
+  684 to 696 -> 1624 [2]
+  700 to 706 -> 1624 [2]
+  912 to 1062 -> 1634 [0]
+  1634 to 1722 -> 1732 [1] lasti
+  1730 to 1730 -> 1732 [1] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c92e4fb30, file "app\adapters\llm_api\registry.py", line 134>:
+134           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                15 (to 42)
+             12 STORE_FAST               1 (x)
+             14 LOAD_GLOBAL              1 (NULL + _parse_model)
+             24 LOAD_FAST                1 (x)
+             26 CALL                     1
+             34 YIELD_VALUE              1
+             36 RESUME                   1
+             38 POP_TOP
+             40 JUMP_BACKWARD           17 (to 8)
+        >>   42 END_FOR
+             44 RETURN_CONST             0 (None)
+        >>   46 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             48 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 46 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c92e4d630, file "app\adapters\llm_api\registry.py", line 153>:
+              0 COPY_FREE_VARS           1
+
+153           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                19 (to 52)
+             14 STORE_FAST               1 (m)
+             16 LOAD_FAST                1 (m)
+             18 LOAD_ATTR                0 (id)
+             38 LOAD_DEREF               2 (default_model)
+             40 COMPARE_OP              40 (==)
+             44 YIELD_VALUE              1
+             46 RESUME                   1
+             48 POP_TOP
+             50 JUMP_BACKWARD           21 (to 10)
+        >>   52 END_FOR
+             54 RETURN_CONST             0 (None)
+        >>   56 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             58 RERAISE                  1
+ExceptionTable:
+  6 to 54 -> 56 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c92e4d730, file "app\adapters\llm_api\registry.py", line 162>:
+162           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                15 (to 42)
+             12 STORE_FAST               1 (q)
+             14 LOAD_GLOBAL              1 (NULL + str)
+             24 LOAD_FAST                1 (q)
+             26 CALL                     1
+             34 YIELD_VALUE              1
+             36 RESUME                   1
+             38 POP_TOP
+             40 JUMP_BACKWARD           17 (to 8)
+        >>   42 END_FOR
+             44 RETURN_CONST             0 (None)
+        >>   46 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             48 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 46 [0] lasti
+
+Disassembly of <code object clear_cache at 0x7f6c92a35890, file "app\adapters\llm_api\registry.py", line 194>:
+194           0 RESUME                   0
+
+196           2 LOAD_CONST               0 (None)
+              4 STORE_GLOBAL             0 (_cache)
+              6 RETURN_CONST             0 (None)
+
+Disassembly of <code object load_catalog at 0x29096e60, file "app\adapters\llm_api\registry.py", line 199>:
+199           0 RESUME                   0
+
+206           2 LOAD_GLOBAL              0 (_cache)
+             12 POP_JUMP_IF_NONE         6 (to 26)
+
+207          14 LOAD_GLOBAL              0 (_cache)
+             24 RETURN_VALUE
+
+209     >>   26 BUILD_LIST               0
+             28 STORE_FAST               0 (raw_providers)
+
+210          30 NOP
+
+211          32 LOAD_GLOBAL              3 (NULL + json)
+             42 LOAD_ATTR                4 (loads)
+             62 LOAD_GLOBAL              6 (_CATALOG_PATH)
+             72 LOAD_ATTR                9 (NULL|self + read_text)
+             92 LOAD_CONST               2 ('utf-8')
+             94 KW_NAMES                 3 (('encoding',))
+             96 CALL                     1
+            104 CALL                     1
+            112 STORE_FAST               1 (data)
+
+212         114 LOAD_FAST                1 (data)
+            116 LOAD_ATTR               11 (NULL|self + get)
+            136 LOAD_CONST               4 ('providers')
+            138 CALL                     1
+            146 COPY                     1
+            148 POP_JUMP_IF_TRUE         2 (to 154)
+            150 POP_TOP
+            152 BUILD_LIST               0
+        >>  154 STORE_FAST               0 (raw_providers)
+
+213         156 LOAD_GLOBAL             13 (NULL + isinstance)
+            166 LOAD_FAST                0 (raw_providers)
+            168 LOAD_GLOBAL             14 (list)
+            178 CALL                     2
+            186 POP_JUMP_IF_TRUE        11 (to 210)
+
+214         188 LOAD_GLOBAL             17 (NULL + ValueError)
+            198 LOAD_CONST               5 ("'providers' không phải danh sách")
+            200 CALL                     1
+            208 RAISE_VARARGS            1
+
+213     >>  210 NOP
+
+219     >>  212 LOAD_CONST               9 (<code object <genexpr> at 0x7f6c9327da10, file "app\adapters\llm_api\registry.py", line 219>)
+            214 MAKE_FUNCTION            0
+            216 LOAD_FAST                0 (raw_providers)
+            218 GET_ITER
+            220 CALL                     0
+            228 GET_ITER
+            230 LOAD_FAST_AND_CLEAR      3 (p)
+            232 SWAP                     2
+            234 BUILD_LIST               0
+            236 SWAP                     2
+        >>  238 FOR_ITER                 7 (to 256)
+            242 STORE_FAST               3 (p)
+            244 LOAD_FAST                3 (p)
+            246 POP_JUMP_IF_TRUE         1 (to 250)
+            248 JUMP_BACKWARD            6 (to 238)
+        >>  250 LOAD_FAST                3 (p)
+            252 LIST_APPEND              2
+            254 JUMP_BACKWARD            9 (to 238)
+        >>  256 END_FOR
+            258 STORE_FAST               4 (parsed)
+            260 STORE_FAST               3 (p)
+
+220         262 LOAD_FAST                4 (parsed)
+            264 POP_JUMP_IF_TRUE        29 (to 324)
+
+221         266 LOAD_CONST              10 (<code object <genexpr> at 0x7f6c92e4d830, file "app\adapters\llm_api\registry.py", line 221>)
+            268 MAKE_FUNCTION            0
+            270 LOAD_GLOBAL             26 (_BUILTIN)
+            280 GET_ITER
+            282 CALL                     0
+            290 GET_ITER
+            292 LOAD_FAST_AND_CLEAR      3 (p)
+            294 SWAP                     2
+            296 BUILD_LIST               0
+            298 SWAP                     2
+        >>  300 FOR_ITER                 7 (to 318)
+            304 STORE_FAST               3 (p)
+            306 LOAD_FAST                3 (p)
+            308 POP_JUMP_IF_TRUE         1 (to 312)
+            310 JUMP_BACKWARD            6 (to 300)
+        >>  312 LOAD_FAST                3 (p)
+            314 LIST_APPEND              2
+            316 JUMP_BACKWARD            9 (to 300)
+        >>  318 END_FOR
+            320 STORE_FAST               4 (parsed)
+            322 STORE_FAST               3 (p)
+
+223     >>  324 LOAD_FAST                4 (parsed)
+            326 STORE_GLOBAL             0 (_cache)
+
+224         328 LOAD_GLOBAL              0 (_cache)
+            338 RETURN_VALUE
+        >>  340 PUSH_EXC_INFO
+
+215         342 LOAD_GLOBAL             18 (OSError)
+            352 LOAD_GLOBAL             16 (ValueError)
+            362 BUILD_TUPLE              2
+            364 CHECK_EXC_MATCH
+            366 POP_JUMP_IF_FALSE       54 (to 476)
+            368 STORE_FAST               2 (exc)
+
+216         370 LOAD_GLOBAL             21 (NULL + log)
+            380 LOAD_ATTR               22 (warning)
+            400 LOAD_CONST               6 ('[llm_api] không đọc được ')
+            402 LOAD_GLOBAL              6 (_CATALOG_PATH)
+            412 LOAD_ATTR               24 (name)
+            432 FORMAT_VALUE             0
+            434 LOAD_CONST               7 (' (')
+            436 LOAD_FAST                2 (exc)
+            438 FORMAT_VALUE             0
+            440 LOAD_CONST               8 (') → dùng catalog nhúng')
+            442 BUILD_STRING             5
+            444 CALL                     1
+            452 POP_TOP
+
+217         454 BUILD_LIST               0
+            456 STORE_FAST               0 (raw_providers)
+            458 POP_EXCEPT
+            460 LOAD_CONST               1 (None)
+            462 STORE_FAST               2 (exc)
+            464 DELETE_FAST              2 (exc)
+            466 JUMP_BACKWARD          128 (to 212)
+        >>  468 LOAD_CONST               1 (None)
+            470 STORE_FAST               2 (exc)
+            472 DELETE_FAST              2 (exc)
+            474 RERAISE                  1
+
+215     >>  476 RERAISE                  0
+        >>  478 COPY                     3
+            480 POP_EXCEPT
+            482 RERAISE                  1
+        >>  484 SWAP                     2
+            486 POP_TOP
+
+219         488 SWAP                     2
+            490 STORE_FAST               3 (p)
+            492 RERAISE                  0
+        >>  494 SWAP                     2
+            496 POP_TOP
+
+221         498 SWAP                     2
+            500 STORE_FAST               3 (p)
+            502 RERAISE                  0
+ExceptionTable:
+  32 to 208 -> 340 [0]
+  234 to 246 -> 484 [2]
+  250 to 256 -> 484 [2]
+  296 to 308 -> 494 [2]
+  312 to 318 -> 494 [2]
+  340 to 368 -> 478 [1] lasti
+  370 to 456 -> 468 [1] lasti
+  468 to 476 -> 478 [1] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c9327da10, file "app\adapters\llm_api\registry.py", line 219>:
+219           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                32 (to 76)
+             12 STORE_FAST               1 (x)
+             14 LOAD_GLOBAL              1 (NULL + isinstance)
+             24 LOAD_FAST                1 (x)
+             26 LOAD_GLOBAL              2 (dict)
+             36 CALL                     2
+             44 POP_JUMP_IF_TRUE         1 (to 48)
+             46 JUMP_BACKWARD           20 (to 8)
+        >>   48 LOAD_GLOBAL              5 (NULL + _parse_provider)
+             58 LOAD_FAST                1 (x)
+             60 CALL                     1
+             68 YIELD_VALUE              1
+             70 RESUME                   1
+             72 POP_TOP
+             74 JUMP_BACKWARD           34 (to 8)
+        >>   76 END_FOR
+             78 RETURN_CONST             0 (None)
+        >>   80 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             82 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 80 [0] lasti
+  48 to 78 -> 80 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c92e4d830, file "app\adapters\llm_api\registry.py", line 221>:
+221           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                15 (to 42)
+             12 STORE_FAST               1 (x)
+             14 LOAD_GLOBAL              1 (NULL + _parse_provider)
+             24 LOAD_FAST                1 (x)
+             26 CALL                     1
+             34 YIELD_VALUE              1
+             36 RESUME                   1
+             38 POP_TOP
+             40 JUMP_BACKWARD           17 (to 8)
+        >>   42 END_FOR
+             44 RETURN_CONST             0 (None)
+        >>   46 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             48 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 46 [0] lasti
+
+Disassembly of <code object endpoint_to_provider at 0x26838120, file "app\adapters\llm_api\registry.py", line 229>:
+              0 MAKE_CELL                3 (default_model)
+
+229           2 RESUME                   0
+
+235           4 LOAD_CONST               1 (<code object <genexpr> at 0x7f6c92e4d930, file "app\adapters\llm_api\registry.py", line 235>)
+              6 MAKE_FUNCTION            0
+              8 LOAD_FAST                0 (row)
+             10 LOAD_ATTR                1 (NULL|self + get)
+             30 LOAD_CONST               2 ('models')
+             32 CALL                     1
+             40 COPY                     1
+             42 POP_JUMP_IF_TRUE         2 (to 48)
+             44 POP_TOP
+             46 BUILD_LIST               0
+        >>   48 GET_ITER
+             50 CALL                     0
+             58 GET_ITER
+             60 LOAD_FAST_AND_CLEAR      1 (m)
+             62 SWAP                     2
+             64 BUILD_LIST               0
+             66 SWAP                     2
+        >>   68 FOR_ITER                 7 (to 86)
+             72 STORE_FAST               1 (m)
+             74 LOAD_FAST                1 (m)
+             76 POP_JUMP_IF_TRUE         1 (to 80)
+             78 JUMP_BACKWARD            6 (to 68)
+        >>   80 LOAD_FAST                1 (m)
+             82 LIST_APPEND              2
+             84 JUMP_BACKWARD            9 (to 68)
+        >>   86 END_FOR
+             88 STORE_FAST               2 (models)
+             90 STORE_FAST               1 (m)
+
+236          92 LOAD_FAST                2 (models)
+             94 POP_JUMP_IF_TRUE        41 (to 178)
+
+237          96 LOAD_GLOBAL              3 (NULL + log)
+            106 LOAD_ATTR                4 (warning)
+            126 LOAD_CONST               3 ('[llm_api] endpoint ')
+            128 LOAD_FAST                0 (row)
+            130 LOAD_ATTR                1 (NULL|self + get)
+            150 LOAD_CONST               4 ('id')
+            152 CALL                     1
+            160 FORMAT_VALUE             2 (repr)
+            162 LOAD_CONST               5 (' không có model hợp lệ → bỏ qua')
+            164 BUILD_STRING             3
+            166 CALL                     1
+            174 POP_TOP
+
+238         176 RETURN_CONST             6 (None)
+
+239     >>  178 LOAD_GLOBAL              7 (NULL + str)
+            188 LOAD_FAST                0 (row)
+            190 LOAD_ATTR                1 (NULL|self + get)
+            210 LOAD_CONST               7 ('default_model')
+            212 CALL                     1
+            220 COPY                     1
+            222 POP_JUMP_IF_TRUE         2 (to 228)
+            224 POP_TOP
+            226 LOAD_CONST               8 ('')
+        >>  228 CALL                     1
+            236 LOAD_ATTR                9 (NULL|self + strip)
+            256 CALL                     0
+            264 COPY                     1
+            266 POP_JUMP_IF_TRUE        15 (to 298)
+            268 POP_TOP
+            270 LOAD_FAST                2 (models)
+            272 LOAD_CONST               9 (0)
+            274 BINARY_SUBSCR
+            278 LOAD_ATTR               10 (id)
+        >>  298 STORE_DEREF              3 (default_model)
+
+240         300 LOAD_GLOBAL             13 (NULL + any)
+            310 LOAD_CLOSURE             3 (default_model)
+            312 BUILD_TUPLE              1
+            314 LOAD_CONST              10 (<code object <genexpr> at 0x7f6c92e4cd30, file "app\adapters\llm_api\registry.py", line 240>)
+            316 MAKE_FUNCTION            8 (closure)
+            318 LOAD_FAST                2 (models)
+            320 GET_ITER
+            322 CALL                     0
+            330 CALL                     1
+            338 POP_JUMP_IF_TRUE        15 (to 370)
+
+241         340 LOAD_FAST                2 (models)
+            342 LOAD_CONST               9 (0)
+            344 BINARY_SUBSCR
+            348 LOAD_ATTR               10 (id)
+            368 STORE_DEREF              3 (default_model)
+
+242     >>  370 LOAD_GLOBAL             15 (NULL + ProviderSpec)
+
+243         380 LOAD_GLOBAL             16 (ENDPOINT_PREFIX)
+            390 FORMAT_VALUE             0
+            392 LOAD_FAST                0 (row)
+            394 LOAD_CONST               4 ('id')
+            396 BINARY_SUBSCR
+            400 FORMAT_VALUE             0
+            402 BUILD_STRING             2
+
+244         404 LOAD_GLOBAL              7 (NULL + str)
+            414 LOAD_FAST                0 (row)
+            416 LOAD_ATTR                1 (NULL|self + get)
+            436 LOAD_CONST              11 ('name')
+            438 CALL                     1
+            446 COPY                     1
+            448 POP_JUMP_IF_TRUE         5 (to 460)
+            450 POP_TOP
+            452 LOAD_FAST                0 (row)
+            454 LOAD_CONST               4 ('id')
+            456 BINARY_SUBSCR
+        >>  460 CALL                     1
+
+245         468 LOAD_GLOBAL              7 (NULL + str)
+            478 LOAD_FAST                0 (row)
+            480 LOAD_ATTR                1 (NULL|self + get)
+            500 LOAD_CONST              12 ('dialect')
+            502 CALL                     1
+            510 COPY                     1
+            512 POP_JUMP_IF_TRUE         2 (to 518)
+            514 POP_TOP
+            516 LOAD_CONST              13 ('openai_chat')
+        >>  518 CALL                     1
+
+246         526 LOAD_GLOBAL              7 (NULL + str)
+            536 LOAD_FAST                0 (row)
+            538 LOAD_ATTR                1 (NULL|self + get)
+            558 LOAD_CONST              14 ('base_url')
+            560 CALL                     1
+            568 COPY                     1
+            570 POP_JUMP_IF_TRUE         2 (to 576)
+            572 POP_TOP
+            574 LOAD_CONST               8 ('')
+        >>  576 CALL                     1
+
+247         584 LOAD_CONST               8 ('')
+
+248         586 LOAD_DEREF               3 (default_model)
+
+249         588 LOAD_FAST                2 (models)
+
+250         590 LOAD_CONST               8 ('')
+
+251         592 LOAD_GLOBAL              7 (NULL + str)
+            602 LOAD_FAST                0 (row)
+            604 LOAD_CONST               4 ('id')
+            606 BINARY_SUBSCR
+            610 CALL                     1
+
+252         618 LOAD_GLOBAL             19 (NULL + float)
+            628 LOAD_FAST                0 (row)
+            630 LOAD_ATTR                1 (NULL|self + get)
+            650 LOAD_CONST              15 ('timeout_s')
+            652 CALL                     1
+            660 COPY                     1
+            662 POP_JUMP_IF_TRUE         2 (to 668)
+            664 POP_TOP
+            666 LOAD_CONST              16 (300)
+        >>  668 CALL                     1
+
+242         676 KW_NAMES                17 (('key', 'label', 'dialect', 'base_url', 'api_key_setting', 'default_model', 'models', 'notes_vi', 'endpoint_id', 'timeout_s'))
+            678 CALL                    10
+            686 RETURN_VALUE
+        >>  688 SWAP                     2
+            690 POP_TOP
+
+235         692 SWAP                     2
+            694 STORE_FAST               1 (m)
+            696 RERAISE                  0
+ExceptionTable:
+  64 to 76 -> 688 [2]
+  80 to 86 -> 688 [2]
+
+Disassembly of <code object <genexpr> at 0x7f6c92e4d930, file "app\adapters\llm_api\registry.py", line 235>:
+235           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                15 (to 42)
+             12 STORE_FAST               1 (x)
+             14 LOAD_GLOBAL              1 (NULL + _parse_model)
+             24 LOAD_FAST                1 (x)
+             26 CALL                     1
+             34 YIELD_VALUE              1
+             36 RESUME                   1
+             38 POP_TOP
+             40 JUMP_BACKWARD           17 (to 8)
+        >>   42 END_FOR
+             44 RETURN_CONST             0 (None)
+        >>   46 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             48 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 46 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c92e4cd30, file "app\adapters\llm_api\registry.py", line 240>:
+              0 COPY_FREE_VARS           1
+
+240           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                19 (to 52)
+             14 STORE_FAST               1 (m)
+             16 LOAD_FAST                1 (m)
+             18 LOAD_ATTR                0 (id)
+             38 LOAD_DEREF               2 (default_model)
+             40 COMPARE_OP              40 (==)
+             44 YIELD_VALUE              1
+             46 RESUME                   1
+             48 POP_TOP
+             50 JUMP_BACKWARD           21 (to 10)
+        >>   52 END_FOR
+             54 RETURN_CONST             0 (None)
+        >>   56 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             58 RERAISE                  1
+ExceptionTable:
+  6 to 54 -> 56 [0] lasti
+
+Disassembly of <code object list_endpoint_providers at 0x7f6c933ad890, file "app\adapters\llm_api\registry.py", line 256>:
+256           0 RESUME                   0
+
+261           2 NOP
+
+262           4 LOAD_CONST               1 (0)
+              6 LOAD_CONST               2 (('llm_endpoint_store',))
+              8 IMPORT_NAME              0 (app.services)
+             10 IMPORT_FROM              1 (llm_endpoint_store)
+             12 STORE_FAST               1 (llm_endpoint_store)
+             14 POP_TOP
+
+264          16 LOAD_FAST                1 (llm_endpoint_store)
+             18 LOAD_ATTR                5 (NULL|self + list_public)
+             38 LOAD_FAST                0 (enabled_only)
+             40 KW_NAMES                 3 (('enabled_only',))
+             42 CALL                     1
+             50 STORE_FAST               2 (rows)
+
+268          52 LOAD_CONST               7 (<code object <genexpr> at 0x7f6c92e4ce30, file "app\adapters\llm_api\registry.py", line 268>)
+             54 MAKE_FUNCTION            0
+             56 LOAD_FAST                2 (rows)
+             58 GET_ITER
+             60 CALL                     0
+             68 GET_ITER
+             70 LOAD_FAST_AND_CLEAR      4 (p)
+             72 SWAP                     2
+             74 BUILD_LIST               0
+             76 SWAP                     2
+        >>   78 FOR_ITER                 7 (to 96)
+             82 STORE_FAST               4 (p)
+             84 LOAD_FAST                4 (p)
+             86 POP_JUMP_IF_TRUE         1 (to 90)
+             88 JUMP_BACKWARD            6 (to 78)
+        >>   90 LOAD_FAST                4 (p)
+             92 LIST_APPEND              2
+             94 JUMP_BACKWARD            9 (to 78)
+        >>   96 END_FOR
+             98 SWAP                     2
+            100 STORE_FAST               4 (p)
+            102 RETURN_VALUE
+        >>  104 PUSH_EXC_INFO
+
+265         106 LOAD_GLOBAL              6 (Exception)
+            116 CHECK_EXC_MATCH
+            118 POP_JUMP_IF_FALSE       37 (to 194)
+            120 STORE_FAST               3 (exc)
+
+266         122 LOAD_GLOBAL              9 (NULL + log)
+            132 LOAD_ATTR               10 (warning)
+            152 LOAD_CONST               4 ('[llm_api] không đọc được bảng llm_endpoints (')
+            154 LOAD_FAST                3 (exc)
+            156 FORMAT_VALUE             0
+            158 LOAD_CONST               5 (') → bỏ qua endpoint tự thêm')
+            160 BUILD_STRING             3
+            162 CALL                     1
+            170 POP_TOP
+
+267         172 BUILD_LIST               0
+            174 SWAP                     2
+            176 POP_EXCEPT
+            178 LOAD_CONST               6 (None)
+            180 STORE_FAST               3 (exc)
+            182 DELETE_FAST              3 (exc)
+            184 RETURN_VALUE
+        >>  186 LOAD_CONST               6 (None)
+            188 STORE_FAST               3 (exc)
+            190 DELETE_FAST              3 (exc)
+            192 RERAISE                  1
+
+265     >>  194 RERAISE                  0
+        >>  196 COPY                     3
+            198 POP_EXCEPT
+            200 RERAISE                  1
+        >>  202 SWAP                     2
+            204 POP_TOP
+
+268         206 SWAP                     2
+            208 STORE_FAST               4 (p)
+            210 RERAISE                  0
+ExceptionTable:
+  4 to 50 -> 104 [0]
+  74 to 86 -> 202 [2]
+  90 to 96 -> 202 [2]
+  104 to 120 -> 196 [1] lasti
+  122 to 172 -> 186 [1] lasti
+  174 to 174 -> 196 [1] lasti
+  186 to 194 -> 196 [1] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c92e4ce30, file "app\adapters\llm_api\registry.py", line 268>:
+268           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                15 (to 42)
+             12 STORE_FAST               1 (r)
+             14 LOAD_GLOBAL              1 (NULL + endpoint_to_provider)
+             24 LOAD_FAST                1 (r)
+             26 CALL                     1
+             34 YIELD_VALUE              1
+             36 RESUME                   1
+             38 POP_TOP
+             40 JUMP_BACKWARD           17 (to 8)
+        >>   42 END_FOR
+             44 RETURN_CONST             0 (None)
+        >>   46 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             48 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 46 [0] lasti
+
+Disassembly of <code object list_providers at 0x7f6c93249cb0, file "app\adapters\llm_api\registry.py", line 271>:
+271           0 RESUME                   0
+
+273           2 LOAD_GLOBAL              1 (NULL + list)
+             12 LOAD_GLOBAL              3 (NULL + load_catalog)
+             22 CALL                     0
+             30 CALL                     1
+             38 STORE_FAST               1 (out)
+
+274          40 LOAD_FAST                0 (include_endpoints)
+             42 POP_JUMP_IF_FALSE       25 (to 94)
+
+275          44 LOAD_FAST                1 (out)
+             46 LOAD_ATTR                5 (NULL|self + extend)
+             66 LOAD_GLOBAL              7 (NULL + list_endpoint_providers)
+             76 CALL                     0
+             84 CALL                     1
+             92 POP_TOP
+
+276     >>   94 LOAD_FAST                1 (out)
+             96 RETURN_VALUE
+
+Disassembly of <code object get_provider at 0x269d4610, file "app\adapters\llm_api\registry.py", line 279>:
+279           0 RESUME                   0
+
+280           2 LOAD_FAST                0 (key)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 LOAD_CONST               1 ('')
+        >>   12 LOAD_ATTR                1 (NULL|self + strip)
+             32 CALL                     0
+             40 STORE_FAST               1 (wanted)
+
+281          42 LOAD_FAST                1 (wanted)
+             44 LOAD_ATTR                3 (NULL|self + startswith)
+             64 LOAD_GLOBAL              4 (ENDPOINT_PREFIX)
+             74 CALL                     1
+             82 POP_JUMP_IF_FALSE       87 (to 258)
+
+282          84 LOAD_FAST                1 (wanted)
+             86 LOAD_GLOBAL              7 (NULL + len)
+             96 LOAD_GLOBAL              4 (ENDPOINT_PREFIX)
+            106 CALL                     1
+            114 LOAD_CONST               0 (None)
+            116 BINARY_SLICE
+            118 LOAD_ATTR                1 (NULL|self + strip)
+            138 CALL                     0
+            146 STORE_FAST               2 (endpoint_id)
+
+283         148 NOP
+
+284         150 LOAD_CONST               2 (0)
+            152 LOAD_CONST               3 (('llm_endpoint_store',))
+            154 IMPORT_NAME              4 (app.services)
+            156 IMPORT_FROM              5 (llm_endpoint_store)
+            158 STORE_FAST               3 (llm_endpoint_store)
+            160 POP_TOP
+
+286         162 LOAD_FAST                3 (llm_endpoint_store)
+            164 LOAD_ATTR               13 (NULL|self + get)
+            184 LOAD_FAST                2 (endpoint_id)
+            186 CALL                     1
+            194 STORE_FAST               4 (row)
+
+290         196 LOAD_FAST                4 (row)
+            198 POP_JUMP_IF_NONE        17 (to 234)
+            200 LOAD_FAST                4 (row)
+            202 LOAD_ATTR               13 (NULL|self + get)
+            222 LOAD_CONST               6 ('enabled')
+            224 CALL                     1
+            232 POP_JUMP_IF_TRUE         1 (to 236)
+
+291     >>  234 RETURN_CONST             0 (None)
+
+292     >>  236 LOAD_GLOBAL             21 (NULL + endpoint_to_provider)
+            246 LOAD_FAST                4 (row)
+            248 CALL                     1
+            256 RETURN_VALUE
+
+294     >>  258 LOAD_FAST                1 (wanted)
+            260 LOAD_ATTR               23 (NULL|self + lower)
+            280 CALL                     0
+            288 STORE_FAST               6 (lowered)
+
+295         290 LOAD_GLOBAL             25 (NULL + load_catalog)
+            300 CALL                     0
+            308 GET_ITER
+        >>  310 FOR_ITER                35 (to 384)
+            314 STORE_FAST               7 (prov)
+
+296         316 LOAD_FAST                7 (prov)
+            318 LOAD_ATTR               26 (key)
+            338 LOAD_ATTR               23 (NULL|self + lower)
+            358 CALL                     0
+            366 LOAD_FAST                6 (lowered)
+            368 COMPARE_OP              40 (==)
+            372 POP_JUMP_IF_TRUE         1 (to 376)
+            374 JUMP_BACKWARD           33 (to 310)
+
+297     >>  376 LOAD_FAST                7 (prov)
+            378 SWAP                     2
+            380 POP_TOP
+            382 RETURN_VALUE
+
+295     >>  384 END_FOR
+
+298         386 RETURN_CONST             0 (None)
+        >>  388 PUSH_EXC_INFO
+
+287         390 LOAD_GLOBAL             14 (Exception)
+            400 CHECK_EXC_MATCH
+            402 POP_JUMP_IF_FALSE       37 (to 478)
+            404 STORE_FAST               5 (exc)
+
+288         406 LOAD_GLOBAL             17 (NULL + log)
+            416 LOAD_ATTR               18 (warning)
+            436 LOAD_CONST               4 ('[llm_api] không đọc được endpoint ')
+            438 LOAD_FAST                2 (endpoint_id)
+            440 FORMAT_VALUE             2 (repr)
+            442 LOAD_CONST               5 (': ')
+            444 LOAD_FAST                5 (exc)
+            446 FORMAT_VALUE             0
+            448 BUILD_STRING             4
+            450 CALL                     1
+            458 POP_TOP
+
+289         460 POP_EXCEPT
+            462 LOAD_CONST               0 (None)
+            464 STORE_FAST               5 (exc)
+            466 DELETE_FAST              5 (exc)
+            468 RETURN_CONST             0 (None)
+        >>  470 LOAD_CONST               0 (None)
+            472 STORE_FAST               5 (exc)
+            474 DELETE_FAST              5 (exc)
+            476 RERAISE                  1
+
+287     >>  478 RERAISE                  0
+        >>  480 COPY                     3
+            482 POP_EXCEPT
+            484 RERAISE                  1
+ExceptionTable:
+  150 to 194 -> 388 [0]
+  388 to 404 -> 480 [1] lasti
+  406 to 458 -> 470 [1] lasti
+  470 to 478 -> 480 [1] lasti

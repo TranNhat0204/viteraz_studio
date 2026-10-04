@@ -1,0 +1,911 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Step assemble — dựng VIDEO HÌNH (source.mp4) từ asset các scene cho video AI Studio.\n\nAI Studio không tải nguồn: bước này DỰNG source.mp4 từ timeline hình rồi render thẳng 1 bản preview\n(burn phụ đề + lồng tiếng) để xem ngay trong Studio. Logic bake tách sang app/render/visual_bake để\nExport/Render-preview tái dùng — và để hỗ trợ EDIT kéo-thả clip kiểu Premiere (config.visual_timeline,\nnon-destructive). source.mp4 ở đây CHỈ là bản preview cho Studio; Export mới bake lại theo timeline\nđã chỉnh + render bản cuối. Xem plan §6.4 + [[video-studio-nle-timeline-plan]].\n')
+              4 STORE_NAME               0 (__doc__)
+
+  9           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 11          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (json)
+             24 STORE_NAME               3 (json)
+
+ 13          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               4 (('make_error', 'E'))
+             30 IMPORT_NAME              4 (app.core.errors)
+             32 IMPORT_FROM              5 (make_error)
+             34 STORE_NAME               5 (make_error)
+             36 IMPORT_FROM              6 (E)
+             38 STORE_NAME               6 (E)
+             40 POP_TOP
+
+ 14          42 LOAD_CONST               1 (0)
+             44 LOAD_CONST               5 (('ProjectFS',))
+             46 IMPORT_NAME              7 (app.core.fs)
+             48 IMPORT_FROM              8 (ProjectFS)
+             50 STORE_NAME               8 (ProjectFS)
+             52 POP_TOP
+
+ 15          54 LOAD_CONST               1 (0)
+             56 LOAD_CONST               6 (('BaseStep', 'StepContext'))
+             58 IMPORT_NAME              9 (app.pipeline.base)
+             60 IMPORT_FROM             10 (BaseStep)
+             62 STORE_NAME              10 (BaseStep)
+             64 IMPORT_FROM             11 (StepContext)
+             66 STORE_NAME              11 (StepContext)
+             68 POP_TOP
+
+ 16          70 LOAD_CONST               1 (0)
+             72 LOAD_CONST               7 (('visual_bake',))
+             74 IMPORT_NAME             12 (app.render)
+             76 IMPORT_FROM             13 (visual_bake)
+             78 STORE_NAME              13 (visual_bake)
+             80 POP_TOP
+
+ 19          82 LOAD_CONST              11 (('video_id', 'str', 'return', 'list[int]'))
+             84 LOAD_CONST               8 (<code object _assert_buildable at 0x26a1aa40, file "app\pipeline\steps\assemble.py", line 19>)
+             86 MAKE_FUNCTION            4 (annotations)
+             88 STORE_NAME              14 (_assert_buildable)
+
+ 59          90 PUSH_NULL
+             92 LOAD_BUILD_CLASS
+             94 LOAD_CONST               9 (<code object AssembleStep at 0x7f6c92eebb40, file "app\pipeline\steps\assemble.py", line 59>)
+             96 MAKE_FUNCTION            0
+             98 LOAD_CONST              10 ('AssembleStep')
+            100 LOAD_NAME               10 (BaseStep)
+            102 CALL                     3
+            110 STORE_NAME              15 (AssembleStep)
+            112 RETURN_CONST             3 (None)
+
+Disassembly of <code object _assert_buildable at 0x26a1aa40, file "app\pipeline\steps\assemble.py", line 19>:
+ 19           0 RESUME                   0
+
+ 26           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('SessionLocal',))
+              6 IMPORT_NAME              0 (app.db.session)
+              8 IMPORT_FROM              1 (SessionLocal)
+             10 STORE_FAST               1 (SessionLocal)
+             12 POP_TOP
+
+ 27          14 LOAD_CONST               1 (0)
+             16 LOAD_CONST               3 (('ContentPlan',))
+             18 IMPORT_NAME              2 (app.db.models)
+             20 IMPORT_FROM              3 (ContentPlan)
+             22 STORE_FAST               2 (ContentPlan)
+             24 POP_TOP
+
+ 28          26 PUSH_NULL
+             28 LOAD_FAST                1 (SessionLocal)
+             30 CALL                     0
+             38 BEFORE_WITH
+             40 STORE_FAST               3 (db)
+
+ 29          42 LOAD_FAST                3 (db)
+             44 LOAD_ATTR                9 (NULL|self + query)
+             64 LOAD_FAST                2 (ContentPlan)
+             66 CALL                     1
+             74 LOAD_ATTR               11 (NULL|self + filter)
+             94 LOAD_FAST                2 (ContentPlan)
+             96 LOAD_ATTR               12 (video_id)
+            116 LOAD_FAST                0 (video_id)
+            118 COMPARE_OP              40 (==)
+            122 CALL                     1
+            130 LOAD_ATTR               15 (NULL|self + first)
+            150 CALL                     0
+            158 STORE_FAST               4 (plan)
+
+ 30         160 BUILD_LIST               0
+            162 STORE_FAST               5 (scenes)
+
+ 31         164 LOAD_FAST                4 (plan)
+            166 POP_JUMP_IF_FALSE       44 (to 256)
+            168 LOAD_FAST                4 (plan)
+            170 LOAD_ATTR               16 (scenes_json)
+            190 POP_JUMP_IF_FALSE       32 (to 256)
+
+ 32         192 NOP
+
+ 33         194 LOAD_GLOBAL             19 (NULL + json)
+            204 LOAD_ATTR               20 (loads)
+            224 LOAD_FAST                4 (plan)
+            226 LOAD_ATTR               16 (scenes_json)
+            246 CALL                     1
+            254 STORE_FAST               5 (scenes)
+
+ 28     >>  256 LOAD_CONST               4 (None)
+            258 LOAD_CONST               4 (None)
+            260 LOAD_CONST               4 (None)
+            262 CALL                     2
+            270 POP_TOP
+
+ 36     >>  272 LOAD_FAST_CHECK          5 (scenes)
+            274 POP_JUMP_IF_TRUE         2 (to 280)
+
+ 37         276 BUILD_LIST               0
+            278 RETURN_VALUE
+
+ 38     >>  280 BUILD_LIST               0
+            282 STORE_FAST               6 (missing)
+
+ 39         284 BUILD_LIST               0
+            286 STORE_FAST               7 (stills)
+
+ 40         288 LOAD_GLOBAL             25 (NULL + enumerate)
+            298 LOAD_FAST                5 (scenes)
+            300 CALL                     1
+            308 GET_ITER
+        >>  310 FOR_ITER               141 (to 596)
+            314 UNPACK_SEQUENCE          2
+            318 STORE_FAST               8 (k)
+            320 STORE_FAST               9 (s)
+
+ 41         322 LOAD_FAST                9 (s)
+            324 LOAD_ATTR               27 (NULL|self + get)
+            344 LOAD_CONST               5 ('render_skip')
+            346 CALL                     1
+            354 POP_JUMP_IF_FALSE        1 (to 358)
+
+ 42         356 JUMP_BACKWARD           24 (to 310)
+
+ 43     >>  358 LOAD_GLOBAL             29 (NULL + int)
+            368 LOAD_FAST                9 (s)
+            370 LOAD_ATTR               27 (NULL|self + get)
+            390 LOAD_CONST               6 ('seq')
+            392 LOAD_FAST                8 (k)
+            394 LOAD_CONST               7 (1)
+            396 BINARY_OP                0 (+)
+            400 CALL                     2
+            408 CALL                     1
+            416 STORE_FAST              10 (seq)
+
+ 44         418 LOAD_GLOBAL             31 (NULL + visual_bake)
+            428 LOAD_ATTR               32 (buildable_asset)
+            448 LOAD_FAST                9 (s)
+            450 CALL                     1
+            458 STORE_FAST              11 (got)
+
+ 45         460 LOAD_FAST               11 (got)
+            462 POP_JUMP_IF_NOT_NONE    18 (to 500)
+
+ 46         464 LOAD_FAST                6 (missing)
+            466 LOAD_ATTR               35 (NULL|self + append)
+            486 LOAD_FAST               10 (seq)
+            488 CALL                     1
+            496 POP_TOP
+            498 JUMP_BACKWARD           95 (to 310)
+
+ 47     >>  500 LOAD_FAST                9 (s)
+            502 LOAD_ATTR               27 (NULL|self + get)
+            522 LOAD_CONST               8 ('media_type')
+            524 CALL                     1
+            532 LOAD_CONST               9 ('video')
+            534 COMPARE_OP              40 (==)
+            538 POP_JUMP_IF_TRUE         1 (to 542)
+            540 JUMP_BACKWARD          116 (to 310)
+        >>  542 LOAD_FAST               11 (got)
+            544 LOAD_CONST               7 (1)
+            546 BINARY_SUBSCR
+            550 LOAD_CONST               9 ('video')
+            552 COMPARE_OP              55 (!=)
+            556 POP_JUMP_IF_TRUE         1 (to 560)
+            558 JUMP_BACKWARD          125 (to 310)
+
+ 48     >>  560 LOAD_FAST                7 (stills)
+            562 LOAD_ATTR               35 (NULL|self + append)
+            582 LOAD_FAST               10 (seq)
+            584 CALL                     1
+            592 POP_TOP
+            594 JUMP_BACKWARD          143 (to 310)
+
+ 40     >>  596 END_FOR
+
+ 49         598 LOAD_FAST                6 (missing)
+            600 POP_JUMP_IF_FALSE       88 (to 778)
+
+ 50         602 LOAD_CONST              10 (', ')
+            604 LOAD_ATTR               37 (NULL|self + join)
+            624 LOAD_CONST              11 (<code object <genexpr> at 0x7f6c92bae430, file "app\pipeline\steps\assemble.py", line 50>)
+            626 MAKE_FUNCTION            0
+            628 LOAD_FAST                6 (missing)
+            630 LOAD_CONST               4 (None)
+            632 LOAD_CONST              12 (8)
+            634 BINARY_SLICE
+            636 GET_ITER
+            638 CALL                     0
+            646 CALL                     1
+            654 LOAD_GLOBAL             39 (NULL + len)
+            664 LOAD_FAST                6 (missing)
+            666 CALL                     1
+            674 LOAD_CONST              12 (8)
+            676 COMPARE_OP              68 (>)
+            680 POP_JUMP_IF_FALSE        2 (to 686)
+            682 LOAD_CONST              13 ('…')
+            684 JUMP_FORWARD             1 (to 688)
+        >>  686 LOAD_CONST              14 ('')
+        >>  688 BINARY_OP                0 (+)
+            692 STORE_FAST              12 (preview)
+
+ 51         694 LOAD_GLOBAL             41 (NULL + make_error)
+
+ 52         704 LOAD_GLOBAL             42 (E)
+            714 LOAD_ATTR               44 (PRECONDITION_MISSING)
+
+ 53         734 LOAD_CONST              15 ('Chưa dựng được: còn ')
+            736 LOAD_GLOBAL             39 (NULL + len)
+            746 LOAD_FAST                6 (missing)
+            748 CALL                     1
+            756 FORMAT_VALUE             0
+            758 LOAD_CONST              16 (' cảnh KHÔNG có ảnh lẫn clip nào (cảnh ')
+            760 LOAD_FAST               12 (preview)
+            762 FORMAT_VALUE             0
+            764 LOAD_CONST              17 ("). Bấm 'Tải lại cảnh thiếu' để tạo đủ ảnh rồi dựng — thiếu clip thì vẫn dựng được bằng ảnh, nhưng cảnh trống thì không (và không dùng ảnh tạm).")
+            766 BUILD_STRING             5
+
+ 51         768 CALL                     2
+            776 RAISE_VARARGS            1
+
+ 56     >>  778 LOAD_FAST                7 (stills)
+            780 RETURN_VALUE
+        >>  782 PUSH_EXC_INFO
+
+ 34         784 LOAD_GLOBAL             18 (json)
+            794 LOAD_ATTR               22 (JSONDecodeError)
+            814 CHECK_EXC_MATCH
+            816 POP_JUMP_IF_FALSE        6 (to 830)
+            818 POP_TOP
+
+ 35         820 BUILD_LIST               0
+            822 STORE_FAST               5 (scenes)
+            824 POP_EXCEPT
+            826 EXTENDED_ARG             1
+            828 JUMP_BACKWARD          287 (to 256)
+
+ 34     >>  830 RERAISE                  0
+        >>  832 COPY                     3
+            834 POP_EXCEPT
+            836 RERAISE                  1
+
+ 28     >>  838 PUSH_EXC_INFO
+            840 WITH_EXCEPT_START
+            842 POP_JUMP_IF_TRUE         1 (to 846)
+            844 RERAISE                  2
+        >>  846 POP_TOP
+            848 POP_EXCEPT
+            850 POP_TOP
+            852 POP_TOP
+            854 EXTENDED_ARG             1
+            856 JUMP_BACKWARD          293 (to 272)
+        >>  858 COPY                     3
+            860 POP_EXCEPT
+            862 RERAISE                  1
+ExceptionTable:
+  40 to 190 -> 838 [1] lasti
+  194 to 254 -> 782 [1]
+  782 to 822 -> 832 [2] lasti
+  824 to 828 -> 838 [1] lasti
+  830 to 830 -> 832 [2] lasti
+  832 to 836 -> 838 [1] lasti
+  838 to 846 -> 858 [3] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c92bae430, file "app\pipeline\steps\assemble.py", line 50>:
+ 50           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                15 (to 42)
+             12 STORE_FAST               1 (x)
+             14 LOAD_GLOBAL              1 (NULL + str)
+             24 LOAD_FAST                1 (x)
+             26 CALL                     1
+             34 YIELD_VALUE              1
+             36 RESUME                   1
+             38 POP_TOP
+             40 JUMP_BACKWARD           17 (to 8)
+        >>   42 END_FOR
+             44 RETURN_CONST             0 (None)
+        >>   46 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             48 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 46 [0] lasti
+
+Disassembly of <code object AssembleStep at 0x7f6c92eebb40, file "app\pipeline\steps\assemble.py", line 59>:
+ 59           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('AssembleStep')
+              8 STORE_NAME               2 (__qualname__)
+
+ 60          10 LOAD_CONST               1 ('assemble')
+             12 STORE_NAME               3 (name)
+
+ 61          14 LOAD_CONST               2 ('CPU')
+             16 STORE_NAME               4 (resource)
+
+ 62          18 LOAD_CONST               3 ('source')
+             20 BUILD_LIST               1
+             22 STORE_NAME               5 (produces)
+
+ 64          24 LOAD_CONST               6 (('ctx', 'StepContext', 'return', 'dict'))
+             26 LOAD_CONST               4 (<code object run at 0x290d4130, file "app\pipeline\steps\assemble.py", line 64>)
+             28 MAKE_FUNCTION            4 (annotations)
+             30 STORE_NAME               6 (run)
+             32 RETURN_CONST             5 (None)
+
+Disassembly of <code object run at 0x290d4130, file "app\pipeline\steps\assemble.py", line 64>:
+              0 MAKE_CELL                1 (ctx)
+
+ 64           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+ 65           8 LOAD_GLOBAL              1 (NULL + ProjectFS)
+             18 LOAD_DEREF               1 (ctx)
+             20 LOAD_ATTR                2 (workdir)
+             40 CALL                     1
+             48 STORE_FAST               2 (fs)
+
+ 69          50 LOAD_GLOBAL              5 (NULL + _assert_buildable)
+             60 LOAD_DEREF               1 (ctx)
+             62 LOAD_ATTR                6 (video_id)
+             82 CALL                     1
+             90 STORE_FAST               3 (stills)
+
+ 70          92 LOAD_FAST                3 (stills)
+             94 POP_JUMP_IF_FALSE       80 (to 256)
+
+ 71          96 LOAD_CONST               1 (', ')
+             98 LOAD_ATTR                9 (NULL|self + join)
+            118 LOAD_CONST               2 (<code object <genexpr> at 0x7f6c92badd30, file "app\pipeline\steps\assemble.py", line 71>)
+            120 MAKE_FUNCTION            0
+            122 LOAD_FAST                3 (stills)
+            124 LOAD_CONST               0 (None)
+            126 LOAD_CONST               3 (8)
+            128 BINARY_SLICE
+            130 GET_ITER
+            132 CALL                     0
+            140 CALL                     1
+            148 LOAD_GLOBAL             11 (NULL + len)
+            158 LOAD_FAST                3 (stills)
+            160 CALL                     1
+            168 LOAD_CONST               3 (8)
+            170 COMPARE_OP              68 (>)
+            174 POP_JUMP_IF_FALSE        2 (to 180)
+            176 LOAD_CONST               4 ('…')
+            178 JUMP_FORWARD             1 (to 182)
+        >>  180 LOAD_CONST               5 ('')
+        >>  182 BINARY_OP                0 (+)
+            186 STORE_FAST               4 (preview)
+
+ 72         188 LOAD_DEREF               1 (ctx)
+            190 LOAD_ATTR               13 (NULL|self + emit_log)
+
+ 73         210 LOAD_GLOBAL             11 (NULL + len)
+            220 LOAD_FAST                3 (stills)
+            222 CALL                     1
+            230 FORMAT_VALUE             0
+            232 LOAD_CONST               6 (' cảnh video KHÔNG có clip → dựng bằng ảnh tĩnh (cảnh ')
+            234 LOAD_FAST                4 (preview)
+            236 FORMAT_VALUE             0
+            238 LOAD_CONST               7 ("). Muốn có clip thì bấm 'Tạo lại clip lỗi' rồi dựng lại.")
+            240 BUILD_STRING             4
+
+ 74         242 LOAD_CONST               8 ('warn')
+
+ 72         244 KW_NAMES                 9 (('level',))
+            246 CALL                     2
+            254 POP_TOP
+
+ 79     >>  256 NOP
+
+ 80         258 LOAD_CONST              10 (0)
+            260 LOAD_CONST              11 (('logo_sweep_service',))
+            262 IMPORT_NAME              7 (app.services)
+            264 IMPORT_FROM              8 (logo_sweep_service)
+            266 STORE_FAST               5 (logo_sweep_service)
+            268 POP_TOP
+
+ 82         270 LOAD_FAST                5 (logo_sweep_service)
+            272 LOAD_ATTR               19 (NULL|self + sweep_video)
+
+ 83         292 LOAD_DEREF               1 (ctx)
+            294 LOAD_ATTR                6 (video_id)
+            314 LOAD_DEREF               1 (ctx)
+            316 LOAD_ATTR                2 (workdir)
+
+ 84         336 LOAD_CLOSURE             1 (ctx)
+            338 BUILD_TUPLE              1
+            340 LOAD_CONST              12 (<code object <lambda> at 0x7f6c92eeb3c0, file "app\pipeline\steps\assemble.py", line 84>)
+            342 MAKE_FUNCTION            8 (closure)
+
+ 82         344 KW_NAMES                13 (('on_log',))
+            346 CALL                     3
+            354 GET_AWAITABLE            0
+            356 LOAD_CONST               0 (None)
+        >>  358 SEND                     3 (to 368)
+            362 YIELD_VALUE              3
+            364 RESUME                   3
+            366 JUMP_BACKWARD_NO_INTERRUPT     5 (to 358)
+        >>  368 END_SEND
+            370 STORE_FAST               6 (report)
+
+ 85         372 LOAD_GLOBAL             11 (NULL + len)
+            382 LOAD_FAST                6 (report)
+            384 LOAD_ATTR               20 (failed)
+            404 CALL                     1
+            412 LOAD_GLOBAL             11 (NULL + len)
+            422 LOAD_FAST                6 (report)
+            424 LOAD_ATTR               22 (deferred)
+            444 CALL                     1
+            452 BINARY_OP                0 (+)
+            456 STORE_FAST               7 (unclean)
+
+ 86         458 LOAD_FAST                6 (report)
+            460 LOAD_ATTR               24 (cleaned)
+            480 POP_JUMP_IF_TRUE         2 (to 486)
+            482 LOAD_FAST                7 (unclean)
+            484 POP_JUMP_IF_FALSE      123 (to 732)
+
+ 87     >>  486 LOAD_DEREF               1 (ctx)
+            488 LOAD_ATTR               13 (NULL|self + emit_log)
+
+ 88         508 LOAD_CONST              14 ('Quét logo trước khi dựng: xoá ')
+            510 LOAD_FAST                6 (report)
+            512 LOAD_ATTR               24 (cleaned)
+            532 FORMAT_VALUE             0
+            534 LOAD_CONST              15 (' asset')
+            536 BUILD_STRING             3
+
+ 89         538 LOAD_FAST                6 (report)
+            540 LOAD_ATTR               26 (forced)
+            560 POP_JUMP_IF_FALSE       16 (to 594)
+            562 LOAD_CONST              16 (' (')
+            564 LOAD_FAST                6 (report)
+            566 LOAD_ATTR               26 (forced)
+            586 FORMAT_VALUE             0
+            588 LOAD_CONST              17 (' theo toạ độ đã học)')
+            590 BUILD_STRING             3
+            592 JUMP_FORWARD             1 (to 596)
+        >>  594 LOAD_CONST               5 ('')
+
+ 88     >>  596 BINARY_OP                0 (+)
+
+ 91         600 LOAD_FAST                7 (unclean)
+            602 POP_JUMP_IF_FALSE       50 (to 704)
+
+ 90         604 LOAD_CONST               1 (', ')
+            606 LOAD_FAST                7 (unclean)
+            608 FORMAT_VALUE             0
+            610 LOAD_CONST              18 (' asset CHƯA sạch: ')
+            612 BUILD_STRING             3
+
+ 91         614 LOAD_CONST               1 (', ')
+            616 LOAD_ATTR                9 (NULL|self + join)
+            636 LOAD_FAST                6 (report)
+            638 LOAD_ATTR               22 (deferred)
+            658 LOAD_FAST                6 (report)
+            660 LOAD_ATTR               20 (failed)
+            680 BINARY_OP                0 (+)
+            684 LOAD_CONST               0 (None)
+            686 LOAD_CONST              19 (5)
+            688 BINARY_SLICE
+            690 CALL                     1
+
+ 90         698 BINARY_OP                0 (+)
+            702 JUMP_FORWARD             1 (to 706)
+
+ 91     >>  704 LOAD_CONST               5 ('')
+
+ 88     >>  706 BINARY_OP                0 (+)
+
+ 92         710 LOAD_FAST                7 (unclean)
+            712 POP_JUMP_IF_FALSE        2 (to 718)
+            714 LOAD_CONST               8 ('warn')
+            716 JUMP_FORWARD             1 (to 720)
+        >>  718 LOAD_CONST              20 ('info')
+
+ 87     >>  720 KW_NAMES                 9 (('level',))
+            722 CALL                     2
+            730 POP_TOP
+
+ 97     >>  732 LOAD_GLOBAL             31 (NULL + visual_bake)
+            742 LOAD_ATTR               32 (bake_source)
+
+ 98         762 LOAD_DEREF               1 (ctx)
+            764 LOAD_ATTR                6 (video_id)
+            784 LOAD_DEREF               1 (ctx)
+            786 LOAD_ATTR                2 (workdir)
+            806 LOAD_DEREF               1 (ctx)
+            808 LOAD_ATTR               34 (config)
+
+ 99         828 LOAD_CLOSURE             1 (ctx)
+            830 BUILD_TUPLE              1
+            832 LOAD_CONST              23 (<code object <lambda> at 0x7f6c92eeb690, file "app\pipeline\steps\assemble.py", line 99>)
+            834 MAKE_FUNCTION            8 (closure)
+
+100         836 LOAD_CLOSURE             1 (ctx)
+            838 BUILD_TUPLE              1
+            840 LOAD_CONST              24 (<code object <lambda> at 0x7f6c92fd4030, file "app\pipeline\steps\assemble.py", line 100>)
+            842 MAKE_FUNCTION            8 (closure)
+
+101         844 LOAD_CONST              43 (('info',))
+            846 LOAD_CLOSURE             1 (ctx)
+            848 BUILD_TUPLE              1
+            850 LOAD_CONST              25 (<code object <lambda> at 0x7f6c92eeb780, file "app\pipeline\steps\assemble.py", line 101>)
+            852 MAKE_FUNCTION            9 (defaults, closure)
+
+ 97         854 KW_NAMES                26 (('cancel_check', 'on_progress', 'emit_log'))
+            856 CALL                     6
+            864 GET_AWAITABLE            0
+            866 LOAD_CONST               0 (None)
+        >>  868 SEND                     3 (to 878)
+            872 YIELD_VALUE              2
+            874 RESUME                   3
+            876 JUMP_BACKWARD_NO_INTERRUPT     5 (to 868)
+        >>  878 END_SEND
+            880 STORE_FAST               9 (out_source)
+
+103         882 LOAD_GLOBAL             31 (NULL + visual_bake)
+            892 LOAD_ATTR               36 (dims_for)
+            912 LOAD_DEREF               1 (ctx)
+            914 LOAD_ATTR               34 (config)
+            934 CALL                     1
+            942 UNPACK_SEQUENCE          2
+            946 STORE_FAST              10 (w)
+            948 STORE_FAST              11 (h)
+
+107         950 LOAD_CONST               0 (None)
+            952 STORE_FAST              12 (preview_meta)
+
+108         954 NOP
+
+109         956 LOAD_DEREF               1 (ctx)
+            958 LOAD_ATTR               39 (NULL|self + emit_progress)
+            978 LOAD_CONST              27 (0.88)
+            980 LOAD_CONST              28 ('Render preview (phụ đề + lồng tiếng)…')
+            982 CALL                     2
+            990 POP_TOP
+
+110         992 LOAD_CONST              10 (0)
+            994 LOAD_CONST              29 (('render_video',))
+            996 IMPORT_NAME             20 (app.render.engine)
+            998 IMPORT_FROM             21 (render_video)
+           1000 STORE_FAST              13 (render_video)
+           1002 POP_TOP
+
+111        1004 PUSH_NULL
+           1006 LOAD_FAST               13 (render_video)
+
+112        1008 LOAD_DEREF               1 (ctx)
+           1010 LOAD_ATTR                6 (video_id)
+           1030 LOAD_DEREF               1 (ctx)
+           1032 LOAD_ATTR                2 (workdir)
+           1052 LOAD_DEREF               1 (ctx)
+           1054 LOAD_ATTR               34 (config)
+
+113        1074 LOAD_FAST                2 (fs)
+           1076 LOAD_ATTR               45 (NULL|self + preview)
+           1096 LOAD_DEREF               1 (ctx)
+           1098 LOAD_ATTR                6 (video_id)
+           1118 CALL                     1
+           1126 LOAD_CONST              30 ('preview')
+
+114        1128 LOAD_CLOSURE             1 (ctx)
+           1130 BUILD_TUPLE              1
+           1132 LOAD_CONST              31 (<code object <lambda> at 0x7f6c81b7fcf0, file "app\pipeline\steps\assemble.py", line 114>)
+           1134 MAKE_FUNCTION            8 (closure)
+
+115        1136 LOAD_CLOSURE             1 (ctx)
+           1138 BUILD_TUPLE              1
+           1140 LOAD_CONST              32 (<code object <lambda> at 0x7f6c92eeba50, file "app\pipeline\steps\assemble.py", line 115>)
+           1142 MAKE_FUNCTION            8 (closure)
+
+116        1144 LOAD_CONST              43 (('info',))
+           1146 LOAD_CLOSURE             1 (ctx)
+           1148 BUILD_TUPLE              1
+           1150 LOAD_CONST              33 (<code object <lambda> at 0x7f6c92eebc30, file "app\pipeline\steps\assemble.py", line 116>)
+           1152 MAKE_FUNCTION            9 (defaults, closure)
+
+111        1154 KW_NAMES                34 (('video_id', 'workdir', 'config', 'out_path', 'quality', 'on_progress', 'cancel_check', 'emit_log'))
+           1156 CALL                     8
+           1164 GET_AWAITABLE            0
+           1166 LOAD_CONST               0 (None)
+        >> 1168 SEND                     3 (to 1178)
+           1172 YIELD_VALUE              3
+           1174 RESUME                   3
+           1176 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1168)
+        >> 1178 END_SEND
+           1180 STORE_FAST              12 (preview_meta)
+
+118        1182 LOAD_DEREF               1 (ctx)
+           1184 LOAD_ATTR               13 (NULL|self + emit_log)
+           1204 LOAD_CONST              35 ('Đã tạo preview: ')
+           1206 LOAD_FAST                2 (fs)
+           1208 LOAD_ATTR               45 (NULL|self + preview)
+           1228 LOAD_DEREF               1 (ctx)
+           1230 LOAD_ATTR                6 (video_id)
+           1250 CALL                     1
+           1258 LOAD_ATTR               46 (name)
+           1278 FORMAT_VALUE             0
+           1280 BUILD_STRING             2
+           1282 CALL                     1
+           1290 POP_TOP
+
+123     >> 1292 LOAD_DEREF               1 (ctx)
+           1294 LOAD_ATTR               39 (NULL|self + emit_progress)
+           1314 LOAD_CONST              38 (1.0)
+           1316 LOAD_CONST              39 ('Dựng video xong.')
+           1318 CALL                     2
+           1326 POP_TOP
+
+125        1328 LOAD_GLOBAL             49 (NULL + str)
+           1338 LOAD_FAST                9 (out_source)
+           1340 LOAD_ATTR               51 (NULL|self + resolve)
+           1360 CALL                     0
+           1368 CALL                     1
+
+126        1376 LOAD_FAST               10 (w)
+           1378 LOAD_FAST               11 (h)
+           1380 LOAD_CONST              40 (('width', 'height'))
+           1382 BUILD_CONST_KEY_MAP      2
+
+124        1384 LOAD_CONST              41 (('source', 'meta'))
+           1386 BUILD_CONST_KEY_MAP      2
+           1388 STORE_FAST              14 (out)
+
+128        1390 LOAD_FAST                2 (fs)
+           1392 LOAD_ATTR               45 (NULL|self + preview)
+           1412 LOAD_DEREF               1 (ctx)
+           1414 LOAD_ATTR                6 (video_id)
+           1434 CALL                     1
+           1442 LOAD_ATTR               53 (NULL|self + exists)
+           1462 CALL                     0
+           1470 POP_JUMP_IF_FALSE       63 (to 1598)
+
+129        1472 LOAD_GLOBAL             49 (NULL + str)
+           1482 LOAD_FAST                2 (fs)
+           1484 LOAD_ATTR               45 (NULL|self + preview)
+           1504 LOAD_DEREF               1 (ctx)
+           1506 LOAD_ATTR                6 (video_id)
+           1526 CALL                     1
+           1534 LOAD_ATTR               51 (NULL|self + resolve)
+           1554 CALL                     0
+           1562 CALL                     1
+           1570 LOAD_FAST               14 (out)
+           1572 LOAD_CONST              30 ('preview')
+           1574 STORE_SUBSCR
+
+130        1578 LOAD_FAST               12 (preview_meta)
+           1580 POP_JUMP_IF_FALSE        8 (to 1598)
+
+131        1582 LOAD_FAST               12 (preview_meta)
+           1584 LOAD_FAST               14 (out)
+           1586 LOAD_CONST              42 ('meta')
+           1588 BINARY_SUBSCR
+           1592 LOAD_CONST              30 ('preview')
+           1594 STORE_SUBSCR
+
+132     >> 1598 LOAD_FAST               14 (out)
+           1600 RETURN_VALUE
+
+ 82     >> 1602 CLEANUP_THROW
+           1604 EXTENDED_ARG             2
+           1606 JUMP_BACKWARD          620 (to 368)
+        >> 1608 PUSH_EXC_INFO
+
+ 93        1610 LOAD_GLOBAL             28 (Exception)
+           1620 CHECK_EXC_MATCH
+           1622 POP_JUMP_IF_FALSE       34 (to 1692)
+           1624 STORE_FAST               8 (e)
+
+ 94        1626 LOAD_DEREF               1 (ctx)
+           1628 LOAD_ATTR               13 (NULL|self + emit_log)
+           1648 LOAD_CONST              21 ('Bỏ qua quét logo trước khi dựng (')
+           1650 LOAD_FAST                8 (e)
+           1652 FORMAT_VALUE             0
+           1654 LOAD_CONST              22 (').')
+           1656 BUILD_STRING             3
+           1658 LOAD_CONST               8 ('warn')
+           1660 KW_NAMES                 9 (('level',))
+           1662 CALL                     2
+           1670 POP_TOP
+           1672 POP_EXCEPT
+           1674 LOAD_CONST               0 (None)
+           1676 STORE_FAST               8 (e)
+           1678 DELETE_FAST              8 (e)
+           1680 EXTENDED_ARG             1
+           1682 JUMP_BACKWARD          476 (to 732)
+        >> 1684 LOAD_CONST               0 (None)
+           1686 STORE_FAST               8 (e)
+           1688 DELETE_FAST              8 (e)
+           1690 RERAISE                  1
+
+ 93     >> 1692 RERAISE                  0
+        >> 1694 COPY                     3
+           1696 POP_EXCEPT
+           1698 RERAISE                  1
+
+ 97     >> 1700 CLEANUP_THROW
+           1702 EXTENDED_ARG             1
+           1704 JUMP_BACKWARD          414 (to 878)
+
+111     >> 1706 CLEANUP_THROW
+           1708 EXTENDED_ARG             1
+           1710 JUMP_BACKWARD          267 (to 1178)
+        >> 1712 PUSH_EXC_INFO
+
+119        1714 LOAD_GLOBAL             28 (Exception)
+           1724 CHECK_EXC_MATCH
+           1726 POP_JUMP_IF_FALSE       33 (to 1794)
+           1728 STORE_FAST               8 (e)
+
+120        1730 LOAD_DEREF               1 (ctx)
+           1732 LOAD_ATTR               13 (NULL|self + emit_log)
+           1752 LOAD_CONST              36 ('Bỏ qua render preview tự động (')
+           1754 LOAD_FAST                8 (e)
+           1756 FORMAT_VALUE             0
+           1758 LOAD_CONST              37 ('); bấm Render trong Studio để xem.')
+           1760 BUILD_STRING             3
+
+121        1762 LOAD_CONST               8 ('warn')
+
+120        1764 KW_NAMES                 9 (('level',))
+           1766 CALL                     2
+           1774 POP_TOP
+           1776 POP_EXCEPT
+           1778 LOAD_CONST               0 (None)
+           1780 STORE_FAST               8 (e)
+           1782 DELETE_FAST              8 (e)
+           1784 JUMP_BACKWARD          247 (to 1292)
+        >> 1786 LOAD_CONST               0 (None)
+           1788 STORE_FAST               8 (e)
+           1790 DELETE_FAST              8 (e)
+           1792 RERAISE                  1
+
+119     >> 1794 RERAISE                  0
+        >> 1796 COPY                     3
+           1798 POP_EXCEPT
+           1800 RERAISE                  1
+        >> 1802 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1804 RERAISE                  1
+ExceptionTable:
+  6 to 254 -> 1802 [0] lasti
+  258 to 360 -> 1608 [0]
+  362 to 362 -> 1602 [2]
+  364 to 730 -> 1608 [0]
+  732 to 870 -> 1802 [0] lasti
+  872 to 872 -> 1700 [2]
+  874 to 952 -> 1802 [0] lasti
+  956 to 1170 -> 1712 [0]
+  1172 to 1172 -> 1706 [2]
+  1174 to 1290 -> 1712 [0]
+  1292 to 1600 -> 1802 [0] lasti
+  1602 to 1602 -> 1608 [0]
+  1608 to 1624 -> 1694 [1] lasti
+  1626 to 1670 -> 1684 [1] lasti
+  1672 to 1682 -> 1802 [0] lasti
+  1684 to 1692 -> 1694 [1] lasti
+  1694 to 1700 -> 1802 [0] lasti
+  1706 to 1706 -> 1712 [0]
+  1712 to 1728 -> 1796 [1] lasti
+  1730 to 1774 -> 1786 [1] lasti
+  1776 to 1784 -> 1802 [0] lasti
+  1786 to 1794 -> 1796 [1] lasti
+  1796 to 1800 -> 1802 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c92badd30, file "app\pipeline\steps\assemble.py", line 71>:
+ 71           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                15 (to 42)
+             12 STORE_FAST               1 (x)
+             14 LOAD_GLOBAL              1 (NULL + str)
+             24 LOAD_FAST                1 (x)
+             26 CALL                     1
+             34 YIELD_VALUE              1
+             36 RESUME                   1
+             38 POP_TOP
+             40 JUMP_BACKWARD           17 (to 8)
+        >>   42 END_FOR
+             44 RETURN_CONST             0 (None)
+        >>   46 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             48 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 46 [0] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c92eeb3c0, file "app\pipeline\steps\assemble.py", line 84>:
+              0 COPY_FREE_VARS           1
+
+ 84           2 RESUME                   0
+              4 LOAD_DEREF               1 (ctx)
+              6 LOAD_ATTR                1 (NULL|self + emit_log)
+             26 LOAD_FAST                0 (m)
+             28 LOAD_CONST               1 ('info')
+             30 KW_NAMES                 2 (('level',))
+             32 CALL                     2
+             40 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c92eeb690, file "app\pipeline\steps\assemble.py", line 99>:
+              0 COPY_FREE_VARS           1
+
+ 99           2 RESUME                   0
+              4 LOAD_DEREF               0 (ctx)
+              6 LOAD_ATTR                1 (NULL|self + is_cancelled)
+             26 CALL                     0
+             34 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c92fd4030, file "app\pipeline\steps\assemble.py", line 100>:
+              0 COPY_FREE_VARS           1
+
+100           2 RESUME                   0
+              4 LOAD_DEREF               1 (ctx)
+              6 LOAD_ATTR                1 (NULL|self + emit_progress)
+             26 LOAD_CONST               1 (0.05)
+             28 LOAD_CONST               2 (0.77)
+             30 LOAD_FAST                0 (p)
+             32 BINARY_OP                5 (*)
+             36 BINARY_OP                0 (+)
+             40 LOAD_CONST               3 ('Dựng các cảnh…')
+             42 CALL                     2
+             50 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c92eeb780, file "app\pipeline\steps\assemble.py", line 101>:
+              0 COPY_FREE_VARS           1
+
+101           2 RESUME                   0
+              4 LOAD_DEREF               2 (ctx)
+              6 LOAD_ATTR                1 (NULL|self + emit_log)
+             26 LOAD_FAST                0 (m)
+             28 LOAD_FAST                1 (lv)
+             30 KW_NAMES                 1 (('level',))
+             32 CALL                     2
+             40 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c81b7fcf0, file "app\pipeline\steps\assemble.py", line 114>:
+              0 COPY_FREE_VARS           1
+
+114           2 RESUME                   0
+              4 LOAD_DEREF               1 (ctx)
+              6 LOAD_ATTR                1 (NULL|self + emit_progress)
+             26 LOAD_CONST               1 (0.88)
+             28 LOAD_CONST               2 (0.12)
+             30 LOAD_FAST                0 (p)
+             32 BINARY_OP                5 (*)
+             36 BINARY_OP                0 (+)
+             40 LOAD_CONST               3 ('Render preview… ')
+             42 LOAD_GLOBAL              3 (NULL + int)
+             52 LOAD_FAST                0 (p)
+             54 LOAD_CONST               4 (100)
+             56 BINARY_OP                5 (*)
+             60 CALL                     1
+             68 FORMAT_VALUE             0
+             70 LOAD_CONST               5 ('%')
+             72 BUILD_STRING             3
+             74 CALL                     2
+             82 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c92eeba50, file "app\pipeline\steps\assemble.py", line 115>:
+              0 COPY_FREE_VARS           1
+
+115           2 RESUME                   0
+              4 LOAD_DEREF               0 (ctx)
+              6 LOAD_ATTR                1 (NULL|self + is_cancelled)
+             26 CALL                     0
+             34 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c92eebc30, file "app\pipeline\steps\assemble.py", line 116>:
+              0 COPY_FREE_VARS           1
+
+116           2 RESUME                   0
+              4 LOAD_DEREF               2 (ctx)
+              6 LOAD_ATTR                1 (NULL|self + emit_log)
+             26 LOAD_FAST                0 (m)
+             28 LOAD_FAST                1 (lv)
+             30 KW_NAMES                 1 (('level',))
+             32 CALL                     2
+             40 RETURN_VALUE

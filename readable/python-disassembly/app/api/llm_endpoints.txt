@@ -1,0 +1,1966 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Router API AI tuỳ chỉnh — thêm/sửa/xoá/thử endpoint LLM do user tự khai.\n\nMọi response ở đây là bản PUBLIC: không key, không header (header có thể mang token). Key chỉ đi\nMỘT chiều — từ form vào DB (mã hoá) — và chỉ được giải mã ngay tại chỗ gọi HTTP.\n\n`POST /endpoints/test` nhận NHÁP form, chưa cần lưu: user dán key, bấm "Thử", biết ngay sai ở đâu,\nthay vì lưu rồi mới phát hiện lúc dựng video. Sửa một endpoint đã lưu thì ô key thường để trống\n(masked) — gửi kèm `endpoint_id` để dùng lại key đã lưu.\n\nXem docs/plan-custom-llm-api.md §4.\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 12           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 14          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (json)
+             24 STORE_NAME               3 (json)
+
+ 15          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               3 (None)
+             30 IMPORT_NAME              4 (time)
+             32 STORE_NAME               4 (time)
+
+ 16          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               4 (('Path',))
+             38 IMPORT_NAME              5 (pathlib)
+             40 IMPORT_FROM              6 (Path)
+             42 STORE_NAME               6 (Path)
+             44 POP_TOP
+
+ 18          46 LOAD_CONST               1 (0)
+             48 LOAD_CONST               3 (None)
+             50 IMPORT_NAME              7 (httpx)
+             52 STORE_NAME               7 (httpx)
+
+ 19          54 LOAD_CONST               1 (0)
+             56 LOAD_CONST               5 (('APIRouter', 'Depends'))
+             58 IMPORT_NAME              8 (fastapi)
+             60 IMPORT_FROM              9 (APIRouter)
+             62 STORE_NAME               9 (APIRouter)
+             64 IMPORT_FROM             10 (Depends)
+             66 STORE_NAME              10 (Depends)
+             68 POP_TOP
+
+ 20          70 LOAD_CONST               1 (0)
+             72 LOAD_CONST               6 (('BaseModel',))
+             74 IMPORT_NAME             11 (pydantic)
+             76 IMPORT_FROM             12 (BaseModel)
+             78 STORE_NAME              12 (BaseModel)
+             80 POP_TOP
+
+ 22          82 LOAD_CONST               1 (0)
+             84 LOAD_CONST               7 (('dialects',))
+             86 IMPORT_NAME             13 (app.adapters.llm_api)
+             88 IMPORT_FROM             14 (dialects)
+             90 STORE_NAME              14 (dialects)
+             92 POP_TOP
+
+ 23          94 LOAD_CONST               1 (0)
+             96 LOAD_CONST               8 (('ApiClient',))
+             98 IMPORT_NAME             15 (app.adapters.llm_api.client)
+            100 IMPORT_FROM             16 (ApiClient)
+            102 STORE_NAME              16 (ApiClient)
+            104 POP_TOP
+
+ 24         106 LOAD_CONST               1 (0)
+            108 LOAD_CONST               9 (('ModelSpec', 'ProviderSpec'))
+            110 IMPORT_NAME             17 (app.adapters.llm_api.registry)
+            112 IMPORT_FROM             18 (ModelSpec)
+            114 STORE_NAME              18 (ModelSpec)
+            116 IMPORT_FROM             19 (ProviderSpec)
+            118 STORE_NAME              19 (ProviderSpec)
+            120 POP_TOP
+
+ 25         122 LOAD_CONST               1 (0)
+            124 LOAD_CONST              10 (('E', 'StudioError', 'make_error'))
+            126 IMPORT_NAME             20 (app.core.errors)
+            128 IMPORT_FROM             21 (E)
+            130 STORE_NAME              21 (E)
+            132 IMPORT_FROM             22 (StudioError)
+            134 STORE_NAME              22 (StudioError)
+            136 IMPORT_FROM             23 (make_error)
+            138 STORE_NAME              23 (make_error)
+            140 POP_TOP
+
+ 26         142 LOAD_CONST               1 (0)
+            144 LOAD_CONST              11 (('log',))
+            146 IMPORT_NAME             24 (app.core.logging)
+            148 IMPORT_FROM             25 (log)
+            150 STORE_NAME              25 (log)
+            152 POP_TOP
+
+ 27         154 LOAD_CONST               1 (0)
+            156 LOAD_CONST              12 (('verify_token',))
+            158 IMPORT_NAME             26 (app.deps)
+            160 IMPORT_FROM             27 (verify_token)
+            162 STORE_NAME              27 (verify_token)
+            164 POP_TOP
+
+ 28         166 LOAD_CONST               1 (0)
+            168 LOAD_CONST              13 (('llm_endpoint_store',))
+            170 IMPORT_NAME             28 (app.services)
+            172 IMPORT_FROM             29 (llm_endpoint_store)
+            174 STORE_NAME              30 (store)
+            176 POP_TOP
+
+ 30         178 PUSH_NULL
+            180 LOAD_NAME                9 (APIRouter)
+            182 LOAD_CONST              14 ('/api/v1/llm')
+            184 LOAD_CONST              15 ('llm')
+            186 BUILD_LIST               1
+            188 PUSH_NULL
+            190 LOAD_NAME               10 (Depends)
+            192 LOAD_NAME               27 (verify_token)
+            194 CALL                     1
+            202 BUILD_LIST               1
+            204 KW_NAMES                16 (('prefix', 'tags', 'dependencies'))
+            206 CALL                     3
+            214 STORE_NAME              31 (router)
+
+ 32         216 PUSH_NULL
+            218 LOAD_NAME                6 (Path)
+            220 LOAD_NAME               32 (__file__)
+            222 CALL                     1
+            230 LOAD_ATTR               67 (NULL|self + resolve)
+            250 CALL                     0
+            258 LOAD_ATTR               68 (parent)
+            278 LOAD_ATTR               68 (parent)
+            298 LOAD_CONST              17 ('resources')
+            300 BINARY_OP               11 (/)
+            304 LOAD_CONST              18 ('llm_presets.json')
+            306 BINARY_OP               11 (/)
+            310 STORE_NAME              35 (_PRESETS_PATH)
+
+ 34         312 LOAD_CONST              19 (60.0)
+            314 STORE_NAME              36 (TEST_TIMEOUT_S)
+
+ 35         316 LOAD_CONST              20 (20.0)
+            318 STORE_NAME              37 (MODELS_TIMEOUT_S)
+
+ 41         320 LOAD_CONST              21 (1024)
+            322 STORE_NAME              38 (TEST_MAX_TOKENS)
+
+ 45         324 LOAD_NAME               21 (E)
+            326 LOAD_ATTR               78 (LLM_API_AUTH)
+            346 LOAD_CONST              22 ('API key sai, hết hạn, hoặc không có quyền với model này.')
+
+ 46         348 LOAD_NAME               21 (E)
+            350 LOAD_ATTR               80 (LLM_API_RATE_LIMIT)
+            370 LOAD_CONST              23 ('Nhà cung cấp đang giới hạn tốc độ hoặc tài khoản hết hạn mức/số dư.')
+
+ 47         372 LOAD_NAME               21 (E)
+            374 LOAD_ATTR               82 (LLM_API_NETWORK)
+            394 LOAD_CONST              24 ('Không kết nối được. Kiểm tra Base URL, mạng, hoặc server local đã bật chưa.')
+
+ 48         396 LOAD_NAME               21 (E)
+            398 LOAD_ATTR               84 (LLM_API_BAD_RESPONSE)
+            418 LOAD_CONST              25 ("Base URL sai đường (thường thiếu /v1), tên model không tồn tại, hoặc chọn nhầm 'Định dạng API'.")
+
+ 50         420 LOAD_NAME               21 (E)
+            422 LOAD_ATTR               86 (LLM_API_CONTEXT_TOO_LONG)
+            442 LOAD_CONST              26 ('Model này có cửa sổ ngữ cảnh rất nhỏ.')
+
+ 44         444 BUILD_MAP                5
+            446 STORE_NAME              44 (_TEST_HINTS)
+
+ 54         448 PUSH_NULL
+            450 LOAD_BUILD_CLASS
+            452 LOAD_CONST              27 (<code object ModelIn at 0x7f6c92d62b80, file "app\api\llm_endpoints.py", line 54>)
+            454 MAKE_FUNCTION            0
+            456 LOAD_CONST              28 ('ModelIn')
+            458 LOAD_NAME               12 (BaseModel)
+            460 CALL                     3
+            468 STORE_NAME              45 (ModelIn)
+
+ 69         470 PUSH_NULL
+            472 LOAD_BUILD_CLASS
+            474 LOAD_CONST              29 (<code object EndpointIn at 0x7f6c9328b560, file "app\api\llm_endpoints.py", line 69>)
+            476 MAKE_FUNCTION            0
+            478 LOAD_CONST              30 ('EndpointIn')
+            480 LOAD_NAME               12 (BaseModel)
+            482 CALL                     3
+            490 STORE_NAME              46 (EndpointIn)
+
+ 83         492 PUSH_NULL
+            494 LOAD_BUILD_CLASS
+            496 LOAD_CONST              31 (<code object TestIn at 0x7f6c81b7dd70, file "app\api\llm_endpoints.py", line 83>)
+            498 MAKE_FUNCTION            0
+            500 LOAD_CONST              32 ('TestIn')
+            502 LOAD_NAME               12 (BaseModel)
+            504 CALL                     3
+            512 STORE_NAME              47 (TestIn)
+
+ 93         514 PUSH_NULL
+            516 LOAD_BUILD_CLASS
+            518 LOAD_CONST              33 (<code object FetchModelsIn at 0x7f6c92a3bbb0, file "app\api\llm_endpoints.py", line 93>)
+            520 MAKE_FUNCTION            0
+            522 LOAD_CONST              34 ('FetchModelsIn')
+            524 LOAD_NAME               12 (BaseModel)
+            526 CALL                     3
+            534 STORE_NAME              48 (FetchModelsIn)
+
+103         536 LOAD_NAME               31 (router)
+            538 LOAD_ATTR               99 (NULL|self + get)
+            558 LOAD_CONST              35 ('/presets')
+            560 CALL                     1
+
+104         568 LOAD_CONST              36 (<code object list_presets at 0x269960f0, file "app\api\llm_endpoints.py", line 103>)
+            570 MAKE_FUNCTION            0
+
+103         572 CALL                     0
+
+104         580 STORE_NAME              50 (list_presets)
+
+118         582 LOAD_NAME               31 (router)
+            584 LOAD_ATTR               99 (NULL|self + get)
+            604 LOAD_CONST              37 ('/endpoints')
+            606 CALL                     1
+
+119         614 LOAD_CONST              38 (<code object list_endpoints at 0x7f6c81a44030, file "app\api\llm_endpoints.py", line 118>)
+            616 MAKE_FUNCTION            0
+
+118         618 CALL                     0
+
+119         626 STORE_NAME              51 (list_endpoints)
+
+123         628 LOAD_NAME               31 (router)
+            630 LOAD_ATTR               99 (NULL|self + get)
+            650 LOAD_CONST              39 ('/choices')
+            652 CALL                     1
+
+124         660 LOAD_CONST              40 (<code object list_choices at 0x269ebee0, file "app\api\llm_endpoints.py", line 123>)
+            662 MAKE_FUNCTION            0
+
+123         664 CALL                     0
+
+124         672 STORE_NAME              52 (list_choices)
+
+168         674 LOAD_CONST              58 (('body', 'EndpointIn', 'return', 'list[dict] | None'))
+            676 LOAD_CONST              41 (<code object _models_payload at 0x7f6c92ea57f0, file "app\api\llm_endpoints.py", line 168>)
+            678 MAKE_FUNCTION            4 (annotations)
+            680 STORE_NAME              53 (_models_payload)
+
+172         682 LOAD_NAME               31 (router)
+            684 LOAD_ATTR              109 (NULL|self + post)
+            704 LOAD_CONST              37 ('/endpoints')
+            706 CALL                     1
+
+173         714 LOAD_CONST              59 (('body', 'EndpointIn'))
+            716 LOAD_CONST              42 (<code object create_endpoint at 0x269e1010, file "app\api\llm_endpoints.py", line 172>)
+            718 MAKE_FUNCTION            4 (annotations)
+
+172         720 CALL                     0
+
+173         728 STORE_NAME              55 (create_endpoint)
+
+188         730 LOAD_NAME               31 (router)
+            732 LOAD_ATTR              113 (NULL|self + put)
+            752 LOAD_CONST              43 ('/endpoints/{endpoint_id}')
+            754 CALL                     1
+
+189         762 LOAD_CONST              60 (('endpoint_id', 'str', 'body', 'EndpointIn'))
+            764 LOAD_CONST              44 (<code object update_endpoint at 0x7f6c92ea56b0, file "app\api\llm_endpoints.py", line 188>)
+            766 MAKE_FUNCTION            4 (annotations)
+
+188         768 CALL                     0
+
+189         776 STORE_NAME              57 (update_endpoint)
+
+196         778 LOAD_NAME               31 (router)
+            780 LOAD_ATTR               99 (NULL|self + get)
+            800 LOAD_CONST              45 ('/endpoints/{endpoint_id}/usages')
+            802 CALL                     1
+
+197         810 LOAD_CONST              61 (('endpoint_id', 'str'))
+            812 LOAD_CONST              46 (<code object endpoint_usages at 0x7f6c81a44230, file "app\api\llm_endpoints.py", line 196>)
+            814 MAKE_FUNCTION            4 (annotations)
+
+196         816 CALL                     0
+
+197         824 STORE_NAME              58 (endpoint_usages)
+
+202         826 LOAD_NAME               31 (router)
+            828 LOAD_ATTR              119 (NULL|self + delete)
+            848 LOAD_CONST              43 ('/endpoints/{endpoint_id}')
+            850 CALL                     1
+
+203         858 LOAD_CONST              61 (('endpoint_id', 'str'))
+            860 LOAD_CONST              47 (<code object delete_endpoint at 0x7f6c9328b280, file "app\api\llm_endpoints.py", line 202>)
+            862 MAKE_FUNCTION            4 (annotations)
+
+202         864 CALL                     0
+
+203         872 STORE_NAME              60 (delete_endpoint)
+
+214         874 NOP
+
+215         876 NOP
+
+214         878 NOP
+
+215         880 NOP
+
+214         882 LOAD_CONST              62 (('api_key', 'str | None', 'headers', 'dict | None', 'endpoint_id', 'str | None', 'return', 'tuple[str, dict]'))
+            884 LOAD_CONST              48 (<code object _draft_secrets at 0x7f6c81a753b0, file "app\api\llm_endpoints.py", line 214>)
+            886 MAKE_FUNCTION            4 (annotations)
+            888 STORE_NAME              61 (_draft_secrets)
+
+229         890 LOAD_CONST              63 (('key', 'str'))
+            892 LOAD_CONST              49 (<code object _draft_dialect at 0x7f6c92ea5f70, file "app\api\llm_endpoints.py", line 229>)
+            894 MAKE_FUNCTION            4 (annotations)
+            896 STORE_NAME              62 (_draft_dialect)
+
+240         898 LOAD_CONST              50 ('Model này không dùng được với tài khoản/key hiện tại (dù có trong danh sách). Bỏ nó khỏi danh sách và thử model khác.')
+            900 STORE_NAME              63 (_MODEL_REJECTED_HINT)
+
+244         902 LOAD_CONST              64 (('exc', 'StudioError', 'return', 'str | None'))
+            904 LOAD_CONST              51 (<code object _hint_for at 0x7f6c81bc97c0, file "app\api\llm_endpoints.py", line 244>)
+            906 MAKE_FUNCTION            4 (annotations)
+            908 STORE_NAME              64 (_hint_for)
+
+253         910 LOAD_CONST              65 (('exc', 'StudioError', 'started', 'float', 'return', 'dict'))
+            912 LOAD_CONST              52 (<code object _result_from_error at 0x7f6c92d63360, file "app\api\llm_endpoints.py", line 253>)
+            914 MAKE_FUNCTION            4 (annotations)
+            916 STORE_NAME              65 (_result_from_error)
+
+263         918 LOAD_NAME               31 (router)
+            920 LOAD_ATTR              109 (NULL|self + post)
+            940 LOAD_CONST              53 ('/endpoints/test')
+            942 CALL                     1
+
+264         950 LOAD_CONST              66 (('body', 'TestIn'))
+            952 LOAD_CONST              54 (<code object test_endpoint at 0x28e59790, file "app\api\llm_endpoints.py", line 263>)
+            954 MAKE_FUNCTION            4 (annotations)
+
+263         956 CALL                     0
+
+264         964 STORE_NAME              66 (test_endpoint)
+
+299         966 LOAD_CONST              67 (('url', 'str', 'headers', 'dict', 'timeout', 'float', 'return', 'httpx.Response'))
+            968 LOAD_CONST              55 (<code object _http_get at 0x7f6c81a75550, file "app\api\llm_endpoints.py", line 299>)
+            970 MAKE_FUNCTION            4 (annotations)
+            972 STORE_NAME              67 (_http_get)
+
+305         974 LOAD_NAME               31 (router)
+            976 LOAD_ATTR              109 (NULL|self + post)
+            996 LOAD_CONST              56 ('/models/fetch')
+            998 CALL                     1
+
+306        1006 LOAD_CONST              68 (('body', 'FetchModelsIn'))
+           1008 LOAD_CONST              57 (<code object fetch_models at 0x26a234e0, file "app\api\llm_endpoints.py", line 305>)
+           1010 MAKE_FUNCTION            4 (annotations)
+
+305        1012 CALL                     0
+
+306        1020 STORE_NAME              68 (fetch_models)
+           1022 RETURN_CONST             3 (None)
+
+Disassembly of <code object ModelIn at 0x7f6c92d62b80, file "app\api\llm_endpoints.py", line 54>:
+ 54           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('ModelIn')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 55          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('id')
+             18 STORE_SUBSCR
+
+ 56          22 LOAD_CONST               3 (None)
+             24 STORE_NAME               4 (label)
+             26 LOAD_CONST               4 ('str | None')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('label')
+             32 STORE_SUBSCR
+
+ 57          36 LOAD_CONST               3 (None)
+             38 STORE_NAME               5 (max_input_tokens)
+             40 LOAD_CONST               6 ('int | None')
+             42 LOAD_NAME                3 (__annotations__)
+             44 LOAD_CONST               7 ('max_input_tokens')
+             46 STORE_SUBSCR
+
+ 58          50 LOAD_CONST               3 (None)
+             52 STORE_NAME               6 (max_output_tokens)
+             54 LOAD_CONST               6 ('int | None')
+             56 LOAD_NAME                3 (__annotations__)
+             58 LOAD_CONST               8 ('max_output_tokens')
+             60 STORE_SUBSCR
+
+ 59          64 LOAD_CONST               3 (None)
+             66 STORE_NAME               7 (price_in)
+             68 LOAD_CONST               9 ('float | None')
+             70 LOAD_NAME                3 (__annotations__)
+             72 LOAD_CONST              10 ('price_in')
+             74 STORE_SUBSCR
+
+ 60          78 LOAD_CONST               3 (None)
+             80 STORE_NAME               8 (price_out)
+             82 LOAD_CONST               9 ('float | None')
+             84 LOAD_NAME                3 (__annotations__)
+             86 LOAD_CONST              11 ('price_out')
+             88 STORE_SUBSCR
+
+ 61          92 LOAD_CONST               3 (None)
+             94 STORE_NAME               9 (price_cache_in)
+             96 LOAD_CONST               9 ('float | None')
+             98 LOAD_NAME                3 (__annotations__)
+            100 LOAD_CONST              12 ('price_cache_in')
+            102 STORE_SUBSCR
+
+ 62         106 LOAD_CONST               3 (None)
+            108 STORE_NAME              10 (supports_reasoning_effort)
+            110 LOAD_CONST              13 ('bool | None')
+            112 LOAD_NAME                3 (__annotations__)
+            114 LOAD_CONST              14 ('supports_reasoning_effort')
+            116 STORE_SUBSCR
+
+ 63         120 LOAD_CONST               3 (None)
+            122 STORE_NAME              11 (honors_temperature)
+            124 LOAD_CONST              13 ('bool | None')
+            126 LOAD_NAME                3 (__annotations__)
+            128 LOAD_CONST              15 ('honors_temperature')
+            130 STORE_SUBSCR
+
+ 65         134 LOAD_CONST              17 (('return', 'dict'))
+            136 LOAD_CONST              16 (<code object as_dict at 0x7f6c92ea5cf0, file "app\api\llm_endpoints.py", line 65>)
+            138 MAKE_FUNCTION            4 (annotations)
+            140 STORE_NAME              12 (as_dict)
+            142 RETURN_CONST             3 (None)
+
+Disassembly of <code object as_dict at 0x7f6c92ea5cf0, file "app\api\llm_endpoints.py", line 65>:
+ 65           0 RESUME                   0
+
+ 66           2 LOAD_FAST                0 (self)
+              4 LOAD_ATTR                1 (NULL|self + model_dump)
+             24 CALL                     0
+             32 LOAD_ATTR                3 (NULL|self + items)
+             52 CALL                     0
+             60 GET_ITER
+             62 LOAD_FAST_AND_CLEAR      1 (k)
+             64 LOAD_FAST_AND_CLEAR      2 (v)
+             66 SWAP                     3
+             68 BUILD_MAP                0
+             70 SWAP                     2
+        >>   72 FOR_ITER                11 (to 98)
+             76 UNPACK_SEQUENCE          2
+             80 STORE_FAST               1 (k)
+             82 STORE_FAST               2 (v)
+             84 LOAD_FAST                2 (v)
+             86 POP_JUMP_IF_NOT_NONE     1 (to 90)
+             88 JUMP_BACKWARD            9 (to 72)
+        >>   90 LOAD_FAST                1 (k)
+             92 LOAD_FAST                2 (v)
+             94 MAP_ADD                  2
+             96 JUMP_BACKWARD           13 (to 72)
+        >>   98 END_FOR
+            100 SWAP                     3
+            102 STORE_FAST               2 (v)
+            104 STORE_FAST               1 (k)
+            106 RETURN_VALUE
+        >>  108 SWAP                     2
+            110 POP_TOP
+            112 SWAP                     3
+            114 STORE_FAST               2 (v)
+            116 STORE_FAST               1 (k)
+            118 RERAISE                  0
+ExceptionTable:
+  68 to 86 -> 108 [3]
+  90 to 98 -> 108 [3]
+
+Disassembly of <code object EndpointIn at 0x7f6c9328b560, file "app\api\llm_endpoints.py", line 69>:
+ 69           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('EndpointIn')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 70          12 LOAD_CONST               1 (None)
+             14 STORE_NAME               3 (name)
+             16 LOAD_CONST               2 ('str | None')
+             18 LOAD_NAME                4 (__annotations__)
+             20 LOAD_CONST               3 ('name')
+             22 STORE_SUBSCR
+
+ 71          26 LOAD_CONST               1 (None)
+             28 STORE_NAME               5 (base_url)
+             30 LOAD_CONST               2 ('str | None')
+             32 LOAD_NAME                4 (__annotations__)
+             34 LOAD_CONST               4 ('base_url')
+             36 STORE_SUBSCR
+
+ 72          40 LOAD_CONST               1 (None)
+             42 STORE_NAME               6 (dialect)
+             44 LOAD_CONST               2 ('str | None')
+             46 LOAD_NAME                4 (__annotations__)
+             48 LOAD_CONST               5 ('dialect')
+             50 STORE_SUBSCR
+
+ 73          54 LOAD_CONST               1 (None)
+             56 STORE_NAME               7 (preset_key)
+             58 LOAD_CONST               2 ('str | None')
+             60 LOAD_NAME                4 (__annotations__)
+             62 LOAD_CONST               6 ('preset_key')
+             64 STORE_SUBSCR
+
+ 74          68 LOAD_CONST               1 (None)
+             70 STORE_NAME               8 (api_key)
+             72 LOAD_CONST               2 ('str | None')
+             74 LOAD_NAME                4 (__annotations__)
+             76 LOAD_CONST               7 ('api_key')
+             78 STORE_SUBSCR
+
+ 75          82 LOAD_CONST               8 (False)
+             84 STORE_NAME               9 (clear_key)
+             86 LOAD_CONST               9 ('bool')
+             88 LOAD_NAME                4 (__annotations__)
+             90 LOAD_CONST              10 ('clear_key')
+             92 STORE_SUBSCR
+
+ 76          96 LOAD_CONST               1 (None)
+             98 STORE_NAME              10 (headers)
+            100 LOAD_CONST              11 ('dict[str, str] | None')
+            102 LOAD_NAME                4 (__annotations__)
+            104 LOAD_CONST              12 ('headers')
+            106 STORE_SUBSCR
+
+ 77         110 LOAD_CONST               1 (None)
+            112 STORE_NAME              11 (models)
+            114 LOAD_CONST              13 ('list[ModelIn] | None')
+            116 LOAD_NAME                4 (__annotations__)
+            118 LOAD_CONST              14 ('models')
+            120 STORE_SUBSCR
+
+ 78         124 LOAD_CONST               1 (None)
+            126 STORE_NAME              12 (default_model)
+            128 LOAD_CONST               2 ('str | None')
+            130 LOAD_NAME                4 (__annotations__)
+            132 LOAD_CONST              15 ('default_model')
+            134 STORE_SUBSCR
+
+ 79         138 LOAD_CONST               1 (None)
+            140 STORE_NAME              13 (timeout_s)
+            142 LOAD_CONST              16 ('int | None')
+            144 LOAD_NAME                4 (__annotations__)
+            146 LOAD_CONST              17 ('timeout_s')
+            148 STORE_SUBSCR
+
+ 80         152 LOAD_CONST               1 (None)
+            154 STORE_NAME              14 (enabled)
+            156 LOAD_CONST              18 ('bool | None')
+            158 LOAD_NAME                4 (__annotations__)
+            160 LOAD_CONST              19 ('enabled')
+            162 STORE_SUBSCR
+            166 RETURN_CONST             1 (None)
+
+Disassembly of <code object TestIn at 0x7f6c81b7dd70, file "app\api\llm_endpoints.py", line 83>:
+ 83           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('TestIn')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 84          12 LOAD_CONST               1 ('Nháp form. `endpoint_id` = đang sửa endpoint đã lưu → dùng lại key/header đã lưu nếu ô trống.')
+             14 STORE_NAME               3 (__doc__)
+
+ 85          16 LOAD_CONST               2 ('str')
+             18 LOAD_NAME                4 (__annotations__)
+             20 LOAD_CONST               3 ('base_url')
+             22 STORE_SUBSCR
+
+ 86          26 LOAD_CONST               4 ('openai_chat')
+             28 STORE_NAME               5 (dialect)
+             30 LOAD_CONST               2 ('str')
+             32 LOAD_NAME                4 (__annotations__)
+             34 LOAD_CONST               5 ('dialect')
+             36 STORE_SUBSCR
+
+ 87          40 LOAD_CONST               6 (None)
+             42 STORE_NAME               6 (api_key)
+             44 LOAD_CONST               7 ('str | None')
+             46 LOAD_NAME                4 (__annotations__)
+             48 LOAD_CONST               8 ('api_key')
+             50 STORE_SUBSCR
+
+ 88          54 LOAD_CONST               6 (None)
+             56 STORE_NAME               7 (headers)
+             58 LOAD_CONST               9 ('dict[str, str] | None')
+             60 LOAD_NAME                4 (__annotations__)
+             62 LOAD_CONST              10 ('headers')
+             64 STORE_SUBSCR
+
+ 89          68 LOAD_CONST               2 ('str')
+             70 LOAD_NAME                4 (__annotations__)
+             72 LOAD_CONST              11 ('model')
+             74 STORE_SUBSCR
+
+ 90          78 LOAD_CONST               6 (None)
+             80 STORE_NAME               8 (endpoint_id)
+             82 LOAD_CONST               7 ('str | None')
+             84 LOAD_NAME                4 (__annotations__)
+             86 LOAD_CONST              12 ('endpoint_id')
+             88 STORE_SUBSCR
+             92 RETURN_CONST             6 (None)
+
+Disassembly of <code object FetchModelsIn at 0x7f6c92a3bbb0, file "app\api\llm_endpoints.py", line 93>:
+ 93           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('FetchModelsIn')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 94          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('base_url')
+             18 STORE_SUBSCR
+
+ 95          22 LOAD_CONST               3 ('openai_chat')
+             24 STORE_NAME               4 (dialect)
+             26 LOAD_CONST               1 ('str')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               4 ('dialect')
+             32 STORE_SUBSCR
+
+ 96          36 LOAD_CONST               5 (None)
+             38 STORE_NAME               5 (api_key)
+             40 LOAD_CONST               6 ('str | None')
+             42 LOAD_NAME                3 (__annotations__)
+             44 LOAD_CONST               7 ('api_key')
+             46 STORE_SUBSCR
+
+ 97          50 LOAD_CONST               5 (None)
+             52 STORE_NAME               6 (headers)
+             54 LOAD_CONST               8 ('dict[str, str] | None')
+             56 LOAD_NAME                3 (__annotations__)
+             58 LOAD_CONST               9 ('headers')
+             60 STORE_SUBSCR
+
+ 98          64 LOAD_CONST               5 (None)
+             66 STORE_NAME               7 (endpoint_id)
+             68 LOAD_CONST               6 ('str | None')
+             70 LOAD_NAME                3 (__annotations__)
+             72 LOAD_CONST              10 ('endpoint_id')
+             74 STORE_SUBSCR
+             78 RETURN_CONST             5 (None)
+
+Disassembly of <code object list_presets at 0x269960f0, file "app\api\llm_endpoints.py", line 103>:
+103           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+105           6 NOP
+
+106           8 LOAD_GLOBAL              1 (NULL + json)
+             18 LOAD_ATTR                2 (loads)
+             38 LOAD_GLOBAL              4 (_PRESETS_PATH)
+             48 LOAD_ATTR                7 (NULL|self + read_text)
+             68 LOAD_CONST               1 ('utf-8')
+             70 KW_NAMES                 2 (('encoding',))
+             72 CALL                     1
+             80 CALL                     1
+             88 STORE_FAST               0 (data)
+
+107          90 LOAD_FAST                0 (data)
+             92 LOAD_ATTR                9 (NULL|self + get)
+            112 LOAD_CONST               3 ('presets')
+            114 CALL                     1
+            122 COPY                     1
+            124 POP_JUMP_IF_TRUE         2 (to 130)
+            126 POP_TOP
+            128 BUILD_LIST               0
+        >>  130 STORE_FAST               1 (presets)
+
+113     >>  132 LOAD_FAST                1 (presets)
+
+114         134 LOAD_GLOBAL             21 (NULL + dialects)
+            144 LOAD_ATTR               22 (keys)
+            164 CALL                     0
+            172 GET_ITER
+            174 LOAD_FAST_AND_CLEAR      3 (k)
+            176 SWAP                     2
+            178 BUILD_LIST               0
+            180 SWAP                     2
+        >>  182 FOR_ITER                36 (to 258)
+            186 STORE_FAST               3 (k)
+            188 LOAD_FAST                3 (k)
+            190 LOAD_GLOBAL             21 (NULL + dialects)
+            200 LOAD_ATTR                8 (get)
+            220 LOAD_FAST                3 (k)
+            222 CALL                     1
+            230 LOAD_ATTR               24 (LABEL)
+            250 LOAD_CONST               6 (('key', 'label'))
+            252 BUILD_CONST_KEY_MAP      2
+            254 LIST_APPEND              2
+            256 JUMP_BACKWARD           38 (to 182)
+        >>  258 END_FOR
+            260 SWAP                     2
+            262 STORE_FAST               3 (k)
+
+112         264 LOAD_CONST               7 (('presets', 'dialects'))
+            266 BUILD_CONST_KEY_MAP      2
+            268 RETURN_VALUE
+        >>  270 PUSH_EXC_INFO
+
+108         272 LOAD_GLOBAL             10 (OSError)
+            282 LOAD_GLOBAL             12 (ValueError)
+            292 BUILD_TUPLE              2
+            294 CHECK_EXC_MATCH
+            296 POP_JUMP_IF_FALSE       53 (to 404)
+            298 STORE_FAST               2 (exc)
+
+110         300 LOAD_GLOBAL             15 (NULL + log)
+            310 LOAD_ATTR               16 (warning)
+            330 LOAD_CONST               4 ('[llm_endpoints] không đọc được ')
+            332 LOAD_GLOBAL              4 (_PRESETS_PATH)
+            342 LOAD_ATTR               18 (name)
+            362 FORMAT_VALUE             0
+            364 LOAD_CONST               5 (': ')
+            366 LOAD_FAST                2 (exc)
+            368 FORMAT_VALUE             0
+            370 BUILD_STRING             4
+            372 CALL                     1
+            380 POP_TOP
+
+111         382 BUILD_LIST               0
+            384 STORE_FAST               1 (presets)
+            386 POP_EXCEPT
+            388 LOAD_CONST               0 (None)
+            390 STORE_FAST               2 (exc)
+            392 DELETE_FAST              2 (exc)
+            394 JUMP_BACKWARD          132 (to 132)
+        >>  396 LOAD_CONST               0 (None)
+            398 STORE_FAST               2 (exc)
+            400 DELETE_FAST              2 (exc)
+            402 RERAISE                  1
+
+108     >>  404 RERAISE                  0
+        >>  406 COPY                     3
+            408 POP_EXCEPT
+            410 RERAISE                  1
+        >>  412 SWAP                     2
+            414 POP_TOP
+
+114         416 SWAP                     2
+            418 STORE_FAST               3 (k)
+            420 RERAISE                  0
+        >>  422 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            424 RERAISE                  1
+ExceptionTable:
+  4 to 4 -> 422 [0] lasti
+  8 to 130 -> 270 [0]
+  132 to 176 -> 422 [0] lasti
+  178 to 258 -> 412 [3]
+  260 to 268 -> 422 [0] lasti
+  270 to 298 -> 406 [1] lasti
+  300 to 384 -> 396 [1] lasti
+  386 to 394 -> 422 [0] lasti
+  396 to 404 -> 406 [1] lasti
+  406 to 420 -> 422 [0] lasti
+
+Disassembly of <code object list_endpoints at 0x7f6c81a44030, file "app\api\llm_endpoints.py", line 118>:
+118           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+120           6 LOAD_CONST               1 ('endpoints')
+              8 LOAD_GLOBAL              1 (NULL + store)
+             18 LOAD_ATTR                2 (list_public)
+             38 CALL                     0
+             46 BUILD_MAP                1
+             48 RETURN_VALUE
+        >>   50 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             52 RERAISE                  1
+ExceptionTable:
+  4 to 48 -> 50 [0] lasti
+
+Disassembly of <code object list_choices at 0x269ebee0, file "app\api\llm_endpoints.py", line 123>:
+123           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+132           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('Setting',))
+             10 IMPORT_NAME              0 (app.db.models)
+             12 IMPORT_FROM              1 (Setting)
+             14 STORE_FAST               0 (Setting)
+             16 POP_TOP
+
+133          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('SessionLocal',))
+             22 IMPORT_NAME              2 (app.db.session)
+             24 IMPORT_FROM              3 (SessionLocal)
+             26 STORE_FAST               1 (SessionLocal)
+             28 POP_TOP
+
+135          30 PUSH_NULL
+             32 LOAD_FAST                1 (SessionLocal)
+             34 CALL                     0
+             42 BEFORE_WITH
+             44 STORE_FAST               2 (db)
+
+136          46 LOAD_FAST                2 (db)
+             48 LOAD_ATTR                9 (NULL|self + get)
+             68 LOAD_FAST                0 (Setting)
+             70 LOAD_CONST               4 ('deepseek_api_key')
+             72 CALL                     2
+             80 STORE_FAST               3 (row)
+
+137          82 LOAD_GLOBAL             11 (NULL + bool)
+             92 LOAD_FAST                3 (row)
+             94 COPY                     1
+             96 POP_JUMP_IF_FALSE       30 (to 158)
+             98 POP_TOP
+            100 LOAD_FAST                3 (row)
+            102 LOAD_ATTR               12 (value)
+            122 COPY                     1
+            124 POP_JUMP_IF_TRUE         2 (to 130)
+            126 POP_TOP
+            128 LOAD_CONST               5 ('')
+        >>  130 LOAD_ATTR               15 (NULL|self + strip)
+            150 CALL                     0
+        >>  158 CALL                     1
+            166 STORE_FAST               4 (deepseek_ready)
+
+135         168 LOAD_CONST               6 (None)
+            170 LOAD_CONST               6 (None)
+            172 LOAD_CONST               6 (None)
+            174 CALL                     2
+            182 POP_TOP
+
+139     >>  184 LOAD_CONST               7 ('deepseek')
+            186 LOAD_CONST               8 ('DeepSeek')
+            188 LOAD_CONST               9 ('builtin')
+            190 LOAD_CONST              10 ('api')
+
+140         192 LOAD_FAST_CHECK          4 (deepseek_ready)
+
+139         194 LOAD_CONST              11 (('value', 'label', 'group', 'kind', 'has_key'))
+            196 BUILD_CONST_KEY_MAP      5
+
+141         198 LOAD_CONST              12 ('chatgpt')
+            200 LOAD_CONST              13 ('ChatGPT (web)')
+            202 LOAD_CONST               9 ('builtin')
+            204 LOAD_CONST              14 ('session')
+            206 LOAD_CONST              15 (('value', 'label', 'group', 'kind'))
+            208 BUILD_CONST_KEY_MAP      4
+
+142         210 LOAD_CONST              16 ('gemini')
+            212 LOAD_CONST              17 ('Gemini (web)')
+            214 LOAD_CONST               9 ('builtin')
+            216 LOAD_CONST              14 ('session')
+            218 LOAD_CONST              15 (('value', 'label', 'group', 'kind'))
+            220 BUILD_CONST_KEY_MAP      4
+
+138         222 BUILD_LIST               3
+            224 STORE_FAST               5 (builtin)
+
+144         226 BUILD_LIST               0
+            228 STORE_FAST               6 (custom)
+
+145         230 LOAD_GLOBAL             17 (NULL + store)
+            240 LOAD_ATTR               18 (list_public)
+            260 LOAD_CONST              18 (True)
+            262 KW_NAMES                19 (('enabled_only',))
+            264 CALL                     1
+            272 GET_ITER
+        >>  274 FOR_ITER               184 (to 646)
+            278 STORE_FAST               7 (ep)
+
+146         280 LOAD_FAST                7 (ep)
+            282 LOAD_CONST              20 ('models')
+            284 BINARY_SUBSCR
+            288 GET_ITER
+        >>  290 FOR_ITER               174 (to 642)
+            294 STORE_FAST               8 (model)
+
+147         296 LOAD_FAST                6 (custom)
+            298 LOAD_ATTR               21 (NULL|self + append)
+
+148         318 LOAD_CONST              21 ('api:')
+            320 LOAD_FAST                7 (ep)
+            322 LOAD_CONST              22 ('id')
+            324 BINARY_SUBSCR
+            328 FORMAT_VALUE             0
+            330 LOAD_CONST              23 ('/')
+            332 LOAD_FAST                8 (model)
+            334 LOAD_CONST              22 ('id')
+            336 BINARY_SUBSCR
+            340 FORMAT_VALUE             0
+            342 BUILD_STRING             4
+
+149         344 LOAD_FAST                7 (ep)
+            346 LOAD_CONST              24 ('name')
+            348 BINARY_SUBSCR
+            352 FORMAT_VALUE             0
+            354 LOAD_CONST              25 (' · ')
+            356 LOAD_FAST                8 (model)
+            358 LOAD_ATTR                9 (NULL|self + get)
+            378 LOAD_CONST              26 ('label')
+            380 CALL                     1
+            388 COPY                     1
+            390 POP_JUMP_IF_TRUE         5 (to 402)
+            392 POP_TOP
+            394 LOAD_FAST                8 (model)
+            396 LOAD_CONST              22 ('id')
+            398 BINARY_SUBSCR
+        >>  402 FORMAT_VALUE             0
+            404 BUILD_STRING             3
+
+150         406 LOAD_FAST                7 (ep)
+            408 LOAD_CONST              24 ('name')
+            410 BINARY_SUBSCR
+
+151         414 LOAD_FAST                7 (ep)
+            416 LOAD_CONST              22 ('id')
+            418 BINARY_SUBSCR
+
+152         422 LOAD_FAST                8 (model)
+            424 LOAD_CONST              22 ('id')
+            426 BINARY_SUBSCR
+
+153         430 LOAD_CONST              10 ('api')
+
+154         432 LOAD_FAST                8 (model)
+            434 LOAD_CONST              22 ('id')
+            436 BINARY_SUBSCR
+            440 LOAD_FAST                7 (ep)
+            442 LOAD_CONST              27 ('default_model')
+            444 BINARY_SUBSCR
+            448 COMPARE_OP              40 (==)
+
+155         452 LOAD_FAST                8 (model)
+            454 LOAD_ATTR                9 (NULL|self + get)
+            474 LOAD_CONST              28 ('max_input_tokens')
+            476 CALL                     1
+
+156         484 LOAD_FAST                7 (ep)
+            486 LOAD_CONST              29 ('has_key')
+            488 BINARY_SUBSCR
+            492 COPY                     1
+            494 POP_JUMP_IF_TRUE         5 (to 506)
+            496 POP_TOP
+            498 LOAD_FAST                7 (ep)
+            500 LOAD_CONST              30 ('is_local')
+            502 BINARY_SUBSCR
+
+159     >>  506 LOAD_FAST                8 (model)
+            508 LOAD_ATTR                9 (NULL|self + get)
+            528 LOAD_CONST              31 ('price_in')
+            530 CALL                     1
+            538 COPY                     1
+            540 POP_JUMP_IF_TRUE         2 (to 546)
+            542 POP_TOP
+            544 LOAD_CONST               1 (0)
+
+160     >>  546 LOAD_FAST                8 (model)
+            548 LOAD_ATTR                9 (NULL|self + get)
+            568 LOAD_CONST              32 ('price_out')
+            570 CALL                     1
+            578 COPY                     1
+            580 POP_JUMP_IF_TRUE         2 (to 586)
+            582 POP_TOP
+            584 LOAD_CONST               1 (0)
+
+161     >>  586 LOAD_FAST                8 (model)
+            588 LOAD_ATTR                9 (NULL|self + get)
+            608 LOAD_CONST              33 ('price_cache_in')
+            610 CALL                     1
+            618 COPY                     1
+            620 POP_JUMP_IF_TRUE         2 (to 626)
+            622 POP_TOP
+            624 LOAD_CONST               1 (0)
+
+147     >>  626 LOAD_CONST              34 (('value', 'label', 'group', 'endpoint_id', 'model_id', 'kind', 'is_default_model', 'max_input_tokens', 'has_key', 'price_in', 'price_out', 'price_cache_in'))
+            628 BUILD_CONST_KEY_MAP     12
+            630 CALL                     1
+            638 POP_TOP
+            640 JUMP_BACKWARD          176 (to 290)
+
+146     >>  642 END_FOR
+            644 JUMP_BACKWARD          186 (to 274)
+
+145     >>  646 END_FOR
+
+163         648 LOAD_CONST              35 ('choices')
+            650 LOAD_FAST                5 (builtin)
+            652 LOAD_FAST                6 (custom)
+            654 BINARY_OP                0 (+)
+            658 BUILD_MAP                1
+            660 RETURN_VALUE
+
+135     >>  662 PUSH_EXC_INFO
+            664 WITH_EXCEPT_START
+            666 POP_JUMP_IF_TRUE         1 (to 670)
+            668 RERAISE                  2
+        >>  670 POP_TOP
+            672 POP_EXCEPT
+            674 POP_TOP
+            676 POP_TOP
+            678 JUMP_BACKWARD          248 (to 184)
+        >>  680 COPY                     3
+            682 POP_EXCEPT
+            684 RERAISE                  1
+        >>  686 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            688 RERAISE                  1
+ExceptionTable:
+  4 to 42 -> 686 [0] lasti
+  44 to 166 -> 662 [1] lasti
+  168 to 660 -> 686 [0] lasti
+  662 to 670 -> 680 [3] lasti
+  672 to 684 -> 686 [0] lasti
+
+Disassembly of <code object _models_payload at 0x7f6c92ea57f0, file "app\api\llm_endpoints.py", line 168>:
+168           0 RESUME                   0
+
+169           2 LOAD_FAST                0 (body)
+              4 LOAD_ATTR                0 (models)
+             24 POP_JUMP_IF_NONE        40 (to 106)
+             26 LOAD_FAST                0 (body)
+             28 LOAD_ATTR                0 (models)
+             48 GET_ITER
+             50 LOAD_FAST_AND_CLEAR      1 (m)
+             52 SWAP                     2
+             54 BUILD_LIST               0
+             56 SWAP                     2
+        >>   58 FOR_ITER                18 (to 98)
+             62 STORE_FAST               1 (m)
+             64 LOAD_FAST                1 (m)
+             66 LOAD_ATTR                3 (NULL|self + as_dict)
+             86 CALL                     0
+             94 LIST_APPEND              2
+             96 JUMP_BACKWARD           20 (to 58)
+        >>   98 END_FOR
+            100 SWAP                     2
+            102 STORE_FAST               1 (m)
+            104 RETURN_VALUE
+        >>  106 LOAD_CONST               0 (None)
+            108 RETURN_VALUE
+        >>  110 SWAP                     2
+            112 POP_TOP
+            114 SWAP                     2
+            116 STORE_FAST               1 (m)
+            118 RERAISE                  0
+ExceptionTable:
+  54 to 98 -> 110 [2]
+
+Disassembly of <code object create_endpoint at 0x269e1010, file "app\api\llm_endpoints.py", line 172>:
+172           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+174           6 LOAD_GLOBAL              1 (NULL + store)
+             16 LOAD_ATTR                2 (create)
+
+175          36 LOAD_FAST                0 (body)
+             38 LOAD_ATTR                4 (name)
+             58 COPY                     1
+             60 POP_JUMP_IF_TRUE         2 (to 66)
+             62 POP_TOP
+             64 LOAD_CONST               1 ('')
+
+176     >>   66 LOAD_FAST                0 (body)
+             68 LOAD_ATTR                6 (base_url)
+             88 COPY                     1
+             90 POP_JUMP_IF_TRUE         2 (to 96)
+             92 POP_TOP
+             94 LOAD_CONST               1 ('')
+
+177     >>   96 LOAD_FAST                0 (body)
+             98 LOAD_ATTR                8 (dialect)
+            118 COPY                     1
+            120 POP_JUMP_IF_TRUE        16 (to 154)
+            122 POP_TOP
+            124 LOAD_GLOBAL              0 (store)
+            134 LOAD_ATTR               10 (DEFAULT_DIALECT)
+
+178     >>  154 LOAD_FAST                0 (body)
+            156 LOAD_ATTR               12 (api_key)
+            176 COPY                     1
+            178 POP_JUMP_IF_TRUE         2 (to 184)
+            180 POP_TOP
+            182 LOAD_CONST               1 ('')
+
+179     >>  184 LOAD_GLOBAL             15 (NULL + _models_payload)
+            194 LOAD_FAST                0 (body)
+            196 CALL                     1
+
+180         204 LOAD_FAST                0 (body)
+            206 LOAD_ATTR               16 (default_model)
+
+181         226 LOAD_FAST                0 (body)
+            228 LOAD_ATTR               18 (preset_key)
+
+182         248 LOAD_FAST                0 (body)
+            250 LOAD_ATTR               20 (headers)
+
+183         270 LOAD_FAST                0 (body)
+            272 LOAD_ATTR               22 (timeout_s)
+            292 COPY                     1
+            294 POP_JUMP_IF_TRUE         2 (to 300)
+            296 POP_TOP
+            298 LOAD_CONST               2 (300)
+
+184     >>  300 LOAD_FAST                0 (body)
+            302 LOAD_ATTR               24 (enabled)
+            322 POP_JUMP_IF_NOT_NONE     7 (to 338)
+            324 LOAD_CONST               3 (True)
+
+174         326 KW_NAMES                 4 (('name', 'base_url', 'dialect', 'api_key', 'models', 'default_model', 'preset_key', 'headers', 'timeout_s', 'enabled'))
+            328 CALL                    10
+            336 RETURN_VALUE
+
+184     >>  338 LOAD_FAST                0 (body)
+            340 LOAD_ATTR               24 (enabled)
+
+174         360 KW_NAMES                 4 (('name', 'base_url', 'dialect', 'api_key', 'models', 'default_model', 'preset_key', 'headers', 'timeout_s', 'enabled'))
+            362 CALL                    10
+            370 RETURN_VALUE
+        >>  372 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            374 RERAISE                  1
+ExceptionTable:
+  4 to 370 -> 372 [0] lasti
+
+Disassembly of <code object update_endpoint at 0x7f6c92ea56b0, file "app\api\llm_endpoints.py", line 188>:
+188           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+190           6 LOAD_FAST                1 (body)
+              8 LOAD_ATTR                1 (NULL|self + model_dump)
+             28 LOAD_CONST               1 (True)
+             30 KW_NAMES                 2 (('exclude_unset',))
+             32 CALL                     1
+             40 STORE_FAST               2 (fields)
+
+191          42 LOAD_CONST               3 ('models')
+             44 LOAD_FAST                2 (fields)
+             46 CONTAINS_OP              0
+             48 POP_JUMP_IF_FALSE       14 (to 78)
+
+192          50 LOAD_GLOBAL              3 (NULL + _models_payload)
+             60 LOAD_FAST                1 (body)
+             62 CALL                     1
+             70 LOAD_FAST                2 (fields)
+             72 LOAD_CONST               3 ('models')
+             74 STORE_SUBSCR
+
+193     >>   78 LOAD_GLOBAL              5 (NULL + store)
+             88 LOAD_ATTR                6 (update)
+            108 LOAD_FAST                0 (endpoint_id)
+            110 BUILD_TUPLE              1
+            112 BUILD_MAP                0
+            114 LOAD_FAST                2 (fields)
+            116 DICT_MERGE               1
+            118 CALL_FUNCTION_EX         1
+            120 RETURN_VALUE
+        >>  122 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            124 RERAISE                  1
+ExceptionTable:
+  4 to 120 -> 122 [0] lasti
+
+Disassembly of <code object endpoint_usages at 0x7f6c81a44230, file "app\api\llm_endpoints.py", line 196>:
+196           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+199           6 LOAD_CONST               1 ('usages')
+              8 LOAD_GLOBAL              1 (NULL + store)
+             18 LOAD_ATTR                2 (usages_of)
+             38 LOAD_FAST                0 (endpoint_id)
+             40 CALL                     1
+             48 BUILD_MAP                1
+             50 RETURN_VALUE
+        >>   52 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             54 RERAISE                  1
+ExceptionTable:
+  4 to 50 -> 52 [0] lasti
+
+Disassembly of <code object delete_endpoint at 0x7f6c9328b280, file "app\api\llm_endpoints.py", line 202>:
+202           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+205           6 LOAD_GLOBAL              1 (NULL + store)
+             16 LOAD_ATTR                2 (usages_of)
+             36 LOAD_FAST                0 (endpoint_id)
+             38 CALL                     1
+             46 STORE_FAST               1 (usages)
+
+206          48 LOAD_GLOBAL              1 (NULL + store)
+             58 LOAD_ATTR                4 (delete)
+             78 LOAD_FAST                0 (endpoint_id)
+             80 CALL                     1
+             88 POP_JUMP_IF_TRUE        32 (to 154)
+
+207          90 LOAD_GLOBAL              7 (NULL + make_error)
+            100 LOAD_GLOBAL              8 (E)
+            110 LOAD_ATTR               10 (LLM_API_ENDPOINT_MISSING)
+
+208         130 LOAD_CONST               1 ('Endpoint AI ')
+            132 LOAD_FAST                0 (endpoint_id)
+            134 FORMAT_VALUE             2 (repr)
+            136 LOAD_CONST               2 (' không tồn tại.')
+            138 BUILD_STRING             3
+            140 LOAD_CONST               3 (404)
+
+207         142 KW_NAMES                 4 (('status_code',))
+            144 CALL                     3
+            152 RAISE_VARARGS            1
+
+209     >>  154 LOAD_CONST               5 (True)
+            156 LOAD_FAST                1 (usages)
+            158 LOAD_CONST               6 (('ok', 'affected'))
+            160 BUILD_CONST_KEY_MAP      2
+            162 RETURN_VALUE
+        >>  164 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            166 RERAISE                  1
+ExceptionTable:
+  4 to 162 -> 164 [0] lasti
+
+Disassembly of <code object _draft_secrets at 0x7f6c81a753b0, file "app\api\llm_endpoints.py", line 214>:
+214           0 RESUME                   0
+
+217           2 LOAD_FAST                0 (api_key)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 LOAD_CONST               1 ('')
+        >>   12 LOAD_ATTR                1 (NULL|self + strip)
+             32 CALL                     0
+             40 STORE_FAST               3 (key)
+
+218          42 LOAD_FAST                3 (key)
+             44 LOAD_ATTR                3 (NULL|self + startswith)
+             64 LOAD_CONST               2 ('•')
+             66 CALL                     1
+             74 POP_JUMP_IF_FALSE        2 (to 80)
+
+219          76 LOAD_CONST               1 ('')
+             78 STORE_FAST               3 (key)
+
+220     >>   80 LOAD_GLOBAL              5 (NULL + dict)
+             90 LOAD_FAST                1 (headers)
+             92 COPY                     1
+             94 POP_JUMP_IF_TRUE         2 (to 100)
+             96 POP_TOP
+             98 BUILD_MAP                0
+        >>  100 CALL                     1
+            108 STORE_FAST               4 (extra)
+
+221         110 LOAD_FAST                2 (endpoint_id)
+            112 POP_JUMP_IF_FALSE       46 (to 206)
+
+222         114 LOAD_FAST                3 (key)
+            116 POP_JUMP_IF_TRUE        21 (to 160)
+
+223         118 LOAD_GLOBAL              7 (NULL + store)
+            128 LOAD_ATTR                8 (api_key_of)
+            148 LOAD_FAST                2 (endpoint_id)
+            150 CALL                     1
+            158 STORE_FAST               3 (key)
+
+224     >>  160 LOAD_FAST                1 (headers)
+            162 POP_JUMP_IF_NOT_NONE    21 (to 206)
+
+225         164 LOAD_GLOBAL              7 (NULL + store)
+            174 LOAD_ATTR               10 (headers_of)
+            194 LOAD_FAST                2 (endpoint_id)
+            196 CALL                     1
+            204 STORE_FAST               4 (extra)
+
+226     >>  206 LOAD_FAST                3 (key)
+            208 LOAD_FAST                4 (extra)
+            210 BUILD_TUPLE              2
+            212 RETURN_VALUE
+
+Disassembly of <code object _draft_dialect at 0x7f6c92ea5f70, file "app\api\llm_endpoints.py", line 229>:
+229           0 RESUME                   0
+
+230           2 LOAD_GLOBAL              1 (NULL + dialects)
+             12 LOAD_ATTR                2 (get)
+             32 LOAD_FAST                0 (key)
+             34 CALL                     1
+             42 STORE_FAST               1 (module)
+
+231          44 LOAD_FAST                1 (module)
+             46 POP_JUMP_IF_NOT_NONE    32 (to 112)
+
+232          48 LOAD_GLOBAL              5 (NULL + make_error)
+             58 LOAD_GLOBAL              6 (E)
+             68 LOAD_ATTR                8 (PRECONDITION_MISSING)
+
+233          88 LOAD_CONST               1 ('Định dạng API ')
+             90 LOAD_FAST                0 (key)
+             92 FORMAT_VALUE             2 (repr)
+             94 LOAD_CONST               2 (' chưa hỗ trợ.')
+             96 BUILD_STRING             3
+             98 LOAD_CONST               3 (422)
+
+232         100 KW_NAMES                 4 (('status_code',))
+            102 CALL                     3
+            110 RAISE_VARARGS            1
+
+234     >>  112 LOAD_FAST                1 (module)
+            114 RETURN_VALUE
+
+Disassembly of <code object _hint_for at 0x7f6c81bc97c0, file "app\api\llm_endpoints.py", line 244>:
+244           0 RESUME                   0
+
+245           2 LOAD_FAST                0 (exc)
+              4 LOAD_ATTR                0 (message)
+             24 COPY                     1
+             26 POP_JUMP_IF_TRUE         2 (to 32)
+             28 POP_TOP
+             30 LOAD_CONST               1 ('')
+        >>   32 LOAD_ATTR                3 (NULL|self + lower)
+             52 CALL                     0
+             60 STORE_FAST               1 (low)
+
+246          62 LOAD_FAST                0 (exc)
+             64 LOAD_ATTR                4 (code)
+             84 LOAD_GLOBAL              6 (E)
+             94 LOAD_ATTR                8 (LLM_API_BAD_RESPONSE)
+            114 COMPARE_OP              40 (==)
+            118 POP_JUMP_IF_FALSE       30 (to 180)
+            120 LOAD_CONST               2 ('model')
+            122 LOAD_FAST                1 (low)
+            124 CONTAINS_OP              0
+            126 POP_JUMP_IF_FALSE       26 (to 180)
+
+247         128 LOAD_CONST               3 ('not supported')
+            130 LOAD_FAST                1 (low)
+            132 CONTAINS_OP              0
+            134 POP_JUMP_IF_TRUE        16 (to 168)
+            136 LOAD_CONST               4 ('not found')
+            138 LOAD_FAST                1 (low)
+            140 CONTAINS_OP              0
+            142 POP_JUMP_IF_TRUE        12 (to 168)
+            144 LOAD_CONST               5 ('does not exist')
+            146 LOAD_FAST                1 (low)
+            148 CONTAINS_OP              0
+            150 POP_JUMP_IF_TRUE         8 (to 168)
+
+248         152 LOAD_CONST               6 ('not available')
+            154 LOAD_FAST                1 (low)
+            156 CONTAINS_OP              0
+            158 POP_JUMP_IF_TRUE         4 (to 168)
+            160 LOAD_CONST               7 ('no access')
+            162 LOAD_FAST                1 (low)
+            164 CONTAINS_OP              0
+            166 POP_JUMP_IF_FALSE        6 (to 180)
+
+249     >>  168 LOAD_GLOBAL             10 (_MODEL_REJECTED_HINT)
+            178 RETURN_VALUE
+
+250     >>  180 LOAD_GLOBAL             12 (_TEST_HINTS)
+            190 LOAD_ATTR               15 (NULL|self + get)
+            210 LOAD_FAST                0 (exc)
+            212 LOAD_ATTR                4 (code)
+            232 CALL                     1
+            240 COPY                     1
+            242 POP_JUMP_IF_TRUE        12 (to 268)
+            244 POP_TOP
+            246 LOAD_FAST                0 (exc)
+            248 LOAD_ATTR               16 (hint)
+        >>  268 RETURN_VALUE
+
+Disassembly of <code object _result_from_error at 0x7f6c92d63360, file "app\api\llm_endpoints.py", line 253>:
+253           0 RESUME                   0
+
+255           2 LOAD_CONST               1 (False)
+
+256           4 LOAD_FAST                0 (exc)
+              6 LOAD_ATTR                0 (code)
+
+257          26 LOAD_FAST                0 (exc)
+             28 LOAD_ATTR                2 (message)
+
+258          48 LOAD_GLOBAL              5 (NULL + _hint_for)
+             58 LOAD_FAST                0 (exc)
+             60 CALL                     1
+
+259          68 LOAD_GLOBAL              7 (NULL + int)
+             78 LOAD_GLOBAL              9 (NULL + time)
+             88 LOAD_ATTR               10 (monotonic)
+            108 CALL                     0
+            116 LOAD_FAST                1 (started)
+            118 BINARY_OP               10 (-)
+            122 LOAD_CONST               2 (1000)
+            124 BINARY_OP                5 (*)
+            128 CALL                     1
+
+254         136 LOAD_CONST               3 (('ok', 'error_code', 'message', 'hint', 'latency_ms'))
+            138 BUILD_CONST_KEY_MAP      5
+            140 RETURN_VALUE
+
+Disassembly of <code object test_endpoint at 0x28e59790, file "app\api\llm_endpoints.py", line 263>:
+263           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+267           6 LOAD_GLOBAL              1 (NULL + time)
+             16 LOAD_ATTR                2 (monotonic)
+             36 CALL                     0
+             44 STORE_FAST               1 (started)
+
+268          46 NOP
+
+269          48 LOAD_GLOBAL              5 (NULL + store)
+             58 LOAD_ATTR                6 (clean_base_url)
+             78 LOAD_FAST                0 (body)
+             80 LOAD_ATTR                8 (base_url)
+            100 CALL                     1
+            108 STORE_FAST               2 (base_url)
+
+270         110 LOAD_GLOBAL             11 (NULL + _draft_dialect)
+            120 LOAD_FAST                0 (body)
+            122 LOAD_ATTR               12 (dialect)
+            142 CALL                     1
+            150 POP_TOP
+
+271         152 LOAD_GLOBAL             15 (NULL + _draft_secrets)
+            162 LOAD_FAST                0 (body)
+            164 LOAD_ATTR               16 (api_key)
+            184 LOAD_FAST                0 (body)
+            186 LOAD_ATTR               18 (headers)
+            206 LOAD_FAST                0 (body)
+            208 LOAD_ATTR               20 (endpoint_id)
+            228 CALL                     3
+            236 UNPACK_SEQUENCE          2
+            240 STORE_FAST               3 (key)
+            242 STORE_FAST               4 (extra)
+
+272         244 LOAD_FAST                0 (body)
+            246 LOAD_ATTR               22 (model)
+            266 COPY                     1
+            268 POP_JUMP_IF_TRUE         2 (to 274)
+            270 POP_TOP
+            272 LOAD_CONST               1 ('')
+        >>  274 LOAD_ATTR               25 (NULL|self + strip)
+            294 CALL                     0
+            302 STORE_FAST               5 (model_id)
+
+273         304 LOAD_FAST                5 (model_id)
+            306 POP_JUMP_IF_TRUE        28 (to 364)
+
+274         308 LOAD_GLOBAL             27 (NULL + make_error)
+            318 LOAD_GLOBAL             28 (E)
+            328 LOAD_ATTR               30 (PRECONDITION_MISSING)
+            348 LOAD_CONST               2 ('Chọn hoặc nhập một model để thử.')
+
+275         350 LOAD_CONST               3 (422)
+
+274         352 KW_NAMES                 4 (('status_code',))
+            354 CALL                     3
+            362 RAISE_VARARGS            1
+
+276     >>  364 LOAD_GLOBAL             33 (NULL + ProviderSpec)
+
+277         374 LOAD_CONST               5 ('draft')
+            376 LOAD_CONST               6 ('Endpoint đang thử')
+            378 LOAD_FAST                0 (body)
+            380 LOAD_ATTR               12 (dialect)
+            400 LOAD_FAST                2 (base_url)
+
+278         402 LOAD_CONST               1 ('')
+            404 LOAD_FAST                5 (model_id)
+
+279         406 LOAD_GLOBAL             35 (NULL + ModelSpec)
+            416 LOAD_FAST                5 (model_id)
+            418 LOAD_GLOBAL             36 (TEST_MAX_TOKENS)
+
+280         428 LOAD_CONST               7 (False)
+
+279         430 KW_NAMES                 8 (('id', 'max_output_tokens', 'honors_temperature'))
+            432 CALL                     3
+            440 BUILD_LIST               1
+
+281         442 LOAD_FAST                4 (extra)
+
+276         444 KW_NAMES                 9 (('key', 'label', 'dialect', 'base_url', 'api_key_setting', 'default_model', 'models', 'extra_headers'))
+            446 CALL                     8
+            454 STORE_FAST               6 (provider)
+
+283         456 LOAD_GLOBAL             39 (NULL + ApiClient)
+            466 LOAD_FAST                6 (provider)
+            468 LOAD_FAST                6 (provider)
+            470 LOAD_ATTR               40 (models)
+            490 LOAD_CONST              10 (0)
+            492 BINARY_SUBSCR
+            496 LOAD_FAST                3 (key)
+            498 LOAD_GLOBAL             42 (TEST_TIMEOUT_S)
+            508 KW_NAMES                11 (('api_key', 'timeout'))
+            510 CALL                     4
+            518 STORE_FAST               7 (client)
+
+284         520 LOAD_CONST              12 (1)
+            522 LOAD_FAST                7 (client)
+            524 STORE_ATTR              22 (max_retries)
+
+285         534 LOAD_FAST                7 (client)
+            536 LOAD_ATTR               47 (NULL|self + complete)
+            556 LOAD_CONST              13 ('user')
+            558 LOAD_CONST              14 ('Reply with the single word: OK')
+            560 LOAD_CONST              15 (('role', 'content'))
+            562 BUILD_CONST_KEY_MAP      2
+            564 BUILD_LIST               1
+
+286         566 LOAD_GLOBAL             36 (TEST_MAX_TOKENS)
+
+285         576 KW_NAMES                16 (('max_tokens',))
+            578 CALL                     2
+            586 GET_AWAITABLE            0
+            588 LOAD_CONST              17 (None)
+        >>  590 SEND                     3 (to 600)
+            594 YIELD_VALUE              3
+            596 RESUME                   3
+            598 JUMP_BACKWARD_NO_INTERRUPT     5 (to 590)
+        >>  600 END_SEND
+            602 STORE_FAST               8 (out)
+
+290         604 LOAD_CONST              18 (True)
+
+291         606 LOAD_GLOBAL             53 (NULL + int)
+            616 LOAD_GLOBAL              1 (NULL + time)
+            626 LOAD_ATTR                2 (monotonic)
+            646 CALL                     0
+            654 LOAD_FAST                1 (started)
+            656 BINARY_OP               10 (-)
+            660 LOAD_CONST              19 (1000)
+            662 BINARY_OP                5 (*)
+            666 CALL                     1
+
+292         674 LOAD_FAST                8 (out)
+            676 LOAD_ATTR               54 (text)
+            696 LOAD_ATTR               25 (NULL|self + strip)
+            716 CALL                     0
+            724 LOAD_CONST              17 (None)
+            726 LOAD_CONST              20 (120)
+            728 BINARY_SLICE
+
+293         730 LOAD_FAST                8 (out)
+            732 LOAD_ATTR               56 (tokens_in)
+
+294         752 LOAD_FAST                8 (out)
+            754 LOAD_ATTR               58 (tokens_out)
+
+295         774 LOAD_FAST                2 (base_url)
+            776 LOAD_ATTR               61 (NULL|self + startswith)
+            796 LOAD_CONST              21 ('http://')
+            798 CALL                     1
+            806 COPY                     1
+            808 POP_JUMP_IF_FALSE       22 (to 854)
+            810 POP_TOP
+            812 LOAD_GLOBAL              5 (NULL + store)
+            822 LOAD_ATTR               62 (is_local_url)
+            842 LOAD_FAST                2 (base_url)
+            844 CALL                     1
+            852 UNARY_NOT
+
+289     >>  854 LOAD_CONST              22 (('ok', 'latency_ms', 'sample', 'tokens_in', 'tokens_out', 'insecure_remote'))
+            856 BUILD_CONST_KEY_MAP      6
+            858 RETURN_VALUE
+
+285     >>  860 CLEANUP_THROW
+            862 JUMP_BACKWARD          132 (to 600)
+        >>  864 PUSH_EXC_INFO
+
+287         866 LOAD_GLOBAL             48 (StudioError)
+            876 CHECK_EXC_MATCH
+            878 POP_JUMP_IF_FALSE       22 (to 924)
+            880 STORE_FAST               9 (exc)
+
+288         882 LOAD_GLOBAL             51 (NULL + _result_from_error)
+            892 LOAD_FAST                9 (exc)
+            894 LOAD_FAST                1 (started)
+            896 CALL                     2
+            904 SWAP                     2
+            906 POP_EXCEPT
+            908 LOAD_CONST              17 (None)
+            910 STORE_FAST               9 (exc)
+            912 DELETE_FAST              9 (exc)
+            914 RETURN_VALUE
+        >>  916 LOAD_CONST              17 (None)
+            918 STORE_FAST               9 (exc)
+            920 DELETE_FAST              9 (exc)
+            922 RERAISE                  1
+
+287     >>  924 RERAISE                  0
+        >>  926 COPY                     3
+            928 POP_EXCEPT
+            930 RERAISE                  1
+        >>  932 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            934 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 932 [0] lasti
+  48 to 592 -> 864 [0]
+  594 to 594 -> 860 [2]
+  596 to 602 -> 864 [0]
+  604 to 858 -> 932 [0] lasti
+  860 to 860 -> 864 [0]
+  864 to 880 -> 926 [1] lasti
+  882 to 902 -> 916 [1] lasti
+  904 to 904 -> 926 [1] lasti
+  906 to 914 -> 932 [0] lasti
+  916 to 924 -> 926 [1] lasti
+  926 to 930 -> 932 [0] lasti
+
+Disassembly of <code object _http_get at 0x7f6c81a75550, file "app\api\llm_endpoints.py", line 299>:
+299           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+301           6 LOAD_GLOBAL              1 (NULL + httpx)
+             16 LOAD_ATTR                2 (AsyncClient)
+             36 LOAD_FAST                2 (timeout)
+             38 KW_NAMES                 1 (('timeout',))
+             40 CALL                     1
+             48 BEFORE_ASYNC_WITH
+             50 GET_AWAITABLE            1
+             52 LOAD_CONST               2 (None)
+        >>   54 SEND                     3 (to 64)
+             58 YIELD_VALUE              2
+             60 RESUME                   3
+             62 JUMP_BACKWARD_NO_INTERRUPT     5 (to 54)
+        >>   64 END_SEND
+             66 STORE_FAST               3 (client)
+
+302          68 LOAD_FAST                3 (client)
+             70 LOAD_ATTR                5 (NULL|self + get)
+             90 LOAD_FAST                0 (url)
+             92 LOAD_FAST                1 (headers)
+             94 KW_NAMES                 3 (('headers',))
+             96 CALL                     2
+            104 GET_AWAITABLE            0
+            106 LOAD_CONST               2 (None)
+        >>  108 SEND                     3 (to 118)
+            112 YIELD_VALUE              3
+            114 RESUME                   3
+            116 JUMP_BACKWARD_NO_INTERRUPT     5 (to 108)
+        >>  118 END_SEND
+
+301         120 SWAP                     2
+            122 LOAD_CONST               2 (None)
+            124 LOAD_CONST               2 (None)
+            126 LOAD_CONST               2 (None)
+            128 CALL                     2
+            136 GET_AWAITABLE            2
+            138 LOAD_CONST               2 (None)
+        >>  140 SEND                     3 (to 150)
+            144 YIELD_VALUE              2
+            146 RESUME                   3
+            148 JUMP_BACKWARD_NO_INTERRUPT     5 (to 140)
+        >>  150 END_SEND
+            152 POP_TOP
+            154 RETURN_VALUE
+        >>  156 CLEANUP_THROW
+            158 JUMP_BACKWARD           48 (to 64)
+
+302     >>  160 CLEANUP_THROW
+            162 JUMP_BACKWARD           23 (to 118)
+
+301     >>  164 CLEANUP_THROW
+            166 JUMP_BACKWARD            9 (to 150)
+        >>  168 PUSH_EXC_INFO
+            170 WITH_EXCEPT_START
+            172 GET_AWAITABLE            2
+            174 LOAD_CONST               2 (None)
+        >>  176 SEND                     4 (to 188)
+            180 YIELD_VALUE              3
+            182 RESUME                   3
+            184 JUMP_BACKWARD_NO_INTERRUPT     5 (to 176)
+        >>  186 CLEANUP_THROW
+        >>  188 END_SEND
+            190 POP_JUMP_IF_TRUE         1 (to 194)
+            192 RERAISE                  2
+        >>  194 POP_TOP
+            196 POP_EXCEPT
+            198 POP_TOP
+            200 POP_TOP
+            202 RETURN_CONST             2 (None)
+        >>  204 COPY                     3
+            206 POP_EXCEPT
+            208 RERAISE                  1
+        >>  210 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            212 RERAISE                  1
+ExceptionTable:
+  4 to 56 -> 210 [0] lasti
+  58 to 58 -> 156 [3]
+  60 to 64 -> 210 [0] lasti
+  66 to 110 -> 168 [1] lasti
+  112 to 112 -> 160 [3]
+  114 to 118 -> 168 [1] lasti
+  120 to 142 -> 210 [0] lasti
+  144 to 144 -> 164 [3]
+  146 to 156 -> 210 [0] lasti
+  160 to 160 -> 168 [1] lasti
+  164 to 164 -> 210 [0] lasti
+  168 to 178 -> 204 [3] lasti
+  180 to 180 -> 186 [6]
+  182 to 194 -> 204 [3] lasti
+  196 to 208 -> 210 [0] lasti
+
+Disassembly of <code object fetch_models at 0x26a234e0, file "app\api\llm_endpoints.py", line 305>:
+305           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+312           6 LOAD_GLOBAL              1 (NULL + time)
+             16 LOAD_ATTR                2 (monotonic)
+             36 CALL                     0
+             44 STORE_FAST               1 (started)
+
+313          46 NOP
+
+314          48 LOAD_GLOBAL              5 (NULL + store)
+             58 LOAD_ATTR                6 (clean_base_url)
+             78 LOAD_FAST                0 (body)
+             80 LOAD_ATTR                8 (base_url)
+            100 CALL                     1
+            108 STORE_FAST               2 (base_url)
+
+315         110 LOAD_GLOBAL             11 (NULL + _draft_dialect)
+            120 LOAD_FAST                0 (body)
+            122 LOAD_ATTR               12 (dialect)
+            142 CALL                     1
+            150 STORE_FAST               3 (module)
+
+316         152 LOAD_GLOBAL             15 (NULL + _draft_secrets)
+            162 LOAD_FAST                0 (body)
+            164 LOAD_ATTR               16 (api_key)
+            184 LOAD_FAST                0 (body)
+            186 LOAD_ATTR               18 (headers)
+            206 LOAD_FAST                0 (body)
+            208 LOAD_ATTR               20 (endpoint_id)
+            228 CALL                     3
+            236 UNPACK_SEQUENCE          2
+            240 STORE_FAST               4 (key)
+            242 STORE_FAST               5 (extra)
+
+317         244 NOP
+
+318         246 LOAD_GLOBAL             23 (NULL + _http_get)
+            256 LOAD_FAST                3 (module)
+            258 LOAD_ATTR               25 (NULL|self + models_url)
+            278 LOAD_FAST                2 (base_url)
+            280 CALL                     1
+            288 LOAD_FAST                3 (module)
+            290 LOAD_ATTR               19 (NULL|self + headers)
+            310 LOAD_FAST                4 (key)
+            312 LOAD_FAST                5 (extra)
+            314 CALL                     2
+
+319         322 LOAD_GLOBAL             26 (MODELS_TIMEOUT_S)
+
+318         332 CALL                     3
+            340 GET_AWAITABLE            0
+            342 LOAD_CONST               1 (None)
+        >>  344 SEND                     3 (to 354)
+            348 YIELD_VALUE              4
+            350 RESUME                   3
+            352 JUMP_BACKWARD_NO_INTERRUPT     5 (to 344)
+        >>  354 END_SEND
+            356 STORE_FAST               6 (resp)
+            358 NOP
+
+325         360 LOAD_FAST                6 (resp)
+            362 LOAD_ATTR               44 (status_code)
+            382 LOAD_CONST               3 ((404, 405))
+            384 CONTAINS_OP              0
+            386 POP_JUMP_IF_FALSE        7 (to 402)
+
+326         388 LOAD_CONST               4 (False)
+            390 LOAD_CONST               5 (True)
+            392 BUILD_LIST               0
+
+327         394 LOAD_CONST               6 ('Nhà cung cấp này không hỗ trợ liệt kê model. Hãy nhập tên model bằng tay.')
+
+326         396 LOAD_CONST               7 (('ok', 'unsupported', 'models', 'message'))
+            398 BUILD_CONST_KEY_MAP      4
+            400 RETURN_VALUE
+
+328     >>  402 LOAD_FAST                6 (resp)
+            404 LOAD_ATTR               44 (status_code)
+            424 LOAD_CONST               8 (200)
+            426 COMPARE_OP              55 (!=)
+            430 POP_JUMP_IF_FALSE       92 (to 616)
+
+329         432 LOAD_FAST                3 (module)
+            434 LOAD_ATTR               47 (NULL|self + classify)
+            454 LOAD_FAST                6 (resp)
+            456 LOAD_ATTR               44 (status_code)
+            476 LOAD_FAST                6 (resp)
+            478 LOAD_ATTR               48 (text)
+            498 LOAD_CONST               1 (None)
+            500 LOAD_CONST               9 (400)
+            502 BINARY_SLICE
+            504 CALL                     2
+            512 STORE_FAST               8 (code)
+
+330         514 LOAD_GLOBAL             43 (NULL + _result_from_error)
+
+331         524 LOAD_GLOBAL             35 (NULL + make_error)
+            534 LOAD_FAST                8 (code)
+            536 LOAD_CONST              10 ('HTTP ')
+            538 LOAD_FAST                6 (resp)
+            540 LOAD_ATTR               44 (status_code)
+            560 FORMAT_VALUE             0
+            562 LOAD_CONST              11 (': ')
+            564 LOAD_FAST                6 (resp)
+            566 LOAD_ATTR               48 (text)
+            586 LOAD_CONST               1 (None)
+            588 LOAD_CONST               8 (200)
+            590 BINARY_SLICE
+            592 FORMAT_VALUE             0
+            594 BUILD_STRING             4
+            596 CALL                     2
+            604 LOAD_FAST                1 (started)
+
+330         606 CALL                     2
+            614 RETURN_VALUE
+
+332     >>  616 NOP
+
+333         618 LOAD_FAST                3 (module)
+            620 LOAD_ATTR               51 (NULL|self + parse_models)
+            640 LOAD_FAST                6 (resp)
+            642 LOAD_ATTR               53 (NULL|self + json)
+            662 CALL                     0
+            670 CALL                     1
+            678 STORE_FAST               9 (ids)
+
+336     >>  680 LOAD_FAST                9 (ids)
+            682 POP_JUMP_IF_TRUE         7 (to 698)
+
+337         684 LOAD_CONST               4 (False)
+            686 LOAD_CONST               5 (True)
+            688 BUILD_LIST               0
+
+338         690 LOAD_CONST              12 ('Nhà cung cấp trả danh sách rỗng hoặc không đọc được. Hãy nhập tay.')
+
+337         692 LOAD_CONST               7 (('ok', 'unsupported', 'models', 'message'))
+            694 BUILD_CONST_KEY_MAP      4
+            696 RETURN_VALUE
+
+339     >>  698 LOAD_CONST               5 (True)
+            700 LOAD_GLOBAL             57 (NULL + sorted)
+            710 LOAD_FAST                9 (ids)
+            712 CALL                     1
+            720 LOAD_GLOBAL             59 (NULL + int)
+            730 LOAD_GLOBAL              1 (NULL + time)
+            740 LOAD_ATTR                2 (monotonic)
+            760 CALL                     0
+            768 LOAD_FAST                1 (started)
+            770 BINARY_OP               10 (-)
+            774 LOAD_CONST              13 (1000)
+            776 BINARY_OP                5 (*)
+            780 CALL                     1
+            788 LOAD_CONST              14 (('ok', 'models', 'latency_ms'))
+            790 BUILD_CONST_KEY_MAP      3
+            792 RETURN_VALUE
+
+318     >>  794 CLEANUP_THROW
+            796 JUMP_BACKWARD          222 (to 354)
+        >>  798 PUSH_EXC_INFO
+
+320         800 LOAD_GLOBAL             28 (httpx)
+            810 LOAD_ATTR               30 (TimeoutException)
+            830 LOAD_GLOBAL             28 (httpx)
+            840 LOAD_ATTR               32 (NetworkError)
+            860 BUILD_TUPLE              2
+            862 CHECK_EXC_MATCH
+            864 POP_JUMP_IF_FALSE       35 (to 936)
+            866 STORE_FAST               7 (exc)
+
+321         868 LOAD_GLOBAL             35 (NULL + make_error)
+            878 LOAD_GLOBAL             36 (E)
+            888 LOAD_ATTR               38 (LLM_API_NETWORK)
+            908 LOAD_CONST               2 ('Không kết nối được: ')
+            910 LOAD_FAST                7 (exc)
+            912 FORMAT_VALUE             0
+            914 BUILD_STRING             2
+            916 CALL                     2
+            924 LOAD_FAST                7 (exc)
+            926 RAISE_VARARGS            2
+        >>  928 LOAD_CONST               1 (None)
+            930 STORE_FAST               7 (exc)
+            932 DELETE_FAST              7 (exc)
+            934 RERAISE                  1
+
+320     >>  936 RERAISE                  0
+        >>  938 COPY                     3
+            940 POP_EXCEPT
+            942 RERAISE                  1
+        >>  944 PUSH_EXC_INFO
+
+322         946 LOAD_GLOBAL             40 (StudioError)
+            956 CHECK_EXC_MATCH
+            958 POP_JUMP_IF_FALSE       22 (to 1004)
+            960 STORE_FAST               7 (exc)
+
+323         962 LOAD_GLOBAL             43 (NULL + _result_from_error)
+            972 LOAD_FAST                7 (exc)
+            974 LOAD_FAST                1 (started)
+            976 CALL                     2
+            984 SWAP                     2
+            986 POP_EXCEPT
+            988 LOAD_CONST               1 (None)
+            990 STORE_FAST               7 (exc)
+            992 DELETE_FAST              7 (exc)
+            994 RETURN_VALUE
+        >>  996 LOAD_CONST               1 (None)
+            998 STORE_FAST               7 (exc)
+           1000 DELETE_FAST              7 (exc)
+           1002 RERAISE                  1
+
+322     >> 1004 RERAISE                  0
+        >> 1006 COPY                     3
+           1008 POP_EXCEPT
+           1010 RERAISE                  1
+        >> 1012 PUSH_EXC_INFO
+
+334        1014 LOAD_GLOBAL             54 (ValueError)
+           1024 CHECK_EXC_MATCH
+           1026 POP_JUMP_IF_FALSE        5 (to 1038)
+           1028 POP_TOP
+
+335        1030 BUILD_LIST               0
+           1032 STORE_FAST               9 (ids)
+           1034 POP_EXCEPT
+           1036 JUMP_BACKWARD          179 (to 680)
+
+334     >> 1038 RERAISE                  0
+        >> 1040 COPY                     3
+           1042 POP_EXCEPT
+           1044 RERAISE                  1
+        >> 1046 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1048 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 1046 [0] lasti
+  48 to 242 -> 944 [0]
+  246 to 346 -> 798 [0]
+  348 to 348 -> 794 [2]
+  350 to 356 -> 798 [0]
+  358 to 614 -> 1046 [0] lasti
+  618 to 678 -> 1012 [0]
+  680 to 792 -> 1046 [0] lasti
+  794 to 794 -> 798 [0]
+  798 to 866 -> 938 [1] lasti
+  868 to 926 -> 928 [1] lasti
+  928 to 936 -> 938 [1] lasti
+  938 to 942 -> 944 [0]
+  944 to 960 -> 1006 [1] lasti
+  962 to 982 -> 996 [1] lasti
+  984 to 984 -> 1006 [1] lasti
+  986 to 994 -> 1046 [0] lasti
+  996 to 1004 -> 1006 [1] lasti
+  1006 to 1010 -> 1046 [0] lasti
+  1012 to 1032 -> 1040 [1] lasti
+  1034 to 1036 -> 1046 [0] lasti
+  1038 to 1038 -> 1040 [1] lasti
+  1040 to 1044 -> 1046 [0] lasti

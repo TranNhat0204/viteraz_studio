@@ -1,0 +1,515 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Router thư viện nhạc (doc 15 §15.9 #8) — search / nghe thử / tải nhạc CC để chèn nền.\n\nGET  /api/v1/music/search    → danh sách track (kèm URL stream để UI nghe thử)\nPOST /api/v1/music/download  → tải track đã chọn vào project/assets/music, trả path cục bộ\n                               (UI ghi path đó vào config.background_music như nhạc nền F3)\n')
+              4 STORE_NAME               0 (__doc__)
+
+  7           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+  9          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (re)
+             24 STORE_NAME               3 (re)
+
+ 10          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               4 (('Path',))
+             30 IMPORT_NAME              4 (pathlib)
+             32 IMPORT_FROM              5 (Path)
+             34 STORE_NAME               5 (Path)
+             36 POP_TOP
+
+ 12          38 LOAD_CONST               1 (0)
+             40 LOAD_CONST               5 (('APIRouter', 'Depends', 'Header', 'HTTPException', 'Query'))
+             42 IMPORT_NAME              6 (fastapi)
+             44 IMPORT_FROM              7 (APIRouter)
+             46 STORE_NAME               7 (APIRouter)
+             48 IMPORT_FROM              8 (Depends)
+             50 STORE_NAME               8 (Depends)
+             52 IMPORT_FROM              9 (Header)
+             54 STORE_NAME               9 (Header)
+             56 IMPORT_FROM             10 (HTTPException)
+             58 STORE_NAME              10 (HTTPException)
+             60 IMPORT_FROM             11 (Query)
+             62 STORE_NAME              11 (Query)
+             64 POP_TOP
+
+ 13          66 LOAD_CONST               1 (0)
+             68 LOAD_CONST               6 (('BaseModel',))
+             70 IMPORT_NAME             12 (pydantic)
+             72 IMPORT_FROM             13 (BaseModel)
+             74 STORE_NAME              13 (BaseModel)
+             76 POP_TOP
+
+ 14          78 LOAD_CONST               1 (0)
+             80 LOAD_CONST               7 (('Session',))
+             82 IMPORT_NAME             14 (sqlalchemy.orm)
+             84 IMPORT_FROM             15 (Session)
+             86 STORE_NAME              15 (Session)
+             88 POP_TOP
+
+ 16          90 LOAD_CONST               1 (0)
+             92 LOAD_CONST               8 (('verify_token', 'get_session'))
+             94 IMPORT_NAME             16 (app.deps)
+             96 IMPORT_FROM             17 (verify_token)
+             98 STORE_NAME              17 (verify_token)
+            100 IMPORT_FROM             18 (get_session)
+            102 STORE_NAME              18 (get_session)
+            104 POP_TOP
+
+ 17         106 LOAD_CONST               1 (0)
+            108 LOAD_CONST               9 (('ProjectFS',))
+            110 IMPORT_NAME             19 (app.core.fs)
+            112 IMPORT_FROM             20 (ProjectFS)
+            114 STORE_NAME              20 (ProjectFS)
+            116 POP_TOP
+
+ 18         118 LOAD_CONST               1 (0)
+            120 LOAD_CONST              10 (('range_stream',))
+            122 IMPORT_NAME             21 (app.core.range_stream)
+            124 IMPORT_FROM             22 (range_stream)
+            126 STORE_NAME              22 (range_stream)
+            128 POP_TOP
+
+ 19         130 LOAD_CONST               1 (0)
+            132 LOAD_CONST              11 (('music_library',))
+            134 IMPORT_NAME             23 (app.adapters)
+            136 IMPORT_FROM             24 (music_library)
+            138 STORE_NAME              25 (music)
+            140 POP_TOP
+
+ 20         142 LOAD_CONST               1 (0)
+            144 LOAD_CONST              12 (('project_service',))
+            146 IMPORT_NAME             26 (app.services)
+            148 IMPORT_FROM             27 (project_service)
+            150 STORE_NAME              28 (psvc)
+            152 POP_TOP
+
+ 22         154 PUSH_NULL
+            156 LOAD_NAME                7 (APIRouter)
+            158 LOAD_CONST              13 ('/api/v1/music')
+            160 LOAD_CONST              14 ('music')
+            162 BUILD_LIST               1
+            164 PUSH_NULL
+            166 LOAD_NAME                8 (Depends)
+            168 LOAD_NAME               17 (verify_token)
+            170 CALL                     1
+            178 BUILD_LIST               1
+            180 KW_NAMES                15 (('prefix', 'tags', 'dependencies'))
+            182 CALL                     3
+            190 STORE_NAME              29 (router)
+
+ 25         192 LOAD_NAME               29 (router)
+            194 LOAD_ATTR               61 (NULL|self + get)
+            214 LOAD_CONST              16 ('/search')
+            216 CALL                     1
+
+ 27         224 PUSH_NULL
+            226 LOAD_NAME               11 (Query)
+            228 LOAD_CONST              17 ('')
+            230 LOAD_CONST              18 ('Từ khoá tự do')
+            232 KW_NAMES                19 (('description',))
+            234 CALL                     2
+
+ 28         242 PUSH_NULL
+            244 LOAD_NAME               11 (Query)
+            246 LOAD_CONST              17 ('')
+            248 LOAD_CONST              20 ('Mood/genre, vd: happy, energetic')
+            250 KW_NAMES                19 (('description',))
+            252 CALL                     2
+
+ 29         260 PUSH_NULL
+            262 LOAD_NAME               11 (Query)
+            264 LOAD_CONST              17 ('')
+            266 LOAD_CONST              21 ('popularity_month | popularity_total | downloads_total | …')
+            268 KW_NAMES                19 (('description',))
+            270 CALL                     2
+
+ 30         278 LOAD_CONST              22 (24)
+
+ 31         280 LOAD_CONST               1 (0)
+
+ 32         282 LOAD_CONST              23 (False)
+
+ 33         284 PUSH_NULL
+            286 LOAD_NAME               11 (Query)
+            288 LOAD_CONST              23 (False)
+            290 LOAD_CONST              24 ('Chỉ nhạc cho phép dùng thương mại')
+            292 KW_NAMES                19 (('description',))
+            294 CALL                     2
+
+ 26         302 BUILD_TUPLE              7
+
+ 27         304 NOP
+
+ 26         306 NOP
+
+ 28         308 NOP
+
+ 26         310 NOP
+
+ 29         312 NOP
+
+ 26         314 NOP
+
+ 30         316 NOP
+
+ 26         318 NOP
+
+ 31         320 NOP
+
+ 26         322 NOP
+
+ 32         324 NOP
+
+ 26         326 NOP
+
+ 33         328 NOP
+
+ 26         330 LOAD_CONST              35 (('q', 'str', 'tags', 'str', 'order', 'str', 'limit', 'int', 'offset', 'int', 'instrumental', 'bool', 'commercial_only', 'bool'))
+            332 LOAD_CONST              25 (<code object search at 0x7f6c9296b930, file "app\api\music.py", line 25>)
+            334 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 25         336 CALL                     0
+
+ 26         344 STORE_NAME              31 (search)
+
+ 43         346 PUSH_NULL
+            348 LOAD_BUILD_CLASS
+            350 LOAD_CONST              26 (<code object DownloadRequest at 0x7f6c81a44430, file "app\api\music.py", line 43>)
+            352 MAKE_FUNCTION            0
+            354 LOAD_CONST              27 ('DownloadRequest')
+            356 LOAD_NAME               13 (BaseModel)
+            358 CALL                     3
+            366 STORE_NAME              32 (DownloadRequest)
+
+ 50         368 LOAD_NAME               29 (router)
+            370 LOAD_ATTR               67 (NULL|self + post)
+            390 LOAD_CONST              28 ('/download')
+            392 CALL                     1
+
+ 51         400 PUSH_NULL
+            402 LOAD_NAME                8 (Depends)
+            404 LOAD_NAME               18 (get_session)
+            406 CALL                     1
+            414 BUILD_TUPLE              1
+            416 LOAD_CONST              36 (('body', 'DownloadRequest', 'db', 'Session'))
+            418 LOAD_CONST              29 (<code object download at 0x28e33660, file "app\api\music.py", line 50>)
+            420 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 50         422 CALL                     0
+
+ 51         430 STORE_NAME              34 (download)
+
+ 65         432 LOAD_NAME               29 (router)
+            434 LOAD_ATTR               61 (NULL|self + get)
+            454 LOAD_CONST              30 ('/file')
+            456 CALL                     1
+
+ 67         464 PUSH_NULL
+            466 LOAD_NAME               11 (Query)
+            468 LOAD_CONST              31 (Ellipsis)
+            470 LOAD_CONST              32 ('Đường dẫn file nhạc nền cục bộ (để preview trộn âm)')
+            472 KW_NAMES                19 (('description',))
+            474 CALL                     2
+
+ 68         482 PUSH_NULL
+            484 LOAD_NAME                9 (Header)
+            486 LOAD_CONST               3 (None)
+            488 KW_NAMES                33 (('default',))
+            490 CALL                     1
+
+ 66         498 BUILD_TUPLE              2
+
+ 67         500 NOP
+
+ 66         502 NOP
+
+ 68         504 NOP
+
+ 66         506 LOAD_CONST              37 (('path', 'str', 'range', 'str | None'))
+            508 LOAD_CONST              34 (<code object music_file at 0x269df260, file "app\api\music.py", line 65>)
+            510 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 65         512 CALL                     0
+
+ 66         520 STORE_NAME              35 (music_file)
+            522 RETURN_CONST             3 (None)
+
+Disassembly of <code object search at 0x7f6c9296b930, file "app\api\music.py", line 25>:
+ 25           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 35           6 LOAD_GLOBAL              1 (NULL + music)
+             16 LOAD_ATTR                2 (search_tracks)
+
+ 36          36 LOAD_FAST                0 (q)
+             38 LOAD_ATTR                5 (NULL|self + strip)
+             58 CALL                     0
+             66 LOAD_FAST                1 (tags)
+             68 LOAD_ATTR                5 (NULL|self + strip)
+             88 CALL                     0
+             96 LOAD_FAST                2 (order)
+             98 LOAD_ATTR                5 (NULL|self + strip)
+            118 CALL                     0
+
+ 37         126 LOAD_FAST                3 (limit)
+            128 LOAD_FAST                4 (offset)
+            130 LOAD_FAST                5 (instrumental)
+
+ 38         132 LOAD_FAST                6 (commercial_only)
+
+ 35         134 KW_NAMES                 1 (('query', 'tags', 'order', 'limit', 'offset', 'instrumental', 'commercial_only'))
+            136 CALL                     7
+            144 GET_AWAITABLE            0
+            146 LOAD_CONST               0 (None)
+        >>  148 SEND                     3 (to 158)
+            152 YIELD_VALUE              2
+            154 RESUME                   3
+            156 JUMP_BACKWARD_NO_INTERRUPT     5 (to 148)
+        >>  158 END_SEND
+            160 STORE_FAST               7 (tracks)
+
+ 40         162 LOAD_CONST               2 ('tracks')
+            164 LOAD_FAST                7 (tracks)
+            166 BUILD_MAP                1
+            168 RETURN_VALUE
+
+ 35     >>  170 CLEANUP_THROW
+            172 JUMP_BACKWARD            8 (to 158)
+        >>  174 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            176 RERAISE                  1
+ExceptionTable:
+  4 to 150 -> 174 [0] lasti
+  152 to 152 -> 170 [2]
+  154 to 170 -> 174 [0] lasti
+
+Disassembly of <code object DownloadRequest at 0x7f6c81a44430, file "app\api\music.py", line 43>:
+ 43           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('DownloadRequest')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 44          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('project_id')
+             18 STORE_SUBSCR
+
+ 45          22 LOAD_CONST               1 ('str')
+             24 LOAD_NAME                3 (__annotations__)
+             26 LOAD_CONST               3 ('audio_url')
+             28 STORE_SUBSCR
+
+ 46          32 LOAD_CONST               4 (None)
+             34 STORE_NAME               4 (name)
+             36 LOAD_CONST               5 ('str | None')
+             38 LOAD_NAME                3 (__annotations__)
+             40 LOAD_CONST               6 ('name')
+             42 STORE_SUBSCR
+
+ 47          46 LOAD_CONST               4 (None)
+             48 STORE_NAME               5 (track_id)
+             50 LOAD_CONST               5 ('str | None')
+             52 LOAD_NAME                3 (__annotations__)
+             54 LOAD_CONST               7 ('track_id')
+             56 STORE_SUBSCR
+             60 RETURN_CONST             4 (None)
+
+Disassembly of <code object download at 0x28e33660, file "app\api\music.py", line 50>:
+ 50           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 52           6 LOAD_GLOBAL              1 (NULL + psvc)
+             16 LOAD_ATTR                2 (get_project)
+             36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (body)
+             40 LOAD_ATTR                4 (project_id)
+             60 CALL                     2
+             68 STORE_FAST               2 (project)
+
+ 53          70 LOAD_GLOBAL              7 (NULL + re)
+             80 LOAD_ATTR                8 (sub)
+            100 LOAD_CONST               1 ('[<>:"/\\\\|?*]')
+            102 LOAD_CONST               2 ('_')
+            104 LOAD_FAST                0 (body)
+            106 LOAD_ATTR               10 (name)
+            126 COPY                     1
+            128 POP_JUMP_IF_TRUE         2 (to 134)
+            130 POP_TOP
+            132 LOAD_CONST               3 ('track')
+        >>  134 CALL                     3
+            142 LOAD_ATTR               13 (NULL|self + strip)
+            162 CALL                     0
+            170 COPY                     1
+            172 POP_JUMP_IF_TRUE         2 (to 178)
+            174 POP_TOP
+            176 LOAD_CONST               3 ('track')
+        >>  178 STORE_FAST               3 (safe)
+
+ 54         180 LOAD_FAST                3 (safe)
+            182 LOAD_ATTR               15 (NULL|self + lower)
+            202 CALL                     0
+            210 LOAD_ATTR               17 (NULL|self + endswith)
+            230 LOAD_CONST               4 ('.mp3')
+            232 CALL                     1
+            240 POP_JUMP_IF_TRUE         5 (to 252)
+
+ 55         242 LOAD_FAST                3 (safe)
+            244 LOAD_CONST               4 ('.mp3')
+            246 BINARY_OP               13 (+=)
+            250 STORE_FAST               3 (safe)
+
+ 56     >>  252 LOAD_GLOBAL             19 (NULL + ProjectFS)
+            262 LOAD_FAST                2 (project)
+            264 LOAD_ATTR               20 (root_path)
+            284 CALL                     1
+            292 LOAD_ATTR               23 (NULL|self + assets_dir)
+            312 CALL                     0
+            320 LOAD_CONST               5 ('music')
+            322 BINARY_OP               11 (/)
+            326 STORE_FAST               4 (music_dir)
+
+ 57         328 LOAD_FAST                4 (music_dir)
+            330 LOAD_FAST                3 (safe)
+            332 BINARY_OP               11 (/)
+            336 STORE_FAST               5 (dest)
+
+ 59         338 LOAD_FAST                5 (dest)
+            340 LOAD_ATTR               25 (NULL|self + exists)
+            360 CALL                     0
+            368 POP_JUMP_IF_FALSE       52 (to 474)
+            370 LOAD_FAST                0 (body)
+            372 LOAD_ATTR               26 (track_id)
+            392 POP_JUMP_IF_FALSE       40 (to 474)
+
+ 60         394 LOAD_FAST                4 (music_dir)
+            396 LOAD_GLOBAL             29 (NULL + Path)
+            406 LOAD_FAST                3 (safe)
+            408 CALL                     1
+            416 LOAD_ATTR               30 (stem)
+            436 FORMAT_VALUE             0
+            438 LOAD_CONST               6 ('-')
+            440 LOAD_FAST                0 (body)
+            442 LOAD_ATTR               26 (track_id)
+            462 FORMAT_VALUE             0
+            464 LOAD_CONST               4 ('.mp3')
+            466 BUILD_STRING             4
+            468 BINARY_OP               11 (/)
+            472 STORE_FAST               5 (dest)
+
+ 61     >>  474 LOAD_GLOBAL             33 (NULL + music)
+            484 LOAD_ATTR               34 (download_track)
+            504 LOAD_FAST                0 (body)
+            506 LOAD_ATTR               36 (audio_url)
+            526 LOAD_FAST                5 (dest)
+            528 KW_NAMES                 7 (('audio_url', 'dest'))
+            530 CALL                     2
+            538 GET_AWAITABLE            0
+            540 LOAD_CONST               0 (None)
+        >>  542 SEND                     3 (to 552)
+            546 YIELD_VALUE              2
+            548 RESUME                   3
+            550 JUMP_BACKWARD_NO_INTERRUPT     5 (to 542)
+        >>  552 END_SEND
+            554 POP_TOP
+
+ 62         556 LOAD_GLOBAL             39 (NULL + str)
+            566 LOAD_FAST                5 (dest)
+            568 LOAD_ATTR               41 (NULL|self + resolve)
+            588 CALL                     0
+            596 CALL                     1
+            604 LOAD_FAST                5 (dest)
+            606 LOAD_ATTR               10 (name)
+            626 LOAD_CONST               8 (('path', 'name'))
+            628 BUILD_CONST_KEY_MAP      2
+            630 RETURN_VALUE
+
+ 61     >>  632 CLEANUP_THROW
+            634 JUMP_BACKWARD           42 (to 552)
+        >>  636 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            638 RERAISE                  1
+ExceptionTable:
+  4 to 544 -> 636 [0] lasti
+  546 to 546 -> 632 [2]
+  548 to 632 -> 636 [0] lasti
+
+Disassembly of <code object music_file at 0x269df260, file "app\api\music.py", line 65>:
+ 65           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 75           6 LOAD_CONST               1 ('://')
+              8 LOAD_FAST                0 (path)
+             10 CONTAINS_OP              0
+             12 POP_JUMP_IF_TRUE        34 (to 82)
+             14 LOAD_FAST                0 (path)
+             16 LOAD_ATTR                1 (NULL|self + startswith)
+             36 LOAD_CONST               2 ('\\\\')
+             38 CALL                     1
+             46 POP_JUMP_IF_TRUE        17 (to 82)
+             48 LOAD_FAST                0 (path)
+             50 LOAD_ATTR                1 (NULL|self + startswith)
+             70 LOAD_CONST               3 ('//')
+             72 CALL                     1
+             80 POP_JUMP_IF_FALSE       13 (to 108)
+
+ 76     >>   82 LOAD_GLOBAL              3 (NULL + HTTPException)
+             92 LOAD_CONST               4 (400)
+             94 LOAD_CONST               5 ('invalid path')
+             96 KW_NAMES                 6 (('status_code', 'detail'))
+             98 CALL                     2
+            106 RAISE_VARARGS            1
+
+ 77     >>  108 LOAD_GLOBAL              5 (NULL + Path)
+            118 LOAD_FAST                0 (path)
+            120 CALL                     1
+            128 STORE_FAST               2 (target)
+
+ 78         130 LOAD_FAST                2 (target)
+            132 LOAD_ATTR                7 (NULL|self + exists)
+            152 CALL                     0
+            160 POP_JUMP_IF_FALSE       16 (to 194)
+            162 LOAD_FAST                2 (target)
+            164 LOAD_ATTR                9 (NULL|self + is_file)
+            184 CALL                     0
+            192 POP_JUMP_IF_TRUE        13 (to 220)
+
+ 79     >>  194 LOAD_GLOBAL              3 (NULL + HTTPException)
+            204 LOAD_CONST               7 (404)
+            206 LOAD_CONST               8 ('music file not found')
+            208 KW_NAMES                 6 (('status_code', 'detail'))
+            210 CALL                     2
+            218 RAISE_VARARGS            1
+
+ 80     >>  220 LOAD_FAST                2 (target)
+            222 LOAD_ATTR               10 (suffix)
+            242 LOAD_ATTR               13 (NULL|self + lower)
+            262 CALL                     0
+            270 LOAD_CONST               9 (('.mp3', '.wav', '.m4a', '.aac', '.ogg', '.flac'))
+            272 CONTAINS_OP              1
+            274 POP_JUMP_IF_FALSE       13 (to 302)
+
+ 81         276 LOAD_GLOBAL              3 (NULL + HTTPException)
+            286 LOAD_CONST               4 (400)
+            288 LOAD_CONST              10 ('unsupported audio type')
+            290 KW_NAMES                 6 (('status_code', 'detail'))
+            292 CALL                     2
+            300 RAISE_VARARGS            1
+
+ 82     >>  302 LOAD_GLOBAL             15 (NULL + range_stream)
+            312 LOAD_FAST                2 (target)
+            314 LOAD_FAST                1 (range)
+            316 KW_NAMES                11 (('range_header',))
+            318 CALL                     2
+            326 RETURN_VALUE
+        >>  328 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            330 RERAISE                  1
+ExceptionTable:
+  4 to 326 -> 328 [0] lasti

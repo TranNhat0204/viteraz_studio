@@ -1,0 +1,360 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Make-it-Original — gói biến đổi chống trùng lặp (doc 15 §15.2).\n\nMỗi video chọn tham số NGẪU NHIÊN nhưng ỔN ĐỊNH theo video_id (giữ idempotency: render lại\ncùng video → cùng kết quả; video khác → khác). Áp ở bước render: hflip + zoom + color grade +\nđổi tốc độ (video setpts SAU ass để sub vẫn khớp; audio atempo cùng hệ số) + xoá metadata.\n')
+              4 STORE_NAME               0 (__doc__)
+
+  7           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+  9          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (hashlib)
+             24 STORE_NAME               3 (hashlib)
+
+ 10          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               4 (('Random',))
+             30 IMPORT_NAME              4 (random)
+             32 IMPORT_FROM              5 (Random)
+             34 STORE_NAME               5 (Random)
+             36 POP_TOP
+
+ 14          38 LOAD_CONST               5 ((0.98, 1.02))
+             40 LOAD_CONST               6 ((1.0, 1.03))
+             42 LOAD_CONST               7 ((0.97, 1.03))
+             44 LOAD_CONST               8 ((0.96, 1.05))
+             46 LOAD_CONST               9 ((-0.03, 0.03))
+             48 LOAD_CONST              10 (('speed', 'zoom', 'contrast', 'saturation', 'bright'))
+             50 BUILD_CONST_KEY_MAP      5
+
+ 15          52 LOAD_CONST              11 ((0.95, 1.05))
+             54 LOAD_CONST              12 ((1.0, 1.06))
+             56 LOAD_CONST              13 ((0.94, 1.06))
+             58 LOAD_CONST              14 ((0.9, 1.1))
+             60 LOAD_CONST              15 ((-0.05, 0.05))
+             62 LOAD_CONST              10 (('speed', 'zoom', 'contrast', 'saturation', 'bright'))
+             64 BUILD_CONST_KEY_MAP      5
+
+ 16          66 LOAD_CONST              16 ((0.92, 1.08))
+             68 LOAD_CONST              17 ((1.0, 1.1))
+             70 LOAD_CONST              18 ((0.9, 1.12))
+             72 LOAD_CONST              19 ((0.85, 1.15))
+             74 LOAD_CONST              20 ((-0.07, 0.07))
+             76 LOAD_CONST              10 (('speed', 'zoom', 'contrast', 'saturation', 'bright'))
+             78 BUILD_CONST_KEY_MAP      5
+
+ 13          80 LOAD_CONST              21 (('light', 'medium', 'strong'))
+             82 BUILD_CONST_KEY_MAP      3
+             84 STORE_NAME               6 (_STRENGTH)
+
+ 20          86 LOAD_CONST              25 (('config', 'dict', 'video_id', 'str', 'return', 'dict | None'))
+             88 LOAD_CONST              22 (<code object resolve_originality at 0x290b11f0, file "app\render\originality.py", line 20>)
+             90 MAKE_FUNCTION            4 (annotations)
+             92 STORE_NAME               7 (resolve_originality)
+
+ 40          94 LOAD_CONST              26 (('o', 'dict', 'frame_w', 'int', 'frame_h', 'int', 'return', 'list[str]'))
+             96 LOAD_CONST              23 (<code object video_pre_sub_filters at 0x28ba5350, file "app\render\originality.py", line 40>)
+             98 MAKE_FUNCTION            4 (annotations)
+            100 STORE_NAME               8 (video_pre_sub_filters)
+
+ 57         102 LOAD_CONST              27 (('o', 'dict', 'return', 'list[str]'))
+            104 LOAD_CONST              24 (<code object video_post_sub_filters at 0x7f6c929f1fd0, file "app\render\originality.py", line 57>)
+            106 MAKE_FUNCTION            4 (annotations)
+            108 STORE_NAME               9 (video_post_sub_filters)
+            110 RETURN_CONST             3 (None)
+
+Disassembly of <code object resolve_originality at 0x290b11f0, file "app\render\originality.py", line 20>:
+ 20           0 RESUME                   0
+
+ 22           2 LOAD_FAST                0 (config)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 BUILD_MAP                0
+        >>   12 LOAD_ATTR                1 (NULL|self + get)
+             32 LOAD_CONST               1 ('originality')
+             34 CALL                     1
+             42 STORE_FAST               2 (o)
+
+ 23          44 LOAD_GLOBAL              3 (NULL + isinstance)
+             54 LOAD_FAST                2 (o)
+             56 LOAD_GLOBAL              4 (dict)
+             66 CALL                     2
+             74 POP_JUMP_IF_FALSE       17 (to 110)
+             76 LOAD_FAST                2 (o)
+             78 LOAD_ATTR                1 (NULL|self + get)
+             98 LOAD_CONST               2 ('enabled')
+            100 CALL                     1
+            108 POP_JUMP_IF_TRUE         1 (to 112)
+
+ 24     >>  110 RETURN_CONST             3 (None)
+
+ 25     >>  112 LOAD_FAST                2 (o)
+            114 LOAD_ATTR                1 (NULL|self + get)
+            134 LOAD_CONST               4 ('strength')
+            136 LOAD_CONST               5 ('medium')
+            138 CALL                     2
+            146 STORE_FAST               3 (strength)
+
+ 26         148 LOAD_GLOBAL              6 (_STRENGTH)
+            158 LOAD_ATTR                1 (NULL|self + get)
+            178 LOAD_FAST                3 (strength)
+            180 LOAD_GLOBAL              6 (_STRENGTH)
+            190 LOAD_CONST               5 ('medium')
+            192 BINARY_SUBSCR
+            196 CALL                     2
+            204 STORE_FAST               4 (rng)
+
+ 27         206 LOAD_GLOBAL              9 (NULL + int)
+            216 LOAD_GLOBAL             11 (NULL + hashlib)
+            226 LOAD_ATTR               12 (sha256)
+            246 LOAD_FAST                1 (video_id)
+            248 FORMAT_VALUE             0
+            250 LOAD_CONST               6 (':')
+            252 LOAD_FAST                3 (strength)
+            254 FORMAT_VALUE             0
+            256 BUILD_STRING             3
+            258 LOAD_ATTR               15 (NULL|self + encode)
+            278 CALL                     0
+            286 CALL                     1
+            294 LOAD_ATTR               17 (NULL|self + hexdigest)
+            314 CALL                     0
+            322 LOAD_CONST               3 (None)
+            324 LOAD_CONST               7 (12)
+            326 BINARY_SLICE
+            328 LOAD_CONST               8 (16)
+            330 CALL                     2
+            338 STORE_FAST               5 (seed)
+
+ 28         340 LOAD_GLOBAL             19 (NULL + Random)
+            350 LOAD_FAST                5 (seed)
+            352 CALL                     1
+            360 STORE_FAST               6 (r)
+
+ 30         362 LOAD_GLOBAL             21 (NULL + bool)
+            372 LOAD_FAST                2 (o)
+            374 LOAD_ATTR                1 (NULL|self + get)
+            394 LOAD_CONST               9 ('flip')
+            396 LOAD_CONST              10 (True)
+            398 CALL                     2
+            406 CALL                     1
+
+ 31         414 LOAD_GLOBAL             23 (NULL + round)
+            424 PUSH_NULL
+            426 LOAD_FAST                6 (r)
+            428 LOAD_ATTR               24 (uniform)
+            448 LOAD_FAST                4 (rng)
+            450 LOAD_CONST              11 ('speed')
+            452 BINARY_SUBSCR
+            456 CALL_FUNCTION_EX         0
+            458 LOAD_CONST              12 (4)
+            460 CALL                     2
+
+ 32         468 LOAD_GLOBAL             23 (NULL + round)
+            478 PUSH_NULL
+            480 LOAD_FAST                6 (r)
+            482 LOAD_ATTR               24 (uniform)
+            502 LOAD_FAST                4 (rng)
+            504 LOAD_CONST              13 ('zoom')
+            506 BINARY_SUBSCR
+            510 CALL_FUNCTION_EX         0
+            512 LOAD_CONST              12 (4)
+            514 CALL                     2
+
+ 33         522 LOAD_GLOBAL             23 (NULL + round)
+            532 PUSH_NULL
+            534 LOAD_FAST                6 (r)
+            536 LOAD_ATTR               24 (uniform)
+            556 LOAD_FAST                4 (rng)
+            558 LOAD_CONST              14 ('contrast')
+            560 BINARY_SUBSCR
+            564 CALL_FUNCTION_EX         0
+            566 LOAD_CONST              15 (3)
+            568 CALL                     2
+
+ 34         576 LOAD_GLOBAL             23 (NULL + round)
+            586 PUSH_NULL
+            588 LOAD_FAST                6 (r)
+            590 LOAD_ATTR               24 (uniform)
+            610 LOAD_FAST                4 (rng)
+            612 LOAD_CONST              16 ('saturation')
+            614 BINARY_SUBSCR
+            618 CALL_FUNCTION_EX         0
+            620 LOAD_CONST              15 (3)
+            622 CALL                     2
+
+ 35         630 LOAD_GLOBAL             23 (NULL + round)
+            640 PUSH_NULL
+            642 LOAD_FAST                6 (r)
+            644 LOAD_ATTR               24 (uniform)
+            664 LOAD_FAST                4 (rng)
+            666 LOAD_CONST              17 ('bright')
+            668 BINARY_SUBSCR
+            672 CALL_FUNCTION_EX         0
+            674 LOAD_CONST              15 (3)
+            676 CALL                     2
+
+ 36         684 LOAD_GLOBAL             21 (NULL + bool)
+            694 LOAD_FAST                2 (o)
+            696 LOAD_ATTR                1 (NULL|self + get)
+            716 LOAD_CONST              18 ('strip_metadata')
+            718 LOAD_CONST              10 (True)
+            720 CALL                     2
+            728 CALL                     1
+
+ 29         736 LOAD_CONST              19 (('flip', 'speed', 'zoom', 'contrast', 'saturation', 'brightness', 'strip_metadata'))
+            738 BUILD_CONST_KEY_MAP      7
+            740 RETURN_VALUE
+
+Disassembly of <code object video_pre_sub_filters at 0x28ba5350, file "app\render\originality.py", line 40>:
+ 40           0 RESUME                   0
+
+ 43           2 BUILD_LIST               0
+              4 STORE_FAST               3 (f)
+
+ 44           6 LOAD_FAST                0 (o)
+              8 LOAD_ATTR                1 (NULL|self + get)
+             28 LOAD_CONST               1 ('flip')
+             30 CALL                     1
+             38 POP_JUMP_IF_FALSE       17 (to 74)
+
+ 45          40 LOAD_FAST                3 (f)
+             42 LOAD_ATTR                3 (NULL|self + append)
+             62 LOAD_CONST               2 ('hflip')
+             64 CALL                     1
+             72 POP_TOP
+
+ 46     >>   74 LOAD_GLOBAL              5 (NULL + float)
+             84 LOAD_FAST                0 (o)
+             86 LOAD_ATTR                1 (NULL|self + get)
+            106 LOAD_CONST               3 ('zoom')
+            108 LOAD_CONST               4 (1.0)
+            110 CALL                     2
+            118 CALL                     1
+            126 STORE_FAST               4 (z)
+
+ 47         128 LOAD_FAST                4 (z)
+            130 LOAD_CONST               5 (1.001)
+            132 COMPARE_OP              68 (>)
+            136 POP_JUMP_IF_FALSE      132 (to 402)
+            138 LOAD_FAST                1 (frame_w)
+            140 POP_JUMP_IF_FALSE      130 (to 402)
+            142 LOAD_FAST                2 (frame_h)
+            144 POP_JUMP_IF_FALSE      128 (to 402)
+
+ 48         146 LOAD_GLOBAL              7 (NULL + max)
+            156 LOAD_CONST               6 (2)
+            158 LOAD_GLOBAL              9 (NULL + int)
+            168 LOAD_FAST                1 (frame_w)
+            170 LOAD_FAST                4 (z)
+            172 BINARY_OP               11 (/)
+            176 CALL                     1
+            184 LOAD_CONST               6 (2)
+            186 BINARY_OP                2 (//)
+            190 LOAD_CONST               6 (2)
+            192 BINARY_OP                5 (*)
+            196 CALL                     2
+            204 STORE_FAST               5 (cw)
+
+ 49         206 LOAD_GLOBAL              7 (NULL + max)
+            216 LOAD_CONST               6 (2)
+            218 LOAD_GLOBAL              9 (NULL + int)
+            228 LOAD_FAST                2 (frame_h)
+            230 LOAD_FAST                4 (z)
+            232 BINARY_OP               11 (/)
+            236 CALL                     1
+            244 LOAD_CONST               6 (2)
+            246 BINARY_OP                2 (//)
+            250 LOAD_CONST               6 (2)
+            252 BINARY_OP                5 (*)
+            256 CALL                     2
+            264 STORE_FAST               6 (ch)
+
+ 50         266 LOAD_FAST                1 (frame_w)
+            268 LOAD_FAST                5 (cw)
+            270 BINARY_OP               10 (-)
+            274 LOAD_CONST               6 (2)
+            276 BINARY_OP                2 (//)
+            280 STORE_FAST               7 (x)
+
+ 51         282 LOAD_FAST                2 (frame_h)
+            284 LOAD_FAST                6 (ch)
+            286 BINARY_OP               10 (-)
+            290 LOAD_CONST               6 (2)
+            292 BINARY_OP                2 (//)
+            296 STORE_FAST               8 (y)
+
+ 52         298 LOAD_FAST                3 (f)
+            300 LOAD_ATTR                3 (NULL|self + append)
+            320 LOAD_CONST               7 ('crop=')
+            322 LOAD_FAST                5 (cw)
+            324 FORMAT_VALUE             0
+            326 LOAD_CONST               8 (':')
+            328 LOAD_FAST                6 (ch)
+            330 FORMAT_VALUE             0
+            332 LOAD_CONST               8 (':')
+            334 LOAD_FAST                7 (x)
+            336 FORMAT_VALUE             0
+            338 LOAD_CONST               8 (':')
+            340 LOAD_FAST                8 (y)
+            342 FORMAT_VALUE             0
+            344 BUILD_STRING             8
+            346 CALL                     1
+            354 POP_TOP
+
+ 53         356 LOAD_FAST                3 (f)
+            358 LOAD_ATTR                3 (NULL|self + append)
+            378 LOAD_CONST               9 ('scale=')
+            380 LOAD_FAST                1 (frame_w)
+            382 FORMAT_VALUE             0
+            384 LOAD_CONST               8 (':')
+            386 LOAD_FAST                2 (frame_h)
+            388 FORMAT_VALUE             0
+            390 BUILD_STRING             4
+            392 CALL                     1
+            400 POP_TOP
+
+ 54     >>  402 LOAD_FAST                3 (f)
+            404 RETURN_VALUE
+
+Disassembly of <code object video_post_sub_filters at 0x7f6c929f1fd0, file "app\render\originality.py", line 57>:
+ 57           0 RESUME                   0
+
+ 61           2 BUILD_LIST               0
+              4 STORE_FAST               1 (f)
+
+ 62           6 LOAD_FAST                1 (f)
+              8 LOAD_ATTR                1 (NULL|self + append)
+             28 LOAD_CONST               1 ('eq=contrast=')
+             30 LOAD_FAST                0 (o)
+             32 LOAD_ATTR                3 (NULL|self + get)
+             52 LOAD_CONST               2 ('contrast')
+             54 LOAD_CONST               3 (1)
+             56 CALL                     2
+             64 LOAD_CONST               4 ('g')
+             66 FORMAT_VALUE             4 (with format)
+             68 LOAD_CONST               5 (':saturation=')
+             70 LOAD_FAST                0 (o)
+             72 LOAD_ATTR                3 (NULL|self + get)
+             92 LOAD_CONST               6 ('saturation')
+             94 LOAD_CONST               3 (1)
+             96 CALL                     2
+            104 LOAD_CONST               4 ('g')
+            106 FORMAT_VALUE             4 (with format)
+            108 LOAD_CONST               7 (':brightness=')
+            110 LOAD_FAST                0 (o)
+            112 LOAD_ATTR                3 (NULL|self + get)
+            132 LOAD_CONST               8 ('brightness')
+            134 LOAD_CONST               9 (0)
+            136 CALL                     2
+            144 LOAD_CONST               4 ('g')
+            146 FORMAT_VALUE             4 (with format)
+            148 BUILD_STRING             6
+            150 CALL                     1
+            158 POP_TOP
+
+ 63         160 LOAD_FAST                1 (f)
+            162 RETURN_VALUE

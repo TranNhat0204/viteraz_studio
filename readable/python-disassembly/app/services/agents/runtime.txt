@@ -1,0 +1,1119 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Bộ chạy agent nhiều bước — cố tình nhỏ.\n\nKhông dùng framework agent bên ngoài: việc này không có vòng lặp tool-calling, không có phân nhánh\ntheo quyết định của model. Nó là một *dây chuyền tuyến tính có kiểm định từng khâu*, và một runtime\n~150 dòng làm việc đó sạch hơn, debug được, không thêm dep vào bản desktop đóng gói.\n\nBa bất biến, mỗi cái sửa một cái đau có thật:\n\n  1. **Artifact lưu sau MỖI bước.** Luồng học DNA cũ chỉ ghi ở cuối, nên hỏng ở bước tổng hợp là mất\n     trắng 5 lượt LLM trước đó. Ở đây chạy lại chỉ tiếp từ bước hỏng.\n  2. **Validate sai → thử lại ĐÚNG bước đó, nói đích danh cái thiếu.** Mẫu này đã hiệu quả ở\n     master_prompt.run_generate_job: model thường sửa được ngay khi bị chỉ mặt.\n  3. **Huỷ được giữa các bước.** Dây chuyền chạy 3-6 phút; không huỷ được là không dùng được.\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 15           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 17          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('dataclass', 'field'))
+             22 IMPORT_NAME              3 (dataclasses)
+             24 IMPORT_FROM              4 (dataclass)
+             26 STORE_NAME               4 (dataclass)
+             28 IMPORT_FROM              5 (field)
+             30 STORE_NAME               5 (field)
+             32 POP_TOP
+
+ 18          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               4 (('Any', 'Awaitable', 'Callable'))
+             38 IMPORT_NAME              6 (typing)
+             40 IMPORT_FROM              7 (Any)
+             42 STORE_NAME               7 (Any)
+             44 IMPORT_FROM              8 (Awaitable)
+             46 STORE_NAME               8 (Awaitable)
+             48 IMPORT_FROM              9 (Callable)
+             50 STORE_NAME               9 (Callable)
+             52 POP_TOP
+
+ 20          54 LOAD_CONST               1 (0)
+             56 LOAD_CONST               5 (('make_error', 'E', 'StudioError'))
+             58 IMPORT_NAME             10 (app.core.errors)
+             60 IMPORT_FROM             11 (make_error)
+             62 STORE_NAME              11 (make_error)
+             64 IMPORT_FROM             12 (E)
+             66 STORE_NAME              12 (E)
+             68 IMPORT_FROM             13 (StudioError)
+             70 STORE_NAME              13 (StudioError)
+             72 POP_TOP
+
+ 21          74 LOAD_CONST               1 (0)
+             76 LOAD_CONST               6 (('log',))
+             78 IMPORT_NAME             14 (app.core.logging)
+             80 IMPORT_FROM             15 (log)
+             82 STORE_NAME              15 (log)
+             84 POP_TOP
+
+ 24          86 LOAD_CONST              15 (('return', 'list[str]'))
+             88 LOAD_CONST               7 (<code object _top_keys at 0x7f6c81ad3bd0, file "app\services\agents\runtime.py", line 24>)
+             90 MAKE_FUNCTION            4 (annotations)
+             92 STORE_NAME              16 (_top_keys)
+
+ 28          94 LOAD_NAME                4 (dataclass)
+
+ 29          96 PUSH_NULL
+             98 LOAD_BUILD_CLASS
+            100 LOAD_CONST               8 (<code object StepContext at 0x7f6c92fd4c30, file "app\services\agents\runtime.py", line 28>)
+            102 MAKE_FUNCTION            0
+            104 LOAD_CONST               9 ('StepContext')
+            106 CALL                     2
+
+ 28         114 CALL                     0
+
+ 29         122 STORE_NAME              17 (StepContext)
+
+ 36         124 LOAD_NAME                4 (dataclass)
+
+ 37         126 PUSH_NULL
+            128 LOAD_BUILD_CLASS
+            130 LOAD_CONST              10 (<code object Step at 0x7f6c92888c90, file "app\services\agents\runtime.py", line 36>)
+            132 MAKE_FUNCTION            0
+            134 LOAD_CONST              11 ('Step')
+            136 CALL                     2
+
+ 36         144 CALL                     0
+
+ 37         152 STORE_NAME              18 (Step)
+
+ 59         154 PUSH_NULL
+            156 LOAD_BUILD_CLASS
+            158 LOAD_CONST              12 (<code object AgentRun at 0x7f6c81ad3cf0, file "app\services\agents\runtime.py", line 59>)
+            160 MAKE_FUNCTION            0
+            162 LOAD_CONST              13 ('AgentRun')
+            164 CALL                     2
+            172 STORE_NAME              19 (AgentRun)
+            174 RETURN_CONST            14 (None)
+
+Disassembly of <code object _top_keys at 0x7f6c81ad3bd0, file "app\services\agents\runtime.py", line 24>:
+ 24           0 RESUME                   0
+
+ 25           2 LOAD_GLOBAL              1 (NULL + isinstance)
+             12 LOAD_FAST                0 (artifact)
+             14 LOAD_GLOBAL              2 (dict)
+             24 CALL                     2
+             32 POP_JUMP_IF_FALSE       28 (to 90)
+             34 LOAD_GLOBAL              5 (NULL + sorted)
+             44 LOAD_FAST                0 (artifact)
+             46 LOAD_ATTR                7 (NULL|self + keys)
+             66 CALL                     0
+             74 CALL                     1
+             82 LOAD_CONST               0 (None)
+             84 LOAD_CONST               1 (15)
+             86 BINARY_SLICE
+             88 RETURN_VALUE
+        >>   90 BUILD_LIST               0
+             92 RETURN_VALUE
+
+Disassembly of <code object StepContext at 0x7f6c92fd4c30, file "app\services\agents\runtime.py", line 28>:
+ 28           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('StepContext')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 30          12 LOAD_CONST               1 ('Những gì một bước được đọc: artifact các bước trước + dữ liệu vào của cả lượt chạy.')
+             14 STORE_NAME               3 (__doc__)
+
+ 31          16 LOAD_CONST               2 ('dict[str, Any]')
+             18 LOAD_NAME                4 (__annotations__)
+             20 LOAD_CONST               3 ('artifacts')
+             22 STORE_SUBSCR
+
+ 32          26 LOAD_CONST               2 ('dict[str, Any]')
+             28 LOAD_NAME                4 (__annotations__)
+             30 LOAD_CONST               4 ('inputs')
+             32 STORE_SUBSCR
+
+ 33          36 LOAD_CONST               5 ('')
+             38 STORE_NAME               5 (retry_reason)
+             40 LOAD_CONST               6 ('str')
+             42 LOAD_NAME                4 (__annotations__)
+             44 LOAD_CONST               7 ('retry_reason')
+             46 STORE_SUBSCR
+             50 RETURN_CONST             8 (None)
+
+Disassembly of <code object Step at 0x7f6c92888c90, file "app\services\agents\runtime.py", line 36>:
+ 36           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('Step')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 38          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('key')
+             18 STORE_SUBSCR
+
+ 39          22 LOAD_CONST               1 ('str')
+             24 LOAD_NAME                3 (__annotations__)
+             26 LOAD_CONST               3 ('label')
+             28 STORE_SUBSCR
+
+ 41          32 LOAD_CONST               4 ('Callable[[StepContext], Awaitable[tuple[str, str]]]')
+             34 LOAD_NAME                3 (__annotations__)
+             36 LOAD_CONST               5 ('build')
+             38 STORE_SUBSCR
+
+ 42          42 LOAD_CONST               6 ('Callable[[str], Any]')
+             44 LOAD_NAME                3 (__annotations__)
+             46 LOAD_CONST               7 ('parse')
+             48 STORE_SUBSCR
+
+ 44          52 LOAD_CONST               8 (None)
+             54 STORE_NAME               4 (validate)
+             56 LOAD_CONST               9 ('Callable[[Any], list[str]] | None')
+             58 LOAD_NAME                3 (__annotations__)
+             60 LOAD_CONST              10 ('validate')
+             62 STORE_SUBSCR
+
+ 45          66 LOAD_CONST              11 (1)
+             68 STORE_NAME               5 (retries)
+             70 LOAD_CONST              12 ('int')
+             72 LOAD_NAME                3 (__annotations__)
+             74 LOAD_CONST              13 ('retries')
+             76 STORE_SUBSCR
+
+ 46          80 LOAD_CONST               8 (None)
+             82 STORE_NAME               6 (temperature)
+             84 LOAD_CONST              14 ('float | None')
+             86 LOAD_NAME                3 (__annotations__)
+             88 LOAD_CONST              15 ('temperature')
+             90 STORE_SUBSCR
+
+ 47          94 LOAD_CONST               8 (None)
+             96 STORE_NAME               7 (max_tokens)
+             98 LOAD_CONST              16 ('int | None')
+            100 LOAD_NAME                3 (__annotations__)
+            102 LOAD_CONST              17 ('max_tokens')
+            104 STORE_SUBSCR
+
+ 50         108 LOAD_CONST               8 (None)
+            110 STORE_NAME               8 (reasoning_effort)
+            112 LOAD_CONST              18 ('str | None')
+            114 LOAD_NAME                3 (__annotations__)
+            116 LOAD_CONST              19 ('reasoning_effort')
+            118 STORE_SUBSCR
+
+ 55         122 LOAD_CONST               8 (None)
+            124 STORE_NAME               9 (retry_reasoning_effort)
+            126 LOAD_CONST              18 ('str | None')
+            128 LOAD_NAME                3 (__annotations__)
+            130 LOAD_CONST              20 ('retry_reasoning_effort')
+            132 STORE_SUBSCR
+
+ 56         136 LOAD_CONST              21 (1.0)
+            138 STORE_NAME              10 (weight)
+            140 LOAD_CONST              22 ('float')
+            142 LOAD_NAME                3 (__annotations__)
+            144 LOAD_CONST              23 ('weight')
+            146 STORE_SUBSCR
+            150 RETURN_CONST             8 (None)
+
+Disassembly of <code object AgentRun at 0x7f6c81ad3cf0, file "app\services\agents\runtime.py", line 59>:
+ 59           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('AgentRun')
+              8 STORE_NAME               2 (__qualname__)
+
+ 60          10 LOAD_CONST               1 ('Một lượt chạy. Giữ artifact + tiến trình + chi phí; gọi lại `execute()` là chạy tiếp phần dở.')
+             12 STORE_NAME               3 (__doc__)
+
+ 62          14 LOAD_CONST               2 (None)
+
+ 63          16 LOAD_CONST               2 (None)
+
+ 64          18 LOAD_CONST               2 (None)
+
+ 65          20 LOAD_CONST               2 (None)
+
+ 62          22 LOAD_CONST               3 (('inputs', 'progress', 'cancel_check', 'on_artifact'))
+             24 BUILD_CONST_KEY_MAP      4
+
+ 63          26 NOP
+
+ 62          28 NOP
+
+ 64          30 NOP
+
+ 62          32 NOP
+
+ 65          34 NOP
+
+ 62          36 LOAD_CONST              10 (('steps', 'list[Step]', 'inputs', 'dict | None', 'progress', 'Callable[[float], None] | None', 'cancel_check', 'Callable[[], bool] | None', 'on_artifact', 'Callable[[str, Any], None] | None'))
+             38 LOAD_CONST               4 (<code object __init__ at 0x7f6c929f3560, file "app\services\agents\runtime.py", line 62>)
+             40 MAKE_FUNCTION            6 (kwdefaults, annotations)
+             42 STORE_NAME               4 (__init__)
+
+ 81          44 LOAD_CONST              11 (('done_weight', 'float', 'total_weight', 'float', 'return', 'None'))
+             46 LOAD_CONST               5 (<code object _emit at 0x7f6c92bcda50, file "app\services\agents\runtime.py", line 81>)
+             48 MAKE_FUNCTION            4 (annotations)
+             50 STORE_NAME               5 (_emit)
+
+ 85          52 LOAD_CONST              12 (('return', 'None'))
+             54 LOAD_CONST               6 (<code object _ensure_running at 0x7f6c930f3230, file "app\services\agents\runtime.py", line 85>)
+             56 MAKE_FUNCTION            4 (annotations)
+             58 STORE_NAME               6 (_ensure_running)
+
+ 89          60 LOAD_CONST              13 (('step', 'Step', 'return', 'Any'))
+             62 LOAD_CONST               7 (<code object _run_step at 0x28abd220, file "app\services\agents\runtime.py", line 89>)
+             64 MAKE_FUNCTION            4 (annotations)
+             66 STORE_NAME               7 (_run_step)
+
+142          68 LOAD_CONST              14 (('return', 'dict[str, Any]'))
+             70 LOAD_CONST               8 (<code object execute at 0x28b9bf10, file "app\services\agents\runtime.py", line 142>)
+             72 MAKE_FUNCTION            4 (annotations)
+             74 STORE_NAME               8 (execute)
+
+166          76 LOAD_CONST              15 (('return', 'dict'))
+             78 LOAD_CONST               9 (<code object state at 0x28abf5a0, file "app\services\agents\runtime.py", line 166>)
+             80 MAKE_FUNCTION            4 (annotations)
+             82 STORE_NAME               9 (state)
+             84 RETURN_CONST             2 (None)
+
+Disassembly of <code object __init__ at 0x7f6c929f3560, file "app\services\agents\runtime.py", line 62>:
+ 62           0 RESUME                   0
+
+ 66           2 LOAD_FAST                1 (steps)
+              4 LOAD_FAST                0 (self)
+              6 STORE_ATTR               0 (steps)
+
+ 67          16 LOAD_FAST                2 (call)
+             18 LOAD_FAST                0 (self)
+             20 STORE_ATTR               1 (call)
+
+ 68          30 LOAD_FAST                3 (inputs)
+             32 COPY                     1
+             34 POP_JUMP_IF_TRUE         2 (to 40)
+             36 POP_TOP
+             38 BUILD_MAP                0
+        >>   40 LOAD_FAST                0 (self)
+             42 STORE_ATTR               2 (inputs)
+
+ 69          52 BUILD_MAP                0
+             54 LOAD_FAST                0 (self)
+             56 STORE_ATTR               3 (artifacts)
+
+ 70          66 BUILD_LIST               0
+             68 LOAD_FAST                0 (self)
+             70 STORE_ATTR               4 (warnings)
+
+ 71          80 LOAD_CONST               1 (0.0)
+             82 LOAD_FAST                0 (self)
+             84 STORE_ATTR               5 (cost_usd)
+
+ 72          94 LOAD_CONST               2 (0)
+             96 LOAD_FAST                0 (self)
+             98 STORE_ATTR               6 (tokens_in)
+
+ 73         108 LOAD_CONST               2 (0)
+            110 LOAD_FAST                0 (self)
+            112 STORE_ATTR               7 (tokens_out)
+
+ 74         122 LOAD_FAST                4 (progress)
+            124 LOAD_FAST                0 (self)
+            126 STORE_ATTR               8 (_progress)
+
+ 75         136 LOAD_FAST                5 (cancel_check)
+            138 LOAD_FAST                0 (self)
+            140 STORE_ATTR               9 (_cancel)
+
+ 77         150 LOAD_FAST                6 (on_artifact)
+            152 LOAD_FAST                0 (self)
+            154 STORE_ATTR              10 (_on_artifact)
+            164 RETURN_CONST             0 (None)
+
+Disassembly of <code object _emit at 0x7f6c92bcda50, file "app\services\agents\runtime.py", line 81>:
+ 81           0 RESUME                   0
+
+ 82           2 LOAD_FAST                0 (self)
+              4 LOAD_ATTR                0 (_progress)
+             24 POP_JUMP_IF_FALSE       40 (to 106)
+             26 LOAD_FAST                2 (total_weight)
+             28 LOAD_CONST               1 (0)
+             30 COMPARE_OP              68 (>)
+             34 POP_JUMP_IF_FALSE       34 (to 104)
+
+ 83          36 LOAD_FAST                0 (self)
+             38 LOAD_ATTR                1 (NULL|self + _progress)
+             58 LOAD_GLOBAL              3 (NULL + round)
+             68 LOAD_CONST               2 (100.0)
+             70 LOAD_FAST                1 (done_weight)
+             72 BINARY_OP                5 (*)
+             76 LOAD_FAST                2 (total_weight)
+             78 BINARY_OP               11 (/)
+             82 LOAD_CONST               3 (1)
+             84 CALL                     2
+             92 CALL                     1
+            100 POP_TOP
+            102 RETURN_CONST             0 (None)
+
+ 82     >>  104 RETURN_CONST             0 (None)
+        >>  106 RETURN_CONST             0 (None)
+
+Disassembly of <code object _ensure_running at 0x7f6c930f3230, file "app\services\agents\runtime.py", line 85>:
+ 85           0 RESUME                   0
+
+ 86           2 LOAD_FAST                0 (self)
+              4 LOAD_ATTR                0 (_cancel)
+             24 POP_JUMP_IF_FALSE       43 (to 112)
+             26 LOAD_FAST                0 (self)
+             28 LOAD_ATTR                1 (NULL|self + _cancel)
+             48 CALL                     0
+             56 POP_JUMP_IF_FALSE       26 (to 110)
+
+ 87          58 LOAD_GLOBAL              3 (NULL + make_error)
+             68 LOAD_GLOBAL              4 (E)
+             78 LOAD_ATTR                6 (CANCELLED)
+             98 LOAD_CONST               1 ('Tác vụ đã bị huỷ.')
+            100 CALL                     2
+            108 RAISE_VARARGS            1
+
+ 86     >>  110 RETURN_CONST             0 (None)
+        >>  112 RETURN_CONST             0 (None)
+
+Disassembly of <code object _run_step at 0x28abd220, file "app\services\agents\runtime.py", line 89>:
+ 89           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 90           6 LOAD_CONST               1 ('')
+              8 STORE_FAST               2 (reason)
+
+ 91          10 BUILD_LIST               0
+             12 STORE_FAST               3 (last_errors)
+
+ 92          14 LOAD_GLOBAL              1 (NULL + range)
+             24 LOAD_FAST                1 (step)
+             26 LOAD_ATTR                2 (retries)
+             46 LOAD_CONST               2 (1)
+             48 BINARY_OP                0 (+)
+             52 CALL                     1
+             60 GET_ITER
+        >>   62 EXTENDED_ARG             1
+             64 FOR_ITER               485 (to 1038)
+             68 STORE_FAST               4 (attempt)
+
+ 93          70 LOAD_GLOBAL              5 (NULL + StepContext)
+             80 LOAD_GLOBAL              7 (NULL + dict)
+             90 LOAD_FAST                0 (self)
+             92 LOAD_ATTR                8 (artifacts)
+            112 CALL                     1
+            120 LOAD_FAST                0 (self)
+            122 LOAD_ATTR               10 (inputs)
+
+ 94         142 LOAD_FAST                2 (reason)
+
+ 93         144 KW_NAMES                 3 (('artifacts', 'inputs', 'retry_reason'))
+            146 CALL                     3
+            154 STORE_FAST               5 (ctx)
+
+ 95         156 LOAD_FAST                1 (step)
+            158 LOAD_ATTR               13 (NULL|self + build)
+            178 LOAD_FAST                5 (ctx)
+            180 CALL                     1
+            188 GET_AWAITABLE            0
+            190 LOAD_CONST               0 (None)
+        >>  192 SEND                     3 (to 202)
+            196 YIELD_VALUE              2
+            198 RESUME                   3
+            200 JUMP_BACKWARD_NO_INTERRUPT     5 (to 192)
+        >>  202 END_SEND
+            204 UNPACK_SEQUENCE          2
+            208 STORE_FAST               6 (system)
+            210 STORE_FAST               7 (user)
+
+ 96         212 LOAD_FAST                1 (step)
+            214 LOAD_ATTR               14 (reasoning_effort)
+            234 STORE_FAST               8 (effort)
+
+ 97         236 LOAD_FAST                2 (reason)
+            238 POP_JUMP_IF_FALSE       27 (to 294)
+
+100         240 LOAD_FAST                7 (user)
+
+101         242 LOAD_CONST               4 ('\n\n⚠️ BẢN TRƯỚC CHƯA DÙNG ĐƯỢC vì: ')
+            244 LOAD_FAST                2 (reason)
+            246 BINARY_OP                0 (+)
+
+102         250 LOAD_CONST               5 ('\nSửa đúng những điểm đó và trả lại đầy đủ theo đúng định dạng đã yêu cầu.')
+
+101         252 BINARY_OP                0 (+)
+
+100         256 BINARY_OP               13 (+=)
+            260 STORE_FAST               7 (user)
+
+106         262 LOAD_FAST                1 (step)
+            264 LOAD_ATTR               16 (retry_reasoning_effort)
+            284 COPY                     1
+            286 POP_JUMP_IF_TRUE         2 (to 292)
+            288 POP_TOP
+            290 LOAD_FAST                8 (effort)
+        >>  292 STORE_FAST               8 (effort)
+
+107     >>  294 LOAD_FAST                0 (self)
+            296 LOAD_ATTR               19 (NULL|self + call)
+
+108         316 LOAD_FAST                6 (system)
+            318 LOAD_FAST                7 (user)
+
+109         320 LOAD_FAST                1 (step)
+            322 LOAD_ATTR               20 (temperature)
+            342 LOAD_FAST                1 (step)
+            344 LOAD_ATTR               22 (max_tokens)
+
+110         364 LOAD_FAST                8 (effort)
+
+107         366 KW_NAMES                 6 (('temperature', 'max_tokens', 'reasoning_effort'))
+            368 CALL                     5
+            376 GET_AWAITABLE            0
+            378 LOAD_CONST               0 (None)
+        >>  380 SEND                     3 (to 390)
+            384 YIELD_VALUE              2
+            386 RESUME                   3
+            388 JUMP_BACKWARD_NO_INTERRUPT     5 (to 380)
+        >>  390 END_SEND
+            392 STORE_FAST               9 (result)
+
+114         394 LOAD_GLOBAL             25 (NULL + getattr)
+            404 LOAD_FAST                9 (result)
+            406 LOAD_CONST               7 ('text')
+            408 LOAD_FAST                9 (result)
+            410 CALL                     3
+            418 STORE_FAST              10 (text)
+
+115         420 LOAD_FAST                0 (self)
+            422 COPY                     1
+            424 LOAD_ATTR               26 (cost_usd)
+            444 LOAD_GLOBAL             29 (NULL + float)
+            454 LOAD_GLOBAL             25 (NULL + getattr)
+            464 LOAD_FAST                9 (result)
+            466 LOAD_CONST               8 ('cost_usd')
+            468 LOAD_CONST               9 (0.0)
+            470 CALL                     3
+            478 COPY                     1
+            480 POP_JUMP_IF_TRUE         2 (to 486)
+            482 POP_TOP
+            484 LOAD_CONST               9 (0.0)
+        >>  486 CALL                     1
+            494 BINARY_OP               13 (+=)
+            498 SWAP                     2
+            500 STORE_ATTR              13 (cost_usd)
+
+116         510 LOAD_FAST                0 (self)
+            512 COPY                     1
+            514 LOAD_ATTR               30 (tokens_in)
+            534 LOAD_GLOBAL             33 (NULL + int)
+            544 LOAD_GLOBAL             25 (NULL + getattr)
+            554 LOAD_FAST                9 (result)
+            556 LOAD_CONST              10 ('tokens_in')
+            558 LOAD_CONST              11 (0)
+            560 CALL                     3
+            568 COPY                     1
+            570 POP_JUMP_IF_TRUE         2 (to 576)
+            572 POP_TOP
+            574 LOAD_CONST              11 (0)
+        >>  576 CALL                     1
+            584 BINARY_OP               13 (+=)
+            588 SWAP                     2
+            590 STORE_ATTR              15 (tokens_in)
+
+117         600 LOAD_FAST                0 (self)
+            602 COPY                     1
+            604 LOAD_ATTR               34 (tokens_out)
+            624 LOAD_GLOBAL             33 (NULL + int)
+            634 LOAD_GLOBAL             25 (NULL + getattr)
+            644 LOAD_FAST                9 (result)
+            646 LOAD_CONST              12 ('tokens_out')
+            648 LOAD_CONST              11 (0)
+            650 CALL                     3
+            658 COPY                     1
+            660 POP_JUMP_IF_TRUE         2 (to 666)
+            662 POP_TOP
+            664 LOAD_CONST              11 (0)
+        >>  666 CALL                     1
+            674 BINARY_OP               13 (+=)
+            678 SWAP                     2
+            680 STORE_ATTR              17 (tokens_out)
+
+119         690 LOAD_FAST                1 (step)
+            692 LOAD_ATTR               37 (NULL|self + parse)
+            712 LOAD_FAST               10 (text)
+            714 CALL                     1
+            722 STORE_FAST              11 (artifact)
+
+120         724 LOAD_FAST                1 (step)
+            726 LOAD_ATTR               38 (validate)
+            746 POP_JUMP_IF_FALSE       17 (to 782)
+            748 LOAD_FAST                1 (step)
+            750 LOAD_ATTR               39 (NULL|self + validate)
+            770 LOAD_FAST               11 (artifact)
+            772 CALL                     1
+            780 JUMP_FORWARD             1 (to 784)
+        >>  782 BUILD_LIST               0
+        >>  784 STORE_FAST              12 (errors)
+
+121         786 LOAD_FAST               12 (errors)
+            788 POP_JUMP_IF_TRUE         4 (to 798)
+
+122         790 LOAD_FAST               11 (artifact)
+            792 SWAP                     2
+            794 POP_TOP
+            796 RETURN_VALUE
+
+123     >>  798 LOAD_FAST               12 (errors)
+            800 STORE_FAST               3 (last_errors)
+
+124         802 LOAD_CONST              13 ('; ')
+            804 LOAD_ATTR               41 (NULL|self + join)
+            824 LOAD_CONST              14 (<code object <genexpr> at 0x7f6c9265c230, file "app\services\agents\runtime.py", line 124>)
+            826 MAKE_FUNCTION            0
+            828 LOAD_FAST               12 (errors)
+            830 GET_ITER
+            832 CALL                     0
+            840 CALL                     1
+            848 STORE_FAST               2 (reason)
+
+128         850 LOAD_GLOBAL             43 (NULL + log)
+            860 LOAD_ATTR               44 (warning)
+
+129         880 LOAD_CONST              15 ('[agent] bước ')
+            882 LOAD_FAST                1 (step)
+            884 LOAD_ATTR               46 (key)
+            904 FORMAT_VALUE             0
+            906 LOAD_CONST              16 (' lần ')
+            908 LOAD_FAST                4 (attempt)
+            910 LOAD_CONST               2 (1)
+            912 BINARY_OP                0 (+)
+            916 FORMAT_VALUE             0
+            918 LOAD_CONST              17 (' chưa đạt: ')
+            920 LOAD_FAST                2 (reason)
+            922 FORMAT_VALUE             0
+
+130         924 LOAD_CONST              18 (' · nhận về ')
+            926 LOAD_GLOBAL             49 (NULL + type)
+            936 LOAD_FAST               11 (artifact)
+            938 CALL                     1
+            946 LOAD_ATTR               50 (__name__)
+            966 FORMAT_VALUE             0
+
+131         968 LOAD_CONST              19 (' khoá=')
+            970 LOAD_GLOBAL             53 (NULL + _top_keys)
+            980 LOAD_FAST               11 (artifact)
+            982 CALL                     1
+            990 FORMAT_VALUE             0
+
+132         992 LOAD_CONST              20 (' · raw[:400]=')
+            994 LOAD_GLOBAL             55 (NULL + str)
+           1004 LOAD_FAST               10 (text)
+           1006 CALL                     1
+           1014 LOAD_CONST               0 (None)
+           1016 LOAD_CONST              21 (400)
+           1018 BINARY_SLICE
+           1020 FORMAT_VALUE             2 (repr)
+
+129        1022 BUILD_STRING            12
+
+128        1024 CALL                     1
+           1032 POP_TOP
+           1034 EXTENDED_ARG             1
+           1036 JUMP_BACKWARD          488 (to 62)
+
+ 92     >> 1038 END_FOR
+
+134        1040 LOAD_GLOBAL             57 (NULL + make_error)
+
+135        1050 LOAD_GLOBAL             58 (E)
+           1060 LOAD_ATTR               60 (UNKNOWN)
+
+136        1080 LOAD_CONST              22 ('Bước “')
+           1082 LOAD_FAST                1 (step)
+           1084 LOAD_ATTR               62 (label)
+           1104 FORMAT_VALUE             0
+           1106 LOAD_CONST              23 ('” không đạt sau ')
+           1108 LOAD_FAST                1 (step)
+           1110 LOAD_ATTR                2 (retries)
+           1130 LOAD_CONST               2 (1)
+           1132 BINARY_OP                0 (+)
+           1136 FORMAT_VALUE             0
+           1138 LOAD_CONST              24 (' lần thử: ')
+           1140 BUILD_STRING             5
+
+137        1142 LOAD_CONST              13 ('; ')
+           1144 LOAD_ATTR               41 (NULL|self + join)
+           1164 LOAD_CONST              25 (<code object <genexpr> at 0x7f6c9265c430, file "app\services\agents\runtime.py", line 137>)
+           1166 MAKE_FUNCTION            0
+           1168 LOAD_FAST                3 (last_errors)
+           1170 GET_ITER
+           1172 CALL                     0
+           1180 CALL                     1
+
+136        1188 BINARY_OP                0 (+)
+
+134        1192 CALL                     2
+           1200 RAISE_VARARGS            1
+
+ 95     >> 1202 CLEANUP_THROW
+           1204 EXTENDED_ARG             1
+           1206 JUMP_BACKWARD          503 (to 202)
+
+107     >> 1208 CLEANUP_THROW
+           1210 EXTENDED_ARG             1
+           1212 JUMP_BACKWARD          412 (to 390)
+        >> 1214 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1216 RERAISE                  1
+ExceptionTable:
+  4 to 194 -> 1214 [0] lasti
+  196 to 196 -> 1202 [3]
+  198 to 382 -> 1214 [0] lasti
+  384 to 384 -> 1208 [3]
+  386 to 1202 -> 1214 [0] lasti
+  1208 to 1208 -> 1214 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c9265c230, file "app\services\agents\runtime.py", line 124>:
+124           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                15 (to 42)
+             12 STORE_FAST               1 (e)
+             14 LOAD_GLOBAL              1 (NULL + str)
+             24 LOAD_FAST                1 (e)
+             26 CALL                     1
+             34 YIELD_VALUE              1
+             36 RESUME                   1
+             38 POP_TOP
+             40 JUMP_BACKWARD           17 (to 8)
+        >>   42 END_FOR
+             44 RETURN_CONST             0 (None)
+        >>   46 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             48 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 46 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c9265c430, file "app\services\agents\runtime.py", line 137>:
+137           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                15 (to 42)
+             12 STORE_FAST               1 (e)
+             14 LOAD_GLOBAL              1 (NULL + str)
+             24 LOAD_FAST                1 (e)
+             26 CALL                     1
+             34 YIELD_VALUE              1
+             36 RESUME                   1
+             38 POP_TOP
+             40 JUMP_BACKWARD           17 (to 8)
+        >>   42 END_FOR
+             44 RETURN_CONST             0 (None)
+        >>   46 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             48 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 46 [0] lasti
+
+Disassembly of <code object execute at 0x28b9bf10, file "app\services\agents\runtime.py", line 142>:
+              0 MAKE_CELL                0 (self)
+
+142           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+143           8 LOAD_GLOBAL              1 (NULL + sum)
+             18 LOAD_CONST               1 (<code object <genexpr> at 0x7f6c930bb550, file "app\services\agents\runtime.py", line 143>)
+             20 MAKE_FUNCTION            0
+             22 LOAD_DEREF               0 (self)
+             24 LOAD_ATTR                2 (steps)
+             44 GET_ITER
+             46 CALL                     0
+             54 CALL                     1
+             62 COPY                     1
+             64 POP_JUMP_IF_TRUE         2 (to 70)
+             66 POP_TOP
+             68 LOAD_CONST               2 (1.0)
+        >>   70 STORE_FAST               1 (total)
+
+144          72 LOAD_GLOBAL              1 (NULL + sum)
+             82 LOAD_CLOSURE             0 (self)
+             84 BUILD_TUPLE              1
+             86 LOAD_CONST               3 (<code object <genexpr> at 0x7f6c930f35f0, file "app\services\agents\runtime.py", line 144>)
+             88 MAKE_FUNCTION            8 (closure)
+             90 LOAD_DEREF               0 (self)
+             92 LOAD_ATTR                2 (steps)
+            112 GET_ITER
+            114 CALL                     0
+            122 CALL                     1
+            130 STORE_FAST               2 (done)
+
+145         132 LOAD_DEREF               0 (self)
+            134 LOAD_ATTR                5 (NULL|self + _emit)
+            154 LOAD_FAST                2 (done)
+            156 LOAD_FAST                1 (total)
+            158 CALL                     2
+            166 POP_TOP
+
+147         168 LOAD_DEREF               0 (self)
+            170 LOAD_ATTR                2 (steps)
+            190 GET_ITER
+        >>  192 FOR_ITER               225 (to 646)
+            196 STORE_FAST               3 (step)
+
+148         198 LOAD_FAST                3 (step)
+            200 LOAD_ATTR                6 (key)
+            220 LOAD_DEREF               0 (self)
+            222 LOAD_ATTR                8 (artifacts)
+            242 CONTAINS_OP              0
+            244 POP_JUMP_IF_FALSE        1 (to 248)
+
+149         246 JUMP_BACKWARD           28 (to 192)
+
+150     >>  248 LOAD_DEREF               0 (self)
+            250 LOAD_ATTR               11 (NULL|self + _ensure_running)
+            270 CALL                     0
+            278 POP_TOP
+
+151         280 LOAD_GLOBAL             13 (NULL + log)
+            290 LOAD_ATTR               14 (info)
+            310 LOAD_CONST               4 ('[agent] → ')
+            312 LOAD_FAST                3 (step)
+            314 LOAD_ATTR                6 (key)
+            334 FORMAT_VALUE             0
+            336 LOAD_CONST               5 (' (')
+            338 LOAD_FAST                3 (step)
+            340 LOAD_ATTR               16 (label)
+            360 FORMAT_VALUE             0
+            362 LOAD_CONST               6 (')')
+            364 BUILD_STRING             5
+            366 CALL                     1
+            374 POP_TOP
+
+152         376 NOP
+
+153         378 LOAD_DEREF               0 (self)
+            380 LOAD_ATTR               19 (NULL|self + _run_step)
+            400 LOAD_FAST                3 (step)
+            402 CALL                     1
+            410 GET_AWAITABLE            0
+            412 LOAD_CONST               0 (None)
+        >>  414 SEND                     3 (to 424)
+            418 YIELD_VALUE              3
+            420 RESUME                   3
+            422 JUMP_BACKWARD_NO_INTERRUPT     5 (to 414)
+        >>  424 END_SEND
+            426 STORE_FAST               4 (artifact)
+
+159         428 LOAD_FAST                4 (artifact)
+            430 LOAD_DEREF               0 (self)
+            432 LOAD_ATTR                8 (artifacts)
+            452 LOAD_FAST                3 (step)
+            454 LOAD_ATTR                6 (key)
+            474 STORE_SUBSCR
+
+160         478 LOAD_DEREF               0 (self)
+            480 LOAD_ATTR               30 (_on_artifact)
+            500 POP_JUMP_IF_FALSE       28 (to 558)
+
+161         502 LOAD_DEREF               0 (self)
+            504 LOAD_ATTR               31 (NULL|self + _on_artifact)
+            524 LOAD_FAST                3 (step)
+            526 LOAD_ATTR                6 (key)
+            546 LOAD_FAST                4 (artifact)
+            548 CALL                     2
+            556 POP_TOP
+
+162     >>  558 LOAD_FAST                2 (done)
+            560 LOAD_GLOBAL             33 (NULL + max)
+            570 LOAD_CONST               9 (0.0)
+            572 LOAD_FAST                3 (step)
+            574 LOAD_ATTR               34 (weight)
+            594 CALL                     2
+            602 BINARY_OP               13 (+=)
+            606 STORE_FAST               2 (done)
+
+163         608 LOAD_DEREF               0 (self)
+            610 LOAD_ATTR                5 (NULL|self + _emit)
+            630 LOAD_FAST                2 (done)
+            632 LOAD_FAST                1 (total)
+            634 CALL                     2
+            642 POP_TOP
+            644 JUMP_BACKWARD          227 (to 192)
+
+147     >>  646 END_FOR
+
+164         648 LOAD_DEREF               0 (self)
+            650 LOAD_ATTR                8 (artifacts)
+            670 RETURN_VALUE
+
+153     >>  672 CLEANUP_THROW
+            674 JUMP_BACKWARD          126 (to 424)
+        >>  676 PUSH_EXC_INFO
+
+154         678 LOAD_GLOBAL             20 (StudioError)
+            688 CHECK_EXC_MATCH
+            690 POP_JUMP_IF_FALSE        2 (to 696)
+            692 POP_TOP
+
+155         694 RAISE_VARARGS            0
+
+156     >>  696 LOAD_GLOBAL             22 (Exception)
+            706 CHECK_EXC_MATCH
+            708 POP_JUMP_IF_FALSE       48 (to 806)
+            710 STORE_FAST               5 (exc)
+
+157         712 LOAD_GLOBAL             25 (NULL + make_error)
+            722 LOAD_GLOBAL             26 (E)
+            732 LOAD_ATTR               28 (UNKNOWN)
+
+158         752 LOAD_CONST               7 ('Bước “')
+            754 LOAD_FAST                3 (step)
+            756 LOAD_ATTR               16 (label)
+            776 FORMAT_VALUE             0
+            778 LOAD_CONST               8 ('” lỗi: ')
+            780 LOAD_FAST                5 (exc)
+            782 FORMAT_VALUE             0
+            784 BUILD_STRING             4
+
+157         786 CALL                     2
+
+158         794 LOAD_FAST                5 (exc)
+
+157         796 RAISE_VARARGS            2
+        >>  798 LOAD_CONST               0 (None)
+            800 STORE_FAST               5 (exc)
+            802 DELETE_FAST              5 (exc)
+            804 RERAISE                  1
+
+156     >>  806 RERAISE                  0
+        >>  808 COPY                     3
+            810 POP_EXCEPT
+            812 RERAISE                  1
+        >>  814 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            816 RERAISE                  1
+ExceptionTable:
+  6 to 374 -> 814 [0] lasti
+  378 to 416 -> 676 [1]
+  418 to 418 -> 672 [3]
+  420 to 426 -> 676 [1]
+  428 to 670 -> 814 [0] lasti
+  672 to 672 -> 676 [1]
+  676 to 710 -> 808 [2] lasti
+  712 to 796 -> 798 [2] lasti
+  798 to 806 -> 808 [2] lasti
+  808 to 812 -> 814 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c930bb550, file "app\services\agents\runtime.py", line 143>:
+143           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                26 (to 64)
+             12 STORE_FAST               1 (s)
+             14 LOAD_GLOBAL              1 (NULL + max)
+             24 LOAD_CONST               0 (0.0)
+             26 LOAD_FAST                1 (s)
+             28 LOAD_ATTR                2 (weight)
+             48 CALL                     2
+             56 YIELD_VALUE              1
+             58 RESUME                   1
+             60 POP_TOP
+             62 JUMP_BACKWARD           28 (to 8)
+        >>   64 END_FOR
+             66 RETURN_CONST             1 (None)
+        >>   68 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             70 RERAISE                  1
+ExceptionTable:
+  4 to 66 -> 68 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c930f35f0, file "app\services\agents\runtime.py", line 144>:
+              0 COPY_FREE_VARS           1
+
+144           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                51 (to 116)
+             14 STORE_FAST               1 (s)
+             16 LOAD_FAST                1 (s)
+             18 LOAD_ATTR                0 (key)
+             38 LOAD_DEREF               2 (self)
+             40 LOAD_ATTR                2 (artifacts)
+             60 CONTAINS_OP              0
+             62 POP_JUMP_IF_TRUE         1 (to 66)
+             64 JUMP_BACKWARD           28 (to 10)
+        >>   66 LOAD_GLOBAL              5 (NULL + max)
+             76 LOAD_CONST               0 (0.0)
+             78 LOAD_FAST                1 (s)
+             80 LOAD_ATTR                6 (weight)
+            100 CALL                     2
+            108 YIELD_VALUE              1
+            110 RESUME                   1
+            112 POP_TOP
+            114 JUMP_BACKWARD           53 (to 10)
+        >>  116 END_FOR
+            118 RETURN_CONST             1 (None)
+        >>  120 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            122 RERAISE                  1
+ExceptionTable:
+  6 to 62 -> 120 [0] lasti
+  66 to 118 -> 120 [0] lasti
+
+Disassembly of <code object state at 0x28abf5a0, file "app\services\agents\runtime.py", line 166>:
+              0 MAKE_CELL                0 (self)
+
+166           2 RESUME                   0
+
+168           4 LOAD_DEREF               0 (self)
+              6 LOAD_ATTR                0 (steps)
+             26 GET_ITER
+             28 LOAD_FAST_AND_CLEAR      1 (s)
+             30 SWAP                     2
+             32 BUILD_LIST               0
+             34 SWAP                     2
+        >>   36 FOR_ITER                39 (to 118)
+             40 STORE_FAST               1 (s)
+             42 LOAD_FAST                1 (s)
+             44 LOAD_ATTR                2 (key)
+             64 LOAD_DEREF               0 (self)
+             66 LOAD_ATTR                4 (artifacts)
+             86 CONTAINS_OP              0
+             88 POP_JUMP_IF_TRUE         1 (to 92)
+             90 JUMP_BACKWARD           28 (to 36)
+        >>   92 LOAD_FAST                1 (s)
+             94 LOAD_ATTR                2 (key)
+            114 LIST_APPEND              2
+            116 JUMP_BACKWARD           41 (to 36)
+        >>  118 END_FOR
+            120 STORE_FAST               2 (done)
+            122 STORE_FAST               1 (s)
+
+169         124 LOAD_GLOBAL              7 (NULL + next)
+            134 LOAD_CLOSURE             0 (self)
+            136 BUILD_TUPLE              1
+            138 LOAD_CONST               1 (<code object <genexpr> at 0x7f6c81ad3990, file "app\services\agents\runtime.py", line 169>)
+            140 MAKE_FUNCTION            8 (closure)
+            142 LOAD_DEREF               0 (self)
+            144 LOAD_ATTR                0 (steps)
+            164 GET_ITER
+            166 CALL                     0
+            174 LOAD_CONST               2 (None)
+            176 CALL                     2
+            184 STORE_FAST               3 (current)
+
+172         186 LOAD_DEREF               0 (self)
+            188 LOAD_ATTR                0 (steps)
+            208 GET_ITER
+
+171         210 LOAD_FAST_AND_CLEAR      1 (s)
+            212 SWAP                     2
+            214 BUILD_LIST               0
+            216 SWAP                     2
+
+172     >>  218 FOR_ITER                50 (to 322)
+            222 STORE_FAST               1 (s)
+
+171         224 LOAD_FAST                1 (s)
+            226 LOAD_ATTR                2 (key)
+            246 LOAD_FAST                1 (s)
+            248 LOAD_ATTR                8 (label)
+            268 LOAD_FAST                1 (s)
+            270 LOAD_ATTR                2 (key)
+            290 LOAD_DEREF               0 (self)
+            292 LOAD_ATTR                4 (artifacts)
+            312 CONTAINS_OP              0
+            314 LOAD_CONST               3 (('key', 'label', 'done'))
+            316 BUILD_CONST_KEY_MAP      3
+            318 LIST_APPEND              2
+            320 JUMP_BACKWARD           52 (to 218)
+
+172     >>  322 END_FOR
+
+171         324 SWAP                     2
+            326 STORE_FAST               1 (s)
+
+173         328 LOAD_GLOBAL             11 (NULL + len)
+            338 LOAD_FAST                2 (done)
+            340 CALL                     1
+
+174         348 LOAD_GLOBAL             11 (NULL + len)
+            358 LOAD_DEREF               0 (self)
+            360 LOAD_ATTR                0 (steps)
+            380 CALL                     1
+
+175         388 LOAD_FAST                3 (current)
+            390 POP_JUMP_IF_FALSE       12 (to 416)
+            392 LOAD_FAST                3 (current)
+            394 LOAD_ATTR                2 (key)
+            414 JUMP_FORWARD             1 (to 418)
+        >>  416 LOAD_CONST               2 (None)
+
+176     >>  418 LOAD_GLOBAL             13 (NULL + round)
+            428 LOAD_DEREF               0 (self)
+            430 LOAD_ATTR               14 (cost_usd)
+            450 LOAD_CONST               4 (6)
+            452 CALL                     2
+
+177         460 LOAD_DEREF               0 (self)
+            462 LOAD_ATTR               16 (tokens_in)
+
+178         482 LOAD_DEREF               0 (self)
+            484 LOAD_ATTR               18 (tokens_out)
+
+179         504 LOAD_GLOBAL             21 (NULL + list)
+            514 LOAD_DEREF               0 (self)
+            516 LOAD_ATTR               22 (warnings)
+            536 CALL                     1
+
+170         544 LOAD_CONST               5 (('steps', 'done_count', 'total_count', 'current_step', 'cost_usd', 'tokens_in', 'tokens_out', 'warnings'))
+            546 BUILD_CONST_KEY_MAP      8
+            548 RETURN_VALUE
+        >>  550 SWAP                     2
+            552 POP_TOP
+
+168         554 SWAP                     2
+            556 STORE_FAST               1 (s)
+            558 RERAISE                  0
+        >>  560 SWAP                     2
+            562 POP_TOP
+
+171         564 SWAP                     2
+            566 STORE_FAST               1 (s)
+            568 RERAISE                  0
+ExceptionTable:
+  32 to 88 -> 550 [2]
+  92 to 118 -> 550 [2]
+  214 to 322 -> 560 [2]
+
+Disassembly of <code object <genexpr> at 0x7f6c81ad3990, file "app\services\agents\runtime.py", line 169>:
+              0 COPY_FREE_VARS           1
+
+169           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                31 (to 76)
+             14 STORE_FAST               1 (s)
+             16 LOAD_FAST                1 (s)
+             18 LOAD_ATTR                0 (key)
+             38 LOAD_DEREF               2 (self)
+             40 LOAD_ATTR                2 (artifacts)
+             60 CONTAINS_OP              1
+             62 POP_JUMP_IF_TRUE         1 (to 66)
+             64 JUMP_BACKWARD           28 (to 10)
+        >>   66 LOAD_FAST                1 (s)
+             68 YIELD_VALUE              1
+             70 RESUME                   1
+             72 POP_TOP
+             74 JUMP_BACKWARD           33 (to 10)
+        >>   76 END_FOR
+             78 RETURN_CONST             0 (None)
+        >>   80 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             82 RERAISE                  1
+ExceptionTable:
+  6 to 62 -> 80 [0] lasti
+  66 to 78 -> 80 [0] lasti

@@ -1,0 +1,3755 @@
+  0           0 RESUME                   0
+
+  1           2 SETUP_ANNOTATIONS
+              4 LOAD_CONST               0 ('AI33 unified TTS provider (api.ai33.pro V3).\n\nAI33 exposes several voice catalogs behind one API. Synthesis is asynchronous:\ncreate a task, poll it, then download the resulting audio URL.\n\nKho giọng RẤT lệch nhau: edge/vbee/minimax/kokoro/fishaudio cộng lại ~1.365 giọng và tải đủ trong\n~2 giây, riêng elevenlabs có ~16.500 giọng = 166 trang và mất ~105 giây. Vì vậy danh mục được nạp\nlàm 2 tầng (xem `list_voices`): tầng NHANH trả ngay cho UI, tầng ĐẦY ĐỦ chạy nền rồi ghi cache\nxuống đĩa để những lần sau tức thì. Chi tiết đo đạc: docs/18-ai33-voice-catalog-va-bo-loc-giong.md\n')
+              6 STORE_NAME               0 (__doc__)
+
+ 11           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('annotations',))
+             12 IMPORT_NAME              1 (__future__)
+             14 IMPORT_FROM              2 (annotations)
+             16 STORE_NAME               2 (annotations)
+             18 POP_TOP
+
+ 13          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               3 (None)
+             24 IMPORT_NAME              3 (asyncio)
+             26 STORE_NAME               3 (asyncio)
+
+ 14          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               3 (None)
+             32 IMPORT_NAME              4 (hashlib)
+             34 STORE_NAME               4 (hashlib)
+
+ 15          36 LOAD_CONST               1 (0)
+             38 LOAD_CONST               3 (None)
+             40 IMPORT_NAME              5 (json)
+             42 STORE_NAME               5 (json)
+
+ 16          44 LOAD_CONST               1 (0)
+             46 LOAD_CONST               3 (None)
+             48 IMPORT_NAME              6 (os)
+             50 STORE_NAME               6 (os)
+
+ 17          52 LOAD_CONST               1 (0)
+             54 LOAD_CONST               3 (None)
+             56 IMPORT_NAME              7 (time)
+             58 STORE_NAME               7 (time)
+
+ 18          60 LOAD_CONST               1 (0)
+             62 LOAD_CONST               4 (('Path',))
+             64 IMPORT_NAME              8 (pathlib)
+             66 IMPORT_FROM              9 (Path)
+             68 STORE_NAME               9 (Path)
+             70 POP_TOP
+
+ 19          72 LOAD_CONST               1 (0)
+             74 LOAD_CONST               5 (('Callable',))
+             76 IMPORT_NAME             10 (typing)
+             78 IMPORT_FROM             11 (Callable)
+             80 STORE_NAME              11 (Callable)
+             82 POP_TOP
+
+ 20          84 LOAD_CONST               1 (0)
+             86 LOAD_CONST               6 (('urlparse',))
+             88 IMPORT_NAME             12 (urllib.parse)
+             90 IMPORT_FROM             13 (urlparse)
+             92 STORE_NAME              13 (urlparse)
+             94 POP_TOP
+
+ 22          96 LOAD_CONST               1 (0)
+             98 LOAD_CONST               3 (None)
+            100 IMPORT_NAME             14 (httpx)
+            102 STORE_NAME              14 (httpx)
+
+ 24         104 LOAD_CONST               1 (0)
+            106 LOAD_CONST               7 (('LANGUAGE_MAP', 'TTSProvider', 'get_setting_value'))
+            108 IMPORT_NAME             15 (app.adapters.tts.base)
+            110 IMPORT_FROM             16 (LANGUAGE_MAP)
+            112 STORE_NAME              16 (LANGUAGE_MAP)
+            114 IMPORT_FROM             17 (TTSProvider)
+            116 STORE_NAME              17 (TTSProvider)
+            118 IMPORT_FROM             18 (get_setting_value)
+            120 STORE_NAME              18 (get_setting_value)
+            122 POP_TOP
+
+ 25         124 LOAD_CONST               1 (0)
+            126 LOAD_CONST               8 (('E', 'make_error'))
+            128 IMPORT_NAME             19 (app.core.errors)
+            130 IMPORT_FROM             20 (E)
+            132 STORE_NAME              20 (E)
+            134 IMPORT_FROM             21 (make_error)
+            136 STORE_NAME              21 (make_error)
+            138 POP_TOP
+
+ 26         140 LOAD_CONST               1 (0)
+            142 LOAD_CONST               9 (('log',))
+            144 IMPORT_NAME             22 (app.core.logging)
+            146 IMPORT_FROM             23 (log)
+            148 STORE_NAME              23 (log)
+            150 POP_TOP
+
+ 28         152 LOAD_CONST              10 ('ai33-tts')
+            154 STORE_NAME              24 (PROVIDER_ID)
+
+ 29         156 LOAD_CONST              11 ('https://api.ai33.pro')
+            158 STORE_NAME              25 (BASE_URL)
+
+ 30         160 LOAD_CONST              12 (('edge', 'elevenlabs', 'minimax', 'kokoro', 'vbee', 'fishaudio', 'clone'))
+            162 STORE_NAME              26 (VOICE_PROVIDERS)
+
+ 31         164 LOAD_CONST              13 ('edge')
+            166 STORE_NAME              27 (DEFAULT_VOICE_PROVIDER)
+
+ 32         168 LOAD_CONST              14 ('audio/mpeg')
+            170 STORE_NAME              28 (PREVIEW_MIME)
+
+ 33         172 LOAD_CONST              15 (120.0)
+            174 STORE_NAME              29 (REQUEST_TIMEOUT)
+
+ 34         176 LOAD_CONST              16 (600.0)
+            178 STORE_NAME              30 (POLL_TIMEOUT)
+
+ 35         180 LOAD_CONST              17 (1.5)
+            182 STORE_NAME              31 (POLL_INTERVAL)
+
+ 36         184 LOAD_CONST              18 (209715200)
+            186 STORE_NAME              32 (MAX_DOWNLOAD_BYTES)
+
+ 39         188 LOAD_CONST              19 (100)
+            190 STORE_NAME              33 (PAGE_SIZE)
+
+ 40         192 LOAD_CONST              20 (8)
+            194 STORE_NAME              34 (PAGE_CONCURRENCY)
+
+ 41         196 LOAD_CONST              21 (20000)
+            198 STORE_NAME              35 (MAX_VOICES_PER_PROVIDER)
+
+ 46         200 PUSH_NULL
+            202 LOAD_NAME               36 (frozenset)
+            204 LOAD_CONST              22 ('elevenlabs')
+            206 BUILD_SET                1
+            208 CALL                     1
+            216 STORE_NAME              37 (SLOW_PROVIDERS)
+
+ 47         218 LOAD_CONST              23 ('category')
+            220 LOAD_CONST              24 ('premade')
+            222 BUILD_MAP                1
+            224 LOAD_CONST              25 ('language')
+            226 LOAD_CONST              26 ('vi')
+            228 BUILD_MAP                1
+            230 BUILD_TUPLE              2
+            232 STORE_NAME              38 (QUICK_SEEDS)
+            234 LOAD_CONST              27 ('tuple[dict, ...]')
+            236 LOAD_NAME               39 (__annotations__)
+            238 LOAD_CONST              28 ('QUICK_SEEDS')
+            240 STORE_SUBSCR
+
+ 48         244 LOAD_CONST              29 (2)
+            246 STORE_NAME              40 (QUICK_SEED_PAGES)
+
+ 49         248 LOAD_CONST              30 (160)
+            250 STORE_NAME              41 (DESCRIPTION_LIMIT)
+
+ 50         252 LOAD_CONST              31 (604800)
+            254 STORE_NAME              42 (CACHE_TTL_SECONDS)
+
+ 51         256 LOAD_CONST              32 (1)
+            258 STORE_NAME              43 (CACHE_VERSION)
+
+ 52         260 LOAD_CONST              33 ('ai33_voices.json')
+            262 STORE_NAME              44 (CACHE_FILENAME)
+
+ 54         264 BUILD_MAP                0
+            266 STORE_NAME              45 (_VOICES_CACHE)
+            268 LOAD_CONST              34 ('dict[str, list[dict]]')
+            270 LOAD_NAME               39 (__annotations__)
+            272 LOAD_CONST              35 ('_VOICES_CACHE')
+            274 STORE_SUBSCR
+
+ 55         278 PUSH_NULL
+            280 LOAD_NAME                3 (asyncio)
+            282 LOAD_ATTR               92 (Lock)
+            302 CALL                     0
+            310 STORE_NAME              47 (_VOICES_CACHE_LOCK)
+
+ 56         312 LOAD_CONST              36 (False)
+            314 STORE_GLOBAL            48 (_VOICES_CACHE_FULL)
+
+ 57         316 LOAD_CONST               3 (None)
+            318 STORE_GLOBAL            49 (_WARM_TASK)
+            320 LOAD_CONST              37 ('asyncio.Task | None')
+            322 LOAD_NAME               39 (__annotations__)
+            324 LOAD_CONST              38 ('_WARM_TASK')
+            326 STORE_SUBSCR
+
+ 60         330 LOAD_CONST              65 (('return', 'Path'))
+            332 LOAD_CONST              39 (<code object _cache_path at 0x7f6c92a39ac0, file "app\adapters\tts\ai33_tts.py", line 60>)
+            334 MAKE_FUNCTION            4 (annotations)
+            336 STORE_NAME              50 (_cache_path)
+
+ 65         338 LOAD_CONST              66 (('return', 'str'))
+            340 LOAD_CONST              40 (<code object _key_fingerprint at 0x7f6c93272ad0, file "app\adapters\tts\ai33_tts.py", line 65>)
+            342 MAKE_FUNCTION            4 (annotations)
+            344 STORE_NAME              51 (_key_fingerprint)
+
+ 70         346 LOAD_CONST              67 (('return', 'list[dict]'))
+            348 LOAD_CONST              41 (<code object _load_disk_cache at 0x269f2230, file "app\adapters\tts\ai33_tts.py", line 70>)
+            350 MAKE_FUNCTION            4 (annotations)
+            352 STORE_NAME              52 (_load_disk_cache)
+
+ 87         354 LOAD_CONST              68 (('voices', 'list[dict]', 'return', 'None'))
+            356 LOAD_CONST              42 (<code object _save_disk_cache at 0x29090a90, file "app\adapters\tts\ai33_tts.py", line 87>)
+            358 MAKE_FUNCTION            4 (annotations)
+            360 STORE_NAME              53 (_save_disk_cache)
+
+105         362 LOAD_CONST              69 (('return', 'None'))
+            364 LOAD_CONST              43 (<code object clear_voices_cache at 0x7f6c9331cb20, file "app\adapters\tts\ai33_tts.py", line 105>)
+            366 MAKE_FUNCTION            4 (annotations)
+            368 STORE_NAME              54 (clear_voices_cache)
+
+116         370 LOAD_CONST              66 (('return', 'str'))
+            372 LOAD_CONST              44 (<code object _api_key at 0x7f6c92d7c170, file "app\adapters\tts\ai33_tts.py", line 116>)
+            374 MAKE_FUNCTION            4 (annotations)
+            376 STORE_NAME              55 (_api_key)
+
+126         378 LOAD_CONST              70 (('return', 'dict[str, str]'))
+            380 LOAD_CONST              45 (<code object _headers at 0x7f6c929b5ed0, file "app\adapters\tts\ai33_tts.py", line 126>)
+            382 MAKE_FUNCTION            4 (annotations)
+            384 STORE_NAME              56 (_headers)
+
+130         386 LOAD_NAME               29 (REQUEST_TIMEOUT)
+            388 BUILD_TUPLE              1
+            390 LOAD_CONST              71 (('timeout', 'float', 'return', 'httpx.AsyncClient'))
+            392 LOAD_CONST              46 (<code object _client at 0x7f6c9331c800, file "app\adapters\tts\ai33_tts.py", line 130>)
+            394 MAKE_FUNCTION            5 (defaults, annotations)
+            396 STORE_NAME              57 (_client)
+
+138         398 LOAD_CONST              72 (('',))
+            400 LOAD_CONST              73 (('status', 'int', 'detail', 'str', 'return', 'None'))
+            402 LOAD_CONST              47 (<code object _raise_http at 0x7f6c9331c030, file "app\adapters\tts\ai33_tts.py", line 138>)
+            404 MAKE_FUNCTION            5 (defaults, annotations)
+            406 STORE_NAME              58 (_raise_http)
+
+147         408 LOAD_CONST              74 (('code', 'str | None', 'return', 'str'))
+            410 LOAD_CONST              48 (<code object _lang at 0x7f6c93272290, file "app\adapters\tts\ai33_tts.py", line 147>)
+            412 MAKE_FUNCTION            4 (annotations)
+            414 STORE_NAME              59 (_lang)
+
+152         416 LOAD_CONST              72 (('',))
+            418 LOAD_CONST              75 (('raw', 'dict', 'provider_code', 'str', 'return', 'dict | None'))
+            420 LOAD_CONST              49 (<code object _map_voice at 0x29060bf0, file "app\adapters\tts\ai33_tts.py", line 152>)
+            422 MAKE_FUNCTION            5 (defaults, annotations)
+            424 STORE_NAME              60 (_map_voice)
+
+181         426 NOP
+
+180         428 LOAD_CONST              76 ((None,))
+
+181         430 NOP
+
+180         432 NOP
+
+181         434 NOP
+
+180         436 NOP
+
+181         438 NOP
+
+180         440 NOP
+
+181         442 NOP
+
+180         444 NOP
+
+182         446 NOP
+
+180         448 LOAD_CONST              77 (('client', 'httpx.AsyncClient', 'provider', 'str', 'page', 'int', 'extra', 'dict | None', 'return', 'dict | None'))
+            450 LOAD_CONST              50 (<code object _fetch_page at 0x269d13a0, file "app\adapters\tts\ai33_tts.py", line 180>)
+            452 MAKE_FUNCTION            5 (defaults, annotations)
+            454 STORE_NAME              61 (_fetch_page)
+
+207         456 LOAD_CONST              78 ((None, None))
+            458 LOAD_CONST              79 (('provider', 'str', 'max_pages', 'int | None', 'extra', 'dict | None', 'return', 'list[dict]'))
+            460 LOAD_CONST              51 (<code object _fetch_voices at 0x28e36bb0, file "app\adapters\tts\ai33_tts.py", line 207>)
+            462 MAKE_FUNCTION            5 (defaults, annotations)
+            464 STORE_NAME              62 (_fetch_voices)
+
+270         466 LOAD_CONST              80 (('chunks', 'list', 'return', 'list[dict]'))
+            468 LOAD_CONST              52 (<code object _merge_sorted at 0x7f6c9326dc50, file "app\adapters\tts\ai33_tts.py", line 270>)
+            470 MAKE_FUNCTION            4 (annotations)
+            472 STORE_NAME              63 (_merge_sorted)
+
+293         474 LOAD_CONST              81 (('quick', 'bool', 'return', 'list[dict]'))
+            476 LOAD_CONST              53 (<code object _fetch_all at 0x7f6c9326d110, file "app\adapters\tts\ai33_tts.py", line 293>)
+            478 MAKE_FUNCTION            4 (annotations)
+            480 STORE_NAME              64 (_fetch_all)
+
+306         482 LOAD_CONST              69 (('return', 'None'))
+            484 LOAD_CONST              54 (<code object _warm_full_catalog at 0x290ebef0, file "app\adapters\tts\ai33_tts.py", line 306>)
+            486 MAKE_FUNCTION            4 (annotations)
+            488 STORE_NAME              65 (_warm_full_catalog)
+
+323         490 LOAD_CONST              69 (('return', 'None'))
+            492 LOAD_CONST              55 (<code object _schedule_warm at 0x7f6c93289b80, file "app\adapters\tts\ai33_tts.py", line 323>)
+            494 MAKE_FUNCTION            4 (annotations)
+            496 STORE_NAME              66 (_schedule_warm)
+
+333         498 LOAD_CONST              67 (('return', 'list[dict]'))
+            500 LOAD_CONST              56 (<code object list_voices at 0x26992f80, file "app\adapters\tts\ai33_tts.py", line 333>)
+            502 MAKE_FUNCTION            4 (annotations)
+            504 STORE_NAME              67 (list_voices)
+
+365         506 LOAD_CONST              82 (('rate', 'str', 'return', 'float'))
+            508 LOAD_CONST              57 (<code object _speed at 0x7f6c9326da70, file "app\adapters\tts\ai33_tts.py", line 365>)
+            510 MAKE_FUNCTION            4 (annotations)
+            512 STORE_NAME              68 (_speed)
+
+380         514 LOAD_CONST              83 (('client', 'httpx.AsyncClient', 'text', 'str', 'voice', 'str', 'speed', 'float', 'return', 'str'))
+            516 LOAD_CONST              58 (<code object _create_task at 0x267ad150, file "app\adapters\tts\ai33_tts.py", line 380>)
+            518 MAKE_FUNCTION            4 (annotations)
+            520 STORE_NAME              69 (_create_task)
+
+407         522 NOP
+
+408         524 NOP
+
+404         526 LOAD_CONST              78 ((None, None))
+
+405         528 NOP
+
+404         530 NOP
+
+406         532 NOP
+
+404         534 NOP
+
+407         536 NOP
+
+404         538 NOP
+
+408         540 NOP
+
+404         542 NOP
+
+409         544 NOP
+
+404         546 LOAD_CONST              84 (('client', 'httpx.AsyncClient', 'task_id', 'str', 'on_progress', 'Callable[[float, str], None] | None', 'cancel_check', 'Callable[[], bool] | None', 'return', 'str'))
+            548 LOAD_CONST              59 (<code object _wait_for_audio at 0x28e2cb60, file "app\adapters\tts\ai33_tts.py", line 404>)
+            550 MAKE_FUNCTION            5 (defaults, annotations)
+            552 STORE_NAME              70 (_wait_for_audio)
+
+472         554 LOAD_CONST              85 (('client', 'httpx.AsyncClient', 'url', 'str', 'return', 'tuple[bytes, str]'))
+            556 LOAD_CONST              60 (<code object _download_audio at 0x269f4a80, file "app\adapters\tts\ai33_tts.py", line 472>)
+            558 MAKE_FUNCTION            4 (annotations)
+            560 STORE_NAME              71 (_download_audio)
+
+491         562 NOP
+
+492         564 NOP
+
+493         566 NOP
+
+488         568 LOAD_CONST              86 (('+0%', None, None))
+
+489         570 NOP
+
+488         572 NOP
+
+490         574 NOP
+
+488         576 NOP
+
+491         578 NOP
+
+488         580 NOP
+
+492         582 NOP
+
+488         584 NOP
+
+493         586 NOP
+
+488         588 NOP
+
+494         590 NOP
+
+488         592 LOAD_CONST              87 (('text', 'str', 'voice', 'str', 'rate', 'str', 'on_progress', 'Callable[[float, str], None] | None', 'cancel_check', 'Callable[[], bool] | None', 'return', 'tuple[bytes, str]'))
+            594 LOAD_CONST              61 (<code object _synthesize_bytes at 0x269dc210, file "app\adapters\tts\ai33_tts.py", line 488>)
+            596 MAKE_FUNCTION            5 (defaults, annotations)
+            598 STORE_NAME              72 (_synthesize_bytes)
+
+506         600 LOAD_CONST              88 (('voice', 'str', 'text', 'str', 'return', 'tuple[bytes, str]'))
+            602 LOAD_CONST              62 (<code object preview_voice at 0x7f6c9324b6d0, file "app\adapters\tts\ai33_tts.py", line 506>)
+            604 MAKE_FUNCTION            4 (annotations)
+            606 STORE_NAME              73 (preview_voice)
+
+511         608 PUSH_NULL
+            610 LOAD_BUILD_CLASS
+            612 LOAD_CONST              63 (<code object AI33TTSProvider at 0x7f6c92a39680, file "app\adapters\tts\ai33_tts.py", line 511>)
+            614 MAKE_FUNCTION            0
+            616 LOAD_CONST              64 ('AI33TTSProvider')
+            618 LOAD_NAME               17 (TTSProvider)
+            620 CALL                     3
+            628 STORE_NAME              74 (AI33TTSProvider)
+            630 RETURN_CONST             3 (None)
+
+Disassembly of <code object _cache_path at 0x7f6c92a39ac0, file "app\adapters\tts\ai33_tts.py", line 60>:
+ 60           0 RESUME                   0
+
+ 61           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('settings',))
+              6 IMPORT_NAME              0 (app.config)
+              8 IMPORT_FROM              1 (settings)
+             10 STORE_FAST               0 (settings)
+             12 POP_TOP
+
+ 62          14 LOAD_GLOBAL              5 (NULL + Path)
+             24 LOAD_FAST                0 (settings)
+             26 LOAD_ATTR                6 (data_dir)
+             46 CALL                     1
+             54 LOAD_GLOBAL              8 (CACHE_FILENAME)
+             64 BINARY_OP               11 (/)
+             68 RETURN_VALUE
+
+Disassembly of <code object _key_fingerprint at 0x7f6c93272ad0, file "app\adapters\tts\ai33_tts.py", line 65>:
+ 65           0 RESUME                   0
+
+ 67           2 LOAD_GLOBAL              1 (NULL + hashlib)
+             12 LOAD_ATTR                2 (sha256)
+             32 LOAD_GLOBAL              5 (NULL + get_setting_value)
+             42 LOAD_CONST               1 ('ai33_api_key')
+             44 CALL                     1
+             52 COPY                     1
+             54 POP_JUMP_IF_TRUE         2 (to 60)
+             56 POP_TOP
+             58 LOAD_CONST               2 ('')
+        >>   60 LOAD_ATTR                7 (NULL|self + strip)
+             80 CALL                     0
+             88 LOAD_ATTR                9 (NULL|self + encode)
+            108 CALL                     0
+            116 CALL                     1
+            124 LOAD_ATTR               11 (NULL|self + hexdigest)
+            144 CALL                     0
+            152 LOAD_CONST               3 (None)
+            154 LOAD_CONST               4 (16)
+            156 BINARY_SLICE
+            158 RETURN_VALUE
+
+Disassembly of <code object _load_disk_cache at 0x269f2230, file "app\adapters\tts\ai33_tts.py", line 70>:
+ 70           0 RESUME                   0
+
+ 71           2 NOP
+
+ 72           4 LOAD_GLOBAL              1 (NULL + _cache_path)
+             14 CALL                     0
+             22 STORE_FAST               0 (path)
+
+ 73          24 LOAD_FAST                0 (path)
+             26 LOAD_ATTR                3 (NULL|self + exists)
+             46 CALL                     0
+             54 POP_JUMP_IF_TRUE         2 (to 60)
+
+ 74          56 BUILD_LIST               0
+             58 RETURN_VALUE
+
+ 75     >>   60 LOAD_GLOBAL              5 (NULL + json)
+             70 LOAD_ATTR                6 (loads)
+             90 LOAD_FAST                0 (path)
+             92 LOAD_ATTR                9 (NULL|self + read_text)
+            112 LOAD_CONST               1 ('utf-8')
+            114 KW_NAMES                 2 (('encoding',))
+            116 CALL                     1
+            124 CALL                     1
+            132 STORE_FAST               1 (blob)
+
+ 79         134 LOAD_FAST                1 (blob)
+            136 LOAD_ATTR               17 (NULL|self + get)
+            156 LOAD_CONST               4 ('version')
+            158 CALL                     1
+            166 LOAD_GLOBAL             18 (CACHE_VERSION)
+            176 COMPARE_OP              55 (!=)
+            180 POP_JUMP_IF_TRUE        28 (to 238)
+            182 LOAD_FAST                1 (blob)
+            184 LOAD_ATTR               17 (NULL|self + get)
+            204 LOAD_CONST               5 ('key_fingerprint')
+            206 CALL                     1
+            214 LOAD_GLOBAL             21 (NULL + _key_fingerprint)
+            224 CALL                     0
+            232 COMPARE_OP              55 (!=)
+            236 POP_JUMP_IF_FALSE        2 (to 242)
+
+ 80     >>  238 BUILD_LIST               0
+            240 RETURN_VALUE
+
+ 81     >>  242 LOAD_GLOBAL             23 (NULL + time)
+            252 LOAD_ATTR               22 (time)
+            272 CALL                     0
+            280 LOAD_GLOBAL             25 (NULL + float)
+            290 LOAD_FAST                1 (blob)
+            292 LOAD_ATTR               17 (NULL|self + get)
+            312 LOAD_CONST               6 ('fetched_at')
+            314 CALL                     1
+            322 COPY                     1
+            324 POP_JUMP_IF_TRUE         2 (to 330)
+            326 POP_TOP
+            328 LOAD_CONST               7 (0)
+        >>  330 CALL                     1
+            338 BINARY_OP               10 (-)
+            342 LOAD_GLOBAL             26 (CACHE_TTL_SECONDS)
+            352 COMPARE_OP              68 (>)
+            356 POP_JUMP_IF_FALSE        2 (to 362)
+
+ 82         358 BUILD_LIST               0
+            360 RETURN_VALUE
+
+ 83     >>  362 LOAD_FAST                1 (blob)
+            364 LOAD_ATTR               17 (NULL|self + get)
+            384 LOAD_CONST               8 ('voices')
+            386 CALL                     1
+            394 STORE_FAST               3 (voices)
+
+ 84         396 LOAD_GLOBAL             29 (NULL + isinstance)
+            406 LOAD_FAST                3 (voices)
+            408 LOAD_GLOBAL             30 (list)
+            418 CALL                     2
+            426 POP_JUMP_IF_FALSE        4 (to 436)
+            428 LOAD_FAST                3 (voices)
+            430 POP_JUMP_IF_FALSE        2 (to 436)
+            432 LOAD_FAST                3 (voices)
+            434 RETURN_VALUE
+        >>  436 BUILD_LIST               0
+            438 RETURN_VALUE
+        >>  440 PUSH_EXC_INFO
+
+ 76         442 LOAD_GLOBAL             10 (Exception)
+            452 CHECK_EXC_MATCH
+            454 POP_JUMP_IF_FALSE       36 (to 528)
+            456 STORE_FAST               2 (exc)
+
+ 77         458 LOAD_GLOBAL             13 (NULL + log)
+            468 LOAD_ATTR               14 (warning)
+            488 LOAD_CONST               3 ('Không đọc được cache giọng AI33: ')
+            490 LOAD_FAST                2 (exc)
+            492 FORMAT_VALUE             0
+            494 BUILD_STRING             2
+            496 CALL                     1
+            504 POP_TOP
+
+ 78         506 BUILD_LIST               0
+            508 SWAP                     2
+            510 POP_EXCEPT
+            512 LOAD_CONST               0 (None)
+            514 STORE_FAST               2 (exc)
+            516 DELETE_FAST              2 (exc)
+            518 RETURN_VALUE
+        >>  520 LOAD_CONST               0 (None)
+            522 STORE_FAST               2 (exc)
+            524 DELETE_FAST              2 (exc)
+            526 RERAISE                  1
+
+ 76     >>  528 RERAISE                  0
+        >>  530 COPY                     3
+            532 POP_EXCEPT
+            534 RERAISE                  1
+ExceptionTable:
+  4 to 56 -> 440 [0]
+  60 to 132 -> 440 [0]
+  440 to 456 -> 530 [1] lasti
+  458 to 506 -> 520 [1] lasti
+  508 to 508 -> 530 [1] lasti
+  520 to 528 -> 530 [1] lasti
+
+Disassembly of <code object _save_disk_cache at 0x29090a90, file "app\adapters\tts\ai33_tts.py", line 87>:
+ 87           0 RESUME                   0
+
+ 88           2 LOAD_FAST                0 (voices)
+              4 POP_JUMP_IF_TRUE         1 (to 8)
+
+ 89           6 RETURN_CONST             0 (None)
+
+ 90     >>    8 NOP
+
+ 91          10 LOAD_GLOBAL              1 (NULL + _cache_path)
+             20 CALL                     0
+             28 STORE_FAST               1 (path)
+
+ 92          30 LOAD_FAST                1 (path)
+             32 LOAD_ATTR                2 (parent)
+             52 LOAD_ATTR                5 (NULL|self + mkdir)
+             72 LOAD_CONST               1 (True)
+             74 LOAD_CONST               1 (True)
+             76 KW_NAMES                 2 (('parents', 'exist_ok'))
+             78 CALL                     2
+             86 POP_TOP
+
+ 93          88 LOAD_FAST                1 (path)
+             90 LOAD_ATTR                7 (NULL|self + with_suffix)
+            110 LOAD_CONST               3 ('.json.tmp')
+            112 CALL                     1
+            120 STORE_FAST               2 (tmp)
+
+ 94         122 LOAD_FAST                2 (tmp)
+            124 LOAD_ATTR                9 (NULL|self + write_text)
+            144 LOAD_GLOBAL             11 (NULL + json)
+            154 LOAD_ATTR               12 (dumps)
+
+ 95         174 LOAD_GLOBAL             14 (CACHE_VERSION)
+
+ 96         184 LOAD_GLOBAL             17 (NULL + _key_fingerprint)
+            194 CALL                     0
+
+ 97         202 LOAD_GLOBAL             19 (NULL + time)
+            212 LOAD_ATTR               18 (time)
+            232 CALL                     0
+
+ 98         240 LOAD_FAST                0 (voices)
+
+ 94         242 LOAD_CONST               4 (('version', 'key_fingerprint', 'fetched_at', 'voices'))
+            244 BUILD_CONST_KEY_MAP      4
+
+ 99         246 LOAD_CONST               5 (False)
+
+ 94         248 KW_NAMES                 6 (('ensure_ascii',))
+            250 CALL                     2
+
+ 99         258 LOAD_CONST               7 ('utf-8')
+
+ 94         260 KW_NAMES                 8 (('encoding',))
+            262 CALL                     2
+            270 POP_TOP
+
+100         272 LOAD_GLOBAL             21 (NULL + os)
+            282 LOAD_ATTR               22 (replace)
+            302 LOAD_FAST                2 (tmp)
+            304 LOAD_FAST                1 (path)
+            306 CALL                     2
+            314 POP_TOP
+            316 RETURN_CONST             0 (None)
+        >>  318 PUSH_EXC_INFO
+
+101         320 LOAD_GLOBAL             24 (Exception)
+            330 CHECK_EXC_MATCH
+            332 POP_JUMP_IF_FALSE       34 (to 402)
+            334 STORE_FAST               3 (exc)
+
+102         336 LOAD_GLOBAL             27 (NULL + log)
+            346 LOAD_ATTR               28 (warning)
+            366 LOAD_CONST               9 ('Không ghi được cache giọng AI33: ')
+            368 LOAD_FAST                3 (exc)
+            370 FORMAT_VALUE             0
+            372 BUILD_STRING             2
+            374 CALL                     1
+            382 POP_TOP
+            384 POP_EXCEPT
+            386 LOAD_CONST               0 (None)
+            388 STORE_FAST               3 (exc)
+            390 DELETE_FAST              3 (exc)
+            392 RETURN_CONST             0 (None)
+        >>  394 LOAD_CONST               0 (None)
+            396 STORE_FAST               3 (exc)
+            398 DELETE_FAST              3 (exc)
+            400 RERAISE                  1
+
+101     >>  402 RERAISE                  0
+        >>  404 COPY                     3
+            406 POP_EXCEPT
+            408 RERAISE                  1
+ExceptionTable:
+  10 to 314 -> 318 [0]
+  318 to 334 -> 404 [1] lasti
+  336 to 382 -> 394 [1] lasti
+  394 to 402 -> 404 [1] lasti
+
+Disassembly of <code object clear_voices_cache at 0x7f6c9331cb20, file "app\adapters\tts\ai33_tts.py", line 105>:
+105           0 RESUME                   0
+
+108           2 LOAD_GLOBAL              0 (_VOICES_CACHE)
+             12 LOAD_ATTR                3 (NULL|self + clear)
+             32 CALL                     0
+             40 POP_TOP
+
+109          42 LOAD_CONST               1 (False)
+             44 STORE_GLOBAL             2 (_VOICES_CACHE_FULL)
+
+110          46 NOP
+
+111          48 LOAD_GLOBAL              7 (NULL + _cache_path)
+             58 CALL                     0
+             66 LOAD_ATTR                9 (NULL|self + unlink)
+             86 LOAD_CONST               2 (True)
+             88 KW_NAMES                 3 (('missing_ok',))
+             90 CALL                     1
+             98 POP_TOP
+            100 RETURN_CONST             5 (None)
+        >>  102 PUSH_EXC_INFO
+
+112         104 LOAD_GLOBAL             10 (Exception)
+            114 CHECK_EXC_MATCH
+            116 POP_JUMP_IF_FALSE       34 (to 186)
+            118 STORE_FAST               0 (exc)
+
+113         120 LOAD_GLOBAL             13 (NULL + log)
+            130 LOAD_ATTR               14 (warning)
+            150 LOAD_CONST               4 ('Không xoá được cache giọng AI33: ')
+            152 LOAD_FAST                0 (exc)
+            154 FORMAT_VALUE             0
+            156 BUILD_STRING             2
+            158 CALL                     1
+            166 POP_TOP
+            168 POP_EXCEPT
+            170 LOAD_CONST               5 (None)
+            172 STORE_FAST               0 (exc)
+            174 DELETE_FAST              0 (exc)
+            176 RETURN_CONST             5 (None)
+        >>  178 LOAD_CONST               5 (None)
+            180 STORE_FAST               0 (exc)
+            182 DELETE_FAST              0 (exc)
+            184 RERAISE                  1
+
+112     >>  186 RERAISE                  0
+        >>  188 COPY                     3
+            190 POP_EXCEPT
+            192 RERAISE                  1
+ExceptionTable:
+  48 to 98 -> 102 [0]
+  102 to 118 -> 188 [1] lasti
+  120 to 166 -> 178 [1] lasti
+  178 to 186 -> 188 [1] lasti
+
+Disassembly of <code object _api_key at 0x7f6c92d7c170, file "app\adapters\tts\ai33_tts.py", line 116>:
+116           0 RESUME                   0
+
+117           2 LOAD_GLOBAL              1 (NULL + get_setting_value)
+             12 LOAD_CONST               1 ('ai33_api_key')
+             14 CALL                     1
+             22 COPY                     1
+             24 POP_JUMP_IF_TRUE         2 (to 30)
+             26 POP_TOP
+             28 LOAD_CONST               2 ('')
+        >>   30 LOAD_ATTR                3 (NULL|self + strip)
+             50 CALL                     0
+             58 STORE_FAST               0 (key)
+
+118          60 LOAD_FAST                0 (key)
+             62 POP_JUMP_IF_TRUE        26 (to 116)
+
+119          64 LOAD_GLOBAL              5 (NULL + make_error)
+
+120          74 LOAD_GLOBAL              6 (E)
+             84 LOAD_ATTR                8 (TTS_AUTH)
+
+121         104 LOAD_CONST               3 ('Chưa cấu hình AI33 API Key. Mở trang TTS → AI33 để nhập key từ ai33.pro.')
+
+119         106 CALL                     2
+            114 RAISE_VARARGS            1
+
+123     >>  116 LOAD_FAST                0 (key)
+            118 RETURN_VALUE
+
+Disassembly of <code object _headers at 0x7f6c929b5ed0, file "app\adapters\tts\ai33_tts.py", line 126>:
+126           0 RESUME                   0
+
+127           2 LOAD_GLOBAL              1 (NULL + _api_key)
+             12 CALL                     0
+             20 LOAD_CONST               1 ('application/json')
+             22 LOAD_CONST               2 (('xi-api-key', 'Accept'))
+             24 BUILD_CONST_KEY_MAP      2
+             26 RETURN_VALUE
+
+Disassembly of <code object _client at 0x7f6c9331c800, file "app\adapters\tts\ai33_tts.py", line 130>:
+130           0 RESUME                   0
+
+131           2 LOAD_GLOBAL              0 (os)
+             12 LOAD_ATTR                2 (environ)
+             32 LOAD_ATTR                5 (NULL|self + get)
+             52 LOAD_CONST               1 ('HTTPS_PROXY')
+             54 CALL                     1
+             62 COPY                     1
+             64 POP_JUMP_IF_TRUE        35 (to 136)
+             66 POP_TOP
+             68 LOAD_GLOBAL              0 (os)
+             78 LOAD_ATTR                2 (environ)
+             98 LOAD_ATTR                5 (NULL|self + get)
+            118 LOAD_CONST               2 ('HTTP_PROXY')
+            120 CALL                     1
+            128 COPY                     1
+            130 POP_JUMP_IF_TRUE         2 (to 136)
+            132 POP_TOP
+            134 LOAD_CONST               0 (None)
+        >>  136 STORE_FAST               1 (proxy)
+
+132         138 LOAD_FAST                0 (timeout)
+            140 LOAD_CONST               3 (True)
+            142 LOAD_CONST               4 (('timeout', 'follow_redirects'))
+            144 BUILD_CONST_KEY_MAP      2
+            146 STORE_FAST               2 (kwargs)
+
+133         148 LOAD_FAST                1 (proxy)
+            150 POP_JUMP_IF_FALSE        5 (to 162)
+
+134         152 LOAD_FAST                1 (proxy)
+            154 LOAD_FAST                2 (kwargs)
+            156 LOAD_CONST               5 ('proxy')
+            158 STORE_SUBSCR
+
+135     >>  162 LOAD_GLOBAL              7 (NULL + httpx)
+            172 LOAD_ATTR                8 (AsyncClient)
+            192 LOAD_CONST               6 (())
+            194 BUILD_MAP                0
+            196 LOAD_FAST                2 (kwargs)
+            198 DICT_MERGE               1
+            200 CALL_FUNCTION_EX         1
+            202 RETURN_VALUE
+
+Disassembly of <code object _raise_http at 0x7f6c9331c030, file "app\adapters\tts\ai33_tts.py", line 138>:
+138           0 RESUME                   0
+
+139           2 LOAD_FAST                0 (status)
+              4 LOAD_CONST               1 ((401, 403))
+              6 CONTAINS_OP              0
+              8 POP_JUMP_IF_FALSE       26 (to 62)
+
+140          10 LOAD_GLOBAL              1 (NULL + make_error)
+             20 LOAD_GLOBAL              2 (E)
+             30 LOAD_ATTR                4 (TTS_AUTH)
+             50 LOAD_CONST               2 ('AI33 từ chối API Key (401/403). Kiểm tra key và quyền sử dụng TTS.')
+             52 CALL                     2
+             60 RAISE_VARARGS            1
+
+141     >>   62 LOAD_FAST                0 (status)
+             64 LOAD_CONST               3 (429)
+             66 COMPARE_OP              40 (==)
+             70 POP_JUMP_IF_FALSE       26 (to 124)
+
+142          72 LOAD_GLOBAL              1 (NULL + make_error)
+             82 LOAD_GLOBAL              2 (E)
+             92 LOAD_ATTR                6 (TTS_RATE_LIMIT)
+            112 LOAD_CONST               4 ('AI33 đang giới hạn tần suất (429). Vui lòng thử lại sau.')
+            114 CALL                     2
+            122 RAISE_VARARGS            1
+
+143     >>  124 LOAD_FAST                0 (status)
+            126 LOAD_CONST               5 (400)
+            128 COMPARE_OP              92 (>=)
+            132 POP_JUMP_IF_FALSE       35 (to 204)
+
+144         134 LOAD_GLOBAL              1 (NULL + make_error)
+            144 LOAD_GLOBAL              2 (E)
+            154 LOAD_ATTR                8 (TTS_NETWORK)
+            174 LOAD_CONST               6 ('AI33 HTTP ')
+            176 LOAD_FAST                0 (status)
+            178 FORMAT_VALUE             0
+            180 LOAD_CONST               7 (': ')
+            182 LOAD_FAST                1 (detail)
+            184 LOAD_CONST               0 (None)
+            186 LOAD_CONST               8 (300)
+            188 BINARY_SLICE
+            190 FORMAT_VALUE             0
+            192 BUILD_STRING             4
+            194 CALL                     2
+            202 RAISE_VARARGS            1
+
+143     >>  204 RETURN_CONST             0 (None)
+
+Disassembly of <code object _lang at 0x7f6c93272290, file "app\adapters\tts\ai33_tts.py", line 147>:
+147           0 RESUME                   0
+
+148           2 LOAD_FAST                0 (code)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE         2 (to 12)
+              8 POP_TOP
+             10 LOAD_CONST               1 ('')
+        >>   12 LOAD_ATTR                1 (NULL|self + strip)
+             32 CALL                     0
+             40 LOAD_ATTR                3 (NULL|self + lower)
+             60 CALL                     0
+             68 LOAD_ATTR                5 (NULL|self + replace)
+             88 LOAD_CONST               2 ('_')
+             90 LOAD_CONST               3 ('-')
+             92 CALL                     2
+            100 STORE_FAST               1 (value)
+
+149         102 LOAD_FAST                1 (value)
+            104 POP_JUMP_IF_FALSE       20 (to 146)
+            106 LOAD_FAST                1 (value)
+            108 LOAD_ATTR                7 (NULL|self + split)
+            128 LOAD_CONST               3 ('-')
+            130 CALL                     1
+            138 LOAD_CONST               4 (0)
+            140 BINARY_SUBSCR
+            144 RETURN_VALUE
+        >>  146 LOAD_CONST               5 ('vi')
+            148 RETURN_VALUE
+
+Disassembly of <code object _map_voice at 0x29060bf0, file "app\adapters\tts\ai33_tts.py", line 152>:
+152           0 RESUME                   0
+
+153           2 LOAD_GLOBAL              1 (NULL + str)
+             12 LOAD_FAST                0 (raw)
+             14 LOAD_ATTR                3 (NULL|self + get)
+             34 LOAD_CONST               1 ('voice_id')
+             36 CALL                     1
+             44 COPY                     1
+             46 POP_JUMP_IF_TRUE        21 (to 90)
+             48 POP_TOP
+             50 LOAD_FAST                0 (raw)
+             52 LOAD_ATTR                3 (NULL|self + get)
+             72 LOAD_CONST               2 ('id')
+             74 CALL                     1
+             82 COPY                     1
+             84 POP_JUMP_IF_TRUE         2 (to 90)
+             86 POP_TOP
+             88 LOAD_CONST               3 ('')
+        >>   90 CALL                     1
+             98 LOAD_ATTR                5 (NULL|self + strip)
+            118 CALL                     0
+            126 STORE_FAST               2 (voice_id)
+
+154         128 LOAD_FAST                2 (voice_id)
+            130 POP_JUMP_IF_TRUE         1 (to 134)
+
+155         132 RETURN_CONST             0 (None)
+
+156     >>  134 LOAD_GLOBAL              7 (NULL + _lang)
+            144 LOAD_FAST                0 (raw)
+            146 LOAD_ATTR                3 (NULL|self + get)
+            166 LOAD_CONST               4 ('language')
+            168 CALL                     1
+            176 COPY                     1
+            178 POP_JUMP_IF_TRUE        17 (to 214)
+            180 POP_TOP
+            182 LOAD_FAST                0 (raw)
+            184 LOAD_ATTR                3 (NULL|self + get)
+            204 LOAD_CONST               5 ('language_code')
+            206 CALL                     1
+        >>  214 CALL                     1
+            222 STORE_FAST               3 (language)
+
+157         224 LOAD_CONST               6 ('_')
+            226 LOAD_FAST                2 (voice_id)
+            228 CONTAINS_OP              0
+            230 POP_JUMP_IF_FALSE       34 (to 300)
+            232 LOAD_FAST                2 (voice_id)
+            234 LOAD_ATTR                9 (NULL|self + split)
+            254 LOAD_CONST               6 ('_')
+            256 CALL                     1
+            264 LOAD_CONST               7 (0)
+            266 BINARY_SUBSCR
+            270 LOAD_ATTR               11 (NULL|self + lower)
+            290 CALL                     0
+            298 JUMP_FORWARD             1 (to 302)
+        >>  300 LOAD_CONST               3 ('')
+        >>  302 STORE_FAST               4 (prefix)
+
+158         304 LOAD_FAST                1 (provider_code)
+            306 COPY                     1
+            308 POP_JUMP_IF_TRUE        16 (to 342)
+            310 POP_TOP
+            312 LOAD_FAST                4 (prefix)
+            314 LOAD_GLOBAL             12 (VOICE_PROVIDERS)
+            324 CONTAINS_OP              0
+            326 POP_JUMP_IF_FALSE        2 (to 332)
+            328 LOAD_FAST                4 (prefix)
+            330 JUMP_FORWARD             5 (to 342)
+        >>  332 LOAD_GLOBAL             14 (DEFAULT_VOICE_PROVIDER)
+        >>  342 STORE_FAST               5 (v_provider)
+
+159         344 LOAD_GLOBAL              1 (NULL + str)
+            354 LOAD_FAST                0 (raw)
+            356 LOAD_ATTR                3 (NULL|self + get)
+            376 LOAD_CONST               8 ('category')
+            378 CALL                     1
+            386 COPY                     1
+            388 POP_JUMP_IF_TRUE         2 (to 394)
+            390 POP_TOP
+            392 LOAD_CONST               3 ('')
+        >>  394 CALL                     1
+            402 LOAD_ATTR               11 (NULL|self + lower)
+            422 CALL                     0
+            430 STORE_FAST               6 (category)
+
+161         432 LOAD_FAST                2 (voice_id)
+
+162         434 LOAD_GLOBAL              1 (NULL + str)
+            444 LOAD_FAST                0 (raw)
+            446 LOAD_ATTR                3 (NULL|self + get)
+            466 LOAD_CONST               4 ('language')
+            468 CALL                     1
+            476 COPY                     1
+            478 POP_JUMP_IF_TRUE         2 (to 484)
+            480 POP_TOP
+            482 LOAD_FAST                3 (language)
+        >>  484 CALL                     1
+
+163         492 LOAD_FAST                3 (language)
+
+164         494 LOAD_GLOBAL             17 (NULL + LANGUAGE_MAP)
+            504 LOAD_ATTR                2 (get)
+            524 LOAD_FAST                3 (language)
+            526 LOAD_FAST                3 (language)
+            528 CALL                     2
+
+165         536 LOAD_GLOBAL              1 (NULL + str)
+            546 LOAD_FAST                0 (raw)
+            548 LOAD_ATTR                3 (NULL|self + get)
+            568 LOAD_CONST               9 ('name')
+            570 CALL                     1
+            578 COPY                     1
+            580 POP_JUMP_IF_TRUE         2 (to 586)
+            582 POP_TOP
+            584 LOAD_FAST                2 (voice_id)
+        >>  586 CALL                     1
+
+166         594 LOAD_GLOBAL              1 (NULL + str)
+            604 LOAD_FAST                0 (raw)
+            606 LOAD_ATTR                3 (NULL|self + get)
+            626 LOAD_CONST              10 ('gender')
+            628 CALL                     1
+            636 COPY                     1
+            638 POP_JUMP_IF_TRUE         2 (to 644)
+            640 POP_TOP
+            642 LOAD_CONST               3 ('')
+        >>  644 CALL                     1
+            652 LOAD_ATTR               11 (NULL|self + lower)
+            672 CALL                     0
+
+167         680 LOAD_GLOBAL             18 (PROVIDER_ID)
+
+168         690 LOAD_FAST                5 (v_provider)
+
+170         692 LOAD_FAST                6 (category)
+            694 LOAD_CONST              11 ('premade')
+            696 COMPARE_OP              40 (==)
+
+171         700 LOAD_GLOBAL              1 (NULL + str)
+            710 LOAD_FAST                0 (raw)
+            712 LOAD_ATTR                3 (NULL|self + get)
+            732 LOAD_CONST              12 ('preview_url')
+            734 CALL                     1
+            742 COPY                     1
+            744 POP_JUMP_IF_TRUE         2 (to 750)
+            746 POP_TOP
+            748 LOAD_CONST               3 ('')
+        >>  750 CALL                     1
+
+173         758 LOAD_GLOBAL              1 (NULL + str)
+            768 LOAD_FAST                0 (raw)
+            770 LOAD_ATTR                3 (NULL|self + get)
+            790 LOAD_CONST              13 ('description')
+            792 CALL                     1
+            800 COPY                     1
+            802 POP_JUMP_IF_TRUE         2 (to 808)
+            804 POP_TOP
+            806 LOAD_CONST               3 ('')
+        >>  808 CALL                     1
+            816 LOAD_CONST               0 (None)
+            818 LOAD_GLOBAL             20 (DESCRIPTION_LIMIT)
+            828 BINARY_SLICE
+
+174         830 LOAD_GLOBAL              1 (NULL + str)
+            840 LOAD_FAST                0 (raw)
+            842 LOAD_ATTR                3 (NULL|self + get)
+            862 LOAD_CONST              14 ('accent')
+            864 CALL                     1
+            872 COPY                     1
+            874 POP_JUMP_IF_TRUE         2 (to 880)
+            876 POP_TOP
+            878 LOAD_CONST               3 ('')
+        >>  880 CALL                     1
+
+175         888 LOAD_GLOBAL              1 (NULL + str)
+            898 LOAD_FAST                0 (raw)
+            900 LOAD_ATTR                3 (NULL|self + get)
+            920 LOAD_CONST              15 ('age')
+            922 CALL                     1
+            930 COPY                     1
+            932 POP_JUMP_IF_TRUE         2 (to 938)
+            934 POP_TOP
+            936 LOAD_CONST               3 ('')
+        >>  938 CALL                     1
+
+176         946 LOAD_FAST                6 (category)
+
+160         948 LOAD_CONST              16 (('name', 'locale', 'language_code', 'language_name', 'friendly_name', 'gender', 'provider', 'voice_provider', 'hot', 'demo', 'description', 'accent', 'age', 'category'))
+            950 BUILD_CONST_KEY_MAP     14
+            952 RETURN_VALUE
+
+Disassembly of <code object _fetch_page at 0x269d13a0, file "app\adapters\tts\ai33_tts.py", line 180>:
+180           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+184           6 LOAD_FAST                1 (provider)
+              8 LOAD_FAST                2 (page)
+             10 LOAD_GLOBAL              0 (PAGE_SIZE)
+             20 LOAD_CONST               1 (('provider', 'page', 'page_size'))
+             22 BUILD_CONST_KEY_MAP      3
+             24 LOAD_FAST                3 (extra)
+             26 COPY                     1
+             28 POP_JUMP_IF_TRUE         2 (to 34)
+             30 POP_TOP
+             32 BUILD_MAP                0
+        >>   34 DICT_UPDATE              1
+             36 STORE_FAST               4 (params)
+
+185          38 LOAD_CONST               2 ((1, 2))
+             40 GET_ITER
+        >>   42 FOR_ITER               145 (to 336)
+             46 STORE_FAST               5 (attempt)
+
+186          48 NOP
+
+187          50 LOAD_FAST                0 (client)
+             52 LOAD_ATTR                3 (NULL|self + get)
+             72 LOAD_GLOBAL              4 (BASE_URL)
+             82 FORMAT_VALUE             0
+             84 LOAD_CONST               3 ('/v3/voices')
+             86 BUILD_STRING             2
+             88 LOAD_GLOBAL              7 (NULL + _headers)
+             98 CALL                     0
+            106 LOAD_FAST                4 (params)
+            108 KW_NAMES                 4 (('headers', 'params'))
+            110 CALL                     3
+            118 GET_AWAITABLE            0
+            120 LOAD_CONST               5 (None)
+        >>  122 SEND                     3 (to 132)
+            126 YIELD_VALUE              3
+            128 RESUME                   3
+            130 JUMP_BACKWARD_NO_INTERRUPT     5 (to 122)
+        >>  132 END_SEND
+            134 STORE_FAST               6 (response)
+
+192         136 LOAD_FAST                6 (response)
+            138 LOAD_ATTR               16 (status_code)
+            158 LOAD_CONST              10 (200)
+            160 COMPARE_OP              55 (!=)
+            164 POP_JUMP_IF_FALSE       62 (to 290)
+
+193         166 LOAD_FAST                5 (attempt)
+            168 LOAD_CONST               6 (2)
+            170 COMPARE_OP              40 (==)
+            174 POP_JUMP_IF_FALSE       56 (to 288)
+
+194         176 LOAD_GLOBAL             13 (NULL + log)
+            186 LOAD_ATTR               14 (warning)
+
+195         206 LOAD_CONST              11 ('AI33 /v3/voices (')
+            208 LOAD_FAST                1 (provider)
+            210 FORMAT_VALUE             0
+            212 LOAD_CONST               8 (' trang ')
+            214 LOAD_FAST                2 (page)
+            216 FORMAT_VALUE             0
+            218 LOAD_CONST              12 (') HTTP ')
+            220 LOAD_FAST                6 (response)
+            222 LOAD_ATTR               16 (status_code)
+            242 FORMAT_VALUE             0
+            244 LOAD_CONST              13 (': ')
+
+196         246 LOAD_FAST                6 (response)
+            248 LOAD_ATTR               18 (text)
+            268 LOAD_CONST               5 (None)
+            270 LOAD_CONST              14 (150)
+            272 BINARY_SLICE
+            274 FORMAT_VALUE             0
+
+195         276 BUILD_STRING             8
+
+194         278 CALL                     1
+            286 POP_TOP
+
+198     >>  288 JUMP_BACKWARD          124 (to 42)
+
+199     >>  290 NOP
+
+200         292 LOAD_FAST                6 (response)
+            294 LOAD_ATTR               21 (NULL|self + json)
+            314 CALL                     0
+            322 COPY                     1
+            324 POP_JUMP_IF_TRUE         2 (to 330)
+            326 POP_TOP
+            328 BUILD_MAP                0
+        >>  330 SWAP                     2
+            332 POP_TOP
+            334 RETURN_VALUE
+
+185     >>  336 END_FOR
+
+204         338 RETURN_CONST             5 (None)
+
+187     >>  340 CLEANUP_THROW
+            342 JUMP_BACKWARD          106 (to 132)
+        >>  344 PUSH_EXC_INFO
+
+188         346 LOAD_GLOBAL              8 (httpx)
+            356 LOAD_ATTR               10 (HTTPError)
+            376 CHECK_EXC_MATCH
+            378 POP_JUMP_IF_FALSE       45 (to 470)
+            380 STORE_FAST               7 (exc)
+
+189         382 LOAD_FAST                5 (attempt)
+            384 LOAD_CONST               6 (2)
+            386 COMPARE_OP              40 (==)
+            390 POP_JUMP_IF_FALSE       30 (to 452)
+
+190         392 LOAD_GLOBAL             13 (NULL + log)
+            402 LOAD_ATTR               14 (warning)
+            422 LOAD_CONST               7 ('Không tải được giọng AI33 (')
+            424 LOAD_FAST                1 (provider)
+            426 FORMAT_VALUE             0
+            428 LOAD_CONST               8 (' trang ')
+            430 LOAD_FAST                2 (page)
+            432 FORMAT_VALUE             0
+            434 LOAD_CONST               9 ('): ')
+            436 LOAD_FAST                7 (exc)
+            438 FORMAT_VALUE             0
+            440 BUILD_STRING             6
+            442 CALL                     1
+            450 POP_TOP
+
+191     >>  452 POP_EXCEPT
+            454 LOAD_CONST               5 (None)
+            456 STORE_FAST               7 (exc)
+            458 DELETE_FAST              7 (exc)
+            460 JUMP_BACKWARD          210 (to 42)
+        >>  462 LOAD_CONST               5 (None)
+            464 STORE_FAST               7 (exc)
+            466 DELETE_FAST              7 (exc)
+            468 RERAISE                  1
+
+188     >>  470 RERAISE                  0
+        >>  472 COPY                     3
+            474 POP_EXCEPT
+            476 RERAISE                  1
+        >>  478 PUSH_EXC_INFO
+
+201         480 LOAD_GLOBAL             22 (ValueError)
+            490 CHECK_EXC_MATCH
+            492 POP_JUMP_IF_FALSE       37 (to 568)
+            494 POP_TOP
+
+202         496 LOAD_FAST                5 (attempt)
+            498 LOAD_CONST               6 (2)
+            500 COMPARE_OP              40 (==)
+            504 POP_JUMP_IF_FALSE       28 (to 562)
+
+203         506 LOAD_GLOBAL             13 (NULL + log)
+            516 LOAD_ATTR               14 (warning)
+            536 LOAD_CONST              11 ('AI33 /v3/voices (')
+            538 LOAD_FAST                1 (provider)
+            540 FORMAT_VALUE             0
+            542 LOAD_CONST               8 (' trang ')
+            544 LOAD_FAST                2 (page)
+            546 FORMAT_VALUE             0
+            548 LOAD_CONST              15 (') trả JSON hỏng')
+            550 BUILD_STRING             5
+            552 CALL                     1
+            560 POP_TOP
+        >>  562 POP_EXCEPT
+            564 EXTENDED_ARG             1
+            566 JUMP_BACKWARD          263 (to 42)
+
+201     >>  568 RERAISE                  0
+        >>  570 COPY                     3
+            572 POP_EXCEPT
+            574 RERAISE                  1
+        >>  576 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            578 RERAISE                  1
+ExceptionTable:
+  4 to 46 -> 576 [0] lasti
+  50 to 124 -> 344 [1]
+  126 to 126 -> 340 [3]
+  128 to 134 -> 344 [1]
+  136 to 288 -> 576 [0] lasti
+  292 to 328 -> 478 [1]
+  330 to 338 -> 576 [0] lasti
+  340 to 340 -> 344 [1]
+  344 to 380 -> 472 [2] lasti
+  382 to 450 -> 462 [2] lasti
+  452 to 460 -> 576 [0] lasti
+  462 to 470 -> 472 [2] lasti
+  472 to 476 -> 576 [0] lasti
+  478 to 560 -> 570 [2] lasti
+  562 to 566 -> 576 [0] lasti
+  568 to 568 -> 570 [2] lasti
+  570 to 574 -> 576 [0] lasti
+
+Disassembly of <code object _fetch_voices at 0x28e36bb0, file "app\adapters\tts\ai33_tts.py", line 207>:
+              0 MAKE_CELL                0 (provider)
+              2 MAKE_CELL                2 (extra)
+              4 MAKE_CELL               13 (client)
+              6 MAKE_CELL               14 (gate)
+              8 MAKE_CELL               15 (seen_ids)
+             10 MAKE_CELL               16 (voices)
+
+207          12 RETURN_GENERATOR
+             14 POP_TOP
+             16 RESUME                   0
+
+213          18 BUILD_LIST               0
+             20 STORE_DEREF             16 (voices)
+
+214          22 LOAD_GLOBAL              1 (NULL + set)
+             32 CALL                     0
+             40 STORE_DEREF             15 (seen_ids)
+
+216          42 LOAD_CONST              12 (('payload', 'dict', 'return', 'int'))
+             44 LOAD_CLOSURE             0 (provider)
+             46 LOAD_CLOSURE            15 (seen_ids)
+             48 LOAD_CLOSURE            16 (voices)
+             50 BUILD_TUPLE              3
+             52 LOAD_CONST               1 (<code object _absorb at 0x7f6c9331c990, file "app\adapters\tts\ai33_tts.py", line 216>)
+             54 MAKE_FUNCTION           12 (annotations, closure)
+             56 STORE_FAST               3 (_absorb)
+
+226          58 NOP
+
+227          60 LOAD_GLOBAL              3 (NULL + _headers)
+             70 CALL                     0
+             78 POP_TOP
+
+232          80 LOAD_GLOBAL             11 (NULL + _client)
+             90 CALL                     0
+             98 BEFORE_ASYNC_WITH
+            100 GET_AWAITABLE            1
+            102 LOAD_CONST               4 (None)
+        >>  104 SEND                     3 (to 114)
+            108 YIELD_VALUE              2
+            110 RESUME                   3
+            112 JUMP_BACKWARD_NO_INTERRUPT     5 (to 104)
+        >>  114 END_SEND
+            116 STORE_DEREF             13 (client)
+
+233         118 LOAD_GLOBAL             13 (NULL + _fetch_page)
+            128 LOAD_DEREF              13 (client)
+            130 LOAD_DEREF               0 (provider)
+            132 LOAD_CONST               5 (1)
+            134 LOAD_DEREF               2 (extra)
+            136 CALL                     4
+            144 GET_AWAITABLE            0
+            146 LOAD_CONST               4 (None)
+        >>  148 SEND                     3 (to 158)
+            152 YIELD_VALUE              3
+            154 RESUME                   3
+            156 JUMP_BACKWARD_NO_INTERRUPT     5 (to 148)
+        >>  158 END_SEND
+            160 STORE_FAST               5 (first)
+
+234         162 LOAD_FAST                5 (first)
+            164 POP_JUMP_IF_TRUE        19 (to 204)
+
+235         166 BUILD_LIST               0
+
+232         168 SWAP                     2
+            170 LOAD_CONST               4 (None)
+            172 LOAD_CONST               4 (None)
+            174 LOAD_CONST               4 (None)
+            176 CALL                     2
+            184 GET_AWAITABLE            2
+            186 LOAD_CONST               4 (None)
+        >>  188 SEND                     3 (to 198)
+            192 YIELD_VALUE              2
+            194 RESUME                   3
+            196 JUMP_BACKWARD_NO_INTERRUPT     5 (to 188)
+        >>  198 END_SEND
+            200 POP_TOP
+            202 RETURN_VALUE
+
+236     >>  204 PUSH_NULL
+            206 LOAD_FAST                3 (_absorb)
+            208 LOAD_FAST                5 (first)
+            210 CALL                     1
+            218 POP_TOP
+
+237         220 LOAD_FAST                5 (first)
+            222 LOAD_ATTR               15 (NULL|self + get)
+            242 LOAD_CONST               6 ('pagination')
+            244 CALL                     1
+            252 COPY                     1
+            254 POP_JUMP_IF_TRUE         2 (to 260)
+            256 POP_TOP
+            258 BUILD_MAP                0
+        >>  260 STORE_FAST               6 (pagination)
+
+238         262 LOAD_FAST                6 (pagination)
+            264 LOAD_ATTR               15 (NULL|self + get)
+            284 LOAD_CONST               7 ('total')
+            286 CALL                     1
+            294 STORE_FAST               7 (total)
+
+240         296 LOAD_GLOBAL             17 (NULL + isinstance)
+            306 LOAD_FAST                7 (total)
+            308 LOAD_GLOBAL             18 (int)
+            318 CALL                     2
+            326 POP_JUMP_IF_FALSE      186 (to 700)
+            328 LOAD_FAST                7 (total)
+            330 LOAD_CONST               8 (0)
+            332 COMPARE_OP              68 (>)
+            336 POP_JUMP_IF_FALSE      181 (to 700)
+
+241         338 LOAD_GLOBAL             21 (NULL + min)
+
+242         348 LOAD_FAST                7 (total)
+            350 UNARY_NEGATIVE
+            352 LOAD_GLOBAL             22 (PAGE_SIZE)
+            362 BINARY_OP                2 (//)
+            366 UNARY_NEGATIVE
+
+243         368 LOAD_GLOBAL             24 (MAX_VOICES_PER_PROVIDER)
+            378 UNARY_NEGATIVE
+            380 LOAD_GLOBAL             22 (PAGE_SIZE)
+            390 BINARY_OP                2 (//)
+            394 UNARY_NEGATIVE
+
+241         396 CALL                     2
+            404 STORE_FAST               8 (last_page)
+
+245         406 LOAD_FAST                1 (max_pages)
+            408 POP_JUMP_IF_FALSE       12 (to 434)
+
+246         410 LOAD_GLOBAL             21 (NULL + min)
+            420 LOAD_FAST                8 (last_page)
+            422 LOAD_FAST                1 (max_pages)
+            424 CALL                     2
+            432 STORE_FAST               8 (last_page)
+
+247     >>  434 LOAD_FAST                8 (last_page)
+            436 LOAD_CONST               5 (1)
+            438 COMPARE_OP              68 (>)
+            442 POP_JUMP_IF_FALSE      109 (to 662)
+
+248         444 LOAD_GLOBAL             27 (NULL + asyncio)
+            454 LOAD_ATTR               28 (Semaphore)
+            474 LOAD_GLOBAL             30 (PAGE_CONCURRENCY)
+            484 CALL                     1
+            492 STORE_DEREF             14 (gate)
+
+250         494 LOAD_CONST              13 (('page', 'int', 'return', 'dict | None'))
+            496 LOAD_CLOSURE            13 (client)
+            498 LOAD_CLOSURE             2 (extra)
+            500 LOAD_CLOSURE            14 (gate)
+            502 LOAD_CLOSURE             0 (provider)
+            504 BUILD_TUPLE              4
+            506 LOAD_CONST               9 (<code object _one at 0x7f6c93289450, file "app\adapters\tts\ai33_tts.py", line 250>)
+            508 MAKE_FUNCTION           12 (annotations, closure)
+            510 STORE_FAST               9 (_one)
+
+254         512 LOAD_GLOBAL             27 (NULL + asyncio)
+            522 LOAD_ATTR               32 (gather)
+            542 LOAD_GLOBAL             35 (NULL + range)
+            552 LOAD_CONST              10 (2)
+            554 LOAD_FAST                8 (last_page)
+            556 LOAD_CONST               5 (1)
+            558 BINARY_OP                0 (+)
+            562 CALL                     2
+            570 GET_ITER
+            572 LOAD_FAST_AND_CLEAR     10 (p)
+            574 SWAP                     2
+            576 BUILD_LIST               0
+            578 SWAP                     2
+        >>  580 FOR_ITER                10 (to 604)
+            584 STORE_FAST              10 (p)
+            586 PUSH_NULL
+            588 LOAD_FAST                9 (_one)
+            590 LOAD_FAST               10 (p)
+            592 CALL                     1
+            600 LIST_APPEND              2
+            602 JUMP_BACKWARD           12 (to 580)
+        >>  604 END_FOR
+            606 SWAP                     2
+            608 STORE_FAST              10 (p)
+            610 CALL_FUNCTION_EX         0
+            612 GET_AWAITABLE            0
+            614 LOAD_CONST               4 (None)
+        >>  616 SEND                     3 (to 626)
+            620 YIELD_VALUE              3
+            622 RESUME                   3
+            624 JUMP_BACKWARD_NO_INTERRUPT     5 (to 616)
+        >>  626 END_SEND
+            628 GET_ITER
+        >>  630 FOR_ITER                13 (to 660)
+            634 STORE_FAST              11 (payload)
+
+255         636 LOAD_FAST               11 (payload)
+            638 POP_JUMP_IF_TRUE         1 (to 642)
+            640 JUMP_BACKWARD            6 (to 630)
+
+256     >>  642 PUSH_NULL
+            644 LOAD_FAST                3 (_absorb)
+            646 LOAD_FAST               11 (payload)
+            648 CALL                     1
+            656 POP_TOP
+            658 JUMP_BACKWARD           15 (to 630)
+
+254     >>  660 END_FOR
+
+257     >>  662 LOAD_DEREF              16 (voices)
+
+232         664 SWAP                     2
+            666 LOAD_CONST               4 (None)
+            668 LOAD_CONST               4 (None)
+            670 LOAD_CONST               4 (None)
+            672 CALL                     2
+            680 GET_AWAITABLE            2
+            682 LOAD_CONST               4 (None)
+        >>  684 SEND                     3 (to 694)
+            688 YIELD_VALUE              2
+            690 RESUME                   3
+            692 JUMP_BACKWARD_NO_INTERRUPT     5 (to 684)
+        >>  694 END_SEND
+            696 POP_TOP
+            698 RETURN_VALUE
+
+260     >>  700 LOAD_CONST               5 (1)
+            702 STORE_FAST              12 (page)
+
+261         704 LOAD_FAST                6 (pagination)
+            706 LOAD_ATTR               15 (NULL|self + get)
+            726 LOAD_CONST              11 ('has_more')
+            728 CALL                     1
+            736 POP_JUMP_IF_FALSE       92 (to 922)
+            738 LOAD_FAST                1 (max_pages)
+            740 POP_JUMP_IF_FALSE        5 (to 752)
+            742 LOAD_FAST               12 (page)
+            744 LOAD_FAST                1 (max_pages)
+            746 COMPARE_OP               2 (<)
+            750 POP_JUMP_IF_FALSE       85 (to 922)
+
+262     >>  752 LOAD_FAST               12 (page)
+            754 LOAD_CONST               5 (1)
+            756 BINARY_OP               13 (+=)
+            760 STORE_FAST              12 (page)
+
+263         762 LOAD_GLOBAL             13 (NULL + _fetch_page)
+            772 LOAD_DEREF              13 (client)
+            774 LOAD_DEREF               0 (provider)
+            776 LOAD_FAST               12 (page)
+            778 LOAD_DEREF               2 (extra)
+            780 CALL                     4
+            788 GET_AWAITABLE            0
+            790 LOAD_CONST               4 (None)
+        >>  792 SEND                     3 (to 802)
+            796 YIELD_VALUE              3
+            798 RESUME                   3
+            800 JUMP_BACKWARD_NO_INTERRUPT     5 (to 792)
+        >>  802 END_SEND
+            804 STORE_FAST              11 (payload)
+
+264         806 LOAD_FAST               11 (payload)
+            808 POP_JUMP_IF_FALSE        8 (to 826)
+            810 PUSH_NULL
+            812 LOAD_FAST                3 (_absorb)
+            814 LOAD_FAST               11 (payload)
+            816 CALL                     1
+            824 POP_JUMP_IF_TRUE         1 (to 828)
+
+265     >>  826 JUMP_FORWARD            47 (to 922)
+
+266     >>  828 LOAD_FAST               11 (payload)
+            830 LOAD_ATTR               15 (NULL|self + get)
+            850 LOAD_CONST               6 ('pagination')
+            852 CALL                     1
+            860 COPY                     1
+            862 POP_JUMP_IF_TRUE         2 (to 868)
+            864 POP_TOP
+            866 BUILD_MAP                0
+        >>  868 STORE_FAST               6 (pagination)
+
+261         870 LOAD_FAST                6 (pagination)
+            872 LOAD_ATTR               15 (NULL|self + get)
+            892 LOAD_CONST              11 ('has_more')
+            894 CALL                     1
+            902 POP_JUMP_IF_FALSE        9 (to 922)
+            904 LOAD_FAST                1 (max_pages)
+            906 POP_JUMP_IF_TRUE         1 (to 910)
+            908 JUMP_BACKWARD           79 (to 752)
+        >>  910 LOAD_FAST               12 (page)
+            912 LOAD_FAST                1 (max_pages)
+            914 COMPARE_OP               2 (<)
+            918 POP_JUMP_IF_FALSE        1 (to 922)
+            920 JUMP_BACKWARD           85 (to 752)
+
+232     >>  922 LOAD_CONST               4 (None)
+            924 LOAD_CONST               4 (None)
+            926 LOAD_CONST               4 (None)
+            928 CALL                     2
+            936 GET_AWAITABLE            2
+            938 LOAD_CONST               4 (None)
+        >>  940 SEND                     3 (to 950)
+            944 YIELD_VALUE              2
+            946 RESUME                   3
+            948 JUMP_BACKWARD_NO_INTERRUPT     5 (to 940)
+        >>  950 END_SEND
+            952 POP_TOP
+
+267         954 LOAD_DEREF              16 (voices)
+            956 RETURN_VALUE
+        >>  958 PUSH_EXC_INFO
+
+228         960 LOAD_GLOBAL              4 (Exception)
+            970 CHECK_EXC_MATCH
+            972 POP_JUMP_IF_FALSE       39 (to 1052)
+            974 STORE_FAST               4 (exc)
+
+229         976 LOAD_GLOBAL              7 (NULL + log)
+            986 LOAD_ATTR                8 (warning)
+           1006 LOAD_CONST               2 ('AI33 _fetch_voices (')
+           1008 LOAD_DEREF               0 (provider)
+           1010 FORMAT_VALUE             0
+           1012 LOAD_CONST               3 ('): ')
+           1014 LOAD_FAST                4 (exc)
+           1016 FORMAT_VALUE             0
+           1018 BUILD_STRING             4
+           1020 CALL                     1
+           1028 POP_TOP
+
+230        1030 BUILD_LIST               0
+           1032 SWAP                     2
+           1034 POP_EXCEPT
+           1036 LOAD_CONST               4 (None)
+           1038 STORE_FAST               4 (exc)
+           1040 DELETE_FAST              4 (exc)
+           1042 RETURN_VALUE
+        >> 1044 LOAD_CONST               4 (None)
+           1046 STORE_FAST               4 (exc)
+           1048 DELETE_FAST              4 (exc)
+           1050 RERAISE                  1
+
+228     >> 1052 RERAISE                  0
+        >> 1054 COPY                     3
+           1056 POP_EXCEPT
+           1058 RERAISE                  1
+
+232     >> 1060 CLEANUP_THROW
+           1062 EXTENDED_ARG             1
+           1064 JUMP_BACKWARD          476 (to 114)
+
+233     >> 1066 CLEANUP_THROW
+           1068 EXTENDED_ARG             1
+           1070 JUMP_BACKWARD          457 (to 158)
+
+232     >> 1072 CLEANUP_THROW
+           1074 EXTENDED_ARG             1
+           1076 JUMP_BACKWARD          440 (to 198)
+        >> 1078 SWAP                     2
+           1080 POP_TOP
+
+254        1082 SWAP                     2
+           1084 STORE_FAST              10 (p)
+           1086 RERAISE                  0
+        >> 1088 CLEANUP_THROW
+           1090 JUMP_BACKWARD          233 (to 626)
+
+232     >> 1092 CLEANUP_THROW
+           1094 JUMP_BACKWARD          201 (to 694)
+
+263     >> 1096 CLEANUP_THROW
+           1098 JUMP_BACKWARD          149 (to 802)
+
+232     >> 1100 CLEANUP_THROW
+           1102 JUMP_BACKWARD           77 (to 950)
+        >> 1104 PUSH_EXC_INFO
+           1106 WITH_EXCEPT_START
+           1108 GET_AWAITABLE            2
+           1110 LOAD_CONST               4 (None)
+        >> 1112 SEND                     4 (to 1124)
+           1116 YIELD_VALUE              3
+           1118 RESUME                   3
+           1120 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1112)
+        >> 1122 CLEANUP_THROW
+        >> 1124 END_SEND
+           1126 POP_JUMP_IF_TRUE         1 (to 1130)
+           1128 RERAISE                  2
+        >> 1130 POP_TOP
+           1132 POP_EXCEPT
+           1134 POP_TOP
+           1136 POP_TOP
+
+267        1138 LOAD_DEREF              16 (voices)
+           1140 RETURN_VALUE
+        >> 1142 COPY                     3
+           1144 POP_EXCEPT
+           1146 RERAISE                  1
+        >> 1148 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1150 RERAISE                  1
+ExceptionTable:
+  16 to 56 -> 1148 [0] lasti
+  60 to 78 -> 958 [0]
+  80 to 106 -> 1148 [0] lasti
+  108 to 108 -> 1060 [3]
+  110 to 114 -> 1148 [0] lasti
+  116 to 150 -> 1104 [1] lasti
+  152 to 152 -> 1066 [3]
+  154 to 166 -> 1104 [1] lasti
+  168 to 190 -> 1148 [0] lasti
+  192 to 192 -> 1072 [3]
+  194 to 202 -> 1148 [0] lasti
+  204 to 574 -> 1104 [1] lasti
+  576 to 604 -> 1078 [5]
+  606 to 618 -> 1104 [1] lasti
+  620 to 620 -> 1088 [3]
+  622 to 638 -> 1104 [1] lasti
+  642 to 662 -> 1104 [1] lasti
+  664 to 686 -> 1148 [0] lasti
+  688 to 688 -> 1092 [3]
+  690 to 698 -> 1148 [0] lasti
+  700 to 794 -> 1104 [1] lasti
+  796 to 796 -> 1096 [3]
+  798 to 906 -> 1104 [1] lasti
+  910 to 918 -> 1104 [1] lasti
+  922 to 942 -> 1148 [0] lasti
+  944 to 944 -> 1100 [2]
+  946 to 956 -> 1148 [0] lasti
+  958 to 974 -> 1054 [1] lasti
+  976 to 1030 -> 1044 [1] lasti
+  1032 to 1032 -> 1054 [1] lasti
+  1034 to 1042 -> 1148 [0] lasti
+  1044 to 1052 -> 1054 [1] lasti
+  1054 to 1060 -> 1148 [0] lasti
+  1066 to 1066 -> 1104 [1] lasti
+  1072 to 1072 -> 1148 [0] lasti
+  1078 to 1088 -> 1104 [1] lasti
+  1092 to 1092 -> 1148 [0] lasti
+  1096 to 1096 -> 1104 [1] lasti
+  1100 to 1100 -> 1148 [0] lasti
+  1104 to 1114 -> 1142 [3] lasti
+  1116 to 1116 -> 1122 [6]
+  1118 to 1130 -> 1142 [3] lasti
+  1132 to 1146 -> 1148 [0] lasti
+
+Disassembly of <code object _absorb at 0x7f6c9331c990, file "app\adapters\tts\ai33_tts.py", line 216>:
+              0 COPY_FREE_VARS           3
+
+216           2 RESUME                   0
+
+217           4 LOAD_CONST               1 (0)
+              6 STORE_FAST               1 (added)
+
+218           8 LOAD_FAST                0 (payload)
+             10 LOAD_ATTR                1 (NULL|self + get)
+             30 LOAD_CONST               2 ('data')
+             32 CALL                     1
+             40 COPY                     1
+             42 POP_JUMP_IF_TRUE         2 (to 48)
+             44 POP_TOP
+             46 BUILD_LIST               0
+        >>   48 GET_ITER
+        >>   50 FOR_ITER                67 (to 188)
+             54 STORE_FAST               2 (raw)
+
+219          56 LOAD_GLOBAL              3 (NULL + _map_voice)
+             66 LOAD_FAST                2 (raw)
+             68 LOAD_DEREF               4 (provider)
+             70 CALL                     2
+             78 STORE_FAST               3 (mapped)
+
+220          80 LOAD_FAST                3 (mapped)
+             82 POP_JUMP_IF_TRUE         1 (to 86)
+             84 JUMP_BACKWARD           18 (to 50)
+        >>   86 LOAD_FAST                3 (mapped)
+             88 LOAD_CONST               3 ('name')
+             90 BINARY_SUBSCR
+             94 LOAD_DEREF               5 (seen_ids)
+             96 CONTAINS_OP              1
+             98 POP_JUMP_IF_TRUE         1 (to 102)
+            100 JUMP_BACKWARD           26 (to 50)
+
+221     >>  102 LOAD_DEREF               5 (seen_ids)
+            104 LOAD_ATTR                5 (NULL|self + add)
+            124 LOAD_FAST                3 (mapped)
+            126 LOAD_CONST               3 ('name')
+            128 BINARY_SUBSCR
+            132 CALL                     1
+            140 POP_TOP
+
+222         142 LOAD_DEREF               6 (voices)
+            144 LOAD_ATTR                7 (NULL|self + append)
+            164 LOAD_FAST                3 (mapped)
+            166 CALL                     1
+            174 POP_TOP
+
+223         176 LOAD_FAST                1 (added)
+            178 LOAD_CONST               4 (1)
+            180 BINARY_OP               13 (+=)
+            184 STORE_FAST               1 (added)
+            186 JUMP_BACKWARD           69 (to 50)
+
+218     >>  188 END_FOR
+
+224         190 LOAD_FAST                1 (added)
+            192 RETURN_VALUE
+
+Disassembly of <code object _one at 0x7f6c93289450, file "app\adapters\tts\ai33_tts.py", line 250>:
+              0 COPY_FREE_VARS           4
+
+250           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+251           8 LOAD_DEREF               3 (gate)
+             10 BEFORE_ASYNC_WITH
+             12 GET_AWAITABLE            1
+             14 LOAD_CONST               0 (None)
+        >>   16 SEND                     3 (to 26)
+             20 YIELD_VALUE              2
+             22 RESUME                   3
+             24 JUMP_BACKWARD_NO_INTERRUPT     5 (to 16)
+        >>   26 END_SEND
+             28 POP_TOP
+
+252          30 LOAD_GLOBAL              1 (NULL + _fetch_page)
+             40 LOAD_DEREF               1 (client)
+             42 LOAD_DEREF               4 (provider)
+             44 LOAD_FAST                0 (page)
+             46 LOAD_DEREF               2 (extra)
+             48 CALL                     4
+             56 GET_AWAITABLE            0
+             58 LOAD_CONST               0 (None)
+        >>   60 SEND                     3 (to 70)
+             64 YIELD_VALUE              3
+             66 RESUME                   3
+             68 JUMP_BACKWARD_NO_INTERRUPT     5 (to 60)
+        >>   70 END_SEND
+
+251          72 SWAP                     2
+             74 LOAD_CONST               0 (None)
+             76 LOAD_CONST               0 (None)
+             78 LOAD_CONST               0 (None)
+             80 CALL                     2
+             88 GET_AWAITABLE            2
+             90 LOAD_CONST               0 (None)
+        >>   92 SEND                     3 (to 102)
+             96 YIELD_VALUE              2
+             98 RESUME                   3
+            100 JUMP_BACKWARD_NO_INTERRUPT     5 (to 92)
+        >>  102 END_SEND
+            104 POP_TOP
+            106 RETURN_VALUE
+        >>  108 CLEANUP_THROW
+            110 JUMP_BACKWARD           43 (to 26)
+
+252     >>  112 CLEANUP_THROW
+            114 JUMP_BACKWARD           23 (to 70)
+
+251     >>  116 CLEANUP_THROW
+            118 JUMP_BACKWARD            9 (to 102)
+        >>  120 PUSH_EXC_INFO
+            122 WITH_EXCEPT_START
+            124 GET_AWAITABLE            2
+            126 LOAD_CONST               0 (None)
+        >>  128 SEND                     4 (to 140)
+            132 YIELD_VALUE              3
+            134 RESUME                   3
+            136 JUMP_BACKWARD_NO_INTERRUPT     5 (to 128)
+        >>  138 CLEANUP_THROW
+        >>  140 END_SEND
+            142 POP_JUMP_IF_TRUE         1 (to 146)
+            144 RERAISE                  2
+        >>  146 POP_TOP
+            148 POP_EXCEPT
+            150 POP_TOP
+            152 POP_TOP
+            154 RETURN_CONST             0 (None)
+        >>  156 COPY                     3
+            158 POP_EXCEPT
+            160 RERAISE                  1
+        >>  162 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            164 RERAISE                  1
+ExceptionTable:
+  6 to 18 -> 162 [0] lasti
+  20 to 20 -> 108 [3]
+  22 to 26 -> 162 [0] lasti
+  28 to 62 -> 120 [1] lasti
+  64 to 64 -> 112 [3]
+  66 to 70 -> 120 [1] lasti
+  72 to 94 -> 162 [0] lasti
+  96 to 96 -> 116 [3]
+  98 to 108 -> 162 [0] lasti
+  112 to 112 -> 120 [1] lasti
+  116 to 116 -> 162 [0] lasti
+  120 to 130 -> 156 [3] lasti
+  132 to 132 -> 138 [6]
+  134 to 146 -> 156 [3] lasti
+  148 to 160 -> 162 [0] lasti
+
+Disassembly of <code object _merge_sorted at 0x7f6c9326dc50, file "app\adapters\tts\ai33_tts.py", line 270>:
+270           0 RESUME                   0
+
+272           2 BUILD_LIST               0
+              4 STORE_FAST               1 (merged)
+
+273           6 LOAD_GLOBAL              1 (NULL + set)
+             16 CALL                     0
+             24 STORE_FAST               2 (seen)
+
+274          26 LOAD_FAST                0 (chunks)
+             28 GET_ITER
+        >>   30 FOR_ITER                99 (to 232)
+             34 STORE_FAST               3 (chunk)
+
+275          36 LOAD_GLOBAL              3 (NULL + isinstance)
+             46 LOAD_FAST                3 (chunk)
+             48 LOAD_GLOBAL              4 (BaseException)
+             58 CALL                     2
+             66 POP_JUMP_IF_FALSE       25 (to 118)
+
+276          68 LOAD_GLOBAL              7 (NULL + log)
+             78 LOAD_ATTR                8 (warning)
+             98 LOAD_CONST               1 ('Một nguồn giọng AI33 nạp lỗi: ')
+            100 LOAD_FAST                3 (chunk)
+            102 FORMAT_VALUE             0
+            104 BUILD_STRING             2
+            106 CALL                     1
+            114 POP_TOP
+
+277         116 JUMP_BACKWARD           44 (to 30)
+
+278     >>  118 LOAD_FAST                3 (chunk)
+            120 COPY                     1
+            122 POP_JUMP_IF_TRUE         2 (to 128)
+            124 POP_TOP
+            126 BUILD_LIST               0
+        >>  128 GET_ITER
+        >>  130 FOR_ITER                47 (to 228)
+            134 STORE_FAST               4 (item)
+
+279         136 LOAD_FAST                4 (item)
+            138 LOAD_CONST               2 ('name')
+            140 BINARY_SUBSCR
+            144 LOAD_FAST                2 (seen)
+            146 CONTAINS_OP              1
+            148 POP_JUMP_IF_TRUE         1 (to 152)
+            150 JUMP_BACKWARD           11 (to 130)
+
+280     >>  152 LOAD_FAST                2 (seen)
+            154 LOAD_ATTR               11 (NULL|self + add)
+            174 LOAD_FAST                4 (item)
+            176 LOAD_CONST               2 ('name')
+            178 BINARY_SUBSCR
+            182 CALL                     1
+            190 POP_TOP
+
+281         192 LOAD_FAST                1 (merged)
+            194 LOAD_ATTR               13 (NULL|self + append)
+            214 LOAD_FAST                4 (item)
+            216 CALL                     1
+            224 POP_TOP
+            226 JUMP_BACKWARD           49 (to 130)
+
+278     >>  228 END_FOR
+            230 JUMP_BACKWARD          101 (to 30)
+
+274     >>  232 END_FOR
+
+282         234 LOAD_FAST                1 (merged)
+            236 LOAD_ATTR               15 (NULL|self + sort)
+
+283         256 LOAD_CONST               3 (<code object <lambda> at 0x7f6c92a399b0, file "app\adapters\tts\ai33_tts.py", line 283>)
+            258 MAKE_FUNCTION            0
+
+282         260 KW_NAMES                 4 (('key',))
+            262 CALL                     1
+            270 POP_TOP
+
+290         272 LOAD_FAST                1 (merged)
+            274 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c92a399b0, file "app\adapters\tts\ai33_tts.py", line 283>:
+283           0 RESUME                   0
+
+284           2 LOAD_FAST                0 (item)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_CONST               1 ('hot')
+             26 CALL                     1
+             34 UNARY_NOT
+
+285          36 LOAD_FAST                0 (item)
+             38 LOAD_CONST               2 ('language_code')
+             40 BINARY_SUBSCR
+             44 LOAD_CONST               3 ('vi')
+             46 COMPARE_OP              55 (!=)
+
+286          50 LOAD_FAST                0 (item)
+             52 LOAD_CONST               4 ('voice_provider')
+             54 BINARY_SUBSCR
+
+287          58 LOAD_FAST                0 (item)
+             60 LOAD_CONST               5 ('friendly_name')
+             62 BINARY_SUBSCR
+
+283          66 BUILD_TUPLE              4
+             68 RETURN_VALUE
+
+Disassembly of <code object _fetch_all at 0x7f6c9326d110, file "app\adapters\tts\ai33_tts.py", line 293>:
+293           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+296           6 BUILD_LIST               0
+              8 STORE_FAST               1 (tasks)
+
+297          10 LOAD_GLOBAL              0 (VOICE_PROVIDERS)
+             20 GET_ITER
+        >>   22 FOR_ITER                78 (to 182)
+             26 STORE_FAST               2 (provider)
+
+298          28 LOAD_FAST                0 (quick)
+             30 POP_JUMP_IF_FALSE       48 (to 128)
+             32 LOAD_FAST                2 (provider)
+             34 LOAD_GLOBAL              2 (SLOW_PROVIDERS)
+             44 CONTAINS_OP              0
+             46 POP_JUMP_IF_FALSE       40 (to 128)
+
+299          48 LOAD_FAST                1 (tasks)
+
+300          50 LOAD_GLOBAL              4 (QUICK_SEEDS)
+             60 GET_ITER
+
+299          62 LOAD_FAST_AND_CLEAR      3 (seed)
+             64 SWAP                     2
+             66 BUILD_LIST               0
+             68 SWAP                     2
+
+300     >>   70 FOR_ITER                20 (to 114)
+             74 STORE_FAST               3 (seed)
+
+299          76 LOAD_GLOBAL              7 (NULL + _fetch_voices)
+             86 LOAD_FAST                2 (provider)
+             88 LOAD_GLOBAL              8 (QUICK_SEED_PAGES)
+             98 LOAD_FAST                3 (seed)
+            100 KW_NAMES                 1 (('max_pages', 'extra'))
+            102 CALL                     3
+            110 LIST_APPEND              2
+            112 JUMP_BACKWARD           22 (to 70)
+
+300     >>  114 END_FOR
+
+299         116 SWAP                     2
+            118 STORE_FAST               3 (seed)
+            120 BINARY_OP               13 (+=)
+            124 STORE_FAST               1 (tasks)
+            126 JUMP_BACKWARD           53 (to 22)
+
+302     >>  128 LOAD_FAST                1 (tasks)
+            130 LOAD_ATTR               11 (NULL|self + append)
+            150 LOAD_GLOBAL              7 (NULL + _fetch_voices)
+            160 LOAD_FAST                2 (provider)
+            162 CALL                     1
+            170 CALL                     1
+            178 POP_TOP
+            180 JUMP_BACKWARD           80 (to 22)
+
+297     >>  182 END_FOR
+
+303         184 LOAD_GLOBAL             13 (NULL + _merge_sorted)
+            194 LOAD_GLOBAL             15 (NULL + asyncio)
+            204 LOAD_ATTR               16 (gather)
+            224 LOAD_FAST                1 (tasks)
+            226 LOAD_CONST               2 ('return_exceptions')
+            228 LOAD_CONST               3 (True)
+            230 BUILD_MAP                1
+            232 CALL_FUNCTION_EX         1
+            234 GET_AWAITABLE            0
+            236 LOAD_CONST               4 (None)
+        >>  238 SEND                     3 (to 248)
+            242 YIELD_VALUE              2
+            244 RESUME                   3
+            246 JUMP_BACKWARD_NO_INTERRUPT     5 (to 238)
+        >>  248 END_SEND
+            250 CALL                     1
+            258 RETURN_VALUE
+        >>  260 SWAP                     2
+            262 POP_TOP
+
+299         264 SWAP                     2
+            266 STORE_FAST               3 (seed)
+            268 RERAISE                  0
+
+303     >>  270 CLEANUP_THROW
+            272 JUMP_BACKWARD           13 (to 248)
+        >>  274 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            276 RERAISE                  1
+ExceptionTable:
+  4 to 64 -> 274 [0] lasti
+  66 to 114 -> 260 [4]
+  116 to 240 -> 274 [0] lasti
+  242 to 242 -> 270 [4]
+  244 to 270 -> 274 [0] lasti
+
+Disassembly of <code object _warm_full_catalog at 0x290ebef0, file "app\adapters\tts\ai33_tts.py", line 306>:
+306           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+309           6 LOAD_GLOBAL              1 (NULL + time)
+             16 LOAD_ATTR                0 (time)
+             36 CALL                     0
+             44 STORE_FAST               0 (started)
+
+310          46 NOP
+
+311          48 LOAD_GLOBAL              3 (NULL + _fetch_all)
+             58 LOAD_CONST               1 (False)
+             60 KW_NAMES                 2 (('quick',))
+             62 CALL                     1
+             70 GET_AWAITABLE            0
+             72 LOAD_CONST               3 (None)
+        >>   74 SEND                     3 (to 84)
+             78 YIELD_VALUE              3
+             80 RESUME                   3
+             82 JUMP_BACKWARD_NO_INTERRUPT     5 (to 74)
+        >>   84 END_SEND
+             86 STORE_FAST               1 (voices)
+
+315          88 LOAD_FAST                1 (voices)
+             90 POP_JUMP_IF_TRUE         1 (to 94)
+
+316          92 RETURN_CONST             3 (None)
+
+317     >>   94 LOAD_FAST                1 (voices)
+             96 LOAD_GLOBAL             10 (_VOICES_CACHE)
+            106 LOAD_CONST               5 ('all')
+            108 STORE_SUBSCR
+
+318         112 LOAD_CONST               6 (True)
+            114 STORE_GLOBAL             6 (_VOICES_CACHE_FULL)
+
+319         116 LOAD_GLOBAL             15 (NULL + _save_disk_cache)
+            126 LOAD_FAST                1 (voices)
+            128 CALL                     1
+            136 POP_TOP
+
+320         138 LOAD_GLOBAL              7 (NULL + log)
+            148 LOAD_ATTR               16 (info)
+            168 LOAD_CONST               7 ('AI33: đã nạp đủ ')
+            170 LOAD_GLOBAL             19 (NULL + len)
+            180 LOAD_FAST                1 (voices)
+            182 CALL                     1
+            190 FORMAT_VALUE             0
+            192 LOAD_CONST               8 (' giọng trong ')
+            194 LOAD_GLOBAL              1 (NULL + time)
+            204 LOAD_ATTR                0 (time)
+            224 CALL                     0
+            232 LOAD_FAST                0 (started)
+            234 BINARY_OP               10 (-)
+            238 LOAD_CONST               9 ('.0f')
+            240 FORMAT_VALUE             4 (with format)
+            242 LOAD_CONST              10 ('s, đã ghi cache đĩa')
+            244 BUILD_STRING             5
+            246 CALL                     1
+            254 POP_TOP
+            256 RETURN_CONST             3 (None)
+
+311     >>  258 CLEANUP_THROW
+            260 JUMP_BACKWARD           89 (to 84)
+        >>  262 PUSH_EXC_INFO
+
+312         264 LOAD_GLOBAL              4 (Exception)
+            274 CHECK_EXC_MATCH
+            276 POP_JUMP_IF_FALSE       34 (to 346)
+            278 STORE_FAST               2 (exc)
+
+313         280 LOAD_GLOBAL              7 (NULL + log)
+            290 LOAD_ATTR                8 (warning)
+            310 LOAD_CONST               4 ('Hâm cache giọng AI33 (nền) lỗi: ')
+            312 LOAD_FAST                2 (exc)
+            314 FORMAT_VALUE             0
+            316 BUILD_STRING             2
+            318 CALL                     1
+            326 POP_TOP
+
+314         328 POP_EXCEPT
+            330 LOAD_CONST               3 (None)
+            332 STORE_FAST               2 (exc)
+            334 DELETE_FAST              2 (exc)
+            336 RETURN_CONST             3 (None)
+        >>  338 LOAD_CONST               3 (None)
+            340 STORE_FAST               2 (exc)
+            342 DELETE_FAST              2 (exc)
+            344 RERAISE                  1
+
+312     >>  346 RERAISE                  0
+        >>  348 COPY                     3
+            350 POP_EXCEPT
+            352 RERAISE                  1
+        >>  354 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            356 RERAISE                  1
+ExceptionTable:
+  4 to 44 -> 354 [0] lasti
+  48 to 76 -> 262 [0]
+  78 to 78 -> 258 [2]
+  80 to 86 -> 262 [0]
+  88 to 256 -> 354 [0] lasti
+  258 to 258 -> 262 [0]
+  262 to 278 -> 348 [1] lasti
+  280 to 326 -> 338 [1] lasti
+  328 to 336 -> 354 [0] lasti
+  338 to 346 -> 348 [1] lasti
+  348 to 352 -> 354 [0] lasti
+
+Disassembly of <code object _schedule_warm at 0x7f6c93289b80, file "app\adapters\tts\ai33_tts.py", line 323>:
+323           0 RESUME                   0
+
+325           2 LOAD_GLOBAL              0 (_WARM_TASK)
+             12 POP_JUMP_IF_FALSE       21 (to 56)
+             14 LOAD_GLOBAL              0 (_WARM_TASK)
+             24 LOAD_ATTR                3 (NULL|self + done)
+             44 CALL                     0
+             52 POP_JUMP_IF_TRUE         1 (to 56)
+
+326          54 RETURN_CONST             0 (None)
+
+327     >>   56 NOP
+
+328          58 LOAD_GLOBAL              5 (NULL + asyncio)
+             68 LOAD_ATTR                6 (get_running_loop)
+             88 CALL                     0
+             96 LOAD_ATTR                9 (NULL|self + create_task)
+            116 LOAD_GLOBAL             11 (NULL + _warm_full_catalog)
+            126 CALL                     0
+            134 CALL                     1
+            142 STORE_GLOBAL             0 (_WARM_TASK)
+            144 RETURN_CONST             0 (None)
+        >>  146 PUSH_EXC_INFO
+
+329         148 LOAD_GLOBAL             12 (RuntimeError)
+            158 CHECK_EXC_MATCH
+            160 POP_JUMP_IF_FALSE        3 (to 168)
+            162 POP_TOP
+
+330         164 POP_EXCEPT
+            166 RETURN_CONST             0 (None)
+
+329     >>  168 RERAISE                  0
+        >>  170 COPY                     3
+            172 POP_EXCEPT
+            174 RERAISE                  1
+ExceptionTable:
+  58 to 142 -> 146 [0]
+  146 to 162 -> 170 [1] lasti
+  168 to 168 -> 170 [1] lasti
+
+Disassembly of <code object list_voices at 0x26992f80, file "app\adapters\tts\ai33_tts.py", line 333>:
+333           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+341           6 LOAD_GLOBAL              0 (_VOICES_CACHE)
+             16 LOAD_ATTR                3 (NULL|self + get)
+             36 LOAD_CONST               1 ('all')
+             38 CALL                     1
+             46 POP_JUMP_IF_FALSE       25 (to 98)
+
+342          48 LOAD_GLOBAL              4 (_VOICES_CACHE_FULL)
+             58 POP_JUMP_IF_TRUE        10 (to 80)
+
+343          60 LOAD_GLOBAL              7 (NULL + _schedule_warm)
+             70 CALL                     0
+             78 POP_TOP
+
+344     >>   80 LOAD_GLOBAL              0 (_VOICES_CACHE)
+             90 LOAD_CONST               1 ('all')
+             92 BINARY_SUBSCR
+             96 RETURN_VALUE
+
+345     >>   98 LOAD_GLOBAL              8 (_VOICES_CACHE_LOCK)
+            108 BEFORE_ASYNC_WITH
+            110 GET_AWAITABLE            1
+            112 LOAD_CONST               2 (None)
+        >>  114 SEND                     3 (to 124)
+            118 YIELD_VALUE              2
+            120 RESUME                   3
+            122 JUMP_BACKWARD_NO_INTERRUPT     5 (to 114)
+        >>  124 END_SEND
+            126 POP_TOP
+
+346         128 LOAD_GLOBAL              0 (_VOICES_CACHE)
+            138 LOAD_ATTR                3 (NULL|self + get)
+            158 LOAD_CONST               1 ('all')
+            160 CALL                     1
+            168 POP_JUMP_IF_FALSE       26 (to 222)
+
+347         170 LOAD_GLOBAL              0 (_VOICES_CACHE)
+            180 LOAD_CONST               1 ('all')
+            182 BINARY_SUBSCR
+
+345         186 SWAP                     2
+            188 LOAD_CONST               2 (None)
+            190 LOAD_CONST               2 (None)
+            192 LOAD_CONST               2 (None)
+            194 CALL                     2
+            202 GET_AWAITABLE            2
+            204 LOAD_CONST               2 (None)
+        >>  206 SEND                     3 (to 216)
+            210 YIELD_VALUE              2
+            212 RESUME                   3
+            214 JUMP_BACKWARD_NO_INTERRUPT     5 (to 206)
+        >>  216 END_SEND
+            218 POP_TOP
+            220 RETURN_VALUE
+
+349     >>  222 LOAD_GLOBAL             11 (NULL + _load_disk_cache)
+            232 CALL                     0
+            240 STORE_FAST               0 (cached)
+
+350         242 LOAD_FAST                0 (cached)
+            244 POP_JUMP_IF_FALSE       64 (to 374)
+
+351         246 LOAD_FAST                0 (cached)
+            248 LOAD_GLOBAL              0 (_VOICES_CACHE)
+            258 LOAD_CONST               1 ('all')
+            260 STORE_SUBSCR
+
+352         264 LOAD_CONST               3 (True)
+            266 STORE_GLOBAL             2 (_VOICES_CACHE_FULL)
+
+353         268 LOAD_GLOBAL             13 (NULL + log)
+            278 LOAD_ATTR               14 (info)
+            298 LOAD_CONST               4 ('AI33: dùng lại ')
+            300 LOAD_GLOBAL             17 (NULL + len)
+            310 LOAD_FAST                0 (cached)
+            312 CALL                     1
+            320 FORMAT_VALUE             0
+            322 LOAD_CONST               5 (' giọng từ cache đĩa')
+            324 BUILD_STRING             3
+            326 CALL                     1
+            334 POP_TOP
+
+354         336 LOAD_FAST                0 (cached)
+
+345         338 SWAP                     2
+            340 LOAD_CONST               2 (None)
+            342 LOAD_CONST               2 (None)
+            344 LOAD_CONST               2 (None)
+            346 CALL                     2
+            354 GET_AWAITABLE            2
+            356 LOAD_CONST               2 (None)
+        >>  358 SEND                     3 (to 368)
+            362 YIELD_VALUE              2
+            364 RESUME                   3
+            366 JUMP_BACKWARD_NO_INTERRUPT     5 (to 358)
+        >>  368 END_SEND
+            370 POP_TOP
+            372 RETURN_VALUE
+
+356     >>  374 LOAD_GLOBAL             19 (NULL + _fetch_all)
+            384 LOAD_CONST               3 (True)
+            386 KW_NAMES                 6 (('quick',))
+            388 CALL                     1
+            396 GET_AWAITABLE            0
+            398 LOAD_CONST               2 (None)
+        >>  400 SEND                     3 (to 410)
+            404 YIELD_VALUE              3
+            406 RESUME                   3
+            408 JUMP_BACKWARD_NO_INTERRUPT     5 (to 400)
+        >>  410 END_SEND
+            412 STORE_FAST               1 (voices)
+
+357         414 LOAD_FAST                1 (voices)
+            416 POP_JUMP_IF_FALSE       11 (to 440)
+
+358         418 LOAD_FAST                1 (voices)
+            420 LOAD_GLOBAL              0 (_VOICES_CACHE)
+            430 LOAD_CONST               1 ('all')
+            432 STORE_SUBSCR
+
+359         436 LOAD_CONST               7 (False)
+            438 STORE_GLOBAL             2 (_VOICES_CACHE_FULL)
+
+360     >>  440 LOAD_GLOBAL             13 (NULL + log)
+            450 LOAD_ATTR               14 (info)
+            470 LOAD_CONST               8 ('AI33: tầng nhanh có ')
+            472 LOAD_GLOBAL             17 (NULL + len)
+            482 LOAD_FAST                1 (voices)
+            484 CALL                     1
+            492 FORMAT_VALUE             0
+            494 LOAD_CONST               9 (' giọng — đang tải nốt danh mục đầy đủ ở nền')
+            496 BUILD_STRING             3
+            498 CALL                     1
+            506 POP_TOP
+
+345         508 LOAD_CONST               2 (None)
+            510 LOAD_CONST               2 (None)
+            512 LOAD_CONST               2 (None)
+            514 CALL                     2
+            522 GET_AWAITABLE            2
+            524 LOAD_CONST               2 (None)
+        >>  526 SEND                     3 (to 536)
+            530 YIELD_VALUE              2
+            532 RESUME                   3
+            534 JUMP_BACKWARD_NO_INTERRUPT     5 (to 526)
+        >>  536 END_SEND
+            538 POP_TOP
+
+361     >>  540 LOAD_GLOBAL              7 (NULL + _schedule_warm)
+            550 CALL                     0
+            558 POP_TOP
+
+362         560 LOAD_GLOBAL              0 (_VOICES_CACHE)
+            570 LOAD_ATTR                3 (NULL|self + get)
+            590 LOAD_CONST               1 ('all')
+            592 BUILD_LIST               0
+            594 CALL                     2
+            602 RETURN_VALUE
+
+345     >>  604 CLEANUP_THROW
+            606 JUMP_BACKWARD          242 (to 124)
+        >>  608 CLEANUP_THROW
+            610 JUMP_BACKWARD          198 (to 216)
+        >>  612 CLEANUP_THROW
+            614 JUMP_BACKWARD          124 (to 368)
+
+356     >>  616 CLEANUP_THROW
+            618 JUMP_BACKWARD          105 (to 410)
+
+345     >>  620 CLEANUP_THROW
+            622 JUMP_BACKWARD           44 (to 536)
+        >>  624 PUSH_EXC_INFO
+            626 WITH_EXCEPT_START
+            628 GET_AWAITABLE            2
+            630 LOAD_CONST               2 (None)
+        >>  632 SEND                     4 (to 644)
+            636 YIELD_VALUE              3
+            638 RESUME                   3
+            640 JUMP_BACKWARD_NO_INTERRUPT     5 (to 632)
+        >>  642 CLEANUP_THROW
+        >>  644 END_SEND
+            646 POP_JUMP_IF_TRUE         1 (to 650)
+            648 RERAISE                  2
+        >>  650 POP_TOP
+            652 POP_EXCEPT
+            654 POP_TOP
+            656 POP_TOP
+            658 JUMP_BACKWARD           60 (to 540)
+        >>  660 COPY                     3
+            662 POP_EXCEPT
+            664 RERAISE                  1
+        >>  666 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            668 RERAISE                  1
+ExceptionTable:
+  4 to 116 -> 666 [0] lasti
+  118 to 118 -> 604 [3]
+  120 to 124 -> 666 [0] lasti
+  126 to 184 -> 624 [1] lasti
+  186 to 208 -> 666 [0] lasti
+  210 to 210 -> 608 [3]
+  212 to 220 -> 666 [0] lasti
+  222 to 336 -> 624 [1] lasti
+  338 to 360 -> 666 [0] lasti
+  362 to 362 -> 612 [3]
+  364 to 372 -> 666 [0] lasti
+  374 to 402 -> 624 [1] lasti
+  404 to 404 -> 616 [3]
+  406 to 506 -> 624 [1] lasti
+  508 to 528 -> 666 [0] lasti
+  530 to 530 -> 620 [2]
+  532 to 604 -> 666 [0] lasti
+  608 to 608 -> 666 [0] lasti
+  612 to 612 -> 666 [0] lasti
+  616 to 616 -> 624 [1] lasti
+  620 to 620 -> 666 [0] lasti
+  624 to 634 -> 660 [3] lasti
+  636 to 636 -> 642 [6]
+  638 to 650 -> 660 [3] lasti
+  652 to 664 -> 666 [0] lasti
+
+Disassembly of <code object _speed at 0x7f6c9326da70, file "app\adapters\tts\ai33_tts.py", line 365>:
+365           0 RESUME                   0
+
+366           2 NOP
+
+367           4 LOAD_GLOBAL              1 (NULL + float)
+             14 LOAD_GLOBAL              3 (NULL + get_setting_value)
+             24 LOAD_CONST               1 ('ai33_speed')
+             26 CALL                     1
+             34 COPY                     1
+             36 POP_JUMP_IF_TRUE         2 (to 42)
+             38 POP_TOP
+             40 LOAD_CONST               2 ('1')
+        >>   42 CALL                     1
+             50 STORE_FAST               1 (configured)
+
+370     >>   52 LOAD_CONST               4 (0.0)
+             54 STORE_FAST               2 (percent)
+
+371          56 LOAD_FAST                0 (rate)
+             58 COPY                     1
+             60 POP_JUMP_IF_TRUE         2 (to 66)
+             62 POP_TOP
+             64 LOAD_CONST               5 ('')
+        >>   66 LOAD_ATTR                7 (NULL|self + strip)
+             86 CALL                     0
+             94 STORE_FAST               3 (value)
+
+372          96 LOAD_FAST                3 (value)
+             98 LOAD_ATTR                9 (NULL|self + endswith)
+            118 LOAD_CONST               6 ('%')
+            120 CALL                     1
+            128 POP_JUMP_IF_FALSE       15 (to 160)
+
+373         130 NOP
+
+374         132 LOAD_GLOBAL              1 (NULL + float)
+            142 LOAD_FAST                3 (value)
+            144 LOAD_CONST               0 (None)
+            146 LOAD_CONST               7 (-1)
+            148 BINARY_SLICE
+            150 CALL                     1
+            158 STORE_FAST               2 (percent)
+
+377     >>  160 LOAD_GLOBAL             11 (NULL + max)
+            170 LOAD_CONST               8 (0.5)
+            172 LOAD_GLOBAL             13 (NULL + min)
+            182 LOAD_CONST               9 (1.5)
+            184 LOAD_FAST                1 (configured)
+            186 LOAD_CONST              10 (1)
+            188 LOAD_FAST                2 (percent)
+            190 LOAD_CONST              11 (100)
+            192 BINARY_OP               11 (/)
+            196 BINARY_OP                0 (+)
+            200 BINARY_OP                5 (*)
+            204 CALL                     2
+            212 CALL                     2
+            220 RETURN_VALUE
+        >>  222 PUSH_EXC_INFO
+
+368         224 LOAD_GLOBAL              4 (ValueError)
+            234 CHECK_EXC_MATCH
+            236 POP_JUMP_IF_FALSE        5 (to 248)
+            238 POP_TOP
+
+369         240 LOAD_CONST               3 (1.0)
+            242 STORE_FAST               1 (configured)
+            244 POP_EXCEPT
+            246 JUMP_BACKWARD           98 (to 52)
+
+368     >>  248 RERAISE                  0
+        >>  250 COPY                     3
+            252 POP_EXCEPT
+            254 RERAISE                  1
+        >>  256 PUSH_EXC_INFO
+
+375         258 LOAD_GLOBAL              4 (ValueError)
+            268 CHECK_EXC_MATCH
+            270 POP_JUMP_IF_FALSE        3 (to 278)
+            272 POP_TOP
+
+376         274 POP_EXCEPT
+            276 JUMP_BACKWARD           59 (to 160)
+
+375     >>  278 RERAISE                  0
+        >>  280 COPY                     3
+            282 POP_EXCEPT
+            284 RERAISE                  1
+ExceptionTable:
+  4 to 50 -> 222 [0]
+  132 to 158 -> 256 [0]
+  222 to 242 -> 250 [1] lasti
+  248 to 248 -> 250 [1] lasti
+  256 to 272 -> 280 [1] lasti
+  278 to 278 -> 280 [1] lasti
+
+Disassembly of <code object _create_task at 0x267ad150, file "app\adapters\tts\ai33_tts.py", line 380>:
+              0 MAKE_CELL                2 (voice)
+
+380           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+381           8 LOAD_GLOBAL              1 (NULL + any)
+             18 LOAD_CLOSURE             2 (voice)
+             20 BUILD_TUPLE              1
+             22 LOAD_CONST               1 (<code object <genexpr> at 0x7f6c92a39ce0, file "app\adapters\tts\ai33_tts.py", line 381>)
+             24 MAKE_FUNCTION            8 (closure)
+             26 LOAD_GLOBAL              2 (VOICE_PROVIDERS)
+             36 GET_ITER
+             38 CALL                     0
+             46 CALL                     1
+             54 POP_JUMP_IF_TRUE        29 (to 114)
+
+382          56 LOAD_GLOBAL              5 (NULL + make_error)
+             66 LOAD_GLOBAL              6 (E)
+             76 LOAD_ATTR                8 (TTS_VOICE_INVALID)
+             96 LOAD_CONST               2 ('AI33 voice_id không hợp lệ hoặc thiếu tiền tố provider: ')
+             98 LOAD_DEREF               2 (voice)
+            100 FORMAT_VALUE             0
+            102 BUILD_STRING             2
+            104 CALL                     2
+            112 RAISE_VARARGS            1
+
+384     >>  114 LOAD_CONST               0 (None)
+            116 LOAD_DEREF               2 (voice)
+            118 BUILD_TUPLE              2
+
+385         120 LOAD_CONST               0 (None)
+            122 LOAD_FAST                1 (text)
+            124 BUILD_TUPLE              2
+
+386         126 LOAD_CONST               0 (None)
+            128 LOAD_GLOBAL             11 (NULL + str)
+            138 LOAD_FAST                3 (speed)
+            140 CALL                     1
+            148 BUILD_TUPLE              2
+
+387         150 LOAD_CONST               3 ((None, 'false'))
+
+383         152 LOAD_CONST               4 (('voice_id', 'text', 'speed', 'with_transcript'))
+            154 BUILD_CONST_KEY_MAP      4
+            156 STORE_FAST               4 (form)
+
+389         158 NOP
+
+390         160 LOAD_FAST                0 (client)
+            162 LOAD_ATTR               13 (NULL|self + post)
+            182 LOAD_GLOBAL             14 (BASE_URL)
+            192 FORMAT_VALUE             0
+            194 LOAD_CONST               5 ('/v3/text-to-speech')
+            196 BUILD_STRING             2
+            198 LOAD_GLOBAL             17 (NULL + _headers)
+            208 CALL                     0
+            216 LOAD_FAST                4 (form)
+            218 KW_NAMES                 6 (('headers', 'files'))
+            220 CALL                     3
+            228 GET_AWAITABLE            0
+            230 LOAD_CONST               0 (None)
+        >>  232 SEND                     3 (to 242)
+            236 YIELD_VALUE              3
+            238 RESUME                   3
+            240 JUMP_BACKWARD_NO_INTERRUPT     5 (to 232)
+        >>  242 END_SEND
+            244 STORE_FAST               5 (response)
+
+393         246 LOAD_GLOBAL             25 (NULL + _raise_http)
+            256 LOAD_FAST                5 (response)
+            258 LOAD_ATTR               26 (status_code)
+            278 LOAD_FAST                5 (response)
+            280 LOAD_ATTR               28 (text)
+            300 CALL                     2
+            308 POP_TOP
+
+394         310 NOP
+
+395         312 LOAD_FAST                5 (response)
+            314 LOAD_ATTR               31 (NULL|self + json)
+            334 CALL                     0
+            342 COPY                     1
+            344 POP_JUMP_IF_TRUE         2 (to 350)
+            346 POP_TOP
+            348 BUILD_MAP                0
+        >>  350 STORE_FAST               7 (payload)
+
+398         352 LOAD_GLOBAL             11 (NULL + str)
+            362 LOAD_FAST                7 (payload)
+            364 LOAD_ATTR               35 (NULL|self + get)
+            384 LOAD_CONST               9 ('task_id')
+            386 CALL                     1
+            394 COPY                     1
+            396 POP_JUMP_IF_TRUE         2 (to 402)
+            398 POP_TOP
+            400 LOAD_CONST              10 ('')
+        >>  402 CALL                     1
+            410 LOAD_ATTR               37 (NULL|self + strip)
+            430 CALL                     0
+            438 STORE_FAST               8 (task_id)
+
+399         440 LOAD_FAST                7 (payload)
+            442 LOAD_ATTR               35 (NULL|self + get)
+            462 LOAD_CONST              11 ('success')
+            464 CALL                     1
+            472 POP_JUMP_IF_FALSE        2 (to 478)
+            474 LOAD_FAST                8 (task_id)
+            476 POP_JUMP_IF_TRUE        41 (to 560)
+
+400     >>  478 LOAD_GLOBAL              5 (NULL + make_error)
+            488 LOAD_GLOBAL              6 (E)
+            498 LOAD_ATTR               22 (TTS_NETWORK)
+            518 LOAD_CONST              12 ('AI33 không tạo được tác vụ: ')
+            520 LOAD_GLOBAL             11 (NULL + str)
+            530 LOAD_FAST                7 (payload)
+            532 CALL                     1
+            540 LOAD_CONST               0 (None)
+            542 LOAD_CONST              13 (300)
+            544 BINARY_SLICE
+            546 FORMAT_VALUE             0
+            548 BUILD_STRING             2
+            550 CALL                     2
+            558 RAISE_VARARGS            1
+
+401     >>  560 LOAD_FAST                8 (task_id)
+            562 RETURN_VALUE
+
+390     >>  564 CLEANUP_THROW
+            566 JUMP_BACKWARD          163 (to 242)
+        >>  568 PUSH_EXC_INFO
+
+391         570 LOAD_GLOBAL             18 (httpx)
+            580 LOAD_ATTR               20 (HTTPError)
+            600 CHECK_EXC_MATCH
+            602 POP_JUMP_IF_FALSE       34 (to 672)
+            604 STORE_FAST               6 (exc)
+
+392         606 LOAD_GLOBAL              5 (NULL + make_error)
+            616 LOAD_GLOBAL              6 (E)
+            626 LOAD_ATTR               22 (TTS_NETWORK)
+            646 LOAD_CONST               7 ('Không tạo được tác vụ AI33: ')
+            648 LOAD_FAST                6 (exc)
+            650 FORMAT_VALUE             0
+            652 BUILD_STRING             2
+            654 CALL                     2
+            662 RAISE_VARARGS            1
+        >>  664 LOAD_CONST               0 (None)
+            666 STORE_FAST               6 (exc)
+            668 DELETE_FAST              6 (exc)
+            670 RERAISE                  1
+
+391     >>  672 RERAISE                  0
+        >>  674 COPY                     3
+            676 POP_EXCEPT
+            678 RERAISE                  1
+        >>  680 PUSH_EXC_INFO
+
+396         682 LOAD_GLOBAL             32 (ValueError)
+            692 CHECK_EXC_MATCH
+            694 POP_JUMP_IF_FALSE       27 (to 750)
+            696 POP_TOP
+
+397         698 LOAD_GLOBAL              5 (NULL + make_error)
+            708 LOAD_GLOBAL              6 (E)
+            718 LOAD_ATTR               22 (TTS_NETWORK)
+            738 LOAD_CONST               8 ('AI33 trả dữ liệu tạo tác vụ không hợp lệ.')
+            740 CALL                     2
+            748 RAISE_VARARGS            1
+
+396     >>  750 RERAISE                  0
+        >>  752 COPY                     3
+            754 POP_EXCEPT
+            756 RERAISE                  1
+        >>  758 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            760 RERAISE                  1
+ExceptionTable:
+  6 to 156 -> 758 [0] lasti
+  160 to 234 -> 568 [0]
+  236 to 236 -> 564 [2]
+  238 to 244 -> 568 [0]
+  246 to 308 -> 758 [0] lasti
+  312 to 350 -> 680 [0]
+  352 to 562 -> 758 [0] lasti
+  564 to 564 -> 568 [0]
+  568 to 604 -> 674 [1] lasti
+  606 to 662 -> 664 [1] lasti
+  664 to 672 -> 674 [1] lasti
+  674 to 678 -> 758 [0] lasti
+  680 to 750 -> 752 [1] lasti
+  752 to 756 -> 758 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c92a39ce0, file "app\adapters\tts\ai33_tts.py", line 381>:
+              0 COPY_FREE_VARS           1
+
+381           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                24 (to 62)
+             14 STORE_FAST               1 (prefix)
+             16 LOAD_DEREF               2 (voice)
+             18 LOAD_ATTR                1 (NULL|self + startswith)
+             38 LOAD_FAST                1 (prefix)
+             40 FORMAT_VALUE             0
+             42 LOAD_CONST               0 ('_')
+             44 BUILD_STRING             2
+             46 CALL                     1
+             54 YIELD_VALUE              1
+             56 RESUME                   1
+             58 POP_TOP
+             60 JUMP_BACKWARD           26 (to 10)
+        >>   62 END_FOR
+             64 RETURN_CONST             1 (None)
+        >>   66 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             68 RERAISE                  1
+ExceptionTable:
+  6 to 64 -> 66 [0] lasti
+
+Disassembly of <code object _wait_for_audio at 0x28e2cb60, file "app\adapters\tts\ai33_tts.py", line 404>:
+404           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+410           6 LOAD_GLOBAL              1 (NULL + asyncio)
+             16 LOAD_ATTR                2 (get_running_loop)
+             36 CALL                     0
+             44 STORE_FAST               4 (loop)
+
+411          46 LOAD_FAST                4 (loop)
+             48 LOAD_ATTR                5 (NULL|self + time)
+             68 CALL                     0
+             76 LOAD_GLOBAL              6 (POLL_TIMEOUT)
+             86 BINARY_OP                0 (+)
+             90 STORE_FAST               5 (deadline)
+
+412          92 LOAD_CONST               1 (0)
+             94 STORE_FAST               6 (consecutive_errors)
+
+413          96 LOAD_CONST               2 (10)
+             98 STORE_FAST               7 (max_consecutive_errors)
+
+415     >>  100 LOAD_FAST                4 (loop)
+            102 LOAD_ATTR                5 (NULL|self + time)
+            122 CALL                     0
+            130 LOAD_FAST                5 (deadline)
+            132 COMPARE_OP               2 (<)
+            136 EXTENDED_ARG             2
+            138 POP_JUMP_IF_FALSE      616 (to 1372)
+
+416     >>  140 LOAD_FAST                3 (cancel_check)
+            142 POP_JUMP_IF_FALSE       33 (to 210)
+            144 PUSH_NULL
+            146 LOAD_FAST                3 (cancel_check)
+            148 CALL                     0
+            156 POP_JUMP_IF_FALSE       26 (to 210)
+
+417         158 LOAD_GLOBAL              9 (NULL + make_error)
+            168 LOAD_GLOBAL             10 (E)
+            178 LOAD_ATTR               12 (CANCELLED)
+            198 LOAD_CONST               3 ('Đã huỷ khi AI33 đang tạo giọng.')
+            200 CALL                     2
+            208 RAISE_VARARGS            1
+
+419     >>  210 NOP
+
+420         212 LOAD_FAST                0 (client)
+            214 LOAD_ATTR               15 (NULL|self + get)
+            234 LOAD_GLOBAL             16 (BASE_URL)
+            244 FORMAT_VALUE             0
+            246 LOAD_CONST               4 ('/v1/task/')
+            248 LOAD_FAST                1 (task_id)
+            250 FORMAT_VALUE             0
+            252 BUILD_STRING             3
+            254 LOAD_GLOBAL             19 (NULL + _headers)
+            264 CALL                     0
+            272 KW_NAMES                 5 (('headers',))
+            274 CALL                     2
+            282 GET_AWAITABLE            0
+            284 LOAD_CONST               0 (None)
+        >>  286 SEND                     3 (to 296)
+            290 YIELD_VALUE              3
+            292 RESUME                   3
+            294 JUMP_BACKWARD_NO_INTERRUPT     5 (to 286)
+        >>  296 END_SEND
+            298 STORE_FAST               8 (response)
+
+422         300 LOAD_FAST                8 (response)
+            302 LOAD_ATTR               20 (status_code)
+            322 LOAD_CONST               6 ((502, 503, 504, 429))
+            324 CONTAINS_OP              0
+            326 POP_JUMP_IF_FALSE      132 (to 592)
+
+423         328 LOAD_FAST                6 (consecutive_errors)
+            330 LOAD_CONST               7 (1)
+            332 BINARY_OP               13 (+=)
+            336 STORE_FAST               6 (consecutive_errors)
+
+424         338 LOAD_GLOBAL             23 (NULL + log)
+            348 LOAD_ATTR               24 (warning)
+
+425         368 LOAD_CONST               8 ('AI33 task polling status=')
+            370 LOAD_FAST                8 (response)
+            372 LOAD_ATTR               20 (status_code)
+            392 FORMAT_VALUE             0
+            394 LOAD_CONST               9 (' (')
+            396 LOAD_FAST                8 (response)
+            398 LOAD_ATTR               26 (text)
+            418 LOAD_CONST               0 (None)
+            420 LOAD_CONST              10 (120)
+            422 BINARY_SLICE
+            424 FORMAT_VALUE             0
+            426 LOAD_CONST              11 ('), attempt ')
+
+426         428 LOAD_FAST                6 (consecutive_errors)
+            430 FORMAT_VALUE             0
+            432 LOAD_CONST              12 ('/')
+            434 LOAD_FAST                7 (max_consecutive_errors)
+            436 FORMAT_VALUE             0
+
+425         438 BUILD_STRING             8
+
+424         440 CALL                     1
+            448 POP_TOP
+
+428         450 LOAD_FAST                6 (consecutive_errors)
+            452 LOAD_FAST                7 (max_consecutive_errors)
+            454 COMPARE_OP              92 (>=)
+            458 POP_JUMP_IF_FALSE       32 (to 524)
+
+429         460 LOAD_GLOBAL             29 (NULL + _raise_http)
+            470 LOAD_FAST                8 (response)
+            472 LOAD_ATTR               20 (status_code)
+            492 LOAD_FAST                8 (response)
+            494 LOAD_ATTR               26 (text)
+            514 CALL                     2
+            522 POP_TOP
+
+430     >>  524 LOAD_GLOBAL              1 (NULL + asyncio)
+            534 LOAD_ATTR               30 (sleep)
+            554 LOAD_GLOBAL             32 (POLL_INTERVAL)
+            564 CALL                     1
+            572 GET_AWAITABLE            0
+            574 LOAD_CONST               0 (None)
+        >>  576 SEND                     3 (to 586)
+            580 YIELD_VALUE              3
+            582 RESUME                   3
+            584 JUMP_BACKWARD_NO_INTERRUPT     5 (to 576)
+        >>  586 END_SEND
+            588 POP_TOP
+
+431         590 JUMP_BACKWARD          246 (to 100)
+
+433     >>  592 LOAD_GLOBAL             29 (NULL + _raise_http)
+            602 LOAD_FAST                8 (response)
+            604 LOAD_ATTR               20 (status_code)
+            624 LOAD_FAST                8 (response)
+            626 LOAD_ATTR               26 (text)
+            646 CALL                     2
+            654 POP_TOP
+
+435         656 NOP
+
+436         658 LOAD_FAST                8 (response)
+            660 LOAD_ATTR               35 (NULL|self + json)
+            680 CALL                     0
+            688 COPY                     1
+            690 POP_JUMP_IF_TRUE         2 (to 696)
+            692 POP_TOP
+            694 BUILD_MAP                0
+        >>  696 STORE_FAST               9 (payload)
+
+444         698 LOAD_CONST               1 (0)
+            700 STORE_FAST               6 (consecutive_errors)
+
+446         702 LOAD_GLOBAL             41 (NULL + str)
+            712 LOAD_FAST                9 (payload)
+            714 LOAD_ATTR               15 (NULL|self + get)
+            734 LOAD_CONST              14 ('status')
+            736 CALL                     1
+            744 COPY                     1
+            746 POP_JUMP_IF_TRUE         2 (to 752)
+            748 POP_TOP
+            750 LOAD_CONST              15 ('')
+        >>  752 CALL                     1
+            760 LOAD_ATTR               43 (NULL|self + lower)
+            780 CALL                     0
+            788 STORE_FAST              10 (status)
+
+447         790 LOAD_GLOBAL             45 (NULL + float)
+            800 LOAD_FAST                9 (payload)
+            802 LOAD_ATTR               15 (NULL|self + get)
+            822 LOAD_CONST              16 ('progress')
+            824 CALL                     1
+            832 COPY                     1
+            834 POP_JUMP_IF_TRUE         2 (to 840)
+            836 POP_TOP
+            838 LOAD_CONST               1 (0)
+        >>  840 CALL                     1
+            848 STORE_FAST              11 (progress)
+
+448         850 LOAD_FAST                2 (on_progress)
+            852 POP_JUMP_IF_FALSE       39 (to 932)
+
+449         854 PUSH_NULL
+            856 LOAD_FAST                2 (on_progress)
+            858 LOAD_GLOBAL             47 (NULL + max)
+            868 LOAD_CONST              17 (0.0)
+            870 LOAD_GLOBAL             49 (NULL + min)
+            880 LOAD_CONST              18 (0.98)
+            882 LOAD_FAST               11 (progress)
+            884 LOAD_CONST              19 (100)
+            886 BINARY_OP               11 (/)
+            890 CALL                     2
+            898 CALL                     2
+            906 LOAD_CONST              20 ('AI33: ')
+            908 LOAD_FAST               10 (status)
+            910 COPY                     1
+            912 POP_JUMP_IF_TRUE         2 (to 918)
+            914 POP_TOP
+            916 LOAD_CONST              21 ('processing')
+        >>  918 FORMAT_VALUE             0
+            920 BUILD_STRING             2
+            922 CALL                     2
+            930 POP_TOP
+
+450     >>  932 LOAD_FAST               10 (status)
+            934 LOAD_CONST              22 ('done')
+            936 COMPARE_OP              40 (==)
+            940 POP_JUMP_IF_FALSE       93 (to 1128)
+
+451         942 LOAD_GLOBAL             41 (NULL + str)
+            952 LOAD_FAST                9 (payload)
+            954 LOAD_ATTR               15 (NULL|self + get)
+            974 LOAD_CONST              23 ('metadata')
+            976 CALL                     1
+            984 COPY                     1
+            986 POP_JUMP_IF_TRUE         2 (to 992)
+            988 POP_TOP
+            990 BUILD_MAP                0
+        >>  992 LOAD_ATTR               15 (NULL|self + get)
+           1012 LOAD_CONST              24 ('audio_url')
+           1014 CALL                     1
+           1022 COPY                     1
+           1024 POP_JUMP_IF_TRUE         2 (to 1030)
+           1026 POP_TOP
+           1028 LOAD_CONST              15 ('')
+        >> 1030 CALL                     1
+           1038 LOAD_ATTR               51 (NULL|self + strip)
+           1058 CALL                     0
+           1066 STORE_FAST              12 (audio_url)
+
+452        1068 LOAD_FAST               12 (audio_url)
+           1070 POP_JUMP_IF_TRUE        26 (to 1124)
+
+453        1072 LOAD_GLOBAL              9 (NULL + make_error)
+           1082 LOAD_GLOBAL             10 (E)
+           1092 LOAD_ATTR               38 (TTS_NETWORK)
+           1112 LOAD_CONST              25 ('AI33 báo hoàn tất nhưng không có audio_url.')
+           1114 CALL                     2
+           1122 RAISE_VARARGS            1
+
+454     >> 1124 LOAD_FAST               12 (audio_url)
+           1126 RETURN_VALUE
+
+455     >> 1128 LOAD_FAST               10 (status)
+           1130 LOAD_CONST              26 ('error')
+           1132 COMPARE_OP              40 (==)
+           1136 POP_JUMP_IF_FALSE       62 (to 1262)
+
+456        1138 LOAD_GLOBAL             41 (NULL + str)
+           1148 LOAD_FAST                9 (payload)
+           1150 LOAD_ATTR               15 (NULL|self + get)
+           1170 LOAD_CONST              27 ('error_message')
+           1172 CALL                     1
+           1180 COPY                     1
+           1182 POP_JUMP_IF_TRUE         2 (to 1188)
+           1184 POP_TOP
+           1186 LOAD_CONST              28 ('Tác vụ thất bại')
+        >> 1188 CALL                     1
+           1196 STORE_FAST              13 (message)
+
+457        1198 LOAD_GLOBAL              9 (NULL + make_error)
+           1208 LOAD_GLOBAL             10 (E)
+           1218 LOAD_ATTR               38 (TTS_NETWORK)
+           1238 LOAD_CONST              29 ('AI33 tạo giọng thất bại: ')
+           1240 LOAD_FAST               13 (message)
+           1242 LOAD_CONST               0 (None)
+           1244 LOAD_CONST              30 (300)
+           1246 BINARY_SLICE
+           1248 FORMAT_VALUE             0
+           1250 BUILD_STRING             2
+           1252 CALL                     2
+           1260 RAISE_VARARGS            1
+
+455     >> 1262 NOP
+
+467     >> 1264 LOAD_GLOBAL              1 (NULL + asyncio)
+           1274 LOAD_ATTR               30 (sleep)
+           1294 LOAD_GLOBAL             32 (POLL_INTERVAL)
+           1304 CALL                     1
+           1312 GET_AWAITABLE            0
+           1314 LOAD_CONST               0 (None)
+        >> 1316 SEND                     3 (to 1326)
+           1320 YIELD_VALUE              2
+           1322 RESUME                   3
+           1324 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1316)
+        >> 1326 END_SEND
+           1328 POP_TOP
+
+415        1330 LOAD_FAST                4 (loop)
+           1332 LOAD_ATTR                5 (NULL|self + time)
+           1352 CALL                     0
+           1360 LOAD_FAST                5 (deadline)
+           1362 COMPARE_OP               2 (<)
+           1366 POP_JUMP_IF_FALSE        2 (to 1372)
+           1368 EXTENDED_ARG             2
+           1370 JUMP_BACKWARD          616 (to 140)
+
+469     >> 1372 LOAD_GLOBAL              9 (NULL + make_error)
+           1382 LOAD_GLOBAL             10 (E)
+           1392 LOAD_ATTR               38 (TTS_NETWORK)
+           1412 LOAD_CONST              34 ('AI33 tạo giọng quá thời gian chờ 10 phút.')
+           1414 CALL                     2
+           1422 RAISE_VARARGS            1
+
+420     >> 1424 CLEANUP_THROW
+           1426 EXTENDED_ARG             2
+           1428 JUMP_BACKWARD          567 (to 296)
+
+430     >> 1430 CLEANUP_THROW
+           1432 EXTENDED_ARG             1
+           1434 JUMP_BACKWARD          425 (to 586)
+        >> 1436 PUSH_EXC_INFO
+
+437        1438 LOAD_GLOBAL             36 (ValueError)
+           1448 CHECK_EXC_MATCH
+           1450 POP_JUMP_IF_FALSE       74 (to 1600)
+           1452 POP_TOP
+
+438        1454 LOAD_FAST                6 (consecutive_errors)
+           1456 LOAD_CONST               7 (1)
+           1458 BINARY_OP               13 (+=)
+           1462 STORE_FAST               6 (consecutive_errors)
+
+439        1464 LOAD_FAST                6 (consecutive_errors)
+           1466 LOAD_FAST                7 (max_consecutive_errors)
+           1468 COMPARE_OP              92 (>=)
+           1472 POP_JUMP_IF_FALSE       26 (to 1526)
+
+440        1474 LOAD_GLOBAL              9 (NULL + make_error)
+           1484 LOAD_GLOBAL             10 (E)
+           1494 LOAD_ATTR               38 (TTS_NETWORK)
+           1514 LOAD_CONST              13 ('AI33 trả trạng thái tác vụ không hợp lệ.')
+           1516 CALL                     2
+           1524 RAISE_VARARGS            1
+
+441     >> 1526 LOAD_GLOBAL              1 (NULL + asyncio)
+           1536 LOAD_ATTR               30 (sleep)
+           1556 LOAD_GLOBAL             32 (POLL_INTERVAL)
+           1566 CALL                     1
+           1574 GET_AWAITABLE            0
+           1576 LOAD_CONST               0 (None)
+        >> 1578 SEND                     4 (to 1590)
+           1582 YIELD_VALUE              4
+           1584 RESUME                   3
+           1586 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1578)
+        >> 1588 CLEANUP_THROW
+        >> 1590 END_SEND
+           1592 POP_TOP
+
+442        1594 POP_EXCEPT
+           1596 EXTENDED_ARG             2
+           1598 JUMP_BACKWARD          750 (to 100)
+
+437     >> 1600 RERAISE                  0
+        >> 1602 COPY                     3
+           1604 POP_EXCEPT
+           1606 RERAISE                  1
+        >> 1608 PUSH_EXC_INFO
+
+459        1610 LOAD_GLOBAL             52 (httpx)
+           1620 LOAD_ATTR               54 (HTTPError)
+           1640 CHECK_EXC_MATCH
+           1642 POP_JUMP_IF_FALSE       80 (to 1804)
+           1644 STORE_FAST              14 (exc)
+
+460        1646 LOAD_FAST                6 (consecutive_errors)
+           1648 LOAD_CONST               7 (1)
+           1650 BINARY_OP               13 (+=)
+           1654 STORE_FAST               6 (consecutive_errors)
+
+461        1656 LOAD_GLOBAL             23 (NULL + log)
+           1666 LOAD_ATTR               24 (warning)
+
+462        1686 LOAD_CONST              31 ('AI33 task polling HTTP exception: ')
+           1688 LOAD_FAST               14 (exc)
+           1690 FORMAT_VALUE             0
+           1692 LOAD_CONST              32 (', attempt ')
+           1694 LOAD_FAST                6 (consecutive_errors)
+           1696 FORMAT_VALUE             0
+           1698 LOAD_CONST              12 ('/')
+           1700 LOAD_FAST                7 (max_consecutive_errors)
+           1702 FORMAT_VALUE             0
+           1704 BUILD_STRING             6
+
+461        1706 CALL                     1
+           1714 POP_TOP
+
+464        1716 LOAD_FAST                6 (consecutive_errors)
+           1718 LOAD_FAST                7 (max_consecutive_errors)
+           1720 COMPARE_OP              92 (>=)
+           1724 POP_JUMP_IF_FALSE       29 (to 1784)
+
+465        1726 LOAD_GLOBAL              9 (NULL + make_error)
+           1736 LOAD_GLOBAL             10 (E)
+           1746 LOAD_ATTR               38 (TTS_NETWORK)
+           1766 LOAD_CONST              33 ('Không đọc được trạng thái AI33: ')
+           1768 LOAD_FAST               14 (exc)
+           1770 FORMAT_VALUE             0
+           1772 BUILD_STRING             2
+           1774 CALL                     2
+           1782 RAISE_VARARGS            1
+
+464     >> 1784 POP_EXCEPT
+           1786 LOAD_CONST               0 (None)
+           1788 STORE_FAST              14 (exc)
+           1790 DELETE_FAST             14 (exc)
+           1792 EXTENDED_ARG             1
+           1794 JUMP_BACKWARD          266 (to 1264)
+        >> 1796 LOAD_CONST               0 (None)
+           1798 STORE_FAST              14 (exc)
+           1800 DELETE_FAST             14 (exc)
+           1802 RERAISE                  1
+
+459     >> 1804 RERAISE                  0
+        >> 1806 COPY                     3
+           1808 POP_EXCEPT
+           1810 RERAISE                  1
+
+467     >> 1812 CLEANUP_THROW
+           1814 JUMP_BACKWARD          245 (to 1326)
+        >> 1816 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1818 RERAISE                  1
+ExceptionTable:
+  4 to 208 -> 1816 [0] lasti
+  212 to 288 -> 1608 [0]
+  290 to 290 -> 1424 [2]
+  292 to 578 -> 1608 [0]
+  580 to 580 -> 1430 [2]
+  582 to 588 -> 1608 [0]
+  590 to 590 -> 1816 [0] lasti
+  592 to 654 -> 1608 [0]
+  658 to 696 -> 1436 [0]
+  698 to 1124 -> 1608 [0]
+  1126 to 1126 -> 1816 [0] lasti
+  1128 to 1260 -> 1608 [0]
+  1262 to 1318 -> 1816 [0] lasti
+  1320 to 1320 -> 1812 [2]
+  1322 to 1366 -> 1816 [0] lasti
+  1372 to 1422 -> 1816 [0] lasti
+  1424 to 1424 -> 1608 [0]
+  1430 to 1430 -> 1608 [0]
+  1436 to 1580 -> 1602 [1] lasti
+  1582 to 1582 -> 1588 [3]
+  1584 to 1592 -> 1602 [1] lasti
+  1594 to 1594 -> 1608 [0]
+  1596 to 1598 -> 1816 [0] lasti
+  1600 to 1600 -> 1602 [1] lasti
+  1602 to 1606 -> 1608 [0]
+  1608 to 1644 -> 1806 [1] lasti
+  1646 to 1782 -> 1796 [1] lasti
+  1784 to 1794 -> 1816 [0] lasti
+  1796 to 1804 -> 1806 [1] lasti
+  1806 to 1812 -> 1816 [0] lasti
+
+Disassembly of <code object _download_audio at 0x269f4a80, file "app\adapters\tts\ai33_tts.py", line 472>:
+472           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+473           6 LOAD_GLOBAL              1 (NULL + urlparse)
+             16 LOAD_FAST                1 (url)
+             18 CALL                     1
+             26 STORE_FAST               2 (parsed)
+
+474          28 LOAD_FAST                2 (parsed)
+             30 LOAD_ATTR                2 (scheme)
+             50 LOAD_CONST               1 ('https')
+             52 COMPARE_OP              55 (!=)
+             56 POP_JUMP_IF_TRUE        12 (to 82)
+             58 LOAD_FAST                2 (parsed)
+             60 LOAD_ATTR                4 (hostname)
+             80 POP_JUMP_IF_TRUE        26 (to 134)
+
+475     >>   82 LOAD_GLOBAL              7 (NULL + make_error)
+             92 LOAD_GLOBAL              8 (E)
+            102 LOAD_ATTR               10 (TTS_NETWORK)
+            122 LOAD_CONST               2 ('AI33 trả audio_url không an toàn (chỉ chấp nhận HTTPS).')
+            124 CALL                     2
+            132 RAISE_VARARGS            1
+
+476     >>  134 NOP
+
+477         136 LOAD_FAST                0 (client)
+            138 LOAD_ATTR               13 (NULL|self + get)
+            158 LOAD_FAST                1 (url)
+            160 CALL                     1
+            168 GET_AWAITABLE            0
+            170 LOAD_CONST               0 (None)
+        >>  172 SEND                     3 (to 182)
+            176 YIELD_VALUE              3
+            178 RESUME                   3
+            180 JUMP_BACKWARD_NO_INTERRUPT     5 (to 172)
+        >>  182 END_SEND
+            184 STORE_FAST               3 (response)
+
+480         186 LOAD_GLOBAL             19 (NULL + _raise_http)
+            196 LOAD_FAST                3 (response)
+            198 LOAD_ATTR               20 (status_code)
+            218 LOAD_CONST               4 ('text')
+            220 LOAD_FAST                3 (response)
+            222 LOAD_ATTR               22 (headers)
+            242 LOAD_ATTR               13 (NULL|self + get)
+            262 LOAD_CONST               5 ('content-type')
+            264 LOAD_CONST               6 ('')
+            266 CALL                     2
+            274 CONTAINS_OP              0
+            276 POP_JUMP_IF_FALSE       12 (to 302)
+            278 LOAD_FAST                3 (response)
+            280 LOAD_ATTR               24 (text)
+            300 JUMP_FORWARD             1 (to 304)
+        >>  302 LOAD_CONST               6 ('')
+        >>  304 CALL                     2
+            312 POP_TOP
+
+481         314 LOAD_GLOBAL             27 (NULL + len)
+            324 LOAD_FAST                3 (response)
+            326 LOAD_ATTR               28 (content)
+            346 CALL                     1
+            354 LOAD_GLOBAL             30 (MAX_DOWNLOAD_BYTES)
+            364 COMPARE_OP              68 (>)
+            368 POP_JUMP_IF_FALSE       26 (to 422)
+
+482         370 LOAD_GLOBAL              7 (NULL + make_error)
+            380 LOAD_GLOBAL              8 (E)
+            390 LOAD_ATTR               10 (TTS_NETWORK)
+            410 LOAD_CONST               7 ('File audio AI33 vượt giới hạn an toàn 200 MB.')
+            412 CALL                     2
+            420 RAISE_VARARGS            1
+
+483     >>  422 LOAD_FAST                3 (response)
+            424 LOAD_ATTR               28 (content)
+            444 POP_JUMP_IF_TRUE        26 (to 498)
+
+484         446 LOAD_GLOBAL              7 (NULL + make_error)
+            456 LOAD_GLOBAL              8 (E)
+            466 LOAD_ATTR               10 (TTS_NETWORK)
+            486 LOAD_CONST               8 ('AI33 trả file audio rỗng.')
+            488 CALL                     2
+            496 RAISE_VARARGS            1
+
+485     >>  498 LOAD_FAST                3 (response)
+            500 LOAD_ATTR               28 (content)
+            520 LOAD_FAST                3 (response)
+            522 LOAD_ATTR               22 (headers)
+            542 LOAD_ATTR               13 (NULL|self + get)
+            562 LOAD_CONST               5 ('content-type')
+            564 LOAD_GLOBAL             32 (PREVIEW_MIME)
+            574 CALL                     2
+            582 LOAD_ATTR               35 (NULL|self + split)
+            602 LOAD_CONST               9 (';')
+            604 CALL                     1
+            612 LOAD_CONST              10 (0)
+            614 BINARY_SUBSCR
+            618 BUILD_TUPLE              2
+            620 RETURN_VALUE
+
+477     >>  622 CLEANUP_THROW
+            624 JUMP_BACKWARD          222 (to 182)
+        >>  626 PUSH_EXC_INFO
+
+478         628 LOAD_GLOBAL             14 (httpx)
+            638 LOAD_ATTR               16 (HTTPError)
+            658 CHECK_EXC_MATCH
+            660 POP_JUMP_IF_FALSE       34 (to 730)
+            662 STORE_FAST               4 (exc)
+
+479         664 LOAD_GLOBAL              7 (NULL + make_error)
+            674 LOAD_GLOBAL              8 (E)
+            684 LOAD_ATTR               10 (TTS_NETWORK)
+            704 LOAD_CONST               3 ('Không tải được audio AI33: ')
+            706 LOAD_FAST                4 (exc)
+            708 FORMAT_VALUE             0
+            710 BUILD_STRING             2
+            712 CALL                     2
+            720 RAISE_VARARGS            1
+        >>  722 LOAD_CONST               0 (None)
+            724 STORE_FAST               4 (exc)
+            726 DELETE_FAST              4 (exc)
+            728 RERAISE                  1
+
+478     >>  730 RERAISE                  0
+        >>  732 COPY                     3
+            734 POP_EXCEPT
+            736 RERAISE                  1
+        >>  738 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            740 RERAISE                  1
+ExceptionTable:
+  4 to 132 -> 738 [0] lasti
+  136 to 174 -> 626 [0]
+  176 to 176 -> 622 [2]
+  178 to 184 -> 626 [0]
+  186 to 620 -> 738 [0] lasti
+  622 to 622 -> 626 [0]
+  626 to 662 -> 732 [1] lasti
+  664 to 720 -> 722 [1] lasti
+  722 to 730 -> 732 [1] lasti
+  732 to 736 -> 738 [0] lasti
+
+Disassembly of <code object _synthesize_bytes at 0x269dc210, file "app\adapters\tts\ai33_tts.py", line 488>:
+488           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+495           6 LOAD_FAST                0 (text)
+              8 COPY                     1
+             10 POP_JUMP_IF_TRUE         2 (to 16)
+             12 POP_TOP
+             14 LOAD_CONST               1 ('')
+        >>   16 LOAD_ATTR                1 (NULL|self + strip)
+             36 CALL                     0
+             44 STORE_FAST               5 (clean_text)
+
+496          46 LOAD_FAST                5 (clean_text)
+             48 POP_JUMP_IF_TRUE        26 (to 102)
+
+497          50 LOAD_GLOBAL              3 (NULL + make_error)
+             60 LOAD_GLOBAL              4 (E)
+             70 LOAD_ATTR                6 (TTS_VOICE_INVALID)
+             90 LOAD_CONST               2 ('AI33: văn bản rỗng.')
+             92 CALL                     2
+            100 RAISE_VARARGS            1
+
+498     >>  102 LOAD_GLOBAL              9 (NULL + len)
+            112 LOAD_FAST                5 (clean_text)
+            114 CALL                     1
+            122 LOAD_CONST               3 (1000000)
+            124 COMPARE_OP              68 (>)
+            128 POP_JUMP_IF_FALSE       26 (to 182)
+
+499         130 LOAD_GLOBAL              3 (NULL + make_error)
+            140 LOAD_GLOBAL              4 (E)
+            150 LOAD_ATTR                6 (TTS_VOICE_INVALID)
+            170 LOAD_CONST               4 ('AI33 chỉ nhận tối đa 1.000.000 ký tự mỗi tác vụ.')
+            172 CALL                     2
+            180 RAISE_VARARGS            1
+
+500     >>  182 LOAD_GLOBAL             11 (NULL + _client)
+            192 LOAD_GLOBAL             12 (POLL_TIMEOUT)
+            202 LOAD_GLOBAL             14 (REQUEST_TIMEOUT)
+            212 BINARY_OP                0 (+)
+            216 CALL                     1
+            224 BEFORE_ASYNC_WITH
+            226 GET_AWAITABLE            1
+            228 LOAD_CONST               0 (None)
+        >>  230 SEND                     3 (to 240)
+            234 YIELD_VALUE              2
+            236 RESUME                   3
+            238 JUMP_BACKWARD_NO_INTERRUPT     5 (to 230)
+        >>  240 END_SEND
+            242 STORE_FAST               6 (client)
+
+501         244 LOAD_GLOBAL             17 (NULL + _create_task)
+            254 LOAD_FAST                6 (client)
+            256 LOAD_FAST                5 (clean_text)
+            258 LOAD_FAST                1 (voice)
+            260 LOAD_GLOBAL             19 (NULL + _speed)
+            270 LOAD_FAST                2 (rate)
+            272 CALL                     1
+            280 CALL                     4
+            288 GET_AWAITABLE            0
+            290 LOAD_CONST               0 (None)
+        >>  292 SEND                     3 (to 302)
+            296 YIELD_VALUE              3
+            298 RESUME                   3
+            300 JUMP_BACKWARD_NO_INTERRUPT     5 (to 292)
+        >>  302 END_SEND
+            304 STORE_FAST               7 (task_id)
+
+502         306 LOAD_GLOBAL             21 (NULL + _wait_for_audio)
+            316 LOAD_FAST                6 (client)
+            318 LOAD_FAST                7 (task_id)
+            320 LOAD_FAST                3 (on_progress)
+            322 LOAD_FAST                4 (cancel_check)
+            324 CALL                     4
+            332 GET_AWAITABLE            0
+            334 LOAD_CONST               0 (None)
+        >>  336 SEND                     3 (to 346)
+            340 YIELD_VALUE              3
+            342 RESUME                   3
+            344 JUMP_BACKWARD_NO_INTERRUPT     5 (to 336)
+        >>  346 END_SEND
+            348 STORE_FAST               8 (audio_url)
+
+503         350 LOAD_GLOBAL             23 (NULL + _download_audio)
+            360 LOAD_FAST                6 (client)
+            362 LOAD_FAST                8 (audio_url)
+            364 CALL                     2
+            372 GET_AWAITABLE            0
+            374 LOAD_CONST               0 (None)
+        >>  376 SEND                     3 (to 386)
+            380 YIELD_VALUE              3
+            382 RESUME                   3
+            384 JUMP_BACKWARD_NO_INTERRUPT     5 (to 376)
+        >>  386 END_SEND
+
+500         388 SWAP                     2
+            390 LOAD_CONST               0 (None)
+            392 LOAD_CONST               0 (None)
+            394 LOAD_CONST               0 (None)
+            396 CALL                     2
+            404 GET_AWAITABLE            2
+            406 LOAD_CONST               0 (None)
+        >>  408 SEND                     3 (to 418)
+            412 YIELD_VALUE              2
+            414 RESUME                   3
+            416 JUMP_BACKWARD_NO_INTERRUPT     5 (to 408)
+        >>  418 END_SEND
+            420 POP_TOP
+            422 RETURN_VALUE
+        >>  424 CLEANUP_THROW
+            426 JUMP_BACKWARD           94 (to 240)
+
+501     >>  428 CLEANUP_THROW
+            430 JUMP_BACKWARD           65 (to 302)
+
+502     >>  432 CLEANUP_THROW
+            434 JUMP_BACKWARD           45 (to 346)
+
+503     >>  436 CLEANUP_THROW
+            438 JUMP_BACKWARD           27 (to 386)
+
+500     >>  440 CLEANUP_THROW
+            442 JUMP_BACKWARD           13 (to 418)
+        >>  444 PUSH_EXC_INFO
+            446 WITH_EXCEPT_START
+            448 GET_AWAITABLE            2
+            450 LOAD_CONST               0 (None)
+        >>  452 SEND                     4 (to 464)
+            456 YIELD_VALUE              3
+            458 RESUME                   3
+            460 JUMP_BACKWARD_NO_INTERRUPT     5 (to 452)
+        >>  462 CLEANUP_THROW
+        >>  464 END_SEND
+            466 POP_JUMP_IF_TRUE         1 (to 470)
+            468 RERAISE                  2
+        >>  470 POP_TOP
+            472 POP_EXCEPT
+            474 POP_TOP
+            476 POP_TOP
+            478 RETURN_CONST             0 (None)
+        >>  480 COPY                     3
+            482 POP_EXCEPT
+            484 RERAISE                  1
+        >>  486 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            488 RERAISE                  1
+ExceptionTable:
+  4 to 232 -> 486 [0] lasti
+  234 to 234 -> 424 [3]
+  236 to 240 -> 486 [0] lasti
+  242 to 294 -> 444 [1] lasti
+  296 to 296 -> 428 [3]
+  298 to 338 -> 444 [1] lasti
+  340 to 340 -> 432 [3]
+  342 to 378 -> 444 [1] lasti
+  380 to 380 -> 436 [3]
+  382 to 386 -> 444 [1] lasti
+  388 to 410 -> 486 [0] lasti
+  412 to 412 -> 440 [3]
+  414 to 424 -> 486 [0] lasti
+  428 to 428 -> 444 [1] lasti
+  432 to 432 -> 444 [1] lasti
+  436 to 436 -> 444 [1] lasti
+  440 to 440 -> 486 [0] lasti
+  444 to 454 -> 480 [3] lasti
+  456 to 456 -> 462 [6]
+  458 to 470 -> 480 [3] lasti
+  472 to 484 -> 486 [0] lasti
+
+Disassembly of <code object preview_voice at 0x7f6c9324b6d0, file "app\adapters\tts\ai33_tts.py", line 506>:
+506           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+507           6 LOAD_FAST                1 (text)
+              8 COPY                     1
+             10 POP_JUMP_IF_TRUE         2 (to 16)
+             12 POP_TOP
+             14 LOAD_CONST               1 ('')
+        >>   16 LOAD_ATTR                1 (NULL|self + strip)
+             36 CALL                     0
+             44 LOAD_CONST               0 (None)
+             46 LOAD_CONST               2 (500)
+             48 BINARY_SLICE
+             50 COPY                     1
+             52 POP_JUMP_IF_TRUE         2 (to 58)
+             54 POP_TOP
+             56 LOAD_CONST               3 ('Xin chào, đây là bản nghe thử giọng AI33 của bạn.')
+        >>   58 STORE_FAST               2 (snippet)
+
+508          60 LOAD_GLOBAL              3 (NULL + _synthesize_bytes)
+             70 LOAD_FAST                2 (snippet)
+             72 LOAD_FAST                0 (voice)
+             74 CALL                     2
+             82 GET_AWAITABLE            0
+             84 LOAD_CONST               0 (None)
+        >>   86 SEND                     3 (to 96)
+             90 YIELD_VALUE              2
+             92 RESUME                   3
+             94 JUMP_BACKWARD_NO_INTERRUPT     5 (to 86)
+        >>   96 END_SEND
+             98 RETURN_VALUE
+        >>  100 CLEANUP_THROW
+            102 JUMP_BACKWARD            4 (to 96)
+        >>  104 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            106 RERAISE                  1
+ExceptionTable:
+  4 to 88 -> 104 [0] lasti
+  90 to 90 -> 100 [2]
+  92 to 100 -> 104 [0] lasti
+
+Disassembly of <code object AI33TTSProvider at 0x7f6c92a39680, file "app\adapters\tts\ai33_tts.py", line 511>:
+511           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('AI33TTSProvider')
+              8 STORE_NAME               2 (__qualname__)
+
+517          10 NOP
+
+518          12 NOP
+
+519          14 NOP
+
+520          16 NOP
+
+521          18 NOP
+
+522          20 NOP
+
+512          22 LOAD_CONST               3 (('+0%', '+0Hz', None, None, None, None))
+
+514          24 NOP
+
+512          26 NOP
+
+515          28 NOP
+
+512          30 NOP
+
+516          32 NOP
+
+512          34 NOP
+
+517          36 NOP
+
+512          38 NOP
+
+518          40 NOP
+
+512          42 NOP
+
+519          44 NOP
+
+512          46 NOP
+
+520          48 NOP
+
+512          50 NOP
+
+521          52 NOP
+
+512          54 NOP
+
+522          56 NOP
+
+512          58 NOP
+
+523          60 NOP
+
+512          62 LOAD_CONST               4 (('text', 'str', 'voice', 'str', 'output_path', 'str', 'rate', 'str', 'pitch', 'str', 'style', 'dict | None', 'context', 'dict | None', 'on_progress', 'Callable[[float, str], None] | None', 'cancel_check', 'Callable[[], bool] | None', 'return', 'None'))
+             64 LOAD_CONST               2 (<code object synthesize at 0x7f6c92eb9a30, file "app\adapters\tts\ai33_tts.py", line 512>)
+             66 MAKE_FUNCTION            5 (defaults, annotations)
+             68 STORE_NAME               3 (synthesize)
+             70 RETURN_CONST             1 (None)
+
+Disassembly of <code object synthesize at 0x7f6c92eb9a30, file "app\adapters\tts\ai33_tts.py", line 512>:
+512           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+524           6 LOAD_GLOBAL              1 (NULL + _synthesize_bytes)
+             16 LOAD_FAST                1 (text)
+             18 LOAD_FAST                2 (voice)
+             20 LOAD_FAST                4 (rate)
+             22 LOAD_FAST                8 (on_progress)
+             24 LOAD_FAST                9 (cancel_check)
+             26 CALL                     5
+             34 GET_AWAITABLE            0
+             36 LOAD_CONST               0 (None)
+        >>   38 SEND                     3 (to 48)
+             42 YIELD_VALUE              2
+             44 RESUME                   3
+             46 JUMP_BACKWARD_NO_INTERRUPT     5 (to 38)
+        >>   48 END_SEND
+             50 UNPACK_SEQUENCE          2
+             54 STORE_FAST              10 (data)
+             56 STORE_FAST              11 (_mime)
+
+525          58 LOAD_FAST                9 (cancel_check)
+             60 POP_JUMP_IF_FALSE       33 (to 128)
+             62 PUSH_NULL
+             64 LOAD_FAST                9 (cancel_check)
+             66 CALL                     0
+             74 POP_JUMP_IF_FALSE       26 (to 128)
+
+526          76 LOAD_GLOBAL              3 (NULL + make_error)
+             86 LOAD_GLOBAL              4 (E)
+             96 LOAD_ATTR                6 (CANCELLED)
+            116 LOAD_CONST               1 ('Đã huỷ khi tạo giọng AI33.')
+            118 CALL                     2
+            126 RAISE_VARARGS            1
+
+527     >>  128 LOAD_FAST                3 (output_path)
+            130 LOAD_CONST               2 ('.tmp')
+            132 BINARY_OP                0 (+)
+            136 STORE_FAST              12 (tmp)
+
+528         138 LOAD_GLOBAL              9 (NULL + open)
+            148 LOAD_FAST               12 (tmp)
+            150 LOAD_CONST               3 ('wb')
+            152 CALL                     2
+            160 BEFORE_WITH
+            162 STORE_FAST              13 (handle)
+
+529         164 LOAD_FAST               13 (handle)
+            166 LOAD_ATTR               11 (NULL|self + write)
+            186 LOAD_FAST               10 (data)
+            188 CALL                     1
+            196 POP_TOP
+
+528         198 LOAD_CONST               0 (None)
+            200 LOAD_CONST               0 (None)
+            202 LOAD_CONST               0 (None)
+            204 CALL                     2
+            212 POP_TOP
+
+530     >>  214 LOAD_GLOBAL             13 (NULL + os)
+            224 LOAD_ATTR               14 (replace)
+            244 LOAD_FAST               12 (tmp)
+            246 LOAD_FAST                3 (output_path)
+            248 CALL                     2
+            256 POP_TOP
+
+531         258 LOAD_FAST                8 (on_progress)
+            260 POP_JUMP_IF_FALSE       10 (to 282)
+
+532         262 PUSH_NULL
+            264 LOAD_FAST                8 (on_progress)
+            266 LOAD_CONST               4 (1.0)
+            268 LOAD_CONST               5 ('AI33: hoàn tất')
+            270 CALL                     2
+            278 POP_TOP
+            280 RETURN_CONST             0 (None)
+
+531     >>  282 RETURN_CONST             0 (None)
+
+524     >>  284 CLEANUP_THROW
+            286 JUMP_BACKWARD          120 (to 48)
+
+528     >>  288 PUSH_EXC_INFO
+            290 WITH_EXCEPT_START
+            292 POP_JUMP_IF_TRUE         1 (to 296)
+            294 RERAISE                  2
+        >>  296 POP_TOP
+            298 POP_EXCEPT
+            300 POP_TOP
+            302 POP_TOP
+            304 JUMP_BACKWARD           46 (to 214)
+        >>  306 COPY                     3
+            308 POP_EXCEPT
+            310 RERAISE                  1
+        >>  312 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            314 RERAISE                  1
+ExceptionTable:
+  4 to 40 -> 312 [0] lasti
+  42 to 42 -> 284 [2]
+  44 to 160 -> 312 [0] lasti
+  162 to 196 -> 288 [1] lasti
+  198 to 284 -> 312 [0] lasti
+  288 to 296 -> 306 [3] lasti
+  298 to 310 -> 312 [0] lasti

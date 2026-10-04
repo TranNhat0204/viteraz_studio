@@ -1,0 +1,1413 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Step research — thu thập DỮ KIỆN THẬT (chống bịa) trước khi viết kịch bản (AI Studio).\n\nVì sao: `script` gọi LLM nhiệt độ cao viết kịch bản từ ý tưởng → với kênh TRI THỨC (lịch sử, khoa học,\ntài chính, quân sự, tâm lý, công nghệ…) LLM rất hay BỊA số liệu/ngày tháng/tên/trích dẫn → video sai,\nmất uy tín. Step này (chạy NGAY TRƯỚC `script`) bắt LLM gom 5–8 dữ kiện cốt lõi + nguồn cho đúng chủ đề,\nlưu vào ContentPlan.research_json. `script` chỉ được dùng dữ kiện ở đây (khối FACTS) — không bịa thêm.\n\nGating: CHỈ chạy thật cho kênh "factual" (engine frontmatter `factual: true`, hoặc config\n`research_enabled` đặt tường minh). Kênh SÁNG TẠO (horror/cổ tích/ru ngủ…) → no-op (enabled=false),\nKHÔNG gọi LLM, không ràng buộc dữ kiện để khỏi giết sức sáng tạo. Idempotent như mọi step (produces).\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 12           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 14          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (json)
+             24 STORE_NAME               3 (json)
+
+ 16          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               4 (('make_error', 'E'))
+             30 IMPORT_NAME              4 (app.core.errors)
+             32 IMPORT_FROM              5 (make_error)
+             34 STORE_NAME               5 (make_error)
+             36 IMPORT_FROM              6 (E)
+             38 STORE_NAME               6 (E)
+             40 POP_TOP
+
+ 17          42 LOAD_CONST               1 (0)
+             44 LOAD_CONST               5 (('ProjectFS',))
+             46 IMPORT_NAME              7 (app.core.fs)
+             48 IMPORT_FROM              8 (ProjectFS)
+             50 STORE_NAME               8 (ProjectFS)
+             52 POP_TOP
+
+ 18          54 LOAD_CONST               1 (0)
+             56 LOAD_CONST               6 (('complete_text',))
+             58 IMPORT_NAME              9 (app.adapters.ai_provider)
+             60 IMPORT_FROM             10 (complete_text)
+             62 STORE_NAME              10 (complete_text)
+             64 POP_TOP
+
+ 19          66 LOAD_CONST               1 (0)
+             68 LOAD_CONST               7 (('BaseStep', 'StepContext'))
+             70 IMPORT_NAME             11 (app.pipeline.base)
+             72 IMPORT_FROM             12 (BaseStep)
+             74 STORE_NAME              12 (BaseStep)
+             76 IMPORT_FROM             13 (StepContext)
+             78 STORE_NAME              13 (StepContext)
+             80 POP_TOP
+
+ 20          82 LOAD_CONST               1 (0)
+             84 LOAD_CONST               8 (('SessionLocal',))
+             86 IMPORT_NAME             14 (app.db.session)
+             88 IMPORT_FROM             15 (SessionLocal)
+             90 STORE_NAME              15 (SessionLocal)
+             92 POP_TOP
+
+ 21          94 LOAD_CONST               1 (0)
+             96 LOAD_CONST               9 (('ContentPlan',))
+             98 IMPORT_NAME             16 (app.db.models)
+            100 IMPORT_FROM             17 (ContentPlan)
+            102 STORE_NAME              17 (ContentPlan)
+            104 POP_TOP
+
+ 22         106 LOAD_CONST               1 (0)
+            108 LOAD_CONST              10 (('channel_engines',))
+            110 IMPORT_NAME             18 (app.services)
+            112 IMPORT_FROM             19 (channel_engines)
+            114 STORE_NAME              19 (channel_engines)
+            116 POP_TOP
+
+ 23         118 LOAD_CONST               1 (0)
+            120 LOAD_CONST              11 (('extract_json_object', 'format_channel_override'))
+            122 IMPORT_NAME             20 (app.services.ideation_service)
+            124 IMPORT_FROM             21 (extract_json_object)
+            126 STORE_NAME              21 (extract_json_object)
+            128 IMPORT_FROM             22 (format_channel_override)
+            130 STORE_NAME              22 (format_channel_override)
+            132 POP_TOP
+
+ 25         134 LOAD_CONST              12 (3)
+            136 STORE_NAME              23 (_MIN_FACTS)
+
+ 26         138 LOAD_CONST              13 (8)
+            140 STORE_NAME              24 (_MAX_FACTS)
+
+ 29         142 LOAD_CONST              21 (('config', 'dict', 'return', 'bool'))
+            144 LOAD_CONST              14 (<code object _is_factual at 0x7f6c81bcbc00, file "app\pipeline\steps\research.py", line 29>)
+            146 MAKE_FUNCTION            4 (annotations)
+            148 STORE_NAME              25 (_is_factual)
+
+ 45         150 NOP
+
+ 44         152 LOAD_CONST              22 ((None,))
+
+ 45         154 NOP
+
+ 44         156 NOP
+
+ 45         158 NOP
+
+ 44         160 LOAD_CONST              23 (('idea', 'dict', 'language', 'str', 'channel_override', 'str | None', 'return', 'tuple[str, str]'))
+            162 LOAD_CONST              15 (<code object _build_research_prompt at 0x26a25f20, file "app\pipeline\steps\research.py", line 44>)
+            164 MAKE_FUNCTION            5 (defaults, annotations)
+            166 STORE_NAME              26 (_build_research_prompt)
+
+100         168 LOAD_CONST              24 (('obj', 'dict', 'return', 'dict'))
+            170 LOAD_CONST              16 (<code object _normalize_research at 0x290aff00, file "app\pipeline\steps\research.py", line 100>)
+            172 MAKE_FUNCTION            4 (annotations)
+            174 STORE_NAME              27 (_normalize_research)
+
+139         176 LOAD_CONST              25 (('vi',))
+            178 LOAD_CONST              26 (('research', 'dict | None', 'language', 'str', 'return', 'str'))
+            180 LOAD_CONST              17 (<code object build_facts_block at 0x290d6280, file "app\pipeline\steps\research.py", line 139>)
+            182 MAKE_FUNCTION            5 (defaults, annotations)
+            184 STORE_NAME              28 (build_facts_block)
+
+180         186 LOAD_CONST              27 (('fs', 'ProjectFS', 'video_id', 'str', 'research', 'dict', 'return', 'None'))
+            188 LOAD_CONST              18 (<code object _write_sources_file at 0x7f6c92c29fb0, file "app\pipeline\steps\research.py", line 180>)
+            190 MAKE_FUNCTION            4 (annotations)
+            192 STORE_NAME              29 (_write_sources_file)
+
+189         194 PUSH_NULL
+            196 LOAD_BUILD_CLASS
+            198 LOAD_CONST              19 (<code object ResearchStep at 0x7f6c92fd6b30, file "app\pipeline\steps\research.py", line 189>)
+            200 MAKE_FUNCTION            0
+            202 LOAD_CONST              20 ('ResearchStep')
+            204 LOAD_NAME               12 (BaseStep)
+            206 CALL                     3
+            214 STORE_NAME              30 (ResearchStep)
+            216 RETURN_CONST             3 (None)
+
+Disassembly of <code object _is_factual at 0x7f6c81bcbc00, file "app\pipeline\steps\research.py", line 29>:
+ 29           0 RESUME                   0
+
+ 35           2 LOAD_FAST                1 (config)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_CONST               1 ('research_enabled')
+             26 CALL                     1
+             34 STORE_FAST               2 (flag)
+
+ 36          36 LOAD_FAST                2 (flag)
+             38 POP_JUMP_IF_NONE        11 (to 62)
+
+ 37          40 LOAD_GLOBAL              3 (NULL + bool)
+             50 LOAD_FAST                2 (flag)
+             52 CALL                     1
+             60 RETURN_VALUE
+
+ 38     >>   62 LOAD_FAST                0 (engine)
+             64 LOAD_ATTR                4 (meta)
+             84 LOAD_ATTR                1 (NULL|self + get)
+            104 LOAD_CONST               2 ('factual')
+            106 CALL                     1
+            114 POP_JUMP_IF_FALSE        1 (to 118)
+
+ 39         116 RETURN_CONST             3 (True)
+
+ 40     >>  118 LOAD_GLOBAL              7 (NULL + channel_engines)
+            128 LOAD_ATTR                8 (bundle_engine)
+            148 LOAD_FAST                0 (engine)
+            150 LOAD_ATTR               10 (id)
+            170 CALL                     1
+            178 STORE_FAST               3 (b)
+
+ 41         180 LOAD_GLOBAL              3 (NULL + bool)
+            190 LOAD_FAST                3 (b)
+            192 COPY                     1
+            194 POP_JUMP_IF_FALSE       27 (to 250)
+            196 POP_TOP
+            198 LOAD_FAST                3 (b)
+            200 LOAD_ATTR                4 (meta)
+            220 LOAD_ATTR                1 (NULL|self + get)
+            240 LOAD_CONST               2 ('factual')
+            242 CALL                     1
+        >>  250 CALL                     1
+            258 RETURN_VALUE
+
+Disassembly of <code object _build_research_prompt at 0x26a25f20, file "app\pipeline\steps\research.py", line 44>:
+ 44           0 RESUME                   0
+
+ 46           2 NOP
+
+ 47           4 LOAD_GLOBAL              1 (NULL + json)
+             14 LOAD_ATTR                2 (dumps)
+             34 LOAD_FAST                1 (idea)
+             36 LOAD_CONST               1 (False)
+             38 KW_NAMES                 2 (('ensure_ascii',))
+             40 CALL                     2
+             48 STORE_FAST               4 (idea_json)
+
+ 53     >>   50 LOAD_FAST                2 (language)
+             52 POP_JUMP_IF_FALSE       25 (to 104)
+             54 LOAD_FAST                2 (language)
+             56 LOAD_ATTR               11 (NULL|self + lower)
+             76 CALL                     0
+             84 LOAD_CONST               3 ('en')
+             86 COMPARE_OP              55 (!=)
+             90 POP_JUMP_IF_FALSE        6 (to 104)
+
+ 51          92 LOAD_CONST               4 ("Write every 'point', 'detail', 'caveats' value in language code '")
+             94 LOAD_FAST                2 (language)
+             96 FORMAT_VALUE             0
+             98 LOAD_CONST               5 ("' (the narration language) so the scriptwriter can use them directly.")
+            100 BUILD_STRING             3
+            102 JUMP_FORWARD             1 (to 106)
+
+ 54     >>  104 LOAD_CONST               6 ('Write the facts in English.')
+
+ 50     >>  106 STORE_FAST               5 (lang_note)
+
+ 56         108 LOAD_FAST                0 (engine)
+            110 LOAD_ATTR               12 (meta)
+            130 LOAD_ATTR               15 (NULL|self + get)
+            150 LOAD_CONST               7 ('niche')
+            152 CALL                     1
+            160 COPY                     1
+            162 POP_JUMP_IF_TRUE         2 (to 168)
+            164 POP_TOP
+            166 LOAD_CONST               8 ('')
+        >>  168 LOAD_ATTR               17 (NULL|self + strip)
+            188 CALL                     0
+            196 STORE_FAST               6 (niche)
+
+ 57         198 LOAD_FAST                6 (niche)
+            200 POP_JUMP_IF_FALSE        6 (to 214)
+            202 LOAD_CONST               9 ("This channel's niche: ")
+            204 LOAD_FAST                6 (niche)
+            206 FORMAT_VALUE             0
+            208 LOAD_CONST              10 ('\n\n')
+            210 BUILD_STRING             3
+            212 JUMP_FORWARD             1 (to 216)
+        >>  214 LOAD_CONST               8 ('')
+        >>  216 STORE_FAST               7 (niche_note)
+
+ 58         218 LOAD_FAST                3 (channel_override)
+            220 COPY                     1
+            222 POP_JUMP_IF_TRUE         2 (to 228)
+            224 POP_TOP
+            226 LOAD_CONST               8 ('')
+        >>  228 LOAD_ATTR               17 (NULL|self + strip)
+            248 CALL                     0
+            256 STORE_FAST               8 (override)
+
+ 59         258 LOAD_FAST                8 (override)
+            260 POP_JUMP_IF_FALSE        5 (to 272)
+            262 LOAD_FAST                8 (override)
+            264 LOAD_CONST              10 ('\n\n')
+            266 BINARY_OP                0 (+)
+            270 JUMP_FORWARD             1 (to 274)
+        >>  272 LOAD_CONST               8 ('')
+        >>  274 STORE_FAST               9 (override_note)
+
+ 61         276 LOAD_CONST              11 ("You are a researcher AND a story editor for a FACTUAL video channel. Your job is to give the scriptwriter the raw material to make the video ACCURATE, feel REAL, and be EMOTIONALLY GRIPPING. Rules:\n- FACTS: prefer well-established, widely-documented facts (historical consensus, primary institutions). If you are NOT confident a specific name/date/number/statistic/quote is correct, leave it OUT — never guess. NEVER invent sources; if unsure of the exact source, name the field of consensus (e.g. 'mainstream historiography') instead of a fake reference.\n- BEYOND FACTS: also surface the material that makes a topic HIT — the little-known/surprising truths, the concrete sensory & human details that make it feel real, and the human stakes that make a viewer CARE. These must still be TRUE (grounded in the record), never fabricated drama.\n- Flag anything disputed or uncertain in 'caveats' so the writer can hedge.")
+
+ 60         278 STORE_FAST              10 (system)
+
+ 74         280 LOAD_CONST              12 ('TASK: Research this approved video idea. Return not just dry facts, but the material to make the script accurate, vivid and emotionally compelling.\n\n')
+
+ 76         282 LOAD_FAST                7 (niche_note)
+            284 FORMAT_VALUE             0
+
+ 77         286 LOAD_FAST                9 (override_note)
+            288 FORMAT_VALUE             0
+
+ 78         290 LOAD_CONST              13 ('APPROVED IDEA:\n')
+            292 LOAD_FAST                4 (idea_json)
+            294 FORMAT_VALUE             0
+            296 LOAD_CONST              14 ('\n\nGive ')
+
+ 79         298 LOAD_GLOBAL             18 (_MIN_FACTS)
+            308 FORMAT_VALUE             0
+            310 LOAD_CONST              15 ('-')
+            312 LOAD_GLOBAL             20 (_MAX_FACTS)
+            322 FORMAT_VALUE             0
+            324 LOAD_CONST              16 (' of the MOST important, accurate facts for THIS specific topic, plus the story material below. ')
+
+ 80         326 LOAD_FAST                5 (lang_note)
+            328 FORMAT_VALUE             0
+            330 LOAD_CONST              17 ('\n\nOUTPUT — a single JSON object ONLY (no markdown, no prose around it):\n{\n  "facts": [\n    {"point": "<short factual claim>", "detail": "<1-2 sentences with the accurate specifics (dates/numbers/names) — only if you are confident>", "source": "<where it is documented, e.g. \'NASA\', \'Encyclopaedia Britannica\', \'historical consensus\'>"}\n  ],\n  "surprising": ["<2-4 TRUE little-known / counterintuitive facts that hook curiosity>"],\n  "vivid_details": ["<2-4 concrete, sensory, human specifics (a real name, place, number, moment, texture) that make the topic feel REAL, not a generic summary>"],\n  "emotional_stakes": "<1-2 sentences: why a viewer should CARE — the human stakes, tension or relatable thread the script should build its emotion on (grounded in reality, not invented drama)>",\n  "sources": ["<reference or further-reading the viewer can check>"],\n  "caveats": "<disputed points / uncertainty the writer should hedge, or empty string>"\n}')
+
+ 74         332 BUILD_STRING            12
+
+ 73         334 STORE_FAST              11 (user)
+
+ 97         336 LOAD_FAST               10 (system)
+            338 LOAD_FAST               11 (user)
+            340 BUILD_TUPLE              2
+            342 RETURN_VALUE
+        >>  344 PUSH_EXC_INFO
+
+ 48         346 LOAD_GLOBAL              4 (TypeError)
+            356 LOAD_GLOBAL              6 (ValueError)
+            366 BUILD_TUPLE              2
+            368 CHECK_EXC_MATCH
+            370 POP_JUMP_IF_FALSE       14 (to 400)
+            372 POP_TOP
+
+ 49         374 LOAD_GLOBAL              9 (NULL + str)
+            384 LOAD_FAST                1 (idea)
+            386 CALL                     1
+            394 STORE_FAST               4 (idea_json)
+            396 POP_EXCEPT
+            398 JUMP_BACKWARD          175 (to 50)
+
+ 48     >>  400 RERAISE                  0
+        >>  402 COPY                     3
+            404 POP_EXCEPT
+            406 RERAISE                  1
+ExceptionTable:
+  4 to 48 -> 344 [0]
+  344 to 394 -> 402 [1] lasti
+  400 to 400 -> 402 [1] lasti
+
+Disassembly of <code object _normalize_research at 0x290aff00, file "app\pipeline\steps\research.py", line 100>:
+              0 MAKE_CELL                0 (obj)
+
+100           2 RESUME                   0
+
+102           4 LOAD_GLOBAL              1 (NULL + isinstance)
+             14 LOAD_DEREF               0 (obj)
+             16 LOAD_ATTR                3 (NULL|self + get)
+             36 LOAD_CONST               1 ('facts')
+             38 CALL                     1
+             46 LOAD_GLOBAL              4 (list)
+             56 CALL                     2
+             64 POP_JUMP_IF_FALSE       17 (to 100)
+             66 LOAD_DEREF               0 (obj)
+             68 LOAD_ATTR                3 (NULL|self + get)
+             88 LOAD_CONST               1 ('facts')
+             90 CALL                     1
+             98 JUMP_FORWARD             1 (to 102)
+        >>  100 BUILD_LIST               0
+        >>  102 STORE_FAST               1 (facts_raw)
+
+103         104 BUILD_LIST               0
+            106 STORE_FAST               2 (facts)
+
+104         108 LOAD_FAST                1 (facts_raw)
+            110 GET_ITER
+        >>  112 FOR_ITER               194 (to 504)
+            116 STORE_FAST               3 (f)
+
+105         118 LOAD_GLOBAL              1 (NULL + isinstance)
+            128 LOAD_FAST                3 (f)
+            130 LOAD_GLOBAL              6 (dict)
+            140 CALL                     2
+            148 POP_JUMP_IF_TRUE         1 (to 152)
+
+106         150 JUMP_BACKWARD           20 (to 112)
+
+107     >>  152 LOAD_GLOBAL              9 (NULL + str)
+            162 LOAD_FAST                3 (f)
+            164 LOAD_ATTR                3 (NULL|self + get)
+            184 LOAD_CONST               2 ('point')
+            186 CALL                     1
+            194 COPY                     1
+            196 POP_JUMP_IF_TRUE        21 (to 240)
+            198 POP_TOP
+            200 LOAD_FAST                3 (f)
+            202 LOAD_ATTR                3 (NULL|self + get)
+            222 LOAD_CONST               3 ('claim')
+            224 CALL                     1
+            232 COPY                     1
+            234 POP_JUMP_IF_TRUE         2 (to 240)
+            236 POP_TOP
+            238 LOAD_CONST               4 ('')
+        >>  240 CALL                     1
+            248 LOAD_ATTR               11 (NULL|self + strip)
+            268 CALL                     0
+            276 STORE_FAST               4 (point)
+
+108         278 LOAD_GLOBAL              9 (NULL + str)
+            288 LOAD_FAST                3 (f)
+            290 LOAD_ATTR                3 (NULL|self + get)
+            310 LOAD_CONST               5 ('detail')
+            312 CALL                     1
+            320 COPY                     1
+            322 POP_JUMP_IF_TRUE         2 (to 328)
+            324 POP_TOP
+            326 LOAD_CONST               4 ('')
+        >>  328 CALL                     1
+            336 LOAD_ATTR               11 (NULL|self + strip)
+            356 CALL                     0
+            364 STORE_FAST               5 (detail)
+
+109         366 LOAD_FAST                4 (point)
+            368 POP_JUMP_IF_TRUE         3 (to 376)
+            370 LOAD_FAST                5 (detail)
+            372 POP_JUMP_IF_TRUE         1 (to 376)
+
+110         374 JUMP_BACKWARD          132 (to 112)
+
+111     >>  376 LOAD_FAST                2 (facts)
+            378 LOAD_ATTR               13 (NULL|self + append)
+
+112         398 LOAD_FAST                4 (point)
+
+113         400 LOAD_FAST                5 (detail)
+
+114         402 LOAD_GLOBAL              9 (NULL + str)
+            412 LOAD_FAST                3 (f)
+            414 LOAD_ATTR                3 (NULL|self + get)
+            434 LOAD_CONST               6 ('source')
+            436 CALL                     1
+            444 COPY                     1
+            446 POP_JUMP_IF_TRUE         2 (to 452)
+            448 POP_TOP
+            450 LOAD_CONST               4 ('')
+        >>  452 CALL                     1
+            460 LOAD_ATTR               11 (NULL|self + strip)
+            480 CALL                     0
+
+111         488 LOAD_CONST               7 (('point', 'detail', 'source'))
+            490 BUILD_CONST_KEY_MAP      3
+            492 CALL                     1
+            500 POP_TOP
+            502 JUMP_BACKWARD          196 (to 112)
+
+104     >>  504 END_FOR
+
+116         506 LOAD_FAST                2 (facts)
+            508 LOAD_CONST               8 (None)
+            510 LOAD_GLOBAL             14 (_MAX_FACTS)
+            520 BINARY_SLICE
+            522 STORE_FAST               2 (facts)
+
+118         524 LOAD_CONST              19 (('key', 'str', 'cap', 'int', 'return', 'list[str]'))
+            526 LOAD_CLOSURE             0 (obj)
+            528 BUILD_TUPLE              1
+            530 LOAD_CONST               9 (<code object _strlist at 0x7f6c81b083b0, file "app\pipeline\steps\research.py", line 118>)
+            532 MAKE_FUNCTION           12 (annotations, closure)
+            534 STORE_FAST               6 (_strlist)
+
+122         536 PUSH_NULL
+            538 LOAD_FAST                6 (_strlist)
+            540 LOAD_CONST              10 ('sources')
+            542 LOAD_CONST              11 (20)
+            544 CALL                     2
+            552 STORE_FAST               7 (sources)
+
+124         554 LOAD_FAST                2 (facts)
+            556 GET_ITER
+        >>  558 FOR_ITER                36 (to 634)
+            562 STORE_FAST               3 (f)
+
+125         564 LOAD_FAST                3 (f)
+            566 LOAD_CONST               6 ('source')
+            568 BINARY_SUBSCR
+            572 POP_JUMP_IF_TRUE         1 (to 576)
+            574 JUMP_BACKWARD            9 (to 558)
+        >>  576 LOAD_FAST                3 (f)
+            578 LOAD_CONST               6 ('source')
+            580 BINARY_SUBSCR
+            584 LOAD_FAST                7 (sources)
+            586 CONTAINS_OP              1
+            588 POP_JUMP_IF_TRUE         1 (to 592)
+            590 JUMP_BACKWARD           17 (to 558)
+
+126     >>  592 LOAD_FAST                7 (sources)
+            594 LOAD_ATTR               13 (NULL|self + append)
+            614 LOAD_FAST                3 (f)
+            616 LOAD_CONST               6 ('source')
+            618 BINARY_SUBSCR
+            622 CALL                     1
+            630 POP_TOP
+            632 JUMP_BACKWARD           38 (to 558)
+
+124     >>  634 END_FOR
+
+128         636 LOAD_CONST              12 (True)
+
+129         638 LOAD_FAST                2 (facts)
+
+131         640 PUSH_NULL
+            642 LOAD_FAST                6 (_strlist)
+            644 LOAD_CONST              13 ('surprising')
+            646 LOAD_CONST              14 (4)
+            648 CALL                     2
+
+132         656 PUSH_NULL
+            658 LOAD_FAST                6 (_strlist)
+            660 LOAD_CONST              15 ('vivid_details')
+            662 LOAD_CONST              14 (4)
+            664 CALL                     2
+
+133         672 LOAD_GLOBAL              9 (NULL + str)
+            682 LOAD_DEREF               0 (obj)
+            684 LOAD_ATTR                3 (NULL|self + get)
+            704 LOAD_CONST              16 ('emotional_stakes')
+            706 CALL                     1
+            714 COPY                     1
+            716 POP_JUMP_IF_TRUE         2 (to 722)
+            718 POP_TOP
+            720 LOAD_CONST               4 ('')
+        >>  722 CALL                     1
+            730 LOAD_ATTR               11 (NULL|self + strip)
+            750 CALL                     0
+
+134         758 LOAD_FAST                7 (sources)
+
+135         760 LOAD_GLOBAL              9 (NULL + str)
+            770 LOAD_DEREF               0 (obj)
+            772 LOAD_ATTR                3 (NULL|self + get)
+            792 LOAD_CONST              17 ('caveats')
+            794 CALL                     1
+            802 COPY                     1
+            804 POP_JUMP_IF_TRUE         2 (to 810)
+            806 POP_TOP
+            808 LOAD_CONST               4 ('')
+        >>  810 CALL                     1
+            818 LOAD_ATTR               11 (NULL|self + strip)
+            838 CALL                     0
+
+127         846 LOAD_CONST              18 (('enabled', 'facts', 'surprising', 'vivid_details', 'emotional_stakes', 'sources', 'caveats'))
+            848 BUILD_CONST_KEY_MAP      7
+            850 RETURN_VALUE
+
+Disassembly of <code object _strlist at 0x7f6c81b083b0, file "app\pipeline\steps\research.py", line 118>:
+              0 COPY_FREE_VARS           1
+
+118           2 RESUME                   0
+
+119           4 LOAD_GLOBAL              1 (NULL + isinstance)
+             14 LOAD_DEREF               4 (obj)
+             16 LOAD_ATTR                3 (NULL|self + get)
+             36 LOAD_FAST                0 (key)
+             38 CALL                     1
+             46 LOAD_GLOBAL              4 (list)
+             56 CALL                     2
+             64 POP_JUMP_IF_FALSE       17 (to 100)
+             66 LOAD_DEREF               4 (obj)
+             68 LOAD_ATTR                3 (NULL|self + get)
+             88 LOAD_FAST                0 (key)
+             90 CALL                     1
+             98 JUMP_FORWARD             1 (to 102)
+        >>  100 BUILD_LIST               0
+        >>  102 STORE_FAST               2 (raw)
+
+120         104 LOAD_FAST                2 (raw)
+            106 GET_ITER
+            108 LOAD_FAST_AND_CLEAR      3 (x)
+            110 SWAP                     2
+            112 BUILD_LIST               0
+            114 SWAP                     2
+        >>  116 FOR_ITER                53 (to 226)
+            120 STORE_FAST               3 (x)
+            122 LOAD_GLOBAL              7 (NULL + str)
+            132 LOAD_FAST                3 (x)
+            134 CALL                     1
+            142 LOAD_ATTR                9 (NULL|self + strip)
+            162 CALL                     0
+            170 POP_JUMP_IF_TRUE         1 (to 174)
+            172 JUMP_BACKWARD           29 (to 116)
+        >>  174 LOAD_GLOBAL              7 (NULL + str)
+            184 LOAD_FAST                3 (x)
+            186 CALL                     1
+            194 LOAD_ATTR                9 (NULL|self + strip)
+            214 CALL                     0
+            222 LIST_APPEND              2
+            224 JUMP_BACKWARD           55 (to 116)
+        >>  226 END_FOR
+            228 SWAP                     2
+            230 STORE_FAST               3 (x)
+            232 LOAD_CONST               0 (None)
+            234 LOAD_FAST                1 (cap)
+            236 BINARY_SLICE
+            238 RETURN_VALUE
+        >>  240 SWAP                     2
+            242 POP_TOP
+            244 SWAP                     2
+            246 STORE_FAST               3 (x)
+            248 RERAISE                  0
+ExceptionTable:
+  112 to 170 -> 240 [2]
+  174 to 226 -> 240 [2]
+
+Disassembly of <code object build_facts_block at 0x290d6280, file "app\pipeline\steps\research.py", line 139>:
+139           0 RESUME                   0
+
+142           2 LOAD_FAST                0 (research)
+              4 POP_JUMP_IF_FALSE       17 (to 40)
+              6 LOAD_FAST                0 (research)
+              8 LOAD_ATTR                1 (NULL|self + get)
+             28 LOAD_CONST               1 ('enabled')
+             30 CALL                     1
+             38 POP_JUMP_IF_TRUE         1 (to 42)
+
+143     >>   40 RETURN_CONST             2 ('')
+
+144     >>   42 LOAD_FAST                0 (research)
+             44 LOAD_ATTR                1 (NULL|self + get)
+             64 LOAD_CONST               3 ('facts')
+             66 CALL                     1
+             74 COPY                     1
+             76 POP_JUMP_IF_TRUE         2 (to 82)
+             78 POP_TOP
+             80 BUILD_LIST               0
+        >>   82 STORE_FAST               2 (facts)
+
+145          84 LOAD_FAST                0 (research)
+             86 LOAD_ATTR                1 (NULL|self + get)
+            106 LOAD_CONST               4 ('surprising')
+            108 CALL                     1
+            116 COPY                     1
+            118 POP_JUMP_IF_TRUE         2 (to 124)
+            120 POP_TOP
+            122 BUILD_LIST               0
+        >>  124 STORE_FAST               3 (surprising)
+
+146         126 LOAD_FAST                0 (research)
+            128 LOAD_ATTR                1 (NULL|self + get)
+            148 LOAD_CONST               5 ('vivid_details')
+            150 CALL                     1
+            158 COPY                     1
+            160 POP_JUMP_IF_TRUE         2 (to 166)
+            162 POP_TOP
+            164 BUILD_LIST               0
+        >>  166 STORE_FAST               4 (vivid)
+
+147         168 LOAD_FAST                0 (research)
+            170 LOAD_ATTR                1 (NULL|self + get)
+            190 LOAD_CONST               6 ('emotional_stakes')
+            192 CALL                     1
+            200 COPY                     1
+            202 POP_JUMP_IF_TRUE         2 (to 208)
+            204 POP_TOP
+            206 LOAD_CONST               2 ('')
+        >>  208 LOAD_ATTR                3 (NULL|self + strip)
+            228 CALL                     0
+            236 STORE_FAST               5 (stakes)
+
+148         238 LOAD_FAST                2 (facts)
+            240 POP_JUMP_IF_TRUE         7 (to 256)
+            242 LOAD_FAST                3 (surprising)
+            244 POP_JUMP_IF_TRUE         5 (to 256)
+            246 LOAD_FAST                4 (vivid)
+            248 POP_JUMP_IF_TRUE         3 (to 256)
+            250 LOAD_FAST                5 (stakes)
+            252 POP_JUMP_IF_TRUE         1 (to 256)
+
+149         254 RETURN_CONST             2 ('')
+
+150     >>  256 BUILD_LIST               0
+            258 STORE_FAST               6 (lines)
+
+151         260 LOAD_FAST                2 (facts)
+            262 POP_JUMP_IF_FALSE      150 (to 564)
+
+152         264 LOAD_FAST                6 (lines)
+
+153         266 LOAD_CONST               7 ('━━━ VERIFIED FACTS — GROUND THE SCRIPT ONLY IN THESE ━━━')
+
+154         268 LOAD_CONST               8 ('You MUST base every concrete claim (dates, numbers, names, statistics, quotes) ONLY on the facts below. Do NOT invent specifics that are not listed here — if a detail is missing, speak generally instead of fabricating it. Weave these naturally into the narration; do not list them mechanically.')
+
+152         270 BUILD_LIST               2
+            272 BINARY_OP               13 (+=)
+            276 STORE_FAST               6 (lines)
+
+158         278 LOAD_FAST                2 (facts)
+            280 GET_ITER
+        >>  282 FOR_ITER                81 (to 448)
+            286 STORE_FAST               7 (f)
+
+159         288 LOAD_FAST                7 (f)
+            290 LOAD_ATTR                1 (NULL|self + get)
+            310 LOAD_CONST               9 ('point')
+            312 CALL                     1
+            320 COPY                     1
+            322 POP_JUMP_IF_TRUE         2 (to 328)
+            324 POP_TOP
+            326 LOAD_CONST               2 ('')
+        >>  328 STORE_FAST               8 (point)
+
+160         330 LOAD_FAST                7 (f)
+            332 LOAD_ATTR                1 (NULL|self + get)
+            352 LOAD_CONST              10 ('detail')
+            354 CALL                     1
+            362 COPY                     1
+            364 POP_JUMP_IF_TRUE         2 (to 370)
+            366 POP_TOP
+            368 LOAD_CONST               2 ('')
+        >>  370 STORE_FAST               9 (detail)
+
+161         372 LOAD_FAST                8 (point)
+            374 POP_JUMP_IF_FALSE        9 (to 394)
+            376 LOAD_FAST                9 (detail)
+            378 POP_JUMP_IF_FALSE        7 (to 394)
+            380 LOAD_FAST                8 (point)
+            382 FORMAT_VALUE             0
+            384 LOAD_CONST              11 (' — ')
+            386 LOAD_FAST                9 (detail)
+            388 FORMAT_VALUE             0
+            390 BUILD_STRING             3
+            392 JUMP_FORWARD             5 (to 404)
+        >>  394 LOAD_FAST                8 (point)
+            396 COPY                     1
+            398 POP_JUMP_IF_TRUE         2 (to 404)
+            400 POP_TOP
+            402 LOAD_FAST                9 (detail)
+        >>  404 STORE_FAST              10 (body)
+
+162         406 LOAD_FAST                6 (lines)
+            408 LOAD_ATTR                5 (NULL|self + append)
+            428 LOAD_CONST              12 ('- ')
+            430 LOAD_FAST               10 (body)
+            432 FORMAT_VALUE             0
+            434 BUILD_STRING             2
+            436 CALL                     1
+            444 POP_TOP
+            446 JUMP_BACKWARD           83 (to 282)
+
+158     >>  448 END_FOR
+
+163         450 LOAD_FAST                0 (research)
+            452 LOAD_ATTR                1 (NULL|self + get)
+            472 LOAD_CONST              13 ('caveats')
+            474 CALL                     1
+            482 COPY                     1
+            484 POP_JUMP_IF_TRUE         2 (to 490)
+            486 POP_TOP
+            488 LOAD_CONST               2 ('')
+        >>  490 LOAD_ATTR                3 (NULL|self + strip)
+            510 CALL                     0
+            518 STORE_FAST              11 (caveats)
+
+164         520 LOAD_FAST               11 (caveats)
+            522 POP_JUMP_IF_FALSE       20 (to 564)
+
+165         524 LOAD_FAST                6 (lines)
+            526 LOAD_ATTR                5 (NULL|self + append)
+            546 LOAD_CONST              14 ("UNCERTAIN / DISPUTED (hedge these, don't state as hard fact): ")
+            548 LOAD_FAST               11 (caveats)
+            550 FORMAT_VALUE             0
+            552 BUILD_STRING             2
+            554 CALL                     1
+            562 POP_TOP
+
+167     >>  564 LOAD_FAST                3 (surprising)
+            566 POP_JUMP_IF_TRUE         4 (to 576)
+            568 LOAD_FAST                4 (vivid)
+            570 POP_JUMP_IF_TRUE         2 (to 576)
+            572 LOAD_FAST                5 (stakes)
+            574 POP_JUMP_IF_FALSE      113 (to 802)
+
+168     >>  576 LOAD_FAST                6 (lines)
+            578 LOAD_ATTR                5 (NULL|self + append)
+            598 LOAD_CONST              15 ('━━━ STORY MATERIAL — use to make it gripping, real and emotional (still all TRUE) ━━━')
+            600 CALL                     1
+            608 POP_TOP
+
+169         610 LOAD_FAST                5 (stakes)
+            612 POP_JUMP_IF_FALSE       20 (to 654)
+
+170         614 LOAD_FAST                6 (lines)
+            616 LOAD_ATTR                5 (NULL|self + append)
+            636 LOAD_CONST              16 ('EMOTIONAL STAKES (build the emotion on this): ')
+            638 LOAD_FAST                5 (stakes)
+            640 FORMAT_VALUE             0
+            642 BUILD_STRING             2
+            644 CALL                     1
+            652 POP_TOP
+
+171     >>  654 LOAD_FAST                3 (surprising)
+            656 POP_JUMP_IF_FALSE       35 (to 728)
+
+172         658 LOAD_FAST                6 (lines)
+            660 LOAD_ATTR                5 (NULL|self + append)
+            680 LOAD_CONST              17 ('SURPRISING TRUTHS (great for the hook / turns): ')
+
+173         682 LOAD_CONST              18 ('; ')
+            684 LOAD_ATTR                7 (NULL|self + join)
+            704 LOAD_FAST                3 (surprising)
+            706 CALL                     1
+
+172         714 BINARY_OP                0 (+)
+            718 CALL                     1
+            726 POP_TOP
+
+174     >>  728 LOAD_FAST                4 (vivid)
+            730 POP_JUMP_IF_FALSE       35 (to 802)
+
+175         732 LOAD_FAST                6 (lines)
+            734 LOAD_ATTR                5 (NULL|self + append)
+            754 LOAD_CONST              19 ('VIVID CONCRETE DETAILS (drop these in so it feels real, not generic): ')
+
+176         756 LOAD_CONST              18 ('; ')
+            758 LOAD_ATTR                7 (NULL|self + join)
+            778 LOAD_FAST                4 (vivid)
+            780 CALL                     1
+
+175         788 BINARY_OP                0 (+)
+            792 CALL                     1
+            800 POP_TOP
+
+177     >>  802 LOAD_CONST              20 ('\n')
+            804 LOAD_ATTR                7 (NULL|self + join)
+            824 LOAD_FAST                6 (lines)
+            826 CALL                     1
+            834 LOAD_CONST              21 ('\n\n')
+            836 BINARY_OP                0 (+)
+            840 RETURN_VALUE
+
+Disassembly of <code object _write_sources_file at 0x7f6c92c29fb0, file "app\pipeline\steps\research.py", line 180>:
+180           0 RESUME                   0
+
+182           2 LOAD_FAST                2 (research)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_CONST               1 ('sources')
+             26 CALL                     1
+             34 COPY                     1
+             36 POP_JUMP_IF_TRUE         2 (to 42)
+             38 POP_TOP
+             40 BUILD_LIST               0
+        >>   42 STORE_FAST               3 (sources)
+
+183          44 LOAD_FAST                3 (sources)
+             46 POP_JUMP_IF_TRUE         1 (to 50)
+
+184          48 RETURN_CONST             2 (None)
+
+185     >>   50 LOAD_CONST               3 ('Nguồn tham khảo:\n')
+             52 LOAD_CONST               4 ('\n')
+             54 LOAD_ATTR                3 (NULL|self + join)
+             74 LOAD_CONST               5 (<code object <genexpr> at 0x7f6c930948a0, file "app\pipeline\steps\research.py", line 185>)
+             76 MAKE_FUNCTION            0
+             78 LOAD_FAST                3 (sources)
+             80 GET_ITER
+             82 CALL                     0
+             90 CALL                     1
+             98 BINARY_OP                0 (+)
+            102 STORE_FAST               4 (body)
+
+186         104 LOAD_FAST                0 (fs)
+            106 LOAD_ATTR                5 (NULL|self + video_dir)
+            126 LOAD_FAST                1 (video_id)
+            128 CALL                     1
+            136 LOAD_CONST               6 ('sources.txt')
+            138 BINARY_OP               11 (/)
+            142 LOAD_ATTR                7 (NULL|self + write_text)
+            162 LOAD_FAST                4 (body)
+            164 LOAD_CONST               7 ('utf-8')
+            166 KW_NAMES                 8 (('encoding',))
+            168 CALL                     2
+            176 POP_TOP
+            178 RETURN_CONST             2 (None)
+
+Disassembly of <code object <genexpr> at 0x7f6c930948a0, file "app\pipeline\steps\research.py", line 185>:
+185           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                 9 (to 30)
+             12 STORE_FAST               1 (s)
+             14 LOAD_CONST               0 ('• ')
+             16 LOAD_FAST                1 (s)
+             18 FORMAT_VALUE             0
+             20 BUILD_STRING             2
+             22 YIELD_VALUE              1
+             24 RESUME                   1
+             26 POP_TOP
+             28 JUMP_BACKWARD           11 (to 8)
+        >>   30 END_FOR
+             32 RETURN_CONST             1 (None)
+        >>   34 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             36 RERAISE                  1
+ExceptionTable:
+  4 to 32 -> 34 [0] lasti
+
+Disassembly of <code object ResearchStep at 0x7f6c92fd6b30, file "app\pipeline\steps\research.py", line 189>:
+189           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('ResearchStep')
+              8 STORE_NAME               2 (__qualname__)
+
+190          10 LOAD_CONST               1 ('research')
+             12 STORE_NAME               3 (name)
+
+191          14 LOAD_CONST               2 ('NET')
+             16 STORE_NAME               4 (resource)
+
+192          18 LOAD_CONST               1 ('research')
+             20 BUILD_LIST               1
+             22 STORE_NAME               5 (produces)
+
+194          24 LOAD_CONST               6 (('ctx', 'StepContext', 'return', 'dict'))
+             26 LOAD_CONST               3 (<code object run at 0x28b27840, file "app\pipeline\steps\research.py", line 194>)
+             28 MAKE_FUNCTION            4 (annotations)
+             30 STORE_NAME               6 (run)
+
+261          32 LOAD_NAME                7 (staticmethod)
+
+262          34 LOAD_CONST               7 (('video_id', 'str', 'research', 'dict', 'return', 'None'))
+             36 LOAD_CONST               4 (<code object _persist at 0x7f6c81b1f290, file "app\pipeline\steps\research.py", line 261>)
+             38 MAKE_FUNCTION            4 (annotations)
+
+261          40 CALL                     0
+
+262          48 STORE_NAME               8 (_persist)
+             50 RETURN_CONST             5 (None)
+
+Disassembly of <code object run at 0x28b27840, file "app\pipeline\steps\research.py", line 194>:
+194           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+195           6 LOAD_GLOBAL              1 (NULL + ProjectFS)
+             16 LOAD_FAST                1 (ctx)
+             18 LOAD_ATTR                2 (workdir)
+             38 CALL                     1
+             46 STORE_FAST               2 (fs)
+
+196          48 LOAD_FAST                2 (fs)
+             50 LOAD_ATTR                5 (NULL|self + video_dir)
+             70 LOAD_FAST                1 (ctx)
+             72 LOAD_ATTR                6 (video_id)
+             92 CALL                     1
+            100 LOAD_CONST               1 ('research.json')
+            102 BINARY_OP               11 (/)
+            106 STORE_FAST               3 (out_path)
+
+197         108 LOAD_FAST                3 (out_path)
+            110 LOAD_ATTR                8 (parent)
+            130 LOAD_ATTR               11 (NULL|self + mkdir)
+            150 LOAD_CONST               2 (True)
+            152 LOAD_CONST               2 (True)
+            154 KW_NAMES                 3 (('parents', 'exist_ok'))
+            156 CALL                     2
+            164 POP_TOP
+
+199         166 LOAD_FAST                1 (ctx)
+            168 LOAD_ATTR               12 (config)
+            188 LOAD_ATTR               15 (NULL|self + get)
+            208 LOAD_CONST               4 ('language')
+            210 CALL                     1
+            218 COPY                     1
+            220 POP_JUMP_IF_TRUE        31 (to 284)
+            222 POP_TOP
+            224 LOAD_FAST                1 (ctx)
+            226 LOAD_ATTR               12 (config)
+            246 LOAD_ATTR               15 (NULL|self + get)
+            266 LOAD_CONST               5 ('dst_lang')
+            268 CALL                     1
+            276 COPY                     1
+            278 POP_JUMP_IF_TRUE         2 (to 284)
+            280 POP_TOP
+            282 LOAD_CONST               6 ('vi')
+        >>  284 STORE_FAST               4 (language)
+
+200         286 LOAD_FAST                1 (ctx)
+            288 LOAD_ATTR               12 (config)
+            308 LOAD_ATTR               15 (NULL|self + get)
+            328 LOAD_CONST               7 ('engine_id')
+            330 CALL                     1
+            338 STORE_FAST               5 (engine_id)
+
+201         340 LOAD_FAST                5 (engine_id)
+            342 POP_JUMP_IF_FALSE       21 (to 386)
+            344 LOAD_GLOBAL             17 (NULL + channel_engines)
+            354 LOAD_ATTR               18 (get_engine)
+            374 LOAD_FAST                5 (engine_id)
+            376 CALL                     1
+            384 JUMP_FORWARD             1 (to 388)
+        >>  386 LOAD_CONST               0 (None)
+        >>  388 STORE_FAST               6 (engine)
+
+202         390 LOAD_FAST                6 (engine)
+            392 POP_JUMP_IF_NOT_NONE    30 (to 454)
+
+203         394 LOAD_GLOBAL             21 (NULL + make_error)
+            404 LOAD_GLOBAL             22 (E)
+            414 LOAD_ATTR               24 (UNKNOWN)
+            434 LOAD_CONST               8 ("Engine '")
+            436 LOAD_FAST                5 (engine_id)
+            438 FORMAT_VALUE             0
+            440 LOAD_CONST               9 ("' không tồn tại — không tra cứu được dữ kiện.")
+            442 BUILD_STRING             3
+            444 CALL                     2
+            452 RAISE_VARARGS            1
+
+206     >>  454 LOAD_GLOBAL             27 (NULL + _is_factual)
+            464 LOAD_FAST                6 (engine)
+            466 LOAD_FAST                1 (ctx)
+            468 LOAD_ATTR               12 (config)
+            488 CALL                     2
+            496 POP_JUMP_IF_TRUE       141 (to 780)
+
+207         498 LOAD_CONST              10 (False)
+            500 BUILD_LIST               0
+            502 BUILD_LIST               0
+            504 LOAD_CONST              11 ('')
+            506 LOAD_CONST              12 (('enabled', 'facts', 'sources', 'caveats'))
+            508 BUILD_CONST_KEY_MAP      4
+            510 STORE_FAST               7 (research)
+
+208         512 LOAD_FAST                0 (self)
+            514 LOAD_ATTR               29 (NULL|self + _persist)
+            534 LOAD_FAST                1 (ctx)
+            536 LOAD_ATTR                6 (video_id)
+            556 LOAD_FAST                7 (research)
+            558 CALL                     2
+            566 POP_TOP
+
+209         568 LOAD_FAST                3 (out_path)
+            570 LOAD_ATTR               31 (NULL|self + write_text)
+            590 LOAD_GLOBAL             33 (NULL + json)
+            600 LOAD_ATTR               34 (dumps)
+            620 LOAD_FAST                7 (research)
+            622 LOAD_CONST              10 (False)
+            624 KW_NAMES                13 (('ensure_ascii',))
+            626 CALL                     2
+            634 LOAD_CONST              14 ('utf-8')
+            636 KW_NAMES                15 (('encoding',))
+            638 CALL                     2
+            646 POP_TOP
+
+210         648 LOAD_FAST                1 (ctx)
+            650 LOAD_ATTR               37 (NULL|self + emit_log)
+            670 LOAD_CONST              16 ('[research] kênh sáng tạo — bỏ qua tra cứu dữ kiện (không ràng buộc fact).')
+            672 CALL                     1
+            680 POP_TOP
+
+211         682 LOAD_FAST                1 (ctx)
+            684 LOAD_ATTR               39 (NULL|self + emit_progress)
+            704 LOAD_CONST              17 (1.0)
+            706 LOAD_CONST              18 ('Không cần tra cứu (kênh sáng tạo).')
+            708 CALL                     2
+            716 POP_TOP
+
+212         718 LOAD_GLOBAL             41 (NULL + str)
+            728 LOAD_FAST                3 (out_path)
+            730 LOAD_ATTR               43 (NULL|self + resolve)
+            750 CALL                     0
+            758 CALL                     1
+            766 LOAD_CONST              10 (False)
+            768 LOAD_CONST              19 (0)
+            770 LOAD_CONST              20 (('enabled', 'facts'))
+            772 BUILD_CONST_KEY_MAP      2
+            774 LOAD_CONST              21 (('research', 'meta'))
+            776 BUILD_CONST_KEY_MAP      2
+            778 RETURN_VALUE
+
+215     >>  780 LOAD_GLOBAL             45 (NULL + SessionLocal)
+            790 CALL                     0
+            798 BEFORE_WITH
+            800 STORE_FAST               8 (db)
+
+216         802 LOAD_FAST                8 (db)
+            804 LOAD_ATTR               47 (NULL|self + query)
+            824 LOAD_GLOBAL             48 (ContentPlan)
+            834 CALL                     1
+            842 LOAD_ATTR               51 (NULL|self + filter)
+            862 LOAD_GLOBAL             48 (ContentPlan)
+            872 LOAD_ATTR                6 (video_id)
+            892 LOAD_FAST                1 (ctx)
+            894 LOAD_ATTR                6 (video_id)
+            914 COMPARE_OP              40 (==)
+            918 CALL                     1
+            926 LOAD_ATTR               53 (NULL|self + first)
+            946 CALL                     0
+            954 STORE_FAST               9 (plan)
+
+217         956 BUILD_MAP                0
+            958 STORE_FAST              10 (idea)
+
+218         960 LOAD_FAST                9 (plan)
+            962 POP_JUMP_IF_FALSE       44 (to 1052)
+            964 LOAD_FAST                9 (plan)
+            966 LOAD_ATTR               54 (outline_json)
+            986 POP_JUMP_IF_FALSE       32 (to 1052)
+
+219         988 NOP
+
+220         990 LOAD_GLOBAL             33 (NULL + json)
+           1000 LOAD_ATTR               56 (loads)
+           1020 LOAD_FAST                9 (plan)
+           1022 LOAD_ATTR               54 (outline_json)
+           1042 CALL                     1
+           1050 STORE_FAST              10 (idea)
+
+215     >> 1052 LOAD_CONST               0 (None)
+           1054 LOAD_CONST               0 (None)
+           1056 LOAD_CONST               0 (None)
+           1058 CALL                     2
+           1066 POP_TOP
+
+223     >> 1068 LOAD_FAST_CHECK         10 (idea)
+           1070 POP_JUMP_IF_TRUE        26 (to 1124)
+
+224        1072 LOAD_GLOBAL             21 (NULL + make_error)
+           1082 LOAD_GLOBAL             22 (E)
+           1092 LOAD_ATTR               60 (PRECONDITION_MISSING)
+
+225        1112 LOAD_CONST              22 ('Thiếu ý tưởng (ContentPlan) cho video AI Studio. Hãy duyệt ý tưởng trước.')
+
+224        1114 CALL                     2
+           1122 RAISE_VARARGS            1
+
+228     >> 1124 LOAD_FAST                1 (ctx)
+           1126 LOAD_ATTR               39 (NULL|self + emit_progress)
+           1146 LOAD_CONST              23 (0.1)
+           1148 LOAD_CONST              24 ('AI đang tra cứu dữ kiện…')
+           1150 CALL                     2
+           1158 POP_TOP
+
+229        1160 LOAD_GLOBAL             63 (NULL + format_channel_override)
+
+230        1170 LOAD_FAST                1 (ctx)
+           1172 LOAD_ATTR               12 (config)
+           1192 LOAD_ATTR               15 (NULL|self + get)
+           1212 LOAD_CONST              25 ('channel_niche')
+           1214 CALL                     1
+           1222 LOAD_FAST                1 (ctx)
+           1224 LOAD_ATTR               12 (config)
+           1244 LOAD_ATTR               15 (NULL|self + get)
+           1264 LOAD_CONST              26 ('channel_brief')
+           1266 CALL                     1
+
+231        1274 LOAD_FAST                1 (ctx)
+           1276 LOAD_ATTR               12 (config)
+           1296 LOAD_ATTR               15 (NULL|self + get)
+           1316 LOAD_CONST              27 ('channel_orientation')
+           1318 CALL                     1
+           1326 LOAD_FAST                1 (ctx)
+           1328 LOAD_ATTR               12 (config)
+           1348 LOAD_ATTR               15 (NULL|self + get)
+           1368 LOAD_CONST              28 ('niche_angle')
+           1370 CALL                     1
+
+229        1378 CALL                     4
+           1386 STORE_FAST              11 (channel_override)
+
+233        1388 LOAD_GLOBAL             65 (NULL + _build_research_prompt)
+           1398 LOAD_FAST                6 (engine)
+           1400 LOAD_FAST               10 (idea)
+           1402 LOAD_FAST                4 (language)
+           1404 LOAD_FAST               11 (channel_override)
+           1406 KW_NAMES                29 (('channel_override',))
+           1408 CALL                     4
+           1416 UNPACK_SEQUENCE          2
+           1420 STORE_FAST              12 (system)
+           1422 STORE_FAST              13 (user)
+
+234        1424 LOAD_FAST                1 (ctx)
+           1426 LOAD_ATTR               12 (config)
+           1446 LOAD_ATTR               15 (NULL|self + get)
+           1466 LOAD_CONST              30 ('provider')
+           1468 CALL                     1
+           1476 COPY                     1
+           1478 POP_JUMP_IF_TRUE         2 (to 1484)
+           1480 POP_TOP
+           1482 LOAD_CONST               0 (None)
+        >> 1484 STORE_FAST              14 (provider)
+
+235        1486 LOAD_GLOBAL             67 (NULL + complete_text)
+           1496 LOAD_FAST               12 (system)
+           1498 LOAD_FAST               13 (user)
+           1500 LOAD_CONST              31 (0.2)
+           1502 LOAD_FAST               14 (provider)
+           1504 KW_NAMES                32 (('temperature', 'provider'))
+           1506 CALL                     4
+           1514 GET_AWAITABLE            0
+           1516 LOAD_CONST               0 (None)
+        >> 1518 SEND                     3 (to 1528)
+           1522 YIELD_VALUE              2
+           1524 RESUME                   3
+           1526 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1518)
+        >> 1528 END_SEND
+           1530 STORE_FAST              15 (raw)
+
+237        1532 NOP
+
+238        1534 LOAD_GLOBAL             69 (NULL + _normalize_research)
+           1544 LOAD_GLOBAL             71 (NULL + extract_json_object)
+           1554 LOAD_FAST               15 (raw)
+           1556 CALL                     1
+           1564 CALL                     1
+           1572 STORE_FAST               7 (research)
+
+246     >> 1574 LOAD_FAST                7 (research)
+           1576 LOAD_ATTR               15 (NULL|self + get)
+           1596 LOAD_CONST              36 ('facts')
+           1598 CALL                     1
+           1606 POP_JUMP_IF_TRUE        19 (to 1646)
+
+247        1608 LOAD_FAST                1 (ctx)
+           1610 LOAD_ATTR               37 (NULL|self + emit_log)
+           1630 LOAD_CONST              37 ('[research] AI không trả dữ kiện nào — script sẽ chạy không có khối FACTS.')
+           1632 LOAD_CONST              34 ('warn')
+           1634 KW_NAMES                35 (('level',))
+           1636 CALL                     2
+           1644 POP_TOP
+
+250     >> 1646 LOAD_FAST                0 (self)
+           1648 LOAD_ATTR               29 (NULL|self + _persist)
+           1668 LOAD_FAST                1 (ctx)
+           1670 LOAD_ATTR                6 (video_id)
+           1690 LOAD_FAST                7 (research)
+           1692 CALL                     2
+           1700 POP_TOP
+
+251        1702 LOAD_FAST                3 (out_path)
+           1704 LOAD_ATTR               31 (NULL|self + write_text)
+           1724 LOAD_GLOBAL             33 (NULL + json)
+           1734 LOAD_ATTR               34 (dumps)
+           1754 LOAD_FAST                7 (research)
+           1756 LOAD_CONST              10 (False)
+           1758 LOAD_CONST              38 (2)
+           1760 KW_NAMES                39 (('ensure_ascii', 'indent'))
+           1762 CALL                     3
+           1770 LOAD_CONST              14 ('utf-8')
+           1772 KW_NAMES                15 (('encoding',))
+           1774 CALL                     2
+           1782 POP_TOP
+
+252        1784 LOAD_GLOBAL             75 (NULL + _write_sources_file)
+           1794 LOAD_FAST                2 (fs)
+           1796 LOAD_FAST                1 (ctx)
+           1798 LOAD_ATTR                6 (video_id)
+           1818 LOAD_FAST                7 (research)
+           1820 CALL                     3
+           1828 POP_TOP
+
+254        1830 LOAD_FAST                1 (ctx)
+           1832 LOAD_ATTR               39 (NULL|self + emit_progress)
+           1852 LOAD_CONST              17 (1.0)
+           1854 LOAD_CONST              40 ('Đã có ')
+           1856 LOAD_GLOBAL             77 (NULL + len)
+           1866 LOAD_FAST                7 (research)
+           1868 LOAD_CONST              36 ('facts')
+           1870 BINARY_SUBSCR
+           1874 CALL                     1
+           1882 FORMAT_VALUE             0
+           1884 LOAD_CONST              41 (' dữ kiện.')
+           1886 BUILD_STRING             3
+           1888 CALL                     2
+           1896 POP_TOP
+
+256        1898 LOAD_GLOBAL             41 (NULL + str)
+           1908 LOAD_FAST                3 (out_path)
+           1910 LOAD_ATTR               43 (NULL|self + resolve)
+           1930 CALL                     0
+           1938 CALL                     1
+
+257        1946 LOAD_CONST               2 (True)
+           1948 LOAD_GLOBAL             77 (NULL + len)
+           1958 LOAD_FAST                7 (research)
+           1960 LOAD_CONST              36 ('facts')
+           1962 BINARY_SUBSCR
+           1966 CALL                     1
+
+258        1974 LOAD_GLOBAL             77 (NULL + len)
+           1984 LOAD_FAST                7 (research)
+           1986 LOAD_CONST              42 ('sources')
+           1988 BINARY_SUBSCR
+           1992 CALL                     1
+
+257        2000 LOAD_CONST              43 (('enabled', 'facts', 'sources'))
+           2002 BUILD_CONST_KEY_MAP      3
+
+255        2004 LOAD_CONST              21 (('research', 'meta'))
+           2006 BUILD_CONST_KEY_MAP      2
+           2008 RETURN_VALUE
+        >> 2010 PUSH_EXC_INFO
+
+221        2012 LOAD_GLOBAL             32 (json)
+           2022 LOAD_ATTR               58 (JSONDecodeError)
+           2042 CHECK_EXC_MATCH
+           2044 POP_JUMP_IF_FALSE        6 (to 2058)
+           2046 POP_TOP
+
+222        2048 BUILD_MAP                0
+           2050 STORE_FAST              10 (idea)
+           2052 POP_EXCEPT
+           2054 EXTENDED_ARG             1
+           2056 JUMP_BACKWARD          503 (to 1052)
+
+221     >> 2058 RERAISE                  0
+        >> 2060 COPY                     3
+           2062 POP_EXCEPT
+           2064 RERAISE                  1
+
+215     >> 2066 PUSH_EXC_INFO
+           2068 WITH_EXCEPT_START
+           2070 POP_JUMP_IF_TRUE         1 (to 2074)
+           2072 RERAISE                  2
+        >> 2074 POP_TOP
+           2076 POP_EXCEPT
+           2078 POP_TOP
+           2080 POP_TOP
+           2082 EXTENDED_ARG             1
+           2084 JUMP_BACKWARD          509 (to 1068)
+        >> 2086 COPY                     3
+           2088 POP_EXCEPT
+           2090 RERAISE                  1
+
+235     >> 2092 CLEANUP_THROW
+           2094 EXTENDED_ARG             1
+           2096 JUMP_BACKWARD          285 (to 1528)
+        >> 2098 PUSH_EXC_INFO
+
+239        2100 LOAD_GLOBAL             72 (ValueError)
+           2110 CHECK_EXC_MATCH
+           2112 POP_JUMP_IF_FALSE       30 (to 2174)
+           2114 POP_TOP
+
+242        2116 LOAD_FAST                1 (ctx)
+           2118 LOAD_ATTR               37 (NULL|self + emit_log)
+           2138 LOAD_CONST              33 ('[research] không đọc được JSON dữ kiện từ AI — bỏ qua (script chạy không ràng buộc).')
+
+243        2140 LOAD_CONST              34 ('warn')
+
+242        2142 KW_NAMES                35 (('level',))
+           2144 CALL                     2
+           2152 POP_TOP
+
+244        2154 LOAD_CONST               2 (True)
+           2156 BUILD_LIST               0
+           2158 BUILD_LIST               0
+           2160 LOAD_CONST              11 ('')
+           2162 LOAD_CONST              12 (('enabled', 'facts', 'sources', 'caveats'))
+           2164 BUILD_CONST_KEY_MAP      4
+           2166 STORE_FAST               7 (research)
+           2168 POP_EXCEPT
+           2170 EXTENDED_ARG             1
+           2172 JUMP_BACKWARD          300 (to 1574)
+
+239     >> 2174 RERAISE                  0
+        >> 2176 COPY                     3
+           2178 POP_EXCEPT
+           2180 RERAISE                  1
+        >> 2182 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           2184 RERAISE                  1
+ExceptionTable:
+  4 to 798 -> 2182 [0] lasti
+  800 to 986 -> 2066 [1] lasti
+  990 to 1050 -> 2010 [1]
+  1052 to 1520 -> 2182 [0] lasti
+  1522 to 1522 -> 2092 [2]
+  1524 to 1530 -> 2182 [0] lasti
+  1534 to 1572 -> 2098 [0]
+  1574 to 2008 -> 2182 [0] lasti
+  2010 to 2050 -> 2060 [2] lasti
+  2052 to 2056 -> 2066 [1] lasti
+  2058 to 2058 -> 2060 [2] lasti
+  2060 to 2064 -> 2066 [1] lasti
+  2066 to 2074 -> 2086 [3] lasti
+  2076 to 2092 -> 2182 [0] lasti
+  2098 to 2166 -> 2176 [1] lasti
+  2168 to 2172 -> 2182 [0] lasti
+  2174 to 2174 -> 2176 [1] lasti
+  2176 to 2180 -> 2182 [0] lasti
+
+Disassembly of <code object _persist at 0x7f6c81b1f290, file "app\pipeline\steps\research.py", line 261>:
+261           0 RESUME                   0
+
+263           2 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             12 CALL                     0
+             20 BEFORE_WITH
+             22 STORE_FAST               2 (db)
+
+264          24 LOAD_FAST                2 (db)
+             26 LOAD_ATTR                3 (NULL|self + query)
+             46 LOAD_GLOBAL              4 (ContentPlan)
+             56 CALL                     1
+             64 LOAD_ATTR                7 (NULL|self + filter)
+             84 LOAD_GLOBAL              4 (ContentPlan)
+             94 LOAD_ATTR                8 (video_id)
+            114 LOAD_FAST                0 (video_id)
+            116 COMPARE_OP              40 (==)
+            120 CALL                     1
+            128 LOAD_ATTR               11 (NULL|self + first)
+            148 CALL                     0
+            156 STORE_FAST               3 (plan)
+
+265         158 LOAD_FAST                3 (plan)
+            160 POP_JUMP_IF_NONE        44 (to 250)
+
+266         162 LOAD_GLOBAL             13 (NULL + json)
+            172 LOAD_ATTR               14 (dumps)
+            192 LOAD_FAST                1 (research)
+            194 LOAD_CONST               1 (False)
+            196 KW_NAMES                 2 (('ensure_ascii',))
+            198 CALL                     2
+            206 LOAD_FAST                3 (plan)
+            208 STORE_ATTR               8 (research_json)
+
+267         218 LOAD_FAST                2 (db)
+            220 LOAD_ATTR               19 (NULL|self + commit)
+            240 CALL                     0
+            248 POP_TOP
+
+263     >>  250 LOAD_CONST               0 (None)
+            252 LOAD_CONST               0 (None)
+            254 LOAD_CONST               0 (None)
+            256 CALL                     2
+            264 POP_TOP
+            266 RETURN_CONST             0 (None)
+        >>  268 PUSH_EXC_INFO
+            270 WITH_EXCEPT_START
+            272 POP_JUMP_IF_TRUE         1 (to 276)
+            274 RERAISE                  2
+        >>  276 POP_TOP
+            278 POP_EXCEPT
+            280 POP_TOP
+            282 POP_TOP
+            284 RETURN_CONST             0 (None)
+        >>  286 COPY                     3
+            288 POP_EXCEPT
+            290 RERAISE                  1
+ExceptionTable:
+  22 to 248 -> 268 [1] lasti
+  268 to 276 -> 286 [3] lasti

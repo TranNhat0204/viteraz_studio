@@ -1,0 +1,538 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Step transcribe — Chuyển đổi âm thanh thành phụ đề offline bằng faster-whisper. Xem docs/06 §6.6.\n')
+              4 STORE_NAME               0 (__doc__)
+
+  3           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+  5          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('make_error', 'E'))
+             22 IMPORT_NAME              3 (app.core.errors)
+             24 IMPORT_FROM              4 (make_error)
+             26 STORE_NAME               4 (make_error)
+             28 IMPORT_FROM              5 (E)
+             30 STORE_NAME               5 (E)
+             32 POP_TOP
+
+  6          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               4 (('ProjectFS',))
+             38 IMPORT_NAME              6 (app.core.fs)
+             40 IMPORT_FROM              7 (ProjectFS)
+             42 STORE_NAME               7 (ProjectFS)
+             44 POP_TOP
+
+  7          46 LOAD_CONST               1 (0)
+             48 LOAD_CONST               5 (('gpu_gate',))
+             50 IMPORT_NAME              8 (app.core.gpu_gate)
+             52 IMPORT_FROM              9 (gpu_gate)
+             54 STORE_NAME               9 (gpu_gate)
+             56 POP_TOP
+
+  8          58 LOAD_CONST               1 (0)
+             60 LOAD_CONST               6 (('WhisperEngine',))
+             62 IMPORT_NAME             10 (app.adapters.whisper_engine)
+             64 IMPORT_FROM             11 (WhisperEngine)
+             66 STORE_NAME              11 (WhisperEngine)
+             68 POP_TOP
+
+  9          70 LOAD_CONST               1 (0)
+             72 LOAD_CONST               7 (('BaseStep', 'StepContext'))
+             74 IMPORT_NAME             12 (app.pipeline.base)
+             76 IMPORT_FROM             13 (BaseStep)
+             78 STORE_NAME              13 (BaseStep)
+             80 IMPORT_FROM             14 (StepContext)
+             82 STORE_NAME              14 (StepContext)
+             84 POP_TOP
+
+ 10          86 LOAD_CONST               1 (0)
+             88 LOAD_CONST               8 (('SessionLocal',))
+             90 IMPORT_NAME             15 (app.db.session)
+             92 IMPORT_FROM             16 (SessionLocal)
+             94 STORE_NAME              16 (SessionLocal)
+             96 POP_TOP
+
+ 11          98 LOAD_CONST               1 (0)
+            100 LOAD_CONST               9 (('SubtitleSegment',))
+            102 IMPORT_NAME             17 (app.db.models)
+            104 IMPORT_FROM             18 (SubtitleSegment)
+            106 STORE_NAME              18 (SubtitleSegment)
+            108 POP_TOP
+
+ 14         110 PUSH_NULL
+            112 LOAD_BUILD_CLASS
+            114 LOAD_CONST              10 (<code object TranscribeStep at 0x7f6c930962e0, file "app\pipeline\steps\transcribe.py", line 14>)
+            116 MAKE_FUNCTION            0
+            118 LOAD_CONST              11 ('TranscribeStep')
+            120 LOAD_NAME               13 (BaseStep)
+            122 CALL                     3
+            130 STORE_NAME              19 (TranscribeStep)
+            132 RETURN_CONST            12 (None)
+
+Disassembly of <code object TranscribeStep at 0x7f6c930962e0, file "app\pipeline\steps\transcribe.py", line 14>:
+ 14           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('TranscribeStep')
+              8 STORE_NAME               2 (__qualname__)
+
+ 15          10 LOAD_CONST               1 ('transcribe')
+             12 STORE_NAME               3 (name)
+
+ 16          14 LOAD_CONST               2 ('GPU')
+             16 STORE_NAME               4 (resource)
+
+ 17          18 LOAD_CONST               3 ('subtitle_original')
+             20 BUILD_LIST               1
+             22 STORE_NAME               5 (produces)
+
+ 19          24 LOAD_CONST               6 (('ctx', 'StepContext', 'return', 'dict'))
+             26 LOAD_CONST               4 (<code object run at 0x28b9a910, file "app\pipeline\steps\transcribe.py", line 19>)
+             28 MAKE_FUNCTION            4 (annotations)
+             30 STORE_NAME               6 (run)
+             32 RETURN_CONST             5 (None)
+
+Disassembly of <code object run at 0x28b9a910, file "app\pipeline\steps\transcribe.py", line 19>:
+              0 MAKE_CELL                1 (ctx)
+
+ 19           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+ 20           8 LOAD_GLOBAL              1 (NULL + ProjectFS)
+             18 LOAD_DEREF               1 (ctx)
+             20 LOAD_ATTR                2 (workdir)
+             40 CALL                     1
+             48 STORE_FAST               2 (fs)
+
+ 21          50 LOAD_FAST                2 (fs)
+             52 LOAD_ATTR                5 (NULL|self + audio_wav)
+             72 LOAD_DEREF               1 (ctx)
+             74 LOAD_ATTR                6 (video_id)
+             94 CALL                     1
+            102 STORE_FAST               3 (in_wav)
+
+ 22         104 LOAD_FAST                2 (fs)
+            106 LOAD_ATTR                9 (NULL|self + subtitle_original)
+            126 LOAD_DEREF               1 (ctx)
+            128 LOAD_ATTR                6 (video_id)
+            148 CALL                     1
+            156 STORE_FAST               4 (out_srt)
+
+ 23         158 LOAD_FAST                2 (fs)
+            160 LOAD_ATTR               11 (NULL|self + video_dir)
+            180 LOAD_DEREF               1 (ctx)
+            182 LOAD_ATTR                6 (video_id)
+            202 CALL                     1
+            210 LOAD_CONST               1 ('subtitle.original.vtt')
+            212 BINARY_OP               11 (/)
+            216 STORE_FAST               5 (out_vtt)
+
+ 25         218 LOAD_FAST                3 (in_wav)
+            220 LOAD_ATTR               13 (NULL|self + exists)
+            240 CALL                     0
+            248 POP_JUMP_IF_TRUE        28 (to 306)
+
+ 26         250 LOAD_GLOBAL             15 (NULL + make_error)
+
+ 27         260 LOAD_GLOBAL             16 (E)
+            270 LOAD_ATTR               18 (PRECONDITION_MISSING)
+
+ 28         290 LOAD_CONST               2 ('Thiếu file âm thanh nguồn (audio.wav). Vui lòng tách âm thanh trước.')
+
+ 29         292 LOAD_CONST               3 ('Hãy chạy step extract_audio trước.')
+
+ 26         294 KW_NAMES                 4 (('hint',))
+            296 CALL                     3
+            304 RAISE_VARARGS            1
+
+ 32     >>  306 LOAD_DEREF               1 (ctx)
+            308 LOAD_ATTR               20 (config)
+            328 LOAD_ATTR               23 (NULL|self + get)
+            348 LOAD_CONST               5 ('whisper_model')
+            350 LOAD_CONST               6 ('small')
+            352 CALL                     2
+            360 STORE_FAST               6 (model_name)
+
+ 35         362 LOAD_CONST               7 (0)
+            364 LOAD_CONST               8 (('effective_whisper_device',))
+            366 IMPORT_NAME             12 (app.core.gpu)
+            368 IMPORT_FROM             13 (effective_whisper_device)
+            370 STORE_FAST               7 (effective_whisper_device)
+            372 POP_TOP
+
+ 36         374 PUSH_NULL
+            376 LOAD_FAST                7 (effective_whisper_device)
+            378 LOAD_DEREF               1 (ctx)
+            380 LOAD_ATTR               20 (config)
+            400 CALL                     1
+            408 STORE_FAST               8 (device)
+
+ 37         410 LOAD_DEREF               1 (ctx)
+            412 LOAD_ATTR               20 (config)
+            432 LOAD_ATTR               23 (NULL|self + get)
+            452 LOAD_CONST               9 ('src_lang')
+            454 LOAD_CONST              10 ('auto')
+            456 CALL                     2
+            464 STORE_FAST               9 (src_lang)
+
+ 39         466 LOAD_GLOBAL             29 (NULL + WhisperEngine)
+            476 LOAD_FAST                6 (model_name)
+            478 KW_NAMES                11 (('model_name',))
+            480 CALL                     1
+            488 STORE_FAST              10 (engine)
+
+ 40         490 LOAD_DEREF               1 (ctx)
+            492 LOAD_ATTR               31 (NULL|self + emit_log)
+            512 LOAD_CONST              12 ('Bắt đầu nhận diện giọng nói (model=')
+            514 LOAD_FAST                6 (model_name)
+            516 FORMAT_VALUE             0
+            518 LOAD_CONST              13 (', device=')
+            520 LOAD_FAST                8 (device)
+            522 FORMAT_VALUE             0
+            524 LOAD_CONST              14 (')...')
+            526 BUILD_STRING             5
+            528 CALL                     1
+            536 POP_TOP
+
+ 42         538 LOAD_CONST              39 (('progress', 'float', 'text', 'str'))
+            540 LOAD_CLOSURE             1 (ctx)
+            542 BUILD_TUPLE              1
+            544 LOAD_CONST              16 (<code object on_prog at 0x7f6c930946c0, file "app\pipeline\steps\transcribe.py", line 42>)
+            546 MAKE_FUNCTION           12 (annotations, closure)
+            548 STORE_FAST              11 (on_prog)
+
+ 48         550 LOAD_GLOBAL             33 (NULL + bool)
+            560 LOAD_DEREF               1 (ctx)
+            562 LOAD_ATTR               20 (config)
+            582 LOAD_ATTR               23 (NULL|self + get)
+            602 LOAD_CONST              17 ('whisper_vad')
+            604 LOAD_CONST              18 (True)
+            606 CALL                     2
+            614 CALL                     1
+            622 STORE_FAST              12 (vad_filter)
+
+ 49         624 LOAD_FAST               12 (vad_filter)
+            626 POP_JUMP_IF_TRUE        19 (to 666)
+
+ 50         628 LOAD_DEREF               1 (ctx)
+            630 LOAD_ATTR               31 (NULL|self + emit_log)
+            650 LOAD_CONST              19 ('VAD tắt theo cấu hình — mốc câu đầu có thể bị kéo về 0s.')
+            652 LOAD_CONST              20 ('warn')
+            654 KW_NAMES                21 (('level',))
+            656 CALL                     2
+            664 POP_TOP
+
+ 58     >>  666 LOAD_CONST               7 (0)
+            668 LOAD_CONST              22 (('is_film_style',))
+            670 IMPORT_NAME             17 (app.pipeline.registry)
+            672 IMPORT_FROM             18 (is_film_style)
+            674 STORE_FAST              13 (is_film_style)
+            676 POP_TOP
+
+ 59         678 LOAD_GLOBAL             33 (NULL + bool)
+            688 LOAD_DEREF               1 (ctx)
+            690 LOAD_ATTR               20 (config)
+            710 LOAD_ATTR               23 (NULL|self + get)
+            730 LOAD_CONST              23 ('whisper_word_snap')
+            732 PUSH_NULL
+            734 LOAD_FAST               13 (is_film_style)
+            736 LOAD_DEREF               1 (ctx)
+            738 LOAD_ATTR               20 (config)
+            758 CALL                     1
+            766 CALL                     2
+            774 CALL                     1
+            782 STORE_FAST              14 (word_snap)
+
+ 60         784 LOAD_FAST               14 (word_snap)
+            786 POP_JUMP_IF_FALSE       17 (to 822)
+
+ 61         788 LOAD_DEREF               1 (ctx)
+            790 LOAD_ATTR               31 (NULL|self + emit_log)
+            810 LOAD_CONST              24 ('Chế độ Phim: lấy mốc từng từ để siết biên câu (bỏ đệm VAD) — chậm hơn ~10-20% nhưng giọng và phụ đề vào đúng khung hình hơn.')
+            812 CALL                     1
+            820 POP_TOP
+
+ 67     >>  822 LOAD_GLOBAL             39 (NULL + gpu_gate)
+            832 LOAD_ATTR               40 (slot)
+            852 LOAD_CONST              25 ('whisper')
+            854 LOAD_DEREF               1 (ctx)
+            856 LOAD_ATTR                6 (video_id)
+            876 LOAD_CONST               0 (None)
+            878 LOAD_CONST              26 (8)
+            880 BINARY_SLICE
+            882 KW_NAMES                27 (('label',))
+            884 CALL                     2
+            892 BEFORE_ASYNC_WITH
+            894 GET_AWAITABLE            1
+            896 LOAD_CONST               0 (None)
+        >>  898 SEND                     3 (to 908)
+            902 YIELD_VALUE              2
+            904 RESUME                   3
+            906 JUMP_BACKWARD_NO_INTERRUPT     5 (to 898)
+        >>  908 END_SEND
+            910 POP_TOP
+
+ 68         912 LOAD_FAST               10 (engine)
+            914 LOAD_ATTR               43 (NULL|self + transcribe)
+
+ 69         934 LOAD_GLOBAL             45 (NULL + str)
+            944 LOAD_FAST                3 (in_wav)
+            946 CALL                     1
+
+ 70         954 LOAD_GLOBAL             45 (NULL + str)
+            964 LOAD_FAST                4 (out_srt)
+            966 CALL                     1
+
+ 71         974 LOAD_GLOBAL             45 (NULL + str)
+            984 LOAD_FAST                5 (out_vtt)
+            986 CALL                     1
+
+ 72         994 LOAD_FAST                8 (device)
+
+ 73         996 LOAD_FAST                9 (src_lang)
+
+ 74         998 LOAD_FAST               11 (on_prog)
+
+ 75        1000 LOAD_CLOSURE             1 (ctx)
+           1002 BUILD_TUPLE              1
+           1004 LOAD_CONST              28 (<code object <lambda> at 0x7f6c93094c60, file "app\pipeline\steps\transcribe.py", line 75>)
+           1006 MAKE_FUNCTION            8 (closure)
+
+ 76        1008 LOAD_FAST               12 (vad_filter)
+
+ 77        1010 LOAD_FAST               14 (word_snap)
+
+ 68        1012 KW_NAMES                29 (('audio_path', 'out_srt', 'out_vtt', 'device', 'src_lang', 'on_progress', 'cancel_check', 'vad_filter', 'word_snap'))
+           1014 CALL                     9
+           1022 GET_AWAITABLE            0
+           1024 LOAD_CONST               0 (None)
+        >> 1026 SEND                     3 (to 1036)
+           1030 YIELD_VALUE              3
+           1032 RESUME                   3
+           1034 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1026)
+        >> 1036 END_SEND
+           1038 STORE_FAST              15 (result)
+
+ 67        1040 LOAD_CONST               0 (None)
+           1042 LOAD_CONST               0 (None)
+           1044 LOAD_CONST               0 (None)
+           1046 CALL                     2
+           1054 GET_AWAITABLE            2
+           1056 LOAD_CONST               0 (None)
+        >> 1058 SEND                     3 (to 1068)
+           1062 YIELD_VALUE              2
+           1064 RESUME                   3
+           1066 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1058)
+        >> 1068 END_SEND
+           1070 POP_TOP
+
+ 80     >> 1072 LOAD_DEREF               1 (ctx)
+           1074 LOAD_ATTR               31 (NULL|self + emit_log)
+           1094 LOAD_CONST              30 ('Đang lưu các phân đoạn phụ đề vào cơ sở dữ liệu...')
+           1096 CALL                     1
+           1104 POP_TOP
+
+ 83        1106 LOAD_GLOBAL             47 (NULL + SessionLocal)
+           1116 CALL                     0
+           1124 BEFORE_WITH
+           1126 STORE_FAST              16 (db)
+
+ 84        1128 LOAD_FAST               16 (db)
+           1130 LOAD_ATTR               49 (NULL|self + query)
+           1150 LOAD_GLOBAL             50 (SubtitleSegment)
+           1160 CALL                     1
+           1168 LOAD_ATTR               53 (NULL|self + filter)
+
+ 85        1188 LOAD_GLOBAL             50 (SubtitleSegment)
+           1198 LOAD_ATTR                6 (video_id)
+           1218 LOAD_DEREF               1 (ctx)
+           1220 LOAD_ATTR                6 (video_id)
+           1240 COMPARE_OP              40 (==)
+
+ 86        1244 LOAD_GLOBAL             50 (SubtitleSegment)
+           1254 LOAD_ATTR               54 (kind)
+           1274 LOAD_CONST              31 ('original')
+           1276 COMPARE_OP              40 (==)
+
+ 84        1280 CALL                     2
+
+ 87        1288 LOAD_ATTR               57 (NULL|self + delete)
+           1308 CALL                     0
+           1316 POP_TOP
+
+ 89        1318 LOAD_FAST_CHECK         15 (result)
+           1320 LOAD_CONST              32 ('segments')
+           1322 BINARY_SUBSCR
+           1326 GET_ITER
+        >> 1328 FOR_ITER                59 (to 1450)
+           1332 STORE_FAST              17 (seg)
+
+ 90        1334 LOAD_GLOBAL             51 (NULL + SubtitleSegment)
+
+ 91        1344 LOAD_DEREF               1 (ctx)
+           1346 LOAD_ATTR                6 (video_id)
+
+ 92        1366 LOAD_CONST              31 ('original')
+
+ 93        1368 LOAD_FAST               17 (seg)
+           1370 LOAD_CONST              33 ('seq')
+           1372 BINARY_SUBSCR
+
+ 94        1376 LOAD_FAST               17 (seg)
+           1378 LOAD_CONST              34 ('start_ms')
+           1380 BINARY_SUBSCR
+
+ 95        1384 LOAD_FAST               17 (seg)
+           1386 LOAD_CONST              35 ('end_ms')
+           1388 BINARY_SUBSCR
+
+ 96        1392 LOAD_FAST               17 (seg)
+           1394 LOAD_CONST              15 ('text')
+           1396 BINARY_SUBSCR
+
+ 97        1400 LOAD_CONST               7 (0)
+
+ 90        1402 KW_NAMES                36 (('video_id', 'kind', 'seq', 'start_ms', 'end_ms', 'text', 'edited'))
+           1404 CALL                     7
+           1412 STORE_FAST              18 (db_seg)
+
+ 99        1414 LOAD_FAST               16 (db)
+           1416 LOAD_ATTR               59 (NULL|self + add)
+           1436 LOAD_FAST               18 (db_seg)
+           1438 CALL                     1
+           1446 POP_TOP
+           1448 JUMP_BACKWARD           61 (to 1328)
+
+ 89     >> 1450 END_FOR
+
+100        1452 LOAD_FAST               16 (db)
+           1454 LOAD_ATTR               61 (NULL|self + commit)
+           1474 CALL                     0
+           1482 POP_TOP
+
+ 83        1484 LOAD_CONST               0 (None)
+           1486 LOAD_CONST               0 (None)
+           1488 LOAD_CONST               0 (None)
+           1490 CALL                     2
+           1498 POP_TOP
+
+102     >> 1500 LOAD_DEREF               1 (ctx)
+           1502 LOAD_ATTR               31 (NULL|self + emit_log)
+           1522 LOAD_CONST              37 ('Đã tạo xong phụ đề gốc: ')
+           1524 LOAD_FAST                4 (out_srt)
+           1526 LOAD_ATTR               62 (name)
+           1546 FORMAT_VALUE             0
+           1548 BUILD_STRING             2
+           1550 CALL                     1
+           1558 POP_TOP
+
+105        1560 LOAD_GLOBAL             45 (NULL + str)
+           1570 LOAD_FAST                4 (out_srt)
+           1572 LOAD_ATTR               65 (NULL|self + resolve)
+           1592 CALL                     0
+           1600 CALL                     1
+
+106        1608 LOAD_GLOBAL             45 (NULL + str)
+           1618 LOAD_FAST                5 (out_vtt)
+           1620 LOAD_ATTR               65 (NULL|self + resolve)
+           1640 CALL                     0
+           1648 CALL                     1
+
+104        1656 LOAD_CONST              38 (('subtitle_original', 'vtt_path'))
+           1658 BUILD_CONST_KEY_MAP      2
+           1660 RETURN_VALUE
+
+ 67     >> 1662 CLEANUP_THROW
+           1664 EXTENDED_ARG             1
+           1666 JUMP_BACKWARD          380 (to 908)
+
+ 68     >> 1668 CLEANUP_THROW
+           1670 EXTENDED_ARG             1
+           1672 JUMP_BACKWARD          319 (to 1036)
+
+ 67     >> 1674 CLEANUP_THROW
+           1676 EXTENDED_ARG             1
+           1678 JUMP_BACKWARD          306 (to 1068)
+        >> 1680 PUSH_EXC_INFO
+           1682 WITH_EXCEPT_START
+           1684 GET_AWAITABLE            2
+           1686 LOAD_CONST               0 (None)
+        >> 1688 SEND                     4 (to 1700)
+           1692 YIELD_VALUE              3
+           1694 RESUME                   3
+           1696 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1688)
+        >> 1698 CLEANUP_THROW
+        >> 1700 END_SEND
+           1702 POP_JUMP_IF_TRUE         1 (to 1706)
+           1704 RERAISE                  2
+        >> 1706 POP_TOP
+           1708 POP_EXCEPT
+           1710 POP_TOP
+           1712 POP_TOP
+           1714 EXTENDED_ARG             1
+           1716 JUMP_BACKWARD          323 (to 1072)
+        >> 1718 COPY                     3
+           1720 POP_EXCEPT
+           1722 RERAISE                  1
+
+ 83     >> 1724 PUSH_EXC_INFO
+           1726 WITH_EXCEPT_START
+           1728 POP_JUMP_IF_TRUE         1 (to 1732)
+           1730 RERAISE                  2
+        >> 1732 POP_TOP
+           1734 POP_EXCEPT
+           1736 POP_TOP
+           1738 POP_TOP
+           1740 JUMP_BACKWARD          121 (to 1500)
+        >> 1742 COPY                     3
+           1744 POP_EXCEPT
+           1746 RERAISE                  1
+        >> 1748 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1750 RERAISE                  1
+ExceptionTable:
+  6 to 900 -> 1748 [0] lasti
+  902 to 902 -> 1662 [3]
+  904 to 908 -> 1748 [0] lasti
+  910 to 1028 -> 1680 [1] lasti
+  1030 to 1030 -> 1668 [3]
+  1032 to 1038 -> 1680 [1] lasti
+  1040 to 1060 -> 1748 [0] lasti
+  1062 to 1062 -> 1674 [2]
+  1064 to 1124 -> 1748 [0] lasti
+  1126 to 1482 -> 1724 [1] lasti
+  1484 to 1662 -> 1748 [0] lasti
+  1668 to 1668 -> 1680 [1] lasti
+  1674 to 1674 -> 1748 [0] lasti
+  1680 to 1690 -> 1718 [3] lasti
+  1692 to 1692 -> 1698 [6]
+  1694 to 1706 -> 1718 [3] lasti
+  1708 to 1722 -> 1748 [0] lasti
+  1724 to 1732 -> 1742 [3] lasti
+  1734 to 1746 -> 1748 [0] lasti
+
+Disassembly of <code object on_prog at 0x7f6c930946c0, file "app\pipeline\steps\transcribe.py", line 42>:
+              0 COPY_FREE_VARS           1
+
+ 42           2 RESUME                   0
+
+ 43           4 LOAD_DEREF               2 (ctx)
+              6 LOAD_ATTR                1 (NULL|self + emit_progress)
+             26 LOAD_FAST                0 (progress)
+             28 LOAD_FAST                1 (text)
+             30 CALL                     2
+             38 POP_TOP
+             40 RETURN_CONST             0 (None)
+
+Disassembly of <code object <lambda> at 0x7f6c93094c60, file "app\pipeline\steps\transcribe.py", line 75>:
+              0 COPY_FREE_VARS           1
+
+ 75           2 RESUME                   0
+              4 LOAD_DEREF               0 (ctx)
+              6 LOAD_ATTR                1 (NULL|self + is_cancelled)
+             26 CALL                     0
+             34 RETURN_VALUE

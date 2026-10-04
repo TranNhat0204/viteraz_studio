@@ -1,0 +1,2002 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Router queue — trạng thái/điều khiển hàng đợi (docs/07 §7.7-7.9).\n\nEndpoints khớp với frontend desktop/src/api/endpoints/queue.ts:\n  GET  /projects/{project_id}/queue   → {summary, running, queued}\n  GET  /jobs/{job_id}                 → chi tiết 1 job\n  POST /queue:pause | /queue:resume\n  PUT  /queue/config                  → đổi max_concurrency / gpu_slots runtime\n  POST /jobs/{job_id}:cancel\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 10           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 12          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (json)
+             24 STORE_NAME               3 (json)
+
+ 13          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               4 (('datetime',))
+             30 IMPORT_NAME              4 (datetime)
+             32 IMPORT_FROM              4 (datetime)
+             34 STORE_NAME               4 (datetime)
+             36 POP_TOP
+
+ 15          38 LOAD_CONST               1 (0)
+             40 LOAD_CONST               5 (('APIRouter', 'Depends'))
+             42 IMPORT_NAME              5 (fastapi)
+             44 IMPORT_FROM              6 (APIRouter)
+             46 STORE_NAME               6 (APIRouter)
+             48 IMPORT_FROM              7 (Depends)
+             50 STORE_NAME               7 (Depends)
+             52 POP_TOP
+
+ 16          54 LOAD_CONST               1 (0)
+             56 LOAD_CONST               6 (('BaseModel',))
+             58 IMPORT_NAME              8 (pydantic)
+             60 IMPORT_FROM              9 (BaseModel)
+             62 STORE_NAME               9 (BaseModel)
+             64 POP_TOP
+
+ 17          66 LOAD_CONST               1 (0)
+             68 LOAD_CONST               7 (('Session',))
+             70 IMPORT_NAME             10 (sqlalchemy.orm)
+             72 IMPORT_FROM             11 (Session)
+             74 STORE_NAME              11 (Session)
+             76 POP_TOP
+
+ 19          78 LOAD_CONST               1 (0)
+             80 LOAD_CONST               8 (('verify_token', 'get_session'))
+             82 IMPORT_NAME             12 (app.deps)
+             84 IMPORT_FROM             13 (verify_token)
+             86 STORE_NAME              13 (verify_token)
+             88 IMPORT_FROM             14 (get_session)
+             90 STORE_NAME              14 (get_session)
+             92 POP_TOP
+
+ 20          94 LOAD_CONST               1 (0)
+             96 LOAD_CONST               9 (('StudioError', 'E'))
+             98 IMPORT_NAME             15 (app.core.errors)
+            100 IMPORT_FROM             16 (StudioError)
+            102 STORE_NAME              16 (StudioError)
+            104 IMPORT_FROM             17 (E)
+            106 STORE_NAME              17 (E)
+            108 POP_TOP
+
+ 21         110 LOAD_CONST               1 (0)
+            112 LOAD_CONST              10 (('Job', 'Project', 'Video', 'VideoStep'))
+            114 IMPORT_NAME             18 (app.db.models)
+            116 IMPORT_FROM             19 (Job)
+            118 STORE_NAME              19 (Job)
+            120 IMPORT_FROM             20 (Project)
+            122 STORE_NAME              20 (Project)
+            124 IMPORT_FROM             21 (Video)
+            126 STORE_NAME              21 (Video)
+            128 IMPORT_FROM             22 (VideoStep)
+            130 STORE_NAME              22 (VideoStep)
+            132 POP_TOP
+
+ 22         134 LOAD_CONST               1 (0)
+            136 LOAD_CONST              11 (('job_queue', 'resource_of'))
+            138 IMPORT_NAME             23 (app.pipeline.queue)
+            140 IMPORT_FROM             24 (job_queue)
+            142 STORE_NAME              24 (job_queue)
+            144 IMPORT_FROM             25 (resource_of)
+            146 STORE_NAME              25 (resource_of)
+            148 POP_TOP
+
+ 24         150 PUSH_NULL
+            152 LOAD_NAME                6 (APIRouter)
+            154 LOAD_CONST              12 ('/api/v1')
+            156 LOAD_CONST              13 ('queue')
+            158 BUILD_LIST               1
+            160 PUSH_NULL
+            162 LOAD_NAME                7 (Depends)
+            164 LOAD_NAME               13 (verify_token)
+            166 CALL                     1
+            174 BUILD_LIST               1
+            176 KW_NAMES                14 (('prefix', 'tags', 'dependencies'))
+            178 CALL                     3
+            186 STORE_NAME              26 (router)
+
+ 27         188 LOAD_CONST              41 (('db', 'Session', 'video_id', 'str | None', 'return', 'str'))
+            190 LOAD_CONST              15 (<code object _video_title at 0x26a23070, file "app\api\queue.py", line 27>)
+            192 MAKE_FUNCTION            4 (annotations)
+            194 STORE_NAME              27 (_video_title)
+
+ 41         196 LOAD_CONST              42 (('db', 'Session', 'j', 'Job', 'return', 'dict'))
+            198 LOAD_CONST              16 (<code object _job_to_dict at 0x28e567b0, file "app\api\queue.py", line 41>)
+            200 MAKE_FUNCTION            4 (annotations)
+            202 STORE_NAME              28 (_job_to_dict)
+
+102         204 LOAD_NAME               26 (router)
+            206 LOAD_ATTR               59 (NULL|self + get)
+            226 LOAD_CONST              17 ('/projects/{project_id}/queue')
+            228 CALL                     1
+
+103         236 PUSH_NULL
+            238 LOAD_NAME                7 (Depends)
+            240 LOAD_NAME               14 (get_session)
+            242 CALL                     1
+            250 BUILD_TUPLE              1
+            252 LOAD_CONST              43 (('project_id', 'str', 'db', 'Session'))
+            254 LOAD_CONST              18 (<code object get_project_queue at 0x28e5a9b0, file "app\api\queue.py", line 102>)
+            256 MAKE_FUNCTION            5 (defaults, annotations)
+
+102         258 CALL                     0
+
+103         266 STORE_NAME              30 (get_project_queue)
+
+153         268 LOAD_NAME               26 (router)
+            270 LOAD_ATTR               59 (NULL|self + get)
+            290 LOAD_CONST              19 ('/jobs/{job_id}')
+            292 CALL                     1
+
+154         300 PUSH_NULL
+            302 LOAD_NAME                7 (Depends)
+            304 LOAD_NAME               14 (get_session)
+            306 CALL                     1
+            314 BUILD_TUPLE              1
+            316 LOAD_CONST              44 (('job_id', 'str', 'db', 'Session'))
+            318 LOAD_CONST              20 (<code object get_job at 0x7f6c92d634b0, file "app\api\queue.py", line 153>)
+            320 MAKE_FUNCTION            5 (defaults, annotations)
+
+153         322 CALL                     0
+
+154         330 STORE_NAME              31 (get_job)
+
+161         332 LOAD_NAME               26 (router)
+            334 LOAD_ATTR               65 (NULL|self + post)
+            354 LOAD_CONST              21 ('/queue:pause')
+            356 CALL                     1
+
+162         364 LOAD_CONST              22 (<code object pause_queue at 0x7f6c92e4d730, file "app\api\queue.py", line 161>)
+            366 MAKE_FUNCTION            0
+
+161         368 CALL                     0
+
+162         376 STORE_NAME              33 (pause_queue)
+
+167         378 LOAD_NAME               26 (router)
+            380 LOAD_ATTR               65 (NULL|self + post)
+            400 LOAD_CONST              23 ('/queue:resume')
+            402 CALL                     1
+
+168         410 LOAD_CONST              24 (<code object resume_queue at 0x7f6c81a44d30, file "app\api\queue.py", line 167>)
+            412 MAKE_FUNCTION            0
+
+167         414 CALL                     0
+
+168         422 STORE_NAME              34 (resume_queue)
+
+173         424 PUSH_NULL
+            426 LOAD_BUILD_CLASS
+            428 LOAD_CONST              25 (<code object QueueConfigUpdate at 0x7f6c92b70250, file "app\api\queue.py", line 173>)
+            430 MAKE_FUNCTION            0
+            432 LOAD_CONST              26 ('QueueConfigUpdate')
+            434 LOAD_NAME                9 (BaseModel)
+            436 CALL                     3
+            444 STORE_NAME              35 (QueueConfigUpdate)
+
+181         446 LOAD_NAME               26 (router)
+            448 LOAD_ATTR               73 (NULL|self + put)
+            468 LOAD_CONST              27 ('/queue/config')
+            470 CALL                     1
+
+182         478 LOAD_CONST              45 (('body', 'QueueConfigUpdate'))
+            480 LOAD_CONST              28 (<code object update_queue_config at 0x269dab70, file "app\api\queue.py", line 181>)
+            482 MAKE_FUNCTION            4 (annotations)
+
+181         484 CALL                     0
+
+182         492 STORE_NAME              37 (update_queue_config)
+
+212         494 LOAD_NAME               26 (router)
+            496 LOAD_ATTR               65 (NULL|self + post)
+            516 LOAD_CONST              29 ('/jobs/{job_id}:cancel')
+            518 CALL                     1
+
+213         526 PUSH_NULL
+            528 LOAD_NAME                7 (Depends)
+            530 LOAD_NAME               14 (get_session)
+            532 CALL                     1
+            540 BUILD_TUPLE              1
+            542 LOAD_CONST              44 (('job_id', 'str', 'db', 'Session'))
+            544 LOAD_CONST              30 (<code object cancel_job at 0x7f6c9296b930, file "app\api\queue.py", line 212>)
+            546 MAKE_FUNCTION            5 (defaults, annotations)
+
+212         548 CALL                     0
+
+213         556 STORE_NAME              38 (cancel_job)
+
+221         558 PUSH_NULL
+            560 LOAD_BUILD_CLASS
+            562 LOAD_CONST              31 (<code object PriorityBody at 0x7f6c92eb6950, file "app\api\queue.py", line 221>)
+            564 MAKE_FUNCTION            0
+            566 LOAD_CONST              32 ('PriorityBody')
+            568 LOAD_NAME                9 (BaseModel)
+            570 CALL                     3
+            578 STORE_NAME              39 (PriorityBody)
+
+225         580 LOAD_NAME               26 (router)
+            582 LOAD_ATTR               65 (NULL|self + post)
+            602 LOAD_CONST              33 ('/jobs/{job_id}:set-priority')
+            604 CALL                     1
+
+226         612 PUSH_NULL
+            614 LOAD_NAME                7 (Depends)
+            616 LOAD_NAME               14 (get_session)
+            618 CALL                     1
+            626 BUILD_TUPLE              1
+            628 LOAD_CONST              46 (('job_id', 'str', 'body', 'PriorityBody', 'db', 'Session'))
+            630 LOAD_CONST              34 (<code object set_job_priority at 0x7f6c9331d7a0, file "app\api\queue.py", line 225>)
+            632 MAKE_FUNCTION            5 (defaults, annotations)
+
+225         634 CALL                     0
+
+226         642 STORE_NAME              40 (set_job_priority)
+
+237         644 LOAD_CONST              35 (('image_provider', 'video_provider', 'flow_profile_id', 'flow_video_model', 'flow_image_model'))
+            646 STORE_NAME              41 (_PROVIDER_KEYS)
+
+240         648 LOAD_CONST              47 (('video_id', 'str', 'cfg', 'dict', 'return', 'dict'))
+            650 LOAD_CONST              36 (<code object _with_current_providers at 0x7f6c81b1cdc0, file "app\api\queue.py", line 240>)
+            652 MAKE_FUNCTION            4 (annotations)
+            654 STORE_NAME              42 (_with_current_providers)
+
+251         656 LOAD_NAME               26 (router)
+            658 LOAD_ATTR               65 (NULL|self + post)
+            678 LOAD_CONST              37 ('/projects/{project_id}:retry-failed')
+            680 CALL                     1
+
+252         688 PUSH_NULL
+            690 LOAD_NAME                7 (Depends)
+            692 LOAD_NAME               14 (get_session)
+            694 CALL                     1
+            702 BUILD_TUPLE              1
+            704 LOAD_CONST              43 (('project_id', 'str', 'db', 'Session'))
+            706 LOAD_CONST              38 (<code object retry_failed at 0x290b69f0, file "app\api\queue.py", line 251>)
+            708 MAKE_FUNCTION            5 (defaults, annotations)
+
+251         710 CALL                     0
+
+252         718 STORE_NAME              43 (retry_failed)
+
+313         720 LOAD_NAME               26 (router)
+            722 LOAD_ATTR               65 (NULL|self + post)
+            742 LOAD_CONST              39 ('/projects/{project_id}:clear-completed')
+            744 CALL                     1
+
+314         752 PUSH_NULL
+            754 LOAD_NAME                7 (Depends)
+            756 LOAD_NAME               14 (get_session)
+            758 CALL                     1
+            766 BUILD_TUPLE              1
+            768 LOAD_CONST              43 (('project_id', 'str', 'db', 'Session'))
+            770 LOAD_CONST              40 (<code object clear_completed at 0x29069f30, file "app\api\queue.py", line 313>)
+            772 MAKE_FUNCTION            5 (defaults, annotations)
+
+313         774 CALL                     0
+
+314         782 STORE_NAME              44 (clear_completed)
+            784 RETURN_CONST             3 (None)
+
+Disassembly of <code object _video_title at 0x26a23070, file "app\api\queue.py", line 27>:
+ 27           0 RESUME                   0
+
+ 29           2 LOAD_FAST                1 (video_id)
+              4 POP_JUMP_IF_TRUE         1 (to 8)
+
+ 30           6 RETURN_CONST             1 ('')
+
+ 31     >>    8 LOAD_FAST                0 (db)
+             10 LOAD_ATTR                1 (NULL|self + get)
+             30 LOAD_GLOBAL              2 (Video)
+             40 LOAD_FAST                1 (video_id)
+             42 CALL                     2
+             50 STORE_FAST               2 (v)
+
+ 32          52 LOAD_FAST                2 (v)
+             54 POP_JUMP_IF_TRUE         2 (to 60)
+
+ 33          56 LOAD_FAST                1 (video_id)
+             58 RETURN_VALUE
+
+ 34     >>   60 LOAD_FAST                2 (v)
+             62 LOAD_ATTR                4 (title)
+             82 POP_JUMP_IF_FALSE       52 (to 188)
+             84 LOAD_FAST                2 (v)
+             86 LOAD_ATTR                4 (title)
+            106 LOAD_ATTR                7 (NULL|self + strip)
+            126 CALL                     0
+            134 POP_JUMP_IF_FALSE       26 (to 188)
+
+ 35         136 LOAD_FAST                2 (v)
+            138 LOAD_ATTR                4 (title)
+            158 LOAD_ATTR                7 (NULL|self + strip)
+            178 CALL                     0
+            186 RETURN_VALUE
+
+ 36     >>  188 LOAD_FAST                2 (v)
+            190 LOAD_ATTR                8 (source_url)
+            210 POP_JUMP_IF_FALSE       59 (to 330)
+
+ 37         212 LOAD_FAST                2 (v)
+            214 LOAD_ATTR                8 (source_url)
+            234 LOAD_ATTR               11 (NULL|self + rstrip)
+            254 LOAD_CONST               2 ('/')
+            256 CALL                     1
+            264 LOAD_ATTR               13 (NULL|self + split)
+            284 LOAD_CONST               2 ('/')
+            286 CALL                     1
+            294 LOAD_CONST               3 (-1)
+            296 BINARY_SUBSCR
+            300 COPY                     1
+            302 POP_JUMP_IF_TRUE        12 (to 328)
+            304 POP_TOP
+            306 LOAD_FAST                2 (v)
+            308 LOAD_ATTR                8 (source_url)
+        >>  328 RETURN_VALUE
+
+ 38     >>  330 LOAD_FAST                1 (video_id)
+            332 RETURN_VALUE
+
+Disassembly of <code object _job_to_dict at 0x28e567b0, file "app\api\queue.py", line 41>:
+ 41           0 RESUME                   0
+
+ 43           2 LOAD_CONST               1 (0.0)
+              4 STORE_FAST               2 (progress)
+
+ 44           6 LOAD_CONST               0 (None)
+              8 STORE_FAST               3 (error)
+
+ 46          10 LOAD_GLOBAL              1 (NULL + hasattr)
+             20 LOAD_GLOBAL              2 (job_queue)
+             30 LOAD_CONST               2 ('_current_step_of')
+             32 CALL                     2
+             40 POP_JUMP_IF_FALSE       21 (to 84)
+             42 LOAD_GLOBAL              3 (NULL + job_queue)
+             52 LOAD_ATTR                4 (_current_step_of)
+             72 LOAD_FAST                1 (j)
+             74 CALL                     1
+             82 JUMP_FORWARD             1 (to 86)
+        >>   84 LOAD_CONST               0 (None)
+        >>   86 STORE_FAST               4 (cur_step)
+
+ 47          88 NOP
+
+ 48          90 LOAD_GLOBAL              7 (NULL + json)
+            100 LOAD_ATTR                8 (loads)
+            120 LOAD_FAST                1 (j)
+            122 LOAD_ATTR               10 (config_json)
+            142 COPY                     1
+            144 POP_JUMP_IF_TRUE         2 (to 150)
+            146 POP_TOP
+            148 LOAD_CONST               3 ('{}')
+        >>  150 CALL                     1
+            158 STORE_FAST               5 (job_config)
+
+ 51     >>  160 LOAD_FAST                1 (j)
+            162 LOAD_ATTR               16 (job_type)
+            182 LOAD_CONST               4 ('background_task')
+            184 COMPARE_OP              40 (==)
+            188 POP_JUMP_IF_FALSE       52 (to 294)
+
+ 52         190 LOAD_GLOBAL             19 (NULL + float)
+            200 LOAD_FAST                5 (job_config)
+            202 LOAD_ATTR               21 (NULL|self + get)
+            222 LOAD_CONST               5 ('_progress')
+            224 CALL                     1
+            232 COPY                     1
+            234 POP_JUMP_IF_TRUE         2 (to 240)
+            236 POP_TOP
+            238 LOAD_CONST               6 (0)
+        >>  240 CALL                     1
+            248 STORE_FAST               2 (progress)
+
+ 53         250 LOAD_FAST                5 (job_config)
+            252 LOAD_ATTR               21 (NULL|self + get)
+            272 LOAD_CONST               7 ('_error')
+            274 CALL                     1
+            282 COPY                     1
+            284 POP_JUMP_IF_TRUE         2 (to 290)
+            286 POP_TOP
+            288 LOAD_CONST               0 (None)
+        >>  290 STORE_FAST               3 (error)
+            292 JUMP_FORWARD           220 (to 734)
+
+ 54     >>  294 LOAD_FAST                1 (j)
+            296 LOAD_ATTR               22 (video_id)
+            316 POP_JUMP_IF_FALSE      208 (to 734)
+
+ 55         318 LOAD_FAST                0 (db)
+            320 LOAD_ATTR               25 (NULL|self + query)
+            340 LOAD_GLOBAL             26 (VideoStep)
+            350 CALL                     1
+            358 LOAD_ATTR               29 (NULL|self + filter)
+            378 LOAD_GLOBAL             26 (VideoStep)
+            388 LOAD_ATTR               22 (video_id)
+            408 LOAD_FAST                1 (j)
+            410 LOAD_ATTR               22 (video_id)
+            430 COMPARE_OP              40 (==)
+            434 CALL                     1
+            442 STORE_FAST               6 (step_q)
+
+ 56         444 LOAD_FAST                1 (j)
+            446 LOAD_ATTR               30 (step_name)
+            466 COPY                     1
+            468 POP_JUMP_IF_TRUE         2 (to 474)
+            470 POP_TOP
+            472 LOAD_FAST                4 (cur_step)
+        >>  474 STORE_FAST               7 (target)
+
+ 57         476 LOAD_FAST                7 (target)
+            478 POP_JUMP_IF_FALSE       49 (to 578)
+
+ 58         480 LOAD_FAST                6 (step_q)
+            482 LOAD_ATTR               29 (NULL|self + filter)
+            502 LOAD_GLOBAL             26 (VideoStep)
+            512 LOAD_ATTR               30 (step_name)
+            532 LOAD_FAST                7 (target)
+            534 COMPARE_OP              40 (==)
+            538 CALL                     1
+            546 LOAD_ATTR               33 (NULL|self + first)
+            566 CALL                     0
+            574 STORE_FAST               8 (row)
+            576 JUMP_FORWARD            48 (to 674)
+
+ 60     >>  578 LOAD_FAST                6 (step_q)
+            580 LOAD_ATTR               29 (NULL|self + filter)
+            600 LOAD_GLOBAL             26 (VideoStep)
+            610 LOAD_ATTR               34 (status)
+            630 LOAD_CONST               8 ('running')
+            632 COMPARE_OP              40 (==)
+            636 CALL                     1
+            644 LOAD_ATTR               33 (NULL|self + first)
+            664 CALL                     0
+            672 STORE_FAST               8 (row)
+
+ 61     >>  674 LOAD_FAST                8 (row)
+            676 POP_JUMP_IF_FALSE       28 (to 734)
+
+ 62         678 LOAD_FAST                8 (row)
+            680 LOAD_ATTR               36 (progress)
+            700 COPY                     1
+            702 POP_JUMP_IF_TRUE         2 (to 708)
+            704 POP_TOP
+            706 LOAD_CONST               1 (0.0)
+        >>  708 STORE_FAST               2 (progress)
+
+ 63         710 LOAD_FAST                8 (row)
+            712 LOAD_ATTR               38 (error_message)
+            732 STORE_FAST               3 (error)
+
+ 64     >>  734 LOAD_CONST               0 (None)
+            736 STORE_FAST               9 (elapsed_s)
+
+ 65         738 LOAD_FAST                1 (j)
+            740 LOAD_ATTR               40 (started_at)
+            760 POP_JUMP_IF_FALSE       82 (to 926)
+
+ 66         762 LOAD_FAST                1 (j)
+            764 LOAD_ATTR               42 (finished_at)
+            784 COPY                     1
+            786 POP_JUMP_IF_TRUE        20 (to 828)
+            788 POP_TOP
+            790 LOAD_GLOBAL             45 (NULL + datetime)
+            800 LOAD_ATTR               46 (utcnow)
+            820 CALL                     0
+        >>  828 STORE_FAST              10 (end)
+
+ 67         830 LOAD_GLOBAL             49 (NULL + max)
+            840 LOAD_CONST               6 (0)
+            842 LOAD_GLOBAL             51 (NULL + int)
+            852 LOAD_FAST               10 (end)
+            854 LOAD_FAST                1 (j)
+            856 LOAD_ATTR               40 (started_at)
+            876 BINARY_OP               10 (-)
+            880 LOAD_ATTR               53 (NULL|self + total_seconds)
+            900 CALL                     0
+            908 CALL                     1
+            916 CALL                     2
+            924 STORE_FAST               9 (elapsed_s)
+
+ 68     >>  926 LOAD_FAST                1 (j)
+            928 LOAD_ATTR               30 (step_name)
+            948 COPY                     1
+            950 POP_JUMP_IF_TRUE        20 (to 992)
+            952 POP_TOP
+            954 LOAD_FAST                4 (cur_step)
+            956 COPY                     1
+            958 POP_JUMP_IF_TRUE        16 (to 992)
+            960 POP_TOP
+            962 LOAD_FAST                1 (j)
+            964 LOAD_ATTR               54 (pipeline_preset)
+            984 COPY                     1
+            986 POP_JUMP_IF_TRUE         2 (to 992)
+            988 POP_TOP
+            990 LOAD_CONST               9 ('')
+        >>  992 STORE_FAST              11 (step_label)
+
+ 69         994 LOAD_FAST                0 (db)
+            996 LOAD_ATTR               21 (NULL|self + get)
+           1016 LOAD_GLOBAL             56 (Project)
+           1026 LOAD_FAST                1 (j)
+           1028 LOAD_ATTR               58 (project_id)
+           1048 CALL                     2
+           1056 STORE_FAST              12 (proj)
+
+ 70        1058 LOAD_FAST               12 (proj)
+           1060 POP_JUMP_IF_FALSE       12 (to 1086)
+           1062 LOAD_FAST               12 (proj)
+           1064 LOAD_ATTR               60 (name)
+           1084 JUMP_FORWARD             1 (to 1088)
+        >> 1086 LOAD_CONST               9 ('')
+        >> 1088 STORE_FAST              13 (project_name)
+
+ 71        1090 LOAD_GLOBAL             63 (NULL + _video_title)
+           1100 LOAD_FAST                0 (db)
+           1102 LOAD_FAST                1 (j)
+           1104 LOAD_ATTR               22 (video_id)
+           1124 CALL                     2
+           1132 STORE_FAST              14 (video_title)
+
+ 72        1134 LOAD_FAST                1 (j)
+           1136 LOAD_ATTR               16 (job_type)
+           1156 LOAD_CONST               4 ('background_task')
+           1158 COMPARE_OP              40 (==)
+           1162 POP_JUMP_IF_FALSE      102 (to 1368)
+
+ 73        1164 LOAD_GLOBAL             65 (NULL + str)
+           1174 LOAD_FAST                5 (job_config)
+           1176 LOAD_ATTR               21 (NULL|self + get)
+           1196 LOAD_CONST              10 ('label')
+           1198 CALL                     1
+           1206 COPY                     1
+           1208 POP_JUMP_IF_TRUE        21 (to 1252)
+           1210 POP_TOP
+           1212 LOAD_FAST                5 (job_config)
+           1214 LOAD_ATTR               21 (NULL|self + get)
+           1234 LOAD_CONST              11 ('channel_url')
+           1236 CALL                     1
+           1244 COPY                     1
+           1246 POP_JUMP_IF_TRUE         2 (to 1252)
+           1248 POP_TOP
+           1250 LOAD_FAST               11 (step_label)
+        >> 1252 CALL                     1
+           1260 STORE_FAST              14 (video_title)
+
+ 74        1262 LOAD_FAST               11 (step_label)
+           1264 LOAD_CONST              12 ('competitor_dna')
+           1266 COMPARE_OP              40 (==)
+           1270 POP_JUMP_IF_FALSE        3 (to 1278)
+
+ 75        1272 LOAD_CONST              13 ('Học DNA kênh')
+           1274 STORE_FAST              11 (step_label)
+           1276 JUMP_FORWARD            45 (to 1368)
+
+ 76     >> 1278 LOAD_FAST               11 (step_label)
+           1280 LOAD_CONST              14 ('audio_story_summary')
+           1282 COMPARE_OP              40 (==)
+           1286 POP_JUMP_IF_FALSE       25 (to 1338)
+
+ 79        1288 LOAD_FAST                5 (job_config)
+           1290 LOAD_ATTR               21 (NULL|self + get)
+           1310 LOAD_CONST              15 ('generation_mode')
+           1312 CALL                     1
+           1320 LOAD_CONST              16 ('remix')
+           1322 COMPARE_OP              40 (==)
+           1326 POP_JUMP_IF_FALSE        2 (to 1332)
+
+ 78        1328 LOAD_CONST              17 ('Đọc & xào lại truyện')
+           1330 JUMP_FORWARD             1 (to 1334)
+
+ 80     >> 1332 LOAD_CONST              18 ('Đọc & tóm tắt truyện')
+
+ 77     >> 1334 STORE_FAST              11 (step_label)
+           1336 JUMP_FORWARD            15 (to 1368)
+
+ 82     >> 1338 LOAD_FAST               11 (step_label)
+           1340 LOAD_CONST              19 ('news_import')
+           1342 COMPARE_OP              40 (==)
+           1346 POP_JUMP_IF_FALSE        3 (to 1354)
+
+ 83        1348 LOAD_CONST              20 ('📰 Import bài báo')
+           1350 STORE_FAST              11 (step_label)
+           1352 JUMP_FORWARD             7 (to 1368)
+
+ 84     >> 1354 LOAD_FAST               11 (step_label)
+           1356 LOAD_CONST              21 ('character_portrait')
+           1358 COMPARE_OP              40 (==)
+           1362 POP_JUMP_IF_FALSE        2 (to 1368)
+
+ 85        1364 LOAD_CONST              22 ('🎭 Vẽ nhân vật')
+           1366 STORE_FAST              11 (step_label)
+
+ 87     >> 1368 LOAD_FAST                1 (j)
+           1370 LOAD_ATTR               66 (id)
+
+ 88        1390 LOAD_FAST                1 (j)
+           1392 LOAD_ATTR               58 (project_id)
+
+ 89        1412 LOAD_FAST               13 (project_name)
+
+ 90        1414 LOAD_FAST                1 (j)
+           1416 LOAD_ATTR               22 (video_id)
+           1436 COPY                     1
+           1438 POP_JUMP_IF_TRUE         2 (to 1444)
+           1440 POP_TOP
+           1442 LOAD_CONST               9 ('')
+
+ 91     >> 1444 LOAD_FAST               14 (video_title)
+
+ 92        1446 LOAD_FAST                1 (j)
+           1448 LOAD_ATTR               68 (priority)
+
+ 93        1468 LOAD_FAST               11 (step_label)
+
+ 94        1470 LOAD_FAST                2 (progress)
+
+ 95        1472 LOAD_GLOBAL             71 (NULL + resource_of)
+           1482 LOAD_FAST                1 (j)
+           1484 LOAD_ATTR               30 (step_name)
+           1504 COPY                     1
+           1506 POP_JUMP_IF_TRUE         6 (to 1520)
+           1508 POP_TOP
+           1510 LOAD_FAST                4 (cur_step)
+           1512 COPY                     1
+           1514 POP_JUMP_IF_TRUE         2 (to 1520)
+           1516 POP_TOP
+           1518 LOAD_CONST               9 ('')
+        >> 1520 LOAD_FAST                5 (job_config)
+           1522 CALL                     2
+
+ 96        1530 LOAD_FAST                1 (j)
+           1532 LOAD_ATTR               34 (status)
+
+ 97        1552 LOAD_FAST                3 (error)
+
+ 98        1554 LOAD_FAST                9 (elapsed_s)
+
+ 86        1556 LOAD_CONST              23 (('job_id', 'project_id', 'project_name', 'video_id', 'video_title', 'priority', 'step_name', 'progress', 'resource', 'status', 'error', 'elapsed_s'))
+           1558 BUILD_CONST_KEY_MAP     12
+           1560 RETURN_VALUE
+        >> 1562 PUSH_EXC_INFO
+
+ 49        1564 LOAD_GLOBAL             12 (TypeError)
+           1574 LOAD_GLOBAL             14 (ValueError)
+           1584 BUILD_TUPLE              2
+           1586 CHECK_EXC_MATCH
+           1588 POP_JUMP_IF_FALSE        6 (to 1602)
+           1590 POP_TOP
+
+ 50        1592 BUILD_MAP                0
+           1594 STORE_FAST               5 (job_config)
+           1596 POP_EXCEPT
+           1598 EXTENDED_ARG             2
+           1600 JUMP_BACKWARD          721 (to 160)
+
+ 49     >> 1602 RERAISE                  0
+        >> 1604 COPY                     3
+           1606 POP_EXCEPT
+           1608 RERAISE                  1
+ExceptionTable:
+  90 to 158 -> 1562 [0]
+  1562 to 1594 -> 1604 [1] lasti
+  1602 to 1602 -> 1604 [1] lasti
+
+Disassembly of <code object get_project_queue at 0x28e5a9b0, file "app\api\queue.py", line 102>:
+102           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+104           6 LOAD_FAST                0 (project_id)
+              8 LOAD_CONST               1 ('all')
+             10 COMPARE_OP              40 (==)
+             14 POP_JUMP_IF_FALSE       80 (to 176)
+
+106          16 LOAD_FAST                1 (db)
+             18 LOAD_ATTR                1 (NULL|self + query)
+             38 LOAD_GLOBAL              2 (Job)
+             48 CALL                     1
+
+107          56 LOAD_ATTR                5 (NULL|self + order_by)
+             76 LOAD_GLOBAL              2 (Job)
+             86 LOAD_ATTR                6 (priority)
+            106 LOAD_GLOBAL              2 (Job)
+            116 LOAD_ATTR                8 (created_at)
+            136 CALL                     2
+
+108         144 LOAD_ATTR               11 (NULL|self + all)
+            164 CALL                     0
+
+105         172 STORE_FAST               2 (rows)
+            174 JUMP_FORWARD           111 (to 398)
+
+112     >>  176 LOAD_FAST                1 (db)
+            178 LOAD_ATTR                1 (NULL|self + query)
+            198 LOAD_GLOBAL              2 (Job)
+            208 CALL                     1
+
+113         216 LOAD_ATTR               13 (NULL|self + filter)
+            236 LOAD_GLOBAL              2 (Job)
+            246 LOAD_ATTR               14 (project_id)
+            266 LOAD_FAST                0 (project_id)
+            268 COMPARE_OP              40 (==)
+            272 CALL                     1
+
+114         280 LOAD_ATTR                5 (NULL|self + order_by)
+            300 LOAD_GLOBAL              2 (Job)
+            310 LOAD_ATTR                6 (priority)
+            330 LOAD_GLOBAL              2 (Job)
+            340 LOAD_ATTR                8 (created_at)
+            360 CALL                     2
+
+115         368 LOAD_ATTR               11 (NULL|self + all)
+            388 CALL                     0
+
+111         396 STORE_FAST               2 (rows)
+
+117     >>  398 LOAD_CONST               2 (0)
+            400 LOAD_CONST               2 (0)
+            402 LOAD_CONST               2 (0)
+            404 LOAD_CONST               2 (0)
+            406 LOAD_CONST               3 (('queued', 'running', 'done', 'failed'))
+            408 BUILD_CONST_KEY_MAP      4
+            410 STORE_FAST               3 (summary)
+
+118         412 BUILD_LIST               0
+            414 BUILD_LIST               0
+            416 BUILD_LIST               0
+            418 STORE_FAST               6 (failed)
+            420 STORE_FAST               5 (queued)
+            422 STORE_FAST               4 (running)
+
+119         424 LOAD_FAST                2 (rows)
+            426 GET_ITER
+        >>  428 FOR_ITER               228 (to 888)
+            432 STORE_FAST               7 (j)
+
+120         434 LOAD_FAST                7 (j)
+            436 LOAD_ATTR               16 (status)
+            456 LOAD_CONST               4 ('queued')
+            458 COMPARE_OP              40 (==)
+            462 POP_JUMP_IF_FALSE       14 (to 492)
+
+121         464 LOAD_FAST                3 (summary)
+            466 LOAD_CONST               4 ('queued')
+            468 COPY                     2
+            470 COPY                     2
+            472 BINARY_SUBSCR
+            476 LOAD_CONST               5 (1)
+            478 BINARY_OP               13 (+=)
+            482 SWAP                     3
+            484 SWAP                     2
+            486 STORE_SUBSCR
+            490 JUMP_FORWARD            86 (to 664)
+
+122     >>  492 LOAD_FAST                7 (j)
+            494 LOAD_ATTR               16 (status)
+            514 LOAD_CONST               6 ('running')
+            516 COMPARE_OP              40 (==)
+            520 POP_JUMP_IF_FALSE       14 (to 550)
+
+123         522 LOAD_FAST                3 (summary)
+            524 LOAD_CONST               6 ('running')
+            526 COPY                     2
+            528 COPY                     2
+            530 BINARY_SUBSCR
+            534 LOAD_CONST               5 (1)
+            536 BINARY_OP               13 (+=)
+            540 SWAP                     3
+            542 SWAP                     2
+            544 STORE_SUBSCR
+            548 JUMP_FORWARD            57 (to 664)
+
+124     >>  550 LOAD_FAST                7 (j)
+            552 LOAD_ATTR               16 (status)
+            572 LOAD_CONST               7 ('done')
+            574 COMPARE_OP              40 (==)
+            578 POP_JUMP_IF_FALSE       14 (to 608)
+
+125         580 LOAD_FAST                3 (summary)
+            582 LOAD_CONST               7 ('done')
+            584 COPY                     2
+            586 COPY                     2
+            588 BINARY_SUBSCR
+            592 LOAD_CONST               5 (1)
+            594 BINARY_OP               13 (+=)
+            598 SWAP                     3
+            600 SWAP                     2
+            602 STORE_SUBSCR
+            606 JUMP_FORWARD            28 (to 664)
+
+126     >>  608 LOAD_FAST                7 (j)
+            610 LOAD_ATTR               16 (status)
+            630 LOAD_CONST               8 ('failed')
+            632 COMPARE_OP              40 (==)
+            636 POP_JUMP_IF_FALSE       13 (to 664)
+
+127         638 LOAD_FAST                3 (summary)
+            640 LOAD_CONST               8 ('failed')
+            642 COPY                     2
+            644 COPY                     2
+            646 BINARY_SUBSCR
+            650 LOAD_CONST               5 (1)
+            652 BINARY_OP               13 (+=)
+            656 SWAP                     3
+            658 SWAP                     2
+            660 STORE_SUBSCR
+
+130     >>  664 LOAD_FAST                7 (j)
+            666 LOAD_ATTR               16 (status)
+            686 LOAD_CONST               9 (('queued', 'running', 'failed'))
+            688 CONTAINS_OP              0
+            690 POP_JUMP_IF_TRUE         1 (to 694)
+            692 JUMP_BACKWARD          133 (to 428)
+
+131     >>  694 NOP
+
+132         696 LOAD_GLOBAL             19 (NULL + _job_to_dict)
+            706 LOAD_FAST                1 (db)
+            708 LOAD_FAST                7 (j)
+            710 CALL                     2
+            718 STORE_FAST               8 (d)
+
+135         720 LOAD_FAST                7 (j)
+            722 LOAD_ATTR               16 (status)
+            742 LOAD_CONST               6 ('running')
+            744 COMPARE_OP              40 (==)
+            748 POP_JUMP_IF_FALSE       18 (to 786)
+
+136         750 LOAD_FAST                4 (running)
+            752 LOAD_ATTR               23 (NULL|self + append)
+            772 LOAD_FAST                8 (d)
+            774 CALL                     1
+            782 POP_TOP
+            784 JUMP_BACKWARD          179 (to 428)
+
+137     >>  786 LOAD_FAST                7 (j)
+            788 LOAD_ATTR               16 (status)
+            808 LOAD_CONST               4 ('queued')
+            810 COMPARE_OP              40 (==)
+            814 POP_JUMP_IF_FALSE       18 (to 852)
+
+138         816 LOAD_FAST                5 (queued)
+            818 LOAD_ATTR               23 (NULL|self + append)
+            838 LOAD_FAST                8 (d)
+            840 CALL                     1
+            848 POP_TOP
+            850 JUMP_BACKWARD          212 (to 428)
+
+140     >>  852 LOAD_FAST                6 (failed)
+            854 LOAD_ATTR               23 (NULL|self + append)
+            874 LOAD_FAST                8 (d)
+            876 CALL                     1
+            884 POP_TOP
+            886 JUMP_BACKWARD          230 (to 428)
+
+119     >>  888 END_FOR
+
+142         890 LOAD_FAST                3 (summary)
+
+143         892 LOAD_FAST                4 (running)
+
+144         894 LOAD_FAST                5 (queued)
+
+145         896 LOAD_GLOBAL             25 (NULL + list)
+            906 LOAD_GLOBAL             27 (NULL + reversed)
+            916 LOAD_FAST                6 (failed)
+            918 CALL                     1
+            926 CALL                     1
+            934 LOAD_CONST               0 (None)
+            936 LOAD_CONST              10 (50)
+            938 BINARY_SLICE
+
+146         940 LOAD_GLOBAL             28 (job_queue)
+            950 LOAD_ATTR               30 (is_paused)
+
+147         970 LOAD_GLOBAL             28 (job_queue)
+            980 LOAD_ATTR               32 (gpu_slots)
+
+148        1000 LOAD_GLOBAL             28 (job_queue)
+           1010 LOAD_ATTR               34 (net_slots)
+
+149        1030 LOAD_GLOBAL             28 (job_queue)
+           1040 LOAD_ATTR               36 (cpu_slots)
+
+141        1060 LOAD_CONST              11 (('summary', 'running', 'queued', 'failed', 'paused', 'gpu_slots', 'net_slots', 'cpu_slots'))
+           1062 BUILD_CONST_KEY_MAP      8
+           1064 RETURN_VALUE
+        >> 1066 PUSH_EXC_INFO
+
+133        1068 LOAD_GLOBAL             20 (Exception)
+           1078 CHECK_EXC_MATCH
+           1080 POP_JUMP_IF_FALSE        4 (to 1090)
+           1082 POP_TOP
+
+134        1084 POP_EXCEPT
+           1086 EXTENDED_ARG             1
+           1088 JUMP_BACKWARD          331 (to 428)
+
+133     >> 1090 RERAISE                  0
+        >> 1092 COPY                     3
+           1094 POP_EXCEPT
+           1096 RERAISE                  1
+        >> 1098 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1100 RERAISE                  1
+ExceptionTable:
+  4 to 690 -> 1098 [0] lasti
+  696 to 718 -> 1066 [1]
+  720 to 1064 -> 1098 [0] lasti
+  1066 to 1082 -> 1092 [2] lasti
+  1084 to 1088 -> 1098 [0] lasti
+  1090 to 1090 -> 1092 [2] lasti
+  1092 to 1096 -> 1098 [0] lasti
+
+Disassembly of <code object get_job at 0x7f6c92d634b0, file "app\api\queue.py", line 153>:
+153           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+155           6 LOAD_FAST                1 (db)
+              8 LOAD_ATTR                1 (NULL|self + get)
+             28 LOAD_GLOBAL              2 (Job)
+             38 LOAD_FAST                0 (job_id)
+             40 CALL                     2
+             48 STORE_FAST               2 (j)
+
+156          50 LOAD_FAST                2 (j)
+             52 POP_JUMP_IF_TRUE        28 (to 110)
+
+157          54 LOAD_GLOBAL              5 (NULL + StudioError)
+             64 LOAD_GLOBAL              6 (E)
+             74 LOAD_ATTR                8 (UNKNOWN)
+             94 LOAD_CONST               1 ('Job không tồn tại')
+             96 LOAD_CONST               2 (404)
+             98 KW_NAMES                 3 (('status_code',))
+            100 CALL                     3
+            108 RAISE_VARARGS            1
+
+158     >>  110 LOAD_GLOBAL             11 (NULL + _job_to_dict)
+            120 LOAD_FAST                1 (db)
+            122 LOAD_FAST                2 (j)
+            124 CALL                     2
+            132 RETURN_VALUE
+        >>  134 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            136 RERAISE                  1
+ExceptionTable:
+  4 to 132 -> 134 [0] lasti
+
+Disassembly of <code object pause_queue at 0x7f6c92e4d730, file "app\api\queue.py", line 161>:
+161           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+163           6 LOAD_GLOBAL              1 (NULL + job_queue)
+             16 LOAD_ATTR                2 (pause)
+             36 CALL                     0
+             44 POP_TOP
+
+164          46 LOAD_CONST               1 (True)
+             48 LOAD_CONST               1 (True)
+             50 LOAD_CONST               2 (('ok', 'paused'))
+             52 BUILD_CONST_KEY_MAP      2
+             54 RETURN_VALUE
+        >>   56 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             58 RERAISE                  1
+ExceptionTable:
+  4 to 54 -> 56 [0] lasti
+
+Disassembly of <code object resume_queue at 0x7f6c81a44d30, file "app\api\queue.py", line 167>:
+167           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+169           6 LOAD_GLOBAL              1 (NULL + job_queue)
+             16 LOAD_ATTR                2 (resume)
+             36 CALL                     0
+             44 POP_TOP
+
+170          46 LOAD_CONST               1 (True)
+             48 LOAD_CONST               2 (False)
+             50 LOAD_CONST               3 (('ok', 'paused'))
+             52 BUILD_CONST_KEY_MAP      2
+             54 RETURN_VALUE
+        >>   56 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             58 RERAISE                  1
+ExceptionTable:
+  4 to 54 -> 56 [0] lasti
+
+Disassembly of <code object QueueConfigUpdate at 0x7f6c92b70250, file "app\api\queue.py", line 173>:
+173           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('QueueConfigUpdate')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+174          12 LOAD_CONST               1 (None)
+             14 STORE_NAME               3 (gpu_slots)
+             16 LOAD_CONST               2 ('int | None')
+             18 LOAD_NAME                4 (__annotations__)
+             20 LOAD_CONST               3 ('gpu_slots')
+             22 STORE_SUBSCR
+
+175          26 LOAD_CONST               1 (None)
+             28 STORE_NAME               5 (net_slots)
+             30 LOAD_CONST               2 ('int | None')
+             32 LOAD_NAME                4 (__annotations__)
+             34 LOAD_CONST               4 ('net_slots')
+             36 STORE_SUBSCR
+
+176          40 LOAD_CONST               1 (None)
+             42 STORE_NAME               6 (cpu_slots)
+             44 LOAD_CONST               2 ('int | None')
+             46 LOAD_NAME                4 (__annotations__)
+             48 LOAD_CONST               5 ('cpu_slots')
+             50 STORE_SUBSCR
+
+178          54 LOAD_CONST               1 (None)
+             56 STORE_NAME               7 (max_concurrency)
+             58 LOAD_CONST               2 ('int | None')
+             60 LOAD_NAME                4 (__annotations__)
+             62 LOAD_CONST               6 ('max_concurrency')
+             64 STORE_SUBSCR
+             68 RETURN_CONST             1 (None)
+
+Disassembly of <code object update_queue_config at 0x269dab70, file "app\api\queue.py", line 181>:
+181           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+183           6 LOAD_FAST                0 (body)
+              8 LOAD_ATTR                0 (gpu_slots)
+             28 POP_JUMP_IF_NONE        51 (to 132)
+             30 LOAD_CONST               1 (1)
+             32 LOAD_FAST                0 (body)
+             34 LOAD_ATTR                0 (gpu_slots)
+             54 SWAP                     2
+             56 COPY                     2
+             58 COMPARE_OP              26 (<=)
+             62 POP_JUMP_IF_FALSE        5 (to 74)
+             64 LOAD_CONST               2 (8)
+             66 COMPARE_OP              26 (<=)
+             70 POP_JUMP_IF_TRUE        30 (to 132)
+             72 JUMP_FORWARD             1 (to 76)
+        >>   74 POP_TOP
+
+184     >>   76 LOAD_GLOBAL              3 (NULL + StudioError)
+             86 LOAD_GLOBAL              4 (E)
+             96 LOAD_ATTR                6 (UNKNOWN)
+            116 LOAD_CONST               3 ('gpu_slots phải trong khoảng 1-8')
+            118 LOAD_CONST               4 (422)
+            120 KW_NAMES                 5 (('status_code',))
+            122 CALL                     3
+            130 RAISE_VARARGS            1
+
+185     >>  132 LOAD_FAST                0 (body)
+            134 LOAD_ATTR                8 (net_slots)
+            154 POP_JUMP_IF_NONE        51 (to 258)
+            156 LOAD_CONST               1 (1)
+            158 LOAD_FAST                0 (body)
+            160 LOAD_ATTR                8 (net_slots)
+            180 SWAP                     2
+            182 COPY                     2
+            184 COMPARE_OP              26 (<=)
+            188 POP_JUMP_IF_FALSE        5 (to 200)
+            190 LOAD_CONST               6 (32)
+            192 COMPARE_OP              26 (<=)
+            196 POP_JUMP_IF_TRUE        30 (to 258)
+            198 JUMP_FORWARD             1 (to 202)
+        >>  200 POP_TOP
+
+186     >>  202 LOAD_GLOBAL              3 (NULL + StudioError)
+            212 LOAD_GLOBAL              4 (E)
+            222 LOAD_ATTR                6 (UNKNOWN)
+            242 LOAD_CONST               7 ('net_slots phải trong khoảng 1-32')
+            244 LOAD_CONST               4 (422)
+            246 KW_NAMES                 5 (('status_code',))
+            248 CALL                     3
+            256 RAISE_VARARGS            1
+
+187     >>  258 LOAD_FAST                0 (body)
+            260 LOAD_ATTR               10 (cpu_slots)
+            280 POP_JUMP_IF_NONE        51 (to 384)
+            282 LOAD_CONST               1 (1)
+            284 LOAD_FAST                0 (body)
+            286 LOAD_ATTR               10 (cpu_slots)
+            306 SWAP                     2
+            308 COPY                     2
+            310 COMPARE_OP              26 (<=)
+            314 POP_JUMP_IF_FALSE        5 (to 326)
+            316 LOAD_CONST               8 (64)
+            318 COMPARE_OP              26 (<=)
+            322 POP_JUMP_IF_TRUE        30 (to 384)
+            324 JUMP_FORWARD             1 (to 328)
+        >>  326 POP_TOP
+
+188     >>  328 LOAD_GLOBAL              3 (NULL + StudioError)
+            338 LOAD_GLOBAL              4 (E)
+            348 LOAD_ATTR                6 (UNKNOWN)
+            368 LOAD_CONST               9 ('cpu_slots phải trong khoảng 1-64')
+            370 LOAD_CONST               4 (422)
+            372 KW_NAMES                 5 (('status_code',))
+            374 CALL                     3
+            382 RAISE_VARARGS            1
+
+189     >>  384 LOAD_GLOBAL             13 (NULL + job_queue)
+            394 LOAD_ATTR               14 (update_config)
+            414 LOAD_FAST                0 (body)
+            416 LOAD_ATTR                0 (gpu_slots)
+            436 LOAD_FAST                0 (body)
+            438 LOAD_ATTR                8 (net_slots)
+            458 LOAD_FAST                0 (body)
+            460 LOAD_ATTR               10 (cpu_slots)
+            480 CALL                     3
+            488 POP_TOP
+
+191         490 LOAD_CONST              10 (0)
+            492 LOAD_CONST              11 (('SessionLocal',))
+            494 IMPORT_NAME              8 (app.db.session)
+            496 IMPORT_FROM              9 (SessionLocal)
+            498 STORE_FAST               1 (SessionLocal)
+            500 POP_TOP
+
+192         502 LOAD_CONST              10 (0)
+            504 LOAD_CONST              12 (('Setting',))
+            506 IMPORT_NAME             10 (app.db.models)
+            508 IMPORT_FROM             11 (Setting)
+            510 STORE_FAST               2 (Setting)
+            512 POP_TOP
+
+193         514 PUSH_NULL
+            516 LOAD_FAST                1 (SessionLocal)
+            518 CALL                     0
+            526 BEFORE_WITH
+            528 STORE_FAST               3 (db)
+
+194         530 LOAD_CONST              13 ('gpu_slots')
+            532 LOAD_FAST                0 (body)
+            534 LOAD_ATTR                0 (gpu_slots)
+            554 BUILD_TUPLE              2
+            556 LOAD_CONST              14 ('net_slots')
+            558 LOAD_FAST                0 (body)
+            560 LOAD_ATTR                8 (net_slots)
+            580 BUILD_TUPLE              2
+
+195         582 LOAD_CONST              15 ('cpu_slots')
+            584 LOAD_FAST                0 (body)
+            586 LOAD_ATTR               10 (cpu_slots)
+            606 BUILD_TUPLE              2
+
+194         608 BUILD_TUPLE              3
+            610 GET_ITER
+        >>  612 FOR_ITER                79 (to 774)
+            616 UNPACK_SEQUENCE          2
+            620 STORE_FAST               4 (key)
+            622 STORE_FAST               5 (val)
+
+196         624 LOAD_FAST                5 (val)
+            626 POP_JUMP_IF_NOT_NONE     1 (to 630)
+
+197         628 JUMP_BACKWARD            9 (to 612)
+
+198     >>  630 LOAD_FAST                3 (db)
+            632 LOAD_ATTR               25 (NULL|self + get)
+            652 LOAD_FAST                2 (Setting)
+            654 LOAD_FAST                4 (key)
+            656 CALL                     2
+            664 STORE_FAST               6 (row)
+
+199         666 LOAD_FAST                6 (row)
+            668 POP_JUMP_IF_FALSE       17 (to 704)
+
+200         670 LOAD_GLOBAL             27 (NULL + str)
+            680 LOAD_FAST                5 (val)
+            682 CALL                     1
+            690 LOAD_FAST                6 (row)
+            692 STORE_ATTR              14 (value)
+            702 JUMP_BACKWARD           46 (to 612)
+
+202     >>  704 LOAD_FAST                3 (db)
+            706 LOAD_ATTR               31 (NULL|self + add)
+            726 PUSH_NULL
+            728 LOAD_FAST                2 (Setting)
+            730 LOAD_FAST                4 (key)
+            732 LOAD_GLOBAL             27 (NULL + str)
+            742 LOAD_FAST                5 (val)
+            744 CALL                     1
+            752 KW_NAMES                16 (('key', 'value'))
+            754 CALL                     2
+            762 CALL                     1
+            770 POP_TOP
+            772 JUMP_BACKWARD           81 (to 612)
+
+194     >>  774 END_FOR
+
+203         776 LOAD_FAST                3 (db)
+            778 LOAD_ATTR               33 (NULL|self + commit)
+            798 CALL                     0
+            806 POP_TOP
+
+193         808 LOAD_CONST               0 (None)
+            810 LOAD_CONST               0 (None)
+            812 LOAD_CONST               0 (None)
+            814 CALL                     2
+            822 POP_TOP
+
+205     >>  824 LOAD_CONST              17 (True)
+
+206         826 LOAD_GLOBAL             12 (job_queue)
+            836 LOAD_ATTR                0 (gpu_slots)
+
+207         856 LOAD_GLOBAL             12 (job_queue)
+            866 LOAD_ATTR                8 (net_slots)
+
+208         886 LOAD_GLOBAL             12 (job_queue)
+            896 LOAD_ATTR               10 (cpu_slots)
+
+204         916 LOAD_CONST              18 (('ok', 'gpu_slots', 'net_slots', 'cpu_slots'))
+            918 BUILD_CONST_KEY_MAP      4
+            920 RETURN_VALUE
+
+193     >>  922 PUSH_EXC_INFO
+            924 WITH_EXCEPT_START
+            926 POP_JUMP_IF_TRUE         1 (to 930)
+            928 RERAISE                  2
+        >>  930 POP_TOP
+            932 POP_EXCEPT
+            934 POP_TOP
+            936 POP_TOP
+            938 JUMP_BACKWARD           58 (to 824)
+        >>  940 COPY                     3
+            942 POP_EXCEPT
+            944 RERAISE                  1
+        >>  946 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            948 RERAISE                  1
+ExceptionTable:
+  4 to 526 -> 946 [0] lasti
+  528 to 806 -> 922 [1] lasti
+  808 to 920 -> 946 [0] lasti
+  922 to 930 -> 940 [3] lasti
+  932 to 944 -> 946 [0] lasti
+
+Disassembly of <code object cancel_job at 0x7f6c9296b930, file "app\api\queue.py", line 212>:
+212           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+214           6 LOAD_FAST                1 (db)
+              8 LOAD_ATTR                1 (NULL|self + get)
+             28 LOAD_GLOBAL              2 (Job)
+             38 LOAD_FAST                0 (job_id)
+             40 CALL                     2
+             48 STORE_FAST               2 (j)
+
+215          50 LOAD_FAST                2 (j)
+             52 POP_JUMP_IF_TRUE        28 (to 110)
+
+216          54 LOAD_GLOBAL              5 (NULL + StudioError)
+             64 LOAD_GLOBAL              6 (E)
+             74 LOAD_ATTR                8 (UNKNOWN)
+             94 LOAD_CONST               1 ('Job không tồn tại')
+             96 LOAD_CONST               2 (404)
+             98 KW_NAMES                 3 (('status_code',))
+            100 CALL                     3
+            108 RAISE_VARARGS            1
+
+217     >>  110 LOAD_GLOBAL             11 (NULL + job_queue)
+            120 LOAD_ATTR               12 (cancel_job)
+            140 LOAD_FAST                0 (job_id)
+            142 CALL                     1
+            150 GET_AWAITABLE            0
+            152 LOAD_CONST               0 (None)
+        >>  154 SEND                     3 (to 164)
+            158 YIELD_VALUE              2
+            160 RESUME                   3
+            162 JUMP_BACKWARD_NO_INTERRUPT     5 (to 154)
+        >>  164 END_SEND
+            166 STORE_FAST               3 (cancelled)
+
+218         168 LOAD_CONST               4 (True)
+            170 LOAD_FAST                3 (cancelled)
+            172 LOAD_CONST               5 (('ok', 'cancelled'))
+            174 BUILD_CONST_KEY_MAP      2
+            176 RETURN_VALUE
+
+217     >>  178 CLEANUP_THROW
+            180 JUMP_BACKWARD            9 (to 164)
+        >>  182 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            184 RERAISE                  1
+ExceptionTable:
+  4 to 156 -> 182 [0] lasti
+  158 to 158 -> 178 [2]
+  160 to 178 -> 182 [0] lasti
+
+Disassembly of <code object PriorityBody at 0x7f6c92eb6950, file "app\api\queue.py", line 221>:
+221           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('PriorityBody')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+222          12 LOAD_CONST               1 ('int')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('priority')
+             18 STORE_SUBSCR
+             22 RETURN_CONST             3 (None)
+
+Disassembly of <code object set_job_priority at 0x7f6c9331d7a0, file "app\api\queue.py", line 225>:
+225           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+228           6 LOAD_FAST                2 (db)
+              8 LOAD_ATTR                1 (NULL|self + get)
+             28 LOAD_GLOBAL              2 (Job)
+             38 LOAD_FAST                0 (job_id)
+             40 CALL                     2
+             48 STORE_FAST               3 (j)
+
+229          50 LOAD_FAST                3 (j)
+             52 POP_JUMP_IF_TRUE        28 (to 110)
+
+230          54 LOAD_GLOBAL              5 (NULL + StudioError)
+             64 LOAD_GLOBAL              6 (E)
+             74 LOAD_ATTR                8 (UNKNOWN)
+             94 LOAD_CONST               1 ('Job không tồn tại')
+             96 LOAD_CONST               2 (404)
+             98 KW_NAMES                 3 (('status_code',))
+            100 CALL                     3
+            108 RAISE_VARARGS            1
+
+231     >>  110 LOAD_GLOBAL             11 (NULL + job_queue)
+            120 LOAD_ATTR               12 (set_priority)
+            140 LOAD_FAST                0 (job_id)
+            142 LOAD_FAST                1 (body)
+            144 LOAD_ATTR               14 (priority)
+            164 CALL                     2
+            172 STORE_FAST               4 (ok)
+
+232         174 LOAD_FAST                4 (ok)
+            176 LOAD_FAST                1 (body)
+            178 LOAD_ATTR               14 (priority)
+            198 LOAD_CONST               4 (('ok', 'priority'))
+            200 BUILD_CONST_KEY_MAP      2
+            202 RETURN_VALUE
+        >>  204 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            206 RERAISE                  1
+ExceptionTable:
+  4 to 202 -> 204 [0] lasti
+
+Disassembly of <code object _with_current_providers at 0x7f6c81b1cdc0, file "app\api\queue.py", line 240>:
+240           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+241           6 NOP
+
+242           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('_ai_studio_config_for',))
+             12 IMPORT_NAME              0 (app.services.ai_studio_service)
+             14 IMPORT_FROM              1 (_ai_studio_config_for)
+             16 STORE_FAST               2 (_ai_studio_config_for)
+             18 POP_TOP
+
+243          20 PUSH_NULL
+             22 LOAD_FAST                2 (_ai_studio_config_for)
+             24 LOAD_FAST                0 (video_id)
+             26 CALL                     1
+             34 GET_AWAITABLE            0
+             36 LOAD_CONST               0 (None)
+        >>   38 SEND                     3 (to 48)
+             42 YIELD_VALUE              3
+             44 RESUME                   3
+             46 JUMP_BACKWARD_NO_INTERRUPT     5 (to 38)
+        >>   48 END_SEND
+             50 UNPACK_SEQUENCE          2
+             54 STORE_FAST               3 (_pid)
+             56 STORE_FAST               4 (fresh)
+
+246          58 LOAD_FAST                1 (cfg)
+             60 LOAD_ATTR                7 (NULL|self + items)
+             80 CALL                     0
+             88 GET_ITER
+             90 LOAD_FAST_AND_CLEAR      5 (k)
+             92 LOAD_FAST_AND_CLEAR      6 (v)
+             94 SWAP                     3
+             96 BUILD_MAP                0
+             98 SWAP                     2
+        >>  100 FOR_ITER                17 (to 138)
+            104 UNPACK_SEQUENCE          2
+            108 STORE_FAST               5 (k)
+            110 STORE_FAST               6 (v)
+            112 LOAD_FAST                5 (k)
+            114 LOAD_GLOBAL              8 (_PROVIDER_KEYS)
+            124 CONTAINS_OP              1
+            126 POP_JUMP_IF_TRUE         1 (to 130)
+            128 JUMP_BACKWARD           15 (to 100)
+        >>  130 LOAD_FAST                5 (k)
+            132 LOAD_FAST                6 (v)
+            134 MAP_ADD                  2
+            136 JUMP_BACKWARD           19 (to 100)
+        >>  138 END_FOR
+            140 STORE_FAST               7 (out)
+            142 STORE_FAST               5 (k)
+            144 STORE_FAST               6 (v)
+
+247         146 LOAD_FAST                7 (out)
+            148 LOAD_ATTR               11 (NULL|self + update)
+            168 LOAD_GLOBAL              8 (_PROVIDER_KEYS)
+            178 GET_ITER
+            180 LOAD_FAST_AND_CLEAR      5 (k)
+            182 SWAP                     2
+            184 BUILD_MAP                0
+            186 SWAP                     2
+        >>  188 FOR_ITER                13 (to 218)
+            192 STORE_FAST               5 (k)
+            194 LOAD_FAST                5 (k)
+            196 LOAD_FAST                4 (fresh)
+            198 CONTAINS_OP              0
+            200 POP_JUMP_IF_TRUE         1 (to 204)
+            202 JUMP_BACKWARD            8 (to 188)
+        >>  204 LOAD_FAST                5 (k)
+            206 LOAD_FAST                4 (fresh)
+            208 LOAD_FAST                5 (k)
+            210 BINARY_SUBSCR
+            214 MAP_ADD                  2
+            216 JUMP_BACKWARD           15 (to 188)
+        >>  218 END_FOR
+            220 SWAP                     2
+            222 STORE_FAST               5 (k)
+            224 CALL                     1
+            232 POP_TOP
+
+248         234 LOAD_FAST                7 (out)
+            236 RETURN_VALUE
+
+243     >>  238 CLEANUP_THROW
+            240 JUMP_BACKWARD           97 (to 48)
+        >>  242 PUSH_EXC_INFO
+
+244         244 LOAD_GLOBAL              4 (Exception)
+            254 CHECK_EXC_MATCH
+            256 POP_JUMP_IF_FALSE        5 (to 268)
+            258 POP_TOP
+
+245         260 LOAD_FAST                1 (cfg)
+            262 SWAP                     2
+            264 POP_EXCEPT
+            266 RETURN_VALUE
+
+244     >>  268 RERAISE                  0
+        >>  270 COPY                     3
+            272 POP_EXCEPT
+            274 RERAISE                  1
+        >>  276 SWAP                     2
+            278 POP_TOP
+
+246         280 SWAP                     3
+            282 STORE_FAST               6 (v)
+            284 STORE_FAST               5 (k)
+            286 RERAISE                  0
+        >>  288 SWAP                     2
+            290 POP_TOP
+
+247         292 SWAP                     2
+            294 STORE_FAST               5 (k)
+            296 RERAISE                  0
+        >>  298 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            300 RERAISE                  1
+ExceptionTable:
+  4 to 4 -> 298 [0] lasti
+  8 to 40 -> 242 [0]
+  42 to 42 -> 238 [2]
+  44 to 56 -> 242 [0]
+  58 to 94 -> 298 [0] lasti
+  96 to 126 -> 276 [3]
+  130 to 138 -> 276 [3]
+  140 to 182 -> 298 [0] lasti
+  184 to 200 -> 288 [4]
+  204 to 218 -> 288 [4]
+  220 to 236 -> 298 [0] lasti
+  238 to 238 -> 242 [0]
+  242 to 262 -> 270 [1] lasti
+  264 to 266 -> 298 [0] lasti
+  268 to 268 -> 270 [1] lasti
+  270 to 296 -> 298 [0] lasti
+
+Disassembly of <code object retry_failed at 0x290b69f0, file "app\api\queue.py", line 251>:
+251           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+258           6 LOAD_FAST                0 (project_id)
+              8 LOAD_CONST               1 ('all')
+             10 COMPARE_OP              40 (==)
+             14 POP_JUMP_IF_FALSE       97 (to 210)
+
+259          16 LOAD_FAST                1 (db)
+             18 LOAD_ATTR                1 (NULL|self + query)
+             38 LOAD_GLOBAL              2 (Job)
+             48 CALL                     1
+
+260          56 LOAD_ATTR                5 (NULL|self + filter)
+             76 LOAD_GLOBAL              2 (Job)
+             86 LOAD_ATTR                6 (status)
+            106 LOAD_CONST               2 ('failed')
+            108 COMPARE_OP              40 (==)
+            112 CALL                     1
+
+261         120 LOAD_ATTR                9 (NULL|self + order_by)
+            140 LOAD_GLOBAL              2 (Job)
+            150 LOAD_ATTR               10 (created_at)
+            170 CALL                     1
+
+262         178 LOAD_ATTR               13 (NULL|self + all)
+            198 CALL                     0
+
+259         206 STORE_FAST               2 (failed)
+            208 JUMP_FORWARD           114 (to 438)
+
+264     >>  210 LOAD_FAST                1 (db)
+            212 LOAD_ATTR                1 (NULL|self + query)
+            232 LOAD_GLOBAL              2 (Job)
+            242 CALL                     1
+
+265         250 LOAD_ATTR                5 (NULL|self + filter)
+            270 LOAD_GLOBAL              2 (Job)
+            280 LOAD_ATTR               14 (project_id)
+            300 LOAD_FAST                0 (project_id)
+            302 COMPARE_OP              40 (==)
+            306 LOAD_GLOBAL              2 (Job)
+            316 LOAD_ATTR                6 (status)
+            336 LOAD_CONST               2 ('failed')
+            338 COMPARE_OP              40 (==)
+            342 CALL                     2
+
+266         350 LOAD_ATTR                9 (NULL|self + order_by)
+            370 LOAD_GLOBAL              2 (Job)
+            380 LOAD_ATTR               10 (created_at)
+            400 CALL                     1
+
+267         408 LOAD_ATTR               13 (NULL|self + all)
+            428 CALL                     0
+
+264         436 STORE_FAST               2 (failed)
+
+268     >>  438 BUILD_MAP                0
+            440 STORE_FAST               3 (by_video)
+
+269         442 BUILD_MAP                0
+            444 STORE_FAST               4 (background)
+
+270         446 LOAD_FAST                2 (failed)
+            448 GET_ITER
+        >>  450 FOR_ITER               155 (to 764)
+            454 STORE_FAST               5 (j)
+
+271         456 LOAD_FAST                5 (j)
+            458 LOAD_ATTR               16 (video_id)
+            478 POP_JUMP_IF_FALSE       16 (to 512)
+
+272         480 LOAD_FAST                5 (j)
+            482 LOAD_FAST                3 (by_video)
+            484 LOAD_FAST                5 (j)
+            486 LOAD_ATTR               16 (video_id)
+            506 STORE_SUBSCR
+            510 JUMP_BACKWARD           31 (to 450)
+
+273     >>  512 LOAD_FAST                5 (j)
+            514 LOAD_ATTR               18 (job_type)
+            534 LOAD_CONST               3 ('background_task')
+            536 COMPARE_OP              40 (==)
+            540 POP_JUMP_IF_TRUE         1 (to 544)
+            542 JUMP_BACKWARD           47 (to 450)
+        >>  544 LOAD_FAST                5 (j)
+            546 LOAD_ATTR               20 (step_name)
+            566 POP_JUMP_IF_TRUE         1 (to 570)
+            568 JUMP_BACKWARD           60 (to 450)
+
+274     >>  570 NOP
+
+275         572 LOAD_GLOBAL             23 (NULL + json)
+            582 LOAD_ATTR               24 (loads)
+            602 LOAD_FAST                5 (j)
+            604 LOAD_ATTR               26 (config_json)
+            624 COPY                     1
+            626 POP_JUMP_IF_TRUE         2 (to 632)
+            628 POP_TOP
+            630 LOAD_CONST               4 ('{}')
+        >>  632 CALL                     1
+            640 STORE_FAST               6 (cfg)
+
+278     >>  642 LOAD_GLOBAL             33 (NULL + str)
+            652 LOAD_FAST                6 (cfg)
+            654 LOAD_ATTR               35 (NULL|self + get)
+            674 LOAD_CONST               5 ('_dedupe_key')
+            676 CALL                     1
+            684 COPY                     1
+            686 POP_JUMP_IF_TRUE        27 (to 742)
+            688 POP_TOP
+            690 LOAD_FAST                5 (j)
+            692 LOAD_ATTR               20 (step_name)
+            712 FORMAT_VALUE             0
+            714 LOAD_CONST               6 (':')
+            716 LOAD_FAST                5 (j)
+            718 LOAD_ATTR               36 (id)
+            738 FORMAT_VALUE             0
+            740 BUILD_STRING             3
+        >>  742 CALL                     1
+            750 STORE_FAST               7 (key)
+
+279         752 LOAD_FAST                5 (j)
+            754 LOAD_FAST                4 (background)
+            756 LOAD_FAST                7 (key)
+            758 STORE_SUBSCR
+            762 JUMP_BACKWARD          157 (to 450)
+
+270     >>  764 END_FOR
+
+280         766 LOAD_CONST               7 (0)
+            768 STORE_FAST               8 (retried)
+
+281         770 LOAD_FAST                3 (by_video)
+            772 LOAD_ATTR               39 (NULL|self + items)
+            792 CALL                     0
+            800 GET_ITER
+        >>  802 FOR_ITER               245 (to 1296)
+            806 UNPACK_SEQUENCE          2
+            810 STORE_FAST               9 (vid)
+            812 STORE_FAST               5 (j)
+
+282         814 LOAD_GLOBAL             23 (NULL + json)
+            824 LOAD_ATTR               24 (loads)
+            844 LOAD_FAST                5 (j)
+            846 LOAD_ATTR               26 (config_json)
+            866 COPY                     1
+            868 POP_JUMP_IF_TRUE         2 (to 874)
+            870 POP_TOP
+            872 LOAD_CONST               4 ('{}')
+        >>  874 CALL                     1
+            882 STORE_FAST               6 (cfg)
+
+283         884 LOAD_GLOBAL             33 (NULL + str)
+            894 LOAD_FAST                5 (j)
+            896 LOAD_ATTR               40 (pipeline_preset)
+            916 COPY                     1
+            918 POP_JUMP_IF_TRUE         2 (to 924)
+            920 POP_TOP
+            922 LOAD_CONST               8 ('')
+        >>  924 CALL                     1
+            932 LOAD_ATTR               43 (NULL|self + startswith)
+            952 LOAD_CONST               9 ('ai_studio')
+            954 CALL                     1
+            962 POP_JUMP_IF_FALSE       20 (to 1004)
+
+284         964 LOAD_GLOBAL             45 (NULL + _with_current_providers)
+            974 LOAD_FAST                9 (vid)
+            976 LOAD_FAST                6 (cfg)
+            978 CALL                     2
+            986 GET_AWAITABLE            0
+            988 LOAD_CONST              10 (None)
+        >>  990 SEND                     3 (to 1000)
+            994 YIELD_VALUE              2
+            996 RESUME                   3
+            998 JUMP_BACKWARD_NO_INTERRUPT     5 (to 990)
+        >> 1000 END_SEND
+           1002 STORE_FAST               6 (cfg)
+
+285     >> 1004 LOAD_FAST                5 (j)
+           1006 LOAD_ATTR               18 (job_type)
+           1026 LOAD_CONST              11 ('single_step')
+           1028 COMPARE_OP              40 (==)
+           1032 POP_JUMP_IF_FALSE       67 (to 1168)
+           1034 LOAD_FAST                5 (j)
+           1036 LOAD_ATTR               20 (step_name)
+           1056 POP_JUMP_IF_FALSE       55 (to 1168)
+
+286        1058 LOAD_GLOBAL             47 (NULL + job_queue)
+           1068 LOAD_ATTR               48 (enqueue_step)
+           1088 LOAD_FAST                5 (j)
+           1090 LOAD_ATTR               14 (project_id)
+           1110 LOAD_FAST                9 (vid)
+           1112 LOAD_FAST                5 (j)
+           1114 LOAD_ATTR               20 (step_name)
+           1134 LOAD_FAST                6 (cfg)
+           1136 LOAD_CONST              12 (False)
+           1138 KW_NAMES                13 (('force_rerun',))
+           1140 CALL                     5
+           1148 GET_AWAITABLE            0
+           1150 LOAD_CONST              10 (None)
+        >> 1152 SEND                     3 (to 1162)
+           1156 YIELD_VALUE              2
+           1158 RESUME                   3
+           1160 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1152)
+        >> 1162 END_SEND
+           1164 POP_TOP
+           1166 JUMP_FORWARD            58 (to 1284)
+
+288     >> 1168 LOAD_GLOBAL             47 (NULL + job_queue)
+           1178 LOAD_ATTR               50 (enqueue_pipeline)
+           1198 LOAD_FAST                5 (j)
+           1200 LOAD_ATTR               14 (project_id)
+           1220 LOAD_FAST                9 (vid)
+           1222 LOAD_FAST                5 (j)
+           1224 LOAD_ATTR               40 (pipeline_preset)
+           1244 COPY                     1
+           1246 POP_JUMP_IF_TRUE         2 (to 1252)
+           1248 POP_TOP
+           1250 LOAD_CONST              14 ('full')
+
+289     >> 1252 LOAD_FAST                6 (cfg)
+           1254 LOAD_CONST              12 (False)
+
+288        1256 KW_NAMES                13 (('force_rerun',))
+           1258 CALL                     5
+           1266 GET_AWAITABLE            0
+           1268 LOAD_CONST              10 (None)
+        >> 1270 SEND                     3 (to 1280)
+           1274 YIELD_VALUE              2
+           1276 RESUME                   3
+           1278 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1270)
+        >> 1280 END_SEND
+           1282 POP_TOP
+
+290     >> 1284 LOAD_FAST                8 (retried)
+           1286 LOAD_CONST              15 (1)
+           1288 BINARY_OP               13 (+=)
+           1292 STORE_FAST               8 (retried)
+           1294 JUMP_BACKWARD          247 (to 802)
+
+281     >> 1296 END_FOR
+
+291        1298 LOAD_FAST                4 (background)
+           1300 LOAD_ATTR               39 (NULL|self + items)
+           1320 CALL                     0
+           1328 GET_ITER
+        >> 1330 FOR_ITER               207 (to 1748)
+           1334 UNPACK_SEQUENCE          2
+           1338 STORE_FAST              10 (dedupe_key)
+           1340 STORE_FAST               5 (j)
+
+292        1342 LOAD_GLOBAL             23 (NULL + json)
+           1352 LOAD_ATTR               24 (loads)
+           1372 LOAD_FAST                5 (j)
+           1374 LOAD_ATTR               26 (config_json)
+           1394 COPY                     1
+           1396 POP_JUMP_IF_TRUE         2 (to 1402)
+           1398 POP_TOP
+           1400 LOAD_CONST               4 ('{}')
+        >> 1402 CALL                     1
+           1410 STORE_FAST               6 (cfg)
+
+293        1412 LOAD_CONST              16 (('_progress', '_error', '_dedupe_key'))
+           1414 GET_ITER
+        >> 1416 FOR_ITER                20 (to 1460)
+           1420 STORE_FAST              11 (transient)
+
+294        1422 LOAD_FAST                6 (cfg)
+           1424 LOAD_ATTR               53 (NULL|self + pop)
+           1444 LOAD_FAST               11 (transient)
+           1446 LOAD_CONST              10 (None)
+           1448 CALL                     2
+           1456 POP_TOP
+           1458 JUMP_BACKWARD           22 (to 1416)
+
+293     >> 1460 END_FOR
+
+295        1462 LOAD_GLOBAL             47 (NULL + job_queue)
+           1472 LOAD_ATTR               54 (enqueue_background_task)
+
+296        1492 LOAD_FAST                5 (j)
+           1494 LOAD_ATTR               20 (step_name)
+
+297        1514 LOAD_FAST                6 (cfg)
+
+298        1516 LOAD_FAST               10 (dedupe_key)
+
+299        1518 LOAD_FAST                5 (j)
+           1520 LOAD_ATTR               56 (priority)
+
+300        1540 LOAD_FAST                5 (j)
+           1542 LOAD_ATTR               14 (project_id)
+
+295        1562 KW_NAMES                17 (('dedupe_key', 'priority', 'project_id'))
+           1564 CALL                     5
+           1572 GET_AWAITABLE            0
+           1574 LOAD_CONST              10 (None)
+        >> 1576 SEND                     3 (to 1586)
+           1580 YIELD_VALUE              2
+           1582 RESUME                   3
+           1584 JUMP_BACKWARD_NO_INTERRUPT     5 (to 1576)
+        >> 1586 END_SEND
+           1588 STORE_FAST              12 (new_job_id)
+
+302        1590 LOAD_FAST                5 (j)
+           1592 LOAD_ATTR               20 (step_name)
+           1612 LOAD_CONST              18 ('audio_story_summary')
+           1614 COMPARE_OP              40 (==)
+           1618 POP_JUMP_IF_FALSE       58 (to 1736)
+           1620 LOAD_FAST                6 (cfg)
+           1622 LOAD_ATTR               35 (NULL|self + get)
+           1642 LOAD_CONST              19 ('idea_id')
+           1644 CALL                     1
+           1652 POP_JUMP_IF_FALSE       41 (to 1736)
+
+303        1654 LOAD_CONST               7 (0)
+           1656 LOAD_CONST              20 (('ai_studio_service',))
+           1658 IMPORT_NAME             29 (app.services)
+           1660 IMPORT_FROM             30 (ai_studio_service)
+           1662 STORE_FAST              13 (ai_studio_service)
+           1664 POP_TOP
+
+304        1666 LOAD_FAST               13 (ai_studio_service)
+           1668 LOAD_ATTR               63 (NULL|self + update_idea_payload)
+           1688 LOAD_FAST                1 (db)
+           1690 LOAD_GLOBAL             33 (NULL + str)
+           1700 LOAD_FAST                6 (cfg)
+           1702 LOAD_CONST              19 ('idea_id')
+           1704 BINARY_SUBSCR
+           1708 CALL                     1
+
+305        1716 LOAD_CONST              21 (True)
+
+306        1718 LOAD_CONST               8 ('')
+
+307        1720 LOAD_FAST               12 (new_job_id)
+
+304        1722 LOAD_CONST              22 (('is_summarizing', 'summary_error', 'queue_job_id'))
+           1724 BUILD_CONST_KEY_MAP      3
+           1726 CALL                     3
+           1734 POP_TOP
+
+309     >> 1736 LOAD_FAST                8 (retried)
+           1738 LOAD_CONST              15 (1)
+           1740 BINARY_OP               13 (+=)
+           1744 STORE_FAST               8 (retried)
+           1746 JUMP_BACKWARD          209 (to 1330)
+
+291     >> 1748 END_FOR
+
+310        1750 LOAD_CONST              21 (True)
+           1752 LOAD_FAST                8 (retried)
+           1754 LOAD_CONST              23 (('ok', 'retried'))
+           1756 BUILD_CONST_KEY_MAP      2
+           1758 RETURN_VALUE
+        >> 1760 PUSH_EXC_INFO
+
+276        1762 LOAD_GLOBAL             28 (TypeError)
+           1772 LOAD_GLOBAL             30 (ValueError)
+           1782 BUILD_TUPLE              2
+           1784 CHECK_EXC_MATCH
+           1786 POP_JUMP_IF_FALSE        6 (to 1800)
+           1788 POP_TOP
+
+277        1790 BUILD_MAP                0
+           1792 STORE_FAST               6 (cfg)
+           1794 POP_EXCEPT
+           1796 EXTENDED_ARG             2
+           1798 JUMP_BACKWARD          579 (to 642)
+
+276     >> 1800 RERAISE                  0
+        >> 1802 COPY                     3
+           1804 POP_EXCEPT
+           1806 RERAISE                  1
+
+284     >> 1808 CLEANUP_THROW
+           1810 EXTENDED_ARG             1
+           1812 JUMP_BACKWARD          407 (to 1000)
+
+286     >> 1814 CLEANUP_THROW
+           1816 EXTENDED_ARG             1
+           1818 JUMP_BACKWARD          329 (to 1162)
+
+288     >> 1820 CLEANUP_THROW
+           1822 EXTENDED_ARG             1
+           1824 JUMP_BACKWARD          273 (to 1280)
+
+295     >> 1826 CLEANUP_THROW
+           1828 JUMP_BACKWARD          122 (to 1586)
+        >> 1830 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1832 RERAISE                  1
+ExceptionTable:
+  4 to 540 -> 1830 [0] lasti
+  544 to 566 -> 1830 [0] lasti
+  572 to 640 -> 1760 [1]
+  642 to 992 -> 1830 [0] lasti
+  994 to 994 -> 1808 [3]
+  996 to 1154 -> 1830 [0] lasti
+  1156 to 1156 -> 1814 [3]
+  1158 to 1272 -> 1830 [0] lasti
+  1274 to 1274 -> 1820 [3]
+  1276 to 1578 -> 1830 [0] lasti
+  1580 to 1580 -> 1826 [3]
+  1582 to 1758 -> 1830 [0] lasti
+  1760 to 1792 -> 1802 [2] lasti
+  1794 to 1798 -> 1830 [0] lasti
+  1800 to 1800 -> 1802 [2] lasti
+  1802 to 1808 -> 1830 [0] lasti
+  1814 to 1814 -> 1830 [0] lasti
+  1820 to 1820 -> 1830 [0] lasti
+  1826 to 1826 -> 1830 [0] lasti
+
+Disassembly of <code object clear_completed at 0x29069f30, file "app\api\queue.py", line 313>:
+313           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+316           6 LOAD_FAST                0 (project_id)
+              8 LOAD_CONST               1 ('all')
+             10 COMPARE_OP              40 (==)
+             14 POP_JUMP_IF_FALSE       82 (to 180)
+
+317          16 LOAD_FAST                1 (db)
+             18 LOAD_ATTR                1 (NULL|self + query)
+             38 LOAD_GLOBAL              2 (Job)
+             48 CALL                     1
+
+318          56 LOAD_ATTR                5 (NULL|self + filter)
+             76 LOAD_GLOBAL              2 (Job)
+             86 LOAD_ATTR                6 (status)
+            106 LOAD_ATTR                9 (NULL|self + in_)
+            126 LOAD_CONST               2 (('done', 'failed', 'cancelled'))
+            128 CALL                     1
+            136 CALL                     1
+
+319         144 LOAD_ATTR               11 (NULL|self + delete)
+            164 LOAD_CONST               3 (False)
+            166 KW_NAMES                 4 (('synchronize_session',))
+            168 CALL                     1
+
+317         176 STORE_FAST               2 (n)
+            178 JUMP_FORWARD            99 (to 378)
+
+321     >>  180 LOAD_FAST                1 (db)
+            182 LOAD_ATTR                1 (NULL|self + query)
+            202 LOAD_GLOBAL              2 (Job)
+            212 CALL                     1
+
+322         220 LOAD_ATTR                5 (NULL|self + filter)
+            240 LOAD_GLOBAL              2 (Job)
+            250 LOAD_ATTR               12 (project_id)
+            270 LOAD_FAST                0 (project_id)
+            272 COMPARE_OP              40 (==)
+
+323         276 LOAD_GLOBAL              2 (Job)
+            286 LOAD_ATTR                6 (status)
+            306 LOAD_ATTR                9 (NULL|self + in_)
+            326 LOAD_CONST               2 (('done', 'failed', 'cancelled'))
+            328 CALL                     1
+
+322         336 CALL                     2
+
+324         344 LOAD_ATTR               11 (NULL|self + delete)
+            364 LOAD_CONST               3 (False)
+            366 KW_NAMES                 4 (('synchronize_session',))
+            368 CALL                     1
+
+321         376 STORE_FAST               2 (n)
+
+325     >>  378 LOAD_FAST                1 (db)
+            380 LOAD_ATTR               15 (NULL|self + commit)
+            400 CALL                     0
+            408 POP_TOP
+
+326         410 LOAD_CONST               5 (True)
+            412 LOAD_GLOBAL             17 (NULL + int)
+            422 LOAD_FAST                2 (n)
+            424 COPY                     1
+            426 POP_JUMP_IF_TRUE         2 (to 432)
+            428 POP_TOP
+            430 LOAD_CONST               6 (0)
+        >>  432 CALL                     1
+            440 LOAD_CONST               7 (('ok', 'cleared'))
+            442 BUILD_CONST_KEY_MAP      2
+            444 RETURN_VALUE
+        >>  446 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            448 RERAISE                  1
+ExceptionTable:
+  4 to 444 -> 446 [0] lasti

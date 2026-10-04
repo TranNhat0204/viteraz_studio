@@ -1,0 +1,2044 @@
+  0           0 RESUME                   0
+
+  1           2 SETUP_ANNOTATIONS
+              4 LOAD_CONST               0 ('Hàng đợi Voice Studio — dán kịch bản dài, bấm một nút, đi làm việc khác.\n\nVì sao phải có hàng đợi thay vì một request HTTP chờ tới cùng:\n  • Bài dài không còn trần ký tự. 60.000 ký tự ≈ 75 phút audio ≈ hàng chục phút sinh — không\n    request HTTP nào nên bị giữ lâu vậy, và người dùng thì bị ghim ở đúng cái tab đó.\n  • Sinh xong phải CÓ FILE trên đĩa ngay, không phụ thuộc việc user còn mở app hay còn bấm "Tải".\n\nBản chất là một consumer duy nhất: worker OmniVoice nạp một model và tuần tự hoá bằng lock, chạy\nsong song hai job chỉ làm chúng chờ nhau ở tầng dưới mà tiến độ thì rối. Nên ở đây `asyncio.Queue`\n+ ĐÚNG MỘT vòng lặp tiêu thụ.\n\nGhi audio theo kiểu NỐI DẦN (`_WavAppender`): sinh xong đoạn nào ghi thẳng đoạn đó vào file đích\nrồi xoá file tạm. Cách cũ gom hết mảng numpy rồi `concatenate` — với bài 2 tiếng là ~350MB giữ\ntrong RAM và ~700MB lúc nối, đủ để giết tiến trình backend đúng lúc sắp xong.\n')
+              6 STORE_NAME               0 (__doc__)
+
+ 16           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('annotations',))
+             12 IMPORT_NAME              1 (__future__)
+             14 IMPORT_FROM              2 (annotations)
+             16 STORE_NAME               2 (annotations)
+             18 POP_TOP
+
+ 18          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               3 (None)
+             24 IMPORT_NAME              3 (asyncio)
+             26 STORE_NAME               3 (asyncio)
+
+ 19          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               3 (None)
+             32 IMPORT_NAME              4 (json)
+             34 STORE_NAME               4 (json)
+
+ 20          36 LOAD_CONST               1 (0)
+             38 LOAD_CONST               3 (None)
+             40 IMPORT_NAME              5 (os)
+             42 STORE_NAME               5 (os)
+
+ 21          44 LOAD_CONST               1 (0)
+             46 LOAD_CONST               3 (None)
+             48 IMPORT_NAME              6 (shutil)
+             50 STORE_NAME               6 (shutil)
+
+ 22          52 LOAD_CONST               1 (0)
+             54 LOAD_CONST               3 (None)
+             56 IMPORT_NAME              7 (tempfile)
+             58 STORE_NAME               7 (tempfile)
+
+ 23          60 LOAD_CONST               1 (0)
+             62 LOAD_CONST               3 (None)
+             64 IMPORT_NAME              8 (time)
+             66 STORE_NAME               8 (time)
+
+ 24          68 LOAD_CONST               1 (0)
+             70 LOAD_CONST               3 (None)
+             72 IMPORT_NAME              9 (uuid)
+             74 STORE_NAME               9 (uuid)
+
+ 25          76 LOAD_CONST               1 (0)
+             78 LOAD_CONST               3 (None)
+             80 IMPORT_NAME             10 (wave)
+             82 STORE_NAME              10 (wave)
+
+ 26          84 LOAD_CONST               1 (0)
+             86 LOAD_CONST               4 (('asdict', 'dataclass', 'field'))
+             88 IMPORT_NAME             11 (dataclasses)
+             90 IMPORT_FROM             12 (asdict)
+             92 STORE_NAME              12 (asdict)
+             94 IMPORT_FROM             13 (dataclass)
+             96 STORE_NAME              13 (dataclass)
+             98 IMPORT_FROM             14 (field)
+            100 STORE_NAME              14 (field)
+            102 POP_TOP
+
+ 27         104 LOAD_CONST               1 (0)
+            106 LOAD_CONST               5 (('Path',))
+            108 IMPORT_NAME             15 (pathlib)
+            110 IMPORT_FROM             16 (Path)
+            112 STORE_NAME              16 (Path)
+            114 POP_TOP
+
+ 29         116 LOAD_CONST               1 (0)
+            118 LOAD_CONST               6 (('log',))
+            120 IMPORT_NAME             17 (app.core.logging)
+            122 IMPORT_FROM             18 (log)
+            124 STORE_NAME              18 (log)
+            126 POP_TOP
+
+ 31         128 LOAD_CONST               7 (180)
+            130 STORE_NAME              19 (GAP_MS)
+
+ 32         132 LOAD_CONST               8 (900)
+            134 STORE_NAME              20 (CHUNK_CHARS)
+
+ 33         136 LOAD_CONST               9 ('jobs.json')
+            138 STORE_NAME              21 (_INDEX)
+
+ 34         140 LOAD_CONST              10 (200)
+            142 STORE_NAME              22 (_KEEP)
+
+ 37         144 LOAD_CONST              11 (('done', 'failed', 'cancelled'))
+            146 STORE_NAME              23 (_TERMINAL)
+
+ 40         148 LOAD_CONST               3 (None)
+            150 STORE_GLOBAL            24 (_OUT_DIR)
+            152 LOAD_CONST              12 ('Path | None')
+            154 LOAD_NAME               25 (__annotations__)
+            156 LOAD_CONST              13 ('_OUT_DIR')
+            158 STORE_SUBSCR
+
+ 43         162 LOAD_CONST              38 (('return', 'Path'))
+            164 LOAD_CONST              14 (<code object output_dir at 0x7f6c92152fb0, file "app\services\voice_studio.py", line 43>)
+            166 MAKE_FUNCTION            4 (annotations)
+            168 STORE_NAME              26 (output_dir)
+
+ 54         170 LOAD_NAME               13 (dataclass)
+
+ 55         172 PUSH_NULL
+            174 LOAD_BUILD_CLASS
+            176 LOAD_CONST              15 (<code object Job at 0x7f6c9220c630, file "app\services\voice_studio.py", line 54>)
+            178 MAKE_FUNCTION            0
+            180 LOAD_CONST              16 ('Job')
+            182 CALL                     2
+
+ 54         190 CALL                     0
+
+ 55         198 STORE_NAME              27 (Job)
+
+ 87         200 BUILD_MAP                0
+            202 STORE_NAME              28 (_JOBS)
+            204 LOAD_CONST              17 ("'dict[str, Job]'")
+            206 LOAD_NAME               25 (__annotations__)
+            208 LOAD_CONST              18 ('_JOBS')
+            210 STORE_SUBSCR
+
+ 88         214 LOAD_CONST               3 (None)
+            216 STORE_GLOBAL            29 (_QUEUE)
+            218 LOAD_CONST              19 ("'asyncio.Queue[str] | None'")
+            220 LOAD_NAME               25 (__annotations__)
+            222 LOAD_CONST              20 ('_QUEUE')
+            224 STORE_SUBSCR
+
+ 89         228 LOAD_CONST               3 (None)
+            230 STORE_GLOBAL            30 (_WORKER)
+            232 LOAD_CONST              21 ("'asyncio.Task | None'")
+            234 LOAD_NAME               25 (__annotations__)
+            236 LOAD_CONST              22 ('_WORKER')
+            238 STORE_SUBSCR
+
+ 90         242 LOAD_CONST              23 (False)
+            244 STORE_GLOBAL            31 (_LOADED)
+
+ 96         246 LOAD_CONST              38 (('return', 'Path'))
+            248 LOAD_CONST              24 (<code object _index_path at 0x7f6c927d55c0, file "app\services\voice_studio.py", line 96>)
+            250 MAKE_FUNCTION            4 (annotations)
+            252 STORE_NAME              32 (_index_path)
+
+100         254 LOAD_CONST              39 (('return', 'None'))
+            256 LOAD_CONST              25 (<code object _load at 0x28d83960, file "app\services\voice_studio.py", line 100>)
+            258 MAKE_FUNCTION            4 (annotations)
+            260 STORE_NAME              33 (_load)
+
+130         262 LOAD_CONST              39 (('return', 'None'))
+            264 LOAD_CONST              26 (<code object _save at 0x28b43320, file "app\services\voice_studio.py", line 130>)
+            266 MAKE_FUNCTION            4 (annotations)
+            268 STORE_NAME              34 (_save)
+
+152         270 PUSH_NULL
+            272 LOAD_BUILD_CLASS
+            274 LOAD_CONST              27 (<code object _WavAppender at 0x7f6c927d4030, file "app\services\voice_studio.py", line 152>)
+            276 MAKE_FUNCTION            0
+            278 LOAD_CONST              28 ('_WavAppender')
+            280 CALL                     2
+            288 STORE_NAME              35 (_WavAppender)
+
+194         290 LOAD_CONST              40 (('text', 'str', 'return', 'list[str]'))
+            292 LOAD_CONST              29 (<code object _split at 0x7f6c927d56b0, file "app\services\voice_studio.py", line 194>)
+            294 MAKE_FUNCTION            4 (annotations)
+            296 STORE_NAME              36 (_split)
+
+199         298 LOAD_CONST              41 (('omnivoice',))
+            300 LOAD_CONST              42 (('s', 'str', 'fallback', 'str', 'return', 'str'))
+            302 LOAD_CONST              30 (<code object _safe_name at 0x7f6c928fe870, file "app\services\voice_studio.py", line 199>)
+            304 MAKE_FUNCTION            5 (defaults, annotations)
+            306 STORE_NAME              37 (_safe_name)
+
+204         308 NOP
+
+205         310 NOP
+
+204         312 NOP
+
+205         314 NOP
+
+204         316 NOP
+
+205         318 NOP
+
+204         320 NOP
+
+205         322 NOP
+
+204         324 LOAD_CONST              43 (('text', 'str', 'voice', 'str', 'voice_name', 'str', 'num_step', 'int', 'speed', 'float', 'guidance_scale', 'float | None', 'seed', 'int | None', 'normalize_text', 'bool', 'return', 'dict'))
+            326 LOAD_CONST              31 (<code object submit at 0x28d91110, file "app\services\voice_studio.py", line 204>)
+            328 MAKE_FUNCTION            4 (annotations)
+            330 STORE_NAME              38 (submit)
+
+229         332 LOAD_CONST              44 (('return', 'list[dict]'))
+            334 LOAD_CONST              32 (<code object list_jobs at 0x7f6c92051630, file "app\services\voice_studio.py", line 229>)
+            336 MAKE_FUNCTION            4 (annotations)
+            338 STORE_NAME              39 (list_jobs)
+
+234         340 LOAD_CONST              45 (('job_id', 'str', 'return', 'Job | None'))
+            342 LOAD_CONST              33 (<code object get at 0x7f6c927e2530, file "app\services\voice_studio.py", line 234>)
+            344 MAKE_FUNCTION            4 (annotations)
+            346 STORE_NAME              40 (get)
+
+239         348 LOAD_CONST              46 (('job_id', 'str', 'return', 'bool'))
+            350 LOAD_CONST              34 (<code object cancel at 0x7f6c927a6590, file "app\services\voice_studio.py", line 239>)
+            352 MAKE_FUNCTION            4 (annotations)
+            354 STORE_NAME              41 (cancel)
+
+251         356 LOAD_CONST              46 (('job_id', 'str', 'return', 'bool'))
+            358 LOAD_CONST              35 (<code object delete at 0x7f6c924120d0, file "app\services\voice_studio.py", line 251>)
+            360 MAKE_FUNCTION            4 (annotations)
+            362 STORE_NAME              42 (delete)
+
+268         364 LOAD_CONST              39 (('return', 'None'))
+            366 LOAD_CONST              36 (<code object _run_worker at 0x28dbe6a0, file "app\services\voice_studio.py", line 268>)
+            368 MAKE_FUNCTION            4 (annotations)
+            370 STORE_NAME              43 (_run_worker)
+
+289         372 LOAD_CONST              47 (('job', 'Job', 'return', 'None'))
+            374 LOAD_CONST              37 (<code object _run_job at 0x28d95720, file "app\services\voice_studio.py", line 289>)
+            376 MAKE_FUNCTION            4 (annotations)
+            378 STORE_NAME              44 (_run_job)
+            380 RETURN_CONST             3 (None)
+
+Disassembly of <code object output_dir at 0x7f6c92152fb0, file "app\services\voice_studio.py", line 43>:
+ 43           0 RESUME                   0
+
+ 46           2 LOAD_GLOBAL              0 (_OUT_DIR)
+             12 POP_JUMP_IF_NOT_NONE    47 (to 108)
+
+ 47          14 LOAD_CONST               1 (0)
+             16 LOAD_CONST               2 (('get_settings',))
+             18 IMPORT_NAME              1 (app.config)
+             20 IMPORT_FROM              2 (get_settings)
+             22 STORE_FAST               0 (get_settings)
+             24 POP_TOP
+
+ 48          26 PUSH_NULL
+             28 LOAD_FAST                0 (get_settings)
+             30 CALL                     0
+             38 LOAD_ATTR                6 (data_dir)
+             58 LOAD_CONST               3 ('voice_studio')
+             60 BINARY_OP               11 (/)
+             64 STORE_FAST               1 (d)
+
+ 49          66 LOAD_FAST                1 (d)
+             68 LOAD_ATTR                9 (NULL|self + mkdir)
+             88 LOAD_CONST               4 (True)
+             90 LOAD_CONST               4 (True)
+             92 KW_NAMES                 5 (('parents', 'exist_ok'))
+             94 CALL                     2
+            102 POP_TOP
+
+ 50         104 LOAD_FAST                1 (d)
+            106 STORE_GLOBAL             0 (_OUT_DIR)
+
+ 51     >>  108 LOAD_GLOBAL              0 (_OUT_DIR)
+            118 RETURN_VALUE
+
+Disassembly of <code object Job at 0x7f6c9220c630, file "app\services\voice_studio.py", line 54>:
+ 54           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('Job')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 56          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('id')
+             18 STORE_SUBSCR
+
+ 57          22 LOAD_CONST               1 ('str')
+             24 LOAD_NAME                3 (__annotations__)
+             26 LOAD_CONST               3 ('name')
+             28 STORE_SUBSCR
+
+ 58          32 LOAD_CONST               1 ('str')
+             34 LOAD_NAME                3 (__annotations__)
+             36 LOAD_CONST               4 ('voice')
+             38 STORE_SUBSCR
+
+ 59          42 LOAD_CONST               1 ('str')
+             44 LOAD_NAME                3 (__annotations__)
+             46 LOAD_CONST               5 ('voice_name')
+             48 STORE_SUBSCR
+
+ 60          52 LOAD_CONST               6 ('int')
+             54 LOAD_NAME                3 (__annotations__)
+             56 LOAD_CONST               7 ('chars')
+             58 STORE_SUBSCR
+
+ 61          62 LOAD_CONST               8 ('queued')
+             64 STORE_NAME               4 (status)
+             66 LOAD_CONST               1 ('str')
+             68 LOAD_NAME                3 (__annotations__)
+             70 LOAD_CONST               9 ('status')
+             72 STORE_SUBSCR
+
+ 62          76 LOAD_CONST              10 (0.0)
+             78 STORE_NAME               5 (progress)
+             80 LOAD_CONST              11 ('float')
+             82 LOAD_NAME                3 (__annotations__)
+             84 LOAD_CONST              12 ('progress')
+             86 STORE_SUBSCR
+
+ 63          90 LOAD_CONST              13 (0)
+             92 STORE_NAME               6 (chunk_done)
+             94 LOAD_CONST               6 ('int')
+             96 LOAD_NAME                3 (__annotations__)
+             98 LOAD_CONST              14 ('chunk_done')
+            100 STORE_SUBSCR
+
+ 64         104 LOAD_CONST              13 (0)
+            106 STORE_NAME               7 (chunk_total)
+            108 LOAD_CONST               6 ('int')
+            110 LOAD_NAME                3 (__annotations__)
+            112 LOAD_CONST              15 ('chunk_total')
+            114 STORE_SUBSCR
+
+ 65         118 LOAD_CONST              10 (0.0)
+            120 STORE_NAME               8 (duration_sec)
+            122 LOAD_CONST              11 ('float')
+            124 LOAD_NAME                3 (__annotations__)
+            126 LOAD_CONST              16 ('duration_sec')
+            128 STORE_SUBSCR
+
+ 66         132 LOAD_CONST              17 ('')
+            134 STORE_NAME               9 (file)
+            136 LOAD_CONST               1 ('str')
+            138 LOAD_NAME                3 (__annotations__)
+            140 LOAD_CONST              18 ('file')
+            142 STORE_SUBSCR
+
+ 67         146 LOAD_CONST              17 ('')
+            148 STORE_NAME              10 (error)
+            150 LOAD_CONST               1 ('str')
+            152 LOAD_NAME                3 (__annotations__)
+            154 LOAD_CONST              19 ('error')
+            156 STORE_SUBSCR
+
+ 68         160 LOAD_CONST              20 (20)
+            162 STORE_NAME              11 (num_step)
+            164 LOAD_CONST               6 ('int')
+            166 LOAD_NAME                3 (__annotations__)
+            168 LOAD_CONST              21 ('num_step')
+            170 STORE_SUBSCR
+
+ 69         174 PUSH_NULL
+            176 LOAD_NAME               12 (field)
+            178 LOAD_NAME               13 (time)
+            180 LOAD_ATTR               26 (time)
+            200 KW_NAMES                22 (('default_factory',))
+            202 CALL                     1
+            210 STORE_NAME              14 (created_at)
+            212 LOAD_CONST              11 ('float')
+            214 LOAD_NAME                3 (__annotations__)
+            216 LOAD_CONST              23 ('created_at')
+            218 STORE_SUBSCR
+
+ 70         222 LOAD_CONST              10 (0.0)
+            224 STORE_NAME              15 (finished_at)
+            226 LOAD_CONST              11 ('float')
+            228 LOAD_NAME                3 (__annotations__)
+            230 LOAD_CONST              24 ('finished_at')
+            232 STORE_SUBSCR
+
+ 73         236 LOAD_CONST              25 (1.0)
+            238 STORE_NAME              16 (speed)
+            240 LOAD_CONST              11 ('float')
+            242 LOAD_NAME                3 (__annotations__)
+            244 LOAD_CONST              26 ('speed')
+            246 STORE_SUBSCR
+
+ 74         250 LOAD_CONST              27 (None)
+            252 STORE_NAME              17 (guidance_scale)
+            254 LOAD_CONST              28 ('float | None')
+            256 LOAD_NAME                3 (__annotations__)
+            258 LOAD_CONST              29 ('guidance_scale')
+            260 STORE_SUBSCR
+
+ 75         264 LOAD_CONST              27 (None)
+            266 STORE_NAME              18 (seed)
+            268 LOAD_CONST              30 ('int | None')
+            270 LOAD_NAME                3 (__annotations__)
+            272 LOAD_CONST              31 ('seed')
+            274 STORE_SUBSCR
+
+ 76         278 LOAD_CONST              32 (True)
+            280 STORE_NAME              19 (normalize_text)
+            282 LOAD_CONST              33 ('bool')
+            284 LOAD_NAME                3 (__annotations__)
+            286 LOAD_CONST              34 ('normalize_text')
+            288 STORE_SUBSCR
+
+ 77         292 LOAD_CONST              17 ('')
+            294 STORE_NAME              20 (text)
+            296 LOAD_CONST               1 ('str')
+            298 LOAD_NAME                3 (__annotations__)
+            300 LOAD_CONST              35 ('text')
+            302 STORE_SUBSCR
+
+ 79         306 LOAD_CONST              37 (('return', 'dict'))
+            308 LOAD_CONST              36 (<code object public at 0x7f6c928fe9e0, file "app\services\voice_studio.py", line 79>)
+            310 MAKE_FUNCTION            4 (annotations)
+            312 STORE_NAME              21 (public)
+            314 RETURN_CONST            27 (None)
+
+Disassembly of <code object public at 0x7f6c928fe9e0, file "app\services\voice_studio.py", line 79>:
+ 79           0 RESUME                   0
+
+ 81           2 LOAD_GLOBAL              1 (NULL + asdict)
+             12 LOAD_FAST                0 (self)
+             14 CALL                     1
+             22 STORE_FAST               1 (d)
+
+ 82          24 LOAD_FAST                1 (d)
+             26 LOAD_ATTR                3 (NULL|self + pop)
+             46 LOAD_CONST               1 ('text')
+             48 LOAD_CONST               2 (None)
+             50 CALL                     2
+             58 POP_TOP
+
+ 83          60 LOAD_FAST                0 (self)
+             62 LOAD_ATTR                4 (file)
+             82 POP_JUMP_IF_FALSE       32 (to 148)
+             84 LOAD_GLOBAL              7 (NULL + str)
+             94 LOAD_GLOBAL              9 (NULL + output_dir)
+            104 CALL                     0
+            112 LOAD_FAST                0 (self)
+            114 LOAD_ATTR                4 (file)
+            134 BINARY_OP               11 (/)
+            138 CALL                     1
+            146 JUMP_FORWARD             1 (to 150)
+        >>  148 LOAD_CONST               3 ('')
+        >>  150 LOAD_FAST                1 (d)
+            152 LOAD_CONST               4 ('file_path')
+            154 STORE_SUBSCR
+
+ 84         158 LOAD_FAST                1 (d)
+            160 RETURN_VALUE
+
+Disassembly of <code object _index_path at 0x7f6c927d55c0, file "app\services\voice_studio.py", line 96>:
+ 96           0 RESUME                   0
+
+ 97           2 LOAD_GLOBAL              1 (NULL + output_dir)
+             12 CALL                     0
+             20 LOAD_GLOBAL              2 (_INDEX)
+             30 BINARY_OP               11 (/)
+             34 RETURN_VALUE
+
+Disassembly of <code object _load at 0x28d83960, file "app\services\voice_studio.py", line 100>:
+100           0 RESUME                   0
+
+107           2 LOAD_GLOBAL              0 (_LOADED)
+             12 POP_JUMP_IF_FALSE        1 (to 16)
+
+108          14 RETURN_CONST             1 (None)
+
+109     >>   16 LOAD_CONST               2 (True)
+             18 STORE_GLOBAL             0 (_LOADED)
+
+110          20 LOAD_GLOBAL              3 (NULL + _index_path)
+             30 CALL                     0
+             38 STORE_FAST               0 (p)
+
+111          40 LOAD_FAST                0 (p)
+             42 LOAD_ATTR                5 (NULL|self + exists)
+             62 CALL                     0
+             70 POP_JUMP_IF_TRUE         1 (to 74)
+
+112          72 RETURN_CONST             1 (None)
+
+113     >>   74 NOP
+
+114          76 LOAD_GLOBAL              7 (NULL + json)
+             86 LOAD_ATTR                8 (loads)
+            106 LOAD_FAST                0 (p)
+            108 LOAD_ATTR               11 (NULL|self + read_text)
+            128 LOAD_CONST               3 ('utf-8')
+            130 KW_NAMES                 4 (('encoding',))
+            132 CALL                     1
+            140 CALL                     1
+            148 STORE_FAST               1 (raw)
+
+118         150 LOAD_GLOBAL             20 (Job)
+            160 LOAD_ATTR               22 (__dataclass_fields__)
+            180 GET_ITER
+            182 LOAD_FAST_AND_CLEAR      3 (f)
+            184 SWAP                     2
+            186 BUILD_SET                0
+            188 SWAP                     2
+        >>  190 FOR_ITER                 4 (to 202)
+            194 STORE_FAST               3 (f)
+            196 LOAD_FAST                3 (f)
+            198 SET_ADD                  2
+            200 JUMP_BACKWARD            6 (to 190)
+        >>  202 END_FOR
+            204 STORE_FAST               4 (valid)
+            206 STORE_FAST               3 (f)
+
+119         208 LOAD_GLOBAL             25 (NULL + isinstance)
+            218 LOAD_FAST                1 (raw)
+            220 LOAD_GLOBAL             26 (list)
+            230 CALL                     2
+            238 POP_JUMP_IF_FALSE        2 (to 244)
+            240 LOAD_FAST                1 (raw)
+            242 JUMP_FORWARD             1 (to 246)
+        >>  244 BUILD_LIST               0
+        >>  246 GET_ITER
+        >>  248 FOR_ITER               104 (to 460)
+            252 STORE_FAST               5 (item)
+
+120         254 NOP
+
+121         256 LOAD_GLOBAL             21 (NULL + Job)
+            266 LOAD_CONST               9 (())
+            268 BUILD_MAP                0
+            270 LOAD_FAST                5 (item)
+            272 LOAD_ATTR               29 (NULL|self + items)
+            292 CALL                     0
+            300 GET_ITER
+            302 LOAD_FAST_AND_CLEAR      6 (k)
+            304 LOAD_FAST_AND_CLEAR      7 (v)
+            306 SWAP                     3
+            308 BUILD_MAP                0
+            310 SWAP                     2
+        >>  312 FOR_ITER                13 (to 342)
+            316 UNPACK_SEQUENCE          2
+            320 STORE_FAST               6 (k)
+            322 STORE_FAST               7 (v)
+            324 LOAD_FAST                6 (k)
+            326 LOAD_FAST                4 (valid)
+            328 CONTAINS_OP              0
+            330 POP_JUMP_IF_TRUE         1 (to 334)
+            332 JUMP_BACKWARD           11 (to 312)
+        >>  334 LOAD_FAST                6 (k)
+            336 LOAD_FAST                7 (v)
+            338 MAP_ADD                  2
+            340 JUMP_BACKWARD           15 (to 312)
+        >>  342 END_FOR
+            344 SWAP                     3
+            346 STORE_FAST               7 (v)
+            348 STORE_FAST               6 (k)
+            350 DICT_MERGE               1
+            352 CALL_FUNCTION_EX         1
+            354 STORE_FAST               8 (job)
+
+124         356 LOAD_FAST                8 (job)
+            358 LOAD_ATTR               32 (status)
+            378 LOAD_GLOBAL             34 (_TERMINAL)
+            388 CONTAINS_OP              1
+            390 POP_JUMP_IF_FALSE       14 (to 420)
+
+125         392 LOAD_CONST               7 ('failed')
+            394 LOAD_FAST                8 (job)
+            396 STORE_ATTR              16 (status)
+
+126         406 LOAD_CONST               8 ('Bị gián đoạn khi đóng ứng dụng — hãy tạo lại.')
+            408 LOAD_FAST                8 (job)
+            410 STORE_ATTR              18 (error)
+
+127     >>  420 LOAD_FAST                8 (job)
+            422 LOAD_GLOBAL             38 (_JOBS)
+            432 LOAD_FAST                8 (job)
+            434 LOAD_ATTR               40 (id)
+            454 STORE_SUBSCR
+            458 JUMP_BACKWARD          106 (to 248)
+
+119     >>  460 END_FOR
+            462 RETURN_CONST             1 (None)
+        >>  464 PUSH_EXC_INFO
+
+115         466 LOAD_GLOBAL             12 (OSError)
+            476 LOAD_GLOBAL             14 (ValueError)
+            486 BUILD_TUPLE              2
+            488 CHECK_EXC_MATCH
+            490 POP_JUMP_IF_FALSE       35 (to 562)
+            492 STORE_FAST               2 (e)
+
+116         494 LOAD_GLOBAL             17 (NULL + log)
+            504 LOAD_ATTR               18 (warning)
+            524 LOAD_CONST               5 ('Voice Studio: không đọc được lịch sử job (')
+            526 LOAD_FAST                2 (e)
+            528 FORMAT_VALUE             0
+            530 LOAD_CONST               6 (')')
+            532 BUILD_STRING             3
+            534 CALL                     1
+            542 POP_TOP
+
+117         544 POP_EXCEPT
+            546 LOAD_CONST               1 (None)
+            548 STORE_FAST               2 (e)
+            550 DELETE_FAST              2 (e)
+            552 RETURN_CONST             1 (None)
+        >>  554 LOAD_CONST               1 (None)
+            556 STORE_FAST               2 (e)
+            558 DELETE_FAST              2 (e)
+            560 RERAISE                  1
+
+115     >>  562 RERAISE                  0
+        >>  564 COPY                     3
+            566 POP_EXCEPT
+            568 RERAISE                  1
+        >>  570 SWAP                     2
+            572 POP_TOP
+
+118         574 SWAP                     2
+            576 STORE_FAST               3 (f)
+            578 RERAISE                  0
+        >>  580 SWAP                     2
+            582 POP_TOP
+
+121         584 SWAP                     3
+            586 STORE_FAST               7 (v)
+            588 STORE_FAST               6 (k)
+            590 RERAISE                  0
+        >>  592 PUSH_EXC_INFO
+
+122         594 LOAD_GLOBAL             30 (TypeError)
+            604 CHECK_EXC_MATCH
+            606 POP_JUMP_IF_FALSE        3 (to 614)
+            608 POP_TOP
+
+123         610 POP_EXCEPT
+            612 JUMP_BACKWARD          183 (to 248)
+
+122     >>  614 RERAISE                  0
+        >>  616 COPY                     3
+            618 POP_EXCEPT
+            620 RERAISE                  1
+ExceptionTable:
+  76 to 148 -> 464 [0]
+  186 to 202 -> 570 [2]
+  256 to 306 -> 592 [1]
+  308 to 330 -> 580 [8]
+  334 to 342 -> 580 [8]
+  344 to 354 -> 592 [1]
+  464 to 492 -> 564 [1] lasti
+  494 to 542 -> 554 [1] lasti
+  554 to 562 -> 564 [1] lasti
+  580 to 590 -> 592 [1]
+  592 to 608 -> 616 [2] lasti
+  614 to 614 -> 616 [2] lasti
+
+Disassembly of <code object _save at 0x28b43320, file "app\services\voice_studio.py", line 130>:
+130           0 RESUME                   0
+
+138           2 NOP
+
+139           4 LOAD_GLOBAL              1 (NULL + sorted)
+             14 LOAD_GLOBAL              2 (_JOBS)
+             24 LOAD_ATTR                5 (NULL|self + values)
+             44 CALL                     0
+             52 LOAD_CONST               1 (<code object <lambda> at 0x7f6c92392a30, file "app\services\voice_studio.py", line 139>)
+             54 MAKE_FUNCTION            0
+             56 LOAD_CONST               2 (True)
+             58 KW_NAMES                 3 (('key', 'reverse'))
+             60 CALL                     3
+             68 LOAD_CONST               4 (None)
+             70 LOAD_GLOBAL              6 (_KEEP)
+             80 BINARY_SLICE
+             82 STORE_FAST               0 (jobs)
+
+140          84 LOAD_GLOBAL              9 (NULL + _index_path)
+             94 CALL                     0
+            102 STORE_FAST               1 (p)
+
+141         104 LOAD_FAST                1 (p)
+            106 LOAD_ATTR               11 (NULL|self + with_suffix)
+            126 LOAD_CONST               5 ('.json.tmp')
+            128 CALL                     1
+            136 STORE_FAST               2 (tmp)
+
+142         138 LOAD_FAST                0 (jobs)
+            140 GET_ITER
+            142 LOAD_FAST_AND_CLEAR      3 (j)
+            144 LOAD_FAST_AND_CLEAR      4 (k)
+            146 LOAD_FAST_AND_CLEAR      5 (v)
+            148 SWAP                     4
+            150 BUILD_LIST               0
+            152 SWAP                     2
+        >>  154 FOR_ITER                53 (to 264)
+            158 STORE_FAST               3 (j)
+            160 LOAD_GLOBAL             13 (NULL + asdict)
+            170 LOAD_FAST                3 (j)
+            172 CALL                     1
+            180 LOAD_ATTR               15 (NULL|self + items)
+            200 CALL                     0
+            208 GET_ITER
+            210 LOAD_FAST_AND_CLEAR      4 (k)
+            212 LOAD_FAST_AND_CLEAR      5 (v)
+            214 SWAP                     3
+            216 BUILD_MAP                0
+            218 SWAP                     2
+        >>  220 FOR_ITER                14 (to 252)
+            224 UNPACK_SEQUENCE          2
+            228 STORE_FAST               4 (k)
+            230 STORE_FAST               5 (v)
+            232 LOAD_FAST                4 (k)
+            234 LOAD_CONST               6 ('text')
+            236 COMPARE_OP              55 (!=)
+            240 POP_JUMP_IF_TRUE         1 (to 244)
+            242 JUMP_BACKWARD           12 (to 220)
+        >>  244 LOAD_FAST                4 (k)
+            246 LOAD_FAST                5 (v)
+            248 MAP_ADD                  2
+            250 JUMP_BACKWARD           16 (to 220)
+        >>  252 END_FOR
+            254 SWAP                     3
+            256 STORE_FAST               5 (v)
+            258 STORE_FAST               4 (k)
+            260 LIST_APPEND              2
+            262 JUMP_BACKWARD           55 (to 154)
+        >>  264 END_FOR
+            266 STORE_FAST               6 (rows)
+            268 STORE_FAST               4 (k)
+            270 STORE_FAST               3 (j)
+            272 STORE_FAST               5 (v)
+
+143         274 LOAD_FAST                2 (tmp)
+            276 LOAD_ATTR               17 (NULL|self + write_text)
+            296 LOAD_GLOBAL             19 (NULL + json)
+            306 LOAD_ATTR               20 (dumps)
+            326 LOAD_FAST                6 (rows)
+            328 LOAD_CONST               7 (False)
+            330 KW_NAMES                 8 (('ensure_ascii',))
+            332 CALL                     2
+            340 LOAD_CONST               9 ('utf-8')
+            342 KW_NAMES                10 (('encoding',))
+            344 CALL                     2
+            352 POP_TOP
+
+144         354 LOAD_GLOBAL             23 (NULL + os)
+            364 LOAD_ATTR               24 (replace)
+            384 LOAD_FAST                2 (tmp)
+            386 LOAD_FAST                1 (p)
+            388 CALL                     2
+            396 POP_TOP
+            398 RETURN_CONST             4 (None)
+        >>  400 SWAP                     2
+            402 POP_TOP
+
+142         404 SWAP                     3
+            406 STORE_FAST               5 (v)
+            408 STORE_FAST               4 (k)
+            410 RERAISE                  0
+        >>  412 SWAP                     2
+            414 POP_TOP
+            416 SWAP                     4
+            418 STORE_FAST               5 (v)
+            420 STORE_FAST               4 (k)
+            422 STORE_FAST               3 (j)
+            424 RERAISE                  0
+        >>  426 PUSH_EXC_INFO
+
+145         428 LOAD_GLOBAL             26 (OSError)
+            438 CHECK_EXC_MATCH
+            440 POP_JUMP_IF_FALSE       35 (to 512)
+            442 STORE_FAST               7 (e)
+
+146         444 LOAD_GLOBAL             29 (NULL + log)
+            454 LOAD_ATTR               30 (warning)
+            474 LOAD_CONST              11 ('Voice Studio: không lưu được lịch sử job (')
+            476 LOAD_FAST                7 (e)
+            478 FORMAT_VALUE             0
+            480 LOAD_CONST              12 (')')
+            482 BUILD_STRING             3
+            484 CALL                     1
+            492 POP_TOP
+            494 POP_EXCEPT
+            496 LOAD_CONST               4 (None)
+            498 STORE_FAST               7 (e)
+            500 DELETE_FAST              7 (e)
+            502 RETURN_CONST             4 (None)
+        >>  504 LOAD_CONST               4 (None)
+            506 STORE_FAST               7 (e)
+            508 DELETE_FAST              7 (e)
+            510 RERAISE                  1
+
+145     >>  512 RERAISE                  0
+        >>  514 COPY                     3
+            516 POP_EXCEPT
+            518 RERAISE                  1
+ExceptionTable:
+  4 to 148 -> 426 [0]
+  150 to 214 -> 412 [4]
+  216 to 240 -> 400 [8]
+  244 to 252 -> 400 [8]
+  254 to 264 -> 412 [4]
+  266 to 396 -> 426 [0]
+  400 to 410 -> 412 [4]
+  412 to 424 -> 426 [0]
+  426 to 442 -> 514 [1] lasti
+  444 to 492 -> 504 [1] lasti
+  504 to 512 -> 514 [1] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c92392a30, file "app\services\voice_studio.py", line 139>:
+139           0 RESUME                   0
+              2 LOAD_FAST                0 (j)
+              4 LOAD_ATTR                0 (created_at)
+             24 RETURN_VALUE
+
+Disassembly of <code object _WavAppender at 0x7f6c927d4030, file "app\services\voice_studio.py", line 152>:
+152           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('_WavAppender')
+              8 STORE_NAME               2 (__qualname__)
+
+153          10 LOAD_CONST               1 ('Mở file WAV đích một lần rồi ghi từng đoạn vào — RAM không phụ thuộc độ dài bài.\n\n    Tham số (sample rate / độ rộng mẫu) lấy từ ĐOẠN ĐẦU TIÊN thay vì hằng số, để nếu sau này worker\n    đổi subtype thì file ghép vẫn đúng chứ không ra tiếng nhiễu.\n    ')
+             12 STORE_NAME               3 (__doc__)
+
+159          14 LOAD_CONST               6 (('path', 'str'))
+             16 LOAD_CONST               2 (<code object __init__ at 0x7f6c92074690, file "app\services\voice_studio.py", line 159>)
+             18 MAKE_FUNCTION            4 (annotations)
+             20 STORE_NAME               4 (__init__)
+
+166          22 LOAD_CONST               7 ((0,))
+             24 LOAD_CONST               8 (('part_path', 'str', 'gap_ms', 'int', 'return', 'None'))
+             26 LOAD_CONST               3 (<code object append at 0x28d94f00, file "app\services\voice_studio.py", line 166>)
+             28 MAKE_FUNCTION            5 (defaults, annotations)
+             30 STORE_NAME               5 (append)
+
+183          32 LOAD_CONST               9 (('return', 'float'))
+             34 LOAD_CONST               4 (<code object close at 0x7f6c92457030, file "app\services\voice_studio.py", line 183>)
+             36 MAKE_FUNCTION            4 (annotations)
+             38 STORE_NAME               6 (close)
+             40 RETURN_CONST             5 (None)
+
+Disassembly of <code object __init__ at 0x7f6c92074690, file "app\services\voice_studio.py", line 159>:
+159           0 RESUME                   0
+
+160           2 LOAD_FAST                1 (path)
+              4 LOAD_FAST                0 (self)
+              6 STORE_ATTR               0 (_path)
+
+161          16 LOAD_CONST               0 (None)
+             18 LOAD_FAST                0 (self)
+             20 STORE_ATTR               1 (_w)
+
+162          30 LOAD_CONST               1 (24000)
+             32 LOAD_FAST                0 (self)
+             34 STORE_ATTR               2 (_sr)
+
+163          44 LOAD_CONST               2 (2)
+             46 LOAD_FAST                0 (self)
+             48 STORE_ATTR               3 (_width)
+
+164          58 LOAD_CONST               3 (0)
+             60 LOAD_FAST                0 (self)
+             62 STORE_ATTR               4 (_frames)
+             72 RETURN_CONST             0 (None)
+
+Disassembly of <code object append at 0x28d94f00, file "app\services\voice_studio.py", line 166>:
+166           0 RESUME                   0
+
+167           2 LOAD_GLOBAL              1 (NULL + wave)
+             12 LOAD_ATTR                2 (open)
+             32 LOAD_FAST                1 (part_path)
+             34 LOAD_CONST               1 ('rb')
+             36 CALL                     2
+             44 BEFORE_WITH
+             46 STORE_FAST               3 (r)
+
+168          48 LOAD_FAST                3 (r)
+             50 LOAD_ATTR                5 (NULL|self + getframerate)
+             70 CALL                     0
+             78 LOAD_FAST                3 (r)
+             80 LOAD_ATTR                7 (NULL|self + getsampwidth)
+            100 CALL                     0
+            108 LOAD_FAST                3 (r)
+            110 LOAD_ATTR                9 (NULL|self + getnchannels)
+            130 CALL                     0
+            138 STORE_FAST               6 (nch)
+            140 STORE_FAST               5 (width)
+            142 STORE_FAST               4 (sr)
+
+169         144 LOAD_FAST                3 (r)
+            146 LOAD_ATTR               11 (NULL|self + readframes)
+            166 LOAD_FAST                3 (r)
+            168 LOAD_ATTR               13 (NULL|self + getnframes)
+            188 CALL                     0
+            196 CALL                     1
+            204 STORE_FAST               7 (data)
+
+167         206 LOAD_CONST               0 (None)
+            208 LOAD_CONST               0 (None)
+            210 LOAD_CONST               0 (None)
+            212 CALL                     2
+            220 POP_TOP
+
+170     >>  222 LOAD_FAST                0 (self)
+            224 LOAD_ATTR               14 (_w)
+            244 POP_JUMP_IF_NOT_NONE   134 (to 514)
+
+171         246 LOAD_FAST_CHECK          4 (sr)
+            248 LOAD_FAST_CHECK          5 (width)
+            250 SWAP                     2
+            252 LOAD_FAST                0 (self)
+            254 STORE_ATTR               8 (_sr)
+            264 LOAD_FAST                0 (self)
+            266 STORE_ATTR               9 (_width)
+
+172         276 LOAD_GLOBAL              1 (NULL + wave)
+            286 LOAD_ATTR                2 (open)
+            306 LOAD_FAST                0 (self)
+            308 LOAD_ATTR               20 (_path)
+            328 LOAD_CONST               2 ('wb')
+            330 CALL                     2
+            338 LOAD_FAST                0 (self)
+            340 STORE_ATTR               7 (_w)
+
+173         350 LOAD_FAST                0 (self)
+            352 LOAD_ATTR               14 (_w)
+            372 LOAD_ATTR               23 (NULL|self + setnchannels)
+            392 LOAD_FAST_CHECK          6 (nch)
+            394 CALL                     1
+            402 POP_TOP
+
+174         404 LOAD_FAST                0 (self)
+            406 LOAD_ATTR               14 (_w)
+            426 LOAD_ATTR               25 (NULL|self + setsampwidth)
+            446 LOAD_FAST                5 (width)
+            448 CALL                     1
+            456 POP_TOP
+
+175         458 LOAD_FAST                0 (self)
+            460 LOAD_ATTR               14 (_w)
+            480 LOAD_ATTR               27 (NULL|self + setframerate)
+            500 LOAD_FAST                4 (sr)
+            502 CALL                     1
+            510 POP_TOP
+            512 JUMP_FORWARD           121 (to 756)
+
+176     >>  514 LOAD_FAST                2 (gap_ms)
+            516 LOAD_CONST               3 (0)
+            518 COMPARE_OP              68 (>)
+            522 POP_JUMP_IF_FALSE      116 (to 756)
+
+177         524 LOAD_CONST               4 (b'\x00')
+            526 LOAD_GLOBAL             29 (NULL + int)
+            536 LOAD_FAST                0 (self)
+            538 LOAD_ATTR               16 (_sr)
+            558 LOAD_FAST                2 (gap_ms)
+            560 BINARY_OP                5 (*)
+            564 LOAD_CONST               5 (1000.0)
+            566 BINARY_OP               11 (/)
+            570 CALL                     1
+            578 LOAD_FAST                0 (self)
+            580 LOAD_ATTR               18 (_width)
+            600 BINARY_OP                5 (*)
+            604 BINARY_OP                5 (*)
+            608 STORE_FAST               8 (silence)
+
+178         610 LOAD_FAST                0 (self)
+            612 LOAD_ATTR               14 (_w)
+            632 LOAD_ATTR               31 (NULL|self + writeframes)
+            652 LOAD_FAST                8 (silence)
+            654 CALL                     1
+            662 POP_TOP
+
+179         664 LOAD_FAST                0 (self)
+            666 COPY                     1
+            668 LOAD_ATTR               32 (_frames)
+            688 LOAD_GLOBAL             29 (NULL + int)
+            698 LOAD_FAST                0 (self)
+            700 LOAD_ATTR               16 (_sr)
+            720 LOAD_FAST                2 (gap_ms)
+            722 BINARY_OP                5 (*)
+            726 LOAD_CONST               5 (1000.0)
+            728 BINARY_OP               11 (/)
+            732 CALL                     1
+            740 BINARY_OP               13 (+=)
+            744 SWAP                     2
+            746 STORE_ATTR              16 (_frames)
+
+180     >>  756 LOAD_FAST                0 (self)
+            758 LOAD_ATTR               14 (_w)
+            778 LOAD_ATTR               31 (NULL|self + writeframes)
+            798 LOAD_FAST_CHECK          7 (data)
+            800 CALL                     1
+            808 POP_TOP
+
+181         810 LOAD_FAST                0 (self)
+            812 COPY                     1
+            814 LOAD_ATTR               32 (_frames)
+            834 LOAD_GLOBAL             35 (NULL + len)
+            844 LOAD_FAST                7 (data)
+            846 CALL                     1
+            854 LOAD_GLOBAL             37 (NULL + max)
+            864 LOAD_CONST               6 (1)
+            866 LOAD_FAST                0 (self)
+            868 LOAD_ATTR               18 (_width)
+            888 CALL                     2
+            896 BINARY_OP                2 (//)
+            900 BINARY_OP               13 (+=)
+            904 SWAP                     2
+            906 STORE_ATTR              16 (_frames)
+            916 RETURN_CONST             0 (None)
+
+167     >>  918 PUSH_EXC_INFO
+            920 WITH_EXCEPT_START
+            922 POP_JUMP_IF_TRUE         1 (to 926)
+            924 RERAISE                  2
+        >>  926 POP_TOP
+            928 POP_EXCEPT
+            930 POP_TOP
+            932 POP_TOP
+            934 EXTENDED_ARG             1
+            936 JUMP_BACKWARD          358 (to 222)
+        >>  938 COPY                     3
+            940 POP_EXCEPT
+            942 RERAISE                  1
+ExceptionTable:
+  46 to 204 -> 918 [1] lasti
+  918 to 926 -> 938 [3] lasti
+
+Disassembly of <code object close at 0x7f6c92457030, file "app\services\voice_studio.py", line 183>:
+183           0 RESUME                   0
+
+184           2 LOAD_FAST                0 (self)
+              4 LOAD_ATTR                0 (_w)
+             24 POP_JUMP_IF_NOT_NONE     1 (to 28)
+
+185          26 RETURN_CONST             1 (0.0)
+
+186     >>   28 LOAD_FAST                0 (self)
+             30 LOAD_ATTR                0 (_w)
+             50 LOAD_ATTR                3 (NULL|self + close)
+             70 CALL                     0
+             78 POP_TOP
+
+187          80 LOAD_CONST               0 (None)
+             82 LOAD_FAST                0 (self)
+             84 STORE_ATTR               0 (_w)
+
+188          94 LOAD_GLOBAL              5 (NULL + round)
+            104 LOAD_FAST                0 (self)
+            106 LOAD_ATTR                6 (_frames)
+            126 LOAD_GLOBAL              9 (NULL + float)
+            136 LOAD_FAST                0 (self)
+            138 LOAD_ATTR               10 (_sr)
+            158 CALL                     1
+            166 BINARY_OP               11 (/)
+            170 LOAD_CONST               2 (2)
+            172 CALL                     2
+            180 RETURN_VALUE
+
+Disassembly of <code object _split at 0x7f6c927d56b0, file "app\services\voice_studio.py", line 194>:
+194           0 RESUME                   0
+
+195           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (('_studio_split',))
+              6 IMPORT_NAME              0 (app.api.system)
+              8 IMPORT_FROM              1 (_studio_split)
+             10 STORE_FAST               1 (_studio_split)
+             12 POP_TOP
+
+196          14 PUSH_NULL
+             16 LOAD_FAST                1 (_studio_split)
+             18 LOAD_FAST                0 (text)
+             20 LOAD_GLOBAL              4 (CHUNK_CHARS)
+             30 CALL                     2
+             38 RETURN_VALUE
+
+Disassembly of <code object _safe_name at 0x7f6c928fe870, file "app\services\voice_studio.py", line 199>:
+199           0 RESUME                   0
+
+200           2 LOAD_CONST               1 ('')
+              4 LOAD_ATTR                1 (NULL|self + join)
+             24 LOAD_CONST               2 (<code object <genexpr> at 0x7f6c92074030, file "app\services\voice_studio.py", line 200>)
+             26 MAKE_FUNCTION            0
+             28 LOAD_FAST                0 (s)
+             30 COPY                     1
+             32 POP_JUMP_IF_TRUE         2 (to 38)
+             34 POP_TOP
+             36 LOAD_CONST               1 ('')
+        >>   38 GET_ITER
+             40 CALL                     0
+             48 CALL                     1
+             56 LOAD_ATTR                3 (NULL|self + strip)
+             76 CALL                     0
+             84 STORE_FAST               2 (keep)
+
+201          86 LOAD_FAST                2 (keep)
+             88 COPY                     1
+             90 POP_JUMP_IF_TRUE         2 (to 96)
+             92 POP_TOP
+             94 LOAD_FAST                1 (fallback)
+        >>   96 LOAD_CONST               0 (None)
+             98 LOAD_CONST               3 (48)
+            100 BINARY_SLICE
+            102 LOAD_ATTR                3 (NULL|self + strip)
+            122 CALL                     0
+            130 LOAD_ATTR                5 (NULL|self + replace)
+            150 LOAD_CONST               4 (' ')
+            152 LOAD_CONST               5 ('_')
+            154 CALL                     2
+            162 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c92074030, file "app\services\voice_studio.py", line 200>:
+200           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                28 (to 68)
+             12 STORE_FAST               1 (c)
+             14 LOAD_FAST                1 (c)
+             16 LOAD_ATTR                1 (NULL|self + isalnum)
+             36 CALL                     0
+             44 POP_JUMP_IF_TRUE         4 (to 54)
+             46 LOAD_FAST                1 (c)
+             48 LOAD_CONST               0 (' -_')
+             50 CONTAINS_OP              0
+             52 POP_JUMP_IF_FALSE        2 (to 58)
+        >>   54 LOAD_FAST                1 (c)
+             56 JUMP_FORWARD             1 (to 60)
+        >>   58 LOAD_CONST               1 ('_')
+        >>   60 YIELD_VALUE              1
+             62 RESUME                   1
+             64 POP_TOP
+             66 JUMP_BACKWARD           30 (to 8)
+        >>   68 END_FOR
+             70 RETURN_CONST             2 (None)
+        >>   72 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             74 RERAISE                  1
+ExceptionTable:
+  4 to 70 -> 72 [0] lasti
+
+Disassembly of <code object submit at 0x28d91110, file "app\services\voice_studio.py", line 204>:
+204           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+207           6 LOAD_GLOBAL              1 (NULL + _load)
+             16 CALL                     0
+             24 POP_TOP
+
+209          26 LOAD_GLOBAL              2 (_QUEUE)
+             36 POP_JUMP_IF_NOT_NONE    20 (to 78)
+
+210          38 LOAD_GLOBAL              5 (NULL + asyncio)
+             48 LOAD_ATTR                6 (Queue)
+             68 CALL                     0
+             76 STORE_GLOBAL             1 (_QUEUE)
+
+211     >>   78 LOAD_FAST                0 (text)
+             80 COPY                     1
+             82 POP_JUMP_IF_TRUE         2 (to 88)
+             84 POP_TOP
+             86 LOAD_CONST               2 ('')
+        >>   88 LOAD_ATTR                9 (NULL|self + strip)
+            108 CALL                     0
+            116 STORE_FAST               0 (text)
+
+212         118 LOAD_CONST               3 (' ')
+            120 LOAD_ATTR               11 (NULL|self + join)
+            140 LOAD_FAST                0 (text)
+            142 LOAD_ATTR               13 (NULL|self + split)
+            162 CALL                     0
+            170 CALL                     1
+            178 LOAD_CONST               1 (None)
+            180 LOAD_CONST               4 (60)
+            182 BINARY_SLICE
+            184 STORE_FAST               8 (first)
+
+213         186 LOAD_GLOBAL             15 (NULL + Job)
+
+214         196 LOAD_GLOBAL             17 (NULL + uuid)
+            206 LOAD_ATTR               18 (uuid4)
+            226 CALL                     0
+            234 LOAD_ATTR               20 (hex)
+            254 LOAD_CONST               1 (None)
+            256 LOAD_CONST               5 (12)
+            258 BINARY_SLICE
+
+215         260 LOAD_FAST                8 (first)
+            262 COPY                     1
+            264 POP_JUMP_IF_TRUE         2 (to 270)
+            266 POP_TOP
+            268 LOAD_CONST               6 ('(không có nội dung)')
+
+216     >>  270 LOAD_FAST                1 (voice)
+            272 LOAD_FAST                2 (voice_name)
+            274 LOAD_GLOBAL             23 (NULL + len)
+            284 LOAD_FAST                0 (text)
+            286 CALL                     1
+
+217         294 LOAD_FAST                3 (num_step)
+            296 LOAD_FAST                4 (speed)
+            298 LOAD_FAST                5 (guidance_scale)
+
+218         300 LOAD_FAST                6 (seed)
+            302 LOAD_FAST                7 (normalize_text)
+            304 LOAD_FAST                0 (text)
+
+213         306 KW_NAMES                 7 (('id', 'name', 'voice', 'voice_name', 'chars', 'num_step', 'speed', 'guidance_scale', 'seed', 'normalize_text', 'text'))
+            308 CALL                    11
+            316 STORE_FAST               9 (job)
+
+220         318 LOAD_GLOBAL             23 (NULL + len)
+            328 LOAD_GLOBAL             25 (NULL + _split)
+            338 LOAD_FAST                0 (text)
+            340 CALL                     1
+            348 CALL                     1
+            356 LOAD_FAST                9 (job)
+            358 STORE_ATTR              13 (chunk_total)
+
+221         368 LOAD_FAST                9 (job)
+            370 LOAD_GLOBAL             28 (_JOBS)
+            380 LOAD_FAST                9 (job)
+            382 LOAD_ATTR               30 (id)
+            402 STORE_SUBSCR
+
+222         406 LOAD_GLOBAL             33 (NULL + _save)
+            416 CALL                     0
+            424 POP_TOP
+
+223         426 LOAD_GLOBAL              2 (_QUEUE)
+            436 LOAD_ATTR               35 (NULL|self + put)
+            456 LOAD_FAST                9 (job)
+            458 LOAD_ATTR               30 (id)
+            478 CALL                     1
+            486 GET_AWAITABLE            0
+            488 LOAD_CONST               1 (None)
+        >>  490 SEND                     3 (to 500)
+            494 YIELD_VALUE              2
+            496 RESUME                   3
+            498 JUMP_BACKWARD_NO_INTERRUPT     5 (to 490)
+        >>  500 END_SEND
+            502 POP_TOP
+
+224         504 LOAD_GLOBAL             36 (_WORKER)
+            514 POP_JUMP_IF_NONE        20 (to 556)
+            516 LOAD_GLOBAL             36 (_WORKER)
+            526 LOAD_ATTR               39 (NULL|self + done)
+            546 CALL                     0
+            554 POP_JUMP_IF_FALSE       31 (to 618)
+
+225     >>  556 LOAD_GLOBAL              5 (NULL + asyncio)
+            566 LOAD_ATTR               40 (create_task)
+            586 LOAD_GLOBAL             43 (NULL + _run_worker)
+            596 CALL                     0
+            604 LOAD_CONST               8 ('voice-studio-worker')
+            606 KW_NAMES                 9 (('name',))
+            608 CALL                     2
+            616 STORE_GLOBAL            18 (_WORKER)
+
+226     >>  618 LOAD_FAST                9 (job)
+            620 LOAD_ATTR               45 (NULL|self + public)
+            640 CALL                     0
+            648 RETURN_VALUE
+
+223     >>  650 CLEANUP_THROW
+            652 JUMP_BACKWARD           77 (to 500)
+        >>  654 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            656 RERAISE                  1
+ExceptionTable:
+  4 to 492 -> 654 [0] lasti
+  494 to 494 -> 650 [2]
+  496 to 650 -> 654 [0] lasti
+
+Disassembly of <code object list_jobs at 0x7f6c92051630, file "app\services\voice_studio.py", line 229>:
+229           0 RESUME                   0
+
+230           2 LOAD_GLOBAL              1 (NULL + _load)
+             12 CALL                     0
+             20 POP_TOP
+
+231          22 LOAD_GLOBAL              3 (NULL + sorted)
+             32 LOAD_GLOBAL              4 (_JOBS)
+             42 LOAD_ATTR                7 (NULL|self + values)
+             62 CALL                     0
+             70 LOAD_CONST               1 (<code object <lambda> at 0x7f6c92393590, file "app\services\voice_studio.py", line 231>)
+             72 MAKE_FUNCTION            0
+             74 LOAD_CONST               2 (True)
+             76 KW_NAMES                 3 (('key', 'reverse'))
+             78 CALL                     3
+             86 GET_ITER
+             88 LOAD_FAST_AND_CLEAR      0 (j)
+             90 SWAP                     2
+             92 BUILD_LIST               0
+             94 SWAP                     2
+        >>   96 FOR_ITER                18 (to 136)
+            100 STORE_FAST               0 (j)
+            102 LOAD_FAST                0 (j)
+            104 LOAD_ATTR                9 (NULL|self + public)
+            124 CALL                     0
+            132 LIST_APPEND              2
+            134 JUMP_BACKWARD           20 (to 96)
+        >>  136 END_FOR
+            138 SWAP                     2
+            140 STORE_FAST               0 (j)
+            142 RETURN_VALUE
+        >>  144 SWAP                     2
+            146 POP_TOP
+            148 SWAP                     2
+            150 STORE_FAST               0 (j)
+            152 RERAISE                  0
+ExceptionTable:
+  92 to 136 -> 144 [2]
+
+Disassembly of <code object <lambda> at 0x7f6c92393590, file "app\services\voice_studio.py", line 231>:
+231           0 RESUME                   0
+              2 LOAD_FAST                0 (j)
+              4 LOAD_ATTR                0 (created_at)
+             24 RETURN_VALUE
+
+Disassembly of <code object get at 0x7f6c927e2530, file "app\services\voice_studio.py", line 234>:
+234           0 RESUME                   0
+
+235           2 LOAD_GLOBAL              1 (NULL + _load)
+             12 CALL                     0
+             20 POP_TOP
+
+236          22 LOAD_GLOBAL              2 (_JOBS)
+             32 LOAD_ATTR                5 (NULL|self + get)
+             52 LOAD_FAST                0 (job_id)
+             54 CALL                     1
+             62 RETURN_VALUE
+
+Disassembly of <code object cancel at 0x7f6c927a6590, file "app\services\voice_studio.py", line 239>:
+239           0 RESUME                   0
+
+241           2 LOAD_GLOBAL              1 (NULL + get)
+             12 LOAD_FAST                0 (job_id)
+             14 CALL                     1
+             22 STORE_FAST               1 (job)
+
+242          24 LOAD_FAST                1 (job)
+             26 POP_JUMP_IF_NONE        18 (to 64)
+             28 LOAD_FAST                1 (job)
+             30 LOAD_ATTR                2 (status)
+             50 LOAD_GLOBAL              4 (_TERMINAL)
+             60 CONTAINS_OP              0
+             62 POP_JUMP_IF_FALSE        1 (to 66)
+
+243     >>   64 RETURN_CONST             1 (False)
+
+244     >>   66 LOAD_FAST                1 (job)
+             68 LOAD_ATTR                2 (status)
+             88 LOAD_CONST               2 ('running')
+             90 COMPARE_OP              40 (==)
+             94 POP_JUMP_IF_FALSE        2 (to 100)
+             96 LOAD_CONST               3 ('cancelling')
+             98 JUMP_FORWARD             1 (to 102)
+        >>  100 LOAD_CONST               4 ('cancelled')
+        >>  102 LOAD_FAST                1 (job)
+            104 STORE_ATTR               1 (status)
+
+245         114 LOAD_FAST                1 (job)
+            116 LOAD_ATTR                2 (status)
+            136 LOAD_CONST               4 ('cancelled')
+            138 COMPARE_OP              40 (==)
+            142 POP_JUMP_IF_FALSE       25 (to 194)
+
+246         144 LOAD_GLOBAL              7 (NULL + time)
+            154 LOAD_ATTR                6 (time)
+            174 CALL                     0
+            182 LOAD_FAST                1 (job)
+            184 STORE_ATTR               4 (finished_at)
+
+247     >>  194 LOAD_GLOBAL             11 (NULL + _save)
+            204 CALL                     0
+            212 POP_TOP
+
+248         214 RETURN_CONST             5 (True)
+
+Disassembly of <code object delete at 0x7f6c924120d0, file "app\services\voice_studio.py", line 251>:
+251           0 RESUME                   0
+
+253           2 LOAD_GLOBAL              1 (NULL + get)
+             12 LOAD_FAST                0 (job_id)
+             14 CALL                     1
+             22 STORE_FAST               1 (job)
+
+254          24 LOAD_FAST                1 (job)
+             26 POP_JUMP_IF_NOT_NONE     1 (to 30)
+
+255          28 RETURN_CONST             2 (False)
+
+256     >>   30 LOAD_FAST                1 (job)
+             32 LOAD_ATTR                2 (status)
+             52 LOAD_CONST               3 (('queued', 'running', 'cancelling'))
+             54 CONTAINS_OP              0
+             56 POP_JUMP_IF_FALSE        1 (to 60)
+
+257          58 RETURN_CONST             2 (False)
+
+258     >>   60 LOAD_FAST                1 (job)
+             62 LOAD_ATTR                4 (file)
+             82 POP_JUMP_IF_FALSE       40 (to 164)
+
+259          84 NOP
+
+260          86 LOAD_GLOBAL              7 (NULL + output_dir)
+             96 CALL                     0
+            104 LOAD_FAST                1 (job)
+            106 LOAD_ATTR                4 (file)
+            126 BINARY_OP               11 (/)
+            130 LOAD_ATTR                9 (NULL|self + unlink)
+            150 LOAD_CONST               4 (True)
+            152 KW_NAMES                 5 (('missing_ok',))
+            154 CALL                     1
+            162 POP_TOP
+
+263     >>  164 LOAD_GLOBAL             12 (_JOBS)
+            174 LOAD_ATTR               15 (NULL|self + pop)
+            194 LOAD_FAST                0 (job_id)
+            196 LOAD_CONST               1 (None)
+            198 CALL                     2
+            206 POP_TOP
+
+264         208 LOAD_GLOBAL             17 (NULL + _save)
+            218 CALL                     0
+            226 POP_TOP
+
+265         228 RETURN_CONST             4 (True)
+        >>  230 PUSH_EXC_INFO
+
+261         232 LOAD_GLOBAL             10 (OSError)
+            242 CHECK_EXC_MATCH
+            244 POP_JUMP_IF_FALSE        3 (to 252)
+            246 POP_TOP
+
+262         248 POP_EXCEPT
+            250 JUMP_BACKWARD           44 (to 164)
+
+261     >>  252 RERAISE                  0
+        >>  254 COPY                     3
+            256 POP_EXCEPT
+            258 RERAISE                  1
+ExceptionTable:
+  86 to 162 -> 230 [0]
+  230 to 246 -> 254 [1] lasti
+  252 to 252 -> 254 [1] lasti
+
+Disassembly of <code object _run_worker at 0x28dbe6a0, file "app\services\voice_studio.py", line 268>:
+268           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+270           6 LOAD_GLOBAL              0 (_QUEUE)
+             16 POP_JUMP_IF_NOT_NONE     2 (to 22)
+             18 LOAD_ASSERTION_ERROR
+             20 RAISE_VARARGS            1
+
+271     >>   22 NOP
+
+272     >>   24 NOP
+
+273          26 LOAD_GLOBAL              0 (_QUEUE)
+             36 LOAD_ATTR                3 (NULL|self + get_nowait)
+             56 CALL                     0
+             64 STORE_FAST               0 (job_id)
+
+276          66 LOAD_GLOBAL              8 (_JOBS)
+             76 LOAD_ATTR               11 (NULL|self + get)
+             96 LOAD_FAST                0 (job_id)
+             98 CALL                     1
+            106 STORE_FAST               1 (job)
+
+277         108 LOAD_FAST                1 (job)
+            110 POP_JUMP_IF_NONE        15 (to 142)
+            112 LOAD_FAST                1 (job)
+            114 LOAD_ATTR               12 (status)
+            134 LOAD_CONST               2 ('queued')
+            136 COMPARE_OP              55 (!=)
+            140 POP_JUMP_IF_FALSE        1 (to 144)
+
+278     >>  142 JUMP_BACKWARD           61 (to 22)
+
+279     >>  144 NOP
+
+280         146 LOAD_GLOBAL             15 (NULL + _run_job)
+            156 LOAD_FAST                1 (job)
+            158 CALL                     1
+            166 GET_AWAITABLE            0
+            168 LOAD_CONST               1 (None)
+        >>  170 SEND                     3 (to 180)
+            174 YIELD_VALUE              3
+            176 RESUME                   3
+            178 JUMP_BACKWARD_NO_INTERRUPT     5 (to 170)
+        >>  180 END_SEND
+            182 POP_TOP
+
+271     >>  184 JUMP_BACKWARD           81 (to 24)
+        >>  186 PUSH_EXC_INFO
+
+274         188 LOAD_GLOBAL              4 (asyncio)
+            198 LOAD_ATTR                6 (QueueEmpty)
+            218 CHECK_EXC_MATCH
+            220 POP_JUMP_IF_FALSE        3 (to 228)
+            222 POP_TOP
+
+275         224 POP_EXCEPT
+            226 RETURN_CONST             1 (None)
+
+274     >>  228 RERAISE                  0
+        >>  230 COPY                     3
+            232 POP_EXCEPT
+            234 RERAISE                  1
+
+280     >>  236 CLEANUP_THROW
+            238 JUMP_BACKWARD           30 (to 180)
+        >>  240 PUSH_EXC_INFO
+
+281         242 LOAD_GLOBAL             16 (Exception)
+            252 CHECK_EXC_MATCH
+            254 POP_JUMP_IF_FALSE      108 (to 472)
+            256 STORE_FAST               2 (e)
+
+282         258 LOAD_CONST               3 ('failed')
+            260 LOAD_FAST                1 (job)
+            262 STORE_ATTR               6 (status)
+
+283         272 LOAD_GLOBAL             19 (NULL + str)
+            282 LOAD_FAST                2 (e)
+            284 CALL                     1
+            292 LOAD_CONST               1 (None)
+            294 LOAD_CONST               4 (300)
+            296 BINARY_SLICE
+            298 LOAD_FAST                1 (job)
+            300 STORE_ATTR              10 (error)
+
+284         310 LOAD_GLOBAL             23 (NULL + time)
+            320 LOAD_ATTR               22 (time)
+            340 CALL                     0
+            348 LOAD_FAST                1 (job)
+            350 STORE_ATTR              12 (finished_at)
+
+285         360 LOAD_GLOBAL             27 (NULL + _save)
+            370 CALL                     0
+            378 POP_TOP
+
+286         380 LOAD_GLOBAL             29 (NULL + log)
+            390 LOAD_ATTR               30 (warning)
+            410 LOAD_CONST               5 ('Voice Studio: job ')
+            412 LOAD_FAST                1 (job)
+            414 LOAD_ATTR               32 (id)
+            434 FORMAT_VALUE             0
+            436 LOAD_CONST               6 (' lỗi — ')
+            438 LOAD_FAST                2 (e)
+            440 FORMAT_VALUE             0
+            442 BUILD_STRING             4
+            444 CALL                     1
+            452 POP_TOP
+            454 POP_EXCEPT
+            456 LOAD_CONST               1 (None)
+            458 STORE_FAST               2 (e)
+            460 DELETE_FAST              2 (e)
+            462 JUMP_BACKWARD          140 (to 184)
+        >>  464 LOAD_CONST               1 (None)
+            466 STORE_FAST               2 (e)
+            468 DELETE_FAST              2 (e)
+            470 RERAISE                  1
+
+281     >>  472 RERAISE                  0
+        >>  474 COPY                     3
+            476 POP_EXCEPT
+            478 RERAISE                  1
+        >>  480 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            482 RERAISE                  1
+ExceptionTable:
+  4 to 22 -> 480 [0] lasti
+  26 to 64 -> 186 [0]
+  66 to 142 -> 480 [0] lasti
+  146 to 172 -> 240 [0]
+  174 to 174 -> 236 [2]
+  176 to 182 -> 240 [0]
+  184 to 184 -> 480 [0] lasti
+  186 to 222 -> 230 [1] lasti
+  224 to 226 -> 480 [0] lasti
+  228 to 228 -> 230 [1] lasti
+  230 to 234 -> 480 [0] lasti
+  236 to 236 -> 240 [0]
+  240 to 256 -> 474 [1] lasti
+  258 to 452 -> 464 [1] lasti
+  454 to 462 -> 480 [0] lasti
+  464 to 472 -> 474 [1] lasti
+  474 to 478 -> 480 [0] lasti
+
+Disassembly of <code object _run_job at 0x28d95720, file "app\services\voice_studio.py", line 289>:
+              0 MAKE_CELL                0 (job)
+
+289           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+
+290           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('_synthesize', '_stable_seed'))
+             12 IMPORT_NAME              0 (app.adapters.tts.omnivoice_tts)
+             14 IMPORT_FROM              1 (_synthesize)
+             16 STORE_FAST               1 (_synthesize)
+             18 IMPORT_FROM              2 (_stable_seed)
+             20 STORE_FAST               2 (_stable_seed)
+             22 POP_TOP
+
+292          24 LOAD_CONST               3 ('running')
+             26 LOAD_DEREF               0 (job)
+             28 STORE_ATTR               3 (status)
+
+293          38 LOAD_CONST               4 (0.0)
+             40 LOAD_DEREF               0 (job)
+             42 STORE_ATTR               4 (progress)
+
+294          52 LOAD_GLOBAL             11 (NULL + _save)
+             62 CALL                     0
+             70 POP_TOP
+
+296          72 LOAD_GLOBAL             13 (NULL + _split)
+             82 LOAD_DEREF               0 (job)
+             84 LOAD_ATTR               14 (text)
+            104 CALL                     1
+            112 STORE_FAST               3 (chunks)
+
+297         114 LOAD_GLOBAL             17 (NULL + len)
+            124 LOAD_FAST                3 (chunks)
+            126 CALL                     1
+            134 LOAD_DEREF               0 (job)
+            136 STORE_ATTR               9 (chunk_total)
+
+298         146 LOAD_FAST                3 (chunks)
+            148 POP_JUMP_IF_TRUE        11 (to 172)
+
+299         150 LOAD_GLOBAL             21 (NULL + RuntimeError)
+            160 LOAD_CONST               5 ('Nội dung rỗng — không có gì để đọc.')
+            162 CALL                     1
+            170 RAISE_VARARGS            1
+
+301     >>  172 LOAD_GLOBAL             23 (NULL + time)
+            182 LOAD_ATTR               24 (strftime)
+            202 LOAD_CONST               6 ('%Y%m%d-%H%M%S')
+            204 LOAD_GLOBAL             23 (NULL + time)
+            214 LOAD_ATTR               26 (localtime)
+            234 LOAD_DEREF               0 (job)
+            236 LOAD_ATTR               28 (created_at)
+            256 CALL                     1
+            264 CALL                     2
+            272 STORE_FAST               4 (stamp)
+
+302         274 LOAD_GLOBAL             31 (NULL + _safe_name)
+            284 LOAD_DEREF               0 (job)
+            286 LOAD_ATTR               32 (voice_name)
+            306 CALL                     1
+            314 FORMAT_VALUE             0
+            316 LOAD_CONST               7 ('_')
+            318 LOAD_FAST                4 (stamp)
+            320 FORMAT_VALUE             0
+            322 LOAD_CONST               7 ('_')
+            324 LOAD_DEREF               0 (job)
+            326 LOAD_ATTR               34 (id)
+            346 LOAD_CONST               0 (None)
+            348 LOAD_CONST               8 (6)
+            350 BINARY_SLICE
+            352 FORMAT_VALUE             0
+            354 LOAD_CONST               9 ('.wav')
+            356 BUILD_STRING             6
+            358 STORE_FAST               5 (out_name)
+
+303         360 LOAD_GLOBAL             37 (NULL + output_dir)
+            370 CALL                     0
+            378 LOAD_FAST                5 (out_name)
+            380 BINARY_OP               11 (/)
+            384 STORE_FAST               6 (out_path)
+
+304         386 LOAD_GLOBAL             39 (NULL + Path)
+            396 LOAD_GLOBAL             41 (NULL + tempfile)
+            406 LOAD_ATTR               42 (mkdtemp)
+            426 LOAD_CONST              10 ('omni_studio_')
+            428 KW_NAMES                11 (('prefix',))
+            430 CALL                     1
+            438 CALL                     1
+            446 STORE_FAST               7 (tmp_dir)
+
+305         448 LOAD_GLOBAL             45 (NULL + _WavAppender)
+            458 LOAD_GLOBAL             47 (NULL + str)
+            468 LOAD_FAST                6 (out_path)
+            470 CALL                     1
+            478 CALL                     1
+            486 STORE_FAST               8 (appender)
+
+306         488 LOAD_GLOBAL             49 (NULL + round)
+            498 LOAD_GLOBAL             51 (NULL + float)
+            508 LOAD_DEREF               0 (job)
+            510 LOAD_ATTR               52 (speed)
+            530 CALL                     1
+            538 LOAD_CONST              12 (1.0)
+            540 BINARY_OP               10 (-)
+            544 LOAD_CONST              13 (100)
+            546 BINARY_OP                5 (*)
+            550 CALL                     1
+            558 LOAD_CONST              14 ('+d')
+            560 FORMAT_VALUE             4 (with format)
+            562 LOAD_CONST              15 ('%')
+            564 BUILD_STRING             2
+            566 STORE_FAST               9 (rate)
+
+310         568 LOAD_CONST               0 (None)
+            570 STORE_FAST              10 (anchor)
+
+311         572 NOP
+
+312         574 LOAD_GLOBAL             55 (NULL + enumerate)
+            584 LOAD_FAST                3 (chunks)
+            586 CALL                     1
+            594 GET_ITER
+        >>  596 EXTENDED_ARG             1
+            598 FOR_ITER               319 (to 1240)
+            602 UNPACK_SEQUENCE          2
+            606 STORE_FAST              11 (i)
+            608 STORE_FAST              12 (chunk)
+
+313         610 LOAD_DEREF               0 (job)
+            612 LOAD_ATTR                6 (status)
+            632 LOAD_CONST              16 ('cancelling')
+            634 COMPARE_OP              40 (==)
+            638 POP_JUMP_IF_FALSE       10 (to 660)
+
+314         640 LOAD_CONST              17 ('cancelled')
+            642 LOAD_DEREF               0 (job)
+            644 STORE_ATTR               3 (status)
+
+315         654 POP_TOP
+            656 EXTENDED_ARG             1
+            658 JUMP_FORWARD           291 (to 1242)
+
+316     >>  660 LOAD_GLOBAL             47 (NULL + str)
+            670 LOAD_FAST                7 (tmp_dir)
+            672 LOAD_CONST              18 ('part_')
+            674 LOAD_FAST               11 (i)
+            676 LOAD_CONST              19 ('05d')
+            678 FORMAT_VALUE             4 (with format)
+            680 LOAD_CONST               9 ('.wav')
+            682 BUILD_STRING             3
+            684 BINARY_OP               11 (/)
+            688 CALL                     1
+            696 STORE_FAST              13 (part)
+
+317         698 PUSH_NULL
+            700 LOAD_FAST                1 (_synthesize)
+
+318         702 LOAD_FAST               12 (chunk)
+            704 LOAD_DEREF               0 (job)
+            706 LOAD_ATTR               56 (voice)
+            726 LOAD_FAST               13 (part)
+            728 LOAD_FAST                9 (rate)
+
+319         730 LOAD_FAST               10 (anchor)
+            732 POP_JUMP_IF_FALSE        5 (to 744)
+            734 LOAD_FAST               10 (anchor)
+            736 LOAD_CONST               1 (0)
+            738 BINARY_SUBSCR
+            742 JUMP_FORWARD             1 (to 746)
+        >>  744 LOAD_CONST               0 (None)
+
+320     >>  746 LOAD_FAST               10 (anchor)
+            748 POP_JUMP_IF_FALSE        5 (to 760)
+            750 LOAD_FAST               10 (anchor)
+            752 LOAD_CONST              20 (1)
+            754 BINARY_SUBSCR
+            758 JUMP_FORWARD             1 (to 762)
+        >>  760 LOAD_CONST               0 (None)
+
+321     >>  762 LOAD_DEREF               0 (job)
+            764 LOAD_ATTR               58 (num_step)
+            784 LOAD_DEREF               0 (job)
+            786 LOAD_ATTR               60 (guidance_scale)
+
+324         806 LOAD_DEREF               0 (job)
+            808 LOAD_ATTR               62 (seed)
+            828 POP_JUMP_IF_NONE        15 (to 860)
+            830 LOAD_DEREF               0 (job)
+            832 LOAD_ATTR               62 (seed)
+            852 LOAD_FAST               11 (i)
+            854 BINARY_OP                0 (+)
+            858 JUMP_FORWARD            28 (to 916)
+        >>  860 PUSH_NULL
+            862 LOAD_FAST                2 (_stable_seed)
+            864 LOAD_DEREF               0 (job)
+            866 LOAD_ATTR               56 (voice)
+            886 LOAD_FAST               12 (chunk)
+            888 LOAD_GLOBAL             47 (NULL + str)
+            898 LOAD_FAST               11 (i)
+            900 CALL                     1
+            908 CALL                     3
+
+325     >>  916 LOAD_DEREF               0 (job)
+            918 LOAD_ATTR               64 (normalize_text)
+
+327         938 LOAD_CONST              21 (0.02)
+            940 LOAD_CONST              21 (0.02)
+
+328         942 LOAD_CLOSURE             0 (job)
+            944 BUILD_TUPLE              1
+            946 LOAD_CONST              22 (<code object <lambda> at 0x7f6c927d57a0, file "app\services\voice_studio.py", line 328>)
+            948 MAKE_FUNCTION            8 (closure)
+
+317         950 KW_NAMES                23 (('rate', 'anchor_ref', 'anchor_text', 'num_step', 'guidance_scale', 'seed', 'normalize_text', 'pad_duration', 'fade_duration', 'cancel_check'))
+            952 CALL                    13
+            960 GET_AWAITABLE            0
+            962 LOAD_CONST               0 (None)
+        >>  964 SEND                     3 (to 974)
+            968 YIELD_VALUE              4
+            970 RESUME                   3
+            972 JUMP_BACKWARD_NO_INTERRUPT     5 (to 964)
+        >>  974 END_SEND
+            976 POP_TOP
+
+330         978 LOAD_FAST                8 (appender)
+            980 LOAD_ATTR               67 (NULL|self + append)
+           1000 LOAD_FAST               13 (part)
+           1002 LOAD_FAST               11 (i)
+           1004 LOAD_CONST               1 (0)
+           1006 COMPARE_OP              68 (>)
+           1010 POP_JUMP_IF_FALSE        6 (to 1024)
+           1012 LOAD_GLOBAL             68 (GAP_MS)
+           1022 JUMP_FORWARD             1 (to 1026)
+        >> 1024 LOAD_CONST               1 (0)
+        >> 1026 KW_NAMES                24 (('gap_ms',))
+           1028 CALL                     2
+           1036 POP_TOP
+
+331        1038 LOAD_FAST               11 (i)
+           1040 LOAD_CONST               1 (0)
+           1042 COMPARE_OP              40 (==)
+           1046 POP_JUMP_IF_FALSE       19 (to 1086)
+           1048 LOAD_GLOBAL             17 (NULL + len)
+           1058 LOAD_FAST                3 (chunks)
+           1060 CALL                     1
+           1068 LOAD_CONST              20 (1)
+           1070 COMPARE_OP              68 (>)
+           1074 POP_JUMP_IF_FALSE        5 (to 1086)
+
+334        1076 LOAD_FAST               13 (part)
+           1078 LOAD_FAST               12 (chunk)
+           1080 BUILD_TUPLE              2
+           1082 STORE_FAST              10 (anchor)
+           1084 JUMP_FORWARD            22 (to 1130)
+
+336     >> 1086 NOP
+
+337        1088 LOAD_GLOBAL             71 (NULL + os)
+           1098 LOAD_ATTR               72 (unlink)
+           1118 LOAD_FAST               13 (part)
+           1120 CALL                     1
+           1128 POP_TOP
+
+340     >> 1130 LOAD_FAST               11 (i)
+           1132 LOAD_CONST              20 (1)
+           1134 BINARY_OP                0 (+)
+           1138 LOAD_DEREF               0 (job)
+           1140 STORE_ATTR              38 (chunk_done)
+
+341        1150 LOAD_GLOBAL             49 (NULL + round)
+           1160 LOAD_DEREF               0 (job)
+           1162 LOAD_ATTR               76 (chunk_done)
+           1182 LOAD_CONST              25 (100.0)
+           1184 BINARY_OP                5 (*)
+           1188 LOAD_DEREF               0 (job)
+           1190 LOAD_ATTR               18 (chunk_total)
+           1210 BINARY_OP               11 (/)
+           1214 LOAD_CONST              20 (1)
+           1216 CALL                     2
+           1224 LOAD_DEREF               0 (job)
+           1226 STORE_ATTR               4 (progress)
+           1236 EXTENDED_ARG             1
+           1238 JUMP_BACKWARD          322 (to 596)
+
+312     >> 1240 END_FOR
+
+343     >> 1242 LOAD_FAST                8 (appender)
+           1244 LOAD_ATTR               79 (NULL|self + close)
+           1264 CALL                     0
+           1272 LOAD_DEREF               0 (job)
+           1274 STORE_ATTR              40 (duration_sec)
+
+344        1284 LOAD_DEREF               0 (job)
+           1286 LOAD_ATTR                6 (status)
+           1306 LOAD_CONST              17 ('cancelled')
+           1308 COMPARE_OP              40 (==)
+           1312 POP_JUMP_IF_FALSE       26 (to 1366)
+
+345        1314 LOAD_FAST                6 (out_path)
+           1316 LOAD_ATTR               73 (NULL|self + unlink)
+           1336 LOAD_CONST              26 (True)
+           1338 KW_NAMES                27 (('missing_ok',))
+           1340 CALL                     1
+           1348 POP_TOP
+
+346        1350 LOAD_CONST              28 ('Đã huỷ.')
+           1352 LOAD_DEREF               0 (job)
+           1354 STORE_ATTR              41 (error)
+           1364 JUMP_FORWARD            72 (to 1510)
+
+348     >> 1366 LOAD_FAST                5 (out_name)
+           1368 LOAD_DEREF               0 (job)
+           1370 STORE_ATTR              42 (file)
+
+349        1380 LOAD_CONST              29 ('done')
+           1382 LOAD_DEREF               0 (job)
+           1384 STORE_ATTR               3 (status)
+
+350        1394 LOAD_CONST              25 (100.0)
+           1396 LOAD_DEREF               0 (job)
+           1398 STORE_ATTR               4 (progress)
+
+351        1408 LOAD_GLOBAL             87 (NULL + log)
+           1418 LOAD_ATTR               88 (info)
+           1438 LOAD_CONST              30 ('Voice Studio: xong ')
+           1440 LOAD_FAST                5 (out_name)
+           1442 FORMAT_VALUE             0
+           1444 LOAD_CONST              31 (' (')
+           1446 LOAD_DEREF               0 (job)
+           1448 LOAD_ATTR               80 (duration_sec)
+           1468 FORMAT_VALUE             0
+           1470 LOAD_CONST              32 ('s, ')
+           1472 LOAD_DEREF               0 (job)
+           1474 LOAD_ATTR               18 (chunk_total)
+           1494 FORMAT_VALUE             0
+           1496 LOAD_CONST              33 (' đoạn)')
+           1498 BUILD_STRING             7
+           1500 CALL                     1
+           1508 POP_TOP
+
+357     >> 1510 LOAD_GLOBAL             23 (NULL + time)
+           1520 LOAD_ATTR               22 (time)
+           1540 CALL                     0
+           1548 LOAD_DEREF               0 (job)
+           1550 STORE_ATTR              46 (finished_at)
+
+358        1560 LOAD_GLOBAL             95 (NULL + shutil)
+           1570 LOAD_ATTR               96 (rmtree)
+           1590 LOAD_FAST                7 (tmp_dir)
+           1592 LOAD_CONST              26 (True)
+           1594 KW_NAMES                34 (('ignore_errors',))
+           1596 CALL                     2
+           1604 POP_TOP
+
+359        1606 LOAD_GLOBAL             11 (NULL + _save)
+           1616 CALL                     0
+           1624 POP_TOP
+           1626 RETURN_CONST             0 (None)
+
+317     >> 1628 CLEANUP_THROW
+           1630 EXTENDED_ARG             1
+           1632 JUMP_BACKWARD          330 (to 974)
+        >> 1634 PUSH_EXC_INFO
+
+338        1636 LOAD_GLOBAL             74 (OSError)
+           1646 CHECK_EXC_MATCH
+           1648 POP_JUMP_IF_FALSE        4 (to 1658)
+           1650 POP_TOP
+
+339        1652 POP_EXCEPT
+           1654 EXTENDED_ARG             1
+           1656 JUMP_BACKWARD          264 (to 1130)
+
+338     >> 1658 RERAISE                  0
+        >> 1660 COPY                     3
+           1662 POP_EXCEPT
+           1664 RERAISE                  1
+        >> 1666 PUSH_EXC_INFO
+
+352        1668 LOAD_GLOBAL             90 (Exception)
+           1678 CHECK_EXC_MATCH
+           1680 POP_JUMP_IF_FALSE       36 (to 1754)
+           1682 POP_TOP
+
+353        1684 LOAD_FAST                8 (appender)
+           1686 LOAD_ATTR               79 (NULL|self + close)
+           1706 CALL                     0
+           1714 POP_TOP
+
+354        1716 LOAD_FAST                6 (out_path)
+           1718 LOAD_ATTR               73 (NULL|self + unlink)
+           1738 LOAD_CONST              26 (True)
+           1740 KW_NAMES                27 (('missing_ok',))
+           1742 CALL                     1
+           1750 POP_TOP
+
+355        1752 RAISE_VARARGS            0
+
+352     >> 1754 RERAISE                  0
+        >> 1756 COPY                     3
+           1758 POP_EXCEPT
+           1760 RERAISE                  1
+        >> 1762 PUSH_EXC_INFO
+
+357        1764 LOAD_GLOBAL             23 (NULL + time)
+           1774 LOAD_ATTR               22 (time)
+           1794 CALL                     0
+           1802 LOAD_DEREF               0 (job)
+           1804 STORE_ATTR              46 (finished_at)
+
+358        1814 LOAD_GLOBAL             95 (NULL + shutil)
+           1824 LOAD_ATTR               96 (rmtree)
+           1844 LOAD_FAST                7 (tmp_dir)
+           1846 LOAD_CONST              26 (True)
+           1848 KW_NAMES                34 (('ignore_errors',))
+           1850 CALL                     2
+           1858 POP_TOP
+
+359        1860 LOAD_GLOBAL             11 (NULL + _save)
+           1870 CALL                     0
+           1878 POP_TOP
+           1880 RERAISE                  0
+        >> 1882 COPY                     3
+           1884 POP_EXCEPT
+           1886 RERAISE                  1
+        >> 1888 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1890 RERAISE                  1
+ExceptionTable:
+  6 to 570 -> 1888 [0] lasti
+  574 to 966 -> 1666 [0]
+  968 to 968 -> 1628 [3]
+  970 to 1084 -> 1666 [0]
+  1088 to 1128 -> 1634 [1]
+  1130 to 1508 -> 1666 [0]
+  1510 to 1626 -> 1888 [0] lasti
+  1628 to 1628 -> 1666 [0]
+  1634 to 1650 -> 1660 [2] lasti
+  1652 to 1656 -> 1666 [0]
+  1658 to 1658 -> 1660 [2] lasti
+  1660 to 1664 -> 1666 [0]
+  1666 to 1754 -> 1756 [1] lasti
+  1756 to 1760 -> 1762 [0]
+  1762 to 1880 -> 1882 [1] lasti
+  1882 to 1886 -> 1888 [0] lasti
+
+Disassembly of <code object <lambda> at 0x7f6c927d57a0, file "app\services\voice_studio.py", line 328>:
+              0 COPY_FREE_VARS           1
+
+328           2 RESUME                   0
+              4 LOAD_DEREF               0 (job)
+              6 LOAD_ATTR                0 (status)
+             26 LOAD_CONST               1 ('cancelling')
+             28 COMPARE_OP              40 (==)
+             32 RETURN_VALUE

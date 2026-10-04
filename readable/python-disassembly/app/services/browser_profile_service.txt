@@ -1,0 +1,4256 @@
+  0           0 RESUME                   0
+
+  1           2 SETUP_ANNOTATIONS
+              4 LOAD_CONST               0 ('BrowserProfile — registry danh tính trình duyệt + LEASE chống xung đột batch đa luồng.\n\nHai vai trò (xem docs/browser-profile-manager-plan.md + docs/flow-parallel-batch-accounts-plan.md):\n\n1. REGISTRY: gom tài khoản Flow/Grok/Meta/ChatGPT/Publish của cùng "người" vào 1 profile.\n   `discover_and_sync()` idempotent: account nào chưa có profile → tự tạo (gộp theo email nếu trùng).\n   KHÔNG di chuyển thư mục Chrome/partition nào — chỉ đăng ký metadata, user không phải đăng nhập lại.\n\n2. LEASE: 1 profile ↔ tối đa 1 video/tác vụ automation tại 1 thời điểm. Batch nhiều video chạy song\n   song thì mỗi video GIỮ ĐỘC QUYỀN 1 tài khoản Flow (qua profile của account đó) tới khi job kết\n   thúc; video khác phải lấy account trống hoặc CHỜ (queue deferral). Sticky pin: video ghim\n   partition vào `videos.flow_account_id` — chạy lại/restart quay về đúng account cũ vì mediaId/\n   entity nhân vật sống trong Flow project của account đó.\n\nQUAN TRỌNG (concurrency): mọi hàm ở đây là SYNC thuần (không await). Backend chạy 1 event loop\nasyncio → hàm sync không bị xen kẽ giữa chừng ⇒ acquire/release/rotate tự atomic mà không cần lock.\nNếu sau này gọi từ thread khác thì phải thêm lock — đừng đổi sang async từng phần.\n')
+              6 STORE_NAME               0 (__doc__)
+
+ 19           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('annotations',))
+             12 IMPORT_NAME              1 (__future__)
+             14 IMPORT_FROM              2 (annotations)
+             16 STORE_NAME               2 (annotations)
+             18 POP_TOP
+
+ 21          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               3 (None)
+             24 IMPORT_NAME              3 (os)
+             26 STORE_NAME               3 (os)
+
+ 22          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               4 (('datetime',))
+             32 IMPORT_NAME              4 (datetime)
+             34 IMPORT_FROM              4 (datetime)
+             36 STORE_NAME               4 (datetime)
+             38 POP_TOP
+
+ 24          40 LOAD_CONST               1 (0)
+             42 LOAD_CONST               5 (('select',))
+             44 IMPORT_NAME              5 (sqlalchemy)
+             46 IMPORT_FROM              6 (select)
+             48 STORE_NAME               6 (select)
+             50 POP_TOP
+
+ 25          52 LOAD_CONST               1 (0)
+             54 LOAD_CONST               6 (('Session',))
+             56 IMPORT_NAME              7 (sqlalchemy.orm)
+             58 IMPORT_FROM              8 (Session)
+             60 STORE_NAME               8 (Session)
+             62 POP_TOP
+
+ 27          64 LOAD_CONST               1 (0)
+             66 LOAD_CONST               7 (('log',))
+             68 IMPORT_NAME              9 (app.core.logging)
+             70 IMPORT_FROM             10 (log)
+             72 STORE_NAME              10 (log)
+             74 POP_TOP
+
+ 28          76 LOAD_CONST               1 (0)
+             78 LOAD_CONST               8 (('BrowserProfile', 'ChatGptAccount', 'FlowAccount', 'GrokAccount', 'Job', 'MetaAccount', 'PublishProfile', 'Video'))
+             80 IMPORT_NAME             11 (app.db.models)
+             82 IMPORT_FROM             12 (BrowserProfile)
+             84 STORE_NAME              12 (BrowserProfile)
+             86 IMPORT_FROM             13 (ChatGptAccount)
+             88 STORE_NAME              13 (ChatGptAccount)
+             90 IMPORT_FROM             14 (FlowAccount)
+             92 STORE_NAME              14 (FlowAccount)
+             94 IMPORT_FROM             15 (GrokAccount)
+             96 STORE_NAME              15 (GrokAccount)
+             98 IMPORT_FROM             16 (Job)
+            100 STORE_NAME              16 (Job)
+            102 IMPORT_FROM             17 (MetaAccount)
+            104 STORE_NAME              17 (MetaAccount)
+            106 IMPORT_FROM             18 (PublishProfile)
+            108 STORE_NAME              18 (PublishProfile)
+            110 IMPORT_FROM             19 (Video)
+            112 STORE_NAME              19 (Video)
+            114 POP_TOP
+
+ 32         116 LOAD_CONST               1 (0)
+            118 LOAD_CONST               9 (('flow_account_service',))
+            120 IMPORT_NAME             20 (app.services)
+            122 IMPORT_FROM             21 (flow_account_service)
+            124 STORE_NAME              22 (flow_acct)
+            126 POP_TOP
+
+ 33         128 LOAD_CONST               1 (0)
+            130 LOAD_CONST              10 (('flow_profile_health',))
+            132 IMPORT_NAME             20 (app.services)
+            134 IMPORT_FROM             23 (flow_profile_health)
+            136 STORE_NAME              24 (flow_health)
+            138 POP_TOP
+
+ 37         140 PUSH_NULL
+            142 LOAD_NAME               25 (max)
+            144 LOAD_CONST               1 (0)
+            146 PUSH_NULL
+            148 LOAD_NAME               26 (int)
+            150 PUSH_NULL
+            152 LOAD_NAME                3 (os)
+            154 LOAD_ATTR               54 (getenv)
+            174 LOAD_CONST              11 ('FLOW_MAX_PARALLEL_ACCOUNTS')
+            176 LOAD_CONST              12 ('3')
+            178 CALL                     2
+            186 CALL                     1
+            194 CALL                     2
+            202 STORE_NAME              28 (FLOW_MAX_PARALLEL_ACCOUNTS)
+
+ 42         204 LOAD_CONST               3 (None)
+            206 STORE_GLOBAL            29 (_default_lease_video_id)
+            208 LOAD_CONST              13 ('str | None')
+            210 LOAD_NAME               30 (__annotations__)
+            212 LOAD_CONST              14 ('_default_lease_video_id')
+            214 STORE_SUBSCR
+
+ 50         218 BUILD_MAP                0
+            220 STORE_NAME              31 (_ACCOUNTS_BY_VIDEO)
+            222 LOAD_CONST              15 ('dict[str, set[str]]')
+            224 LOAD_NAME               30 (__annotations__)
+            226 LOAD_CONST              16 ('_ACCOUNTS_BY_VIDEO')
+            228 STORE_SUBSCR
+
+ 53         232 LOAD_CONST              77 (('video_id', 'str | None', 'partition_id', 'str | None', 'return', 'None'))
+            234 LOAD_CONST              17 (<code object note_account_used at 0x7f6c92bcf210, file "app\services\browser_profile_service.py", line 53>)
+            236 MAKE_FUNCTION            4 (annotations)
+            238 STORE_NAME              32 (note_account_used)
+
+ 60         240 LOAD_CONST              78 (('video_id', 'str | None', 'return', 'list[str]'))
+            242 LOAD_CONST              18 (<code object accounts_of_video at 0x7f6c9268d350, file "app\services\browser_profile_service.py", line 60>)
+            244 MAKE_FUNCTION            4 (annotations)
+            246 STORE_NAME              33 (accounts_of_video)
+
+ 67         248 LOAD_CONST              79 (('video_id', 'str | None', 'return', 'None'))
+            250 LOAD_CONST              19 (<code object forget_video_accounts at 0x7f6c9265d330, file "app\services\browser_profile_service.py", line 67>)
+            252 MAKE_FUNCTION            4 (annotations)
+            254 STORE_NAME              34 (forget_video_accounts)
+
+ 73         256 LOAD_CONST              80 (('db', 'Session', 'video_id', 'str', 'partition_id', 'str', 'return', 'bool'))
+            258 LOAD_CONST              20 (<code object owns_account at 0x7f6c930c6d80, file "app\services\browser_profile_service.py", line 73>)
+            260 MAKE_FUNCTION            4 (annotations)
+            262 STORE_NAME              35 (owns_account)
+
+ 90         264 LOAD_CONST              21 ('flow')
+            266 LOAD_NAME               14 (FlowAccount)
+            268 BUILD_TUPLE              2
+
+ 91         270 LOAD_CONST              22 ('grok')
+            272 LOAD_NAME               15 (GrokAccount)
+            274 BUILD_TUPLE              2
+
+ 92         276 LOAD_CONST              23 ('meta')
+            278 LOAD_NAME               17 (MetaAccount)
+            280 BUILD_TUPLE              2
+
+ 93         282 LOAD_CONST              24 ('chatgpt')
+            284 LOAD_NAME               13 (ChatGptAccount)
+            286 BUILD_TUPLE              2
+
+ 94         288 LOAD_CONST              25 ('publish')
+            290 LOAD_NAME               18 (PublishProfile)
+            292 BUILD_TUPLE              2
+
+ 89         294 BUILD_TUPLE              5
+            296 STORE_NAME              36 (_PLATFORM_TABLES)
+
+100         298 LOAD_CONST              81 (('return', 'str | None'))
+            300 LOAD_CONST              26 (<code object _account_email at 0x7f6c926fc160, file "app\services\browser_profile_service.py", line 100>)
+            302 MAKE_FUNCTION            4 (annotations)
+            304 STORE_NAME              37 (_account_email)
+
+105         306 LOAD_CONST              82 (('return', 'str'))
+            308 LOAD_CONST              27 (<code object _account_label at 0x7f6c92889a50, file "app\services\browser_profile_service.py", line 105>)
+            310 MAKE_FUNCTION            4 (annotations)
+            312 STORE_NAME              38 (_account_label)
+
+111         314 LOAD_CONST              83 (('db', 'Session', 'return', 'int'))
+            316 LOAD_CONST              28 (<code object discover_and_sync at 0x28b00630, file "app\services\browser_profile_service.py", line 111>)
+            318 MAKE_FUNCTION            4 (annotations)
+            320 STORE_NAME              39 (discover_and_sync)
+
+140         322 LOAD_CONST              84 (('db', 'Session', 'return', 'list[BrowserProfile]'))
+            324 LOAD_CONST              29 (<code object list_profiles at 0x7f6c81993430, file "app\services\browser_profile_service.py", line 140>)
+            326 MAKE_FUNCTION            4 (annotations)
+            328 STORE_NAME              40 (list_profiles)
+
+148         330 LOAD_CONST              85 (('db', 'Session', 'label', 'str', 'return', 'BrowserProfile'))
+            332 LOAD_CONST              30 (<code object create_profile at 0x7f6c92680570, file "app\services\browser_profile_service.py", line 148>)
+            334 MAKE_FUNCTION            4 (annotations)
+            336 STORE_NAME              41 (create_profile)
+
+159         338 LOAD_CONST              83 (('db', 'Session', 'return', 'int'))
+            340 LOAD_CONST              31 (<code object import_flow_chrome_profiles at 0x28acf6b0, file "app\services\browser_profile_service.py", line 159>)
+            342 MAKE_FUNCTION            4 (annotations)
+            344 STORE_NAME              42 (import_flow_chrome_profiles)
+
+186         346 LOAD_CONST              86 (('db', 'Session', 'profile_id', 'str', 'platforms', 'dict', 'return', 'BrowserProfile | None'))
+            348 LOAD_CONST              32 (<code object set_platforms at 0x28ac0c00, file "app\services\browser_profile_service.py", line 186>)
+            350 MAKE_FUNCTION            4 (annotations)
+            352 STORE_NAME              43 (set_platforms)
+
+231         354 LOAD_CONST              87 (('db', 'Session', 'profile_id', 'str', 'return', 'BrowserProfile | None'))
+            356 LOAD_CONST              33 (<code object get_profile at 0x7f6c926952f0, file "app\services\browser_profile_service.py", line 231>)
+            358 MAKE_FUNCTION            4 (annotations)
+            360 STORE_NAME              44 (get_profile)
+
+235         362 LOAD_CONST              88 (('db', 'Session', 'profile_id', 'str', 'return', 'dict[str, list]'))
+            364 LOAD_CONST              34 (<code object _accounts_of at 0x7f6c92b97870, file "app\services\browser_profile_service.py", line 235>)
+            366 MAKE_FUNCTION            4 (annotations)
+            368 STORE_NAME              45 (_accounts_of)
+
+243         370 LOAD_CONST              89 (('db', 'Session', 'p', 'BrowserProfile', 'return', 'dict'))
+            372 LOAD_CONST              35 (<code object to_dict at 0x28afb6e0, file "app\services\browser_profile_service.py", line 243>)
+            374 MAKE_FUNCTION            4 (annotations)
+            376 STORE_NAME              46 (to_dict)
+
+303         378 LOAD_CONST               3 (None)
+
+304         380 LOAD_CONST               3 (None)
+            382 LOAD_CONST               3 (None)
+
+303         384 LOAD_CONST              36 (('label', 'notes', 'status'))
+            386 BUILD_CONST_KEY_MAP      3
+
+304         388 NOP
+
+303         390 NOP
+
+304         392 NOP
+
+303         394 NOP
+
+304         396 NOP
+
+303         398 LOAD_CONST              90 (('db', 'Session', 'profile_id', 'str', 'label', 'str | None', 'notes', 'str | None', 'status', 'str | None', 'return', 'BrowserProfile | None'))
+            400 LOAD_CONST              37 (<code object update_profile at 0x7f6c929f3c90, file "app\services\browser_profile_service.py", line 303>)
+            402 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            404 STORE_NAME              47 (update_profile)
+
+318         406 LOAD_CONST              91 (('db', 'Session', 'profile_id', 'str', 'platform', 'str', 'account_id', 'str', 'return', 'bool'))
+            408 LOAD_CONST              38 (<code object assign_account at 0x7f6c92b97a00, file "app\services\browser_profile_service.py", line 318>)
+            410 MAKE_FUNCTION            4 (annotations)
+            412 STORE_NAME              48 (assign_account)
+
+331         414 LOAD_CONST              92 (('db', 'Session', 'profile_id', 'str', 'return', 'tuple[bool, str]'))
+            416 LOAD_CONST              39 (<code object delete_profile at 0x28afa930, file "app\services\browser_profile_service.py", line 331>)
+            418 MAKE_FUNCTION            4 (annotations)
+            420 STORE_NAME              49 (delete_profile)
+
+371         422 LOAD_CONST              93 (('db', 'Session', 'return', 'set[str]'))
+            424 LOAD_CONST              40 (<code object _active_video_ids at 0x7f6c92bdfb40, file "app\services\browser_profile_service.py", line 371>)
+            426 MAKE_FUNCTION            4 (annotations)
+            428 STORE_NAME              50 (_active_video_ids)
+
+376         430 LOAD_CONST              83 (('db', 'Session', 'return', 'int'))
+            432 LOAD_CONST              41 (<code object reap_stale at 0x28baa5f0, file "app\services\browser_profile_service.py", line 376>)
+            434 MAKE_FUNCTION            4 (annotations)
+            436 STORE_NAME              51 (reap_stale)
+
+402         438 LOAD_CONST              94 (('db', 'Session', 'acc', 'FlowAccount', 'return', 'BrowserProfile | None'))
+            440 LOAD_CONST              42 (<code object _profile_of_flow_account at 0x7f6c929f3b20, file "app\services\browser_profile_service.py", line 402>)
+            442 MAKE_FUNCTION            4 (annotations)
+            444 STORE_NAME              52 (_profile_of_flow_account)
+
+409         446 LOAD_CONST              95 (('db', 'Session', 'return', 'list[FlowAccount]'))
+            448 LOAD_CONST              43 (<code object _flow_accounts_ready at 0x28af88a0, file "app\services\browser_profile_service.py", line 409>)
+            450 MAKE_FUNCTION            4 (annotations)
+            452 STORE_NAME              53 (_flow_accounts_ready)
+
+435         454 LOAD_CONST              44 (True)
+
+434         456 LOAD_CONST              45 (('update_pin',))
+            458 BUILD_CONST_KEY_MAP      1
+
+435         460 NOP
+
+434         462 NOP
+
+435         464 NOP
+
+434         466 NOP
+
+435         468 NOP
+
+434         470 LOAD_CONST              96 (('db', 'Session', 'prof', 'BrowserProfile', 'video_id', 'str', 'job_id', 'str | None', 'partition_id', 'str', 'update_pin', 'bool', 'return', 'None'))
+            472 LOAD_CONST              46 (<code object _lease at 0x7f6c92b97d20, file "app\services\browser_profile_service.py", line 434>)
+            474 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            476 STORE_NAME              54 (_lease)
+
+446         478 LOAD_CONST              97 (('db', 'Session', 'video_id', 'str', 'return', 'int'))
+            480 LOAD_CONST              47 (<code object _leased_count_excluding at 0x7f6c81992c10, file "app\services\browser_profile_service.py", line 446>)
+            482 MAKE_FUNCTION            4 (annotations)
+            484 STORE_NAME              55 (_leased_count_excluding)
+
+452         486 NOP
+
+453         488 NOP
+
+452         490 LOAD_CONST              98 ((None, None))
+
+453         492 NOP
+
+452         494 NOP
+
+453         496 NOP
+
+452         498 LOAD_CONST              99 (('db', 'Session', 'video_id', 'str', 'job_id', 'str | None', 'preferred_profile_id', 'str | None', 'return', 'str | None'))
+            500 LOAD_CONST              48 (<code object lease_acquire_flow at 0x28ae5900, file "app\services\browser_profile_service.py", line 452>)
+            502 MAKE_FUNCTION            5 (defaults, annotations)
+            504 STORE_NAME              56 (lease_acquire_flow)
+
+526         506 NOP
+
+525         508 LOAD_CONST             100 ((None,))
+
+526         510 NOP
+
+525         512 NOP
+
+526         514 NOP
+
+525         516 NOP
+
+526         518 NOP
+
+525         520 LOAD_CONST             101 (('db', 'Session', 'video_id', 'str', 'job_id', 'str | None', 'limit', 'int', 'preferred_profile_id', 'str | None', 'return', 'list[str]'))
+            522 LOAD_CONST              49 (<code object lease_acquire_flow_many at 0x28ad0140, file "app\services\browser_profile_service.py", line 525>)
+            524 MAKE_FUNCTION            5 (defaults, annotations)
+            526 STORE_NAME              57 (lease_acquire_flow_many)
+
+582         528 LOAD_CONST               3 (None)
+
+581         530 LOAD_CONST              50 (('job_id',))
+            532 BUILD_CONST_KEY_MAP      1
+
+582         534 NOP
+
+581         536 NOP
+
+582         538 NOP
+
+581         540 NOP
+
+582         542 NOP
+
+581         544 LOAD_CONST             102 (('db', 'Session', 'video_id', 'str', 'current_partition', 'str | None', 'tried', 'set[str]', 'job_id', 'str | None', 'return', 'str | None'))
+            546 LOAD_CONST              51 (<code object lease_rotate_flow at 0x7f6c9257fa50, file "app\services\browser_profile_service.py", line 581>)
+            548 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            550 STORE_NAME              58 (lease_rotate_flow)
+
+602         552 NOP
+
+601         554 LOAD_CONST             100 ((None,))
+
+602         556 NOP
+
+601         558 NOP
+
+602         560 NOP
+
+601         562 LOAD_CONST             103 (('db', 'Session', 'current_partition', 'str | None', 'tried', 'set[str] | None', 'return', 'bool'))
+            564 LOAD_CONST              52 (<code object has_spare_flow_profile at 0x7f6c81992db0, file "app\services\browser_profile_service.py", line 601>)
+            566 MAKE_FUNCTION            5 (defaults, annotations)
+            568 STORE_NAME              59 (has_spare_flow_profile)
+
+621         570 LOAD_CONST               3 (None)
+
+620         572 LOAD_CONST              50 (('job_id',))
+            574 BUILD_CONST_KEY_MAP      1
+
+621         576 NOP
+
+620         578 NOP
+
+621         580 NOP
+
+620         582 NOP
+
+621         584 NOP
+
+620         586 LOAD_CONST             102 (('db', 'Session', 'video_id', 'str', 'current_partition', 'str | None', 'tried', 'set[str]', 'job_id', 'str | None', 'return', 'str | None'))
+            588 LOAD_CONST              53 (<code object lease_rotate_flow_worker at 0x28ad7320, file "app\services\browser_profile_service.py", line 620>)
+            590 MAKE_FUNCTION            6 (kwdefaults, annotations)
+            592 STORE_NAME              60 (lease_rotate_flow_worker)
+
+639         594 LOAD_CONST              97 (('db', 'Session', 'video_id', 'str', 'return', 'int'))
+            596 LOAD_CONST              54 (<code object lease_release_video at 0x7f6c819a5580, file "app\services\browser_profile_service.py", line 639>)
+            598 MAKE_FUNCTION            4 (annotations)
+            600 STORE_NAME              61 (lease_release_video)
+
+657         602 LOAD_CONST             100 ((None,))
+            604 LOAD_CONST             104 (('db', 'Session', 'video_id', 'str', 'keep_profile_id', 'str | None', 'return', 'int'))
+            606 LOAD_CONST              55 (<code object release_other_profiles at 0x28b63d00, file "app\services\browser_profile_service.py", line 657>)
+            608 MAKE_FUNCTION            5 (defaults, annotations)
+            610 STORE_NAME              62 (release_other_profiles)
+
+686         612 NOP
+
+685         614 LOAD_CONST             100 ((None,))
+
+686         616 NOP
+
+685         618 NOP
+
+686         620 NOP
+
+685         622 LOAD_CONST             105 (('db', 'Session', 'profile_id', 'str', 'video_id', 'str', 'job_id', 'str | None', 'return', 'bool'))
+            624 LOAD_CONST              56 (<code object lease_profile_for_video at 0x7f6c930c7120, file "app\services\browser_profile_service.py", line 685>)
+            626 MAKE_FUNCTION            5 (defaults, annotations)
+            628 STORE_NAME              63 (lease_profile_for_video)
+
+707         630 LOAD_CONST             106 (('db', 'Session', 'profile_id', 'str', 'video_id', 'str', 'return', 'bool'))
+            632 LOAD_CONST              57 (<code object release_profile_if_held at 0x7f6c926ac480, file "app\services\browser_profile_service.py", line 707>)
+            634 MAKE_FUNCTION            4 (annotations)
+            636 STORE_NAME              64 (release_profile_if_held)
+
+720         638 LOAD_CONST             107 (('db', 'Session', 'profile_id', 'str', 'return', 'bool'))
+            640 LOAD_CONST              58 (<code object force_release at 0x7f6c926ac8d0, file "app\services\browser_profile_service.py", line 720>)
+            642 MAKE_FUNCTION            4 (annotations)
+            644 STORE_NAME              65 (force_release)
+
+733         646 NOP
+
+734         648 NOP
+
+733         650 LOAD_CONST              98 ((None, None))
+
+734         652 NOP
+
+733         654 NOP
+
+734         656 NOP
+
+733         658 LOAD_CONST             108 (('db', 'Session', 'video_id', 'str', 'job_id', 'str | None', 'preferred_profile_id', 'str | None', 'return', 'bool'))
+            660 LOAD_CONST              59 (<code object flow_admission at 0x28ba9b00, file "app\services\browser_profile_service.py", line 733>)
+            662 MAKE_FUNCTION            5 (defaults, annotations)
+            664 STORE_NAME              66 (flow_admission)
+
+787         666 LOAD_CONST              60 ('ima2')
+            668 LOAD_CONST               3 (None)
+            670 BUILD_MAP                1
+            672 STORE_NAME              67 (_PROVIDER_SLOTS)
+            674 LOAD_CONST              61 ('dict[str, str | None]')
+            676 LOAD_NAME               30 (__annotations__)
+            678 LOAD_CONST              62 ('_PROVIDER_SLOTS')
+            680 STORE_SUBSCR
+
+790         684 LOAD_CONST              63 (('ima2',))
+
+791         686 LOAD_CONST              63 (('ima2',))
+
+792         688 LOAD_CONST              63 (('ima2',))
+
+796         690 LOAD_CONST              64 (())
+
+788         692 LOAD_CONST              65 (('chatgpt_generate', 'grok_generate', 'chatgpt_grok_generate', 'grok_video'))
+            694 BUILD_CONST_KEY_MAP      4
+            696 STORE_NAME              68 (PROVIDER_SLOT_STEPS)
+            698 LOAD_CONST              66 ('dict[str, tuple[str, ...]]')
+            700 LOAD_NAME               30 (__annotations__)
+            702 LOAD_CONST              67 ('PROVIDER_SLOT_STEPS')
+            704 STORE_SUBSCR
+
+800         708 LOAD_CONST             109 (('db', 'Session', 'return', 'None'))
+            710 LOAD_CONST              68 (<code object _reap_provider_slots at 0x7f6c92c2bdb0, file "app\services\browser_profile_service.py", line 800>)
+            712 MAKE_FUNCTION            4 (annotations)
+            714 STORE_NAME              69 (_reap_provider_slots)
+
+808         716 LOAD_CONST             110 (('db', 'Session', 'step_name', 'str', 'video_id', 'str', 'return', 'bool'))
+            718 LOAD_CONST              69 (<code object provider_admission at 0x7f6c92889bb0, file "app\services\browser_profile_service.py", line 808>)
+            720 MAKE_FUNCTION            4 (annotations)
+            722 STORE_NAME              70 (provider_admission)
+
+821         724 LOAD_CONST             111 (('video_id', 'str', 'return', 'int'))
+            726 LOAD_CONST              70 (<code object release_provider_slots at 0x7f6c926902b0, file "app\services\browser_profile_service.py", line 821>)
+            728 MAKE_FUNCTION            4 (annotations)
+            730 STORE_NAME              71 (release_provider_slots)
+
+831         732 LOAD_CONST             112 (('db', 'Session', 'partition_id', 'str', 'return', 'str | None'))
+            734 LOAD_CONST              71 (<code object chrome_dir_of_partition at 0x7f6c926bc230, file "app\services\browser_profile_service.py", line 831>)
+            736 MAKE_FUNCTION            4 (annotations)
+            738 STORE_NAME              72 (chrome_dir_of_partition)
+
+844         740 LOAD_CONST             113 (('db', 'Session', 'profile_id', 'str', 'return', 'str | None'))
+            742 LOAD_CONST              72 (<code object chrome_dir_of_profile at 0x7f6c926fc750, file "app\services\browser_profile_service.py", line 844>)
+            744 MAKE_FUNCTION            4 (annotations)
+            746 STORE_NAME              73 (chrome_dir_of_profile)
+
+851         748 LOAD_CONST             114 (('p', 'BrowserProfile', 'return', 'dict'))
+            750 LOAD_CONST              73 (<code object _platforms_of at 0x7f6c92c3f750, file "app\services\browser_profile_service.py", line 851>)
+            752 MAKE_FUNCTION            4 (annotations)
+            754 STORE_NAME              74 (_platforms_of)
+
+859         756 NOP
+
+860         758 NOP
+
+859         760 LOAD_CONST              98 ((None, None))
+
+860         762 NOP
+
+859         764 NOP
+
+860         766 NOP
+
+859         768 LOAD_CONST              99 (('db', 'Session', 'video_id', 'str', 'job_id', 'str | None', 'preferred_profile_id', 'str | None', 'return', 'str | None'))
+            770 LOAD_CONST              74 (<code object lease_chatgpt_ui_profile at 0x28ae0620, file "app\services\browser_profile_service.py", line 859>)
+            772 MAKE_FUNCTION            5 (defaults, annotations)
+            774 STORE_NAME              75 (lease_chatgpt_ui_profile)
+
+890         776 NOP
+
+891         778 NOP
+
+890         780 NOP
+
+891         782 NOP
+
+890         784 LOAD_CONST             115 (('db', 'Session', 'video_id', 'str', 'job_id', 'str | None', 'preferred_profile_id', 'str', 'return', 'bool'))
+            786 LOAD_CONST              75 (<code object combo_pin_admission at 0x7f6c926ac760, file "app\services\browser_profile_service.py", line 890>)
+            788 MAKE_FUNCTION            4 (annotations)
+            790 STORE_NAME              76 (combo_pin_admission)
+
+905         792 LOAD_CONST              93 (('db', 'Session', 'return', 'set[str]'))
+            794 LOAD_CONST              76 (<code object leased_partitions at 0x28aa9fa0, file "app\services\browser_profile_service.py", line 905>)
+            796 MAKE_FUNCTION            4 (annotations)
+            798 STORE_NAME              77 (leased_partitions)
+            800 RETURN_CONST             3 (None)
+
+Disassembly of <code object note_account_used at 0x7f6c92bcf210, file "app\services\browser_profile_service.py", line 53>:
+ 53           0 RESUME                   0
+
+ 55           2 LOAD_FAST                0 (video_id)
+              4 POP_JUMP_IF_FALSE        2 (to 10)
+              6 LOAD_FAST                1 (partition_id)
+              8 POP_JUMP_IF_TRUE         1 (to 12)
+
+ 56     >>   10 RETURN_CONST             1 (None)
+
+ 57     >>   12 LOAD_GLOBAL              0 (_ACCOUNTS_BY_VIDEO)
+             22 LOAD_ATTR                3 (NULL|self + setdefault)
+             42 LOAD_FAST                0 (video_id)
+             44 LOAD_GLOBAL              5 (NULL + set)
+             54 CALL                     0
+             62 CALL                     2
+             70 LOAD_ATTR                7 (NULL|self + add)
+             90 LOAD_FAST                1 (partition_id)
+             92 CALL                     1
+            100 POP_TOP
+            102 RETURN_CONST             1 (None)
+
+Disassembly of <code object accounts_of_video at 0x7f6c9268d350, file "app\services\browser_profile_service.py", line 60>:
+ 60           0 RESUME                   0
+
+ 62           2 LOAD_FAST                0 (video_id)
+              4 POP_JUMP_IF_TRUE         2 (to 10)
+
+ 63           6 BUILD_LIST               0
+              8 RETURN_VALUE
+
+ 64     >>   10 LOAD_GLOBAL              1 (NULL + sorted)
+             20 LOAD_GLOBAL              2 (_ACCOUNTS_BY_VIDEO)
+             30 LOAD_ATTR                5 (NULL|self + get)
+             50 LOAD_FAST                0 (video_id)
+             52 LOAD_GLOBAL              7 (NULL + set)
+             62 CALL                     0
+             70 CALL                     2
+             78 CALL                     1
+             86 RETURN_VALUE
+
+Disassembly of <code object forget_video_accounts at 0x7f6c9265d330, file "app\services\browser_profile_service.py", line 67>:
+ 67           0 RESUME                   0
+
+ 69           2 LOAD_FAST                0 (video_id)
+              4 POP_JUMP_IF_FALSE       23 (to 52)
+
+ 70           6 LOAD_GLOBAL              0 (_ACCOUNTS_BY_VIDEO)
+             16 LOAD_ATTR                3 (NULL|self + pop)
+             36 LOAD_FAST                0 (video_id)
+             38 LOAD_CONST               1 (None)
+             40 CALL                     2
+             48 POP_TOP
+             50 RETURN_CONST             1 (None)
+
+ 69     >>   52 RETURN_CONST             1 (None)
+
+Disassembly of <code object owns_account at 0x7f6c930c6d80, file "app\services\browser_profile_service.py", line 73>:
+ 73           0 RESUME                   0
+
+ 79           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + query)
+             24 LOAD_GLOBAL              2 (FlowAccount)
+             34 CALL                     1
+             42 LOAD_ATTR                5 (NULL|self + filter)
+             62 LOAD_GLOBAL              2 (FlowAccount)
+             72 LOAD_ATTR                6 (partition_id)
+             92 LOAD_FAST                2 (partition_id)
+             94 COMPARE_OP              40 (==)
+             98 CALL                     1
+            106 LOAD_ATTR                9 (NULL|self + first)
+            126 CALL                     0
+            134 STORE_FAST               3 (acc)
+
+ 80         136 LOAD_FAST                3 (acc)
+            138 POP_JUMP_IF_NONE        12 (to 164)
+            140 LOAD_FAST                3 (acc)
+            142 LOAD_ATTR               10 (browser_profile_id)
+            162 POP_JUMP_IF_TRUE         1 (to 166)
+
+ 82     >>  164 RETURN_CONST             2 (True)
+
+ 83     >>  166 LOAD_FAST                0 (db)
+            168 LOAD_ATTR               13 (NULL|self + get)
+            188 LOAD_GLOBAL             14 (BrowserProfile)
+            198 LOAD_FAST                3 (acc)
+            200 LOAD_ATTR               10 (browser_profile_id)
+            220 CALL                     2
+            228 STORE_FAST               4 (prof)
+
+ 84         230 LOAD_FAST                4 (prof)
+            232 POP_JUMP_IF_NOT_NONE     1 (to 236)
+
+ 85         234 RETURN_CONST             2 (True)
+
+ 86     >>  236 LOAD_FAST                4 (prof)
+            238 LOAD_ATTR               16 (leased_by_video_id)
+            258 LOAD_CONST               1 (None)
+            260 LOAD_FAST                1 (video_id)
+            262 BUILD_TUPLE              2
+            264 CONTAINS_OP              0
+            266 RETURN_VALUE
+
+Disassembly of <code object _account_email at 0x7f6c926fc160, file "app\services\browser_profile_service.py", line 100>:
+100           0 RESUME                   0
+
+101           2 LOAD_GLOBAL              1 (NULL + getattr)
+             12 LOAD_FAST                0 (acc)
+             14 LOAD_CONST               1 ('email')
+             16 LOAD_CONST               0 (None)
+             18 CALL                     3
+             26 COPY                     1
+             28 POP_JUMP_IF_TRUE         2 (to 34)
+             30 POP_TOP
+             32 LOAD_CONST               2 ('')
+        >>   34 LOAD_ATTR                3 (NULL|self + strip)
+             54 CALL                     0
+             62 LOAD_ATTR                5 (NULL|self + lower)
+             82 CALL                     0
+             90 STORE_FAST               1 (email)
+
+102          92 LOAD_FAST                1 (email)
+             94 COPY                     1
+             96 POP_JUMP_IF_TRUE         2 (to 102)
+             98 POP_TOP
+            100 LOAD_CONST               0 (None)
+        >>  102 RETURN_VALUE
+
+Disassembly of <code object _account_label at 0x7f6c92889a50, file "app\services\browser_profile_service.py", line 105>:
+105           0 RESUME                   0
+
+106           2 LOAD_GLOBAL              1 (NULL + getattr)
+             12 LOAD_FAST                0 (acc)
+             14 LOAD_CONST               1 ('label')
+             16 LOAD_CONST               0 (None)
+             18 CALL                     3
+             26 COPY                     1
+             28 POP_JUMP_IF_TRUE        62 (to 154)
+             30 POP_TOP
+             32 LOAD_GLOBAL              1 (NULL + getattr)
+             42 LOAD_FAST                0 (acc)
+             44 LOAD_CONST               2 ('name')
+             46 LOAD_CONST               0 (None)
+             48 CALL                     3
+             56 COPY                     1
+             58 POP_JUMP_IF_TRUE        47 (to 154)
+             60 POP_TOP
+
+107          62 LOAD_GLOBAL              1 (NULL + getattr)
+             72 LOAD_FAST                0 (acc)
+             74 LOAD_CONST               3 ('email')
+             76 LOAD_CONST               0 (None)
+             78 CALL                     3
+
+106          86 COPY                     1
+             88 POP_JUMP_IF_TRUE        32 (to 154)
+             90 POP_TOP
+
+107          92 LOAD_GLOBAL              1 (NULL + getattr)
+            102 LOAD_FAST                0 (acc)
+            104 LOAD_CONST               4 ('partition_id')
+            106 LOAD_CONST               0 (None)
+            108 CALL                     3
+
+106         116 COPY                     1
+            118 POP_JUMP_IF_TRUE        17 (to 154)
+            120 POP_TOP
+
+108         122 LOAD_GLOBAL              1 (NULL + getattr)
+            132 LOAD_FAST                0 (acc)
+            134 LOAD_CONST               5 ('chrome_id')
+            136 LOAD_CONST               0 (None)
+            138 CALL                     3
+
+106         146 COPY                     1
+            148 POP_JUMP_IF_TRUE         2 (to 154)
+            150 POP_TOP
+
+108         152 LOAD_CONST               6 ('profile')
+
+106     >>  154 RETURN_VALUE
+
+Disassembly of <code object discover_and_sync at 0x28b00630, file "app\services\browser_profile_service.py", line 111>:
+111           0 RESUME                   0
+
+118           2 LOAD_GLOBAL              1 (NULL + list)
+             12 LOAD_FAST                0 (db)
+             14 LOAD_ATTR                3 (NULL|self + scalars)
+             34 LOAD_GLOBAL              5 (NULL + select)
+             44 LOAD_GLOBAL              6 (BrowserProfile)
+             54 CALL                     1
+             62 CALL                     1
+             70 LOAD_ATTR                9 (NULL|self + all)
+             90 CALL                     0
+             98 CALL                     1
+            106 STORE_FAST               1 (profiles)
+
+119         108 LOAD_FAST                1 (profiles)
+            110 GET_ITER
+            112 LOAD_FAST_AND_CLEAR      2 (p)
+            114 SWAP                     2
+            116 BUILD_MAP                0
+            118 SWAP                     2
+        >>  120 FOR_ITER                56 (to 236)
+            124 STORE_FAST               2 (p)
+            126 LOAD_FAST                2 (p)
+            128 LOAD_ATTR               10 (email)
+            148 POP_JUMP_IF_TRUE         1 (to 152)
+            150 JUMP_BACKWARD           16 (to 120)
+        >>  152 LOAD_FAST                2 (p)
+            154 LOAD_ATTR               10 (email)
+            174 LOAD_ATTR               13 (NULL|self + strip)
+            194 CALL                     0
+            202 LOAD_ATTR               15 (NULL|self + lower)
+            222 CALL                     0
+            230 LOAD_FAST                2 (p)
+            232 MAP_ADD                  2
+            234 JUMP_BACKWARD           58 (to 120)
+        >>  236 END_FOR
+            238 STORE_FAST               3 (by_email)
+            240 STORE_FAST               2 (p)
+
+120         242 LOAD_CONST               1 (0)
+            244 STORE_FAST               4 (created)
+
+121         246 LOAD_GLOBAL             16 (_PLATFORM_TABLES)
+            256 GET_ITER
+        >>  258 FOR_ITER               182 (to 626)
+            262 UNPACK_SEQUENCE          2
+            266 STORE_FAST               5 (_platform)
+            268 STORE_FAST               6 (model)
+
+122         270 LOAD_FAST                0 (db)
+            272 LOAD_ATTR                3 (NULL|self + scalars)
+            292 LOAD_GLOBAL              5 (NULL + select)
+            302 LOAD_FAST                6 (model)
+            304 CALL                     1
+            312 CALL                     1
+            320 LOAD_ATTR                9 (NULL|self + all)
+            340 CALL                     0
+            348 GET_ITER
+        >>  350 FOR_ITER               134 (to 622)
+            354 STORE_FAST               7 (acc)
+
+123         356 LOAD_GLOBAL             19 (NULL + getattr)
+            366 LOAD_FAST                7 (acc)
+            368 LOAD_CONST               2 ('browser_profile_id')
+            370 LOAD_CONST               3 (None)
+            372 CALL                     3
+            380 POP_JUMP_IF_FALSE        1 (to 384)
+
+124         382 JUMP_BACKWARD           17 (to 350)
+
+125     >>  384 LOAD_GLOBAL             21 (NULL + _account_email)
+            394 LOAD_FAST                7 (acc)
+            396 CALL                     1
+            404 STORE_FAST               8 (email)
+
+126         406 LOAD_FAST                8 (email)
+            408 POP_JUMP_IF_FALSE       17 (to 444)
+            410 LOAD_FAST                3 (by_email)
+            412 LOAD_ATTR               23 (NULL|self + get)
+            432 LOAD_FAST                8 (email)
+            434 CALL                     1
+            442 JUMP_FORWARD             1 (to 446)
+        >>  444 LOAD_CONST               3 (None)
+        >>  446 STORE_FAST               9 (prof)
+
+127         448 LOAD_FAST                9 (prof)
+            450 POP_JUMP_IF_NOT_NONE    67 (to 586)
+
+128         452 LOAD_GLOBAL              7 (NULL + BrowserProfile)
+            462 LOAD_GLOBAL             25 (NULL + _account_label)
+            472 LOAD_FAST                7 (acc)
+            474 CALL                     1
+            482 LOAD_FAST                8 (email)
+            484 KW_NAMES                 4 (('label', 'email'))
+            486 CALL                     2
+            494 STORE_FAST               9 (prof)
+
+129         496 LOAD_FAST                0 (db)
+            498 LOAD_ATTR               27 (NULL|self + add)
+            518 LOAD_FAST                9 (prof)
+            520 CALL                     1
+            528 POP_TOP
+
+130         530 LOAD_FAST                0 (db)
+            532 LOAD_ATTR               29 (NULL|self + flush)
+            552 CALL                     0
+            560 POP_TOP
+
+131         562 LOAD_FAST                4 (created)
+            564 LOAD_CONST               5 (1)
+            566 BINARY_OP               13 (+=)
+            570 STORE_FAST               4 (created)
+
+132         572 LOAD_FAST                8 (email)
+            574 POP_JUMP_IF_FALSE        5 (to 586)
+
+133         576 LOAD_FAST                9 (prof)
+            578 LOAD_FAST                3 (by_email)
+            580 LOAD_FAST                8 (email)
+            582 STORE_SUBSCR
+
+134     >>  586 LOAD_FAST                9 (prof)
+            588 LOAD_ATTR               30 (id)
+            608 LOAD_FAST                7 (acc)
+            610 STORE_ATTR              16 (browser_profile_id)
+            620 JUMP_BACKWARD          136 (to 350)
+
+122     >>  622 END_FOR
+            624 JUMP_BACKWARD          184 (to 258)
+
+121     >>  626 END_FOR
+
+135         628 LOAD_FAST                4 (created)
+            630 POP_JUMP_IF_TRUE        12 (to 656)
+            632 LOAD_FAST                0 (db)
+            634 LOAD_ATTR               34 (dirty)
+            654 POP_JUMP_IF_FALSE       16 (to 688)
+
+136     >>  656 LOAD_FAST                0 (db)
+            658 LOAD_ATTR               37 (NULL|self + commit)
+            678 CALL                     0
+            686 POP_TOP
+
+137     >>  688 LOAD_FAST                4 (created)
+            690 RETURN_VALUE
+        >>  692 SWAP                     2
+            694 POP_TOP
+
+119         696 SWAP                     2
+            698 STORE_FAST               2 (p)
+            700 RERAISE                  0
+ExceptionTable:
+  116 to 148 -> 692 [2]
+  152 to 236 -> 692 [2]
+
+Disassembly of <code object list_profiles at 0x7f6c81993430, file "app\services\browser_profile_service.py", line 140>:
+140           0 RESUME                   0
+
+141           2 LOAD_GLOBAL              1 (NULL + import_flow_chrome_profiles)
+             12 LOAD_FAST                0 (db)
+             14 CALL                     1
+             22 POP_TOP
+
+142          24 LOAD_GLOBAL              3 (NULL + discover_and_sync)
+             34 LOAD_FAST                0 (db)
+             36 CALL                     1
+             44 POP_TOP
+
+143          46 LOAD_GLOBAL              5 (NULL + list)
+             56 LOAD_FAST                0 (db)
+             58 LOAD_ATTR                7 (NULL|self + scalars)
+             78 LOAD_GLOBAL              9 (NULL + select)
+             88 LOAD_GLOBAL             10 (BrowserProfile)
+             98 CALL                     1
+            106 LOAD_ATTR               13 (NULL|self + order_by)
+            126 LOAD_GLOBAL             10 (BrowserProfile)
+            136 LOAD_ATTR               14 (created_at)
+            156 CALL                     1
+            164 CALL                     1
+            172 LOAD_ATTR               17 (NULL|self + all)
+            192 CALL                     0
+            200 CALL                     1
+            208 RETURN_VALUE
+
+Disassembly of <code object create_profile at 0x7f6c92680570, file "app\services\browser_profile_service.py", line 148>:
+148           0 RESUME                   0
+
+150           2 LOAD_GLOBAL              1 (NULL + BrowserProfile)
+             12 LOAD_FAST                1 (label)
+             14 COPY                     1
+             16 POP_JUMP_IF_TRUE         2 (to 22)
+             18 POP_TOP
+             20 LOAD_CONST               1 ('')
+        >>   22 LOAD_ATTR                3 (NULL|self + strip)
+             42 CALL                     0
+             50 COPY                     1
+             52 POP_JUMP_IF_TRUE         2 (to 58)
+             54 POP_TOP
+             56 LOAD_CONST               2 ('Profile mới')
+        >>   58 LOAD_CONST               3 ('user')
+             60 KW_NAMES                 4 (('label', 'source'))
+             62 CALL                     2
+             70 STORE_FAST               2 (p)
+
+151          72 LOAD_FAST                0 (db)
+             74 LOAD_ATTR                5 (NULL|self + add)
+             94 LOAD_FAST                2 (p)
+             96 CALL                     1
+            104 POP_TOP
+
+152         106 LOAD_FAST                0 (db)
+            108 LOAD_ATTR                7 (NULL|self + flush)
+            128 CALL                     0
+            136 POP_TOP
+
+153         138 LOAD_CONST               5 ('browser-profiles/')
+            140 LOAD_FAST                2 (p)
+            142 LOAD_ATTR                8 (id)
+            162 FORMAT_VALUE             0
+            164 BUILD_STRING             2
+            166 LOAD_FAST                2 (p)
+            168 STORE_ATTR               5 (chrome_dir)
+
+154         178 LOAD_FAST                0 (db)
+            180 LOAD_ATTR               13 (NULL|self + commit)
+            200 CALL                     0
+            208 POP_TOP
+
+155         210 LOAD_FAST                0 (db)
+            212 LOAD_ATTR               15 (NULL|self + refresh)
+            232 LOAD_FAST                2 (p)
+            234 CALL                     1
+            242 POP_TOP
+
+156         244 LOAD_FAST                2 (p)
+            246 RETURN_VALUE
+
+Disassembly of <code object import_flow_chrome_profiles at 0x28acf6b0, file "app\services\browser_profile_service.py", line 159>:
+159           0 RESUME                   0
+
+166           2 LOAD_CONST               1 (0)
+              4 STORE_FAST               1 (n)
+
+167           6 LOAD_FAST                0 (db)
+              8 LOAD_ATTR                1 (NULL|self + scalars)
+             28 LOAD_GLOBAL              3 (NULL + select)
+             38 LOAD_GLOBAL              4 (FlowAccount)
+             48 CALL                     1
+             56 CALL                     1
+             64 LOAD_ATTR                7 (NULL|self + all)
+             84 CALL                     0
+             92 GET_ITER
+        >>   94 FOR_ITER               249 (to 596)
+             98 STORE_FAST               2 (acc)
+
+168         100 LOAD_FAST                2 (acc)
+            102 LOAD_ATTR                8 (partition_id)
+            122 LOAD_ATTR               11 (NULL|self + startswith)
+            142 LOAD_CONST               2 ('bp:')
+            144 CALL                     1
+            152 POP_JUMP_IF_FALSE        1 (to 156)
+
+169         154 JUMP_BACKWARD           31 (to 94)
+
+170     >>  156 LOAD_FAST                2 (acc)
+            158 LOAD_ATTR               12 (browser_profile_id)
+            178 POP_JUMP_IF_FALSE       32 (to 244)
+            180 LOAD_FAST                0 (db)
+            182 LOAD_ATTR               15 (NULL|self + get)
+            202 LOAD_GLOBAL             16 (BrowserProfile)
+            212 LOAD_FAST                2 (acc)
+            214 LOAD_ATTR               12 (browser_profile_id)
+            234 CALL                     2
+            242 JUMP_FORWARD             1 (to 246)
+        >>  244 LOAD_CONST               3 (None)
+        >>  246 STORE_FAST               3 (prof)
+
+171         248 LOAD_FAST                3 (prof)
+            250 POP_JUMP_IF_NOT_NONE   117 (to 486)
+
+172         252 LOAD_GLOBAL             17 (NULL + BrowserProfile)
+            262 LOAD_FAST                2 (acc)
+            264 LOAD_ATTR               18 (email)
+            284 COPY                     1
+            286 POP_JUMP_IF_TRUE        26 (to 340)
+            288 POP_TOP
+            290 LOAD_FAST                2 (acc)
+            292 LOAD_ATTR               20 (label)
+            312 COPY                     1
+            314 POP_JUMP_IF_TRUE        12 (to 340)
+            316 POP_TOP
+            318 LOAD_FAST                2 (acc)
+            320 LOAD_ATTR                8 (partition_id)
+
+173     >>  340 LOAD_FAST                2 (acc)
+            342 LOAD_ATTR               18 (email)
+            362 LOAD_CONST               4 ('imported')
+
+172         364 KW_NAMES                 5 (('label', 'email', 'source'))
+            366 CALL                     3
+            374 STORE_FAST               3 (prof)
+
+174         376 LOAD_FAST                0 (db)
+            378 LOAD_ATTR               23 (NULL|self + add)
+            398 LOAD_FAST                3 (prof)
+            400 CALL                     1
+            408 POP_TOP
+
+175         410 LOAD_FAST                0 (db)
+            412 LOAD_ATTR               25 (NULL|self + flush)
+            432 CALL                     0
+            440 POP_TOP
+
+176         442 LOAD_FAST                3 (prof)
+            444 LOAD_ATTR               26 (id)
+            464 LOAD_FAST                2 (acc)
+            466 STORE_ATTR               6 (browser_profile_id)
+
+177         476 LOAD_FAST                1 (n)
+            478 LOAD_CONST               6 (1)
+            480 BINARY_OP               13 (+=)
+            484 STORE_FAST               1 (n)
+
+178     >>  486 LOAD_FAST                3 (prof)
+            488 LOAD_ATTR               28 (chrome_dir)
+            508 POP_JUMP_IF_FALSE        1 (to 512)
+            510 JUMP_BACKWARD          209 (to 94)
+
+179     >>  512 LOAD_CONST               7 ('flow-chrome/')
+            514 LOAD_FAST                2 (acc)
+            516 LOAD_ATTR                8 (partition_id)
+            536 FORMAT_VALUE             0
+            538 BUILD_STRING             2
+            540 LOAD_FAST                3 (prof)
+            542 STORE_ATTR              14 (chrome_dir)
+
+180         552 LOAD_FAST                3 (prof)
+            554 LOAD_ATTR               30 (source)
+            574 COPY                     1
+            576 POP_JUMP_IF_TRUE         2 (to 582)
+            578 POP_TOP
+            580 LOAD_CONST               4 ('imported')
+        >>  582 LOAD_FAST                3 (prof)
+            584 STORE_ATTR              15 (source)
+            594 JUMP_BACKWARD          251 (to 94)
+
+167     >>  596 END_FOR
+
+181         598 LOAD_FAST                1 (n)
+            600 POP_JUMP_IF_TRUE        12 (to 626)
+            602 LOAD_FAST                0 (db)
+            604 LOAD_ATTR               32 (dirty)
+            624 POP_JUMP_IF_FALSE       16 (to 658)
+
+182     >>  626 LOAD_FAST                0 (db)
+            628 LOAD_ATTR               35 (NULL|self + commit)
+            648 CALL                     0
+            656 POP_TOP
+
+183     >>  658 LOAD_FAST                1 (n)
+            660 RETURN_VALUE
+
+Disassembly of <code object set_platforms at 0x28ac0c00, file "app\services\browser_profile_service.py", line 186>:
+186           0 RESUME                   0
+
+194           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               2 (None)
+              6 IMPORT_NAME              0 (json)
+              8 STORE_FAST               3 (_json)
+
+195          10 LOAD_FAST                0 (db)
+             12 LOAD_ATTR                3 (NULL|self + get)
+             32 LOAD_GLOBAL              4 (BrowserProfile)
+             42 LOAD_FAST                1 (profile_id)
+             44 CALL                     2
+             52 STORE_FAST               4 (p)
+
+196          54 LOAD_FAST                4 (p)
+             56 POP_JUMP_IF_NOT_NONE     1 (to 60)
+
+197          58 RETURN_CONST             2 (None)
+
+198     >>   60 LOAD_FAST                3 (_json)
+             62 LOAD_ATTR                7 (NULL|self + dumps)
+             82 LOAD_FAST                2 (platforms)
+             84 COPY                     1
+             86 POP_JUMP_IF_TRUE         2 (to 92)
+             88 POP_TOP
+             90 BUILD_MAP                0
+        >>   92 LOAD_CONST               3 (False)
+             94 KW_NAMES                 4 (('ensure_ascii',))
+             96 CALL                     2
+            104 LOAD_FAST                4 (p)
+            106 STORE_ATTR               4 (platforms_json)
+
+199         116 LOAD_GLOBAL             11 (NULL + datetime)
+            126 LOAD_ATTR               12 (now)
+            146 CALL                     0
+            154 LOAD_FAST                4 (p)
+            156 STORE_ATTR               7 (last_health_at)
+
+200         166 LOAD_FAST                2 (platforms)
+            168 COPY                     1
+            170 POP_JUMP_IF_TRUE         2 (to 176)
+            172 POP_TOP
+            174 BUILD_MAP                0
+        >>  176 LOAD_ATTR                3 (NULL|self + get)
+            196 LOAD_CONST               5 ('flow')
+            198 CALL                     1
+            206 COPY                     1
+            208 POP_JUMP_IF_TRUE         2 (to 214)
+            210 POP_TOP
+            212 BUILD_MAP                0
+        >>  214 STORE_FAST               5 (flow_info)
+
+201         216 LOAD_FAST                5 (flow_info)
+            218 LOAD_ATTR                3 (NULL|self + get)
+            238 LOAD_CONST               6 ('email')
+            240 CALL                     1
+            248 POP_JUMP_IF_FALSE       22 (to 294)
+            250 LOAD_FAST                4 (p)
+            252 LOAD_ATTR               16 (email)
+            272 POP_JUMP_IF_TRUE        10 (to 294)
+
+202         274 LOAD_FAST                5 (flow_info)
+            276 LOAD_CONST               6 ('email')
+            278 BINARY_SUBSCR
+            282 LOAD_FAST                4 (p)
+            284 STORE_ATTR               8 (email)
+
+203     >>  294 LOAD_FAST                5 (flow_info)
+            296 LOAD_ATTR                3 (NULL|self + get)
+            316 LOAD_CONST               7 ('connected')
+            318 CALL                     1
+            326 EXTENDED_ARG             1
+            328 POP_JUMP_IF_FALSE      261 (to 852)
+            330 LOAD_FAST                4 (p)
+            332 LOAD_ATTR               18 (chrome_dir)
+            352 COPY                     1
+            354 POP_JUMP_IF_TRUE         2 (to 360)
+            356 POP_TOP
+            358 LOAD_CONST               8 ('')
+        >>  360 LOAD_ATTR               21 (NULL|self + startswith)
+            380 LOAD_CONST               9 ('browser-profiles/')
+            382 CALL                     1
+            390 POP_JUMP_IF_FALSE      230 (to 852)
+
+204         392 LOAD_CONST              10 ('bp:')
+            394 LOAD_FAST                1 (profile_id)
+            396 FORMAT_VALUE             0
+            398 BUILD_STRING             2
+            400 STORE_FAST               6 (part)
+
+205         402 LOAD_FAST                0 (db)
+            404 LOAD_ATTR               23 (NULL|self + scalar)
+            424 LOAD_GLOBAL             25 (NULL + select)
+            434 LOAD_GLOBAL             26 (FlowAccount)
+            444 CALL                     1
+            452 LOAD_ATTR               29 (NULL|self + where)
+            472 LOAD_GLOBAL             26 (FlowAccount)
+            482 LOAD_ATTR               30 (partition_id)
+            502 LOAD_FAST                6 (part)
+            504 COMPARE_OP              40 (==)
+            508 CALL                     1
+            516 CALL                     1
+            524 STORE_FAST               7 (acc)
+
+206         526 LOAD_FAST                7 (acc)
+            528 POP_JUMP_IF_NOT_NONE   132 (to 794)
+
+207         530 LOAD_GLOBAL             33 (NULL + max)
+            540 LOAD_CONST              11 (<code object <genexpr> at 0x7f6c9265d830, file "app\services\browser_profile_service.py", line 207>)
+            542 MAKE_FUNCTION            0
+            544 LOAD_FAST                0 (db)
+            546 LOAD_ATTR               35 (NULL|self + scalars)
+            566 LOAD_GLOBAL             25 (NULL + select)
+            576 LOAD_GLOBAL             26 (FlowAccount)
+            586 CALL                     1
+            594 CALL                     1
+            602 LOAD_ATTR               37 (NULL|self + all)
+            622 CALL                     0
+            630 GET_ITER
+            632 CALL                     0
+
+208         640 LOAD_CONST               1 (0)
+
+207         642 KW_NAMES                12 (('default',))
+            644 CALL                     2
+            652 STORE_FAST               8 (max_order)
+
+209         654 LOAD_FAST                0 (db)
+            656 LOAD_ATTR               39 (NULL|self + add)
+            676 LOAD_GLOBAL             27 (NULL + FlowAccount)
+            686 LOAD_FAST                6 (part)
+            688 LOAD_FAST                4 (p)
+            690 LOAD_ATTR               40 (label)
+            710 LOAD_FAST                5 (flow_info)
+            712 LOAD_ATTR                3 (NULL|self + get)
+            732 LOAD_CONST               6 ('email')
+            734 CALL                     1
+
+210         742 LOAD_FAST                4 (p)
+            744 LOAD_ATTR               42 (id)
+            764 LOAD_FAST                8 (max_order)
+            766 LOAD_CONST              13 (1)
+            768 BINARY_OP                0 (+)
+
+209         772 KW_NAMES                14 (('partition_id', 'label', 'email', 'browser_profile_id', 'order_index'))
+            774 CALL                     5
+            782 CALL                     1
+            790 POP_TOP
+            792 JUMP_FORWARD            29 (to 852)
+
+211     >>  794 LOAD_FAST                7 (acc)
+            796 LOAD_ATTR               44 (browser_profile_id)
+            816 POP_JUMP_IF_TRUE        17 (to 852)
+
+212         818 LOAD_FAST                4 (p)
+            820 LOAD_ATTR               42 (id)
+            840 LOAD_FAST                7 (acc)
+            842 STORE_ATTR              22 (browser_profile_id)
+
+216     >>  852 LOAD_FAST                2 (platforms)
+            854 COPY                     1
+            856 POP_JUMP_IF_TRUE         2 (to 862)
+            858 POP_TOP
+            860 BUILD_MAP                0
+        >>  862 LOAD_ATTR                3 (NULL|self + get)
+            882 LOAD_CONST              15 ('grok')
+            884 CALL                     1
+            892 COPY                     1
+            894 POP_JUMP_IF_TRUE         2 (to 900)
+            896 POP_TOP
+            898 BUILD_MAP                0
+        >>  900 STORE_FAST               9 (grok_info)
+
+217         902 LOAD_FAST                9 (grok_info)
+            904 LOAD_ATTR                3 (NULL|self + get)
+            924 LOAD_CONST               7 ('connected')
+            926 CALL                     1
+            934 POP_JUMP_IF_FALSE      245 (to 1426)
+            936 LOAD_FAST                4 (p)
+            938 LOAD_ATTR               18 (chrome_dir)
+            958 COPY                     1
+            960 POP_JUMP_IF_TRUE         2 (to 966)
+            962 POP_TOP
+            964 LOAD_CONST               8 ('')
+        >>  966 LOAD_ATTR               21 (NULL|self + startswith)
+            986 LOAD_CONST               9 ('browser-profiles/')
+            988 CALL                     1
+            996 POP_JUMP_IF_FALSE      214 (to 1426)
+
+218         998 LOAD_CONST              10 ('bp:')
+           1000 LOAD_FAST                1 (profile_id)
+           1002 FORMAT_VALUE             0
+           1004 BUILD_STRING             2
+           1006 STORE_FAST               6 (part)
+
+219        1008 LOAD_FAST                0 (db)
+           1010 LOAD_ATTR               23 (NULL|self + scalar)
+           1030 LOAD_GLOBAL             25 (NULL + select)
+           1040 LOAD_GLOBAL             46 (GrokAccount)
+           1050 CALL                     1
+           1058 LOAD_ATTR               29 (NULL|self + where)
+           1078 LOAD_GLOBAL             46 (GrokAccount)
+           1088 LOAD_ATTR               30 (partition_id)
+           1108 LOAD_FAST                6 (part)
+           1110 COMPARE_OP              40 (==)
+           1114 CALL                     1
+           1122 CALL                     1
+           1130 STORE_FAST              10 (gacc)
+
+220        1132 LOAD_FAST               10 (gacc)
+           1134 POP_JUMP_IF_NOT_NONE   116 (to 1368)
+
+221        1136 LOAD_GLOBAL             33 (NULL + max)
+           1146 LOAD_CONST              16 (<code object <genexpr> at 0x7f6c9265d930, file "app\services\browser_profile_service.py", line 221>)
+           1148 MAKE_FUNCTION            0
+           1150 LOAD_FAST                0 (db)
+           1152 LOAD_ATTR               35 (NULL|self + scalars)
+           1172 LOAD_GLOBAL             25 (NULL + select)
+           1182 LOAD_GLOBAL             46 (GrokAccount)
+           1192 CALL                     1
+           1200 CALL                     1
+           1208 LOAD_ATTR               37 (NULL|self + all)
+           1228 CALL                     0
+           1236 GET_ITER
+           1238 CALL                     0
+           1246 LOAD_CONST               1 (0)
+           1248 KW_NAMES                12 (('default',))
+           1250 CALL                     2
+           1258 STORE_FAST              11 (gmax)
+
+222        1260 LOAD_FAST                0 (db)
+           1262 LOAD_ATTR               39 (NULL|self + add)
+           1282 LOAD_GLOBAL             47 (NULL + GrokAccount)
+           1292 LOAD_FAST                6 (part)
+           1294 LOAD_FAST                4 (p)
+           1296 LOAD_ATTR               40 (label)
+
+223        1316 LOAD_FAST                4 (p)
+           1318 LOAD_ATTR               42 (id)
+           1338 LOAD_FAST               11 (gmax)
+           1340 LOAD_CONST              13 (1)
+           1342 BINARY_OP                0 (+)
+
+222        1346 KW_NAMES                17 (('partition_id', 'label', 'browser_profile_id', 'order_index'))
+           1348 CALL                     4
+           1356 CALL                     1
+           1364 POP_TOP
+           1366 JUMP_FORWARD            29 (to 1426)
+
+224     >> 1368 LOAD_FAST               10 (gacc)
+           1370 LOAD_ATTR               44 (browser_profile_id)
+           1390 POP_JUMP_IF_TRUE        17 (to 1426)
+
+225        1392 LOAD_FAST                4 (p)
+           1394 LOAD_ATTR               42 (id)
+           1414 LOAD_FAST               10 (gacc)
+           1416 STORE_ATTR              22 (browser_profile_id)
+
+226     >> 1426 LOAD_FAST                0 (db)
+           1428 LOAD_ATTR               49 (NULL|self + commit)
+           1448 CALL                     0
+           1456 POP_TOP
+
+227        1458 LOAD_FAST                0 (db)
+           1460 LOAD_ATTR               51 (NULL|self + refresh)
+           1480 LOAD_FAST                4 (p)
+           1482 CALL                     1
+           1490 POP_TOP
+
+228        1492 LOAD_FAST                4 (p)
+           1494 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x7f6c9265d830, file "app\services\browser_profile_service.py", line 207>:
+207           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                16 (to 44)
+             12 STORE_FAST               1 (a)
+             14 LOAD_FAST                1 (a)
+             16 LOAD_ATTR                0 (order_index)
+             36 YIELD_VALUE              1
+             38 RESUME                   1
+             40 POP_TOP
+             42 JUMP_BACKWARD           18 (to 8)
+        >>   44 END_FOR
+             46 RETURN_CONST             0 (None)
+        >>   48 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             50 RERAISE                  1
+ExceptionTable:
+  4 to 46 -> 48 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c9265d930, file "app\services\browser_profile_service.py", line 221>:
+221           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                16 (to 44)
+             12 STORE_FAST               1 (a)
+             14 LOAD_FAST                1 (a)
+             16 LOAD_ATTR                0 (order_index)
+             36 YIELD_VALUE              1
+             38 RESUME                   1
+             40 POP_TOP
+             42 JUMP_BACKWARD           18 (to 8)
+        >>   44 END_FOR
+             46 RETURN_CONST             0 (None)
+        >>   48 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             50 RERAISE                  1
+ExceptionTable:
+  4 to 46 -> 48 [0] lasti
+
+Disassembly of <code object get_profile at 0x7f6c926952f0, file "app\services\browser_profile_service.py", line 231>:
+231           0 RESUME                   0
+
+232           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_GLOBAL              2 (BrowserProfile)
+             34 LOAD_FAST                1 (profile_id)
+             36 CALL                     2
+             44 RETURN_VALUE
+
+Disassembly of <code object _accounts_of at 0x7f6c92b97870, file "app\services\browser_profile_service.py", line 235>:
+235           0 RESUME                   0
+
+236           2 BUILD_MAP                0
+              4 STORE_FAST               2 (out)
+
+237           6 LOAD_GLOBAL              0 (_PLATFORM_TABLES)
+             16 GET_ITER
+        >>   18 FOR_ITER                87 (to 196)
+             22 UNPACK_SEQUENCE          2
+             26 STORE_FAST               3 (platform)
+             28 STORE_FAST               4 (model)
+
+238          30 LOAD_FAST                0 (db)
+             32 LOAD_ATTR                3 (NULL|self + scalars)
+             52 LOAD_GLOBAL              5 (NULL + select)
+             62 LOAD_FAST                4 (model)
+             64 CALL                     1
+             72 LOAD_ATTR                7 (NULL|self + where)
+             92 LOAD_FAST                4 (model)
+             94 LOAD_ATTR                8 (browser_profile_id)
+            114 LOAD_FAST                1 (profile_id)
+            116 COMPARE_OP              40 (==)
+            120 CALL                     1
+            128 CALL                     1
+            136 LOAD_ATTR               11 (NULL|self + all)
+            156 CALL                     0
+            164 STORE_FAST               5 (rows)
+
+239         166 LOAD_GLOBAL             13 (NULL + list)
+            176 LOAD_FAST                5 (rows)
+            178 CALL                     1
+            186 LOAD_FAST                2 (out)
+            188 LOAD_FAST                3 (platform)
+            190 STORE_SUBSCR
+            194 JUMP_BACKWARD           89 (to 18)
+
+237     >>  196 END_FOR
+
+240         198 LOAD_FAST                2 (out)
+            200 RETURN_VALUE
+
+Disassembly of <code object to_dict at 0x28afb6e0, file "app\services\browser_profile_service.py", line 243>:
+              0 MAKE_CELL               11 (now)
+
+243           2 RESUME                   0
+
+245           4 LOAD_GLOBAL              1 (NULL + datetime)
+             14 LOAD_ATTR                2 (now)
+             34 CALL                     0
+             42 STORE_DEREF             11 (now)
+
+247          44 LOAD_CONST               8 (('platform', 'str', 'return', 'dict'))
+             46 LOAD_CLOSURE            11 (now)
+             48 BUILD_TUPLE              1
+             50 LOAD_CONST               1 (<code object _acc at 0x28b05440, file "app\services\browser_profile_service.py", line 247>)
+             52 MAKE_FUNCTION           12 (annotations, closure)
+             54 STORE_FAST               2 (_acc)
+
+267          56 LOAD_GLOBAL              5 (NULL + _accounts_of)
+             66 LOAD_FAST                0 (db)
+             68 LOAD_FAST                1 (p)
+             70 LOAD_ATTR                6 (id)
+             90 CALL                     2
+             98 LOAD_ATTR                9 (NULL|self + items)
+            118 CALL                     0
+            126 GET_ITER
+
+266         128 LOAD_FAST_AND_CLEAR      3 (platform)
+            130 LOAD_FAST_AND_CLEAR      4 (rows)
+            132 LOAD_FAST_AND_CLEAR      5 (a)
+            134 SWAP                     4
+            136 BUILD_MAP                0
+            138 SWAP                     2
+
+267     >>  140 FOR_ITER                29 (to 202)
+            144 UNPACK_SEQUENCE          2
+            148 STORE_FAST               3 (platform)
+            150 STORE_FAST               4 (rows)
+
+266         152 LOAD_FAST                3 (platform)
+            154 LOAD_FAST                4 (rows)
+            156 GET_ITER
+            158 LOAD_FAST_AND_CLEAR      5 (a)
+            160 SWAP                     2
+            162 BUILD_LIST               0
+            164 SWAP                     2
+        >>  166 FOR_ITER                11 (to 192)
+            170 STORE_FAST               5 (a)
+            172 PUSH_NULL
+            174 LOAD_FAST                2 (_acc)
+            176 LOAD_FAST                3 (platform)
+            178 LOAD_FAST                5 (a)
+            180 CALL                     2
+            188 LIST_APPEND              2
+            190 JUMP_BACKWARD           13 (to 166)
+        >>  192 END_FOR
+            194 SWAP                     2
+            196 STORE_FAST               5 (a)
+            198 MAP_ADD                  2
+            200 JUMP_BACKWARD           31 (to 140)
+
+267     >>  202 END_FOR
+
+266         204 STORE_FAST               6 (accounts)
+            206 STORE_FAST               4 (rows)
+            208 STORE_FAST               3 (platform)
+            210 STORE_FAST               5 (a)
+
+269         212 LOAD_CONST               2 (None)
+            214 STORE_FAST               7 (lease)
+
+270         216 LOAD_FAST                1 (p)
+            218 LOAD_ATTR               10 (leased_by_video_id)
+            238 POP_JUMP_IF_FALSE      122 (to 484)
+
+271         240 LOAD_FAST                0 (db)
+            242 LOAD_ATTR               13 (NULL|self + get)
+            262 LOAD_GLOBAL             14 (Video)
+            272 LOAD_FAST                1 (p)
+            274 LOAD_ATTR               10 (leased_by_video_id)
+            294 CALL                     2
+            302 STORE_FAST               8 (video)
+
+273         304 LOAD_FAST                1 (p)
+            306 LOAD_ATTR               10 (leased_by_video_id)
+
+274         326 LOAD_FAST                8 (video)
+            328 POP_JUMP_IF_FALSE       12 (to 354)
+            330 LOAD_FAST                8 (video)
+            332 LOAD_ATTR               16 (title)
+            352 JUMP_FORWARD             1 (to 356)
+        >>  354 LOAD_CONST               2 (None)
+
+275     >>  356 LOAD_FAST                1 (p)
+            358 LOAD_ATTR               18 (leased_job_id)
+
+276         378 LOAD_FAST                1 (p)
+            380 LOAD_ATTR               20 (lease_kind)
+
+277         400 LOAD_FAST                1 (p)
+            402 LOAD_ATTR               22 (lease_heartbeat_at)
+            422 POP_JUMP_IF_FALSE       26 (to 476)
+            424 LOAD_FAST                1 (p)
+            426 LOAD_ATTR               22 (lease_heartbeat_at)
+            446 LOAD_ATTR               25 (NULL|self + isoformat)
+            466 CALL                     0
+            474 JUMP_FORWARD             1 (to 478)
+        >>  476 LOAD_CONST               2 (None)
+
+272     >>  478 LOAD_CONST               3 (('video_id', 'video_title', 'job_id', 'kind', 'heartbeat_at'))
+            480 BUILD_CONST_KEY_MAP      5
+            482 STORE_FAST               7 (lease)
+
+280     >>  484 LOAD_CONST               4 (0)
+            486 LOAD_CONST               2 (None)
+            488 IMPORT_NAME             13 (json)
+            490 STORE_FAST               9 (_json)
+
+281         492 NOP
+
+282         494 LOAD_FAST                1 (p)
+            496 LOAD_ATTR               28 (platforms_json)
+            516 POP_JUMP_IF_FALSE       27 (to 572)
+            518 LOAD_FAST                9 (_json)
+            520 LOAD_ATTR               31 (NULL|self + loads)
+            540 LOAD_FAST                1 (p)
+            542 LOAD_ATTR               28 (platforms_json)
+            562 CALL                     1
+            570 JUMP_FORWARD             1 (to 574)
+        >>  572 BUILD_MAP                0
+        >>  574 STORE_FAST              10 (platforms)
+
+287     >>  576 LOAD_FAST                1 (p)
+            578 LOAD_ATTR                6 (id)
+
+288         598 LOAD_FAST                1 (p)
+            600 LOAD_ATTR               36 (label)
+
+289         620 LOAD_FAST                1 (p)
+            622 LOAD_ATTR               38 (email)
+
+290         642 LOAD_FAST                1 (p)
+            644 LOAD_ATTR               40 (status)
+
+291         664 LOAD_FAST                1 (p)
+            666 LOAD_ATTR               42 (notes)
+
+292         686 LOAD_FAST                7 (lease)
+
+293         688 LOAD_FAST                6 (accounts)
+
+295         690 LOAD_FAST                1 (p)
+            692 LOAD_ATTR               44 (chrome_dir)
+            712 COPY                     1
+            714 POP_JUMP_IF_TRUE        15 (to 746)
+            716 POP_TOP
+            718 LOAD_CONST               5 ('browser-profiles/')
+            720 LOAD_FAST                1 (p)
+            722 LOAD_ATTR                6 (id)
+            742 FORMAT_VALUE             0
+            744 BUILD_STRING             2
+
+296     >>  746 LOAD_FAST                1 (p)
+            748 LOAD_ATTR               46 (source)
+            768 COPY                     1
+            770 POP_JUMP_IF_TRUE         2 (to 776)
+            772 POP_TOP
+            774 LOAD_CONST               6 ('user')
+
+297     >>  776 LOAD_FAST               10 (platforms)
+
+298         778 LOAD_FAST                1 (p)
+            780 LOAD_ATTR               48 (last_health_at)
+            800 POP_JUMP_IF_FALSE       26 (to 854)
+            802 LOAD_FAST                1 (p)
+            804 LOAD_ATTR               48 (last_health_at)
+            824 LOAD_ATTR               25 (NULL|self + isoformat)
+            844 CALL                     0
+            852 JUMP_FORWARD             1 (to 856)
+        >>  854 LOAD_CONST               2 (None)
+
+299     >>  856 LOAD_FAST                1 (p)
+            858 LOAD_ATTR               50 (created_at)
+            878 POP_JUMP_IF_FALSE       28 (to 936)
+            880 LOAD_FAST                1 (p)
+            882 LOAD_ATTR               50 (created_at)
+            902 LOAD_ATTR               25 (NULL|self + isoformat)
+            922 CALL                     0
+
+286         930 LOAD_CONST               7 (('id', 'label', 'email', 'status', 'notes', 'lease', 'accounts', 'chrome_dir', 'source', 'platforms', 'last_health_at', 'created_at'))
+            932 BUILD_CONST_KEY_MAP     12
+            934 RETURN_VALUE
+
+299     >>  936 LOAD_CONST               2 (None)
+
+286         938 LOAD_CONST               7 (('id', 'label', 'email', 'status', 'notes', 'lease', 'accounts', 'chrome_dir', 'source', 'platforms', 'last_health_at', 'created_at'))
+            940 BUILD_CONST_KEY_MAP     12
+            942 RETURN_VALUE
+        >>  944 SWAP                     2
+            946 POP_TOP
+
+266         948 SWAP                     2
+            950 STORE_FAST               5 (a)
+            952 RERAISE                  0
+        >>  954 SWAP                     2
+            956 POP_TOP
+            958 SWAP                     4
+            960 STORE_FAST               5 (a)
+            962 STORE_FAST               4 (rows)
+            964 STORE_FAST               3 (platform)
+            966 RERAISE                  0
+        >>  968 PUSH_EXC_INFO
+
+283         970 LOAD_GLOBAL             32 (TypeError)
+            980 LOAD_GLOBAL             34 (ValueError)
+            990 BUILD_TUPLE              2
+            992 CHECK_EXC_MATCH
+            994 POP_JUMP_IF_FALSE        5 (to 1006)
+            996 POP_TOP
+
+284         998 BUILD_MAP                0
+           1000 STORE_FAST              10 (platforms)
+           1002 POP_EXCEPT
+           1004 JUMP_BACKWARD          215 (to 576)
+
+283     >> 1006 RERAISE                  0
+        >> 1008 COPY                     3
+           1010 POP_EXCEPT
+           1012 RERAISE                  1
+ExceptionTable:
+  136 to 160 -> 954 [4]
+  162 to 192 -> 944 [8]
+  194 to 202 -> 954 [4]
+  494 to 574 -> 968 [0]
+  944 to 952 -> 954 [4]
+  968 to 1000 -> 1008 [1] lasti
+  1006 to 1006 -> 1008 [1] lasti
+
+Disassembly of <code object _acc at 0x28b05440, file "app\services\browser_profile_service.py", line 247>:
+              0 COPY_FREE_VARS           1
+
+247           2 RESUME                   0
+
+249           4 LOAD_FAST                1 (a)
+              6 LOAD_ATTR                0 (id)
+
+250          26 LOAD_GLOBAL              3 (NULL + getattr)
+             36 LOAD_FAST                1 (a)
+             38 LOAD_CONST               1 ('label')
+             40 LOAD_CONST               0 (None)
+             42 CALL                     3
+             50 COPY                     1
+             52 POP_JUMP_IF_TRUE        13 (to 80)
+             54 POP_TOP
+             56 LOAD_GLOBAL              3 (NULL + getattr)
+             66 LOAD_FAST                1 (a)
+             68 LOAD_CONST               2 ('name')
+             70 LOAD_CONST               0 (None)
+             72 CALL                     3
+
+251     >>   80 LOAD_GLOBAL              3 (NULL + getattr)
+             90 LOAD_FAST                1 (a)
+             92 LOAD_CONST               3 ('email')
+             94 LOAD_CONST               0 (None)
+             96 CALL                     3
+
+248         104 LOAD_CONST               4 (('id', 'label', 'email'))
+            106 BUILD_CONST_KEY_MAP      3
+            108 STORE_FAST               2 (d)
+
+254         110 LOAD_FAST                0 (platform)
+            112 LOAD_CONST               5 ('publish')
+            114 COMPARE_OP              40 (==)
+            118 POP_JUMP_IF_FALSE       56 (to 232)
+
+255         120 LOAD_FAST                1 (a)
+            122 LOAD_ATTR                4 (chrome_id)
+            142 LOAD_FAST                2 (d)
+            144 LOAD_CONST               6 ('chrome_id')
+            146 STORE_SUBSCR
+
+256         150 LOAD_FAST                1 (a)
+            152 LOAD_ATTR                6 (youtube_channel)
+            172 LOAD_FAST                1 (a)
+            174 LOAD_ATTR                8 (facebook_page)
+
+257         194 LOAD_FAST                1 (a)
+            196 LOAD_ATTR               10 (tiktok_username)
+
+256         216 LOAD_CONST               7 (('youtube', 'facebook', 'tiktok'))
+            218 BUILD_CONST_KEY_MAP      3
+            220 LOAD_FAST                2 (d)
+            222 LOAD_CONST               8 ('linked')
+            224 STORE_SUBSCR
+
+264         228 LOAD_FAST                2 (d)
+            230 RETURN_VALUE
+
+259     >>  232 LOAD_FAST                1 (a)
+            234 LOAD_ATTR               12 (partition_id)
+            254 LOAD_FAST                2 (d)
+            256 LOAD_CONST               9 ('partition_id')
+            258 STORE_SUBSCR
+
+260         262 LOAD_GLOBAL             15 (NULL + bool)
+            272 LOAD_GLOBAL              3 (NULL + getattr)
+            282 LOAD_FAST                1 (a)
+            284 LOAD_CONST              10 ('enabled')
+            286 LOAD_CONST              11 (1)
+            288 CALL                     3
+            296 CALL                     1
+            304 STORE_FAST               3 (enabled)
+
+261         306 LOAD_GLOBAL             15 (NULL + bool)
+            316 LOAD_GLOBAL              3 (NULL + getattr)
+            326 LOAD_FAST                1 (a)
+            328 LOAD_CONST              12 ('exhausted_until')
+            330 LOAD_CONST               0 (None)
+            332 CALL                     3
+            340 COPY                     1
+            342 POP_JUMP_IF_FALSE       15 (to 374)
+            344 POP_TOP
+
+262         346 LOAD_FAST                1 (a)
+            348 LOAD_ATTR               16 (exhausted_until)
+            368 LOAD_DEREF               5 (now)
+            370 COMPARE_OP              68 (>)
+
+261     >>  374 CALL                     1
+            382 STORE_FAST               4 (exhausted)
+
+263         384 LOAD_FAST                3 (enabled)
+            386 POP_JUMP_IF_TRUE         2 (to 392)
+            388 LOAD_CONST              13 ('disabled')
+            390 JUMP_FORWARD             5 (to 402)
+        >>  392 LOAD_FAST                4 (exhausted)
+            394 POP_JUMP_IF_FALSE        2 (to 400)
+            396 LOAD_CONST              14 ('exhausted')
+            398 JUMP_FORWARD             1 (to 402)
+        >>  400 LOAD_CONST              15 ('ready')
+        >>  402 LOAD_FAST                2 (d)
+            404 LOAD_CONST              16 ('status')
+            406 STORE_SUBSCR
+
+264         410 LOAD_FAST                2 (d)
+            412 RETURN_VALUE
+
+Disassembly of <code object update_profile at 0x7f6c929f3c90, file "app\services\browser_profile_service.py", line 303>:
+303           0 RESUME                   0
+
+305           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_GLOBAL              2 (BrowserProfile)
+             34 LOAD_FAST                1 (profile_id)
+             36 CALL                     2
+             44 STORE_FAST               5 (p)
+
+306          46 LOAD_FAST                5 (p)
+             48 POP_JUMP_IF_TRUE         1 (to 52)
+
+307          50 RETURN_CONST             0 (None)
+
+308     >>   52 LOAD_FAST                2 (label)
+             54 POP_JUMP_IF_NONE        21 (to 98)
+
+309          56 LOAD_FAST                2 (label)
+             58 COPY                     1
+             60 POP_JUMP_IF_TRUE        12 (to 86)
+             62 POP_TOP
+             64 LOAD_FAST                5 (p)
+             66 LOAD_ATTR                4 (label)
+        >>   86 LOAD_FAST                5 (p)
+             88 STORE_ATTR               2 (label)
+
+310     >>   98 LOAD_FAST                3 (notes)
+            100 POP_JUMP_IF_NONE         7 (to 116)
+
+311         102 LOAD_FAST                3 (notes)
+            104 LOAD_FAST                5 (p)
+            106 STORE_ATTR               3 (notes)
+
+312     >>  116 LOAD_FAST                4 (status)
+            118 LOAD_CONST               1 (('ready', 'disabled'))
+            120 CONTAINS_OP              0
+            122 POP_JUMP_IF_FALSE        7 (to 138)
+
+313         124 LOAD_FAST                4 (status)
+            126 LOAD_FAST                5 (p)
+            128 STORE_ATTR               4 (status)
+
+314     >>  138 LOAD_FAST                0 (db)
+            140 LOAD_ATTR               11 (NULL|self + commit)
+            160 CALL                     0
+            168 POP_TOP
+
+315         170 LOAD_FAST                5 (p)
+            172 RETURN_VALUE
+
+Disassembly of <code object assign_account at 0x7f6c92b97a00, file "app\services\browser_profile_service.py", line 318>:
+318           0 RESUME                   0
+
+320           2 LOAD_GLOBAL              1 (NULL + dict)
+             12 LOAD_GLOBAL              2 (_PLATFORM_TABLES)
+             22 CALL                     1
+             30 LOAD_ATTR                5 (NULL|self + get)
+             50 LOAD_FAST                2 (platform)
+             52 CALL                     1
+             60 STORE_FAST               4 (model)
+
+321          62 LOAD_FAST                4 (model)
+             64 POP_JUMP_IF_NONE        22 (to 110)
+             66 LOAD_FAST                0 (db)
+             68 LOAD_ATTR                5 (NULL|self + get)
+             88 LOAD_GLOBAL              6 (BrowserProfile)
+             98 LOAD_FAST                1 (profile_id)
+            100 CALL                     2
+            108 POP_JUMP_IF_NOT_NONE     1 (to 112)
+
+322     >>  110 RETURN_CONST             1 (False)
+
+323     >>  112 LOAD_FAST                0 (db)
+            114 LOAD_ATTR                5 (NULL|self + get)
+            134 LOAD_FAST                4 (model)
+            136 LOAD_FAST                3 (account_id)
+            138 CALL                     2
+            146 STORE_FAST               5 (acc)
+
+324         148 LOAD_FAST                5 (acc)
+            150 POP_JUMP_IF_NOT_NONE     1 (to 154)
+
+325         152 RETURN_CONST             1 (False)
+
+326     >>  154 LOAD_FAST                1 (profile_id)
+            156 LOAD_FAST                5 (acc)
+            158 STORE_ATTR               4 (browser_profile_id)
+
+327         168 LOAD_FAST                0 (db)
+            170 LOAD_ATTR               11 (NULL|self + commit)
+            190 CALL                     0
+            198 POP_TOP
+
+328         200 RETURN_CONST             2 (True)
+
+Disassembly of <code object delete_profile at 0x28afa930, file "app\services\browser_profile_service.py", line 331>:
+331           0 RESUME                   0
+
+345           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_GLOBAL              2 (BrowserProfile)
+             34 LOAD_FAST                1 (profile_id)
+             36 CALL                     2
+             44 STORE_FAST               2 (p)
+
+346          46 LOAD_FAST                2 (p)
+             48 POP_JUMP_IF_TRUE         1 (to 52)
+
+347          50 RETURN_CONST             1 ((False, 'not_found'))
+
+348     >>   52 LOAD_FAST                2 (p)
+             54 LOAD_ATTR                4 (leased_by_video_id)
+             74 POP_JUMP_IF_FALSE        1 (to 78)
+
+349          76 RETURN_CONST             2 ((False, 'leased'))
+
+354     >>   78 LOAD_FAST                0 (db)
+             80 LOAD_ATTR                7 (NULL|self + scalars)
+            100 LOAD_GLOBAL              9 (NULL + select)
+            110 LOAD_GLOBAL             10 (FlowAccount)
+            120 CALL                     1
+
+355         128 LOAD_ATTR               13 (NULL|self + where)
+            148 LOAD_GLOBAL             10 (FlowAccount)
+            158 LOAD_ATTR               14 (browser_profile_id)
+            178 LOAD_FAST                1 (profile_id)
+            180 COMPARE_OP              40 (==)
+            184 CALL                     1
+
+354         192 CALL                     1
+
+355         200 LOAD_ATTR               17 (NULL|self + all)
+            220 CALL                     0
+
+354         228 GET_ITER
+
+353         230 LOAD_FAST_AND_CLEAR      3 (a)
+            232 SWAP                     2
+            234 BUILD_LIST               0
+            236 SWAP                     2
+
+354     >>  238 FOR_ITER                14 (to 270)
+
+353         242 STORE_FAST               3 (a)
+            244 LOAD_FAST                3 (a)
+            246 LOAD_ATTR               18 (partition_id)
+            266 LIST_APPEND              2
+            268 JUMP_BACKWARD           16 (to 238)
+
+354     >>  270 END_FOR
+
+353         272 STORE_FAST               4 (dead)
+            274 STORE_FAST               3 (a)
+
+356         276 LOAD_FAST                4 (dead)
+            278 POP_JUMP_IF_FALSE       98 (to 476)
+
+357         280 LOAD_FAST                0 (db)
+            282 LOAD_ATTR               21 (NULL|self + query)
+            302 LOAD_GLOBAL             22 (Video)
+            312 CALL                     1
+            320 LOAD_ATTR               25 (NULL|self + filter)
+            340 LOAD_GLOBAL             22 (Video)
+            350 LOAD_ATTR               26 (flow_account_id)
+            370 LOAD_ATTR               29 (NULL|self + in_)
+            390 LOAD_FAST                4 (dead)
+            392 CALL                     1
+            400 CALL                     1
+            408 LOAD_ATTR               31 (NULL|self + update)
+
+358         428 LOAD_GLOBAL             22 (Video)
+            438 LOAD_ATTR               26 (flow_account_id)
+            458 LOAD_CONST               3 (None)
+            460 BUILD_MAP                1
+            462 LOAD_CONST               4 (False)
+
+357         464 KW_NAMES                 5 (('synchronize_session',))
+            466 CALL                     2
+            474 POP_TOP
+
+359     >>  476 LOAD_GLOBAL             32 (_PLATFORM_TABLES)
+            486 GET_ITER
+        >>  488 FOR_ITER               104 (to 700)
+            492 UNPACK_SEQUENCE          2
+            496 STORE_FAST               5 (_platform)
+            498 STORE_FAST               6 (model)
+
+360         500 LOAD_FAST                6 (model)
+            502 LOAD_GLOBAL             34 (PublishProfile)
+            512 IS_OP                    0
+            514 POP_JUMP_IF_FALSE        1 (to 518)
+
+361         516 JUMP_BACKWARD           15 (to 488)
+
+362     >>  518 LOAD_FAST                0 (db)
+            520 LOAD_ATTR                7 (NULL|self + scalars)
+            540 LOAD_GLOBAL              9 (NULL + select)
+            550 LOAD_FAST                6 (model)
+            552 CALL                     1
+            560 LOAD_ATTR               13 (NULL|self + where)
+            580 LOAD_FAST                6 (model)
+            582 LOAD_ATTR               14 (browser_profile_id)
+            602 LOAD_FAST                1 (profile_id)
+            604 COMPARE_OP              40 (==)
+            608 CALL                     1
+            616 CALL                     1
+            624 LOAD_ATTR               17 (NULL|self + all)
+            644 CALL                     0
+            652 GET_ITER
+        >>  654 FOR_ITER                19 (to 696)
+            658 STORE_FAST               7 (acc)
+
+363         660 LOAD_FAST                0 (db)
+            662 LOAD_ATTR               37 (NULL|self + delete)
+            682 LOAD_FAST                7 (acc)
+            684 CALL                     1
+            692 POP_TOP
+            694 JUMP_BACKWARD           21 (to 654)
+
+362     >>  696 END_FOR
+            698 JUMP_BACKWARD          106 (to 488)
+
+359     >>  700 END_FOR
+
+364         702 LOAD_FAST                0 (db)
+            704 LOAD_ATTR               37 (NULL|self + delete)
+            724 LOAD_FAST                2 (p)
+            726 CALL                     1
+            734 POP_TOP
+
+365         736 LOAD_FAST                0 (db)
+            738 LOAD_ATTR               39 (NULL|self + commit)
+            758 CALL                     0
+            766 POP_TOP
+
+366         768 RETURN_CONST             6 ((True, 'ok'))
+        >>  770 SWAP                     2
+            772 POP_TOP
+
+353         774 SWAP                     2
+            776 STORE_FAST               3 (a)
+            778 RERAISE                  0
+ExceptionTable:
+  234 to 270 -> 770 [2]
+
+Disassembly of <code object _active_video_ids at 0x7f6c92bdfb40, file "app\services\browser_profile_service.py", line 371>:
+371           0 RESUME                   0
+
+372           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + query)
+             24 LOAD_GLOBAL              2 (Job)
+             34 LOAD_ATTR                4 (video_id)
+             54 CALL                     1
+             62 LOAD_ATTR                7 (NULL|self + filter)
+             82 LOAD_GLOBAL              2 (Job)
+             92 LOAD_ATTR                8 (status)
+            112 LOAD_ATTR               11 (NULL|self + in_)
+            132 LOAD_CONST               1 (('queued', 'running'))
+            134 CALL                     1
+            142 CALL                     1
+            150 LOAD_ATTR               13 (NULL|self + all)
+            170 CALL                     0
+            178 STORE_FAST               1 (rows)
+
+373         180 LOAD_FAST                1 (rows)
+            182 GET_ITER
+            184 LOAD_FAST_AND_CLEAR      2 (r)
+            186 SWAP                     2
+            188 BUILD_SET                0
+            190 SWAP                     2
+        >>  192 FOR_ITER                13 (to 222)
+            196 STORE_FAST               2 (r)
+            198 LOAD_FAST                2 (r)
+            200 LOAD_CONST               2 (0)
+            202 BINARY_SUBSCR
+            206 POP_JUMP_IF_TRUE         1 (to 210)
+            208 JUMP_BACKWARD            9 (to 192)
+        >>  210 LOAD_FAST                2 (r)
+            212 LOAD_CONST               2 (0)
+            214 BINARY_SUBSCR
+            218 SET_ADD                  2
+            220 JUMP_BACKWARD           15 (to 192)
+        >>  222 END_FOR
+            224 SWAP                     2
+            226 STORE_FAST               2 (r)
+            228 RETURN_VALUE
+        >>  230 SWAP                     2
+            232 POP_TOP
+            234 SWAP                     2
+            236 STORE_FAST               2 (r)
+            238 RERAISE                  0
+ExceptionTable:
+  188 to 206 -> 230 [2]
+  210 to 222 -> 230 [2]
+
+Disassembly of <code object reap_stale at 0x28baa5f0, file "app\services\browser_profile_service.py", line 376>:
+376           0 RESUME                   0
+
+383           2 LOAD_GLOBAL              1 (NULL + _active_video_ids)
+             12 LOAD_FAST                0 (db)
+             14 CALL                     1
+             22 STORE_FAST               1 (active)
+
+384          24 LOAD_CONST               1 (0)
+             26 STORE_FAST               2 (n)
+
+385          28 LOAD_FAST                0 (db)
+             30 LOAD_ATTR                3 (NULL|self + scalars)
+             50 LOAD_GLOBAL              5 (NULL + select)
+             60 LOAD_GLOBAL              6 (BrowserProfile)
+             70 CALL                     1
+
+386          78 LOAD_ATTR                9 (NULL|self + where)
+             98 LOAD_GLOBAL              6 (BrowserProfile)
+            108 LOAD_ATTR               10 (leased_by_video_id)
+            128 LOAD_ATTR               13 (NULL|self + is_not)
+            148 LOAD_CONST               2 (None)
+            150 CALL                     1
+            158 CALL                     1
+
+385         166 CALL                     1
+
+386         174 LOAD_ATTR               15 (NULL|self + all)
+            194 CALL                     0
+
+385         202 GET_ITER
+        >>  204 FOR_ITER                97 (to 402)
+            208 STORE_FAST               3 (p)
+
+387         210 LOAD_FAST                3 (p)
+            212 LOAD_ATTR               10 (leased_by_video_id)
+            232 LOAD_FAST                1 (active)
+            234 CONTAINS_OP              1
+            236 POP_JUMP_IF_TRUE         1 (to 240)
+            238 JUMP_BACKWARD           18 (to 204)
+
+388     >>  240 LOAD_GLOBAL             17 (NULL + log)
+            250 LOAD_ATTR               18 (info)
+            270 LOAD_CONST               3 ("[lease] thu hồi lease mồ côi: profile '")
+            272 LOAD_FAST                3 (p)
+            274 LOAD_ATTR               20 (label)
+            294 FORMAT_VALUE             0
+            296 LOAD_CONST               4 ("' ← video ")
+            298 LOAD_FAST                3 (p)
+            300 LOAD_ATTR               10 (leased_by_video_id)
+            320 FORMAT_VALUE             0
+            322 BUILD_STRING             4
+            324 CALL                     1
+            332 POP_TOP
+
+389         334 LOAD_CONST               2 (None)
+            336 LOAD_FAST                3 (p)
+            338 STORE_ATTR               5 (leased_by_video_id)
+
+390         348 LOAD_CONST               2 (None)
+            350 LOAD_FAST                3 (p)
+            352 STORE_ATTR              11 (leased_job_id)
+
+391         362 LOAD_CONST               2 (None)
+            364 LOAD_FAST                3 (p)
+            366 STORE_ATTR              12 (lease_kind)
+
+392         376 LOAD_CONST               2 (None)
+            378 LOAD_FAST                3 (p)
+            380 STORE_ATTR              13 (lease_heartbeat_at)
+
+393         390 LOAD_FAST                2 (n)
+            392 LOAD_CONST               5 (1)
+            394 BINARY_OP               13 (+=)
+            398 STORE_FAST               2 (n)
+            400 JUMP_BACKWARD           99 (to 204)
+
+385     >>  402 END_FOR
+
+394         404 LOAD_FAST                2 (n)
+            406 POP_JUMP_IF_FALSE       16 (to 440)
+
+395         408 LOAD_FAST                0 (db)
+            410 LOAD_ATTR               29 (NULL|self + commit)
+            430 CALL                     0
+            438 POP_TOP
+
+396     >>  440 LOAD_GLOBAL             30 (_default_lease_video_id)
+            450 POP_JUMP_IF_FALSE       10 (to 472)
+            452 LOAD_GLOBAL             30 (_default_lease_video_id)
+            462 LOAD_FAST                1 (active)
+            464 CONTAINS_OP              1
+            466 POP_JUMP_IF_FALSE        2 (to 472)
+
+397         468 LOAD_CONST               2 (None)
+            470 STORE_GLOBAL            15 (_default_lease_video_id)
+
+398     >>  472 LOAD_GLOBAL             33 (NULL + _reap_provider_slots)
+            482 LOAD_FAST                0 (db)
+            484 CALL                     1
+            492 POP_TOP
+
+399         494 LOAD_FAST                2 (n)
+            496 RETURN_VALUE
+
+Disassembly of <code object _profile_of_flow_account at 0x7f6c929f3b20, file "app\services\browser_profile_service.py", line 402>:
+402           0 RESUME                   0
+
+403           2 LOAD_FAST                1 (acc)
+              4 LOAD_ATTR                0 (browser_profile_id)
+             24 POP_JUMP_IF_TRUE        28 (to 82)
+
+404          26 LOAD_GLOBAL              3 (NULL + discover_and_sync)
+             36 LOAD_FAST                0 (db)
+             38 CALL                     1
+             46 POP_TOP
+
+405          48 LOAD_FAST                0 (db)
+             50 LOAD_ATTR                5 (NULL|self + refresh)
+             70 LOAD_FAST                1 (acc)
+             72 CALL                     1
+             80 POP_TOP
+
+406     >>   82 LOAD_FAST                1 (acc)
+             84 LOAD_ATTR                0 (browser_profile_id)
+            104 POP_JUMP_IF_FALSE       32 (to 170)
+            106 LOAD_FAST                0 (db)
+            108 LOAD_ATTR                7 (NULL|self + get)
+            128 LOAD_GLOBAL              8 (BrowserProfile)
+            138 LOAD_FAST                1 (acc)
+            140 LOAD_ATTR                0 (browser_profile_id)
+            160 CALL                     2
+            168 RETURN_VALUE
+        >>  170 LOAD_CONST               0 (None)
+            172 RETURN_VALUE
+
+Disassembly of <code object _flow_accounts_ready at 0x28af88a0, file "app\services\browser_profile_service.py", line 409>:
+409           0 RESUME                   0
+
+423           2 LOAD_GLOBAL              1 (NULL + datetime)
+             12 LOAD_ATTR                2 (now)
+             32 CALL                     0
+             40 STORE_FAST               1 (now)
+
+424          42 LOAD_FAST                0 (db)
+             44 LOAD_ATTR                5 (NULL|self + scalars)
+
+425          64 LOAD_GLOBAL              7 (NULL + select)
+             74 LOAD_GLOBAL              8 (FlowAccount)
+             84 CALL                     1
+             92 LOAD_ATTR               11 (NULL|self + where)
+            112 LOAD_GLOBAL              8 (FlowAccount)
+            122 LOAD_ATTR               12 (enabled)
+            142 LOAD_CONST               1 (1)
+            144 COMPARE_OP              40 (==)
+            148 CALL                     1
+
+426         156 LOAD_ATTR               15 (NULL|self + order_by)
+            176 LOAD_GLOBAL              8 (FlowAccount)
+            186 LOAD_ATTR               16 (order_index)
+            206 LOAD_GLOBAL              8 (FlowAccount)
+            216 LOAD_ATTR               18 (last_used_at)
+            236 LOAD_ATTR               21 (NULL|self + is_)
+            256 LOAD_CONST               2 (None)
+            258 CALL                     1
+            266 LOAD_ATTR               23 (NULL|self + desc)
+            286 CALL                     0
+
+427         294 LOAD_GLOBAL              8 (FlowAccount)
+            304 LOAD_ATTR               18 (last_used_at)
+            324 LOAD_GLOBAL              8 (FlowAccount)
+            334 LOAD_ATTR               24 (created_at)
+
+426         354 CALL                     4
+
+424         362 CALL                     1
+
+427         370 LOAD_ATTR               27 (NULL|self + all)
+            390 CALL                     0
+
+424         398 STORE_FAST               2 (rows)
+
+428         400 LOAD_FAST                2 (rows)
+            402 GET_ITER
+            404 LOAD_FAST_AND_CLEAR      3 (a)
+            406 SWAP                     2
+            408 BUILD_LIST               0
+            410 SWAP                     2
+        >>  412 FOR_ITER                58 (to 532)
+            416 STORE_FAST               3 (a)
+
+429         418 LOAD_FAST                3 (a)
+            420 LOAD_ATTR               28 (exhausted_until)
+            440 POP_JUMP_IF_FALSE       15 (to 472)
+            442 LOAD_FAST                3 (a)
+            444 LOAD_ATTR               28 (exhausted_until)
+            464 LOAD_FAST                1 (now)
+            466 COMPARE_OP              68 (>)
+            470 POP_JUMP_IF_TRUE        29 (to 530)
+
+430     >>  472 LOAD_FAST                3 (a)
+            474 LOAD_ATTR               30 (cooldown_until)
+            494 POP_JUMP_IF_FALSE       15 (to 526)
+            496 LOAD_FAST                3 (a)
+            498 LOAD_ATTR               30 (cooldown_until)
+            518 LOAD_FAST                1 (now)
+            520 COMPARE_OP              68 (>)
+            524 POP_JUMP_IF_TRUE         2 (to 530)
+
+428     >>  526 LOAD_FAST                3 (a)
+            528 LIST_APPEND              2
+        >>  530 JUMP_BACKWARD           60 (to 412)
+        >>  532 END_FOR
+            534 STORE_FAST               4 (ready)
+            536 STORE_FAST               3 (a)
+
+431         538 LOAD_GLOBAL             33 (NULL + flow_health)
+            548 LOAD_ATTR               34 (drop_sick)
+            568 LOAD_FAST                4 (ready)
+            570 LOAD_CONST               3 (<code object <lambda> at 0x7f6c926f4650, file "app\services\browser_profile_service.py", line 431>)
+            572 MAKE_FUNCTION            0
+            574 LOAD_CONST               4 ('lease Flow')
+            576 KW_NAMES                 5 (('where',))
+            578 CALL                     3
+            586 RETURN_VALUE
+        >>  588 SWAP                     2
+            590 POP_TOP
+
+428         592 SWAP                     2
+            594 STORE_FAST               3 (a)
+            596 RERAISE                  0
+ExceptionTable:
+  408 to 532 -> 588 [2]
+
+Disassembly of <code object <lambda> at 0x7f6c926f4650, file "app\services\browser_profile_service.py", line 431>:
+431           0 RESUME                   0
+              2 LOAD_FAST                0 (a)
+              4 LOAD_ATTR                0 (partition_id)
+             24 RETURN_VALUE
+
+Disassembly of <code object _lease at 0x7f6c92b97d20, file "app\services\browser_profile_service.py", line 434>:
+434           0 RESUME                   0
+
+436           2 LOAD_FAST                2 (video_id)
+              4 LOAD_FAST                1 (prof)
+              6 STORE_ATTR               0 (leased_by_video_id)
+
+437          16 LOAD_FAST                3 (job_id)
+             18 LOAD_FAST                1 (prof)
+             20 STORE_ATTR               1 (leased_job_id)
+
+438          30 LOAD_CONST               1 ('generate')
+             32 LOAD_FAST                1 (prof)
+             34 STORE_ATTR               2 (lease_kind)
+
+439          44 LOAD_GLOBAL              7 (NULL + datetime)
+             54 LOAD_ATTR                8 (now)
+             74 CALL                     0
+             82 LOAD_FAST                1 (prof)
+             84 STORE_ATTR               5 (lease_heartbeat_at)
+
+440          94 LOAD_FAST                0 (db)
+             96 LOAD_ATTR               13 (NULL|self + get)
+            116 LOAD_GLOBAL             14 (Video)
+            126 LOAD_FAST                2 (video_id)
+            128 CALL                     2
+            136 STORE_FAST               6 (v)
+
+441         138 LOAD_FAST                6 (v)
+            140 POP_JUMP_IF_NONE         9 (to 160)
+            142 LOAD_FAST                5 (update_pin)
+            144 POP_JUMP_IF_FALSE        7 (to 160)
+
+442         146 LOAD_FAST                4 (partition_id)
+            148 LOAD_FAST                6 (v)
+            150 STORE_ATTR               8 (flow_account_id)
+
+443     >>  160 LOAD_FAST                0 (db)
+            162 LOAD_ATTR               19 (NULL|self + commit)
+            182 CALL                     0
+            190 POP_TOP
+            192 RETURN_CONST             0 (None)
+
+Disassembly of <code object _leased_count_excluding at 0x7f6c81992c10, file "app\services\browser_profile_service.py", line 446>:
+446           0 RESUME                   0
+
+447           2 LOAD_GLOBAL              1 (NULL + int)
+             12 LOAD_FAST                0 (db)
+             14 LOAD_ATTR                3 (NULL|self + query)
+             34 LOAD_GLOBAL              4 (BrowserProfile)
+             44 CALL                     1
+
+448          52 LOAD_ATTR                7 (NULL|self + filter)
+             72 LOAD_GLOBAL              4 (BrowserProfile)
+             82 LOAD_ATTR                8 (leased_by_video_id)
+            102 LOAD_ATTR               11 (NULL|self + is_not)
+            122 LOAD_CONST               0 (None)
+            124 CALL                     1
+
+449         132 LOAD_GLOBAL              4 (BrowserProfile)
+            142 LOAD_ATTR                8 (leased_by_video_id)
+            162 LOAD_FAST                1 (video_id)
+            164 COMPARE_OP              55 (!=)
+
+448         168 CALL                     2
+
+449         176 LOAD_ATTR               13 (NULL|self + count)
+            196 CALL                     0
+
+447         204 CALL                     1
+            212 RETURN_VALUE
+
+Disassembly of <code object lease_acquire_flow at 0x28ae5900, file "app\services\browser_profile_service.py", line 452>:
+              0 MAKE_CELL               13 (pinned)
+
+452           2 RESUME                   0
+
+468           4 LOAD_GLOBAL              1 (NULL + reap_stale)
+             14 LOAD_FAST                0 (db)
+             16 CALL                     1
+             24 POP_TOP
+
+471          26 LOAD_FAST                0 (db)
+             28 LOAD_ATTR                3 (NULL|self + scalars)
+             48 LOAD_GLOBAL              5 (NULL + select)
+             58 LOAD_GLOBAL              6 (BrowserProfile)
+             68 CALL                     1
+
+472          76 LOAD_ATTR                9 (NULL|self + where)
+             96 LOAD_GLOBAL              6 (BrowserProfile)
+            106 LOAD_ATTR               10 (leased_by_video_id)
+            126 LOAD_FAST                1 (video_id)
+            128 COMPARE_OP              40 (==)
+            132 CALL                     1
+
+471         140 CALL                     1
+
+472         148 LOAD_ATTR               13 (NULL|self + first)
+            168 CALL                     0
+
+471         176 STORE_FAST               4 (held)
+
+473         178 LOAD_FAST                4 (held)
+            180 EXTENDED_ARG             1
+            182 POP_JUMP_IF_NONE       268 (to 720)
+
+474         184 LOAD_GLOBAL             15 (NULL + datetime)
+            194 LOAD_ATTR               16 (now)
+            214 CALL                     0
+            222 LOAD_FAST                4 (held)
+            224 STORE_ATTR               9 (lease_heartbeat_at)
+
+475         234 LOAD_FAST                0 (db)
+            236 LOAD_ATTR               21 (NULL|self + get)
+            256 LOAD_GLOBAL             22 (Video)
+            266 LOAD_FAST                1 (video_id)
+            268 CALL                     2
+            276 STORE_FAST               5 (v)
+
+476         278 LOAD_FAST                5 (v)
+            280 POP_JUMP_IF_FALSE       12 (to 306)
+            282 LOAD_FAST                5 (v)
+            284 LOAD_ATTR               24 (flow_account_id)
+            304 JUMP_FORWARD             1 (to 308)
+        >>  306 LOAD_CONST               1 (None)
+        >>  308 STORE_DEREF             13 (pinned)
+
+477         310 LOAD_DEREF              13 (pinned)
+            312 POP_JUMP_IF_FALSE      107 (to 528)
+
+478         314 LOAD_FAST                0 (db)
+            316 LOAD_ATTR               27 (NULL|self + scalar)
+            336 LOAD_GLOBAL              5 (NULL + select)
+            346 LOAD_GLOBAL             28 (FlowAccount)
+            356 CALL                     1
+            364 LOAD_ATTR                9 (NULL|self + where)
+            384 LOAD_GLOBAL             28 (FlowAccount)
+            394 LOAD_ATTR               30 (partition_id)
+            414 LOAD_DEREF              13 (pinned)
+            416 COMPARE_OP              40 (==)
+            420 CALL                     1
+            428 CALL                     1
+            436 STORE_FAST               6 (acc)
+
+479         438 LOAD_FAST                6 (acc)
+            440 POP_JUMP_IF_NONE        43 (to 528)
+            442 LOAD_FAST                6 (acc)
+            444 LOAD_ATTR               32 (browser_profile_id)
+            464 LOAD_FAST                4 (held)
+            466 LOAD_ATTR               34 (id)
+            486 COMPARE_OP              40 (==)
+            490 POP_JUMP_IF_FALSE       18 (to 528)
+
+480         492 LOAD_FAST                0 (db)
+            494 LOAD_ATTR               37 (NULL|self + commit)
+            514 CALL                     0
+            522 POP_TOP
+
+481         524 LOAD_DEREF              13 (pinned)
+            526 RETURN_VALUE
+
+483     >>  528 LOAD_GLOBAL             39 (NULL + _flow_accounts_ready)
+            538 LOAD_FAST                0 (db)
+            540 CALL                     1
+            548 GET_ITER
+        >>  550 FOR_ITER                66 (to 686)
+            554 STORE_FAST               6 (acc)
+
+484         556 LOAD_FAST                6 (acc)
+            558 LOAD_ATTR               32 (browser_profile_id)
+            578 LOAD_FAST                4 (held)
+            580 LOAD_ATTR               34 (id)
+            600 COMPARE_OP              40 (==)
+            604 POP_JUMP_IF_TRUE         1 (to 608)
+            606 JUMP_BACKWARD           29 (to 550)
+
+485     >>  608 LOAD_GLOBAL             41 (NULL + _lease)
+            618 LOAD_FAST                0 (db)
+            620 LOAD_FAST                4 (held)
+            622 LOAD_FAST                1 (video_id)
+            624 LOAD_FAST                2 (job_id)
+            626 LOAD_FAST                6 (acc)
+            628 LOAD_ATTR               30 (partition_id)
+            648 CALL                     5
+            656 POP_TOP
+
+486         658 LOAD_FAST                6 (acc)
+            660 LOAD_ATTR               30 (partition_id)
+            680 SWAP                     2
+            682 POP_TOP
+            684 RETURN_VALUE
+
+483     >>  686 END_FOR
+
+487         688 LOAD_FAST                0 (db)
+            690 LOAD_ATTR               37 (NULL|self + commit)
+            710 CALL                     0
+            718 POP_TOP
+
+489     >>  720 LOAD_GLOBAL             39 (NULL + _flow_accounts_ready)
+            730 LOAD_FAST                0 (db)
+            732 CALL                     1
+            740 STORE_FAST               7 (ready)
+
+490         742 LOAD_FAST                7 (ready)
+            744 POP_JUMP_IF_TRUE         1 (to 748)
+
+491         746 RETURN_CONST             1 (None)
+
+493     >>  748 LOAD_GLOBAL             42 (FLOW_MAX_PARALLEL_ACCOUNTS)
+            758 POP_JUMP_IF_FALSE       20 (to 800)
+
+494         760 LOAD_GLOBAL             45 (NULL + _leased_count_excluding)
+            770 LOAD_FAST                0 (db)
+            772 LOAD_FAST                1 (video_id)
+            774 CALL                     2
+            782 LOAD_GLOBAL             42 (FLOW_MAX_PARALLEL_ACCOUNTS)
+            792 COMPARE_OP              92 (>=)
+            796 POP_JUMP_IF_FALSE        1 (to 800)
+
+495         798 RETURN_CONST             1 (None)
+
+498     >>  800 LOAD_FAST                0 (db)
+            802 LOAD_ATTR               21 (NULL|self + get)
+            822 LOAD_GLOBAL             22 (Video)
+            832 LOAD_FAST                1 (video_id)
+            834 CALL                     2
+            842 STORE_FAST               5 (v)
+
+499         844 LOAD_FAST                5 (v)
+            846 POP_JUMP_IF_FALSE       12 (to 872)
+            848 LOAD_FAST                5 (v)
+            850 LOAD_ATTR               24 (flow_account_id)
+            870 JUMP_FORWARD             1 (to 874)
+        >>  872 LOAD_CONST               1 (None)
+        >>  874 STORE_DEREF             13 (pinned)
+
+502         876 LOAD_FAST                3 (preferred_profile_id)
+            878 POP_JUMP_IF_FALSE      134 (to 1148)
+            880 LOAD_DEREF              13 (pinned)
+            882 POP_JUMP_IF_TRUE       132 (to 1148)
+
+503         884 LOAD_FAST                7 (ready)
+            886 GET_ITER
+            888 LOAD_FAST_AND_CLEAR      8 (a)
+            890 SWAP                     2
+            892 BUILD_LIST               0
+            894 SWAP                     2
+        >>  896 FOR_ITER                20 (to 940)
+            900 STORE_FAST               8 (a)
+            902 LOAD_FAST                8 (a)
+            904 LOAD_ATTR               32 (browser_profile_id)
+            924 LOAD_FAST                3 (preferred_profile_id)
+            926 COMPARE_OP              40 (==)
+            930 POP_JUMP_IF_TRUE         1 (to 934)
+            932 JUMP_BACKWARD           19 (to 896)
+        >>  934 LOAD_FAST                8 (a)
+            936 LIST_APPEND              2
+            938 JUMP_BACKWARD           22 (to 896)
+        >>  940 END_FOR
+            942 STORE_FAST               9 (pref_accs)
+            944 STORE_FAST               8 (a)
+
+504         946 LOAD_FAST                0 (db)
+            948 LOAD_ATTR               21 (NULL|self + get)
+            968 LOAD_GLOBAL              6 (BrowserProfile)
+            978 LOAD_FAST                3 (preferred_profile_id)
+            980 CALL                     2
+            988 STORE_FAST              10 (pref)
+
+505         990 LOAD_FAST                9 (pref_accs)
+            992 POP_JUMP_IF_FALSE       77 (to 1148)
+            994 LOAD_FAST               10 (pref)
+            996 POP_JUMP_IF_NONE        75 (to 1148)
+            998 LOAD_FAST               10 (pref)
+           1000 LOAD_ATTR               46 (status)
+           1020 LOAD_CONST               2 ('disabled')
+           1022 COMPARE_OP              55 (!=)
+           1026 POP_JUMP_IF_FALSE       60 (to 1148)
+
+507        1028 LOAD_FAST               10 (pref)
+           1030 LOAD_ATTR               10 (leased_by_video_id)
+           1050 LOAD_CONST               1 (None)
+           1052 LOAD_FAST                1 (video_id)
+           1054 BUILD_TUPLE              2
+           1056 CONTAINS_OP              0
+           1058 POP_JUMP_IF_FALSE       43 (to 1146)
+
+508        1060 LOAD_GLOBAL             41 (NULL + _lease)
+           1070 LOAD_FAST                0 (db)
+           1072 LOAD_FAST               10 (pref)
+           1074 LOAD_FAST                1 (video_id)
+           1076 LOAD_FAST                2 (job_id)
+           1078 LOAD_FAST                9 (pref_accs)
+           1080 LOAD_CONST               3 (0)
+           1082 BINARY_SUBSCR
+           1086 LOAD_ATTR               30 (partition_id)
+           1106 CALL                     5
+           1114 POP_TOP
+
+509        1116 LOAD_FAST                9 (pref_accs)
+           1118 LOAD_CONST               3 (0)
+           1120 BINARY_SUBSCR
+           1124 LOAD_ATTR               30 (partition_id)
+           1144 RETURN_VALUE
+
+510     >> 1146 RETURN_CONST             1 (None)
+
+513     >> 1148 LOAD_GLOBAL             49 (NULL + sorted)
+           1158 LOAD_FAST                7 (ready)
+           1160 LOAD_CLOSURE            13 (pinned)
+           1162 BUILD_TUPLE              1
+           1164 LOAD_CONST               4 (<code object <lambda> at 0x7f6c926957a0, file "app\services\browser_profile_service.py", line 513>)
+           1166 MAKE_FUNCTION            8 (closure)
+           1168 KW_NAMES                 5 (('key',))
+           1170 CALL                     2
+           1178 STORE_FAST              11 (ordered)
+
+515        1180 LOAD_FAST               11 (ordered)
+           1182 GET_ITER
+        >> 1184 FOR_ITER                87 (to 1362)
+           1188 STORE_FAST               6 (acc)
+
+516        1190 LOAD_GLOBAL             51 (NULL + _profile_of_flow_account)
+           1200 LOAD_FAST                0 (db)
+           1202 LOAD_FAST                6 (acc)
+           1204 CALL                     2
+           1212 STORE_FAST              12 (prof)
+
+517        1214 LOAD_FAST               12 (prof)
+           1216 POP_JUMP_IF_NONE        15 (to 1248)
+           1218 LOAD_FAST               12 (prof)
+           1220 LOAD_ATTR               46 (status)
+           1240 LOAD_CONST               2 ('disabled')
+           1242 COMPARE_OP              40 (==)
+           1246 POP_JUMP_IF_FALSE        1 (to 1250)
+
+518     >> 1248 JUMP_BACKWARD           33 (to 1184)
+
+519     >> 1250 LOAD_FAST               12 (prof)
+           1252 LOAD_ATTR               10 (leased_by_video_id)
+           1272 LOAD_CONST               1 (None)
+           1274 LOAD_FAST                1 (video_id)
+           1276 BUILD_TUPLE              2
+           1278 CONTAINS_OP              0
+           1280 POP_JUMP_IF_TRUE         1 (to 1284)
+           1282 JUMP_BACKWARD           50 (to 1184)
+
+520     >> 1284 LOAD_GLOBAL             41 (NULL + _lease)
+           1294 LOAD_FAST                0 (db)
+           1296 LOAD_FAST               12 (prof)
+           1298 LOAD_FAST                1 (video_id)
+           1300 LOAD_FAST                2 (job_id)
+           1302 LOAD_FAST                6 (acc)
+           1304 LOAD_ATTR               30 (partition_id)
+           1324 CALL                     5
+           1332 POP_TOP
+
+521        1334 LOAD_FAST                6 (acc)
+           1336 LOAD_ATTR               30 (partition_id)
+           1356 SWAP                     2
+           1358 POP_TOP
+           1360 RETURN_VALUE
+
+515     >> 1362 END_FOR
+
+522        1364 RETURN_CONST             1 (None)
+        >> 1366 SWAP                     2
+           1368 POP_TOP
+
+503        1370 SWAP                     2
+           1372 STORE_FAST               8 (a)
+           1374 RERAISE                  0
+ExceptionTable:
+  892 to 930 -> 1366 [2]
+  934 to 940 -> 1366 [2]
+
+Disassembly of <code object <lambda> at 0x7f6c926957a0, file "app\services\browser_profile_service.py", line 513>:
+              0 COPY_FREE_VARS           1
+
+513           2 RESUME                   0
+              4 LOAD_FAST                0 (a)
+              6 LOAD_ATTR                0 (partition_id)
+             26 LOAD_DEREF               1 (pinned)
+             28 COMPARE_OP              40 (==)
+             32 POP_JUMP_IF_FALSE        2 (to 38)
+             34 LOAD_CONST               1 (0)
+             36 RETURN_VALUE
+        >>   38 LOAD_CONST               2 (1)
+             40 RETURN_VALUE
+
+Disassembly of <code object lease_acquire_flow_many at 0x28ad0140, file "app\services\browser_profile_service.py", line 525>:
+              0 MAKE_CELL                4 (preferred_profile_id)
+              2 MAKE_CELL               12 (pinned)
+
+525           4 RESUME                   0
+
+533           6 LOAD_GLOBAL              1 (NULL + reap_stale)
+             16 LOAD_FAST                0 (db)
+             18 CALL                     1
+             26 POP_TOP
+
+534          28 LOAD_GLOBAL              3 (NULL + max)
+             38 LOAD_CONST               1 (1)
+             40 LOAD_GLOBAL              5 (NULL + min)
+             50 LOAD_CONST               2 (10)
+             52 LOAD_GLOBAL              7 (NULL + int)
+             62 LOAD_FAST                3 (limit)
+             64 COPY                     1
+             66 POP_JUMP_IF_TRUE         2 (to 72)
+             68 POP_TOP
+             70 LOAD_CONST               1 (1)
+        >>   72 CALL                     1
+             80 CALL                     2
+             88 CALL                     2
+             96 STORE_FAST               3 (limit)
+
+535          98 LOAD_GLOBAL              9 (NULL + _flow_accounts_ready)
+            108 LOAD_FAST                0 (db)
+            110 CALL                     1
+            118 STORE_FAST               5 (ready)
+
+536         120 LOAD_FAST                5 (ready)
+            122 POP_JUMP_IF_TRUE         2 (to 128)
+
+537         124 BUILD_LIST               0
+            126 RETURN_VALUE
+
+539     >>  128 LOAD_FAST                0 (db)
+            130 LOAD_ATTR               11 (NULL|self + get)
+            150 LOAD_GLOBAL             12 (Video)
+            160 LOAD_FAST                1 (video_id)
+            162 CALL                     2
+            170 STORE_FAST               6 (video)
+
+540         172 LOAD_FAST                6 (video)
+            174 POP_JUMP_IF_FALSE       12 (to 200)
+            176 LOAD_FAST                6 (video)
+            178 LOAD_ATTR               14 (flow_account_id)
+            198 JUMP_FORWARD             1 (to 202)
+        >>  200 LOAD_CONST               3 (None)
+        >>  202 STORE_DEREF             12 (pinned)
+
+541         204 LOAD_GLOBAL             17 (NULL + sorted)
+
+542         214 LOAD_FAST                5 (ready)
+
+543         216 LOAD_CLOSURE            12 (pinned)
+            218 LOAD_CLOSURE             4 (preferred_profile_id)
+            220 BUILD_TUPLE              2
+            222 LOAD_CONST               4 (<code object <lambda> at 0x7f6c9268d7d0, file "app\services\browser_profile_service.py", line 543>)
+            224 MAKE_FUNCTION            8 (closure)
+
+541         226 KW_NAMES                 5 (('key',))
+            228 CALL                     2
+            236 STORE_FAST               7 (ordered)
+
+548         238 BUILD_LIST               0
+            240 STORE_FAST               8 (selected)
+
+549         242 LOAD_GLOBAL             19 (NULL + set)
+            252 CALL                     0
+            260 STORE_FAST               9 (selected_profiles)
+
+552         262 LOAD_FAST                7 (ordered)
+            264 GET_ITER
+        >>  266 FOR_ITER               175 (to 620)
+            270 STORE_FAST              10 (acc)
+
+553         272 LOAD_GLOBAL             21 (NULL + _profile_of_flow_account)
+            282 LOAD_FAST                0 (db)
+            284 LOAD_FAST               10 (acc)
+            286 CALL                     2
+            294 STORE_FAST              11 (prof)
+
+554         296 LOAD_FAST               11 (prof)
+            298 POP_JUMP_IF_NONE        29 (to 358)
+            300 LOAD_FAST               11 (prof)
+            302 LOAD_ATTR               22 (status)
+            322 LOAD_CONST               6 ('disabled')
+            324 COMPARE_OP              40 (==)
+            328 POP_JUMP_IF_TRUE        14 (to 358)
+            330 LOAD_FAST               11 (prof)
+            332 LOAD_ATTR               24 (id)
+            352 LOAD_FAST                9 (selected_profiles)
+            354 CONTAINS_OP              0
+            356 POP_JUMP_IF_FALSE        1 (to 360)
+
+555     >>  358 JUMP_BACKWARD           47 (to 266)
+
+556     >>  360 LOAD_FAST               11 (prof)
+            362 LOAD_ATTR               26 (leased_by_video_id)
+            382 LOAD_FAST                1 (video_id)
+            384 COMPARE_OP              40 (==)
+            388 POP_JUMP_IF_TRUE         1 (to 392)
+            390 JUMP_BACKWARD           63 (to 266)
+
+557     >>  392 LOAD_GLOBAL             29 (NULL + datetime)
+            402 LOAD_ATTR               30 (now)
+            422 CALL                     0
+            430 LOAD_FAST               11 (prof)
+            432 STORE_ATTR              16 (lease_heartbeat_at)
+
+558         442 LOAD_FAST                8 (selected)
+            444 LOAD_ATTR               35 (NULL|self + append)
+            464 LOAD_FAST               10 (acc)
+            466 LOAD_ATTR               36 (partition_id)
+            486 CALL                     1
+            494 POP_TOP
+
+559         496 LOAD_FAST                9 (selected_profiles)
+            498 LOAD_ATTR               39 (NULL|self + add)
+            518 LOAD_FAST               11 (prof)
+            520 LOAD_ATTR               24 (id)
+            540 CALL                     1
+            548 POP_TOP
+
+560         550 LOAD_GLOBAL             41 (NULL + len)
+            560 LOAD_FAST                8 (selected)
+            562 CALL                     1
+            570 LOAD_FAST                3 (limit)
+            572 COMPARE_OP              92 (>=)
+            576 POP_JUMP_IF_TRUE         1 (to 580)
+            578 JUMP_BACKWARD          157 (to 266)
+
+561     >>  580 LOAD_FAST                0 (db)
+            582 LOAD_ATTR               43 (NULL|self + commit)
+            602 CALL                     0
+            610 POP_TOP
+
+562         612 LOAD_FAST                8 (selected)
+            614 SWAP                     2
+            616 POP_TOP
+            618 RETURN_VALUE
+
+552     >>  620 END_FOR
+
+564         622 LOAD_FAST                7 (ordered)
+            624 GET_ITER
+        >>  626 FOR_ITER               178 (to 986)
+            630 STORE_FAST              10 (acc)
+
+565         632 LOAD_FAST               10 (acc)
+            634 LOAD_ATTR               36 (partition_id)
+            654 LOAD_FAST                8 (selected)
+            656 CONTAINS_OP              0
+            658 POP_JUMP_IF_FALSE        1 (to 662)
+
+566         660 JUMP_BACKWARD           18 (to 626)
+
+567     >>  662 LOAD_GLOBAL             21 (NULL + _profile_of_flow_account)
+            672 LOAD_FAST                0 (db)
+            674 LOAD_FAST               10 (acc)
+            676 CALL                     2
+            684 STORE_FAST              11 (prof)
+
+568         686 LOAD_FAST               11 (prof)
+            688 POP_JUMP_IF_NONE        29 (to 748)
+            690 LOAD_FAST               11 (prof)
+            692 LOAD_ATTR               22 (status)
+            712 LOAD_CONST               6 ('disabled')
+            714 COMPARE_OP              40 (==)
+            718 POP_JUMP_IF_TRUE        14 (to 748)
+            720 LOAD_FAST               11 (prof)
+            722 LOAD_ATTR               24 (id)
+            742 LOAD_FAST                9 (selected_profiles)
+            744 CONTAINS_OP              0
+            746 POP_JUMP_IF_FALSE        1 (to 750)
+
+569     >>  748 JUMP_BACKWARD           62 (to 626)
+
+570     >>  750 LOAD_FAST               11 (prof)
+            752 LOAD_ATTR               26 (leased_by_video_id)
+            772 POP_JUMP_IF_NONE         1 (to 776)
+
+571         774 JUMP_BACKWARD           75 (to 626)
+
+572     >>  776 LOAD_GLOBAL             45 (NULL + _lease)
+            786 LOAD_FAST                0 (db)
+            788 LOAD_FAST               11 (prof)
+            790 LOAD_FAST                1 (video_id)
+            792 LOAD_FAST                2 (job_id)
+            794 LOAD_FAST               10 (acc)
+            796 LOAD_ATTR               36 (partition_id)
+
+573         816 LOAD_FAST                8 (selected)
+            818 UNARY_NOT
+            820 COPY                     1
+            822 POP_JUMP_IF_FALSE        3 (to 830)
+            824 POP_TOP
+            826 LOAD_DEREF              12 (pinned)
+            828 UNARY_NOT
+
+572     >>  830 KW_NAMES                 7 (('update_pin',))
+            832 CALL                     6
+            840 POP_TOP
+
+574         842 LOAD_FAST                8 (selected)
+            844 LOAD_ATTR               35 (NULL|self + append)
+            864 LOAD_FAST               10 (acc)
+            866 LOAD_ATTR               36 (partition_id)
+            886 CALL                     1
+            894 POP_TOP
+
+575         896 LOAD_FAST                9 (selected_profiles)
+            898 LOAD_ATTR               39 (NULL|self + add)
+            918 LOAD_FAST               11 (prof)
+            920 LOAD_ATTR               24 (id)
+            940 CALL                     1
+            948 POP_TOP
+
+576         950 LOAD_GLOBAL             41 (NULL + len)
+            960 LOAD_FAST                8 (selected)
+            962 CALL                     1
+            970 LOAD_FAST                3 (limit)
+            972 COMPARE_OP              92 (>=)
+            976 POP_JUMP_IF_TRUE         1 (to 980)
+            978 JUMP_BACKWARD          177 (to 626)
+
+577     >>  980 POP_TOP
+
+578         982 LOAD_FAST                8 (selected)
+            984 RETURN_VALUE
+
+564     >>  986 END_FOR
+
+578         988 LOAD_FAST                8 (selected)
+            990 RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x7f6c9268d7d0, file "app\services\browser_profile_service.py", line 543>:
+              0 COPY_FREE_VARS           2
+
+543           2 RESUME                   0
+
+544           4 LOAD_DEREF               2 (preferred_profile_id)
+              6 POP_JUMP_IF_FALSE       17 (to 42)
+              8 LOAD_FAST                0 (a)
+             10 LOAD_ATTR                0 (browser_profile_id)
+             30 LOAD_DEREF               2 (preferred_profile_id)
+             32 COMPARE_OP              40 (==)
+             36 POP_JUMP_IF_FALSE        2 (to 42)
+             38 LOAD_CONST               1 (0)
+             40 JUMP_FORWARD             1 (to 44)
+        >>   42 LOAD_CONST               2 (1)
+
+545     >>   44 LOAD_FAST                0 (a)
+             46 LOAD_ATTR                2 (partition_id)
+             66 LOAD_DEREF               1 (pinned)
+             68 COMPARE_OP              40 (==)
+             72 POP_JUMP_IF_FALSE        3 (to 80)
+             74 LOAD_CONST               1 (0)
+
+543          76 BUILD_TUPLE              2
+             78 RETURN_VALUE
+
+545     >>   80 LOAD_CONST               2 (1)
+
+543          82 BUILD_TUPLE              2
+             84 RETURN_VALUE
+
+Disassembly of <code object lease_rotate_flow at 0x7f6c9257fa50, file "app\services\browser_profile_service.py", line 581>:
+581           0 RESUME                   0
+
+588           2 LOAD_GLOBAL              1 (NULL + lease_release_video)
+             12 LOAD_FAST                0 (db)
+             14 LOAD_FAST                1 (video_id)
+             16 CALL                     2
+             24 POP_TOP
+
+589          26 LOAD_GLOBAL              3 (NULL + _flow_accounts_ready)
+             36 LOAD_FAST                0 (db)
+             38 CALL                     1
+             46 GET_ITER
+        >>   48 FOR_ITER               113 (to 278)
+             52 STORE_FAST               5 (acc)
+
+590          54 LOAD_FAST                5 (acc)
+             56 LOAD_ATTR                4 (partition_id)
+             76 LOAD_FAST                3 (tried)
+             78 CONTAINS_OP              0
+             80 POP_JUMP_IF_TRUE        15 (to 112)
+             82 LOAD_FAST                5 (acc)
+             84 LOAD_ATTR                4 (partition_id)
+            104 LOAD_FAST                2 (current_partition)
+            106 COMPARE_OP              40 (==)
+            110 POP_JUMP_IF_FALSE        1 (to 114)
+
+591     >>  112 JUMP_BACKWARD           33 (to 48)
+
+592     >>  114 LOAD_GLOBAL              7 (NULL + _profile_of_flow_account)
+            124 LOAD_FAST                0 (db)
+            126 LOAD_FAST                5 (acc)
+            128 CALL                     2
+            136 STORE_FAST               6 (prof)
+
+593         138 LOAD_FAST                6 (prof)
+            140 POP_JUMP_IF_NONE        15 (to 172)
+            142 LOAD_FAST                6 (prof)
+            144 LOAD_ATTR                8 (status)
+            164 LOAD_CONST               2 ('disabled')
+            166 COMPARE_OP              40 (==)
+            170 POP_JUMP_IF_FALSE        1 (to 174)
+
+594     >>  172 JUMP_BACKWARD           63 (to 48)
+
+595     >>  174 LOAD_FAST                6 (prof)
+            176 LOAD_ATTR               10 (leased_by_video_id)
+            196 POP_JUMP_IF_NONE         1 (to 200)
+            198 JUMP_BACKWARD           76 (to 48)
+
+596     >>  200 LOAD_GLOBAL             13 (NULL + _lease)
+            210 LOAD_FAST                0 (db)
+            212 LOAD_FAST                6 (prof)
+            214 LOAD_FAST                1 (video_id)
+            216 LOAD_FAST                4 (job_id)
+            218 LOAD_FAST                5 (acc)
+            220 LOAD_ATTR                4 (partition_id)
+            240 CALL                     5
+            248 POP_TOP
+
+597         250 LOAD_FAST                5 (acc)
+            252 LOAD_ATTR                4 (partition_id)
+            272 SWAP                     2
+            274 POP_TOP
+            276 RETURN_VALUE
+
+589     >>  278 END_FOR
+
+598         280 RETURN_CONST             1 (None)
+
+Disassembly of <code object has_spare_flow_profile at 0x7f6c81992db0, file "app\services\browser_profile_service.py", line 601>:
+601           0 RESUME                   0
+
+609           2 LOAD_FAST                2 (tried)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE        10 (to 28)
+              8 POP_TOP
+             10 LOAD_GLOBAL              1 (NULL + set)
+             20 CALL                     0
+        >>   28 STORE_FAST               2 (tried)
+
+610          30 LOAD_GLOBAL              3 (NULL + _flow_accounts_ready)
+             40 LOAD_FAST                0 (db)
+             42 CALL                     1
+             50 GET_ITER
+        >>   52 FOR_ITER                75 (to 206)
+             56 STORE_FAST               3 (acc)
+
+611          58 LOAD_FAST                3 (acc)
+             60 LOAD_ATTR                4 (partition_id)
+             80 LOAD_FAST                2 (tried)
+             82 CONTAINS_OP              0
+             84 POP_JUMP_IF_TRUE        15 (to 116)
+             86 LOAD_FAST                3 (acc)
+             88 LOAD_ATTR                4 (partition_id)
+            108 LOAD_FAST                1 (current_partition)
+            110 COMPARE_OP              40 (==)
+            114 POP_JUMP_IF_FALSE        1 (to 118)
+
+612     >>  116 JUMP_BACKWARD           33 (to 52)
+
+613     >>  118 LOAD_GLOBAL              7 (NULL + _profile_of_flow_account)
+            128 LOAD_FAST                0 (db)
+            130 LOAD_FAST                3 (acc)
+            132 CALL                     2
+            140 STORE_FAST               4 (prof)
+
+614         142 LOAD_FAST                4 (prof)
+            144 POP_JUMP_IF_NONE        27 (to 200)
+            146 LOAD_FAST                4 (prof)
+            148 LOAD_ATTR                8 (status)
+            168 LOAD_CONST               1 ('disabled')
+            170 COMPARE_OP              40 (==)
+            174 POP_JUMP_IF_TRUE        12 (to 200)
+            176 LOAD_FAST                4 (prof)
+            178 LOAD_ATTR               10 (leased_by_video_id)
+            198 POP_JUMP_IF_NONE         1 (to 202)
+
+615     >>  200 JUMP_BACKWARD           75 (to 52)
+
+616     >>  202 POP_TOP
+            204 RETURN_CONST             2 (True)
+
+610     >>  206 END_FOR
+
+617         208 RETURN_CONST             3 (False)
+
+Disassembly of <code object lease_rotate_flow_worker at 0x28ad7320, file "app\services\browser_profile_service.py", line 620>:
+620           0 RESUME                   0
+
+623           2 LOAD_FAST                2 (current_partition)
+              4 POP_JUMP_IF_FALSE       99 (to 204)
+
+624           6 LOAD_FAST                0 (db)
+              8 LOAD_ATTR                1 (NULL|self + scalar)
+             28 LOAD_GLOBAL              3 (NULL + select)
+             38 LOAD_GLOBAL              4 (FlowAccount)
+             48 CALL                     1
+
+625          56 LOAD_ATTR                7 (NULL|self + where)
+             76 LOAD_GLOBAL              4 (FlowAccount)
+             86 LOAD_ATTR                8 (partition_id)
+            106 LOAD_FAST                2 (current_partition)
+            108 COMPARE_OP              40 (==)
+            112 CALL                     1
+
+624         120 CALL                     1
+            128 STORE_FAST               5 (current)
+
+626         130 LOAD_FAST                5 (current)
+            132 POP_JUMP_IF_NONE        35 (to 204)
+            134 LOAD_FAST                5 (current)
+            136 LOAD_ATTR               10 (browser_profile_id)
+            156 POP_JUMP_IF_FALSE       23 (to 204)
+
+627         158 LOAD_GLOBAL             13 (NULL + release_profile_if_held)
+            168 LOAD_FAST                0 (db)
+            170 LOAD_FAST                5 (current)
+            172 LOAD_ATTR               10 (browser_profile_id)
+            192 LOAD_FAST                1 (video_id)
+            194 CALL                     3
+            202 POP_TOP
+
+628     >>  204 LOAD_GLOBAL             15 (NULL + _flow_accounts_ready)
+            214 LOAD_FAST                0 (db)
+            216 CALL                     1
+            224 GET_ITER
+        >>  226 FOR_ITER               114 (to 458)
+            230 STORE_FAST               6 (acc)
+
+629         232 LOAD_FAST                6 (acc)
+            234 LOAD_ATTR                8 (partition_id)
+            254 LOAD_FAST                3 (tried)
+            256 CONTAINS_OP              0
+            258 POP_JUMP_IF_TRUE        15 (to 290)
+            260 LOAD_FAST                6 (acc)
+            262 LOAD_ATTR                8 (partition_id)
+            282 LOAD_FAST                2 (current_partition)
+            284 COMPARE_OP              40 (==)
+            288 POP_JUMP_IF_FALSE        1 (to 292)
+
+630     >>  290 JUMP_BACKWARD           33 (to 226)
+
+631     >>  292 LOAD_GLOBAL             17 (NULL + _profile_of_flow_account)
+            302 LOAD_FAST                0 (db)
+            304 LOAD_FAST                6 (acc)
+            306 CALL                     2
+            314 STORE_FAST               7 (prof)
+
+632         316 LOAD_FAST                7 (prof)
+            318 POP_JUMP_IF_NONE        27 (to 374)
+            320 LOAD_FAST                7 (prof)
+            322 LOAD_ATTR               18 (status)
+            342 LOAD_CONST               2 ('disabled')
+            344 COMPARE_OP              40 (==)
+            348 POP_JUMP_IF_TRUE        12 (to 374)
+            350 LOAD_FAST                7 (prof)
+            352 LOAD_ATTR               20 (leased_by_video_id)
+            372 POP_JUMP_IF_NONE         1 (to 376)
+
+633     >>  374 JUMP_BACKWARD           75 (to 226)
+
+634     >>  376 LOAD_GLOBAL             23 (NULL + _lease)
+            386 LOAD_FAST                0 (db)
+            388 LOAD_FAST                7 (prof)
+            390 LOAD_FAST                1 (video_id)
+            392 LOAD_FAST                4 (job_id)
+            394 LOAD_FAST                6 (acc)
+            396 LOAD_ATTR                8 (partition_id)
+            416 LOAD_CONST               3 (False)
+            418 KW_NAMES                 4 (('update_pin',))
+            420 CALL                     6
+            428 POP_TOP
+
+635         430 LOAD_FAST                6 (acc)
+            432 LOAD_ATTR                8 (partition_id)
+            452 SWAP                     2
+            454 POP_TOP
+            456 RETURN_VALUE
+
+628     >>  458 END_FOR
+
+636         460 RETURN_CONST             1 (None)
+
+Disassembly of <code object lease_release_video at 0x7f6c819a5580, file "app\services\browser_profile_service.py", line 639>:
+639           0 RESUME                   0
+
+642           2 LOAD_CONST               1 (0)
+              4 STORE_FAST               2 (n)
+
+643           6 LOAD_FAST                0 (db)
+              8 LOAD_ATTR                1 (NULL|self + scalars)
+             28 LOAD_GLOBAL              3 (NULL + select)
+             38 LOAD_GLOBAL              4 (BrowserProfile)
+             48 CALL                     1
+
+644          56 LOAD_ATTR                7 (NULL|self + where)
+             76 LOAD_GLOBAL              4 (BrowserProfile)
+             86 LOAD_ATTR                8 (leased_by_video_id)
+            106 LOAD_FAST                1 (video_id)
+            108 COMPARE_OP              40 (==)
+            112 CALL                     1
+
+643         120 CALL                     1
+
+644         128 LOAD_ATTR               11 (NULL|self + all)
+            148 CALL                     0
+
+643         156 GET_ITER
+        >>  158 FOR_ITER                35 (to 232)
+            162 STORE_FAST               3 (p)
+
+645         164 LOAD_CONST               2 (None)
+            166 LOAD_FAST                3 (p)
+            168 STORE_ATTR               4 (leased_by_video_id)
+
+646         178 LOAD_CONST               2 (None)
+            180 LOAD_FAST                3 (p)
+            182 STORE_ATTR               6 (leased_job_id)
+
+647         192 LOAD_CONST               2 (None)
+            194 LOAD_FAST                3 (p)
+            196 STORE_ATTR               7 (lease_kind)
+
+648         206 LOAD_CONST               2 (None)
+            208 LOAD_FAST                3 (p)
+            210 STORE_ATTR               8 (lease_heartbeat_at)
+
+649         220 LOAD_FAST                2 (n)
+            222 LOAD_CONST               3 (1)
+            224 BINARY_OP               13 (+=)
+            228 STORE_FAST               2 (n)
+            230 JUMP_BACKWARD           37 (to 158)
+
+643     >>  232 END_FOR
+
+650         234 LOAD_FAST                2 (n)
+            236 POP_JUMP_IF_FALSE       16 (to 270)
+
+651         238 LOAD_FAST                0 (db)
+            240 LOAD_ATTR               19 (NULL|self + commit)
+            260 CALL                     0
+            268 POP_TOP
+
+652     >>  270 LOAD_GLOBAL             20 (_default_lease_video_id)
+            280 LOAD_FAST                1 (video_id)
+            282 COMPARE_OP              40 (==)
+            286 POP_JUMP_IF_FALSE        2 (to 292)
+
+653         288 LOAD_CONST               2 (None)
+            290 STORE_GLOBAL            10 (_default_lease_video_id)
+
+654     >>  292 LOAD_FAST                2 (n)
+            294 RETURN_VALUE
+
+Disassembly of <code object release_other_profiles at 0x28b63d00, file "app\services\browser_profile_service.py", line 657>:
+657           0 RESUME                   0
+
+666           2 LOAD_CONST               1 (0)
+              4 STORE_FAST               3 (n)
+
+667           6 LOAD_FAST                0 (db)
+              8 LOAD_ATTR                1 (NULL|self + scalars)
+             28 LOAD_GLOBAL              3 (NULL + select)
+             38 LOAD_GLOBAL              4 (BrowserProfile)
+             48 CALL                     1
+
+668          56 LOAD_ATTR                7 (NULL|self + where)
+             76 LOAD_GLOBAL              4 (BrowserProfile)
+             86 LOAD_ATTR                8 (leased_by_video_id)
+            106 LOAD_FAST                1 (video_id)
+            108 COMPARE_OP              40 (==)
+            112 CALL                     1
+
+667         120 CALL                     1
+
+668         128 LOAD_ATTR               11 (NULL|self + all)
+            148 CALL                     0
+
+667         156 GET_ITER
+        >>  158 FOR_ITER                53 (to 268)
+            162 STORE_FAST               4 (p)
+
+669         164 LOAD_FAST                2 (keep_profile_id)
+            166 POP_JUMP_IF_FALSE       16 (to 200)
+            168 LOAD_FAST                4 (p)
+            170 LOAD_ATTR               12 (id)
+            190 LOAD_FAST                2 (keep_profile_id)
+            192 COMPARE_OP              40 (==)
+            196 POP_JUMP_IF_FALSE        1 (to 200)
+
+670         198 JUMP_BACKWARD           21 (to 158)
+
+671     >>  200 LOAD_CONST               2 (None)
+            202 LOAD_FAST                4 (p)
+            204 STORE_ATTR               4 (leased_by_video_id)
+
+672         214 LOAD_CONST               2 (None)
+            216 LOAD_FAST                4 (p)
+            218 STORE_ATTR               7 (leased_job_id)
+
+673         228 LOAD_CONST               2 (None)
+            230 LOAD_FAST                4 (p)
+            232 STORE_ATTR               8 (lease_kind)
+
+674         242 LOAD_CONST               2 (None)
+            244 LOAD_FAST                4 (p)
+            246 STORE_ATTR               9 (lease_heartbeat_at)
+
+675         256 LOAD_FAST                3 (n)
+            258 LOAD_CONST               3 (1)
+            260 BINARY_OP               13 (+=)
+            264 STORE_FAST               3 (n)
+            266 JUMP_BACKWARD           55 (to 158)
+
+667     >>  268 END_FOR
+
+676         270 LOAD_FAST                3 (n)
+            272 POP_JUMP_IF_FALSE       16 (to 306)
+
+677         274 LOAD_FAST                0 (db)
+            276 LOAD_ATTR               21 (NULL|self + commit)
+            296 CALL                     0
+            304 POP_TOP
+
+680     >>  306 LOAD_GLOBAL             22 (_default_lease_video_id)
+            316 LOAD_FAST                1 (video_id)
+            318 COMPARE_OP              40 (==)
+            322 POP_JUMP_IF_FALSE        4 (to 332)
+            324 LOAD_FAST                2 (keep_profile_id)
+            326 POP_JUMP_IF_NOT_NONE     2 (to 332)
+
+681         328 LOAD_CONST               2 (None)
+            330 STORE_GLOBAL            11 (_default_lease_video_id)
+
+682     >>  332 LOAD_FAST                3 (n)
+            334 RETURN_VALUE
+
+Disassembly of <code object lease_profile_for_video at 0x7f6c930c7120, file "app\services\browser_profile_service.py", line 685>:
+685           0 RESUME                   0
+
+694           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_GLOBAL              2 (BrowserProfile)
+             34 LOAD_FAST                1 (profile_id)
+             36 CALL                     2
+             44 STORE_FAST               4 (p)
+
+695          46 LOAD_FAST                4 (p)
+             48 POP_JUMP_IF_NONE        15 (to 80)
+             50 LOAD_FAST                4 (p)
+             52 LOAD_ATTR                4 (status)
+             72 LOAD_CONST               2 ('disabled')
+             74 COMPARE_OP              40 (==)
+             78 POP_JUMP_IF_FALSE        1 (to 82)
+
+696     >>   80 RETURN_CONST             3 (False)
+
+697     >>   82 LOAD_FAST                4 (p)
+             84 LOAD_ATTR                6 (leased_by_video_id)
+            104 LOAD_CONST               1 (None)
+            106 LOAD_FAST                2 (video_id)
+            108 BUILD_TUPLE              2
+            110 CONTAINS_OP              1
+            112 POP_JUMP_IF_FALSE        1 (to 116)
+
+698         114 RETURN_CONST             3 (False)
+
+699     >>  116 LOAD_FAST                2 (video_id)
+            118 LOAD_FAST                4 (p)
+            120 STORE_ATTR               3 (leased_by_video_id)
+
+700         130 LOAD_FAST                3 (job_id)
+            132 LOAD_FAST                4 (p)
+            134 STORE_ATTR               4 (leased_job_id)
+
+701         144 LOAD_FAST                4 (p)
+            146 LOAD_ATTR               10 (lease_kind)
+            166 COPY                     1
+            168 POP_JUMP_IF_TRUE         2 (to 174)
+            170 POP_TOP
+            172 LOAD_CONST               4 ('generate')
+        >>  174 LOAD_FAST                4 (p)
+            176 STORE_ATTR               5 (lease_kind)
+
+702         186 LOAD_GLOBAL             13 (NULL + datetime)
+            196 LOAD_ATTR               14 (now)
+            216 CALL                     0
+            224 LOAD_FAST                4 (p)
+            226 STORE_ATTR               8 (lease_heartbeat_at)
+
+703         236 LOAD_FAST                0 (db)
+            238 LOAD_ATTR               19 (NULL|self + commit)
+            258 CALL                     0
+            266 POP_TOP
+
+704         268 RETURN_CONST             5 (True)
+
+Disassembly of <code object release_profile_if_held at 0x7f6c926ac480, file "app\services\browser_profile_service.py", line 707>:
+707           0 RESUME                   0
+
+709           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_GLOBAL              2 (BrowserProfile)
+             34 LOAD_FAST                1 (profile_id)
+             36 CALL                     2
+             44 STORE_FAST               3 (p)
+
+710          46 LOAD_FAST                3 (p)
+             48 POP_JUMP_IF_NONE        15 (to 80)
+             50 LOAD_FAST                3 (p)
+             52 LOAD_ATTR                4 (leased_by_video_id)
+             72 LOAD_FAST                2 (video_id)
+             74 COMPARE_OP              55 (!=)
+             78 POP_JUMP_IF_FALSE        1 (to 82)
+
+711     >>   80 RETURN_CONST             2 (False)
+
+712     >>   82 LOAD_CONST               1 (None)
+             84 LOAD_FAST                3 (p)
+             86 STORE_ATTR               2 (leased_by_video_id)
+
+713          96 LOAD_CONST               1 (None)
+             98 LOAD_FAST                3 (p)
+            100 STORE_ATTR               3 (leased_job_id)
+
+714         110 LOAD_CONST               1 (None)
+            112 LOAD_FAST                3 (p)
+            114 STORE_ATTR               4 (lease_kind)
+
+715         124 LOAD_CONST               1 (None)
+            126 LOAD_FAST                3 (p)
+            128 STORE_ATTR               5 (lease_heartbeat_at)
+
+716         138 LOAD_FAST                0 (db)
+            140 LOAD_ATTR               13 (NULL|self + commit)
+            160 CALL                     0
+            168 POP_TOP
+
+717         170 RETURN_CONST             3 (True)
+
+Disassembly of <code object force_release at 0x7f6c926ac8d0, file "app\services\browser_profile_service.py", line 720>:
+720           0 RESUME                   0
+
+722           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_GLOBAL              2 (BrowserProfile)
+             34 LOAD_FAST                1 (profile_id)
+             36 CALL                     2
+             44 STORE_FAST               2 (p)
+
+723          46 LOAD_FAST                2 (p)
+             48 POP_JUMP_IF_FALSE       12 (to 74)
+             50 LOAD_FAST                2 (p)
+             52 LOAD_ATTR                4 (leased_by_video_id)
+             72 POP_JUMP_IF_TRUE         1 (to 76)
+
+724     >>   74 RETURN_CONST             1 (False)
+
+725     >>   76 LOAD_CONST               2 (None)
+             78 LOAD_FAST                2 (p)
+             80 STORE_ATTR               2 (leased_by_video_id)
+
+726          90 LOAD_CONST               2 (None)
+             92 LOAD_FAST                2 (p)
+             94 STORE_ATTR               3 (leased_job_id)
+
+727         104 LOAD_CONST               2 (None)
+            106 LOAD_FAST                2 (p)
+            108 STORE_ATTR               4 (lease_kind)
+
+728         118 LOAD_CONST               2 (None)
+            120 LOAD_FAST                2 (p)
+            122 STORE_ATTR               5 (lease_heartbeat_at)
+
+729         132 LOAD_FAST                0 (db)
+            134 LOAD_ATTR               13 (NULL|self + commit)
+            154 CALL                     0
+            162 POP_TOP
+
+730         164 RETURN_CONST             3 (True)
+
+Disassembly of <code object flow_admission at 0x28ba9b00, file "app\services\browser_profile_service.py", line 733>:
+              0 MAKE_CELL                3 (preferred_profile_id)
+
+733           2 RESUME                   0
+
+742           4 LOAD_FAST                0 (db)
+              6 LOAD_ATTR                1 (NULL|self + scalars)
+             26 LOAD_GLOBAL              3 (NULL + select)
+             36 LOAD_GLOBAL              4 (FlowAccount)
+             46 CALL                     1
+             54 CALL                     1
+             62 LOAD_ATTR                7 (NULL|self + first)
+             82 CALL                     0
+             90 POP_JUMP_IF_TRUE        25 (to 142)
+
+743          92 LOAD_GLOBAL              9 (NULL + reap_stale)
+            102 LOAD_FAST                0 (db)
+            104 CALL                     1
+            112 POP_TOP
+
+744         114 LOAD_GLOBAL             10 (_default_lease_video_id)
+            124 LOAD_CONST               1 (None)
+            126 LOAD_FAST                1 (video_id)
+            128 BUILD_TUPLE              2
+            130 CONTAINS_OP              0
+            132 POP_JUMP_IF_FALSE        3 (to 140)
+
+745         134 LOAD_FAST                1 (video_id)
+            136 STORE_GLOBAL             5 (_default_lease_video_id)
+
+746         138 RETURN_CONST             2 (True)
+
+747     >>  140 RETURN_CONST             3 (False)
+
+748     >>  142 LOAD_GLOBAL             13 (NULL + lease_acquire_flow)
+            152 LOAD_FAST                0 (db)
+            154 LOAD_FAST                1 (video_id)
+            156 LOAD_FAST                2 (job_id)
+            158 LOAD_DEREF               3 (preferred_profile_id)
+            160 CALL                     4
+            168 POP_JUMP_IF_NONE         1 (to 172)
+
+749         170 RETURN_CONST             2 (True)
+
+752     >>  172 LOAD_DEREF               3 (preferred_profile_id)
+            174 POP_JUMP_IF_FALSE       69 (to 314)
+
+753         176 LOAD_FAST                0 (db)
+            178 LOAD_ATTR               15 (NULL|self + get)
+            198 LOAD_GLOBAL             16 (BrowserProfile)
+            208 LOAD_DEREF               3 (preferred_profile_id)
+            210 CALL                     2
+            218 STORE_FAST               4 (pref)
+
+756         220 LOAD_FAST                4 (pref)
+            222 POP_JUMP_IF_NONE        45 (to 314)
+            224 LOAD_FAST                4 (pref)
+            226 LOAD_ATTR               18 (status)
+            246 LOAD_CONST               4 ('disabled')
+            248 COMPARE_OP              55 (!=)
+            252 POP_JUMP_IF_FALSE       30 (to 314)
+            254 LOAD_GLOBAL             21 (NULL + any)
+            264 LOAD_CLOSURE             3 (preferred_profile_id)
+            266 BUILD_TUPLE              1
+            268 LOAD_CONST               5 (<code object <genexpr> at 0x7f6c9265e630, file "app\services\browser_profile_service.py", line 756>)
+            270 MAKE_FUNCTION            8 (closure)
+
+757         272 LOAD_GLOBAL             23 (NULL + _flow_accounts_ready)
+            282 LOAD_FAST                0 (db)
+            284 CALL                     1
+            292 GET_ITER
+
+756         294 CALL                     0
+            302 CALL                     1
+            310 POP_JUMP_IF_FALSE        1 (to 314)
+
+758         312 RETURN_CONST             3 (False)
+
+767     >>  314 LOAD_GLOBAL             23 (NULL + _flow_accounts_ready)
+            324 LOAD_FAST                0 (db)
+            326 CALL                     1
+            334 POP_JUMP_IF_FALSE        1 (to 338)
+
+768         336 RETURN_CONST             3 (False)
+
+769     >>  338 LOAD_GLOBAL             25 (NULL + flow_acct)
+            348 LOAD_ATTR               26 (cooling_accounts)
+            368 LOAD_FAST                0 (db)
+            370 CALL                     1
+            378 STORE_FAST               5 (cooling)
+
+770         380 LOAD_FAST                5 (cooling)
+            382 POP_JUMP_IF_FALSE       60 (to 504)
+
+771         384 LOAD_GLOBAL             29 (NULL + min)
+            394 LOAD_CONST               6 (<code object <genexpr> at 0x7f6c9265e530, file "app\services\browser_profile_service.py", line 771>)
+            396 MAKE_FUNCTION            0
+            398 LOAD_FAST                5 (cooling)
+            400 GET_ITER
+            402 CALL                     0
+            410 CALL                     1
+            418 STORE_FAST               6 (wake)
+
+772         420 LOAD_GLOBAL             31 (NULL + log)
+            430 LOAD_ATTR               32 (info)
+            450 LOAD_CONST               7 ('[lease] video ')
+            452 LOAD_FAST                1 (video_id)
+            454 FORMAT_VALUE             0
+            456 LOAD_CONST               8 (': cả ')
+            458 LOAD_GLOBAL             35 (NULL + len)
+            468 LOAD_FAST                5 (cooling)
+            470 CALL                     1
+            478 FORMAT_VALUE             0
+            480 LOAD_CONST               9 (' tài khoản Flow đang nghỉ (Flow giới hạn tạm thời) → chờ tới ')
+
+773         482 LOAD_FAST                6 (wake)
+            484 LOAD_CONST              10 ('%H:%M')
+            486 FORMAT_VALUE             4 (with format)
+            488 LOAD_CONST              11 (' rồi chạy tiếp.')
+
+772         490 BUILD_STRING             7
+            492 CALL                     1
+            500 POP_TOP
+
+774         502 RETURN_CONST             3 (False)
+
+775     >>  504 RETURN_CONST             2 (True)
+
+Disassembly of <code object <genexpr> at 0x7f6c9265e630, file "app\services\browser_profile_service.py", line 756>:
+              0 COPY_FREE_VARS           1
+
+756           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+
+757     >>   10 FOR_ITER                19 (to 52)
+             14 STORE_FAST               1 (a)
+             16 LOAD_FAST                1 (a)
+             18 LOAD_ATTR                0 (browser_profile_id)
+             38 LOAD_DEREF               2 (preferred_profile_id)
+             40 COMPARE_OP              40 (==)
+             44 YIELD_VALUE              1
+             46 RESUME                   1
+             48 POP_TOP
+             50 JUMP_BACKWARD           21 (to 10)
+        >>   52 END_FOR
+             54 RETURN_CONST             0 (None)
+        >>   56 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             58 RERAISE                  1
+ExceptionTable:
+  6 to 54 -> 56 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x7f6c9265e530, file "app\services\browser_profile_service.py", line 771>:
+771           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+              6 LOAD_FAST                0 (.0)
+        >>    8 FOR_ITER                16 (to 44)
+             12 STORE_FAST               1 (a)
+             14 LOAD_FAST                1 (a)
+             16 LOAD_ATTR                0 (cooldown_until)
+             36 YIELD_VALUE              1
+             38 RESUME                   1
+             40 POP_TOP
+             42 JUMP_BACKWARD           18 (to 8)
+        >>   44 END_FOR
+             46 RETURN_CONST             0 (None)
+        >>   48 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             50 RERAISE                  1
+ExceptionTable:
+  4 to 46 -> 48 [0] lasti
+
+Disassembly of <code object _reap_provider_slots at 0x7f6c92c2bdb0, file "app\services\browser_profile_service.py", line 800>:
+800           0 RESUME                   0
+
+801           2 LOAD_GLOBAL              1 (NULL + _active_video_ids)
+             12 LOAD_FAST                0 (db)
+             14 CALL                     1
+             22 STORE_FAST               1 (active)
+
+802          24 LOAD_GLOBAL              3 (NULL + list)
+             34 LOAD_GLOBAL              4 (_PROVIDER_SLOTS)
+             44 LOAD_ATTR                7 (NULL|self + items)
+             64 CALL                     0
+             72 CALL                     1
+             80 GET_ITER
+        >>   82 FOR_ITER                49 (to 184)
+             86 UNPACK_SEQUENCE          2
+             90 STORE_FAST               2 (slot)
+             92 STORE_FAST               3 (vid)
+
+803          94 LOAD_FAST                3 (vid)
+             96 POP_JUMP_IF_TRUE         1 (to 100)
+             98 JUMP_BACKWARD            9 (to 82)
+        >>  100 LOAD_FAST                3 (vid)
+            102 LOAD_FAST                1 (active)
+            104 CONTAINS_OP              1
+            106 POP_JUMP_IF_TRUE         1 (to 110)
+            108 JUMP_BACKWARD           14 (to 82)
+
+804     >>  110 LOAD_GLOBAL              9 (NULL + log)
+            120 LOAD_ATTR               10 (info)
+            140 LOAD_CONST               1 ('[lease] thu hồi provider slot mồ côi: ')
+            142 LOAD_FAST                2 (slot)
+            144 FORMAT_VALUE             0
+            146 LOAD_CONST               2 (' ← video ')
+            148 LOAD_FAST                3 (vid)
+            150 FORMAT_VALUE             0
+            152 BUILD_STRING             4
+            154 CALL                     1
+            162 POP_TOP
+
+805         164 LOAD_CONST               0 (None)
+            166 LOAD_GLOBAL              4 (_PROVIDER_SLOTS)
+            176 LOAD_FAST                2 (slot)
+            178 STORE_SUBSCR
+            182 JUMP_BACKWARD           51 (to 82)
+
+802     >>  184 END_FOR
+            186 RETURN_CONST             0 (None)
+
+Disassembly of <code object provider_admission at 0x7f6c92889bb0, file "app\services\browser_profile_service.py", line 808>:
+              0 MAKE_CELL                2 (video_id)
+
+808           2 RESUME                   0
+
+810           4 LOAD_GLOBAL              0 (PROVIDER_SLOT_STEPS)
+             14 LOAD_ATTR                3 (NULL|self + get)
+             34 LOAD_FAST                1 (step_name)
+             36 CALL                     1
+             44 STORE_FAST               3 (slots)
+
+811          46 LOAD_FAST                3 (slots)
+             48 POP_JUMP_IF_TRUE         1 (to 52)
+
+812          50 RETURN_CONST             1 (True)
+
+813     >>   52 LOAD_GLOBAL              5 (NULL + _reap_provider_slots)
+             62 LOAD_FAST                0 (db)
+             64 CALL                     1
+             72 POP_TOP
+
+814          74 LOAD_GLOBAL              7 (NULL + all)
+             84 LOAD_CLOSURE             2 (video_id)
+             86 BUILD_TUPLE              1
+             88 LOAD_CONST               2 (<code object <genexpr> at 0x7f6c9265e730, file "app\services\browser_profile_service.py", line 814>)
+             90 MAKE_FUNCTION            8 (closure)
+             92 LOAD_FAST                3 (slots)
+             94 GET_ITER
+             96 CALL                     0
+            104 CALL                     1
+            112 POP_JUMP_IF_FALSE       17 (to 148)
+
+815         114 LOAD_FAST                3 (slots)
+            116 GET_ITER
+        >>  118 FOR_ITER                11 (to 144)
+            122 STORE_FAST               4 (s)
+
+816         124 LOAD_DEREF               2 (video_id)
+            126 LOAD_GLOBAL              8 (_PROVIDER_SLOTS)
+            136 LOAD_FAST                4 (s)
+            138 STORE_SUBSCR
+            142 JUMP_BACKWARD           13 (to 118)
+
+815     >>  144 END_FOR
+
+817         146 RETURN_CONST             1 (True)
+
+818     >>  148 RETURN_CONST             3 (False)
+
+Disassembly of <code object <genexpr> at 0x7f6c9265e730, file "app\services\browser_profile_service.py", line 814>:
+              0 COPY_FREE_VARS           1
+
+814           2 RETURN_GENERATOR
+              4 POP_TOP
+              6 RESUME                   0
+              8 LOAD_FAST                0 (.0)
+        >>   10 FOR_ITER                17 (to 48)
+             14 STORE_FAST               1 (s)
+             16 LOAD_GLOBAL              0 (_PROVIDER_SLOTS)
+             26 LOAD_FAST                1 (s)
+             28 BINARY_SUBSCR
+             32 LOAD_CONST               0 (None)
+             34 LOAD_DEREF               2 (video_id)
+             36 BUILD_TUPLE              2
+             38 CONTAINS_OP              0
+             40 YIELD_VALUE              1
+             42 RESUME                   1
+             44 POP_TOP
+             46 JUMP_BACKWARD           19 (to 10)
+        >>   48 END_FOR
+             50 RETURN_CONST             0 (None)
+        >>   52 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             54 RERAISE                  1
+ExceptionTable:
+  6 to 50 -> 52 [0] lasti
+
+Disassembly of <code object release_provider_slots at 0x7f6c926902b0, file "app\services\browser_profile_service.py", line 821>:
+821           0 RESUME                   0
+
+823           2 LOAD_CONST               1 (0)
+              4 STORE_FAST               1 (n)
+
+824           6 LOAD_GLOBAL              1 (NULL + list)
+             16 LOAD_GLOBAL              2 (_PROVIDER_SLOTS)
+             26 LOAD_ATTR                5 (NULL|self + items)
+             46 CALL                     0
+             54 CALL                     1
+             62 GET_ITER
+        >>   64 FOR_ITER                25 (to 118)
+             68 UNPACK_SEQUENCE          2
+             72 STORE_FAST               2 (slot)
+             74 STORE_FAST               3 (vid)
+
+825          76 LOAD_FAST                3 (vid)
+             78 LOAD_FAST                0 (video_id)
+             80 COMPARE_OP              40 (==)
+             84 POP_JUMP_IF_TRUE         1 (to 88)
+             86 JUMP_BACKWARD           12 (to 64)
+
+826     >>   88 LOAD_CONST               2 (None)
+             90 LOAD_GLOBAL              2 (_PROVIDER_SLOTS)
+            100 LOAD_FAST                2 (slot)
+            102 STORE_SUBSCR
+
+827         106 LOAD_FAST                1 (n)
+            108 LOAD_CONST               3 (1)
+            110 BINARY_OP               13 (+=)
+            114 STORE_FAST               1 (n)
+            116 JUMP_BACKWARD           27 (to 64)
+
+824     >>  118 END_FOR
+
+828         120 LOAD_FAST                1 (n)
+            122 RETURN_VALUE
+
+Disassembly of <code object chrome_dir_of_partition at 0x7f6c926bc230, file "app\services\browser_profile_service.py", line 831>:
+831           0 RESUME                   0
+
+835           2 LOAD_GLOBAL              0 (FlowAccount)
+             12 LOAD_GLOBAL              2 (GrokAccount)
+             22 BUILD_TUPLE              2
+             24 GET_ITER
+        >>   26 FOR_ITER               137 (to 304)
+             30 STORE_FAST               2 (model)
+
+836          32 LOAD_FAST                0 (db)
+             34 LOAD_ATTR                5 (NULL|self + scalar)
+             54 LOAD_GLOBAL              7 (NULL + select)
+             64 LOAD_FAST                2 (model)
+             66 CALL                     1
+             74 LOAD_ATTR                9 (NULL|self + where)
+             94 LOAD_FAST                2 (model)
+             96 LOAD_ATTR               10 (partition_id)
+            116 LOAD_FAST                1 (partition_id)
+            118 COMPARE_OP              40 (==)
+            122 CALL                     1
+            130 CALL                     1
+            138 STORE_FAST               3 (acc)
+
+837         140 LOAD_FAST                3 (acc)
+            142 POP_JUMP_IF_NOT_NONE     1 (to 146)
+            144 JUMP_BACKWARD           60 (to 26)
+        >>  146 LOAD_FAST                3 (acc)
+            148 LOAD_ATTR               12 (browser_profile_id)
+            168 POP_JUMP_IF_TRUE         1 (to 172)
+            170 JUMP_BACKWARD           73 (to 26)
+
+838     >>  172 LOAD_FAST                0 (db)
+            174 LOAD_ATTR               15 (NULL|self + get)
+            194 LOAD_GLOBAL             16 (BrowserProfile)
+            204 LOAD_FAST                3 (acc)
+            206 LOAD_ATTR               12 (browser_profile_id)
+            226 CALL                     2
+            234 STORE_FAST               4 (p)
+
+839         236 LOAD_FAST                4 (p)
+            238 POP_JUMP_IF_NOT_NONE     1 (to 242)
+            240 JUMP_BACKWARD          108 (to 26)
+
+840     >>  242 LOAD_FAST                4 (p)
+            244 LOAD_ATTR               18 (chrome_dir)
+            264 COPY                     1
+            266 POP_JUMP_IF_TRUE        15 (to 298)
+            268 POP_TOP
+            270 LOAD_CONST               2 ('browser-profiles/')
+            272 LOAD_FAST                4 (p)
+            274 LOAD_ATTR               20 (id)
+            294 FORMAT_VALUE             0
+            296 BUILD_STRING             2
+        >>  298 SWAP                     2
+            300 POP_TOP
+            302 RETURN_VALUE
+
+835     >>  304 END_FOR
+
+841         306 RETURN_CONST             1 (None)
+
+Disassembly of <code object chrome_dir_of_profile at 0x7f6c926fc750, file "app\services\browser_profile_service.py", line 844>:
+844           0 RESUME                   0
+
+847           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + get)
+             24 LOAD_GLOBAL              2 (BrowserProfile)
+             34 LOAD_FAST                1 (profile_id)
+             36 CALL                     2
+             44 STORE_FAST               2 (p)
+
+848          46 LOAD_FAST                2 (p)
+             48 POP_JUMP_IF_FALSE       29 (to 108)
+             50 LOAD_FAST                2 (p)
+             52 LOAD_ATTR                4 (chrome_dir)
+             72 COPY                     1
+             74 POP_JUMP_IF_TRUE        15 (to 106)
+             76 POP_TOP
+             78 LOAD_CONST               1 ('browser-profiles/')
+             80 LOAD_FAST                2 (p)
+             82 LOAD_ATTR                6 (id)
+            102 FORMAT_VALUE             0
+            104 BUILD_STRING             2
+        >>  106 RETURN_VALUE
+        >>  108 LOAD_CONST               2 (None)
+            110 RETURN_VALUE
+
+Disassembly of <code object _platforms_of at 0x7f6c92c3f750, file "app\services\browser_profile_service.py", line 851>:
+851           0 RESUME                   0
+
+852           2 LOAD_CONST               1 (0)
+              4 LOAD_CONST               0 (None)
+              6 IMPORT_NAME              0 (json)
+              8 STORE_FAST               1 (_json)
+
+853          10 NOP
+
+854          12 LOAD_FAST                0 (p)
+             14 LOAD_ATTR                2 (platforms_json)
+             34 POP_JUMP_IF_FALSE       27 (to 90)
+             36 LOAD_FAST                1 (_json)
+             38 LOAD_ATTR                5 (NULL|self + loads)
+             58 LOAD_FAST                0 (p)
+             60 LOAD_ATTR                2 (platforms_json)
+             80 CALL                     1
+             88 RETURN_VALUE
+        >>   90 BUILD_MAP                0
+             92 RETURN_VALUE
+        >>   94 PUSH_EXC_INFO
+
+855          96 LOAD_GLOBAL              6 (TypeError)
+            106 LOAD_GLOBAL              8 (ValueError)
+            116 BUILD_TUPLE              2
+            118 CHECK_EXC_MATCH
+            120 POP_JUMP_IF_FALSE        5 (to 132)
+            122 POP_TOP
+
+856         124 BUILD_MAP                0
+            126 SWAP                     2
+            128 POP_EXCEPT
+            130 RETURN_VALUE
+
+855     >>  132 RERAISE                  0
+        >>  134 COPY                     3
+            136 POP_EXCEPT
+            138 RERAISE                  1
+ExceptionTable:
+  12 to 86 -> 94 [0]
+  90 to 90 -> 94 [0]
+  94 to 126 -> 134 [1] lasti
+  132 to 132 -> 134 [1] lasti
+
+Disassembly of <code object lease_chatgpt_ui_profile at 0x28ae0620, file "app\services\browser_profile_service.py", line 859>:
+859           0 RESUME                   0
+
+870           2 LOAD_FAST                0 (db)
+              4 LOAD_ATTR                1 (NULL|self + scalars)
+
+871          24 LOAD_GLOBAL              3 (NULL + select)
+             34 LOAD_GLOBAL              4 (BrowserProfile)
+             44 CALL                     1
+             52 LOAD_ATTR                7 (NULL|self + where)
+             72 LOAD_GLOBAL              4 (BrowserProfile)
+             82 LOAD_ATTR                8 (leased_by_video_id)
+            102 LOAD_FAST                1 (video_id)
+            104 COMPARE_OP              40 (==)
+            108 CALL                     1
+
+870         116 CALL                     1
+
+871         124 LOAD_ATTR               11 (NULL|self + all)
+            144 CALL                     0
+
+870         152 GET_ITER
+            154 LOAD_FAST_AND_CLEAR      4 (p)
+            156 SWAP                     2
+            158 BUILD_LIST               0
+            160 SWAP                     2
+        >>  162 FOR_ITER                14 (to 194)
+            166 STORE_FAST               4 (p)
+            168 LOAD_FAST                4 (p)
+            170 LOAD_ATTR               12 (id)
+            190 LIST_APPEND              2
+            192 JUMP_BACKWARD           16 (to 162)
+        >>  194 END_FOR
+            196 STORE_FAST               5 (held_ids)
+            198 STORE_FAST               4 (p)
+
+872         200 BUILD_LIST               0
+            202 STORE_FAST               6 (ordered_ids)
+
+873         204 LOAD_FAST                3 (preferred_profile_id)
+            206 POP_JUMP_IF_FALSE        3 (to 214)
+            208 LOAD_FAST                3 (preferred_profile_id)
+            210 BUILD_LIST               1
+            212 JUMP_FORWARD             1 (to 216)
+        >>  214 BUILD_LIST               0
+        >>  216 LOAD_FAST                5 (held_ids)
+            218 BINARY_OP                0 (+)
+            222 GET_ITER
+        >>  224 FOR_ITER                27 (to 282)
+            228 STORE_FAST               7 (pid)
+
+874         230 LOAD_FAST                7 (pid)
+            232 POP_JUMP_IF_TRUE         1 (to 236)
+            234 JUMP_BACKWARD            6 (to 224)
+        >>  236 LOAD_FAST                7 (pid)
+            238 LOAD_FAST                6 (ordered_ids)
+            240 CONTAINS_OP              1
+            242 POP_JUMP_IF_TRUE         1 (to 246)
+            244 JUMP_BACKWARD           11 (to 224)
+
+875     >>  246 LOAD_FAST                6 (ordered_ids)
+            248 LOAD_ATTR               15 (NULL|self + append)
+            268 LOAD_FAST                7 (pid)
+            270 CALL                     1
+            278 POP_TOP
+            280 JUMP_BACKWARD           29 (to 224)
+
+873     >>  282 END_FOR
+
+876         284 LOAD_FAST                0 (db)
+            286 LOAD_ATTR                1 (NULL|self + scalars)
+            306 LOAD_GLOBAL              3 (NULL + select)
+            316 LOAD_GLOBAL              4 (BrowserProfile)
+            326 CALL                     1
+            334 LOAD_ATTR               17 (NULL|self + order_by)
+            354 LOAD_GLOBAL              4 (BrowserProfile)
+            364 LOAD_ATTR               18 (created_at)
+            384 CALL                     1
+            392 CALL                     1
+            400 LOAD_ATTR               11 (NULL|self + all)
+            420 CALL                     0
+            428 GET_ITER
+        >>  430 FOR_ITER                44 (to 522)
+            434 STORE_FAST               4 (p)
+
+877         436 LOAD_FAST                4 (p)
+            438 LOAD_ATTR               12 (id)
+            458 LOAD_FAST                6 (ordered_ids)
+            460 CONTAINS_OP              1
+            462 POP_JUMP_IF_TRUE         1 (to 466)
+            464 JUMP_BACKWARD           18 (to 430)
+
+878     >>  466 LOAD_FAST                6 (ordered_ids)
+            468 LOAD_ATTR               15 (NULL|self + append)
+            488 LOAD_FAST                4 (p)
+            490 LOAD_ATTR               12 (id)
+            510 CALL                     1
+            518 POP_TOP
+            520 JUMP_BACKWARD           46 (to 430)
+
+876     >>  522 END_FOR
+
+879         524 LOAD_FAST                6 (ordered_ids)
+            526 GET_ITER
+        >>  528 FOR_ITER               106 (to 744)
+            532 STORE_FAST               7 (pid)
+
+880         534 LOAD_FAST                0 (db)
+            536 LOAD_ATTR               21 (NULL|self + get)
+            556 LOAD_GLOBAL              4 (BrowserProfile)
+            566 LOAD_FAST                7 (pid)
+            568 CALL                     2
+            576 STORE_FAST               4 (p)
+
+881         578 LOAD_FAST                4 (p)
+            580 POP_JUMP_IF_NONE        15 (to 612)
+            582 LOAD_FAST                4 (p)
+            584 LOAD_ATTR               22 (status)
+            604 LOAD_CONST               2 ('disabled')
+            606 COMPARE_OP              40 (==)
+            610 POP_JUMP_IF_FALSE        1 (to 614)
+
+882     >>  612 JUMP_BACKWARD           43 (to 528)
+
+883     >>  614 LOAD_GLOBAL             25 (NULL + _platforms_of)
+            624 LOAD_FAST                4 (p)
+            626 CALL                     1
+            634 LOAD_ATTR               21 (NULL|self + get)
+            654 LOAD_CONST               3 ('chatgpt')
+            656 CALL                     1
+            664 COPY                     1
+            666 POP_JUMP_IF_TRUE         2 (to 672)
+            668 POP_TOP
+            670 BUILD_MAP                0
+        >>  672 LOAD_ATTR               21 (NULL|self + get)
+            692 LOAD_CONST               4 ('connected')
+            694 CALL                     1
+            702 POP_JUMP_IF_TRUE         1 (to 706)
+
+884         704 JUMP_BACKWARD           89 (to 528)
+
+885     >>  706 LOAD_GLOBAL             27 (NULL + lease_profile_for_video)
+            716 LOAD_FAST                0 (db)
+            718 LOAD_FAST                7 (pid)
+            720 LOAD_FAST                1 (video_id)
+            722 LOAD_FAST                2 (job_id)
+            724 CALL                     4
+            732 POP_JUMP_IF_TRUE         1 (to 736)
+            734 JUMP_BACKWARD          104 (to 528)
+
+886     >>  736 LOAD_FAST                7 (pid)
+            738 SWAP                     2
+            740 POP_TOP
+            742 RETURN_VALUE
+
+879     >>  744 END_FOR
+
+887         746 RETURN_CONST             1 (None)
+        >>  748 SWAP                     2
+            750 POP_TOP
+
+870         752 SWAP                     2
+            754 STORE_FAST               4 (p)
+            756 RERAISE                  0
+ExceptionTable:
+  158 to 194 -> 748 [2]
+
+Disassembly of <code object combo_pin_admission at 0x7f6c926ac760, file "app\services\browser_profile_service.py", line 890>:
+890           0 RESUME                   0
+
+896           2 LOAD_GLOBAL              1 (NULL + reap_stale)
+             12 LOAD_FAST                0 (db)
+             14 CALL                     1
+             22 POP_TOP
+
+897          24 LOAD_FAST                0 (db)
+             26 LOAD_ATTR                3 (NULL|self + get)
+             46 LOAD_GLOBAL              4 (BrowserProfile)
+             56 LOAD_FAST                3 (preferred_profile_id)
+             58 CALL                     2
+             66 STORE_FAST               4 (p)
+
+898          68 LOAD_FAST                4 (p)
+             70 POP_JUMP_IF_NONE        15 (to 102)
+             72 LOAD_FAST                4 (p)
+             74 LOAD_ATTR                6 (status)
+             94 LOAD_CONST               2 ('disabled')
+             96 COMPARE_OP              40 (==)
+            100 POP_JUMP_IF_FALSE        1 (to 104)
+
+899     >>  102 RETURN_CONST             3 (True)
+
+900     >>  104 LOAD_FAST                4 (p)
+            106 LOAD_ATTR                8 (leased_by_video_id)
+            126 LOAD_CONST               1 (None)
+            128 LOAD_FAST                1 (video_id)
+            130 BUILD_TUPLE              2
+            132 CONTAINS_OP              1
+            134 POP_JUMP_IF_FALSE        1 (to 138)
+
+901         136 RETURN_CONST             4 (False)
+
+902     >>  138 LOAD_GLOBAL             11 (NULL + lease_profile_for_video)
+            148 LOAD_FAST                0 (db)
+            150 LOAD_FAST                3 (preferred_profile_id)
+            152 LOAD_FAST                1 (video_id)
+            154 LOAD_FAST                2 (job_id)
+            156 CALL                     4
+            164 RETURN_VALUE
+
+Disassembly of <code object leased_partitions at 0x28aa9fa0, file "app\services\browser_profile_service.py", line 905>:
+905           0 RESUME                   0
+
+907           2 LOAD_GLOBAL              1 (NULL + set)
+             12 CALL                     0
+             20 STORE_FAST               1 (out)
+
+908          22 LOAD_FAST                0 (db)
+             24 LOAD_ATTR                3 (NULL|self + scalars)
+
+909          44 LOAD_GLOBAL              5 (NULL + select)
+             54 LOAD_GLOBAL              6 (BrowserProfile)
+             64 CALL                     1
+             72 LOAD_ATTR                9 (NULL|self + where)
+             92 LOAD_GLOBAL              6 (BrowserProfile)
+            102 LOAD_ATTR               10 (leased_by_video_id)
+            122 LOAD_ATTR               13 (NULL|self + is_not)
+            142 LOAD_CONST               1 (None)
+            144 CALL                     1
+            152 CALL                     1
+
+908         160 CALL                     1
+
+909         168 LOAD_ATTR               15 (NULL|self + all)
+            188 CALL                     0
+
+908         196 GET_ITER
+            198 LOAD_FAST_AND_CLEAR      2 (p)
+            200 SWAP                     2
+            202 BUILD_SET                0
+            204 SWAP                     2
+        >>  206 FOR_ITER                14 (to 238)
+            210 STORE_FAST               2 (p)
+            212 LOAD_FAST                2 (p)
+            214 LOAD_ATTR               16 (id)
+            234 SET_ADD                  2
+            236 JUMP_BACKWARD           16 (to 206)
+        >>  238 END_FOR
+            240 STORE_FAST               3 (busy)
+            242 STORE_FAST               2 (p)
+
+910         244 LOAD_FAST                3 (busy)
+            246 POP_JUMP_IF_TRUE         2 (to 252)
+
+911         248 LOAD_FAST                1 (out)
+            250 RETURN_VALUE
+
+912     >>  252 LOAD_FAST                0 (db)
+            254 LOAD_ATTR                3 (NULL|self + scalars)
+            274 LOAD_GLOBAL              5 (NULL + select)
+            284 LOAD_GLOBAL             18 (FlowAccount)
+            294 CALL                     1
+            302 CALL                     1
+            310 LOAD_ATTR               15 (NULL|self + all)
+            330 CALL                     0
+            338 GET_ITER
+        >>  340 FOR_ITER                44 (to 432)
+            344 STORE_FAST               4 (acc)
+
+913         346 LOAD_FAST                4 (acc)
+            348 LOAD_ATTR               20 (browser_profile_id)
+            368 LOAD_FAST                3 (busy)
+            370 CONTAINS_OP              0
+            372 POP_JUMP_IF_TRUE         1 (to 376)
+            374 JUMP_BACKWARD           18 (to 340)
+
+914     >>  376 LOAD_FAST                1 (out)
+            378 LOAD_ATTR               23 (NULL|self + add)
+            398 LOAD_FAST                4 (acc)
+            400 LOAD_ATTR               24 (partition_id)
+            420 CALL                     1
+            428 POP_TOP
+            430 JUMP_BACKWARD           46 (to 340)
+
+912     >>  432 END_FOR
+
+915         434 LOAD_FAST                1 (out)
+            436 RETURN_VALUE
+        >>  438 SWAP                     2
+            440 POP_TOP
+
+908         442 SWAP                     2
+            444 STORE_FAST               2 (p)
+            446 RERAISE                  0
+ExceptionTable:
+  202 to 238 -> 438 [2]

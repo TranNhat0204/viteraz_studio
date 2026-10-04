@@ -1,0 +1,727 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Router tài khoản Google Flow — danh sách + trạng thái quota + THỐNG KÊ (credit/lượt ảnh/tháng).\n\nĐăng nhập/đăng xuất Google nằm bên Electron (IPC flow:*). Router này quản lý METADATA:\nElectron sau khi mở cửa sổ login cho 1 partition mới sẽ POST về đây để lưu (partition_id + email).\n\nTrang "Quản lý tài khoản Flow" đọc thêm:\n  - credit còn lại (cache; POST /{id}/refresh-credits lấy LIVE qua bridge selftest),\n  - lượt ảnh đã dùng hôm nay + hạn mức/ngày do user đặt (Flow không expose lượt còn lại),\n  - số ảnh/video đã tạo trong THÁNG (app tự đếm — bảng flow_usage_events).\nXem plan đa-tài-khoản Flow.\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 12           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 14          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('APIRouter', 'Depends'))
+             22 IMPORT_NAME              3 (fastapi)
+             24 IMPORT_FROM              4 (APIRouter)
+             26 STORE_NAME               4 (APIRouter)
+             28 IMPORT_FROM              5 (Depends)
+             30 STORE_NAME               5 (Depends)
+             32 POP_TOP
+
+ 15          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               4 (('BaseModel',))
+             38 IMPORT_NAME              6 (pydantic)
+             40 IMPORT_FROM              7 (BaseModel)
+             42 STORE_NAME               7 (BaseModel)
+             44 POP_TOP
+
+ 16          46 LOAD_CONST               1 (0)
+             48 LOAD_CONST               5 (('Session',))
+             50 IMPORT_NAME              8 (sqlalchemy.orm)
+             52 IMPORT_FROM              9 (Session)
+             54 STORE_NAME               9 (Session)
+             56 POP_TOP
+
+ 18          58 LOAD_CONST               1 (0)
+             60 LOAD_CONST               6 (('FlowSessionClient',))
+             62 IMPORT_NAME             10 (app.adapters.flow_session)
+             64 IMPORT_FROM             11 (FlowSessionClient)
+             66 STORE_NAME              11 (FlowSessionClient)
+             68 POP_TOP
+
+ 19          70 LOAD_CONST               1 (0)
+             72 LOAD_CONST               7 (('verify_token', 'get_session'))
+             74 IMPORT_NAME             12 (app.deps)
+             76 IMPORT_FROM             13 (verify_token)
+             78 STORE_NAME              13 (verify_token)
+             80 IMPORT_FROM             14 (get_session)
+             82 STORE_NAME              14 (get_session)
+             84 POP_TOP
+
+ 20          86 LOAD_CONST               1 (0)
+             88 LOAD_CONST               8 (('flow_account_service',))
+             90 IMPORT_NAME             15 (app.services)
+             92 IMPORT_FROM             16 (flow_account_service)
+             94 STORE_NAME              17 (svc)
+             96 POP_TOP
+
+ 22          98 PUSH_NULL
+            100 LOAD_NAME                4 (APIRouter)
+            102 LOAD_CONST               9 ('/api/v1/flow/accounts')
+            104 LOAD_CONST              10 ('flow-accounts')
+            106 BUILD_LIST               1
+
+ 23         108 PUSH_NULL
+            110 LOAD_NAME                5 (Depends)
+            112 LOAD_NAME               13 (verify_token)
+            114 CALL                     1
+            122 BUILD_LIST               1
+
+ 22         124 KW_NAMES                11 (('prefix', 'tags', 'dependencies'))
+            126 CALL                     3
+            134 STORE_NAME              18 (router)
+
+ 26         136 PUSH_NULL
+            138 LOAD_BUILD_CLASS
+            140 LOAD_CONST              12 (<code object AccountCreate at 0x7f6c93321030, file "app\api\flow_accounts.py", line 26>)
+            142 MAKE_FUNCTION            0
+            144 LOAD_CONST              13 ('AccountCreate')
+            146 LOAD_NAME                7 (BaseModel)
+            148 CALL                     3
+            156 STORE_NAME              19 (AccountCreate)
+
+ 32         158 PUSH_NULL
+            160 LOAD_BUILD_CLASS
+            162 LOAD_CONST              14 (<code object AccountUpdate at 0x7f6c81b7dd70, file "app\api\flow_accounts.py", line 32>)
+            164 MAKE_FUNCTION            0
+            166 LOAD_CONST              15 ('AccountUpdate')
+            168 LOAD_NAME                7 (BaseModel)
+            170 CALL                     3
+            178 STORE_NAME              20 (AccountUpdate)
+
+ 42         180 PUSH_NULL
+            182 LOAD_BUILD_CLASS
+            184 LOAD_CONST              16 (<code object ReorderRequest at 0x7f6c92eb6250, file "app\api\flow_accounts.py", line 42>)
+            186 MAKE_FUNCTION            0
+            188 LOAD_CONST              17 ('ReorderRequest')
+            190 LOAD_NAME                7 (BaseModel)
+            192 CALL                     3
+            200 STORE_NAME              21 (ReorderRequest)
+
+ 46         202 LOAD_NAME               18 (router)
+            204 LOAD_ATTR               45 (NULL|self + get)
+            224 LOAD_CONST              18 ('')
+            226 CALL                     1
+
+ 47         234 PUSH_NULL
+            236 LOAD_NAME                5 (Depends)
+            238 LOAD_NAME               14 (get_session)
+            240 CALL                     1
+            248 BUILD_TUPLE              1
+            250 LOAD_CONST              37 (('db', 'Session'))
+            252 LOAD_CONST              19 (<code object list_accounts at 0x7f6c92d630c0, file "app\api\flow_accounts.py", line 46>)
+            254 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 46         256 CALL                     0
+
+ 47         264 STORE_NAME              23 (list_accounts)
+
+ 52         266 LOAD_NAME               18 (router)
+            268 LOAD_ATTR               49 (NULL|self + post)
+            288 LOAD_CONST              18 ('')
+            290 LOAD_CONST              20 (201)
+            292 KW_NAMES                21 (('status_code',))
+            294 CALL                     2
+
+ 53         302 PUSH_NULL
+            304 LOAD_NAME                5 (Depends)
+            306 LOAD_NAME               14 (get_session)
+            308 CALL                     1
+            316 BUILD_TUPLE              1
+            318 LOAD_CONST              38 (('body', 'AccountCreate', 'db', 'Session'))
+            320 LOAD_CONST              22 (<code object create_account at 0x7f6c9328b840, file "app\api\flow_accounts.py", line 52>)
+            322 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 52         324 CALL                     0
+
+ 53         332 STORE_NAME              25 (create_account)
+
+ 58         334 LOAD_NAME               18 (router)
+            336 LOAD_ATTR               53 (NULL|self + put)
+            356 LOAD_CONST              23 ('/reorder')
+            358 CALL                     1
+
+ 59         366 PUSH_NULL
+            368 LOAD_NAME                5 (Depends)
+            370 LOAD_NAME               14 (get_session)
+            372 CALL                     1
+            380 BUILD_TUPLE              1
+            382 LOAD_CONST              39 (('body', 'ReorderRequest', 'db', 'Session'))
+            384 LOAD_CONST              24 (<code object reorder at 0x7f6c81b7dc50, file "app\api\flow_accounts.py", line 58>)
+            386 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 58         388 CALL                     0
+
+ 59         396 STORE_NAME              27 (reorder)
+
+ 64         398 LOAD_NAME               18 (router)
+            400 LOAD_ATTR               45 (NULL|self + get)
+            420 LOAD_CONST              25 ('/{account_id}/stats')
+            422 CALL                     1
+
+ 65         430 PUSH_NULL
+            432 LOAD_NAME                5 (Depends)
+            434 LOAD_NAME               14 (get_session)
+            436 CALL                     1
+            444 BUILD_TUPLE              1
+            446 LOAD_CONST              40 (('account_id', 'str', 'db', 'Session'))
+            448 LOAD_CONST              26 (<code object account_stats at 0x7f6c81c20ae0, file "app\api\flow_accounts.py", line 64>)
+            450 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 64         452 CALL                     0
+
+ 65         460 STORE_NAME              28 (account_stats)
+
+ 71         462 LOAD_NAME               18 (router)
+            464 LOAD_ATTR               49 (NULL|self + post)
+            484 LOAD_CONST              27 ('/{account_id}/refresh-credits')
+            486 CALL                     1
+
+ 72         494 PUSH_NULL
+            496 LOAD_NAME                5 (Depends)
+            498 LOAD_NAME               14 (get_session)
+            500 CALL                     1
+            508 BUILD_TUPLE              1
+            510 LOAD_CONST              40 (('account_id', 'str', 'db', 'Session'))
+            512 LOAD_CONST              28 (<code object refresh_credits at 0x28e33660, file "app\api\flow_accounts.py", line 71>)
+            514 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 71         516 CALL                     0
+
+ 72         524 STORE_NAME              29 (refresh_credits)
+
+ 99         526 LOAD_NAME               18 (router)
+            528 LOAD_ATTR               53 (NULL|self + put)
+            548 LOAD_CONST              29 ('/{account_id}')
+            550 CALL                     1
+
+100         558 PUSH_NULL
+            560 LOAD_NAME                5 (Depends)
+            562 LOAD_NAME               14 (get_session)
+            564 CALL                     1
+            572 BUILD_TUPLE              1
+            574 LOAD_CONST              41 (('account_id', 'str', 'body', 'AccountUpdate', 'db', 'Session'))
+            576 LOAD_CONST              30 (<code object update_account at 0x7f6c9324f830, file "app\api\flow_accounts.py", line 99>)
+            578 MAKE_FUNCTION            5 (defaults, annotations)
+
+ 99         580 CALL                     0
+
+100         588 STORE_NAME              30 (update_account)
+
+109         590 LOAD_NAME               18 (router)
+            592 LOAD_ATTR               49 (NULL|self + post)
+            612 LOAD_CONST              31 ('/{account_id}/clear-exhausted')
+            614 CALL                     1
+
+110         622 PUSH_NULL
+            624 LOAD_NAME                5 (Depends)
+            626 LOAD_NAME               14 (get_session)
+            628 CALL                     1
+            636 BUILD_TUPLE              1
+            638 LOAD_CONST              40 (('account_id', 'str', 'db', 'Session'))
+            640 LOAD_CONST              32 (<code object clear_exhausted at 0x7f6c81c20c10, file "app\api\flow_accounts.py", line 109>)
+            642 MAKE_FUNCTION            5 (defaults, annotations)
+
+109         644 CALL                     0
+
+110         652 STORE_NAME              31 (clear_exhausted)
+
+115         654 LOAD_NAME               18 (router)
+            656 LOAD_ATTR               49 (NULL|self + post)
+            676 LOAD_CONST              33 ('/{account_id}/clear-cooldown')
+            678 CALL                     1
+
+116         686 PUSH_NULL
+            688 LOAD_NAME                5 (Depends)
+            690 LOAD_NAME               14 (get_session)
+            692 CALL                     1
+            700 BUILD_TUPLE              1
+            702 LOAD_CONST              40 (('account_id', 'str', 'db', 'Session'))
+            704 LOAD_CONST              34 (<code object clear_cooldown at 0x7f6c81c20fa0, file "app\api\flow_accounts.py", line 115>)
+            706 MAKE_FUNCTION            5 (defaults, annotations)
+
+115         708 CALL                     0
+
+116         716 STORE_NAME              32 (clear_cooldown)
+
+122         718 LOAD_NAME               18 (router)
+            720 LOAD_ATTR               67 (NULL|self + delete)
+            740 LOAD_CONST              29 ('/{account_id}')
+            742 CALL                     1
+
+123         750 PUSH_NULL
+            752 LOAD_NAME                5 (Depends)
+            754 LOAD_NAME               14 (get_session)
+            756 CALL                     1
+            764 BUILD_TUPLE              1
+            766 LOAD_CONST              40 (('account_id', 'str', 'db', 'Session'))
+            768 LOAD_CONST              35 (<code object delete_account at 0x7f6c93321530, file "app\api\flow_accounts.py", line 122>)
+            770 MAKE_FUNCTION            5 (defaults, annotations)
+
+122         772 CALL                     0
+
+123         780 STORE_NAME              34 (delete_account)
+            782 RETURN_CONST            36 (None)
+
+Disassembly of <code object AccountCreate at 0x7f6c93321030, file "app\api\flow_accounts.py", line 26>:
+ 26           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('AccountCreate')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 27          12 LOAD_CONST               1 ('str')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('partition_id')
+             18 STORE_SUBSCR
+
+ 28          22 LOAD_CONST               3 (None)
+             24 STORE_NAME               4 (label)
+             26 LOAD_CONST               4 ('str | None')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('label')
+             32 STORE_SUBSCR
+
+ 29          36 LOAD_CONST               3 (None)
+             38 STORE_NAME               5 (email)
+             40 LOAD_CONST               4 ('str | None')
+             42 LOAD_NAME                3 (__annotations__)
+             44 LOAD_CONST               6 ('email')
+             46 STORE_SUBSCR
+             50 RETURN_CONST             3 (None)
+
+Disassembly of <code object AccountUpdate at 0x7f6c81b7dd70, file "app\api\flow_accounts.py", line 32>:
+ 32           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('AccountUpdate')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 33          12 LOAD_CONST               1 (None)
+             14 STORE_NAME               3 (label)
+             16 LOAD_CONST               2 ('str | None')
+             18 LOAD_NAME                4 (__annotations__)
+             20 LOAD_CONST               3 ('label')
+             22 STORE_SUBSCR
+
+ 34          26 LOAD_CONST               1 (None)
+             28 STORE_NAME               5 (email)
+             30 LOAD_CONST               2 ('str | None')
+             32 LOAD_NAME                4 (__annotations__)
+             34 LOAD_CONST               4 ('email')
+             36 STORE_SUBSCR
+
+ 35          40 LOAD_CONST               1 (None)
+             42 STORE_NAME               6 (enabled)
+             44 LOAD_CONST               5 ('bool | None')
+             46 LOAD_NAME                4 (__annotations__)
+             48 LOAD_CONST               6 ('enabled')
+             50 STORE_SUBSCR
+
+ 36          54 LOAD_CONST               1 (None)
+             56 STORE_NAME               7 (daily_image_cap)
+             58 LOAD_CONST               7 ('int | None')
+             60 LOAD_NAME                4 (__annotations__)
+             62 LOAD_CONST               8 ('daily_image_cap')
+             64 STORE_SUBSCR
+
+ 39          68 LOAD_CONST               1 (None)
+             70 STORE_NAME               8 (video_engine)
+             72 LOAD_CONST               2 ('str | None')
+             74 LOAD_NAME                4 (__annotations__)
+             76 LOAD_CONST               9 ('video_engine')
+             78 STORE_SUBSCR
+             82 RETURN_CONST             1 (None)
+
+Disassembly of <code object ReorderRequest at 0x7f6c92eb6250, file "app\api\flow_accounts.py", line 42>:
+ 42           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('ReorderRequest')
+              8 STORE_NAME               2 (__qualname__)
+             10 SETUP_ANNOTATIONS
+
+ 43          12 LOAD_CONST               1 ('list[str]')
+             14 LOAD_NAME                3 (__annotations__)
+             16 LOAD_CONST               2 ('ordered_ids')
+             18 STORE_SUBSCR
+             22 RETURN_CONST             3 (None)
+
+Disassembly of <code object list_accounts at 0x7f6c92d630c0, file "app\api\flow_accounts.py", line 46>:
+ 46           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 49           6 LOAD_CONST               1 ('accounts')
+              8 LOAD_GLOBAL              1 (NULL + svc)
+             18 LOAD_ATTR                2 (list_accounts)
+             38 LOAD_FAST                0 (db)
+             40 CALL                     1
+             48 GET_ITER
+             50 LOAD_FAST_AND_CLEAR      1 (a)
+             52 SWAP                     2
+             54 BUILD_LIST               0
+             56 SWAP                     2
+        >>   58 FOR_ITER                24 (to 110)
+             62 STORE_FAST               1 (a)
+             64 LOAD_GLOBAL              1 (NULL + svc)
+             74 LOAD_ATTR                4 (to_dict)
+             94 LOAD_FAST                1 (a)
+             96 LOAD_FAST                0 (db)
+             98 CALL                     2
+            106 LIST_APPEND              2
+            108 JUMP_BACKWARD           26 (to 58)
+        >>  110 END_FOR
+            112 SWAP                     2
+            114 STORE_FAST               1 (a)
+            116 BUILD_MAP                1
+            118 RETURN_VALUE
+        >>  120 SWAP                     2
+            122 POP_TOP
+            124 SWAP                     2
+            126 STORE_FAST               1 (a)
+            128 RERAISE                  0
+        >>  130 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            132 RERAISE                  1
+ExceptionTable:
+  4 to 52 -> 130 [0] lasti
+  54 to 110 -> 120 [3]
+  112 to 128 -> 130 [0] lasti
+
+Disassembly of <code object create_account at 0x7f6c9328b840, file "app\api\flow_accounts.py", line 52>:
+ 52           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 54           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (create_account)
+             36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (body)
+             40 LOAD_ATTR                4 (partition_id)
+             60 LOAD_FAST                0 (body)
+             62 LOAD_ATTR                6 (label)
+             82 LOAD_FAST                0 (body)
+             84 LOAD_ATTR                8 (email)
+            104 CALL                     4
+            112 STORE_FAST               2 (a)
+
+ 55         114 LOAD_GLOBAL              1 (NULL + svc)
+            124 LOAD_ATTR               10 (to_dict)
+            144 LOAD_FAST                2 (a)
+            146 LOAD_FAST                1 (db)
+            148 CALL                     2
+            156 RETURN_VALUE
+        >>  158 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            160 RERAISE                  1
+ExceptionTable:
+  4 to 156 -> 158 [0] lasti
+
+Disassembly of <code object reorder at 0x7f6c81b7dc50, file "app\api\flow_accounts.py", line 58>:
+ 58           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 60           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (reorder)
+             36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (body)
+             40 LOAD_ATTR                4 (ordered_ids)
+             60 CALL                     2
+             68 POP_TOP
+
+ 61          70 LOAD_CONST               1 ('ok')
+             72 LOAD_CONST               2 (True)
+             74 BUILD_MAP                1
+             76 RETURN_VALUE
+        >>   78 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             80 RERAISE                  1
+ExceptionTable:
+  4 to 76 -> 78 [0] lasti
+
+Disassembly of <code object account_stats at 0x7f6c81c20ae0, file "app\api\flow_accounts.py", line 64>:
+ 64           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 67           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (get_account)
+             36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (account_id)
+             40 CALL                     2
+             48 STORE_FAST               2 (a)
+
+ 68          50 LOAD_GLOBAL              1 (NULL + svc)
+             60 LOAD_ATTR                4 (to_dict)
+             80 LOAD_FAST                2 (a)
+             82 LOAD_FAST                1 (db)
+             84 CALL                     2
+             92 RETURN_VALUE
+        >>   94 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             96 RERAISE                  1
+ExceptionTable:
+  4 to 92 -> 94 [0] lasti
+
+Disassembly of <code object refresh_credits at 0x28e33660, file "app\api\flow_accounts.py", line 71>:
+ 71           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+ 77           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (get_account)
+             36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (account_id)
+             40 CALL                     2
+             48 STORE_FAST               2 (a)
+
+ 78          50 LOAD_GLOBAL              5 (NULL + FlowSessionClient)
+             60 LOAD_FAST                2 (a)
+             62 LOAD_ATTR                6 (partition_id)
+             82 KW_NAMES                 1 (('account_id',))
+             84 CALL                     1
+             92 STORE_FAST               3 (client)
+
+ 79          94 LOAD_FAST                3 (client)
+             96 LOAD_ATTR                9 (NULL|self + get_credits)
+            116 CALL                     0
+            124 GET_AWAITABLE            0
+            126 LOAD_CONST               2 (None)
+        >>  128 SEND                     3 (to 138)
+            132 YIELD_VALUE              2
+            134 RESUME                   3
+            136 JUMP_BACKWARD_NO_INTERRUPT     5 (to 128)
+        >>  138 END_SEND
+            140 STORE_FAST               4 (res)
+
+ 83         142 LOAD_FAST                4 (res)
+            144 LOAD_ATTR               11 (NULL|self + get)
+            164 LOAD_CONST               3 ('credits')
+            166 CALL                     1
+            174 STORE_FAST               5 (credits)
+
+ 84         176 LOAD_GLOBAL             13 (NULL + isinstance)
+            186 LOAD_FAST                5 (credits)
+            188 LOAD_GLOBAL             14 (int)
+            198 LOAD_GLOBAL             16 (float)
+            208 BUILD_TUPLE              2
+            210 CALL                     2
+            218 COPY                     1
+            220 POP_JUMP_IF_FALSE       24 (to 270)
+            222 POP_TOP
+            224 LOAD_GLOBAL             13 (NULL + isinstance)
+            234 LOAD_FAST                5 (credits)
+            236 LOAD_GLOBAL             18 (bool)
+            246 CALL                     2
+            254 UNARY_NOT
+            256 COPY                     1
+            258 POP_JUMP_IF_FALSE        5 (to 270)
+            260 POP_TOP
+            262 LOAD_FAST                5 (credits)
+            264 LOAD_CONST               4 (0)
+            266 COMPARE_OP              92 (>=)
+        >>  270 STORE_FAST               6 (got_number)
+
+ 85         272 LOAD_GLOBAL             19 (NULL + bool)
+            282 LOAD_FAST                4 (res)
+            284 LOAD_ATTR               11 (NULL|self + get)
+            304 LOAD_CONST               5 ('ok')
+            306 CALL                     1
+            314 CALL                     1
+            322 COPY                     1
+            324 POP_JUMP_IF_FALSE        2 (to 330)
+            326 POP_TOP
+            328 LOAD_FAST                6 (got_number)
+        >>  330 STORE_FAST               7 (ok)
+
+ 86         332 LOAD_FAST                7 (ok)
+            334 POP_JUMP_IF_FALSE       95 (to 526)
+
+ 87         336 LOAD_GLOBAL              1 (NULL + svc)
+            346 LOAD_ATTR               20 (set_credits_cache)
+            366 LOAD_FAST                1 (db)
+            368 LOAD_FAST                0 (account_id)
+            370 LOAD_FAST                5 (credits)
+            372 LOAD_FAST                4 (res)
+            374 LOAD_ATTR               11 (NULL|self + get)
+            394 LOAD_CONST               6 ('tier')
+            396 CALL                     1
+            404 CALL                     4
+            412 STORE_FAST               2 (a)
+
+ 89         414 LOAD_FAST                4 (res)
+            416 LOAD_ATTR               11 (NULL|self + get)
+            436 LOAD_CONST               7 ('email')
+            438 CALL                     1
+            446 POP_JUMP_IF_FALSE       39 (to 526)
+            448 LOAD_FAST                2 (a)
+            450 LOAD_ATTR               22 (email)
+            470 POP_JUMP_IF_TRUE        27 (to 526)
+
+ 90         472 LOAD_GLOBAL              1 (NULL + svc)
+            482 LOAD_ATTR               24 (update_account)
+            502 LOAD_FAST                1 (db)
+            504 LOAD_FAST                0 (account_id)
+            506 LOAD_FAST                4 (res)
+            508 LOAD_CONST               7 ('email')
+            510 BINARY_SUBSCR
+            514 KW_NAMES                 8 (('email',))
+            516 CALL                     3
+            524 STORE_FAST               2 (a)
+
+ 91     >>  526 LOAD_GLOBAL              1 (NULL + svc)
+            536 LOAD_ATTR               26 (to_dict)
+            556 LOAD_FAST                2 (a)
+            558 LOAD_FAST                1 (db)
+            560 CALL                     2
+            568 STORE_FAST               8 (out)
+
+ 92         570 LOAD_FAST                7 (ok)
+            572 LOAD_FAST                8 (out)
+            574 LOAD_CONST               9 ('refresh_ok')
+            576 STORE_SUBSCR
+
+ 93         580 LOAD_FAST                4 (res)
+            582 LOAD_ATTR               11 (NULL|self + get)
+            602 LOAD_CONST              10 ('reason')
+            604 CALL                     1
+            612 COPY                     1
+            614 POP_JUMP_IF_TRUE         6 (to 628)
+            616 POP_TOP
+
+ 94         618 LOAD_FAST                7 (ok)
+            620 POP_JUMP_IF_FALSE        2 (to 626)
+            622 LOAD_CONST               2 (None)
+            624 JUMP_FORWARD             1 (to 628)
+        >>  626 LOAD_CONST              11 ('Flow không trả về số credit (chưa đăng nhập, phiên hết hạn, hoặc Google đã đổi giao diện chỗ hiện tín dụng). Mở tài khoản rồi đăng nhập lại Flow.')
+
+ 93     >>  628 LOAD_FAST                8 (out)
+            630 LOAD_CONST              12 ('refresh_reason')
+            632 STORE_SUBSCR
+
+ 96         636 LOAD_FAST                8 (out)
+            638 RETURN_VALUE
+
+ 79     >>  640 CLEANUP_THROW
+            642 JUMP_BACKWARD          253 (to 138)
+        >>  644 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            646 RERAISE                  1
+ExceptionTable:
+  4 to 130 -> 644 [0] lasti
+  132 to 132 -> 640 [2]
+  134 to 640 -> 644 [0] lasti
+
+Disassembly of <code object update_account at 0x7f6c9324f830, file "app\api\flow_accounts.py", line 99>:
+ 99           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+102           6 LOAD_CONST               1 ('video_engine')
+              8 LOAD_FAST                1 (body)
+             10 LOAD_ATTR                0 (model_fields_set)
+             30 CONTAINS_OP              0
+             32 POP_JUMP_IF_FALSE       12 (to 58)
+             34 LOAD_FAST                1 (body)
+             36 LOAD_ATTR                2 (video_engine)
+             56 JUMP_FORWARD             1 (to 60)
+        >>   58 LOAD_CONST               2 (Ellipsis)
+        >>   60 STORE_FAST               3 (video_engine_kwarg)
+
+103          62 LOAD_GLOBAL              5 (NULL + svc)
+             72 LOAD_ATTR                6 (update_account)
+             92 LOAD_FAST                2 (db)
+             94 LOAD_FAST                0 (account_id)
+             96 LOAD_FAST                1 (body)
+             98 LOAD_ATTR                8 (label)
+            118 LOAD_FAST                1 (body)
+            120 LOAD_ATTR               10 (email)
+
+104         140 LOAD_FAST                1 (body)
+            142 LOAD_ATTR               12 (enabled)
+            162 LOAD_FAST                1 (body)
+            164 LOAD_ATTR               14 (daily_image_cap)
+
+105         184 LOAD_FAST                3 (video_engine_kwarg)
+
+103         186 KW_NAMES                 3 (('label', 'email', 'enabled', 'daily_image_cap', 'video_engine'))
+            188 CALL                     7
+            196 STORE_FAST               4 (a)
+
+106         198 LOAD_GLOBAL              5 (NULL + svc)
+            208 LOAD_ATTR               16 (to_dict)
+            228 LOAD_FAST                4 (a)
+            230 LOAD_FAST                2 (db)
+            232 CALL                     2
+            240 RETURN_VALUE
+        >>  242 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            244 RERAISE                  1
+ExceptionTable:
+  4 to 240 -> 242 [0] lasti
+
+Disassembly of <code object clear_exhausted at 0x7f6c81c20c10, file "app\api\flow_accounts.py", line 109>:
+109           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+111           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (clear_exhausted)
+             36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (account_id)
+             40 CALL                     2
+             48 STORE_FAST               2 (a)
+
+112          50 LOAD_GLOBAL              1 (NULL + svc)
+             60 LOAD_ATTR                4 (to_dict)
+             80 LOAD_FAST                2 (a)
+             82 LOAD_FAST                1 (db)
+             84 CALL                     2
+             92 RETURN_VALUE
+        >>   94 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             96 RERAISE                  1
+ExceptionTable:
+  4 to 92 -> 94 [0] lasti
+
+Disassembly of <code object clear_cooldown at 0x7f6c81c20fa0, file "app\api\flow_accounts.py", line 115>:
+115           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+118           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (clear_cooldown)
+             36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (account_id)
+             40 CALL                     2
+             48 STORE_FAST               2 (a)
+
+119          50 LOAD_GLOBAL              1 (NULL + svc)
+             60 LOAD_ATTR                4 (to_dict)
+             80 LOAD_FAST                2 (a)
+             82 LOAD_FAST                1 (db)
+             84 CALL                     2
+             92 RETURN_VALUE
+        >>   94 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             96 RERAISE                  1
+ExceptionTable:
+  4 to 92 -> 94 [0] lasti
+
+Disassembly of <code object delete_account at 0x7f6c93321530, file "app\api\flow_accounts.py", line 122>:
+122           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+124           6 LOAD_GLOBAL              1 (NULL + svc)
+             16 LOAD_ATTR                2 (delete_account)
+             36 LOAD_FAST                1 (db)
+             38 LOAD_FAST                0 (account_id)
+             40 CALL                     2
+             48 POP_TOP
+
+125          50 LOAD_CONST               1 ('deleted')
+             52 LOAD_FAST                0 (account_id)
+             54 BUILD_MAP                1
+             56 RETURN_VALUE
+        >>   58 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+             60 RERAISE                  1
+ExceptionTable:
+  4 to 56 -> 58 [0] lasti

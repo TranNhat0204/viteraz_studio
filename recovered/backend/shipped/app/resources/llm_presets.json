@@ -1,0 +1,184 @@
+{
+  "version": 1,
+  "_doc": [
+    "Preset cho form 'Thêm API tuỳ chỉnh' (Cài đặt → AI Dịch & Ảnh). ĐÂY LÀ MỒI, KHÔNG PHẢI LUẬT:",
+    "mọi trường đều sửa được trong form trước khi lưu, và sau khi lưu endpoint KHÔNG còn phụ thuộc",
+    "file này nữa (bản ghi nằm trong bảng llm_endpoints).",
+    "",
+    "CỐ Ý KHÔNG ghi tên model cho phần lớn preset. Tên model của cả thị trường đổi hàng tháng — chính",
+    "repo này đã dính: 'deepseek-chat' hardcode trong deepseek.py, alias đó ngưng 24/07/2026. Preset",
+    "nào có 'list_models': true thì form tự gọi GET {base_url}/models để lấy danh sách THẬT từ nhà.",
+    "Chỉ ba nhà có số đo thật trong llm_providers.json (08/09/2026) mới mang sẵn model.",
+    "",
+    "dialect: 'openai_chat' | 'anthropic_messages' — xem app/adapters/llm_api/dialects/.",
+    "Thêm preset = thêm một khối ở đây. Không sửa mã. File nằm trong danh sách trắng của backend.spec."
+  ],
+  "presets": [
+    {
+      "key": "openai",
+      "label": "OpenAI",
+      "dialect": "openai_chat",
+      "base_url": "https://api.openai.com/v1",
+      "key_url": "platform.openai.com/api-keys",
+      "list_models": true,
+      "notes_vi": "Vượt 272K token đầu vào thì CẢ request bị tính giá nhân — đường API tuỳ chỉnh không tự chặn vách giá này.",
+      "models": [
+        {"id": "gpt-5.6-luna", "max_input_tokens": 1050000, "max_output_tokens": 128000, "supports_reasoning_effort": true},
+        {"id": "gpt-5.6-terra", "max_input_tokens": 1050000, "max_output_tokens": 128000, "supports_reasoning_effort": true}
+      ]
+    },
+    {
+      "key": "anthropic",
+      "label": "Anthropic (Claude)",
+      "dialect": "anthropic_messages",
+      "base_url": "https://api.anthropic.com/v1",
+      "key_url": "console.anthropic.com/settings/keys",
+      "list_models": true,
+      "notes_vi": "Định dạng Messages riêng của Anthropic — KHÔNG chọn 'OpenAI-compatible' cho nhà này.",
+      "models": []
+    },
+    {
+      "key": "gemini",
+      "label": "Google Gemini (API key)",
+      "dialect": "openai_chat",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "key_url": "aistudio.google.com/apikey",
+      "list_models": true,
+      "notes_vi": "Đây là Gemini qua API key (tính tiền theo token), KHÁC 'Gemini web' đăng nhập tài khoản Google.",
+      "models": [
+        {"id": "gemini-3.6-flash", "max_input_tokens": 1000000, "max_output_tokens": 64000, "supports_reasoning_effort": true},
+        {"id": "gemini-2.5-flash-lite", "max_input_tokens": 1000000, "max_output_tokens": 64000}
+      ]
+    },
+    {
+      "key": "deepseek",
+      "label": "DeepSeek",
+      "dialect": "openai_chat",
+      "base_url": "https://api.deepseek.com/v1",
+      "key_url": "platform.deepseek.com/api_keys",
+      "list_models": true,
+      "notes_vi": "Giờ thấp điểm giảm 50% (cao điểm chỉ 01-04h và 06-10h UTC, T2-T6).",
+      "models": [
+        {"id": "deepseek-v4-flash", "max_input_tokens": 1000000, "max_output_tokens": 384000, "supports_reasoning_effort": true},
+        {"id": "deepseek-v4-pro", "max_input_tokens": 1000000, "max_output_tokens": 384000, "supports_reasoning_effort": true}
+      ]
+    },
+    {
+      "key": "openrouter",
+      "label": "OpenRouter",
+      "dialect": "openai_chat",
+      "base_url": "https://openrouter.ai/api/v1",
+      "key_url": "openrouter.ai/keys",
+      "list_models": true,
+      "notes_vi": "Một key gọi được hàng trăm model của nhiều nhà. Tên model có dạng 'nhà/model'.",
+      "headers": {"X-Title": "Viteraz Studio"},
+      "models": []
+    },
+    {
+      "key": "groq",
+      "label": "Groq",
+      "dialect": "openai_chat",
+      "base_url": "https://api.groq.com/openai/v1",
+      "key_url": "console.groq.com/keys",
+      "list_models": true,
+      "notes_vi": "Rất nhanh, nhưng ngữ cảnh và giới hạn tốc độ gói miễn phí nhỏ — hợp cho ý tưởng/SEO hơn là dịch cả phim.",
+      "models": []
+    },
+    {
+      "key": "together",
+      "label": "Together AI",
+      "dialect": "openai_chat",
+      "base_url": "https://api.together.xyz/v1",
+      "key_url": "api.together.ai/settings/api-keys",
+      "list_models": true,
+      "models": []
+    },
+    {
+      "key": "xai",
+      "label": "xAI (Grok API)",
+      "dialect": "openai_chat",
+      "base_url": "https://api.x.ai/v1",
+      "key_url": "console.x.ai",
+      "list_models": true,
+      "notes_vi": "Grok qua API key — khác 'Grok web' dùng phiên đăng nhập để tạo ảnh/video.",
+      "models": []
+    },
+    {
+      "key": "mistral",
+      "label": "Mistral",
+      "dialect": "openai_chat",
+      "base_url": "https://api.mistral.ai/v1",
+      "key_url": "console.mistral.ai/api-keys",
+      "list_models": true,
+      "models": []
+    },
+    {
+      "key": "moonshot",
+      "label": "Moonshot (Kimi)",
+      "dialect": "openai_chat",
+      "base_url": "https://api.moonshot.ai/v1",
+      "key_url": "platform.moonshot.ai/console/api-keys",
+      "list_models": true,
+      "models": []
+    },
+    {
+      "key": "qwen",
+      "label": "Qwen (Alibaba DashScope)",
+      "dialect": "openai_chat",
+      "base_url": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+      "key_url": "bailian.console.alibabacloud.com",
+      "list_models": true,
+      "notes_vi": "Bản quốc tế. Tài khoản Trung Quốc đại lục dùng https://dashscope.aliyuncs.com/compatible-mode/v1.",
+      "models": []
+    },
+    {
+      "key": "zhipu",
+      "label": "Zhipu (GLM)",
+      "dialect": "openai_chat",
+      "base_url": "https://open.bigmodel.cn/api/paas/v4",
+      "key_url": "open.bigmodel.cn/usercenter/apikeys",
+      "list_models": false,
+      "notes_vi": "Không có đường liệt kê model — nhập tên model bằng tay.",
+      "models": []
+    },
+    {
+      "key": "siliconflow",
+      "label": "SiliconFlow",
+      "dialect": "openai_chat",
+      "base_url": "https://api.siliconflow.cn/v1",
+      "key_url": "cloud.siliconflow.cn/account/ak",
+      "list_models": true,
+      "models": []
+    },
+    {
+      "key": "ollama",
+      "label": "Ollama (chạy trên máy)",
+      "dialect": "openai_chat",
+      "base_url": "http://localhost:11434/v1",
+      "key_url": "",
+      "list_models": true,
+      "notes_vi": "Không cần API key. Model nhỏ (dưới ~14B) hay trả sai JSON ở bước storyboard/ý tưởng — thử trước bằng nút 'Thử kết nối'.",
+      "models": []
+    },
+    {
+      "key": "lmstudio",
+      "label": "LM Studio (chạy trên máy)",
+      "dialect": "openai_chat",
+      "base_url": "http://localhost:1234/v1",
+      "key_url": "",
+      "list_models": true,
+      "notes_vi": "Không cần API key. Bật 'Start Server' trong LM Studio trước khi thử.",
+      "models": []
+    },
+    {
+      "key": "custom",
+      "label": "Tuỳ chỉnh (tương thích OpenAI)",
+      "dialect": "openai_chat",
+      "base_url": "",
+      "key_url": "",
+      "list_models": true,
+      "notes_vi": "Relay/proxy bất kỳ nói giao thức OpenAI Chat Completions. Base URL thường kết thúc bằng /v1.",
+      "models": []
+    }
+  ]
+}

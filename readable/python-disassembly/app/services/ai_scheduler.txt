@@ -1,0 +1,1939 @@
+  0           0 RESUME                   0
+
+  1           2 SETUP_ANNOTATIONS
+              4 LOAD_CONST               0 ('AI Studio scheduler — vòng nền tự quản (KHÔNG dùng dependency ngoài) cho cron đề xuất ý tưởng.\n\nMỗi `TICK_INTERVAL_SEC` quét các kênh `enabled`: nếu hôm nay CHƯA surface ý tưởng và đã qua giờ\n`run_time` → gọi `ensure_next_idea` (đảm bảo kênh luôn có ý tưởng đang chờ) rồi đánh dấu\n`last_surfaced_date` (idempotent: mỗi kênh tối đa 1 lần/ngày, kể cả app mở/đóng nhiều lần).\n\nChọn vòng asyncio thay APScheduler để tránh thêm dependency (frozen exe). Quản lý start/stop trong\nlifespan giống job_queue. Pattern "tick định kỳ + so giờ" còn bù được khi app tắt đúng giờ run_time\n(lần tick kế tiếp bắt kịp). Xem plan §3.5.\n')
+              6 STORE_NAME               0 (__doc__)
+
+ 11           8 LOAD_CONST               1 (0)
+             10 LOAD_CONST               2 (('annotations',))
+             12 IMPORT_NAME              1 (__future__)
+             14 IMPORT_FROM              2 (annotations)
+             16 STORE_NAME               2 (annotations)
+             18 POP_TOP
+
+ 13          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               3 (None)
+             24 IMPORT_NAME              3 (asyncio)
+             26 STORE_NAME               3 (asyncio)
+
+ 14          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               4 (('datetime',))
+             32 IMPORT_NAME              4 (datetime)
+             34 IMPORT_FROM              4 (datetime)
+             36 STORE_NAME               4 (datetime)
+             38 POP_TOP
+
+ 16          40 LOAD_CONST               1 (0)
+             42 LOAD_CONST               5 (('log',))
+             44 IMPORT_NAME              5 (app.core.logging)
+             46 IMPORT_FROM              6 (log)
+             48 STORE_NAME               6 (log)
+             50 POP_TOP
+
+ 17          52 LOAD_CONST               1 (0)
+             54 LOAD_CONST               6 (('SessionLocal',))
+             56 IMPORT_NAME              7 (app.db.session)
+             58 IMPORT_FROM              8 (SessionLocal)
+             60 STORE_NAME               8 (SessionLocal)
+             62 POP_TOP
+
+ 18          64 LOAD_CONST               1 (0)
+             66 LOAD_CONST               7 (('FbPage', 'FbPageDailySnapshot', 'ScheduleConfig'))
+             68 IMPORT_NAME              9 (app.db.models)
+             70 IMPORT_FROM             10 (FbPage)
+             72 STORE_NAME              10 (FbPage)
+             74 IMPORT_FROM             11 (FbPageDailySnapshot)
+             76 STORE_NAME              11 (FbPageDailySnapshot)
+             78 IMPORT_FROM             12 (ScheduleConfig)
+             80 STORE_NAME              12 (ScheduleConfig)
+             82 POP_TOP
+
+ 19          84 LOAD_CONST               1 (0)
+             86 LOAD_CONST               8 (('ai_studio_service',))
+             88 IMPORT_NAME             13 (app.services)
+             90 IMPORT_FROM             14 (ai_studio_service)
+             92 STORE_NAME              15 (svc)
+             94 POP_TOP
+
+ 20          96 LOAD_CONST               1 (0)
+             98 LOAD_CONST               9 (('ai_post_service',))
+            100 IMPORT_NAME             13 (app.services)
+            102 IMPORT_FROM             16 (ai_post_service)
+            104 STORE_NAME              17 (posts)
+            106 POP_TOP
+
+ 21         108 LOAD_CONST               1 (0)
+            110 LOAD_CONST              10 (('fb_publish_service',))
+            112 IMPORT_NAME             13 (app.services)
+            114 IMPORT_FROM             18 (fb_publish_service)
+            116 STORE_NAME              18 (fb_publish_service)
+            118 POP_TOP
+
+ 22         120 LOAD_CONST               1 (0)
+            122 LOAD_CONST              11 (('fb_settings', 'fb_token_pool'))
+            124 IMPORT_NAME             13 (app.services)
+            126 IMPORT_FROM             19 (fb_settings)
+            128 STORE_NAME              19 (fb_settings)
+            130 IMPORT_FROM             20 (fb_token_pool)
+            132 STORE_NAME              20 (fb_token_pool)
+            134 POP_TOP
+
+ 23         136 LOAD_CONST               1 (0)
+            138 LOAD_CONST              12 (('FbGraphClient',))
+            140 IMPORT_NAME             21 (app.services.fb_graph_client)
+            142 IMPORT_FROM             22 (FbGraphClient)
+            144 STORE_NAME              22 (FbGraphClient)
+            146 POP_TOP
+
+ 25         148 LOAD_CONST              13 (300)
+            150 STORE_NAME              23 (TICK_INTERVAL_SEC)
+
+ 26         152 LOAD_CONST              14 (60)
+            154 STORE_NAME              24 (PUBLISH_TICK_INTERVAL_SEC)
+
+ 27         156 LOAD_CONST              15 (20)
+            158 STORE_NAME              25 (INITIAL_DELAY_SEC)
+
+ 29         160 LOAD_CONST               3 (None)
+            162 STORE_GLOBAL            26 (_task)
+            164 LOAD_CONST              16 ('asyncio.Task | None')
+            166 LOAD_NAME               27 (__annotations__)
+            168 LOAD_CONST              17 ('_task')
+            170 STORE_SUBSCR
+
+ 30         174 LOAD_CONST               3 (None)
+            176 STORE_GLOBAL            28 (_publish_task)
+            178 LOAD_CONST              16 ('asyncio.Task | None')
+            180 LOAD_NAME               27 (__annotations__)
+            182 LOAD_CONST              18 ('_publish_task')
+            184 STORE_SUBSCR
+
+ 31         188 LOAD_CONST               3 (None)
+            190 STORE_GLOBAL            29 (_stop)
+            192 LOAD_CONST              19 ('asyncio.Event | None')
+            194 LOAD_NAME               27 (__annotations__)
+            196 LOAD_CONST              20 ('_stop')
+            198 STORE_SUBSCR
+
+ 34         202 PUSH_NULL
+            204 LOAD_NAME                3 (asyncio)
+            206 LOAD_ATTR               60 (Lock)
+            226 CALL                     0
+            234 STORE_NAME              31 (_publish_lock)
+
+ 37         236 LOAD_CONST              34 (('now', 'datetime', 'return', 'str'))
+            238 LOAD_CONST              21 (<code object _today_str at 0x7f6c93097c30, file "app\services\ai_scheduler.py", line 37>)
+            240 MAKE_FUNCTION            4 (annotations)
+            242 STORE_NAME              32 (_today_str)
+
+ 41         244 LOAD_CONST              35 (('cfg', 'ScheduleConfig', 'now', 'datetime', 'return', 'bool'))
+            246 LOAD_CONST              22 (<code object _is_due at 0x28b9ba90, file "app\services\ai_scheduler.py", line 41>)
+            248 MAKE_FUNCTION            4 (annotations)
+            250 STORE_NAME              33 (_is_due)
+
+ 57         252 LOAD_CONST              36 (('now', 'datetime', 'return', 'list[str]'))
+            254 LOAD_CONST              23 (<code object _due_channels at 0x7f6c9257f870, file "app\services\ai_scheduler.py", line 57>)
+            256 MAKE_FUNCTION            4 (annotations)
+            258 STORE_NAME              34 (_due_channels)
+
+ 63         260 LOAD_CONST              35 (('cfg', 'ScheduleConfig', 'now', 'datetime', 'return', 'bool'))
+            262 LOAD_CONST              24 (<code object _post_is_due at 0x28bcc980, file "app\services\ai_scheduler.py", line 63>)
+            264 MAKE_FUNCTION            4 (annotations)
+            266 STORE_NAME              35 (_post_is_due)
+
+ 78         268 LOAD_CONST              36 (('now', 'datetime', 'return', 'list[str]'))
+            270 LOAD_CONST              25 (<code object _due_post_channels at 0x7f6c9257fa50, file "app\services\ai_scheduler.py", line 78>)
+            272 MAKE_FUNCTION            4 (annotations)
+            274 STORE_NAME              36 (_due_post_channels)
+
+ 84         276 LOAD_CONST              37 (('project_id', 'str', 'day', 'str', 'return', 'None'))
+            278 LOAD_CONST              26 (<code object _mark_surfaced at 0x7f6c81b0b670, file "app\services\ai_scheduler.py", line 84>)
+            280 MAKE_FUNCTION            4 (annotations)
+            282 STORE_NAME              37 (_mark_surfaced)
+
+ 93         284 LOAD_CONST              37 (('project_id', 'str', 'day', 'str', 'return', 'None'))
+            286 LOAD_CONST              27 (<code object _mark_post_surfaced at 0x7f6c81b0bbb0, file "app\services\ai_scheduler.py", line 93>)
+            288 MAKE_FUNCTION            4 (annotations)
+            290 STORE_NAME              38 (_mark_post_surfaced)
+
+102         292 LOAD_CONST              38 (('return', 'dict'))
+            294 LOAD_CONST              28 (<code object run_tick_now at 0x28ab7ad0, file "app\services\ai_scheduler.py", line 102>)
+            296 MAKE_FUNCTION            4 (annotations)
+            298 STORE_NAME              39 (run_tick_now)
+
+152         300 LOAD_CONST              39 ((None,))
+            302 LOAD_CONST              40 (('now', 'datetime | None', 'return', 'dict'))
+            304 LOAD_CONST              29 (<code object fb_snapshot_daily at 0x28ab8610, file "app\services\ai_scheduler.py", line 152>)
+            306 MAKE_FUNCTION            5 (defaults, annotations)
+            308 STORE_NAME              40 (fb_snapshot_daily)
+
+191         310 LOAD_CONST              41 (('return', 'None'))
+            312 LOAD_CONST              30 (<code object _run_loop at 0x29090550, file "app\services\ai_scheduler.py", line 191>)
+            314 MAKE_FUNCTION            4 (annotations)
+            316 STORE_NAME              41 (_run_loop)
+
+209         318 LOAD_CONST              41 (('return', 'None'))
+            320 LOAD_CONST              31 (<code object _run_publish_loop at 0x28b9bf10, file "app\services\ai_scheduler.py", line 209>)
+            322 MAKE_FUNCTION            4 (annotations)
+            324 STORE_NAME              42 (_run_publish_loop)
+
+231         326 LOAD_CONST              41 (('return', 'None'))
+            328 LOAD_CONST              32 (<code object start at 0x7f6c9257fc30, file "app\services\ai_scheduler.py", line 231>)
+            330 MAKE_FUNCTION            4 (annotations)
+            332 STORE_NAME              43 (start)
+
+242         334 LOAD_CONST              41 (('return', 'None'))
+            336 LOAD_CONST              33 (<code object stop at 0x28ba88f0, file "app\services\ai_scheduler.py", line 242>)
+            338 MAKE_FUNCTION            4 (annotations)
+            340 STORE_NAME              44 (stop)
+            342 RETURN_CONST             3 (None)
+
+Disassembly of <code object _today_str at 0x7f6c93097c30, file "app\services\ai_scheduler.py", line 37>:
+ 37           0 RESUME                   0
+
+ 38           2 LOAD_FAST                0 (now)
+              4 LOAD_ATTR                1 (NULL|self + strftime)
+             24 LOAD_CONST               1 ('%Y-%m-%d')
+             26 CALL                     1
+             34 RETURN_VALUE
+
+Disassembly of <code object _is_due at 0x28b9ba90, file "app\services\ai_scheduler.py", line 41>:
+ 41           0 RESUME                   0
+
+ 43           2 LOAD_FAST                0 (cfg)
+              4 LOAD_ATTR                0 (enabled)
+             24 POP_JUMP_IF_FALSE       12 (to 50)
+             26 LOAD_FAST                0 (cfg)
+             28 LOAD_ATTR                2 (engine_id)
+             48 POP_JUMP_IF_TRUE         1 (to 52)
+
+ 44     >>   50 RETURN_CONST             1 (False)
+
+ 45     >>   52 LOAD_FAST                0 (cfg)
+             54 LOAD_ATTR                4 (last_surfaced_date)
+             74 LOAD_GLOBAL              7 (NULL + _today_str)
+             84 LOAD_FAST                1 (now)
+             86 CALL                     1
+             94 COMPARE_OP              40 (==)
+             98 POP_JUMP_IF_FALSE        1 (to 102)
+
+ 46         100 RETURN_CONST             1 (False)
+
+ 47     >>  102 LOAD_FAST                0 (cfg)
+            104 LOAD_ATTR                8 (run_time)
+            124 COPY                     1
+            126 POP_JUMP_IF_TRUE         2 (to 132)
+            128 POP_TOP
+            130 LOAD_CONST               2 ('07:00')
+        >>  132 LOAD_ATTR               11 (NULL|self + strip)
+            152 CALL                     0
+            160 STORE_FAST               2 (run_time)
+
+ 48         162 NOP
+
+ 49         164 LOAD_FAST                2 (run_time)
+            166 LOAD_ATTR               13 (NULL|self + split)
+            186 LOAD_CONST               3 (':')
+            188 CALL                     1
+            196 UNPACK_SEQUENCE          2
+            200 STORE_FAST               3 (hh)
+            202 STORE_FAST               4 (mm)
+
+ 50         204 LOAD_GLOBAL             15 (NULL + int)
+            214 LOAD_FAST                3 (hh)
+            216 CALL                     1
+            224 LOAD_CONST               4 (60)
+            226 BINARY_OP                5 (*)
+            230 LOAD_GLOBAL             15 (NULL + int)
+            240 LOAD_FAST                4 (mm)
+            242 CALL                     1
+            250 BINARY_OP                0 (+)
+            254 STORE_FAST               5 (due_minutes)
+
+ 53     >>  256 LOAD_FAST                1 (now)
+            258 LOAD_ATTR               20 (hour)
+            278 LOAD_CONST               4 (60)
+            280 BINARY_OP                5 (*)
+            284 LOAD_FAST                1 (now)
+            286 LOAD_ATTR               22 (minute)
+            306 BINARY_OP                0 (+)
+            310 STORE_FAST               6 (now_minutes)
+
+ 54         312 LOAD_FAST                6 (now_minutes)
+            314 LOAD_FAST                5 (due_minutes)
+            316 COMPARE_OP              92 (>=)
+            320 RETURN_VALUE
+        >>  322 PUSH_EXC_INFO
+
+ 51         324 LOAD_GLOBAL             16 (ValueError)
+            334 LOAD_GLOBAL             18 (AttributeError)
+            344 BUILD_TUPLE              2
+            346 CHECK_EXC_MATCH
+            348 POP_JUMP_IF_FALSE        5 (to 360)
+            350 POP_TOP
+
+ 52         352 LOAD_CONST               5 (420)
+            354 STORE_FAST               5 (due_minutes)
+            356 POP_EXCEPT
+            358 JUMP_BACKWARD           52 (to 256)
+
+ 51     >>  360 RERAISE                  0
+        >>  362 COPY                     3
+            364 POP_EXCEPT
+            366 RERAISE                  1
+ExceptionTable:
+  164 to 254 -> 322 [0]
+  322 to 354 -> 362 [1] lasti
+  360 to 360 -> 362 [1] lasti
+
+Disassembly of <code object _due_channels at 0x7f6c9257f870, file "app\services\ai_scheduler.py", line 57>:
+ 57           0 RESUME                   0
+
+ 58           2 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             12 CALL                     0
+             20 BEFORE_WITH
+             22 STORE_FAST               1 (db)
+
+ 59          24 LOAD_FAST                1 (db)
+             26 LOAD_ATTR                3 (NULL|self + query)
+             46 LOAD_GLOBAL              4 (ScheduleConfig)
+             56 CALL                     1
+             64 LOAD_ATTR                7 (NULL|self + filter)
+             84 LOAD_GLOBAL              4 (ScheduleConfig)
+             94 LOAD_ATTR                8 (enabled)
+            114 LOAD_CONST               1 (1)
+            116 COMPARE_OP              40 (==)
+            120 CALL                     1
+            128 LOAD_ATTR               11 (NULL|self + all)
+            148 CALL                     0
+            156 STORE_FAST               2 (rows)
+
+ 60         158 LOAD_FAST                2 (rows)
+            160 GET_ITER
+            162 LOAD_FAST_AND_CLEAR      3 (c)
+            164 SWAP                     2
+            166 BUILD_LIST               0
+            168 SWAP                     2
+        >>  170 FOR_ITER                27 (to 228)
+            174 STORE_FAST               3 (c)
+            176 LOAD_GLOBAL             13 (NULL + _is_due)
+            186 LOAD_FAST                3 (c)
+            188 LOAD_FAST                0 (now)
+            190 CALL                     2
+            198 POP_JUMP_IF_TRUE         1 (to 202)
+            200 JUMP_BACKWARD           16 (to 170)
+        >>  202 LOAD_FAST                3 (c)
+            204 LOAD_ATTR               14 (project_id)
+            224 LIST_APPEND              2
+            226 JUMP_BACKWARD           29 (to 170)
+        >>  228 END_FOR
+            230 SWAP                     2
+            232 STORE_FAST               3 (c)
+
+ 58         234 SWAP                     2
+            236 LOAD_CONST               0 (None)
+            238 LOAD_CONST               0 (None)
+            240 LOAD_CONST               0 (None)
+            242 CALL                     2
+            250 POP_TOP
+            252 RETURN_VALUE
+        >>  254 SWAP                     2
+            256 POP_TOP
+
+ 60         258 SWAP                     2
+            260 STORE_FAST               3 (c)
+            262 RERAISE                  0
+
+ 58     >>  264 PUSH_EXC_INFO
+            266 WITH_EXCEPT_START
+            268 POP_JUMP_IF_TRUE         1 (to 272)
+            270 RERAISE                  2
+        >>  272 POP_TOP
+            274 POP_EXCEPT
+            276 POP_TOP
+            278 POP_TOP
+            280 RETURN_CONST             0 (None)
+        >>  282 COPY                     3
+            284 POP_EXCEPT
+            286 RERAISE                  1
+ExceptionTable:
+  22 to 164 -> 264 [1] lasti
+  166 to 198 -> 254 [3]
+  202 to 228 -> 254 [3]
+  230 to 232 -> 264 [1] lasti
+  254 to 262 -> 264 [1] lasti
+  264 to 272 -> 282 [3] lasti
+
+Disassembly of <code object _post_is_due at 0x28bcc980, file "app\services\ai_scheduler.py", line 63>:
+ 63           0 RESUME                   0
+
+ 65           2 LOAD_FAST                0 (cfg)
+              4 LOAD_ATTR                0 (post_enabled)
+             24 POP_JUMP_IF_FALSE       12 (to 50)
+             26 LOAD_FAST                0 (cfg)
+             28 LOAD_ATTR                2 (engine_id)
+             48 POP_JUMP_IF_TRUE         1 (to 52)
+
+ 66     >>   50 RETURN_CONST             1 (False)
+
+ 67     >>   52 LOAD_FAST                0 (cfg)
+             54 LOAD_ATTR                4 (post_last_surfaced_date)
+             74 LOAD_GLOBAL              7 (NULL + _today_str)
+             84 LOAD_FAST                1 (now)
+             86 CALL                     1
+             94 COMPARE_OP              40 (==)
+             98 POP_JUMP_IF_FALSE        1 (to 102)
+
+ 68         100 RETURN_CONST             1 (False)
+
+ 69     >>  102 LOAD_FAST                0 (cfg)
+            104 LOAD_ATTR                8 (post_run_time)
+            124 COPY                     1
+            126 POP_JUMP_IF_TRUE         2 (to 132)
+            128 POP_TOP
+            130 LOAD_CONST               2 ('08:00')
+        >>  132 LOAD_ATTR               11 (NULL|self + strip)
+            152 CALL                     0
+            160 STORE_FAST               2 (run_time)
+
+ 70         162 NOP
+
+ 71         164 LOAD_FAST                2 (run_time)
+            166 LOAD_ATTR               13 (NULL|self + split)
+            186 LOAD_CONST               3 (':')
+            188 CALL                     1
+            196 UNPACK_SEQUENCE          2
+            200 STORE_FAST               3 (hh)
+            202 STORE_FAST               4 (mm)
+
+ 72         204 LOAD_GLOBAL             15 (NULL + int)
+            214 LOAD_FAST                3 (hh)
+            216 CALL                     1
+            224 LOAD_CONST               4 (60)
+            226 BINARY_OP                5 (*)
+            230 LOAD_GLOBAL             15 (NULL + int)
+            240 LOAD_FAST                4 (mm)
+            242 CALL                     1
+            250 BINARY_OP                0 (+)
+            254 STORE_FAST               5 (due_minutes)
+
+ 75     >>  256 LOAD_FAST                1 (now)
+            258 LOAD_ATTR               20 (hour)
+            278 LOAD_CONST               4 (60)
+            280 BINARY_OP                5 (*)
+            284 LOAD_FAST                1 (now)
+            286 LOAD_ATTR               22 (minute)
+            306 BINARY_OP                0 (+)
+            310 LOAD_FAST                5 (due_minutes)
+            312 COMPARE_OP              92 (>=)
+            316 RETURN_VALUE
+        >>  318 PUSH_EXC_INFO
+
+ 73         320 LOAD_GLOBAL             16 (ValueError)
+            330 LOAD_GLOBAL             18 (AttributeError)
+            340 BUILD_TUPLE              2
+            342 CHECK_EXC_MATCH
+            344 POP_JUMP_IF_FALSE        5 (to 356)
+            346 POP_TOP
+
+ 74         348 LOAD_CONST               5 (480)
+            350 STORE_FAST               5 (due_minutes)
+            352 POP_EXCEPT
+            354 JUMP_BACKWARD           50 (to 256)
+
+ 73     >>  356 RERAISE                  0
+        >>  358 COPY                     3
+            360 POP_EXCEPT
+            362 RERAISE                  1
+ExceptionTable:
+  164 to 254 -> 318 [0]
+  318 to 350 -> 358 [1] lasti
+  356 to 356 -> 358 [1] lasti
+
+Disassembly of <code object _due_post_channels at 0x7f6c9257fa50, file "app\services\ai_scheduler.py", line 78>:
+ 78           0 RESUME                   0
+
+ 79           2 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             12 CALL                     0
+             20 BEFORE_WITH
+             22 STORE_FAST               1 (db)
+
+ 80          24 LOAD_FAST                1 (db)
+             26 LOAD_ATTR                3 (NULL|self + query)
+             46 LOAD_GLOBAL              4 (ScheduleConfig)
+             56 CALL                     1
+             64 LOAD_ATTR                7 (NULL|self + filter)
+             84 LOAD_GLOBAL              4 (ScheduleConfig)
+             94 LOAD_ATTR                8 (post_enabled)
+            114 LOAD_CONST               1 (1)
+            116 COMPARE_OP              40 (==)
+            120 CALL                     1
+            128 LOAD_ATTR               11 (NULL|self + all)
+            148 CALL                     0
+            156 STORE_FAST               2 (rows)
+
+ 81         158 LOAD_FAST                2 (rows)
+            160 GET_ITER
+            162 LOAD_FAST_AND_CLEAR      3 (c)
+            164 SWAP                     2
+            166 BUILD_LIST               0
+            168 SWAP                     2
+        >>  170 FOR_ITER                27 (to 228)
+            174 STORE_FAST               3 (c)
+            176 LOAD_GLOBAL             13 (NULL + _post_is_due)
+            186 LOAD_FAST                3 (c)
+            188 LOAD_FAST                0 (now)
+            190 CALL                     2
+            198 POP_JUMP_IF_TRUE         1 (to 202)
+            200 JUMP_BACKWARD           16 (to 170)
+        >>  202 LOAD_FAST                3 (c)
+            204 LOAD_ATTR               14 (project_id)
+            224 LIST_APPEND              2
+            226 JUMP_BACKWARD           29 (to 170)
+        >>  228 END_FOR
+            230 SWAP                     2
+            232 STORE_FAST               3 (c)
+
+ 79         234 SWAP                     2
+            236 LOAD_CONST               0 (None)
+            238 LOAD_CONST               0 (None)
+            240 LOAD_CONST               0 (None)
+            242 CALL                     2
+            250 POP_TOP
+            252 RETURN_VALUE
+        >>  254 SWAP                     2
+            256 POP_TOP
+
+ 81         258 SWAP                     2
+            260 STORE_FAST               3 (c)
+            262 RERAISE                  0
+
+ 79     >>  264 PUSH_EXC_INFO
+            266 WITH_EXCEPT_START
+            268 POP_JUMP_IF_TRUE         1 (to 272)
+            270 RERAISE                  2
+        >>  272 POP_TOP
+            274 POP_EXCEPT
+            276 POP_TOP
+            278 POP_TOP
+            280 RETURN_CONST             0 (None)
+        >>  282 COPY                     3
+            284 POP_EXCEPT
+            286 RERAISE                  1
+ExceptionTable:
+  22 to 164 -> 264 [1] lasti
+  166 to 198 -> 254 [3]
+  202 to 228 -> 254 [3]
+  230 to 232 -> 264 [1] lasti
+  254 to 262 -> 264 [1] lasti
+  264 to 272 -> 282 [3] lasti
+
+Disassembly of <code object _mark_surfaced at 0x7f6c81b0b670, file "app\services\ai_scheduler.py", line 84>:
+ 84           0 RESUME                   0
+
+ 85           2 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             12 CALL                     0
+             20 BEFORE_WITH
+             22 STORE_FAST               2 (db)
+
+ 86          24 LOAD_FAST                2 (db)
+             26 LOAD_ATTR                3 (NULL|self + query)
+             46 LOAD_GLOBAL              4 (ScheduleConfig)
+             56 CALL                     1
+
+ 87          64 LOAD_ATTR                7 (NULL|self + filter)
+             84 LOAD_GLOBAL              4 (ScheduleConfig)
+             94 LOAD_ATTR                8 (project_id)
+            114 LOAD_FAST                0 (project_id)
+            116 COMPARE_OP              40 (==)
+            120 CALL                     1
+            128 LOAD_ATTR               11 (NULL|self + first)
+            148 CALL                     0
+
+ 86         156 STORE_FAST               3 (cfg)
+
+ 88         158 LOAD_FAST                3 (cfg)
+            160 POP_JUMP_IF_FALSE       23 (to 208)
+
+ 89         162 LOAD_FAST                1 (day)
+            164 LOAD_FAST                3 (cfg)
+            166 STORE_ATTR               6 (last_surfaced_date)
+
+ 90         176 LOAD_FAST                2 (db)
+            178 LOAD_ATTR               15 (NULL|self + commit)
+            198 CALL                     0
+            206 POP_TOP
+
+ 85     >>  208 LOAD_CONST               0 (None)
+            210 LOAD_CONST               0 (None)
+            212 LOAD_CONST               0 (None)
+            214 CALL                     2
+            222 POP_TOP
+            224 RETURN_CONST             0 (None)
+        >>  226 PUSH_EXC_INFO
+            228 WITH_EXCEPT_START
+            230 POP_JUMP_IF_TRUE         1 (to 234)
+            232 RERAISE                  2
+        >>  234 POP_TOP
+            236 POP_EXCEPT
+            238 POP_TOP
+            240 POP_TOP
+            242 RETURN_CONST             0 (None)
+        >>  244 COPY                     3
+            246 POP_EXCEPT
+            248 RERAISE                  1
+ExceptionTable:
+  22 to 206 -> 226 [1] lasti
+  226 to 234 -> 244 [3] lasti
+
+Disassembly of <code object _mark_post_surfaced at 0x7f6c81b0bbb0, file "app\services\ai_scheduler.py", line 93>:
+ 93           0 RESUME                   0
+
+ 94           2 LOAD_GLOBAL              1 (NULL + SessionLocal)
+             12 CALL                     0
+             20 BEFORE_WITH
+             22 STORE_FAST               2 (db)
+
+ 95          24 LOAD_FAST                2 (db)
+             26 LOAD_ATTR                3 (NULL|self + query)
+             46 LOAD_GLOBAL              4 (ScheduleConfig)
+             56 CALL                     1
+
+ 96          64 LOAD_ATTR                7 (NULL|self + filter)
+             84 LOAD_GLOBAL              4 (ScheduleConfig)
+             94 LOAD_ATTR                8 (project_id)
+            114 LOAD_FAST                0 (project_id)
+            116 COMPARE_OP              40 (==)
+            120 CALL                     1
+            128 LOAD_ATTR               11 (NULL|self + first)
+            148 CALL                     0
+
+ 95         156 STORE_FAST               3 (cfg)
+
+ 97         158 LOAD_FAST                3 (cfg)
+            160 POP_JUMP_IF_FALSE       23 (to 208)
+
+ 98         162 LOAD_FAST                1 (day)
+            164 LOAD_FAST                3 (cfg)
+            166 STORE_ATTR               6 (post_last_surfaced_date)
+
+ 99         176 LOAD_FAST                2 (db)
+            178 LOAD_ATTR               15 (NULL|self + commit)
+            198 CALL                     0
+            206 POP_TOP
+
+ 94     >>  208 LOAD_CONST               0 (None)
+            210 LOAD_CONST               0 (None)
+            212 LOAD_CONST               0 (None)
+            214 CALL                     2
+            222 POP_TOP
+            224 RETURN_CONST             0 (None)
+        >>  226 PUSH_EXC_INFO
+            228 WITH_EXCEPT_START
+            230 POP_JUMP_IF_TRUE         1 (to 234)
+            232 RERAISE                  2
+        >>  234 POP_TOP
+            236 POP_EXCEPT
+            238 POP_TOP
+            240 POP_TOP
+            242 RETURN_CONST             0 (None)
+        >>  244 COPY                     3
+            246 POP_EXCEPT
+            248 RERAISE                  1
+ExceptionTable:
+  22 to 206 -> 226 [1] lasti
+  226 to 234 -> 244 [3] lasti
+
+Disassembly of <code object run_tick_now at 0x28ab7ad0, file "app\services\ai_scheduler.py", line 102>:
+102           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+104           6 LOAD_GLOBAL              1 (NULL + datetime)
+             16 LOAD_ATTR                2 (now)
+             36 CALL                     0
+             44 STORE_FAST               0 (now)
+
+105          46 LOAD_GLOBAL              5 (NULL + _today_str)
+             56 LOAD_FAST                0 (now)
+             58 CALL                     1
+             66 STORE_FAST               1 (day)
+
+106          68 LOAD_GLOBAL              7 (NULL + _due_channels)
+             78 LOAD_FAST                0 (now)
+             80 CALL                     1
+             88 STORE_FAST               2 (due)
+
+107          90 BUILD_LIST               0
+             92 STORE_FAST               3 (surfaced)
+
+108          94 BUILD_MAP                0
+             96 STORE_FAST               4 (errors)
+
+109          98 LOAD_FAST                2 (due)
+            100 GET_ITER
+        >>  102 FOR_ITER               142 (to 390)
+            106 STORE_FAST               5 (pid)
+
+110         108 NOP
+
+111         110 LOAD_GLOBAL              9 (NULL + svc)
+            120 LOAD_ATTR               10 (ensure_next_idea)
+            140 LOAD_FAST                5 (pid)
+            142 CALL                     1
+            150 GET_AWAITABLE            0
+            152 LOAD_CONST               1 (None)
+        >>  154 SEND                     3 (to 164)
+            158 YIELD_VALUE              3
+            160 RESUME                   3
+            162 JUMP_BACKWARD_NO_INTERRUPT     5 (to 154)
+        >>  164 END_SEND
+            166 STORE_FAST               6 (idea)
+
+113         168 LOAD_GLOBAL             13 (NULL + _mark_surfaced)
+            178 LOAD_FAST                5 (pid)
+            180 LOAD_FAST                1 (day)
+            182 CALL                     2
+            190 POP_TOP
+
+114         192 LOAD_FAST                6 (idea)
+            194 POP_JUMP_IF_FALSE       96 (to 388)
+
+115         196 LOAD_FAST                3 (surfaced)
+            198 LOAD_ATTR               15 (NULL|self + append)
+            218 LOAD_FAST                5 (pid)
+            220 CALL                     1
+            228 POP_TOP
+
+116         230 LOAD_GLOBAL             17 (NULL + log)
+            240 LOAD_ATTR               18 (info)
+            260 LOAD_CONST               2 ('[ai_scheduler] kênh ')
+            262 LOAD_FAST                5 (pid)
+            264 FORMAT_VALUE             0
+            266 LOAD_CONST               3 (": surface ý tưởng mới '")
+            268 LOAD_FAST                6 (idea)
+            270 LOAD_CONST               4 ('payload')
+            272 BINARY_SUBSCR
+            276 LOAD_ATTR               21 (NULL|self + get)
+            296 LOAD_CONST               5 ('title')
+            298 CALL                     1
+            306 FORMAT_VALUE             0
+            308 LOAD_CONST               6 ("'")
+            310 BUILD_STRING             5
+            312 CALL                     1
+            320 POP_TOP
+
+118         322 NOP
+
+119         324 LOAD_CONST               7 (0)
+            326 LOAD_CONST               8 (('telegram_service',))
+            328 IMPORT_NAME             11 (app.services)
+            330 IMPORT_FROM             12 (telegram_service)
+            332 STORE_FAST               7 (telegram_service)
+            334 POP_TOP
+
+120         336 LOAD_FAST                7 (telegram_service)
+            338 LOAD_ATTR               27 (NULL|self + notify_new_idea)
+            358 LOAD_FAST                5 (pid)
+            360 LOAD_FAST                6 (idea)
+            362 CALL                     2
+            370 GET_AWAITABLE            0
+            372 LOAD_CONST               1 (None)
+        >>  374 SEND                     3 (to 384)
+            378 YIELD_VALUE              4
+            380 RESUME                   3
+            382 JUMP_BACKWARD_NO_INTERRUPT     5 (to 374)
+        >>  384 END_SEND
+            386 POP_TOP
+        >>  388 JUMP_BACKWARD          144 (to 102)
+
+109     >>  390 END_FOR
+
+128         392 LOAD_GLOBAL             35 (NULL + _due_post_channels)
+            402 LOAD_FAST                0 (now)
+            404 CALL                     1
+            412 STORE_FAST               9 (due_posts)
+
+129         414 BUILD_LIST               0
+            416 STORE_FAST              10 (posts_surfaced)
+
+130         418 LOAD_FAST                9 (due_posts)
+            420 GET_ITER
+        >>  422 FOR_ITER               142 (to 710)
+            426 STORE_FAST               5 (pid)
+
+131         428 NOP
+
+132         430 LOAD_GLOBAL             37 (NULL + posts)
+            440 LOAD_ATTR               38 (ensure_next_post)
+            460 LOAD_FAST                5 (pid)
+            462 CALL                     1
+            470 GET_AWAITABLE            0
+            472 LOAD_CONST               1 (None)
+        >>  474 SEND                     3 (to 484)
+            478 YIELD_VALUE              3
+            480 RESUME                   3
+            482 JUMP_BACKWARD_NO_INTERRUPT     5 (to 474)
+        >>  484 END_SEND
+            486 STORE_FAST              11 (post)
+
+133         488 LOAD_GLOBAL             41 (NULL + _mark_post_surfaced)
+            498 LOAD_FAST                5 (pid)
+            500 LOAD_FAST                1 (day)
+            502 CALL                     2
+            510 POP_TOP
+
+134         512 LOAD_FAST               11 (post)
+            514 POP_JUMP_IF_FALSE       96 (to 708)
+
+135         516 LOAD_FAST               10 (posts_surfaced)
+            518 LOAD_ATTR               15 (NULL|self + append)
+            538 LOAD_FAST                5 (pid)
+            540 CALL                     1
+            548 POP_TOP
+
+136         550 LOAD_GLOBAL             17 (NULL + log)
+            560 LOAD_ATTR               18 (info)
+            580 LOAD_CONST               2 ('[ai_scheduler] kênh ')
+            582 LOAD_FAST                5 (pid)
+            584 FORMAT_VALUE             0
+            586 LOAD_CONST              11 (": surface bài viết mới '")
+            588 LOAD_FAST               11 (post)
+            590 LOAD_CONST               4 ('payload')
+            592 BINARY_SUBSCR
+            596 LOAD_ATTR               21 (NULL|self + get)
+            616 LOAD_CONST              12 ('topic')
+            618 CALL                     1
+            626 FORMAT_VALUE             0
+            628 LOAD_CONST               6 ("'")
+            630 BUILD_STRING             5
+            632 CALL                     1
+            640 POP_TOP
+
+137         642 NOP
+
+138         644 LOAD_CONST               7 (0)
+            646 LOAD_CONST               8 (('telegram_service',))
+            648 IMPORT_NAME             11 (app.services)
+            650 IMPORT_FROM             12 (telegram_service)
+            652 STORE_FAST               7 (telegram_service)
+            654 POP_TOP
+
+139         656 LOAD_FAST                7 (telegram_service)
+            658 LOAD_ATTR               43 (NULL|self + notify_new_post)
+            678 LOAD_FAST                5 (pid)
+            680 LOAD_FAST               11 (post)
+            682 CALL                     2
+            690 GET_AWAITABLE            0
+            692 LOAD_CONST               1 (None)
+        >>  694 SEND                     3 (to 704)
+            698 YIELD_VALUE              4
+            700 RESUME                   3
+            702 JUMP_BACKWARD_NO_INTERRUPT     5 (to 694)
+        >>  704 END_SEND
+            706 POP_TOP
+        >>  708 JUMP_BACKWARD          144 (to 422)
+
+130     >>  710 END_FOR
+
+146         712 LOAD_GLOBAL             45 (NULL + fb_snapshot_daily)
+            722 LOAD_FAST                0 (now)
+            724 CALL                     1
+            732 GET_AWAITABLE            0
+            734 LOAD_CONST               1 (None)
+        >>  736 SEND                     3 (to 746)
+            740 YIELD_VALUE              2
+            742 RESUME                   3
+            744 JUMP_BACKWARD_NO_INTERRUPT     5 (to 736)
+        >>  746 END_SEND
+            748 STORE_FAST              12 (snapshots)
+
+147         750 LOAD_GLOBAL             47 (NULL + len)
+            760 LOAD_FAST                2 (due)
+            762 CALL                     1
+            770 LOAD_FAST                3 (surfaced)
+
+148         772 LOAD_GLOBAL             47 (NULL + len)
+            782 LOAD_FAST                9 (due_posts)
+            784 CALL                     1
+            792 LOAD_FAST               10 (posts_surfaced)
+
+149         794 LOAD_FAST               12 (snapshots)
+            796 LOAD_FAST                4 (errors)
+
+147         798 LOAD_CONST              16 (('checked', 'surfaced', 'posts_checked', 'posts_surfaced', 'snapshots', 'errors'))
+            800 BUILD_CONST_KEY_MAP      6
+            802 RETURN_VALUE
+
+111     >>  804 CLEANUP_THROW
+            806 EXTENDED_ARG             1
+            808 JUMP_BACKWARD          323 (to 164)
+
+120     >>  810 CLEANUP_THROW
+            812 JUMP_BACKWARD          215 (to 384)
+        >>  814 PUSH_EXC_INFO
+
+121         816 LOAD_GLOBAL             28 (Exception)
+            826 CHECK_EXC_MATCH
+            828 POP_JUMP_IF_FALSE       34 (to 898)
+            830 STORE_FAST               8 (e)
+
+122         832 LOAD_GLOBAL             17 (NULL + log)
+            842 LOAD_ATTR               30 (warning)
+            862 LOAD_CONST               9 ('[ai_scheduler] gửi Telegram lỗi (bỏ qua): ')
+            864 LOAD_FAST                8 (e)
+            866 FORMAT_VALUE             0
+            868 BUILD_STRING             2
+            870 CALL                     1
+            878 POP_TOP
+            880 POP_EXCEPT
+            882 LOAD_CONST               1 (None)
+            884 STORE_FAST               8 (e)
+            886 DELETE_FAST              8 (e)
+            888 JUMP_BACKWARD          251 (to 388)
+        >>  890 LOAD_CONST               1 (None)
+            892 STORE_FAST               8 (e)
+            894 DELETE_FAST              8 (e)
+            896 RERAISE                  1
+
+121     >>  898 RERAISE                  0
+        >>  900 COPY                     3
+            902 POP_EXCEPT
+            904 RERAISE                  1
+        >>  906 PUSH_EXC_INFO
+
+123         908 LOAD_GLOBAL             28 (Exception)
+            918 CHECK_EXC_MATCH
+            920 POP_JUMP_IF_FALSE       52 (to 1026)
+            922 STORE_FAST               8 (e)
+
+124         924 LOAD_GLOBAL             33 (NULL + str)
+            934 LOAD_FAST                8 (e)
+            936 CALL                     1
+            944 LOAD_FAST                4 (errors)
+            946 LOAD_FAST                5 (pid)
+            948 STORE_SUBSCR
+
+125         952 LOAD_GLOBAL             17 (NULL + log)
+            962 LOAD_ATTR               30 (warning)
+            982 LOAD_CONST               2 ('[ai_scheduler] kênh ')
+            984 LOAD_FAST                5 (pid)
+            986 FORMAT_VALUE             0
+            988 LOAD_CONST              10 (' lỗi khi surface: ')
+            990 LOAD_FAST                8 (e)
+            992 FORMAT_VALUE             0
+            994 BUILD_STRING             4
+            996 CALL                     1
+           1004 POP_TOP
+           1006 POP_EXCEPT
+           1008 LOAD_CONST               1 (None)
+           1010 STORE_FAST               8 (e)
+           1012 DELETE_FAST              8 (e)
+           1014 EXTENDED_ARG             1
+           1016 JUMP_BACKWARD          458 (to 102)
+        >> 1018 LOAD_CONST               1 (None)
+           1020 STORE_FAST               8 (e)
+           1022 DELETE_FAST              8 (e)
+           1024 RERAISE                  1
+
+123     >> 1026 RERAISE                  0
+        >> 1028 COPY                     3
+           1030 POP_EXCEPT
+           1032 RERAISE                  1
+
+132     >> 1034 CLEANUP_THROW
+           1036 EXTENDED_ARG             1
+           1038 JUMP_BACKWARD          278 (to 484)
+
+139     >> 1040 CLEANUP_THROW
+           1042 JUMP_BACKWARD          170 (to 704)
+        >> 1044 PUSH_EXC_INFO
+
+140        1046 LOAD_GLOBAL             28 (Exception)
+           1056 CHECK_EXC_MATCH
+           1058 POP_JUMP_IF_FALSE       34 (to 1128)
+           1060 STORE_FAST               8 (e)
+
+141        1062 LOAD_GLOBAL             17 (NULL + log)
+           1072 LOAD_ATTR               30 (warning)
+           1092 LOAD_CONST              13 ('[ai_scheduler] gửi Telegram (bài viết) lỗi (bỏ qua): ')
+           1094 LOAD_FAST                8 (e)
+           1096 FORMAT_VALUE             0
+           1098 BUILD_STRING             2
+           1100 CALL                     1
+           1108 POP_TOP
+           1110 POP_EXCEPT
+           1112 LOAD_CONST               1 (None)
+           1114 STORE_FAST               8 (e)
+           1116 DELETE_FAST              8 (e)
+           1118 JUMP_BACKWARD          206 (to 708)
+        >> 1120 LOAD_CONST               1 (None)
+           1122 STORE_FAST               8 (e)
+           1124 DELETE_FAST              8 (e)
+           1126 RERAISE                  1
+
+140     >> 1128 RERAISE                  0
+        >> 1130 COPY                     3
+           1132 POP_EXCEPT
+           1134 RERAISE                  1
+        >> 1136 PUSH_EXC_INFO
+
+142        1138 LOAD_GLOBAL             28 (Exception)
+           1148 CHECK_EXC_MATCH
+           1150 POP_JUMP_IF_FALSE       55 (to 1262)
+           1152 STORE_FAST               8 (e)
+
+143        1154 LOAD_GLOBAL             33 (NULL + str)
+           1164 LOAD_FAST                8 (e)
+           1166 CALL                     1
+           1174 LOAD_FAST                4 (errors)
+           1176 LOAD_CONST              14 ('post:')
+           1178 LOAD_FAST                5 (pid)
+           1180 FORMAT_VALUE             0
+           1182 BUILD_STRING             2
+           1184 STORE_SUBSCR
+
+144        1188 LOAD_GLOBAL             17 (NULL + log)
+           1198 LOAD_ATTR               30 (warning)
+           1218 LOAD_CONST               2 ('[ai_scheduler] kênh ')
+           1220 LOAD_FAST                5 (pid)
+           1222 FORMAT_VALUE             0
+           1224 LOAD_CONST              15 (' lỗi khi surface bài viết: ')
+           1226 LOAD_FAST                8 (e)
+           1228 FORMAT_VALUE             0
+           1230 BUILD_STRING             4
+           1232 CALL                     1
+           1240 POP_TOP
+           1242 POP_EXCEPT
+           1244 LOAD_CONST               1 (None)
+           1246 STORE_FAST               8 (e)
+           1248 DELETE_FAST              8 (e)
+           1250 EXTENDED_ARG             1
+           1252 JUMP_BACKWARD          416 (to 422)
+        >> 1254 LOAD_CONST               1 (None)
+           1256 STORE_FAST               8 (e)
+           1258 DELETE_FAST              8 (e)
+           1260 RERAISE                  1
+
+142     >> 1262 RERAISE                  0
+        >> 1264 COPY                     3
+           1266 POP_EXCEPT
+           1268 RERAISE                  1
+
+146     >> 1270 CLEANUP_THROW
+           1272 EXTENDED_ARG             1
+           1274 JUMP_BACKWARD          265 (to 746)
+        >> 1276 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1278 RERAISE                  1
+ExceptionTable:
+  4 to 106 -> 1276 [0] lasti
+  110 to 156 -> 906 [1]
+  158 to 158 -> 804 [3]
+  160 to 320 -> 906 [1]
+  324 to 376 -> 814 [1]
+  378 to 378 -> 810 [3]
+  380 to 386 -> 814 [1]
+  388 to 426 -> 1276 [0] lasti
+  430 to 476 -> 1136 [1]
+  478 to 478 -> 1034 [3]
+  480 to 640 -> 1136 [1]
+  644 to 696 -> 1044 [1]
+  698 to 698 -> 1040 [3]
+  700 to 706 -> 1044 [1]
+  708 to 738 -> 1276 [0] lasti
+  740 to 740 -> 1270 [2]
+  742 to 802 -> 1276 [0] lasti
+  804 to 804 -> 906 [1]
+  810 to 810 -> 814 [1]
+  814 to 830 -> 900 [2] lasti
+  832 to 878 -> 890 [2] lasti
+  880 to 888 -> 906 [1]
+  890 to 898 -> 900 [2] lasti
+  900 to 904 -> 906 [1]
+  906 to 922 -> 1028 [2] lasti
+  924 to 1004 -> 1018 [2] lasti
+  1006 to 1016 -> 1276 [0] lasti
+  1018 to 1026 -> 1028 [2] lasti
+  1028 to 1032 -> 1276 [0] lasti
+  1034 to 1034 -> 1136 [1]
+  1040 to 1040 -> 1044 [1]
+  1044 to 1060 -> 1130 [2] lasti
+  1062 to 1108 -> 1120 [2] lasti
+  1110 to 1118 -> 1136 [1]
+  1120 to 1128 -> 1130 [2] lasti
+  1130 to 1134 -> 1136 [1]
+  1136 to 1152 -> 1264 [2] lasti
+  1154 to 1240 -> 1254 [2] lasti
+  1242 to 1252 -> 1276 [0] lasti
+  1254 to 1262 -> 1264 [2] lasti
+  1264 to 1270 -> 1276 [0] lasti
+
+Disassembly of <code object fb_snapshot_daily at 0x28ab8610, file "app\services\ai_scheduler.py", line 152>:
+152           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+154           6 LOAD_FAST                0 (now)
+              8 COPY                     1
+             10 POP_JUMP_IF_TRUE        20 (to 52)
+             12 POP_TOP
+             14 LOAD_GLOBAL              1 (NULL + datetime)
+             24 LOAD_ATTR                2 (now)
+             44 CALL                     0
+        >>   52 STORE_FAST               1 (current)
+
+155          54 LOAD_FAST                1 (current)
+             56 LOAD_ATTR                5 (NULL|self + strftime)
+             76 LOAD_CONST               1 ('%Y-%m-%d')
+             78 CALL                     1
+             86 STORE_FAST               2 (day)
+
+156          88 LOAD_CONST               2 (0)
+             90 LOAD_CONST               2 (0)
+             92 BUILD_MAP                0
+             94 LOAD_CONST               3 (('captured', 'skipped', 'errors'))
+             96 BUILD_CONST_KEY_MAP      3
+             98 STORE_FAST               3 (summary)
+
+157         100 LOAD_GLOBAL              7 (NULL + SessionLocal)
+            110 CALL                     0
+            118 BEFORE_WITH
+            120 STORE_FAST               4 (db)
+
+158         122 LOAD_FAST                4 (db)
+            124 LOAD_ATTR                9 (NULL|self + query)
+            144 LOAD_GLOBAL             10 (FbPage)
+            154 CALL                     1
+            162 LOAD_ATTR               13 (NULL|self + filter)
+            182 LOAD_GLOBAL             10 (FbPage)
+            192 LOAD_ATTR               14 (status)
+            212 LOAD_CONST               4 ('active')
+            214 COMPARE_OP              40 (==)
+            218 CALL                     1
+            226 LOAD_ATTR               17 (NULL|self + all)
+            246 CALL                     0
+            254 STORE_FAST               5 (pages)
+
+159         256 LOAD_FAST                5 (pages)
+            258 GET_ITER
+        >>  260 EXTENDED_ARG             1
+            262 FOR_ITER               404 (to 1074)
+            266 STORE_FAST               6 (page)
+
+160         268 LOAD_FAST                4 (db)
+            270 LOAD_ATTR                9 (NULL|self + query)
+            290 LOAD_GLOBAL             18 (FbPageDailySnapshot)
+            300 LOAD_ATTR               20 (id)
+            320 CALL                     1
+            328 LOAD_ATTR               13 (NULL|self + filter)
+
+161         348 LOAD_GLOBAL             18 (FbPageDailySnapshot)
+            358 LOAD_ATTR               22 (fb_page_id)
+            378 LOAD_FAST                6 (page)
+            380 LOAD_ATTR               20 (id)
+            400 COMPARE_OP              40 (==)
+
+162         404 LOAD_GLOBAL             18 (FbPageDailySnapshot)
+            414 LOAD_ATTR               24 (snapshot_date)
+            434 LOAD_FAST                2 (day)
+            436 COMPARE_OP              40 (==)
+
+160         440 CALL                     2
+
+163         448 LOAD_ATTR               27 (NULL|self + first)
+            468 CALL                     0
+
+160         476 STORE_FAST               7 (exists)
+
+164         478 LOAD_FAST                7 (exists)
+            480 POP_JUMP_IF_FALSE       14 (to 510)
+
+165         482 LOAD_FAST                3 (summary)
+            484 LOAD_CONST               5 ('skipped')
+            486 COPY                     2
+            488 COPY                     2
+            490 BINARY_SUBSCR
+            494 LOAD_CONST               6 (1)
+            496 BINARY_OP               13 (+=)
+            500 SWAP                     3
+            502 SWAP                     2
+            504 STORE_SUBSCR
+
+166         508 JUMP_BACKWARD          125 (to 260)
+
+167     >>  510 NOP
+
+168         512 LOAD_GLOBAL             29 (NULL + fb_token_pool)
+            522 LOAD_ATTR               30 (peek_token)
+            542 LOAD_FAST                4 (db)
+            544 LOAD_FAST                6 (page)
+            546 LOAD_ATTR               32 (page_id)
+            566 CALL                     2
+            574 STORE_FAST               8 (token)
+
+169         576 LOAD_FAST                8 (token)
+            578 POP_JUMP_IF_NOT_NONE    11 (to 602)
+
+170         580 LOAD_GLOBAL             35 (NULL + RuntimeError)
+            590 LOAD_CONST               8 ('Không còn token hợp lệ')
+            592 CALL                     1
+            600 RAISE_VARARGS            1
+
+171     >>  602 LOAD_GLOBAL             29 (NULL + fb_token_pool)
+            612 LOAD_ATTR               36 (decrypt_token)
+            632 LOAD_FAST                4 (db)
+            634 LOAD_FAST                8 (token)
+            636 LOAD_ATTR               20 (id)
+            656 CALL                     2
+            664 STORE_FAST               9 (plain)
+
+172         666 LOAD_FAST                6 (page)
+            668 LOAD_ATTR               38 (proxy)
+            688 COPY                     1
+            690 POP_JUMP_IF_TRUE        26 (to 744)
+            692 POP_TOP
+            694 LOAD_GLOBAL             41 (NULL + fb_settings)
+            704 LOAD_ATTR               42 (get_str)
+            724 LOAD_FAST                4 (db)
+            726 LOAD_CONST               9 ('fb_proxy_global')
+            728 CALL                     2
+            736 COPY                     1
+            738 POP_JUMP_IF_TRUE         2 (to 744)
+            740 POP_TOP
+            742 LOAD_CONST               7 (None)
+        >>  744 STORE_FAST              10 (proxy)
+
+173         746 LOAD_GLOBAL             45 (NULL + FbGraphClient)
+            756 LOAD_FAST                9 (plain)
+            758 LOAD_FAST               10 (proxy)
+            760 KW_NAMES                10 (('proxy',))
+            762 CALL                     2
+            770 LOAD_ATTR               47 (NULL|self + get_page_stats)
+            790 LOAD_FAST                6 (page)
+            792 LOAD_ATTR               32 (page_id)
+            812 CALL                     1
+            820 GET_AWAITABLE            0
+            822 LOAD_CONST               7 (None)
+        >>  824 SEND                     3 (to 834)
+            828 YIELD_VALUE              4
+            830 RESUME                   3
+            832 JUMP_BACKWARD_NO_INTERRUPT     5 (to 824)
+        >>  834 END_SEND
+            836 STORE_FAST              11 (stats)
+
+174         838 LOAD_GLOBAL             49 (NULL + int)
+            848 LOAD_FAST               11 (stats)
+            850 LOAD_ATTR               51 (NULL|self + get)
+            870 LOAD_CONST              11 ('followers_count')
+            872 CALL                     1
+            880 COPY                     1
+            882 POP_JUMP_IF_TRUE         2 (to 888)
+            884 POP_TOP
+            886 LOAD_CONST               2 (0)
+        >>  888 CALL                     1
+            896 LOAD_FAST                6 (page)
+            898 STORE_ATTR              26 (followers_count)
+
+175         908 LOAD_GLOBAL             19 (NULL + FbPageDailySnapshot)
+
+176         918 LOAD_FAST                6 (page)
+            920 LOAD_ATTR               20 (id)
+
+177         940 LOAD_FAST                2 (day)
+
+178         942 LOAD_FAST                6 (page)
+            944 LOAD_ATTR               52 (followers_count)
+
+179         964 LOAD_FAST                1 (current)
+
+175         966 KW_NAMES                12 (('fb_page_id', 'snapshot_date', 'followers_count', 'captured_at'))
+            968 CALL                     4
+            976 STORE_FAST              12 (row)
+
+181         978 LOAD_FAST                4 (db)
+            980 LOAD_ATTR               55 (NULL|self + add)
+           1000 LOAD_FAST               12 (row)
+           1002 CALL                     1
+           1010 POP_TOP
+
+182        1012 LOAD_FAST                4 (db)
+           1014 LOAD_ATTR               57 (NULL|self + commit)
+           1034 CALL                     0
+           1042 POP_TOP
+
+183        1044 LOAD_FAST                3 (summary)
+           1046 LOAD_CONST              13 ('captured')
+           1048 COPY                     2
+           1050 COPY                     2
+           1052 BINARY_SUBSCR
+           1056 LOAD_CONST               6 (1)
+           1058 BINARY_OP               13 (+=)
+           1062 SWAP                     3
+           1064 SWAP                     2
+           1066 STORE_SUBSCR
+           1070 EXTENDED_ARG             1
+           1072 JUMP_BACKWARD          407 (to 260)
+
+159     >> 1074 END_FOR
+           1076 NOP
+
+157        1078 LOAD_CONST               7 (None)
+           1080 LOAD_CONST               7 (None)
+           1082 LOAD_CONST               7 (None)
+           1084 CALL                     2
+           1092 POP_TOP
+
+188        1094 LOAD_FAST                3 (summary)
+           1096 RETURN_VALUE
+
+173     >> 1098 CLEANUP_THROW
+           1100 JUMP_BACKWARD          134 (to 834)
+        >> 1102 PUSH_EXC_INFO
+
+184        1104 LOAD_GLOBAL             58 (Exception)
+           1114 CHECK_EXC_MATCH
+           1116 POP_JUMP_IF_FALSE       91 (to 1300)
+           1118 STORE_FAST              13 (exc)
+
+185        1120 LOAD_FAST                4 (db)
+           1122 LOAD_ATTR               61 (NULL|self + rollback)
+           1142 CALL                     0
+           1150 POP_TOP
+
+186        1152 LOAD_GLOBAL             63 (NULL + str)
+           1162 LOAD_FAST               13 (exc)
+           1164 CALL                     1
+           1172 LOAD_FAST                3 (summary)
+           1174 LOAD_CONST              14 ('errors')
+           1176 BINARY_SUBSCR
+           1180 LOAD_FAST                6 (page)
+           1182 LOAD_ATTR               20 (id)
+           1202 STORE_SUBSCR
+
+187        1206 LOAD_GLOBAL             65 (NULL + log)
+           1216 LOAD_ATTR               66 (warning)
+           1236 LOAD_CONST              15 ('[ai_scheduler] snapshot page ')
+           1238 LOAD_FAST                6 (page)
+           1240 LOAD_ATTR               20 (id)
+           1260 FORMAT_VALUE             0
+           1262 LOAD_CONST              16 (' lỗi: ')
+           1264 LOAD_FAST               13 (exc)
+           1266 FORMAT_VALUE             0
+           1268 BUILD_STRING             4
+           1270 CALL                     1
+           1278 POP_TOP
+           1280 POP_EXCEPT
+           1282 LOAD_CONST               7 (None)
+           1284 STORE_FAST              13 (exc)
+           1286 DELETE_FAST             13 (exc)
+           1288 EXTENDED_ARG             2
+           1290 JUMP_BACKWARD          516 (to 260)
+        >> 1292 LOAD_CONST               7 (None)
+           1294 STORE_FAST              13 (exc)
+           1296 DELETE_FAST             13 (exc)
+           1298 RERAISE                  1
+
+184     >> 1300 RERAISE                  0
+        >> 1302 COPY                     3
+           1304 POP_EXCEPT
+           1306 RERAISE                  1
+
+157     >> 1308 PUSH_EXC_INFO
+           1310 WITH_EXCEPT_START
+           1312 POP_JUMP_IF_TRUE         1 (to 1316)
+           1314 RERAISE                  2
+        >> 1316 POP_TOP
+           1318 POP_EXCEPT
+           1320 POP_TOP
+           1322 POP_TOP
+
+188        1324 LOAD_FAST                3 (summary)
+           1326 RETURN_VALUE
+        >> 1328 COPY                     3
+           1330 POP_EXCEPT
+           1332 RERAISE                  1
+        >> 1334 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+           1336 RERAISE                  1
+ExceptionTable:
+  4 to 118 -> 1334 [0] lasti
+  120 to 508 -> 1308 [1] lasti
+  512 to 826 -> 1102 [2]
+  828 to 828 -> 1098 [4]
+  830 to 1068 -> 1102 [2]
+  1070 to 1074 -> 1308 [1] lasti
+  1078 to 1096 -> 1334 [0] lasti
+  1098 to 1098 -> 1102 [2]
+  1102 to 1118 -> 1302 [3] lasti
+  1120 to 1278 -> 1292 [3] lasti
+  1280 to 1290 -> 1308 [1] lasti
+  1292 to 1300 -> 1302 [3] lasti
+  1302 to 1306 -> 1308 [1] lasti
+  1308 to 1316 -> 1328 [3] lasti
+  1318 to 1332 -> 1334 [0] lasti
+
+Disassembly of <code object _run_loop at 0x29090550, file "app\services\ai_scheduler.py", line 191>:
+191           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+192           6 LOAD_GLOBAL              0 (_stop)
+             16 POP_JUMP_IF_NOT_NONE     2 (to 22)
+             18 LOAD_ASSERTION_ERROR
+             20 RAISE_VARARGS            1
+
+193     >>   22 NOP
+
+194          24 LOAD_GLOBAL              3 (NULL + asyncio)
+             34 LOAD_ATTR                4 (wait_for)
+             54 LOAD_GLOBAL              0 (_stop)
+             64 LOAD_ATTR                7 (NULL|self + wait)
+             84 CALL                     0
+             92 LOAD_GLOBAL              8 (INITIAL_DELAY_SEC)
+            102 KW_NAMES                 1 (('timeout',))
+            104 CALL                     2
+            112 GET_AWAITABLE            0
+            114 LOAD_CONST               0 (None)
+        >>  116 SEND                     3 (to 126)
+            120 YIELD_VALUE              3
+            122 RESUME                   3
+            124 JUMP_BACKWARD_NO_INTERRUPT     5 (to 116)
+        >>  126 END_SEND
+            128 POP_TOP
+
+195         130 RETURN_CONST             0 (None)
+
+194     >>  132 CLEANUP_THROW
+            134 JUMP_BACKWARD            5 (to 126)
+        >>  136 PUSH_EXC_INFO
+
+196         138 LOAD_GLOBAL              2 (asyncio)
+            148 LOAD_ATTR               10 (TimeoutError)
+            168 CHECK_EXC_MATCH
+            170 POP_JUMP_IF_FALSE        3 (to 178)
+            172 POP_TOP
+
+197         174 POP_EXCEPT
+            176 JUMP_FORWARD             4 (to 186)
+
+196     >>  178 RERAISE                  0
+        >>  180 COPY                     3
+            182 POP_EXCEPT
+            184 RERAISE                  1
+
+198     >>  186 LOAD_GLOBAL              0 (_stop)
+            196 LOAD_ATTR               13 (NULL|self + is_set)
+            216 CALL                     0
+            224 POP_JUMP_IF_TRUE       170 (to 566)
+
+199     >>  226 NOP
+
+200         228 LOAD_GLOBAL             15 (NULL + run_tick_now)
+            238 CALL                     0
+            246 GET_AWAITABLE            0
+            248 LOAD_CONST               0 (None)
+        >>  250 SEND                     4 (to 262)
+            254 YIELD_VALUE              3
+            256 RESUME                   3
+            258 JUMP_BACKWARD_NO_INTERRUPT     5 (to 250)
+        >>  260 CLEANUP_THROW
+        >>  262 END_SEND
+            264 POP_TOP
+            266 JUMP_FORWARD            46 (to 360)
+        >>  268 PUSH_EXC_INFO
+
+201         270 LOAD_GLOBAL             16 (Exception)
+            280 CHECK_EXC_MATCH
+            282 POP_JUMP_IF_FALSE       34 (to 352)
+            284 STORE_FAST               0 (e)
+
+202         286 LOAD_GLOBAL             19 (NULL + log)
+            296 LOAD_ATTR               20 (warning)
+            316 LOAD_CONST               2 ('[ai_scheduler] tick lỗi: ')
+            318 LOAD_FAST                0 (e)
+            320 FORMAT_VALUE             0
+            322 BUILD_STRING             2
+            324 CALL                     1
+            332 POP_TOP
+            334 POP_EXCEPT
+            336 LOAD_CONST               0 (None)
+            338 STORE_FAST               0 (e)
+            340 DELETE_FAST              0 (e)
+            342 JUMP_FORWARD             8 (to 360)
+        >>  344 LOAD_CONST               0 (None)
+            346 STORE_FAST               0 (e)
+            348 DELETE_FAST              0 (e)
+            350 RERAISE                  1
+
+201     >>  352 RERAISE                  0
+        >>  354 COPY                     3
+            356 POP_EXCEPT
+            358 RERAISE                  1
+
+203     >>  360 NOP
+
+204         362 LOAD_GLOBAL              3 (NULL + asyncio)
+            372 LOAD_ATTR                4 (wait_for)
+            392 LOAD_GLOBAL              0 (_stop)
+            402 LOAD_ATTR                7 (NULL|self + wait)
+            422 CALL                     0
+            430 LOAD_GLOBAL             22 (TICK_INTERVAL_SEC)
+            440 KW_NAMES                 1 (('timeout',))
+            442 CALL                     2
+            450 GET_AWAITABLE            0
+            452 LOAD_CONST               0 (None)
+        >>  454 SEND                     4 (to 466)
+            458 YIELD_VALUE              3
+            460 RESUME                   3
+            462 JUMP_BACKWARD_NO_INTERRUPT     5 (to 454)
+        >>  464 CLEANUP_THROW
+        >>  466 END_SEND
+            468 POP_TOP
+            470 JUMP_FORWARD            25 (to 522)
+        >>  472 PUSH_EXC_INFO
+
+205         474 LOAD_GLOBAL              2 (asyncio)
+            484 LOAD_ATTR               10 (TimeoutError)
+            504 CHECK_EXC_MATCH
+            506 POP_JUMP_IF_FALSE        3 (to 514)
+            508 POP_TOP
+
+206         510 POP_EXCEPT
+            512 JUMP_BACKWARD          164 (to 186)
+
+205     >>  514 RERAISE                  0
+        >>  516 COPY                     3
+            518 POP_EXCEPT
+            520 RERAISE                  1
+
+198     >>  522 LOAD_GLOBAL              0 (_stop)
+            532 LOAD_ATTR               13 (NULL|self + is_set)
+            552 CALL                     0
+            560 POP_JUMP_IF_TRUE         1 (to 564)
+            562 JUMP_BACKWARD          169 (to 226)
+        >>  564 RETURN_CONST             0 (None)
+        >>  566 RETURN_CONST             0 (None)
+        >>  568 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            570 RERAISE                  1
+ExceptionTable:
+  4 to 20 -> 568 [0] lasti
+  24 to 118 -> 136 [0]
+  120 to 120 -> 132 [2]
+  122 to 128 -> 136 [0]
+  130 to 130 -> 568 [0] lasti
+  132 to 132 -> 136 [0]
+  136 to 172 -> 180 [1] lasti
+  174 to 176 -> 568 [0] lasti
+  178 to 178 -> 180 [1] lasti
+  180 to 224 -> 568 [0] lasti
+  228 to 252 -> 268 [0]
+  254 to 254 -> 260 [2]
+  256 to 264 -> 268 [0]
+  266 to 266 -> 568 [0] lasti
+  268 to 284 -> 354 [1] lasti
+  286 to 332 -> 344 [1] lasti
+  334 to 342 -> 568 [0] lasti
+  344 to 352 -> 354 [1] lasti
+  354 to 358 -> 568 [0] lasti
+  362 to 456 -> 472 [0]
+  458 to 458 -> 464 [2]
+  460 to 468 -> 472 [0]
+  470 to 470 -> 568 [0] lasti
+  472 to 508 -> 516 [1] lasti
+  510 to 512 -> 568 [0] lasti
+  514 to 514 -> 516 [1] lasti
+  516 to 560 -> 568 [0] lasti
+  564 to 566 -> 568 [0] lasti
+
+Disassembly of <code object _run_publish_loop at 0x28b9bf10, file "app\services\ai_scheduler.py", line 209>:
+209           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+211           6 LOAD_GLOBAL              0 (_stop)
+             16 POP_JUMP_IF_NOT_NONE     2 (to 22)
+             18 LOAD_ASSERTION_ERROR
+             20 RAISE_VARARGS            1
+
+212     >>   22 NOP
+
+213          24 LOAD_GLOBAL              3 (NULL + asyncio)
+             34 LOAD_ATTR                4 (wait_for)
+             54 LOAD_GLOBAL              0 (_stop)
+             64 LOAD_ATTR                7 (NULL|self + wait)
+             84 CALL                     0
+             92 LOAD_GLOBAL              8 (INITIAL_DELAY_SEC)
+            102 KW_NAMES                 2 (('timeout',))
+            104 CALL                     2
+            112 GET_AWAITABLE            0
+            114 LOAD_CONST               1 (None)
+        >>  116 SEND                     3 (to 126)
+            120 YIELD_VALUE              3
+            122 RESUME                   3
+            124 JUMP_BACKWARD_NO_INTERRUPT     5 (to 116)
+        >>  126 END_SEND
+            128 POP_TOP
+
+214         130 RETURN_CONST             1 (None)
+
+213     >>  132 CLEANUP_THROW
+            134 JUMP_BACKWARD            5 (to 126)
+        >>  136 PUSH_EXC_INFO
+
+215         138 LOAD_GLOBAL              2 (asyncio)
+            148 LOAD_ATTR               10 (TimeoutError)
+            168 CHECK_EXC_MATCH
+            170 POP_JUMP_IF_FALSE        3 (to 178)
+            172 POP_TOP
+
+216         174 POP_EXCEPT
+            176 JUMP_FORWARD             4 (to 186)
+
+215     >>  178 RERAISE                  0
+        >>  180 COPY                     3
+            182 POP_EXCEPT
+            184 RERAISE                  1
+
+217     >>  186 LOAD_GLOBAL              0 (_stop)
+            196 LOAD_ATTR               13 (NULL|self + is_set)
+            216 CALL                     0
+            224 EXTENDED_ARG             1
+            226 POP_JUMP_IF_TRUE       295 (to 818)
+
+218     >>  228 NOP
+
+219         230 LOAD_GLOBAL             14 (_publish_lock)
+            240 BEFORE_ASYNC_WITH
+            242 GET_AWAITABLE            1
+            244 LOAD_CONST               1 (None)
+        >>  246 SEND                     4 (to 258)
+            250 YIELD_VALUE              3
+            252 RESUME                   3
+            254 JUMP_BACKWARD_NO_INTERRUPT     5 (to 246)
+        >>  256 CLEANUP_THROW
+        >>  258 END_SEND
+            260 POP_TOP
+
+220         262 LOAD_GLOBAL             17 (NULL + fb_publish_service)
+            272 LOAD_ATTR               18 (publish_due)
+            292 CALL                     0
+            300 GET_AWAITABLE            0
+            302 LOAD_CONST               1 (None)
+        >>  304 SEND                     4 (to 316)
+            308 YIELD_VALUE              4
+            310 RESUME                   3
+            312 JUMP_BACKWARD_NO_INTERRUPT     5 (to 304)
+        >>  314 CLEANUP_THROW
+        >>  316 END_SEND
+            318 STORE_FAST               0 (summary)
+
+221         320 LOAD_FAST                0 (summary)
+            322 LOAD_ATTR               21 (NULL|self + get)
+            342 LOAD_CONST               3 ('posted')
+            344 CALL                     1
+            352 POP_JUMP_IF_TRUE        17 (to 388)
+            354 LOAD_FAST                0 (summary)
+            356 LOAD_ATTR               21 (NULL|self + get)
+            376 LOAD_CONST               4 ('recovered')
+            378 CALL                     1
+            386 POP_JUMP_IF_FALSE       24 (to 436)
+
+222     >>  388 LOAD_GLOBAL             23 (NULL + log)
+            398 LOAD_ATTR               24 (info)
+            418 LOAD_CONST               5 ('[ai_scheduler] publish: ')
+            420 LOAD_FAST                0 (summary)
+            422 FORMAT_VALUE             0
+            424 BUILD_STRING             2
+            426 CALL                     1
+            434 POP_TOP
+
+219     >>  436 LOAD_CONST               1 (None)
+            438 LOAD_CONST               1 (None)
+            440 LOAD_CONST               1 (None)
+            442 CALL                     2
+            450 GET_AWAITABLE            2
+            452 LOAD_CONST               1 (None)
+        >>  454 SEND                     4 (to 466)
+            458 YIELD_VALUE              3
+            460 RESUME                   3
+            462 JUMP_BACKWARD_NO_INTERRUPT     5 (to 454)
+        >>  464 CLEANUP_THROW
+        >>  466 END_SEND
+            468 POP_TOP
+            470 JUMP_FORWARD            21 (to 514)
+        >>  472 PUSH_EXC_INFO
+            474 WITH_EXCEPT_START
+            476 GET_AWAITABLE            2
+            478 LOAD_CONST               1 (None)
+        >>  480 SEND                     4 (to 492)
+            484 YIELD_VALUE              4
+            486 RESUME                   3
+            488 JUMP_BACKWARD_NO_INTERRUPT     5 (to 480)
+        >>  490 CLEANUP_THROW
+        >>  492 END_SEND
+            494 POP_JUMP_IF_TRUE         1 (to 498)
+            496 RERAISE                  2
+        >>  498 POP_TOP
+            500 POP_EXCEPT
+            502 POP_TOP
+            504 POP_TOP
+            506 JUMP_FORWARD             3 (to 514)
+        >>  508 COPY                     3
+            510 POP_EXCEPT
+            512 RERAISE                  1
+        >>  514 JUMP_FORWARD            46 (to 608)
+        >>  516 PUSH_EXC_INFO
+
+223         518 LOAD_GLOBAL             26 (Exception)
+            528 CHECK_EXC_MATCH
+            530 POP_JUMP_IF_FALSE       34 (to 600)
+            532 STORE_FAST               1 (e)
+
+224         534 LOAD_GLOBAL             23 (NULL + log)
+            544 LOAD_ATTR               28 (warning)
+            564 LOAD_CONST               6 ('[ai_scheduler] publish tick lỗi: ')
+            566 LOAD_FAST                1 (e)
+            568 FORMAT_VALUE             0
+            570 BUILD_STRING             2
+            572 CALL                     1
+            580 POP_TOP
+            582 POP_EXCEPT
+            584 LOAD_CONST               1 (None)
+            586 STORE_FAST               1 (e)
+            588 DELETE_FAST              1 (e)
+            590 JUMP_FORWARD             8 (to 608)
+        >>  592 LOAD_CONST               1 (None)
+            594 STORE_FAST               1 (e)
+            596 DELETE_FAST              1 (e)
+            598 RERAISE                  1
+
+223     >>  600 RERAISE                  0
+        >>  602 COPY                     3
+            604 POP_EXCEPT
+            606 RERAISE                  1
+
+225     >>  608 NOP
+
+226         610 LOAD_GLOBAL              3 (NULL + asyncio)
+            620 LOAD_ATTR                4 (wait_for)
+            640 LOAD_GLOBAL              0 (_stop)
+            650 LOAD_ATTR                7 (NULL|self + wait)
+            670 CALL                     0
+            678 LOAD_GLOBAL             30 (PUBLISH_TICK_INTERVAL_SEC)
+            688 KW_NAMES                 2 (('timeout',))
+            690 CALL                     2
+            698 GET_AWAITABLE            0
+            700 LOAD_CONST               1 (None)
+        >>  702 SEND                     4 (to 714)
+            706 YIELD_VALUE              3
+            708 RESUME                   3
+            710 JUMP_BACKWARD_NO_INTERRUPT     5 (to 702)
+        >>  712 CLEANUP_THROW
+        >>  714 END_SEND
+            716 POP_TOP
+            718 JUMP_FORWARD            26 (to 772)
+        >>  720 PUSH_EXC_INFO
+
+227         722 LOAD_GLOBAL              2 (asyncio)
+            732 LOAD_ATTR               10 (TimeoutError)
+            752 CHECK_EXC_MATCH
+            754 POP_JUMP_IF_FALSE        4 (to 764)
+            756 POP_TOP
+
+228         758 POP_EXCEPT
+            760 EXTENDED_ARG             1
+            762 JUMP_BACKWARD          289 (to 186)
+
+227     >>  764 RERAISE                  0
+        >>  766 COPY                     3
+            768 POP_EXCEPT
+            770 RERAISE                  1
+
+217     >>  772 LOAD_GLOBAL              0 (_stop)
+            782 LOAD_ATTR               13 (NULL|self + is_set)
+            802 CALL                     0
+            810 POP_JUMP_IF_TRUE         2 (to 816)
+            812 EXTENDED_ARG             1
+            814 JUMP_BACKWARD          294 (to 228)
+        >>  816 RETURN_CONST             1 (None)
+        >>  818 RETURN_CONST             1 (None)
+        >>  820 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            822 RERAISE                  1
+ExceptionTable:
+  4 to 20 -> 820 [0] lasti
+  24 to 118 -> 136 [0]
+  120 to 120 -> 132 [2]
+  122 to 128 -> 136 [0]
+  130 to 130 -> 820 [0] lasti
+  132 to 132 -> 136 [0]
+  136 to 172 -> 180 [1] lasti
+  174 to 176 -> 820 [0] lasti
+  178 to 178 -> 180 [1] lasti
+  180 to 226 -> 820 [0] lasti
+  230 to 248 -> 516 [0]
+  250 to 250 -> 256 [3]
+  252 to 258 -> 516 [0]
+  260 to 306 -> 472 [1] lasti
+  308 to 308 -> 314 [3]
+  310 to 434 -> 472 [1] lasti
+  436 to 456 -> 516 [0]
+  458 to 458 -> 464 [2]
+  460 to 470 -> 516 [0]
+  472 to 482 -> 508 [3] lasti
+  484 to 484 -> 490 [6]
+  486 to 498 -> 508 [3] lasti
+  500 to 512 -> 516 [0]
+  514 to 514 -> 820 [0] lasti
+  516 to 532 -> 602 [1] lasti
+  534 to 580 -> 592 [1] lasti
+  582 to 590 -> 820 [0] lasti
+  592 to 600 -> 602 [1] lasti
+  602 to 606 -> 820 [0] lasti
+  610 to 704 -> 720 [0]
+  706 to 706 -> 712 [2]
+  708 to 716 -> 720 [0]
+  718 to 718 -> 820 [0] lasti
+  720 to 756 -> 766 [1] lasti
+  758 to 762 -> 820 [0] lasti
+  764 to 764 -> 766 [1] lasti
+  766 to 810 -> 820 [0] lasti
+  816 to 818 -> 820 [0] lasti
+
+Disassembly of <code object start at 0x7f6c9257fc30, file "app\services\ai_scheduler.py", line 231>:
+231           0 RESUME                   0
+
+234           2 LOAD_GLOBAL              0 (_task)
+             12 POP_JUMP_IF_NONE        21 (to 56)
+             14 LOAD_GLOBAL              0 (_task)
+             24 LOAD_ATTR                3 (NULL|self + done)
+             44 CALL                     0
+             52 POP_JUMP_IF_TRUE         1 (to 56)
+
+235          54 RETURN_CONST             1 (None)
+
+236     >>   56 LOAD_GLOBAL              5 (NULL + asyncio)
+             66 LOAD_ATTR                6 (Event)
+             86 CALL                     0
+             94 STORE_GLOBAL             4 (_stop)
+
+237          96 LOAD_GLOBAL              5 (NULL + asyncio)
+            106 LOAD_ATTR               10 (create_task)
+            126 LOAD_GLOBAL             13 (NULL + _run_loop)
+            136 CALL                     0
+            144 CALL                     1
+            152 STORE_GLOBAL             0 (_task)
+
+238         154 LOAD_GLOBAL              5 (NULL + asyncio)
+            164 LOAD_ATTR               10 (create_task)
+            184 LOAD_GLOBAL             15 (NULL + _run_publish_loop)
+            194 CALL                     0
+            202 CALL                     1
+            210 STORE_GLOBAL             8 (_publish_task)
+
+239         212 LOAD_GLOBAL             19 (NULL + log)
+            222 LOAD_ATTR               20 (info)
+            242 LOAD_CONST               2 ('[ai_scheduler] đã khởi động (surface mỗi ')
+            244 LOAD_GLOBAL             22 (TICK_INTERVAL_SEC)
+            254 FORMAT_VALUE             0
+            256 LOAD_CONST               3 ('s, publish mỗi ')
+            258 LOAD_GLOBAL             24 (PUBLISH_TICK_INTERVAL_SEC)
+            268 FORMAT_VALUE             0
+            270 LOAD_CONST               4 ('s).')
+            272 BUILD_STRING             5
+            274 CALL                     1
+            282 POP_TOP
+            284 RETURN_CONST             1 (None)
+
+Disassembly of <code object stop at 0x28ba88f0, file "app\services\ai_scheduler.py", line 242>:
+242           0 RETURN_GENERATOR
+              2 POP_TOP
+              4 RESUME                   0
+
+245           6 LOAD_GLOBAL              0 (_stop)
+             16 POP_JUMP_IF_NONE        20 (to 58)
+
+246          18 LOAD_GLOBAL              0 (_stop)
+             28 LOAD_ATTR                3 (NULL|self + set)
+             48 CALL                     0
+             56 POP_TOP
+
+247     >>   58 LOAD_GLOBAL              4 (_task)
+             68 LOAD_GLOBAL              6 (_publish_task)
+             78 BUILD_TUPLE              2
+             80 GET_ITER
+        >>   82 FOR_ITER                37 (to 160)
+             86 STORE_FAST               0 (t)
+
+248          88 LOAD_FAST                0 (t)
+             90 POP_JUMP_IF_NOT_NONE     1 (to 94)
+             92 JUMP_BACKWARD            6 (to 82)
+
+249     >>   94 NOP
+
+250          96 LOAD_GLOBAL              9 (NULL + asyncio)
+            106 LOAD_ATTR               10 (wait_for)
+            126 LOAD_FAST                0 (t)
+            128 LOAD_CONST               2 (5)
+            130 KW_NAMES                 3 (('timeout',))
+            132 CALL                     2
+            140 GET_AWAITABLE            0
+            142 LOAD_CONST               1 (None)
+        >>  144 SEND                     3 (to 154)
+            148 YIELD_VALUE              3
+            150 RESUME                   3
+            152 JUMP_BACKWARD_NO_INTERRUPT     5 (to 144)
+        >>  154 END_SEND
+            156 POP_TOP
+            158 JUMP_BACKWARD           39 (to 82)
+
+247     >>  160 END_FOR
+
+253         162 LOAD_CONST               1 (None)
+            164 STORE_GLOBAL             2 (_task)
+
+254         166 LOAD_CONST               1 (None)
+            168 STORE_GLOBAL             3 (_publish_task)
+
+255         170 LOAD_GLOBAL             19 (NULL + log)
+            180 LOAD_ATTR               20 (info)
+            200 LOAD_CONST               4 ('[ai_scheduler] đã dừng.')
+            202 CALL                     1
+            210 POP_TOP
+            212 RETURN_CONST             1 (None)
+
+250     >>  214 CLEANUP_THROW
+            216 JUMP_BACKWARD           32 (to 154)
+        >>  218 PUSH_EXC_INFO
+
+251         220 LOAD_GLOBAL              8 (asyncio)
+            230 LOAD_ATTR               12 (TimeoutError)
+            250 LOAD_GLOBAL              8 (asyncio)
+            260 LOAD_ATTR               14 (CancelledError)
+            280 BUILD_TUPLE              2
+            282 CHECK_EXC_MATCH
+            284 POP_JUMP_IF_FALSE       19 (to 324)
+            286 POP_TOP
+
+252         288 LOAD_FAST                0 (t)
+            290 LOAD_ATTR               17 (NULL|self + cancel)
+            310 CALL                     0
+            318 POP_TOP
+            320 POP_EXCEPT
+            322 JUMP_BACKWARD          121 (to 82)
+
+251     >>  324 RERAISE                  0
+        >>  326 COPY                     3
+            328 POP_EXCEPT
+            330 RERAISE                  1
+        >>  332 CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+            334 RERAISE                  1
+ExceptionTable:
+  4 to 90 -> 332 [0] lasti
+  96 to 146 -> 218 [1]
+  148 to 148 -> 214 [3]
+  150 to 156 -> 218 [1]
+  158 to 212 -> 332 [0] lasti
+  214 to 214 -> 218 [1]
+  218 to 318 -> 326 [2] lasti
+  320 to 322 -> 332 [0] lasti
+  324 to 324 -> 326 [2] lasti
+  326 to 330 -> 332 [0] lasti

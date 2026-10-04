@@ -1,0 +1,210 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Logging: ghi ra file + (tuỳ chọn) đẩy log.line qua EventBus.')
+              4 STORE_NAME               0 (__doc__)
+
+  2           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+  4          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (None)
+             22 IMPORT_NAME              3 (logging)
+             24 STORE_NAME               3 (logging)
+
+  5          26 LOAD_CONST               1 (0)
+             28 LOAD_CONST               3 (None)
+             30 IMPORT_NAME              4 (sys)
+             32 STORE_NAME               4 (sys)
+
+  7          34 LOAD_CONST               1 (0)
+             36 LOAD_CONST               4 (('get_settings',))
+             38 IMPORT_NAME              5 (app.config)
+             40 IMPORT_FROM              6 (get_settings)
+             42 STORE_NAME               6 (get_settings)
+             44 POP_TOP
+
+ 10          46 LOAD_CONST               5 ('video_studio_file')
+             48 STORE_NAME               7 (_FILE_HANDLER_MARKER)
+
+ 13          50 LOAD_CONST               8 (('return', 'logging.Logger'))
+             52 LOAD_CONST               6 (<code object setup_logging at 0x26a24140, file "app\core\logging.py", line 13>)
+             54 MAKE_FUNCTION            4 (annotations)
+             56 STORE_NAME               8 (setup_logging)
+
+ 28          58 LOAD_CONST               9 ((None,))
+             60 LOAD_CONST              10 (('logger', 'logging.Logger | None', 'return', 'logging.Logger'))
+             62 LOAD_CONST               7 (<code object configure_file_logging at 0x290bc360, file "app\core\logging.py", line 28>)
+             64 MAKE_FUNCTION            5 (defaults, annotations)
+             66 STORE_NAME               9 (configure_file_logging)
+
+ 47          68 PUSH_NULL
+             70 LOAD_NAME                8 (setup_logging)
+             72 CALL                     0
+             80 STORE_NAME              10 (log)
+             82 RETURN_CONST             3 (None)
+
+Disassembly of <code object setup_logging at 0x26a24140, file "app\core\logging.py", line 13>:
+ 13           0 RESUME                   0
+
+ 14           2 LOAD_GLOBAL              1 (NULL + logging)
+             12 LOAD_ATTR                2 (getLogger)
+             32 LOAD_CONST               1 ('video-studio')
+             34 CALL                     1
+             42 STORE_FAST               0 (logger)
+
+ 15          44 LOAD_FAST                0 (logger)
+             46 LOAD_ATTR                4 (handlers)
+             66 POP_JUMP_IF_TRUE       122 (to 312)
+
+ 16          68 LOAD_FAST                0 (logger)
+             70 LOAD_ATTR                7 (NULL|self + setLevel)
+             90 LOAD_GLOBAL              0 (logging)
+            100 LOAD_ATTR                8 (INFO)
+            120 CALL                     1
+            128 POP_TOP
+
+ 18         130 LOAD_GLOBAL              1 (NULL + logging)
+            140 LOAD_ATTR               10 (Formatter)
+            160 LOAD_CONST               2 ('%(asctime)s [%(levelname)s] %(message)s')
+            162 LOAD_CONST               3 ('%H:%M:%S')
+            164 CALL                     2
+            172 STORE_FAST               1 (fmt)
+
+ 20         174 LOAD_GLOBAL              1 (NULL + logging)
+            184 LOAD_ATTR               12 (StreamHandler)
+            204 LOAD_GLOBAL             14 (sys)
+            214 LOAD_ATTR               16 (stdout)
+            234 CALL                     1
+            242 STORE_FAST               2 (sh)
+
+ 21         244 LOAD_FAST                2 (sh)
+            246 LOAD_ATTR               19 (NULL|self + setFormatter)
+            266 LOAD_FAST                1 (fmt)
+            268 CALL                     1
+            276 POP_TOP
+
+ 22         278 LOAD_FAST                0 (logger)
+            280 LOAD_ATTR               21 (NULL|self + addHandler)
+            300 LOAD_FAST                2 (sh)
+            302 CALL                     1
+            310 POP_TOP
+
+ 24     >>  312 LOAD_GLOBAL             23 (NULL + configure_file_logging)
+            322 LOAD_FAST                0 (logger)
+            324 CALL                     1
+            332 POP_TOP
+
+ 25         334 LOAD_FAST                0 (logger)
+            336 RETURN_VALUE
+
+Disassembly of <code object configure_file_logging at 0x290bc360, file "app\core\logging.py", line 28>:
+ 28           0 RESUME                   0
+
+ 29           2 LOAD_FAST                0 (logger)
+              4 COPY                     1
+              6 POP_JUMP_IF_TRUE        21 (to 50)
+              8 POP_TOP
+             10 LOAD_GLOBAL              1 (NULL + logging)
+             20 LOAD_ATTR                2 (getLogger)
+             40 LOAD_CONST               1 ('video-studio')
+             42 CALL                     1
+        >>   50 STORE_FAST               0 (logger)
+
+ 30          52 LOAD_GLOBAL              1 (NULL + logging)
+             62 LOAD_ATTR                4 (Formatter)
+             82 LOAD_CONST               2 ('%(asctime)s [%(levelname)s] %(message)s')
+             84 LOAD_CONST               3 ('%H:%M:%S')
+             86 CALL                     2
+             94 STORE_FAST               1 (fmt)
+
+ 32          96 LOAD_GLOBAL              7 (NULL + list)
+            106 LOAD_FAST                0 (logger)
+            108 LOAD_ATTR                8 (handlers)
+            128 CALL                     1
+            136 GET_ITER
+        >>  138 FOR_ITER                53 (to 248)
+            142 STORE_FAST               2 (handler)
+
+ 33         144 LOAD_GLOBAL             11 (NULL + getattr)
+            154 LOAD_FAST                2 (handler)
+            156 LOAD_GLOBAL             12 (_FILE_HANDLER_MARKER)
+            166 LOAD_CONST               4 (False)
+            168 CALL                     3
+            176 POP_JUMP_IF_TRUE         1 (to 180)
+            178 JUMP_BACKWARD           21 (to 138)
+
+ 34     >>  180 LOAD_FAST                0 (logger)
+            182 LOAD_ATTR               15 (NULL|self + removeHandler)
+            202 LOAD_FAST                2 (handler)
+            204 CALL                     1
+            212 POP_TOP
+
+ 35         214 LOAD_FAST                2 (handler)
+            216 LOAD_ATTR               17 (NULL|self + close)
+            236 CALL                     0
+            244 POP_TOP
+            246 JUMP_BACKWARD           55 (to 138)
+
+ 32     >>  248 END_FOR
+
+ 37         250 NOP
+
+ 38         252 LOAD_GLOBAL              1 (NULL + logging)
+            262 LOAD_ATTR               18 (FileHandler)
+            282 LOAD_GLOBAL             21 (NULL + get_settings)
+            292 CALL                     0
+            300 LOAD_ATTR               22 (data_dir)
+            320 LOAD_CONST               5 ('logs')
+            322 BINARY_OP               11 (/)
+            326 LOAD_CONST               6 ('backend.log')
+            328 BINARY_OP               11 (/)
+            332 LOAD_CONST               7 ('utf-8')
+            334 KW_NAMES                 8 (('encoding',))
+            336 CALL                     2
+            344 STORE_FAST               3 (fh)
+
+ 39         346 LOAD_FAST                3 (fh)
+            348 LOAD_ATTR               25 (NULL|self + setFormatter)
+            368 LOAD_FAST                1 (fmt)
+            370 CALL                     1
+            378 POP_TOP
+
+ 40         380 LOAD_GLOBAL             27 (NULL + setattr)
+            390 LOAD_FAST                3 (fh)
+            392 LOAD_GLOBAL             12 (_FILE_HANDLER_MARKER)
+            402 LOAD_CONST               9 (True)
+            404 CALL                     3
+            412 POP_TOP
+
+ 41         414 LOAD_FAST                0 (logger)
+            416 LOAD_ATTR               29 (NULL|self + addHandler)
+            436 LOAD_FAST                3 (fh)
+            438 CALL                     1
+            446 POP_TOP
+
+ 44         448 LOAD_FAST                0 (logger)
+            450 RETURN_VALUE
+        >>  452 PUSH_EXC_INFO
+
+ 42         454 LOAD_GLOBAL             30 (Exception)
+            464 CHECK_EXC_MATCH
+            466 POP_JUMP_IF_FALSE        4 (to 476)
+            468 POP_TOP
+
+ 43         470 POP_EXCEPT
+
+ 44         472 LOAD_FAST                0 (logger)
+            474 RETURN_VALUE
+
+ 42     >>  476 RERAISE                  0
+        >>  478 COPY                     3
+            480 POP_EXCEPT
+            482 RERAISE                  1
+ExceptionTable:
+  252 to 446 -> 452 [0]
+  452 to 468 -> 478 [1] lasti
+  476 to 476 -> 478 [1] lasti

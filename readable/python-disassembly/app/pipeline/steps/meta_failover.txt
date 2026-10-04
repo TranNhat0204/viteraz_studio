@@ -1,0 +1,371 @@
+  0           0 RESUME                   0
+
+  1           2 LOAD_CONST               0 ('Bộ chọn tài khoản Meta AI + tự xoay vòng khi hết quota NGÀY (dùng cho meta_generate).\n\nProvider thứ 2 cho ảnh/video — TÁCH HẲN khỏi Flow (mirror FlowFailover, dùng MetaSessionClient +\nmeta_account_service). Kịch bản:\n  - Bảng meta_accounts RỖNG  → chế độ 1-tài-khoản: `account_id=None` (partition Electron mặc định).\n  - Có tài khoản, còn ít nhất 1 cái dùng được → chọn account đó, mọi request bridge đính account_id.\n  - Có tài khoản nhưng TẤT CẢ đã hết quota ngày → `exhausted_all=True` (caller dùng placeholder ngay).\n  - Đang chạy gặp META_QUOTA → `on_quota()` khoá account hiện tại tới nửa đêm rồi chuyển account khác.\n')
+              4 STORE_NAME               0 (__doc__)
+
+ 10           6 LOAD_CONST               1 (0)
+              8 LOAD_CONST               2 (('annotations',))
+             10 IMPORT_NAME              1 (__future__)
+             12 IMPORT_FROM              2 (annotations)
+             14 STORE_NAME               2 (annotations)
+             16 POP_TOP
+
+ 12          18 LOAD_CONST               1 (0)
+             20 LOAD_CONST               3 (('MetaSessionClient',))
+             22 IMPORT_NAME              3 (app.adapters.meta_session)
+             24 IMPORT_FROM              4 (MetaSessionClient)
+             26 STORE_NAME               4 (MetaSessionClient)
+             28 POP_TOP
+
+ 13          30 LOAD_CONST               1 (0)
+             32 LOAD_CONST               4 (('SessionLocal',))
+             34 IMPORT_NAME              5 (app.db.session)
+             36 IMPORT_FROM              6 (SessionLocal)
+             38 STORE_NAME               6 (SessionLocal)
+             40 POP_TOP
+
+ 14          42 LOAD_CONST               1 (0)
+             44 LOAD_CONST               5 (('meta_account_service',))
+             46 IMPORT_NAME              7 (app.services)
+             48 IMPORT_FROM              8 (meta_account_service)
+             50 STORE_NAME               9 (meta_acct)
+             52 POP_TOP
+
+ 17          54 PUSH_NULL
+             56 LOAD_BUILD_CLASS
+             58 LOAD_CONST               6 (<code object MetaFailover at 0x7f6c930b88b0, file "app\pipeline\steps\meta_failover.py", line 17>)
+             60 MAKE_FUNCTION            0
+             62 LOAD_CONST               7 ('MetaFailover')
+             64 CALL                     2
+             72 STORE_NAME              10 (MetaFailover)
+             74 RETURN_CONST             8 (None)
+
+Disassembly of <code object MetaFailover at 0x7f6c930b88b0, file "app\pipeline\steps\meta_failover.py", line 17>:
+ 17           0 RESUME                   0
+              2 LOAD_NAME                0 (__name__)
+              4 STORE_NAME               1 (__module__)
+              6 LOAD_CONST               0 ('MetaFailover')
+              8 STORE_NAME               2 (__qualname__)
+
+ 18          10 LOAD_CONST               9 ((None,))
+             12 LOAD_CONST              10 (('project_key', 'str | None', 'return', 'None'))
+             14 LOAD_CONST               2 (<code object __init__ at 0x290b6ec0, file "app\pipeline\steps\meta_failover.py", line 18>)
+             16 MAKE_FUNCTION            5 (defaults, annotations)
+             18 STORE_NAME               3 (__init__)
+
+ 36          20 LOAD_CONST              11 (('return', 'None'))
+             22 LOAD_CONST               3 (<code object _adopt at 0x7f6c92b4b0f0, file "app\pipeline\steps\meta_failover.py", line 36>)
+             24 MAKE_FUNCTION            4 (annotations)
+             26 STORE_NAME               4 (_adopt)
+
+ 40          28 LOAD_NAME                5 (property)
+
+ 41          30 LOAD_CONST              12 (('return', 'bool'))
+             32 LOAD_CONST               4 (<code object exhausted_all at 0x7f6c92fd6730, file "app\pipeline\steps\meta_failover.py", line 40>)
+             34 MAKE_FUNCTION            4 (annotations)
+
+ 40          36 CALL                     0
+
+ 41          44 STORE_NAME               6 (exhausted_all)
+
+ 47          46 LOAD_CONST              13 (('mark_quota', 'bool', 'return', 'bool'))
+             48 LOAD_CONST               5 (<code object _switch at 0x290e3bd0, file "app\pipeline\steps\meta_failover.py", line 47>)
+             50 MAKE_FUNCTION            4 (annotations)
+             52 STORE_NAME               7 (_switch)
+
+ 69          54 LOAD_CONST              12 (('return', 'bool'))
+             56 LOAD_CONST               6 (<code object on_quota at 0x7f6c930943f0, file "app\pipeline\steps\meta_failover.py", line 69>)
+             58 MAKE_FUNCTION            4 (annotations)
+             60 STORE_NAME               8 (on_quota)
+
+ 73          62 LOAD_CONST              12 (('return', 'bool'))
+             64 LOAD_CONST               7 (<code object on_rate_limit at 0x7f6c930966a0, file "app\pipeline\steps\meta_failover.py", line 73>)
+             66 MAKE_FUNCTION            4 (annotations)
+             68 STORE_NAME               9 (on_rate_limit)
+
+ 77          70 LOAD_CONST              12 (('return', 'bool'))
+             72 LOAD_CONST               8 (<code object on_auth at 0x7f6c930947b0, file "app\pipeline\steps\meta_failover.py", line 77>)
+             74 MAKE_FUNCTION            4 (annotations)
+             76 STORE_NAME              10 (on_auth)
+             78 RETURN_CONST             1 (None)
+
+Disassembly of <code object __init__ at 0x290b6ec0, file "app\pipeline\steps\meta_failover.py", line 18>:
+ 18           0 RESUME                   0
+
+ 19           2 LOAD_GLOBAL              1 (NULL + set)
+             12 CALL                     0
+             20 LOAD_FAST                0 (self)
+             22 STORE_ATTR               1 (tried)
+
+ 20          32 LOAD_CONST               1 (False)
+             34 LOAD_FAST                0 (self)
+             36 STORE_ATTR               2 (multi)
+
+ 21          46 LOAD_CONST               0 (None)
+             48 LOAD_FAST                0 (self)
+             50 STORE_ATTR               3 (account_id)
+
+ 22          60 LOAD_CONST               2 ('mặc định')
+             62 LOAD_FAST                0 (self)
+             64 STORE_ATTR               4 (label)
+
+ 23          74 LOAD_CONST               1 (False)
+             76 LOAD_FAST                0 (self)
+             78 STORE_ATTR               5 (exhausted)
+
+ 24          88 LOAD_FAST                1 (project_key)
+             90 LOAD_FAST                0 (self)
+             92 STORE_ATTR               6 (project_key)
+
+ 25         102 LOAD_GLOBAL             15 (NULL + SessionLocal)
+            112 CALL                     0
+            120 BEFORE_WITH
+            122 STORE_FAST               2 (db)
+
+ 26         124 LOAD_GLOBAL             17 (NULL + meta_acct)
+            134 LOAD_ATTR               18 (list_accounts)
+            154 LOAD_FAST                2 (db)
+            156 CALL                     1
+            164 POP_JUMP_IF_FALSE       87 (to 340)
+
+ 27         166 LOAD_CONST               3 (True)
+            168 LOAD_FAST                0 (self)
+            170 STORE_ATTR               2 (multi)
+
+ 28         180 LOAD_GLOBAL             17 (NULL + meta_acct)
+            190 LOAD_ATTR               20 (next_available)
+            210 LOAD_FAST                2 (db)
+            212 CALL                     1
+            220 STORE_FAST               3 (acc)
+
+ 29         222 LOAD_FAST                3 (acc)
+            224 POP_JUMP_IF_NONE        50 (to 326)
+
+ 30         226 LOAD_FAST                0 (self)
+            228 LOAD_ATTR               23 (NULL|self + _adopt)
+            248 LOAD_FAST                3 (acc)
+            250 CALL                     1
+            258 POP_TOP
+
+ 31         260 LOAD_GLOBAL             17 (NULL + meta_acct)
+            270 LOAD_ATTR               24 (mark_used)
+            290 LOAD_FAST                2 (db)
+            292 LOAD_FAST                3 (acc)
+            294 LOAD_ATTR               26 (partition_id)
+            314 CALL                     2
+            322 POP_TOP
+            324 JUMP_FORWARD             7 (to 340)
+
+ 33     >>  326 LOAD_CONST               3 (True)
+            328 LOAD_FAST                0 (self)
+            330 STORE_ATTR               5 (exhausted)
+
+ 25     >>  340 LOAD_CONST               0 (None)
+            342 LOAD_CONST               0 (None)
+            344 LOAD_CONST               0 (None)
+            346 CALL                     2
+            354 POP_TOP
+
+ 34     >>  356 LOAD_GLOBAL             29 (NULL + MetaSessionClient)
+            366 LOAD_FAST                0 (self)
+            368 LOAD_ATTR                6 (account_id)
+            388 LOAD_FAST                1 (project_key)
+            390 KW_NAMES                 4 (('account_id', 'project_key'))
+            392 CALL                     2
+            400 LOAD_FAST                0 (self)
+            402 STORE_ATTR              15 (client)
+            412 RETURN_CONST             0 (None)
+
+ 25     >>  414 PUSH_EXC_INFO
+            416 WITH_EXCEPT_START
+            418 POP_JUMP_IF_TRUE         1 (to 422)
+            420 RERAISE                  2
+        >>  422 POP_TOP
+            424 POP_EXCEPT
+            426 POP_TOP
+            428 POP_TOP
+            430 JUMP_BACKWARD           38 (to 356)
+        >>  432 COPY                     3
+            434 POP_EXCEPT
+            436 RERAISE                  1
+ExceptionTable:
+  122 to 338 -> 414 [1] lasti
+  414 to 422 -> 432 [3] lasti
+
+Disassembly of <code object _adopt at 0x7f6c92b4b0f0, file "app\pipeline\steps\meta_failover.py", line 36>:
+ 36           0 RESUME                   0
+
+ 37           2 LOAD_FAST                1 (acc)
+              4 LOAD_ATTR                0 (partition_id)
+             24 LOAD_FAST                0 (self)
+             26 STORE_ATTR               1 (account_id)
+
+ 38          36 LOAD_FAST                1 (acc)
+             38 LOAD_ATTR                4 (email)
+             58 COPY                     1
+             60 POP_JUMP_IF_TRUE        26 (to 114)
+             62 POP_TOP
+             64 LOAD_FAST                1 (acc)
+             66 LOAD_ATTR                6 (label)
+             86 COPY                     1
+             88 POP_JUMP_IF_TRUE        12 (to 114)
+             90 POP_TOP
+             92 LOAD_FAST                1 (acc)
+             94 LOAD_ATTR                0 (partition_id)
+        >>  114 LOAD_FAST                0 (self)
+            116 STORE_ATTR               3 (label)
+            126 RETURN_CONST             0 (None)
+
+Disassembly of <code object exhausted_all at 0x7f6c92fd6730, file "app\pipeline\steps\meta_failover.py", line 40>:
+ 40           0 RESUME                   0
+
+ 43           2 LOAD_FAST                0 (self)
+              4 LOAD_ATTR                0 (multi)
+             24 POP_JUMP_IF_FALSE       12 (to 50)
+
+ 44          26 LOAD_FAST                0 (self)
+             28 LOAD_ATTR                2 (exhausted)
+             48 RETURN_VALUE
+
+ 45     >>   50 RETURN_CONST             1 (False)
+
+Disassembly of <code object _switch at 0x290e3bd0, file "app\pipeline\steps\meta_failover.py", line 47>:
+ 47           0 RESUME                   0
+
+ 53           2 LOAD_FAST                0 (self)
+              4 LOAD_ATTR                0 (multi)
+             24 POP_JUMP_IF_TRUE         1 (to 28)
+
+ 54          26 RETURN_CONST             1 (False)
+
+ 55     >>   28 LOAD_GLOBAL              3 (NULL + SessionLocal)
+             38 CALL                     0
+             46 BEFORE_WITH
+             48 STORE_FAST               2 (db)
+
+ 56          50 LOAD_FAST                0 (self)
+             52 LOAD_ATTR                4 (account_id)
+             72 POP_JUMP_IF_FALSE       71 (to 216)
+
+ 57          74 LOAD_FAST                1 (mark_quota)
+             76 POP_JUMP_IF_FALSE       32 (to 142)
+
+ 58          78 LOAD_GLOBAL              7 (NULL + meta_acct)
+             88 LOAD_ATTR                8 (mark_exhausted)
+            108 LOAD_FAST                2 (db)
+            110 LOAD_FAST                0 (self)
+            112 LOAD_ATTR                4 (account_id)
+            132 CALL                     2
+            140 POP_TOP
+
+ 59     >>  142 LOAD_FAST                0 (self)
+            144 LOAD_ATTR               10 (tried)
+            164 LOAD_ATTR               13 (NULL|self + add)
+            184 LOAD_FAST                0 (self)
+            186 LOAD_ATTR                4 (account_id)
+            206 CALL                     1
+            214 POP_TOP
+
+ 60     >>  216 LOAD_GLOBAL              7 (NULL + meta_acct)
+            226 LOAD_ATTR               14 (next_available)
+            246 LOAD_FAST                2 (db)
+            248 LOAD_FAST                0 (self)
+            250 LOAD_ATTR               10 (tried)
+            270 KW_NAMES                 2 (('exclude',))
+            272 CALL                     2
+            280 STORE_FAST               3 (nxt)
+
+ 61         282 LOAD_FAST                3 (nxt)
+            284 POP_JUMP_IF_NOT_NONE    17 (to 320)
+
+ 62         286 LOAD_CONST               4 (True)
+            288 LOAD_FAST                0 (self)
+            290 STORE_ATTR               8 (exhausted)
+
+ 63         300 NOP
+
+ 55         302 LOAD_CONST               3 (None)
+            304 LOAD_CONST               3 (None)
+            306 LOAD_CONST               3 (None)
+            308 CALL                     2
+            316 POP_TOP
+            318 RETURN_CONST             1 (False)
+
+ 64     >>  320 LOAD_FAST                0 (self)
+            322 LOAD_ATTR               19 (NULL|self + _adopt)
+            342 LOAD_FAST                3 (nxt)
+            344 CALL                     1
+            352 POP_TOP
+
+ 65         354 LOAD_GLOBAL              7 (NULL + meta_acct)
+            364 LOAD_ATTR               20 (mark_used)
+            384 LOAD_FAST                2 (db)
+            386 LOAD_FAST                3 (nxt)
+            388 LOAD_ATTR               22 (partition_id)
+            408 CALL                     2
+            416 POP_TOP
+
+ 55         418 LOAD_CONST               3 (None)
+            420 LOAD_CONST               3 (None)
+            422 LOAD_CONST               3 (None)
+            424 CALL                     2
+            432 POP_TOP
+
+ 66     >>  434 LOAD_GLOBAL             25 (NULL + MetaSessionClient)
+            444 LOAD_FAST                0 (self)
+            446 LOAD_ATTR                4 (account_id)
+            466 LOAD_FAST                0 (self)
+            468 LOAD_ATTR               26 (project_key)
+            488 KW_NAMES                 5 (('account_id', 'project_key'))
+            490 CALL                     2
+            498 LOAD_FAST                0 (self)
+            500 STORE_ATTR              14 (client)
+
+ 67         510 RETURN_CONST             4 (True)
+
+ 55     >>  512 PUSH_EXC_INFO
+            514 WITH_EXCEPT_START
+            516 POP_JUMP_IF_TRUE         1 (to 520)
+            518 RERAISE                  2
+        >>  520 POP_TOP
+            522 POP_EXCEPT
+            524 POP_TOP
+            526 POP_TOP
+            528 JUMP_BACKWARD           48 (to 434)
+        >>  530 COPY                     3
+            532 POP_EXCEPT
+            534 RERAISE                  1
+ExceptionTable:
+  48 to 300 -> 512 [1] lasti
+  320 to 416 -> 512 [1] lasti
+  512 to 520 -> 530 [3] lasti
+
+Disassembly of <code object on_quota at 0x7f6c930943f0, file "app\pipeline\steps\meta_failover.py", line 69>:
+ 69           0 RESUME                   0
+
+ 71           2 LOAD_FAST                0 (self)
+              4 LOAD_ATTR                1 (NULL|self + _switch)
+             24 LOAD_CONST               1 (True)
+             26 KW_NAMES                 2 (('mark_quota',))
+             28 CALL                     1
+             36 RETURN_VALUE
+
+Disassembly of <code object on_rate_limit at 0x7f6c930966a0, file "app\pipeline\steps\meta_failover.py", line 73>:
+ 73           0 RESUME                   0
+
+ 75           2 LOAD_FAST                0 (self)
+              4 LOAD_ATTR                1 (NULL|self + _switch)
+             24 LOAD_CONST               1 (False)
+             26 KW_NAMES                 2 (('mark_quota',))
+             28 CALL                     1
+             36 RETURN_VALUE
+
+Disassembly of <code object on_auth at 0x7f6c930947b0, file "app\pipeline\steps\meta_failover.py", line 77>:
+ 77           0 RESUME                   0
+
+ 79           2 LOAD_FAST                0 (self)
+              4 LOAD_ATTR                1 (NULL|self + _switch)
+             24 LOAD_CONST               1 (False)
+             26 KW_NAMES                 2 (('mark_quota',))
+             28 CALL                     1
+             36 RETURN_VALUE
